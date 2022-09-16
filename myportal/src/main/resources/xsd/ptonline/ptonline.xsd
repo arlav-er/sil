@@ -1,0 +1,157 @@
+<xs:schema xmlns="http://pattoonline.ws.myportal.eng.it/"
+	elementFormDefault="qualified"
+	targetNamespace="http://pattoonline.ws.myportal.eng.it/" version="1.0"
+	xmlns:tns="http://pattoonline.ws.myportal.eng.it/"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+               jaxb:version="2.0"
+			   xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    jaxb:extensionBindingPrefixes="xjc">
+	<!-- Types -->
+	<xs:complexType name="PattoType">
+		<xs:sequence>
+			<xs:element name="CodiceFiscale"
+				type="CodiceFiscaleType" />
+			<xs:element name="DataPatto" type="xs:date" />
+			<xs:element minOccurs="1" maxOccurs="1"
+				name="CodServiziAmministrativi">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="1" maxOccurs="1"
+				name="NumProtocollo">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="1" maxOccurs="1"
+				name="AnnoProtocollo" type="xs:integer" />
+			<xs:element minOccurs="1" maxOccurs="1"
+				name="CodProvinciaProv">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	
+
+			
+
+			
+	<xs:simpleType name="CodiceFiscaleType">
+		<xs:annotation>
+			<xs:appinfo>
+				<jaxb:class name="CodiceFiscaleType" />
+				
+				
+				<!--
+				<jaxb:property>
+					<jaxb:baseType>
+						<jaxb:javaType name="CodiceFiscaleType"
+							parseMethod="it.eng.myportal.ws.pattoonline.RegexParser.parseRegex" 
+							printMethod="it.eng.myportal.ws.pattoonline.RegexParser.printRegex" />
+					</jaxb:baseType>
+				</jaxb:property>
+				-->
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern
+				value="[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]" />
+			<xs:pattern value="[0-9]{11}" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="PattoPortaleType">
+		<xs:sequence>
+			<xs:element name="Patto" type="tns:PattoType" />
+			<xs:element minOccurs="0" name="AccettazionePatto"
+				type="tns:AccettazionePattoType" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PattoAccettatoType">
+		<xs:sequence>
+			<xs:element name="Patto" type="tns:PattoType" />
+			<xs:element name="AccettazionePatto"
+				type="tns:AccettazionePattoType" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	
+	
+	<xs:annotation>
+    <xs:appinfo>
+        <jaxb:bindings node="//xs:complexType[@name='AccettazionePattoType']//xs:element[@name='TipoAccettazione']//xs:simpleType">
+            <jaxb:typesafeEnumClass name="TipoAccettazioneEnum">
+                <jaxb:typesafeEnumMember value="OTP" name = "OTP"  />
+            </jaxb:typesafeEnumClass>
+        </jaxb:bindings>              
+    </xs:appinfo>
+</xs:annotation>
+	
+	<xs:complexType name="AccettazionePattoType">
+		<xs:sequence>
+			<xs:element name="DtmAccettazione" type="xs:dateTime" />
+			<xs:element name="TipoAccettazione">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="OTP" />
+						<xs:enumeration value="SPID" />
+						<xs:enumeration value="CIE" />
+						<xs:enumeration value="RV" />
+						<xs:enumeration value="SMS" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EsitoType">
+		<xs:sequence>
+			<xs:element name="Esito">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="OK" />
+						<xs:enumeration value="KO" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element minOccurs="0" name="Descrizione">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="InvioPatto" type="tns:InvioPatto" />
+	<xs:complexType name="InvioPatto">
+		<xs:sequence>
+			<xs:element name="Patto" type="tns:PattoType" />
+			<xs:element name="PDFPatto" type="xs:base64Binary" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="InvioPattoResponse" type="tns:EsitoType" />
+	<xs:element name="RichiestaPatto" type="tns:RichiestaPatto" />
+	<xs:complexType name="RichiestaPatto">
+		<xs:sequence>
+			<xs:element name="Patto" type="tns:PattoType" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="RichiestaPattoResponse"
+		type="tns:ResponsePatto" />
+	<xs:complexType name="ResponsePatto">
+		<xs:sequence>
+			<xs:element name="PattoPortale"
+				type="tns:PattoPortaleType" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

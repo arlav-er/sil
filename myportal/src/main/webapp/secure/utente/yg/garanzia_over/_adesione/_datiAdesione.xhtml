@@ -1,0 +1,102 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui">
+	<fieldset>
+		<legend>Dati adesione</legend>
+		<table style="border-spacing: 1.5em;">
+			<tr>
+				<td>
+					<p:outputLabel value="Data adesione a Umbriattiva Adulti" />
+					<br />
+					<h:outputText value="#{ygOverAdesioneBean.dataNewAdesione}">
+						<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+					</h:outputText>
+				</td>
+			</tr>
+			<ui:fragment rendered="#{ygOverAdesioneBean.isDomicilioFuoriRegione()}">
+				<tr>
+					<td>
+						<p:outputLabel for="provRiferimentoInput" value="Provincia di riferimento" />
+						<br />
+						<p:selectOneMenu id="provRiferimentoInput" required="true"
+							value="#{ygOverAdesioneBean.utente.utenteInfo.provinciaRiferimento}"
+							converter="deProvinciaDTOConverter" 
+							requiredMessage="La provincia di riferimento è obbligatoria">
+							<f:selectItem itemLabel=" -- " itemValue="" />
+							<f:selectItems value="#{ygOverAdesioneBean.provinciaRiferimentoList}" var="prov"
+							itemLabel="#{prov.descrizione}" itemValue="#{prov}" />
+							<p:ajax process="@this" update="@this cpiRiferimentoInput" 
+								listener="#{ygOverAdesioneBean.aggiornaCpiRiferimentoList}"/>
+						</p:selectOneMenu>
+						<br />
+						<p:message for="provRiferimentoInput" />
+					</td>
+					<td>
+						<p:outputLabel for="cpiRiferimentoInput" value="CPI di riferimento" />
+						<br />
+						<p:selectOneMenu id="cpiRiferimentoInput" required="true"
+							value="#{ygOverAdesioneBean.newAdesioneCpi}" converter="deCpiDTOConverter" 
+							requiredMessage="Il CPI di riferimento è obbligatorio"
+							disabled="#{empty ygOverAdesioneBean.utente.utenteInfo.provinciaRiferimento}">
+							<f:selectItem itemLabel=" -- " itemValue="" />
+							<f:selectItems value="#{ygOverAdesioneBean.cpiRiferimentoList}" var="cpi"
+							itemLabel="#{cpi.descrizione}" itemValue="#{cpi}" />
+						</p:selectOneMenu>
+						<br/>
+						<p:message for="cpiRiferimentoInput" />
+					</td>
+				</tr>
+			</ui:fragment>
+			<tr>
+				<td colspan="2">
+					<p:outputLabel for="smsNotificaInput"
+						value="Acconsento a ricevere messaggi SMS di notifica al numero indicato" />
+					<br />
+					<p:selectOneButton id="smsNotificaInput" required="true"
+						value="#{ygOverAdesioneBean.utente.utenteInfo.flgConsensoSms}"
+						requiredMessage="Questa dichiarazione è obbligatoria">
+						<f:selectItem itemLabel="Sì" itemValue="true" />
+						<f:selectItem itemLabel="No" itemValue="false" />
+						<p:ajax process="@this" update="@this cellulareInput @(.ui-outputlabel)" />
+					</p:selectOneButton>
+					<br />
+					<p:message for="smsNotificaInput" />
+				</td>
+				<td colspan="2">
+				<div style="display: none;">
+					<p:outputLabel for="ammortizzatoriInput"
+						value="Dichiaro di essere percettore di ammortizzatori" />
+					<h:outputText id="ammortizzatoriInfo" styleClass="ui-icon ui-icon-info" 
+						style="display: inline-block;"/>
+					<p:tooltip id="ammortizzatoriTooltip" for="ammortizzatoriInfo" position="bottom">
+						<h:outputText value="I percettori di ammortizzatori sociali sono coloro che percepiscono:" />
+						<br />
+						<h:outputText value="- l'indennità Nuova Assicurazione Sociale per l'Impiego (Naspi);" />
+						<br />
+						<h:outputText value="- l'indennità di mobilità ex l. 223/91." />
+					</p:tooltip>
+					<br />
+					<p:selectOneButton id="ammortizzatoriInput" required="false"
+						value="#{ygOverAdesioneBean.newAdesioneAmmortizzatori}"
+						requiredMessage="Questa dichiarazione è obbligatoria">
+						<f:selectItem itemLabel="Sì" itemValue="true" />
+						<f:selectItem itemLabel="No" itemValue="false" />
+						<p:ajax process="@this" update="@this" />
+					</p:selectOneButton>
+					<br />
+					<p:message for="ammortizzatoriInput" />
+				</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h:outputText style="font-weight: bold;" value="Tutte le dichiarazioni sono rese e sottoscritte ai sensi degli artt. 45 e 46 del D.P.R. n. 445/2000 "/>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+</ui:composition>

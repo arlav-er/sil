@@ -1,0 +1,665 @@
+<!-- STATEMENTS/AGENDA1.XML -->
+<!-- Giovanni Landi -->
+<STATEMENT name="SELECT_UNIQUE_ASSEGNAZIONE"
+            query="SELECT PRGASSEGNAZIONE FROM AG_ASSEGNAZIONE
+                  WHERE CODCPI=?
+                  AND CODSERVIZIO=?
+                  AND PRGAMBIENTE=?
+                  AND PRGSPI=?"/>
+
+<STATEMENT name="INSERT_ASSEGNAZIONE"
+            query="INSERT INTO AG_ASSEGNAZIONE (
+                     PRGASSEGNAZIONE, CODCPI, CODSERVIZIO, PRGAMBIENTE, 
+                     PRGSPI, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD) 
+                VALUES (S_AG_ASSEGNAZIONE.nextval, ?, ?, ?, ?, 
+                ?, sysdate, ?, sysdate)"/>
+
+<STATEMENT name="DELETE_ASSEGNAZIONE"
+            query="DELETE FROM AG_ASSEGNAZIONE
+                  WHERE CODCPI=?
+                  AND PRGASSEGNAZIONE=?"/>
+
+<STATEMENT name="UPDATE_ASSEGNAZIONE"
+            query="UPDATE AG_ASSEGNAZIONE 
+                  SET CODSERVIZIO=?,
+                      PRGAMBIENTE=?, 
+                      PRGSPI=?,
+                      CDNUTMOD=?,
+                      DTMMOD=sysdate,
+                      NUMKLOASSEGNAZIONE=?
+                  WHERE PRGASSEGNAZIONE=? AND CODCPI=?"/>
+
+<STATEMENT name="SELECT_ASSEGNAZIONE"
+            query="SELECT AG_ASSEGNAZIONE.PRGASSEGNAZIONE,
+                          AG_ASSEGNAZIONE.CODCPI,
+                          AG_ASSEGNAZIONE.CODSERVIZIO,
+                          AG_ASSEGNAZIONE.PRGSPI,
+                          AG_ASSEGNAZIONE.PRGAMBIENTE,
+                          AG_ASSEGNAZIONE.CDNUTINS,
+                          TO_CHAR(DTMINS, 'DD/MM/YYYY') DTMINS,
+                          AG_ASSEGNAZIONE.CDNUTMOD,
+                          TO_CHAR(DTMMOD, 'DD/MM/YYYY') DTMMOD,
+                          AG_ASSEGNAZIONE.NUMKLOASSEGNAZIONE
+                          FROM AG_ASSEGNAZIONE
+                          WHERE AG_ASSEGNAZIONE.PRGASSEGNAZIONE=? AND AG_ASSEGNAZIONE.CODCPI=?"/>
+
+<STATEMENT name="DELETE_AMBIENTE"
+            query="DELETE FROM DE_AMBIENTE
+                  WHERE CODCPI=?
+                  AND PRGAMBIENTE=?"/>
+
+<STATEMENT name="InsertAmbiente"
+            query="INSERT INTO DE_AMBIENTE (
+                     PRGAMBIENTE, STRDESCRIZIONE, DATINIZIOVAL, DATFINEVAL, 
+                     CODCPI, NUMCAPACITA, NUMCAPIENZA, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)
+                VALUES (S_DE_AMBIENTE.nextval, ?, TO_DATE(?,'DD/MM/YYYY'), nvl(TO_DATE(?,'DD/MM/YYYY'),TO_DATE(?,'DD/MM/YYYY')), ?,
+                ?, ?, ?, sysdate, ?, sysdate)"/>
+
+<STATEMENT name="DettaglioAmbiente"
+            query="SELECT DE_AMBIENTE.PRGAMBIENTE,
+                          DE_AMBIENTE.STRDESCRIZIONE,
+                          TO_CHAR(DE_AMBIENTE.DATINIZIOVAL, 'DD/MM/YYYY') DATINIZIOVAL,
+                          TO_CHAR(DE_AMBIENTE.DATFINEVAL, 'DD/MM/YYYY') DATFINEVAL,
+                          DE_AMBIENTE.CODCPI,
+                          DE_AMBIENTE.NUMCAPACITA,
+                          DE_AMBIENTE.NUMCAPIENZA,
+                          DE_AMBIENTE.CDNUTINS,
+                          TO_CHAR(DTMINS, 'DD/MM/YYYY') DTMINS,
+                          DE_AMBIENTE.CDNUTMOD,
+                          TO_CHAR(DTMMOD, 'DD/MM/YYYY') DTMMOD,
+                          DE_AMBIENTE.NUMKLOAMBIENTE
+                          FROM DE_AMBIENTE
+                          WHERE DE_AMBIENTE.PRGAMBIENTE=? AND DE_AMBIENTE.CODCPI=?"/>
+
+<STATEMENT name="DataFineDefault"
+            query="select DATA_DEFAULT
+                      from USER_TAB_COLUMNS a
+                      where a.table_name = 'DE_AMBIENTE'
+                      and column_name='DATFINEVAL'"/>
+
+<STATEMENT name="UpdateAmbiente"
+            query="UPDATE DE_AMBIENTE
+                  SET STRDESCRIZIONE=?,
+                      DATINIZIOVAL=TO_DATE(?,'DD/MM/YYYY'),
+                      DATFINEVAL=nvl(TO_DATE(?,'DD/MM/YYYY'),TO_DATE(?,'DD/MM/YYYY')),
+                      NUMCAPACITA=?,
+                      NUMCAPIENZA=?,
+                      CDNUTMOD=?,
+                      DTMMOD=sysdate,
+                      NUMKLOAMBIENTE=?
+                  WHERE PRGAMBIENTE=? AND CODCPI=?"/>
+
+<STATEMENT name="ListaServizi"
+            query="SELECT DE_SERVIZIO_AREA.STRDESCRIZIONE as Area,
+                          DE_SERVIZIO.CODSERVIZIO,
+                          DE_SERVIZIO.PRGSERVIZIOAREA,
+                          DE_SERVIZIO.STRDESCRIZIONE as Servizio,
+                          TO_CHAR(DE_SERVIZIO.DATINIZIOVAL, 'DD/MM/YYYY') DATINIZIOVAL,
+                          TO_CHAR(DE_SERVIZIO.DATFINEVAL, 'DD/MM/YYYY') DATFINEVAL,
+                          mn_yg_tipo_attivita.STRDESCRIZIONE as desctipoattivitalista,
+                          de_prestazione.strdescrizione as descprestazionelista,
+                          ma_servizio_prestazione.prgprestazione as PRGPRESTAZIONE,
+                          ma_servizio_prestazione.FLGPOLATTIVA as POLATTIVA,
+                          ma_servizio_tipoattivita.codtipoattivita as PRGTIPOATTIVITA
+                          FROM DE_SERVIZIO_AREA, DE_SERVIZIO, ma_servizio_prestazione, de_prestazione, ma_servizio_tipoattivita, mn_yg_tipo_attivita  
+                          WHERE DE_SERVIZIO_AREA.PRGSERVIZIOAREA=DE_SERVIZIO.PRGSERVIZIOAREA
+                          and DE_SERVIZIO_AREA.PRGSERVIZIOAREA = nvl(?,DE_SERVIZIO_AREA.PRGSERVIZIOAREA )
+ 						  and decode(?,'on',sysdate, DE_SERVIZIO.DATINIZIOVAL) between  DE_SERVIZIO.DATINIZIOVAL and   DE_SERVIZIO.Datfineval  
+						  and Upper(DE_SERVIZIO.STRDESCRIZIONE) like '%'||Upper(?)||'%'
+						  
+						  and DE_SERVIZIO.CODSERVIZIO = ma_servizio_prestazione.codservizio
+  						  and ma_servizio_prestazione.prgprestazione = de_prestazione.prgprestazione
+  						  and decode(?,'on','S','S','S','N') = ma_servizio_prestazione.flgpolattiva
+  						  and  DE_PRESTAZIONE.prgprestazione between decode(?,null,1,?) and decode(?,null,1000000,?) 
+						  
+						  and DE_SERVIZIO.CODSERVIZIO = ma_servizio_tipoattivita.codservizio
+  						  and ma_servizio_tipoattivita.codtipoattivita = mn_yg_tipo_attivita.codtipoattivita
+  						  and Upper(mn_yg_tipo_attivita.codtipoattivita) like '%'||Upper(?)||'%'
+						  "/>
+
+<STATEMENT name="SELECT_COMBO_SERVIZIO_AREA" 
+           query="select PRGSERVIZIOAREA as CODICE,
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE,
+                                    DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS STRSCADUTO
+                  from DE_SERVIZIO_AREA
+                  WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                  order by DECODE(STRSCADUTO,&apos;&apos;,0,1),STRDESCRIZIONE" />
+
+<STATEMENT name="InsertServizio"
+            query="INSERT INTO DE_SERVIZIO (
+                     CODSERVIZIO, STRDESCRIZIONE, DATINIZIOVAL, DATFINEVAL, 
+                     PRGSERVIZIOAREA,  FLGPATRONATO, DTMINS, CDNUTINS, DTMMOD, CDNUTMOD)
+                VALUES (?, ?, TO_DATE(?,'DD/MM/YYYY'), nvl(TO_DATE(?,'DD/MM/YYYY'),TO_DATE(?,'DD/MM/YYYY')), 
+                				   ?, ?, sysdate, ?       , sysdate, ?)"/>
+
+<STATEMENT name="DeleteServizio"
+            query="DELETE FROM DE_SERVIZIO
+                  WHERE CODSERVIZIO=?"/>
+
+<STATEMENT name="DeleteServizioPrestazione"
+            query="DELETE FROM MA_SERVIZIO_PRESTAZIONE
+                  WHERE CODSERVIZIO=?
+                  AND PRGPRESTAZIONE=?
+                  "/>
+
+<STATEMENT name="DeleteServizioTipoAttivita"
+            query="DELETE FROM MA_SERVIZIO_TIPOATTIVITA
+                  WHERE CODSERVIZIO=?
+                  AND CODTIPOATTIVITA=?
+                  "/>
+
+<STATEMENT name="DettaglioServizio"
+            query="SELECT DE_SERVIZIO.CODSERVIZIO,
+                          DE_SERVIZIO.STRDESCRIZIONE,
+                          TO_CHAR(DE_SERVIZIO.DATINIZIOVAL, 'DD/MM/YYYY') DATINIZIOVAL,
+                          TO_CHAR(DE_SERVIZIO.DATFINEVAL, 'DD/MM/YYYY') DATFINEVAL,
+                          DE_SERVIZIO.PRGSERVIZIOAREA AS CODICE,
+                          mn_yg_tipo_attivita.CODTIPOATTIVITA as CODICETIPOATTIVITA,
+                          de_prestazione.PRGPRESTAZIONE as CODICEPRESTAZIONE,
+                          ma_servizio_prestazione.flgpolattiva as FLGPOLATTIVA,
+                          DE_SERVIZIO.FLGPATRONATO,                     
+                          DE_SERVIZIO.CDNUTINS,
+                          TO_CHAR(DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS,
+                          DE_SERVIZIO.CDNUTMOD,
+                          TO_CHAR(DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD,
+                          DE_SERVIZIO.NUMKLOSERVIZIO
+						FROM DE_SERVIZIO 
+						  inner join DE_SERVIZIO_AREA on DE_SERVIZIO_AREA.PRGSERVIZIOAREA=DE_SERVIZIO.PRGSERVIZIOAREA
+						  left outer join ma_servizio_prestazione  on DE_SERVIZIO.CODSERVIZIO = ma_servizio_prestazione.codservizio
+						  left outer join de_prestazione on ma_servizio_prestazione.prgprestazione = de_prestazione.prgprestazione 
+						  left outer join  ma_servizio_tipoattivita on DE_SERVIZIO.CODSERVIZIO = ma_servizio_tipoattivita.codservizio
+							left outer join mn_yg_tipo_attivita on ma_servizio_tipoattivita.codtipoattivita = mn_yg_tipo_attivita.codtipoattivita
+						 WHERE DE_SERVIZIO.CODSERVIZIO= ?                          
+                          "/>
+
+<STATEMENT name="UpdateServizio"
+            query="UPDATE DE_SERVIZIO
+                  SET CODSERVIZIO=?,
+                      STRDESCRIZIONE=?,
+                      DATINIZIOVAL=TO_DATE(?,'DD/MM/YYYY'),
+                      DATFINEVAL=nvl(TO_DATE(?,'DD/MM/YYYY'),TO_DATE(?,'DD/MM/YYYY')),
+                      PRGSERVIZIOAREA=?,
+                      FLGPATRONATO=?,
+                      DTMMOD=sysdate,
+                      CDNUTMOD=?,
+                      NUMKLOSERVIZIO=?
+                  WHERE CODSERVIZIO=?"/>
+
+<STATEMENT name="UpdateMaServizioPrestazione"
+            query="UPDATE MA_SERVIZIO_PRESTAZIONE
+                  SET PRGPRESTAZIONE=?,
+                      FLGPOLATTIVA=decode(?,'on','S','N')
+                  WHERE CODSERVIZIO=?"/>
+
+<STATEMENT name="UpdateMaServizioTipoAttivita"
+            query="UPDATE MA_SERVIZIO_TIPOATTIVITA
+                  SET CODTIPOATTIVITA=?
+                  WHERE CODSERVIZIO=?"/>
+
+<STATEMENT name="ListaOperatori"
+            query="SELECT AN_SPI.PRGSPI,
+                          AN_SPI.STRCOGNOME,
+                          AN_SPI.STRNOME,
+                          AN_SPI.STRCODICEFISCALE,
+                          AN_SPI.STRSESSO,
+                          AN_SPI.STRSIGLAOPERATORE,
+                          TO_CHAR(AN_SPI.DATNASC,'DD/MM/YYYY') DATNASC,
+                          TO_CHAR(AN_SPI.DATINIZIOVAL,'DD/MM/YYYY') DATINIZIOVAL,
+                          TO_CHAR(AN_SPI.DATFINEVAL,'DD/MM/YYYY') DATFINEVAL
+                          FROM AN_SPI
+                         WHERE 
+                   				nvl(Upper(AN_SPI.STRCOGNOME), ' ')  like Upper(?)||'%'
+                            and nvl(Upper(AN_SPI.STRNOME), ' ') like Upper(?)||'%'
+                            and nvl(Upper(AN_SPI.STRCODICEFISCALE), ' ') like Upper(?)||'%'
+                            and  nvl(Upper(AN_SPI.STRSIGLAOPERATORE), ' ') like Upper(?)||'%'
+                            and nvl(to_char(AN_SPI.DATNASC,'DD/MM/YYYY'), ' ') = nvl(?,nvl(to_char(AN_SPI.DATNASC,'DD/MM/YYYY'), ' '))
+                            and decode(?,'on',sysdate, AN_SPI.DATINIZIOVAL) between  AN_SPI.DATINIZIOVAL and   AN_SPI.Datfineval  
+                          order by an_spi.STRCOGNOME, an_spi.STRNOME"/>
+
+<STATEMENT name="InsertOperatore"
+            query="INSERT INTO AN_SPI (
+                     PRGSPI, STRCOGNOME, STRNOME,STRCODICEFISCALE, 
+                     STRSESSO,STRSIGLAOPERATORE ,DATNASC,STRTELOPERATORE,DATINIZIOVAL,DATFINEVAL,CDNUTINS,DTMINS,CDNUTMOD,DTMMOD, STREMAIL)
+                VALUES (?, ?, ?, ?, ?, ?, TO_DATE(?,'DD/MM/YYYY'),?,TO_DATE(?,'DD/MM/YYYY'), nvl(TO_DATE(?,'DD/MM/YYYY'),TO_DATE(?,'DD/MM/YYYY')),?,SYSDATE,?,SYSDATE, ?)"/>
+
+<STATEMENT name="InsertOperatoreNextVal"
+            query="SELECT S_AN_SPI.nextval AS do_nextval
+               	   FROM DUAL"/>
+
+
+
+<STATEMENT name="DeleteOperatore"
+            query="DELETE FROM AN_SPI
+                  WHERE PRGSPI=?"/>
+
+<STATEMENT name="DettaglioOperatore"
+            query="SELECT AN_SPI.PRGSPI,
+                          AN_SPI.STRCOGNOME,
+                          AN_SPI.STRNOME,
+                          AN_SPI.STRCODICEFISCALE,
+                          AN_SPI.STRSESSO,
+                          AN_SPI.STRSIGLAOPERATORE,
+                          TO_CHAR(DATNASC, 'DD/MM/YYYY') DATNASC,
+                          AN_SPI.STRTELOPERATORE,
+                          TO_CHAR(AN_SPI.DATINIZIOVAL,'DD/MM/YYYY') DATINIZIOVAL,
+                          TO_CHAR(AN_SPI.DATFINEVAL,'DD/MM/YYYY') DATFINEVAL,
+                          CDNUTINS,
+                          TO_CHAR(DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS,
+                          CDNUTMOD,
+                          TO_CHAR(DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD,
+                          AN_SPI.STREMAIL
+                          FROM AN_SPI
+                          WHERE AN_SPI.PRGSPI=?"/>
+
+<STATEMENT name="UpdateOperatore"
+            query="UPDATE AN_SPI
+                  SET STRCOGNOME=?,
+                      STRNOME=?,
+                      STRCODICEFISCALE=?,
+                      STRSESSO=?,
+                      STRSIGLAOPERATORE=?,
+                      DATNASC=TO_DATE(?,'DD/MM/YYYY'),
+                      STRTELOPERATORE=?,
+                      DATINIZIOVAL=TO_DATE(?,'DD/MM/YYYY'),
+                      DATFINEVAL=nvl(TO_DATE(?,'DD/MM/YYYY'),TO_DATE(?,'DD/MM/YYYY')),
+                      CDNUTMOD = ?,
+                      DTMMOD = SYSDATE,
+                      STREMAIL =?
+                      
+                  WHERE PRGSPI=?"/>
+
+<STATEMENT name="SELECT_COMBO_STATO_SLOT_SETTIMANA_TIPO"
+         query="select CODSTATOSLOT as CODICE, 
+                STRDESCRIZIONE || DECODE(SYSDATE,    
+                                  GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                  &apos;&apos;) AS DESCRIZIONE
+                from DE_STATO_SLOT 
+                WHERE to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;) BETWEEN
+                      to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) AND
+                      to_date(to_char(DATFINEVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) AND
+                      (CODSTATOSLOT IN (&apos;B&apos;,&apos;C&apos;))
+                order by STRDESCRIZIONE"/>
+
+<STATEMENT name="SELECT_COMBO_MODELLO_STAMPA"
+         query="select PRGMODELLOSTAMPA as CODICE, 
+                STRDESCRIZIONE || DECODE(SYSDATE,    
+                                  GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                  &apos;&apos;) AS DESCRIZIONE
+                from ST_MODELLO_STAMPA
+                WHERE to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;) BETWEEN
+                      to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) AND
+                      to_date(to_char(DATFINEVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;)
+                order by STRDESCRIZIONE"/>
+                
+                
+<STATEMENT name="FIND_SLOT_AGENDA" query="{ call ? := PG_AGENDA.ao_findSlot(
+	?,?,?,?,?,
+	?,?,?,?,?,
+	?,?,?,?,?
+	)}
+" />
+
+<STATEMENT name="SELECT_CELL_LAV_BY_CF" query="
+	
+	SELECT 
+		cdnlavoratore,
+		strcodicefiscale,
+		strcell,
+		flgInvioSMS,
+		numklolavoratore
+	FROM
+		AN_LAVORATORE
+	WHERE
+		strcodicefiscale = ?
+	
+" />
+
+<STATEMENT name="UPDATE_CELL_LAV_BY_CF" query="
+	
+	UPDATE AN_LAVORATORE
+	SET
+		strcell = ?,
+		flgInvioSMS = ?,
+		numklolavoratore = ? + 1
+	WHERE
+		cdnlavoratore = ?
+	
+" />
+
+<STATEMENT name="REGISTRA_APPUNTAMENTO_AGENDA" query="{ call ? := PG_AGENDA.ao_registraAppuntamento(
+	?,?,?,?,?,
+	?,?,?,?,?,
+	?,?,?,?,?,
+	?,?,?,?,?,?,
+	?,?,?,?,?,?
+	)}
+" />
+
+<STATEMENT name="CONTROLLI_COERENZA_LAVORATORE_AGENDA" query="{ call ? := PG_AGENDA.ao_effettuaControlliCoerenza(
+	?,?,?,?,?,?,?,?,?,?,?
+	)}
+" />
+
+<STATEMENT name="MITTENTE_IR_AGENDA" query="
+	
+	SELECT strnome || ' ' || strcognome as mittente
+	from TS_UTENTE
+	where cdnUt = ?
+	
+"/>
+
+<STATEMENT name="SELECT_CODTIPOSMS_APPUNTAMENTO_ONLINE" query="
+
+ 	select strValore
+     from ts_config_loc
+    where codtipoconfig = ?
+      and strcodrif = ? 
+      and num = 6
+     
+          
+" />
+
+<STATEMENT name="SELECT_SPECS_EMAIL_APPUNTAMENTO_ONLINE" query="
+
+	select * 
+	from ts_email 
+	where codtipoemail = (
+	  select strvalore
+	  from ts_config_loc
+	  where codtipoconfig = ?
+	  and strcodrif = ?
+	  and num = 5
+	)
+
+" />
+
+<STATEMENT name="INSERT_EVIDENZA_APPUNTAMENTO_ONLINE" query="
+
+	insert into AN_EVIDENZA (
+      prgevidenza,
+      cdnlavoratore,
+      datdatascad,
+      strevidenza,
+      cdnutins,
+      dtmins,
+      cdnutmod,
+      dtmmod,
+      prgtipoevidenza
+    ) values (
+      S_AN_EVIDENZA.nextval,
+      ?,
+      trunc(sysdate) + 30,
+      ?,
+      150,
+      sysdate,
+      150,
+      sysdate,
+      ?
+    )
+	
+" />
+
+<STATEMENT name="SELECT_DATI_AN_LAV_STORIA_INF_APPUNTAMENTO_ONLINE" query="
+        
+        SELECT PRGLAVSTORIAINF, STRNOTE,
+        	NUMKLOLAVSTORIAINF,
+        	CODCPIORIG, CODCPITIT, CODMONOTIPOCPI
+		FROM AN_LAV_STORIA_INF
+        WHERE CDNLAVORATORE=? 
+        AND DATFINE is null
+        
+"/>
+
+<STATEMENT name="UPDATE_AN_LAV_STORIA_INF_APPUNTAMENTO_ONLINE" query="
+			
+			UPDATE AN_LAV_STORIA_INF
+               SET CODCPITIT=?, 
+                   CDNUTMOD=?, 
+                   CODMONOTIPOCPI = ?,
+                   CODCPIORIG = ?,
+                   DTMMOD=SYSDATE, 
+                   NUMKLOLAVSTORIAINF = ?,
+                   CODCOMDOM = ?
+                WHERE CDNLAVORATORE=? AND
+                      DATFINE is null
+"/>   
+
+<STATEMENT
+        name="INSERT_AN_LAVORATOREANAGIND_APPUNTAMENTO_APPUNTAMENTO_ONLINE"
+        query="INSERT INTO AN_LAVORATORE
+                  (cdnLavoratore,
+                  strCodiceFiscale,
+                  strCognome,
+                  strNome,
+                  strSesso,
+                  datNasc,
+                  codComNas,
+                  codCittadinanza,
+                  codCittadinanza2,
+                  codstatoCivile,
+                  flgMilite,
+                  numFigli,
+                  strNote,
+                  FLGCFOK,
+                  cdnUtins, dtmins,
+                  cdnUtmod, dtmmod,
+                  CODCOMRES,
+                  STRINDIRIZZORES, 
+                  STRLOCALITARES, 
+                  STRCAPRES, 
+                  CODCOMDOM, 
+                  STRINDIRIZZODOM, 
+                  STRLOCALITADOM, 
+                  STRCAPDOM,
+                  STRTELRES, STRTELDOM, STRTELALTRO, 
+                  STRCELL, STREMAIL, STRFAX, FLGINVIOSMS)
+                  VALUES 
+                  (?, UPPER(?),UPPER(?), UPPER(?), ?, 
+                   TO_DATE(?,'DD/MM/YYYY'), 
+                   ?, ?, ?, 
+                   ?, ?,
+                   ?, ?, ?, 
+                   ?, SYSDATE, 
+                   ?, SYSDATE, 
+                   ?, ?, ?, ?, ?, ?, ?, ?,
+                   ?,?,?,?,?,?,?)
+"/>
+
+<!--  Fabio Spadaro 20141007 - start-->
+<STATEMENT name="SELECT_COMBO_TIPO_ATTIVITA" query="select CODTIPOATTIVITA as CODICE, 
+                  STRDESCRIZIONE AS DESCRIZIONE
+                  from mn_yg_tipo_attivita" />
+                  
+<STATEMENT name="SELECT_COMBO_PRESTAZIONE" query="select PRGPRESTAZIONE as CODICE, 
+                  STRDESCRIZIONE AS DESCRIZIONE
+                  from DE_PRESTAZIONE" />
+                  
+<STATEMENT name="InsertMaServizioPrestazione"
+            query="INSERT INTO MA_SERVIZIO_PRESTAZIONE (
+                     CODSERVIZIO, PRGPRESTAZIONE, FLGPOLATTIVA)
+                VALUES (?, ?, decode(?,'on','S','N'))"/>
+                
+<STATEMENT name="InsertMaServizioTipoAttivita"
+            query="INSERT INTO MA_SERVIZIO_TIPOATTIVITA (
+                     CODSERVIZIO, CODTIPOATTIVITA)
+                VALUES (?, ?)"/>
+
+<STATEMENT name="VerificaEsistenzaMaServizioTipoAttivita"
+            query="SELECT CODTIPOATTIVITA AS NUM FROM MA_SERVIZIO_TIPOATTIVITA 
+                WHERE CODSERVIZIO = ?" />
+
+<STATEMENT name="VerificaEsistenzaMaServizioPrestazione"
+            query="SELECT CODSERVIZIO AS NUM FROM MA_SERVIZIO_PRESTAZIONE 
+                WHERE CODSERVIZIO = ?"/>
+
+<!--  Fabio Spadaro 20141007 - end -->
+
+<STATEMENT name="SELECT_COMBO_OBBIETTIVO_MISURA_YEI" 
+		query="select PRGAZIONIRAGG as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                    '') AS DESCRIZIONE,
+                                    DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                               '') AS STRSCADUTO   
+                  from DE_AZIONE_RAGG
+                  order by DECODE(STRSCADUTO,'',0,1),DESCRIZIONE" />
+
+<STATEMENT name="DettaglioAzione"
+            query="	 
+              select de_azione_ragg.STRDESCRIZIONE     as  DESCOBBIETTIVOMISURAYEI,
+		           de_azione_ragg.PRGAZIONIRAGG        as  PRGAZIONIRAGG,
+		           de_azione.STRDESCRIZIONE            as  AZIONE,
+		           de_azione.PRGAZIONI                 as  PRGAZIONI,
+		           de_azione.DATINIZIOVAL              as  DATINIZIOVAL,
+		           de_azione.DATFINEVAL                as  DATFINEVAL,
+		           de_prestazione.PRGPRESTAZIONE       as  COMBOPRESTAZIONE, 
+		           de_prestazione.STRDESCRIZIONE       as  DESCPRESTAZIONE, 
+		           mn_yg_tipo_attivita.CODTIPOATTIVITA as  COMBOTIPOATTIVITA, 
+		           mn_yg_tipo_attivita.STRDESCRIZIONE  as  DESCTIPOATTIVITA,
+		          de_azione_ragg.FLG_MISURAYEI        as  FLAGMISURAYEI,
+				   ma_azione_prestazione.FLGPOLATTIVA  as  FLAGPOLATTIVA
+		      from 
+		     DE_AZIONE_RAGG
+		        JOIN
+		     DE_AZIONE
+		       ON de_azione_ragg.PRGAZIONIRAGG = de_azione.PRGAZIONERAGG 
+		        LEFT JOIN
+		     MA_AZIONE_TIPOATTIVITA
+		       ON (ma_azione_tipoattivita.PRGAZIONI = de_azione.PRGAZIONI and
+		       	  trunc(sysdate) between trunc(ma_azione_tipoattivita.datinizioval) and trunc(ma_azione_tipoattivita.datfineval))
+		        LEFT JOIN
+		     MN_YG_TIPO_ATTIVITA  
+		       ON mn_yg_tipo_attivita.codtipoattivita = ma_azione_tipoattivita.CODTIPOATTIVITA
+		        LEFT JOIN
+		     MA_AZIONE_PRESTAZIONE
+		       ON de_azione.prgazioni = ma_azione_prestazione.prgazioni
+		        LEFT JOIN
+		     DE_PRESTAZIONE 
+		       ON de_prestazione.prgprestazione = ma_azione_prestazione.prgprestazione
+			 WHERE de_azione.PRGAZIONI = ?                          
+                          "/>
+                          
+<STATEMENT name="InsertDeAzione"
+            query="INSERT INTO DE_AZIONE (
+		            PRGAZIONI,
+		            STRDESCRIZIONE,
+		            DATINIZIOVAL,
+		            DATFINEVAL,
+		            PRGAZIONERAGG,
+		            FLGFORMAZIONE,
+		    		CODAZIONESIFER,
+		    		FLGADESIONEGG,
+		    		CODSOTTOAZIONE)
+              VALUES (?, ?, sysdate, TO_DATE('31-12-2100','DD/MM/YYYY'),?, 
+              	   null, null, null, null)"/>
+
+<STATEMENT name="SelectMaxDeAzione"
+            query="SELECT max(PRGAZIONI) as MAXPRGAZIONI from de_azione WHERE PRGAZIONERAGG = ?"/>
+            
+<STATEMENT name="UPDATE_CONTATTI_LAV_BY_CDNLAV" query="
+	UPDATE AN_LAVORATORE
+	SET
+		strcell = ?, stremail = ?,
+		cdnutmod = ?, dtmmod = sysdate,
+		numklolavoratore = ?
+	WHERE
+		cdnlavoratore = ?
+" />
+
+<STATEMENT name="LOAD_TIPO_EVIDENZA_DA_CONFIGURAZIONE"
+            query="select strvalore
+			from ts_config_loc
+			where codtipoconfig = ?
+			and strcodrif = (select codprovinciasil from ts_generale where prggenerale = 1)
+			and num = ?
+"/>
+
+<STATEMENT name="LOAD_PROGRESSIVO_TIPO_EVIDENZA"
+            query="select prgtipoevidenza from de_tipo_evidenza where codtipoevidenza = ?
+"/>
+
+<STATEMENT name="REGISTRA_APPUNTAMENTO_AGENDA_ID_COAP" query="{ call ? := PG_AGENDA.ao_aggiornaAppuntamentoIdCoap(
+	?,?,?,?,?)} " />
+	
+<STATEMENT name="REGISTRA_ESITO_APPUNTAMENTO_ANPAL"
+	query=" INSERT
+    INTO AG_INVIO_ESITO
+      (
+        STRIDNUOVOAPPCOAP ,
+        CODESITOAPPUNT , 
+        DTMINVIO , 
+        CDNUTINVIO , 
+        CODMINAPPUNT , 
+        CODCPI , 
+        IDINVIOESITO , 
+        CODESITONOTIFICA ,
+        STRDESCESITONEGATIVO ,
+        PRGAPPUNTAMENTO 
+      )
+      VALUES
+      (
+        ? ,
+        ? ,
+        sysdate ,
+        ? ,
+        ? ,
+        ? ,
+        S_AG_INVIO_ESITO.nextval ,
+        ? ,
+        ? ,
+       ?
+      )"
+/>
+<STATEMENT name="APP_ULTIMO_INVIO_ANPAL"
+	query="
+		SELECT TO_CHAR(AG_INVIO_ESITO.DTMINVIO, 'dd/mm/yyyy hh24:mi') AS dataInvio,
+		  AG_INVIO_ESITO.CODESITONOTIFICA || ' - ' ||
+		  AG_INVIO_ESITO.STRDESCESITONEGATIVO AS esitoNotifica,
+		  AG_INVIO_ESITO.CODMINAPPUNT  || ' - ' ||
+		  MN_ESITO_APP.STRDESCRIZIONE AS esitoAppuntamento
+		FROM AG_INVIO_ESITO
+		INNER JOIN MN_ESITO_APP
+		ON (AG_INVIO_ESITO.CODMINAPPUNT =MN_ESITO_APP.CODESITOAPPMIN)
+		WHERE PRGAPPUNTAMENTO  = ?
+		AND DTMINVIO   =
+		  (SELECT MAX(es.DTMINVIO)
+		  FROM AG_INVIO_ESITO es
+		  WHERE es.PRGAPPUNTAMENTO =?)
+	"
+/>
+<STATEMENT name="GET_MN_ESITO_APP"
+	query="
+		 SELECT MN_ESITO_APP.CODESITOAPPMIN
+			FROM MN_ESITO_APP
+			INNER JOIN DE_ESITO_APPUNT
+			ON DE_ESITO_APPUNT.CODMIN = MN_ESITO_APP.CODESITOAPPMIN
+			WHERE DE_ESITO_APPUNT.CODESITOAPPUNT = ?
+	"
+/>
+<STATEMENT name="APP_ALL_INVIO_ANPAL"
+	query="
+		SELECT TO_CHAR(AG_INVIO_ESITO.DTMINVIO, 'dd/mm/yyyy hh24:mi') AS dataInvio,
+		  AG_INVIO_ESITO.CODESITONOTIFICA || ' - ' ||
+		  AG_INVIO_ESITO.STRDESCESITONEGATIVO AS esitoNotifica,
+		  AG_INVIO_ESITO.CODMINAPPUNT  || ' - ' ||
+		  MN_ESITO_APP.STRDESCRIZIONE AS esitoAppuntamento,
+		  DE_ESITO_APPUNT.STRDESCRIZIONE as esitoSil
+		FROM AG_INVIO_ESITO
+		INNER JOIN DE_ESITO_APPUNT ON DE_ESITO_APPUNT.CODESITOAPPUNT = AG_INVIO_ESITO.CODESITOAPPUNT
+		INNER JOIN MN_ESITO_APP
+		ON (AG_INVIO_ESITO.CODMINAPPUNT =MN_ESITO_APP.CODESITOAPPMIN)
+		WHERE PRGAPPUNTAMENTO  = ?
+		ORDER BY DTMINVIO DESC, IDINVIOESITO DESC
+	"
+/>

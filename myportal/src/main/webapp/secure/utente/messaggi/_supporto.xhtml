@@ -1,0 +1,282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<h:outputText
+		value="#{msg['cittadino.messaggi.supporto.descrizione']}"
+		escape="false" />
+	
+	<cc:messages id="supportoMessages" />	
+	
+	<h:form id="supportoForm">
+		<ui:fragment rendered="#{empty supportoBean.list}">
+			<h3 class="nessun_elemento_trovato">Nessuna richiesta presente</h3>
+		</ui:fragment>
+		
+		<ui:fragment rendered="#{not empty supportoBean.list}">
+			<div style="display: none;">
+				<h:inputHidden id="pageValue" value="#{supportoBean.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{supportoBean.changePage}" value="DUMMY FOR PAGINATION">
+					<f:ajax execute=":supportoForm:pageValue" render=":supportoForm:tabella :supportoDetailForm" />
+				</h:commandButton>
+			</div>
+			
+			<script type="text/javascript">				
+				$(jq("supportoForm:paginationBar")).pagination({							    
+					pages: #{supportoBean.paginationHandler.pages()},						       
+					cssStyle: 'light-theme',
+					prevText: 'Prec.',
+					nextText: 'Succ.',
+					onPageClick: function (pageNumber, event) {
+						document.getElementById("supportoForm:pageValue").value = pageNumber;
+						document.getElementById("supportoForm:pageCommand").click();
+						$(jq("supportoDetailForm")).hide();
+						$(jq("supportoForm:tabella")).hide();					            
+						$(jq("supportoForm:paginationLoader")).show();
+					}
+				});
+			</script>
+			
+			<h:panelGroup layout="block" id="paginationBar" 
+				class="widget_container ui-tabs ui-widget-content ui-corner-all" />
+			<br />
+	
+			<cc:waiting id="paginationLoader" hidden="true" waitMessage="Caricamento..." />	
+			
+			<h:panelGroup layout="block" id="tabella" class="dataTables_wrapper">	
+				<table class="dataTable">
+					<tr>
+						<th class="ui-state-default"></th>
+						<th class="ui-state-default">Mittente</th>
+						<th class="ui-state-default">Oggetto</th>
+						<th class="ui-state-default">Data</th>
+					</tr>
+					
+					<ui:repeat value="#{supportoBean.list}" var="messaggio" varStatus="status">
+						<tr>
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{supportoBean.view}">
+									<h:panelGroup styleClass="ui-icon ui-icon-arrowreturnthick-1-w fix-icon"
+										rendered="#{!sessionBean.isProprietary(messaggio.last)}" />
+									<span class="ui-icon #{messaggio.letto ? 'ui-icon-mail-open' 
+										: 'ui-icon-mail-closed'} fix_icon" />
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":supportoForm:tabella :supportoDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{supportoBean.view}">
+									<h:outputText value="#{messaggio.mittente} &nbsp;"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}" />
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":supportoForm:tabella :supportoDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{supportoBean.view}">
+									<h:outputText value="#{messaggio.ticket} - #{messaggio.oggetto} &nbsp;"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}" />
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":supportoForm:tabella :supportoDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{supportoBean.view}">
+									<h:outputText value="#{empty messaggio.dtmIns ? '&nbsp;' : messaggio.dtmIns}"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":supportoForm:tabella :supportoDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+						</tr>
+					</ui:repeat>
+				</table>
+				<script type="text/javascript">
+					$(jq("supportoForm:paginationLoader")).hide();
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+		</ui:fragment>
+	</h:form>
+	<br />
+	
+	<cc:waiting id="supportoDetailLoader" hidden="true" waitMessage="Caricamento..." />
+	<cc:waiting id="supportoInviaLoader" hidden="true" waitMessage="Invio in corso..." />
+	<cc:waiting id="supportoRispondiLoader" hidden="true" waitMessage="Risposta in corso..." />
+		
+	<h:form id="supportoDetailForm">
+		<h:panelGroup layout="block" rendered="#{not supportoBean.showPanel}">
+			<h:commandLink styleClass="newTicketButton" value="Invia una richiesta"
+				action="#{supportoBean.showInsertPanel}">
+				<f:ajax execute="@this" render=":supportoDetailForm" onevent="onShowDetail" />
+			</h:commandLink>
+		</h:panelGroup>
+
+		<h:panelGroup styleClass="insertPanel focusPanel" layout="block"
+			rendered="#{supportoBean.showPanel}">
+			<h:panelGrid columns="2" cellspacing="10">
+				<h:panelGroup />
+				
+				<cc:inputText value="#{supportoBean.data.ticket}"
+					rendered="#{not empty supportoBean.data.ticket}"
+					label="Ticket n°:" editingMode="false" />
+				
+				<cc:inputText type="date" value="#{supportoBean.data.dtmIns}"
+					label="Data invio" editingMode="false" />
+			</h:panelGrid>
+
+			<h:panelGrid columns="1">
+				<cc:inputText value="#{supportoBean.data.oggetto}" label="Oggetto"
+					editingMode="#{supportoBean.editing}" required="true"
+					maxlength="250" />
+
+				<cc:inputToken decodeObjects="true" label="Curriculum Vitae"
+					value="#{supportoBean.data.listaCurricula}"
+					editingMode="#{supportoBean.editing}"
+					rendered="#{not empty supportoBean.myCurricula}">
+					<f:selectItems value="#{supportoBean.myCurricula}" />
+				</cc:inputToken>
+
+				<cc:inputToken decodeObjects="true"
+					label="Lettera di presentazione"
+					value="#{supportoBean.data.listaLettere}"
+					editingMode="#{supportoBean.editing}"
+					rendered="#{not empty supportoBean.myLettere}">
+					<f:selectItems value="#{supportoBean.myLettere}" />
+				</cc:inputToken>
+
+				<h:panelGroup layout="block" styleClass="messageDiv"
+					rendered="#{not supportoBean.editing}">
+					<h:outputText styleClass="mittente"
+						value="Richiesta di #{supportoBean.data.mittente} - inviata il " />
+					<h:outputText value="#{supportoBean.data.dtmIns}"
+						styleClass="mittente">
+						<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+					</h:outputText>
+					<br />
+					
+					<div class="corpo">
+						#{supportoBean.data.corpo}
+					</div>
+
+					<cc:upload readonly="#{true}" label="File allegato"
+						rendered="#{not empty supportoBean.data.idMsgAllegato}"
+						value="#{supportoBean.data.allegatoFileName}"
+						tmpValue="#{supportoBean.data.allegatoFileNameTmp}"
+						idAllegato="#{supportoBean.data.idMsgAllegato}" />
+				</h:panelGroup>
+				
+				<h:panelGroup id="rispostePanel" layout="block"
+					rendered="#{not supportoBean.editing}">
+					<ui:repeat var="risposta" value="#{supportoBean.data.risposte}">
+						<div class="messageDiv">
+							<h:outputText styleClass="mittente"
+								value="Risposta di #{risposta.mittente} - inviata il " />
+							<h:outputText value="#{risposta.dtmIns}" styleClass="mittente">
+								<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+							</h:outputText>
+							<br />
+							
+							<div class="corpo">
+								#{risposta.corpo}
+							</div>
+						</div>
+					</ui:repeat>
+				</h:panelGroup>
+				
+				<cc:inputTextarea style="width:81%" disableAjax="false"
+					maxlength="3000" rendered="#{supportoBean.editing}"
+					label="Richiesta:" value="#{supportoBean.data.corpo}"
+					richTextMode="false" required="true" />
+				
+				<cc:inputTextarea style="width:81%" id="risposta_corpo"
+					disableAjax="false" maxlength="3000" label="Risposta:"
+					rendered="#{(not supportoBean.editing) and (not sessionBean.isProprietary(supportoBean.data.last))}"
+					value="#{supportoBean.risposta.corpo}" richTextMode="false"
+					required="true" />
+			</h:panelGrid>
+
+			<div id="buttons">
+				<h:commandLink id="inviaRispostaBtn" styleClass="marginButton commentButton"
+					action="#{supportoBean.send}" value="Invia risposta"
+					rendered="#{(not supportoBean.editing) and (not sessionBean.isProprietary(supportoBean.data.last))}">
+					<f:ajax execute="@form" onevent="onRispondi"
+						render=":supportoDetailForm :supportoForm:tabella :supportoMessages"/>
+				</h:commandLink>
+				
+				<h:commandLink styleClass="marginButton newTicketButton"
+					action="#{supportoBean.save}" value="Invia"
+					rendered="#{supportoBean.editing}">
+					<f:ajax execute="@form" onevent="onInvia"
+						render=":supportoForm :supportoDetailForm :supportoMessages" />
+				</h:commandLink>
+				
+				<cc:upload label="Inserisci un allegato" idAllegato=""
+					value="#{supportoBean.data.allegatoFileName}"
+					tmpValue="#{supportoBean.data.allegatoFileNameTmp}"
+					rendered="#{supportoBean.editing}" />
+				
+				<h:commandLink action="#{supportoBean.dontedit}" value="Chiudi" immediate="true" id="closeButton"
+					styleClass="marginButton closeButton #{((supportoBean.editing) || 
+					((not supportoBean.editing) and (not sessionBean.isProprietary(supportoBean.data.last)))) 
+					? 'secondButton' : ''}">
+					<f:ajax execute="@this" render="@form" onevent="onHideDetail" />
+				</h:commandLink>
+			</div>
+		</h:panelGroup>
+		<script type="text/javascript">
+			disegnaBottoni();
+		</script>
+	</h:form>
+	
+	<script type="text/javascript">
+	// <![CDATA[[
+		function onHideDetail(data) {
+			if (data.status == 'begin') {
+				$(jq("supportoDetailForm")).slideUp("slow");
+			}
+		}
+		
+		function onShowDetail(data) {
+			if (data.status == 'begin') {
+				$(jq("supportoDetailForm")).hide();
+				$(jq("supportoDetailLoader")).show();
+			} else if (data.status == 'success') {
+				$(jq("supportoDetailLoader")).hide();
+				PrimeFaces.scrollTo("supportoDetailForm");
+			}
+		}
+		
+		function onInvia(data) {
+			if (data.status == 'begin') {
+				$(jq("supportoDetailForm")).hide();
+				$(jq("supportoInviaLoader")).show();
+			} else if (data.status == 'success') {
+				$(jq("supportoInviaLoader")).hide();
+			}
+		}
+		
+		function onRispondi(data) {
+			if (data.status == 'begin') {
+				$(jq("supportoDetailForm")).hide();
+				$(jq("supportoRispondiLoader")).show();
+			} else if (data.status == 'success') {
+				$(jq("supportoRispondiLoader")).hide();
+			}
+		}
+	//]]> 
+	</script>
+</ui:composition>

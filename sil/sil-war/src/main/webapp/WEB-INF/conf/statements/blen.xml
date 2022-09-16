@@ -1,0 +1,609 @@
+					
+<STATEMENT name = "GET_STATO_OCCUPAZ_BLEN_WS"
+			query ="SELECT lav.cdnlavoratore,lav.strcodicefiscale, lav.strcognome, lav.strnome, TO_CHAR (LAV.datNasc, 'YYYY-MM-DD') datNasc,
+						   lav.strsesso, COMNASC.CODCOM comNasc, COMNASC.STRDENOMINAZIONE denomNasc, PROVNASC.STRTARGA targaNasc,
+            			   comRes.CODCOM comRes, comRes.STRDENOMINAZIONE denomRes, PROVRES.STRTARGA targaRes, LAV.STRINDIRIZZORES,
+            			   de_comune.CODCOM comDom, de_comune.STRDENOMINAZIONE denomDom, de_provincia.STRTARGA targaDom,lav.STRINDIRIZZODOM, 
+            			   de_stato_occupaz_ragg.codstatooccupazragg codstatooccupazragg,
+            			   decode(de_stato_occupaz_ragg.codstatooccupazragg, de_stato_occupaz.codstatooccupaz, de_stato_occupaz_ragg.strdescrizione,
+                        		 (de_stato_occupaz_ragg.strdescrizione || ': ' || de_stato_occupaz.strdescrizione 
+                                  			||decode(de_stato_occupaz_ragg.CODSTATOOCCUPAZRAGG,'D',PG_INFO_RIASS.stato_occ_mobil(lav.cdnlavoratore),'I', 
+                                            PG_INFO_RIASS.stato_occ_mobil(lav.cdnlavoratore),'') ) ) AS statoOcc, 
+         		   		  case 
+		    		 	   when de_stato_occupaz_ragg.CODSTATOOCCUPAZRAGG in ('D','I')
+			        	   then
+			               (to_number(
+										(to_char(to_date(?,'dd/mm/yyyy'),'yyyy') - to_char(am_stato_occupaz.datcalcoloanzianita,'yyyy')) * 12
+				  						 + to_char(to_date(?,'dd/mm/yyyy'),'mm') - to_char(am_stato_occupaz.datcalcoloanzianita,'mm') + 1
+									+ (case 
+				   	 	  				   when ((to_char(to_date(?,'dd/mm/yyyy'),'yyyy') 
+				                                  - to_char(am_stato_occupaz.datcalcoloanzianita,'yyyy')) * 12
+				   		  	   			   	      + to_char(to_date(?,'dd/mm/yyyy'),'mm') 
+					                              - to_char(am_stato_occupaz.datcalcoloanzianita,'mm') + 1) &gt; 1
+										   then	  
+										   	       -(case when
+													 trunc(am_stato_occupaz.datcalcoloanzianita) &gt;= (select trunc(dat150) from ts_generale) 
+														then 2 - (trunc( (
+															(case 
+															  when to_number(to_char(LAST_DAY(to_date('01/' || to_char(to_date(?,'dd/mm/yyyy'), 'mm') || '/' || to_char(to_date(?,'dd/mm/yyyy'), 'yyyy'), 'dd/mm/yyyy')), 'dd')) =
+																   to_number(to_char(to_date(?,'dd/mm/yyyy'), 'dd'))
+															  then 30
+															  else to_number(to_char(to_date(?,'dd/mm/yyyy'), 'dd'))
+															end) + (30 - 
+																	(case
+																	  when to_number(to_char(am_stato_occupaz.datcalcoloanzianita, 'dd')) &lt; 31 
+																	  then to_number(to_char(am_stato_occupaz.datcalcoloanzianita, 'dd'))
+																	  else 30
+																	end) + 1
+																  )) /30))
+													 when
+													 (30 - to_char(am_stato_occupaz.datcalcoloanzianita,'dd') + 1) &lt; 16
+													 then 1
+													 when
+													 (30 - to_char(am_stato_occupaz.datcalcoloanzianita,'dd') + 1) &gt;= 15
+													 then 0
+											   	 end)
+											   	 -(case when
+													  trunc(am_stato_occupaz.datcalcoloanzianita) &lt; (select trunc(dat150) from ts_generale) and to_char(to_date(?,'dd/mm/yyyy'),'dd') &lt; 16
+													  then 1
+													  when
+													  trunc(am_stato_occupaz.datcalcoloanzianita) &lt; (select trunc(dat150) from ts_generale) and to_char(to_date(?,'dd/mm/yyyy'),'dd') &gt;= 15
+													  then 0
+													  else 0
+												 end)					
+						 				  when
+						 	  			  	  ((to_char(to_date(?,'dd/mm/yyyy'),'yyyy') 
+				                                - to_char(am_stato_occupaz.datcalcoloanzianita,'yyyy')) * 12
+				   		  	  			  	  	+ to_char(to_date(?,'dd/mm/yyyy'),'mm') 
+				                                - to_char(am_stato_occupaz.datcalcoloanzianita,'mm') + 1) = 1
+						 				  then
+						 				  	  -(case when
+													trunc(am_stato_occupaz.datcalcoloanzianita) &gt;= (select trunc(dat150) from ts_generale) and 
+													 (to_number(to_char(to_date(?,'dd/mm/yyyy'),'dd')) - to_number(to_char(am_stato_occupaz.datcalcoloanzianita,'dd')) + 1) =
+													 to_number(to_char(LAST_DAY(to_date('01/' || to_char(to_date(?,'dd/mm/yyyy'), 'mm') || '/' || to_char(to_date(?,'dd/mm/yyyy'), 'yyyy'), 'dd/mm/yyyy')), 'dd'))
+													 then 0
+													 when
+													 trunc(am_stato_occupaz.datcalcoloanzianita) &gt;= (select trunc(dat150) from ts_generale) and 
+													 (to_number(to_char(to_date(?,'dd/mm/yyyy'),'dd')) - to_number(to_char(am_stato_occupaz.datcalcoloanzianita,'dd')) + 1) &lt;&gt;
+													 to_number(to_char(LAST_DAY(to_date('01/' || to_char(to_date(?,'dd/mm/yyyy'), 'mm') || '/' || to_char(to_date(?,'dd/mm/yyyy'), 'yyyy'), 'dd/mm/yyyy')), 'dd'))
+													 then 1
+													 when trunc(am_stato_occupaz.datcalcoloanzianita) &lt; (select trunc(dat150) from ts_generale) and
+													 (to_number(to_char(to_date(?,'dd/mm/yyyy'),'dd')) - to_number(to_char(am_stato_occupaz.datcalcoloanzianita,'dd')) + 1) &lt; 16 
+													 then 1 
+													 when trunc(am_stato_occupaz.datcalcoloanzianita) &lt; (select trunc(dat150) from ts_generale) and
+													 (to_number(to_char(to_date(?,'dd/mm/yyyy'),'dd')) - to_number(to_char(am_stato_occupaz.datcalcoloanzianita,'dd')) + 1) &gt;= 15
+													 then 0
+										     end)
+						 				  end)))	  	
+			             when de_stato_occupaz_ragg.CODSTATOOCCUPAZRAGG not in ('D','I')
+			             then
+			                  0
+			         end
+			         mesi_anz,
+			         (case 
+						when de_stato_occupaz_ragg.CODSTATOOCCUPAZRAGG in ('D','I')
+						   then
+								(case 
+									when ((to_char(to_date(?,'dd/mm/yyyy'),'yyyy') 
+										  - to_char(am_stato_occupaz.datcalcoloanzianita,'yyyy')) * 12
+										  + to_char(to_date(?,'dd/mm/yyyy'),'mm') 
+										  - to_char(am_stato_occupaz.datcalcoloanzianita,'mm') + 1) &gt; 1
+									then	  
+										   (case when
+											 trunc(am_stato_occupaz.datcalcoloanzianita) &gt;= (select trunc(dat150) from ts_generale) 
+												then mod(
+												((case 
+													  when to_number(to_char(LAST_DAY(to_date('01/' || to_char(to_date(?,'dd/mm/yyyy'), 'mm') || '/' || to_char(to_date(?,'dd/mm/yyyy'), 'yyyy'), 'dd/mm/yyyy')), 'dd')) =
+														   to_number(to_char(to_date(?,'dd/mm/yyyy'), 'dd'))
+													  then 30
+													  else to_number(to_char(to_date(?,'dd/mm/yyyy'), 'dd'))
+													end) + 
+													(30 - 
+														(case
+														  when to_number(to_char(am_stato_occupaz.datcalcoloanzianita, 'dd')) &lt; 31 
+														  then to_number(to_char(am_stato_occupaz.datcalcoloanzianita, 'dd'))
+														  else 30
+														end) + 1
+													  )
+												), 30)
+											  else 0
+											end)
+									when
+									  ((to_char(to_date(?,'dd/mm/yyyy'),'yyyy') 
+										- to_char(am_stato_occupaz.datcalcoloanzianita,'yyyy')) * 12
+										+ to_char(to_date(?,'dd/mm/yyyy'),'mm') 
+										- to_char(am_stato_occupaz.datcalcoloanzianita,'mm') + 1) = 1
+										then
+											(case when
+												trunc(am_stato_occupaz.datcalcoloanzianita) &gt;= (select trunc(dat150) from ts_generale) 
+												  and (to_number(to_char(to_date(?,'dd/mm/yyyy'),'dd')) - to_number(to_char(am_stato_occupaz.datcalcoloanzianita,'dd')) + 1) =
+													   to_number(to_char(LAST_DAY(to_date('01/' || to_char(to_date(?,'dd/mm/yyyy'), 'mm') || '/' || to_char(to_date(?,'dd/mm/yyyy'), 'yyyy'), 'dd/mm/yyyy')), 'dd'))
+												then 0
+												when
+												  trunc(am_stato_occupaz.datcalcoloanzianita) &gt;= (select trunc(dat150) from ts_generale) 
+												  and (to_number(to_char(to_date(?,'dd/mm/yyyy'),'dd')) - to_number(to_char(am_stato_occupaz.datcalcoloanzianita,'dd')) + 1) &lt;&gt;
+													   to_number(to_char(LAST_DAY(to_date('01/' || to_char(to_date(?,'dd/mm/yyyy'), 'mm') || '/' || to_char(to_date(?,'dd/mm/yyyy'), 'yyyy'), 'dd/mm/yyyy')), 'dd'))
+												then (to_number(to_char(to_date(?,'dd/mm/yyyy'),'dd')) - to_number(to_char(am_stato_occupaz.datcalcoloanzianita,'dd')) + 1)
+												else 0
+											end)
+									else 0
+								end)			  	
+						 when de_stato_occupaz_ragg.CODSTATOOCCUPAZRAGG not in ('D','I')
+						 then 0
+					end)
+					giorni_anz,
+         			to_number(substr(PG_MOVIMENTI.MesiRischioDisoccupazione(lav.cdnLavoratore, am_stato_occupaz.datcalcoloanzianita), 1,
+					instr(PG_MOVIMENTI.MesiRischioDisoccupazione(lav.cdnLavoratore, am_stato_occupaz.datcalcoloanzianita), '-', 1)-1)) mesi_rischio_disocc,
+		         	PG_MOVIMENTI.MesiRischioDisoccupazione(lav.cdnLavoratore, am_stato_occupaz.datcalcoloanzianita) mesi_rischio_disocc_completo,
+		         	case 
+		              	when de_stato_occupaz_ragg.CODSTATOOCCUPAZRAGG in ('D','I')
+		              		then MESISOSPPRECFORNERO(lav.cdnlavoratore, am_stato_occupaz.datcalcolomesisosp, am_stato_occupaz.datinizio)
+		            	when de_stato_occupaz_ragg.CODSTATOOCCUPAZRAGG not in ('D','I') 
+		              		then 0
+		         	end
+		         	NUMMESISOSP,
+		         	to_number(substr(pg_movimenti.MesiSospDecretoFornero2014(lav.cdnlavoratore, am_stato_occupaz.DATINIZIO, am_stato_occupaz.prgstatooccupaz), 1,
+						instr(pg_movimenti.MesiSospDecretoFornero2014(lav.cdnlavoratore, am_stato_occupaz.DATINIZIO, am_stato_occupaz.prgstatooccupaz), '-', 1)-1))
+		      		mesiSospFornero2014,
+		      		pg_movimenti.MesiSospDecretoFornero2014(lav.cdnlavoratore, am_stato_occupaz.DATINIZIO, am_stato_occupaz.prgstatooccupaz) 
+		      		mesiSospFornero2014_completo,
+         			TO_CHAR (am_stato_occupaz.datanzianitadisoc,'YYYY-MM-DD' ) dataDichIM,
+         			cpi.codcpi, CPI.STRDESCRIZIONE, 
+          			TO_CHAR (ANAG.DATINIZIO,'YYYY-MM-DD' ) dataElencoAnag
+         		FROM am_stato_occupaz 
+            	INNER JOIN de_stato_occupaz ON (am_stato_occupaz.codstatooccupaz = de_stato_occupaz.codstatooccupaz) 
+            	INNER JOIN de_stato_occupaz_ragg ON (de_stato_occupaz.codstatooccupazragg = de_stato_occupaz_ragg.codstatooccupazragg) 
+            	INNER JOIN an_lavoratore lav on (lav.cdnlavoratore = am_stato_occupaz.cdnlavoratore) 
+            	INNER JOIN de_comune comNasc on (LAV.CODCOMNAS = comNasc.codcom) 
+            	LEFT JOIN de_provincia provNasc on (COMNASC.CODPROVINCIA = PROVNASC.CODPROVINCIA) 
+            	INNER JOIN de_comune comRes on (LAV.CODCOMRES = comRes.codcom) 
+            	LEFT JOIN de_provincia provRes on (comRes.CODPROVINCIA = provRes.CODPROVINCIA) 
+            	INNER JOIN de_comune on (lav.codcomdom = de_comune.codcom) 
+            	LEFT JOIN de_provincia on (de_comune.codprovincia = de_provincia.codprovincia )
+            	INNER JOIN am_elenco_anagrafico anag on (ANAG.CDNLAVORATORE = LAV.CDNLAVORATORE)
+            	INNER JOIN an_lav_storia_inf inf on (inf.CDNLAVORATORE = LAV.CDNLAVORATORE)
+            	LEFT JOIN de_cpi cpi on (CPI.CODCPI = INF.CODCPITIT)	
+    			WHERE lav.strcodicefiscale = ? and to_date(?,'dd/mm/yyyy') between trunc(am_stato_occupaz.datinizio) 
+    				  and  nvl((trunc(am_stato_occupaz.datfine)) , sysdate )  and inf.codmonotipocpi = 'C'
+    				  and ( to_date(?,'dd/mm/yyyy') &gt;= trunc(inf.datinizio) and to_date(?,'dd/mm/yyyy') &lt;= nvl(trunc(inf.datfine),sysdate) ) 
+                      and ( to_date(?,'dd/mm/yyyy') &gt;= trunc(anag.datinizio) and to_date(?,'dd/mm/yyyy') &lt;= nvl(trunc(anag.datcan),sysdate) ) 
+    			ORDER BY am_stato_occupaz.datinizio DESC " />
+
+
+<!-- Recupera tutti i movimenti aperti a partire da una certa data -->
+<STATEMENT name="GET_MOVIMENTI_BLEN_WS" query="
+		select mov.PRGMOVIMENTO, 
+			to_char(mov.DATINIZIOMOV , 'dd/mm/yyyy') as datiniziomov, 			
+			to_char(mov.DATFINEMOV, 'dd/mm/yyyy') as datFineMov ,
+			to_char(mov.DATinizioAvv,'dd/mm/yyyy') as datInizioAvv ,
+			to_char(mov.datInizioMovPrec,'dd/mm/yyyy') as datInizioMovPrec ,
+			nvl(to_char(mov.DATFineMovEffettiva,'dd/mm/yyyy'),'01/01/2100') as datFineMovEffettiva ,
+			to_char(mov.datSitSanata,'dd/mm/yyyy') as datSitSanata ,
+			mov.DATINIZIOMOV as dataSort,
+			mov.dtmIns as dataSort2,
+            mov.codmansione,
+            mov.codccnl,
+            unaz.codateco,
+            att.codatecodot,
+            mans.codmansionedot
+		from am_movimento mov, an_unita_azienda unaz, 
+			 an_azienda anaz, de_comune deco,
+			 de_tipo_contratto deass,
+			 DE_CONTRATTO_COLLETTIVO cc,
+             DE_ATTIVITA att,
+             de_mansione mans
+		where mov.cdnLavoratore = ?
+			and mov.prgunita = unaz.PRGUNITA 
+			and unaz.PRGAZIENDA = mov.PRGAZIENDA
+			and anaz.PRGAZIENDA = unaz.PRGAZIENDA
+			and unaz.CODCOM = deco.CODCOM(+)
+			and mov.codtipocontratto = deass.codtipocontratto (+)
+			and mov.codccnl = cc.codccnl
+			and unaz.codateco =  att.codateco  
+			and mans.codmansione = mov.codmansione
+			
+			AND MOV.CODSTATOATTO = 'PR'
+			and mov.codtipomov in ('AVV','TRA','PRO')
+      		AND (
+	      			(
+	      				(DATFINEMOVEFFETTIVA IS NULL OR DATFINEMOVEFFETTIVA &gt;= to_date(?,'dd/mm/yyyy')) 
+	      				and (DATINIZIOMOV &lt;= to_date(?,'dd/mm/yyyy'))
+	      			)
+      			or esiste_catena_aperta(mov.prgmovimento,mov.prgmovimentosucc) &gt; 0
+			)
+			
+		order by dataSort asc, mov.PRGMOVIMENTO asc
+"/>
+
+<STATEMENT name="COUNT_MOBILITA_BLEN_WS" query="
+		SELECT
+		COUNT (*) NUMMOB
+		  from AM_MOBILITA_ISCR mob
+		  where mob.DATINIZIO &lt;= to_date(?,'dd/mm/yyyy')
+				and mob.DATFINE &gt;= to_date(?,'dd/mm/yyyy')
+		        and mob.cdnlavoratore = ?
+"/>
+
+<STATEMENT name="COUNT_ESPERIENZA_EDILE_BLEN_WS" query="
+    select count (*) num
+    from am_movimento mov
+         ,DE_CONTRATTO_COLLETTIVO cc
+         ,an_unita_azienda unaz 
+         ,an_azienda anaz
+         ,DE_ATTIVITA att
+    where mov.cdnLavoratore = ?
+      AND MOV.CODSTATOATTO = 'PR'
+      AND ((DATFINEMOVEFFETTIVA IS NULL OR DATFINEMOVEFFETTIVA &gt;= to_date(?,'dd/mm/yyyy')) or 
+           (DATFINEMOVEFFETTIVA IS NOT NULL AND DATFINEMOVEFFETTIVA &lt;= to_date(?,'dd/mm/yyyy')))
+      and (DATINIZIOMOV &lt;= to_date(?,'dd/mm/yyyy'))
+      and mov.codccnl = cc.codccnl
+      and mov.prgunita = unaz.PRGUNITA 
+      and  mov.PRGAZIENDA  = unaz.PRGAZIENDA  
+      and anaz.PRGAZIENDA = unaz.PRGAZIENDA
+      and unaz.codateco =  att.codateco  
+      and (att.flgedile = 'S' or cc.flgedile = 'S')
+      and mov.codtipomov in ('AVV', 'TRA')
+"/>
+
+<STATEMENT name="COUNT_CIGS_BLEN_WS" query="
+		SELECT 
+        COUNT (*) NUMCIG
+        FROM am_altra_iscr cig
+           where cig.DATINIZIO &lt;= to_date(?,'dd/mm/yyyy')
+				   AND cig.DATFINE &gt;= to_date(?,'dd/mm/yyyy')
+           and codtipoiscr in ('O','S')       
+           AND cig.cdnlavoratore =  ? "/>
+           
+<STATEMENT name="SELECT_RICERCA_AZIENDA" query="select az.prgazienda as prgazienda,
+													az.strCodiceFiscale as strCodiceFiscale,
+													az.strPartitaIva as strPartitaIva,
+													az.strRagioneSociale as strRagioneSociale, az.codNatGiuridica as codNatGiuridica, 
+													az.codTipoAzienda as codTipoAzienda, az.strSitoInternet as strSitoInternet, 
+													az.strDescAttivita as strDescAttivita, to_char(az.numSoci) as numSoci, 
+													to_char(az.numDipendenti) as numDipendenti, 
+													to_char(az.numCollaboratori) as numCollaboratori,
+													to_char(az.numAltraPosizione) as numAltraPosizione,
+													to_char(az.datInizio, 'dd/mm/yyyy') as datInizio,
+													to_char(az.datFine, 'dd/mm/yyyy') as datFine,
+													to_char(az.dataGGInformazione, 'dd/mm/yyyy') as dataGGInformazione,
+													az.strHistory as strHistory, az.strNote as strNote, 
+													to_char(az.cdnUtIns) as cdnUtIns, to_char(az.cdnUtMod) as cdnUtMod,
+													az.flgdatiok as flgdatiok, az.strNumAlboInterinali as strNumAlboInterinali, 
+													az.strRepartoInail as strRepartoInail, az.strPatInail as strPatInail, 
+													az.flgObbligoL68 as flgObbligoL68, az.strNumAgSomministrazione as strNumAgSomministrazione
+												 from an_azienda az 
+												 WHERE az.strcodicefiscale = ? " /> 
+												 
+<STATEMENT name="SELECT_CPI_COMUNE" query="SELECT CODCPI FROM DE_COMUNE WHERE CODCOM = ? " /> 
+
+
+<STATEMENT name="SELECT_RICERCA_UNITA_INDIRIZZO" query="SELECT prgUnita FROM AN_UNITA_AZIENDA 
+											WHERE prgAzienda = ?  
+											 AND UPPER(codCom) = ? 
+											 AND UPPER(strindirizzo) = ? " /> 
+											 
+<STATEMENT name="SELECT_RICERCA_UNITA_COMUNE" query="SELECT prgUnita, nvl(flgsede,'N') sede
+										   	 			FROM  AN_UNITA_AZIENDA 
+															WHERE prgAzienda = ? 
+											 				AND UPPER(codCom) = ?
+											 				AND rownum = 1
+											 				order by sede desc  " />
+											 				
+<STATEMENT name="SELECT_RICERCA_SEDI_AZIENDA" query="SELECT prgUnita, strIndirizzo, flgSede,
+													strRea, strLocalita, codCom, strCap,
+													flgMezziPub, codAzStato,
+													strResponsabile, strReferente,
+													strTel, strFax, strEmail,
+													codAteco, codCCNL,
+													to_char(datInizio, 'dd/mm/yyyy') as datInizio, 
+													to_char(datFine, 'dd/mm/yyyy') as datFine, strNote,
+													to_char(cdnUtIns) as cdnUtIns, to_char(cdnUtMod) as cdnUtMod,
+													strnumeroinps, strNumRegistroCommitt,
+													to_char(datRegistroCommit, 'dd/mm/yyyy') as datRegistroCommit, strRiferimentoSare,
+													strRepartoInps, strDenominazione 
+												FROM AN_UNITA_AZIENDA 
+												WHERE prgAzienda = ? " />
+
+<STATEMENT name="SELECT_PRGMANSIONE_DA_CODMANSIONE_E_LAVORATORE" query="
+	select prgmansione
+	from pr_mansione
+	where cdnlavoratore = ?
+  	  and codmansione = ?
+" />
+
+<STATEMENT name="SELECT_MANSIONE_SIL_DA_MANSIONE_MIN" query="SELECT CODMANSIONE
+										   	 			FROM DE_MANSIONE 
+															WHERE CODMANSIONEDOT = ? " />
+															
+<STATEMENT name="SELECT_TITOLO_SIL_DA_TITOLO_MIN" query="SELECT (case 
+															    When 
+															     SUBSTR(?, 1, 2) in ('81', '83') then SUBSTR(?, 1, 2)
+															    else SUBSTR(?, 1, 1) || '0' 
+															    end) || '000000' as CODTITOLO
+										   	 			FROM DUAL " />
+										   	 			
+<STATEMENT name="SELECT_GRADOCONOSC_SIL_DA_GRADOCONOSC_MIN" query="SELECT MIN(CDNGRADO) CDNGRADO FROM MA_GRADO_CONSC_LIN   WHERE COD_CONOSCENZA = ? " />
+
+<STATEMENT name="SELECT_ABILIT_SIL_DA_ABILIT_MIN" query="SELECT MIN(CODABILITAZIONEGEN) CODABILITAZIONEGEN FROM  ma_abilitazione M where codabilitazione = ? " />
+
+														
+<STATEMENT name="SELECT_CODCONTRATTO_DA_RAPPORTO_MIN" query="SELECT DISTINCT(CONTRATTO.CODCONTRATTO) AS CODCONTRATTO
+										   	 			FROM MA_RAPPORTO_LAV 
+										   	 			INNER JOIN DE_TIPO_CONTRATTO CONTRATTO ON 
+										   	 				(MA_RAPPORTO_LAV.CODTIPOCONTRATTO = CONTRATTO.CODTIPOCONTRATTO)
+															WHERE MA_RAPPORTO_LAV.CODRAPPORTOLAV = ? " />
+															
+<STATEMENT name="SELECT_CODATECO_DA_CODATECODOT" query="select CODATECO from de_attivita t where codatecodot =  ? " />		
+
+<STATEMENT name="SELECT_COUNT_COM_RICHIESTA"  query="select COUNT(*) NUM from DO_COMUNE  where PRGRICHIESTAAZ = ?  AND CODCOM =  ? " />
+
+<STATEMENT name="SELECT_CPI_DA_INTERMEIARIO" query="select codcpi from de_cpi where codintermediariocl = ? " />
+
+
+<STATEMENT name="MATCH_CREA_ROSA_NOMINATIVA_TRANS"
+           query="{ call ? := PG_INCROCIO.creaRosaNomGrezzaTrans(?, ?, ?, ?, ?, ?) }"
+/>																						
+
+<STATEMENT name="AGGIUNGI_LAV_ROSA_GREZZA_TRANS"
+           query="{ call ? := PG_INCROCIO.inserisciLavRosaNomGrezzaTrans(?,?,?,?,?,?,?,?,?,?) }"
+/>		
+
+<STATEMENT name="SELECT_TS_ENDPOINT" query="SELECT  strUrl FROM TS_ENDPOINT WHERE strName = ? " />
+
+<STATEMENT name="WS_LOGON_BLEN" query="SELECT prgws, struserid, 
+				 strpassword FROM ts_ws 
+				 WHERE  codservizio =  ? " />
+
+<STATEMENT
+        name="INSERT_DO_RICHIESTA_AZ_BLEN"
+        query="INSERT INTO DO_RICHIESTA_AZ
+                  (PRGRICHIESTAAZ,
+                  PRGAZIENDA,
+                  PRGUNITA,
+                  codCpi,
+                  NUMANNO,
+                  NUMRICHIESTA,
+                  NUMSTORICO,
+                  DATRICHIESTA,
+                  FLGART16,
+                  DATSCADENZA,
+                  NUMPROFRICHIESTI,
+                  STRLOCALITA,
+                  PRGSPI,
+                  STRCOGNOMERIFERIMENTO,
+                  STRNOMERIFERIMENTO,
+                  STRTELRIFERIMENTO,
+                  STRFAXRIFERIMENTO,
+                  STREMAILRIFERIMENTO,
+                  FLGAUTOMUNITO,
+                  FLGMILITE,
+                  CODTRASFERTA,
+                  FLGFUORISEDE,
+                  TXTNOTEOPERATORE,
+                  flgMotomunito,
+                  flgVittoAlloggio,
+                  flgVitto,
+                  flgTurismo,
+                  strSesso,
+                  codMotGenere,
+                  strMotivSesso,
+                  codArea,
+                  cdnUtins,
+                  DTMINS,
+                  cdnUtmod,
+                  DTMMOD,                  
+                  NUMKLORICHIESTAAZ,
+                  CDNGRUPPO,
+                  NUMPOSTOAS,
+                  NUMPOSTOLSU,
+                  NUMPOSTOMILITARE,                  
+                  NUMPOSTOMB,
+                  FLGRIUSOGRADUATORIA,
+                  DATCHIAMATA,
+                  CODTIPOLSU,
+                  FLGSVANTAGGIATI,
+				  STRMOTSVANTAGGIATI,
+				  DATVERIFICASVAN,
+				  FLGDISNONISCR,
+				  STRMOTNONISCR,
+				  DATVERIFICADIS,
+				  CODRAPPORTOLAV,
+				  FLGNULLAOSTA 
+                  )
+                  VALUES 
+                  (?, ?, ?, ?, ?, ?, ?,
+                   TO_DATE(?,'DD/MM/YYYY'), 
+                   ?, 
+                   TO_DATE(?,'DD/MM/YYYY'),
+                   ?,?,?,?,?,?,?,?,?,?,?,?,?,
+                   ?,?,?,?,?,?,?,?,
+                   ?,
+                   SYSDATE,
+                   ?,
+                   SYSDATE,
+                   null,
+                   ?,
+                   ?,?,?,?,?,TO_DATE(?,'DD/MM/YYYY'),
+                   ?,?,?,TO_DATE(?,'DD/MM/YYYY'),?,?,TO_DATE(?,'DD/MM/YYYY'),?,?
+                   )"/>      
+                   
+
+<STATEMENT
+        name="BLEN_UPDATE_CPI_COMPETENZA"
+        query="
+	
+	update an_lav_storia_inf
+	set numklolavstoriainf = numklolavstoriainf + 1,
+	    codCpiOrig = ?,
+		codcpitit = ?
+		where cdnlavoratore = ?
+"/>
+
+<STATEMENT 	name="BLEN_SELECT_CODTIPOCERTIFICATO"
+        	query="
+	
+	select 
+		codtipocertificato
+	from de_tipo_corso
+	where codcl = ?
+	and rownum &lt;= 1
+	order by codtipocertificato
+	
+"/>
+
+<STATEMENT 	name="BLEN_SELECT_CODCORSO"
+        	query="
+        	
+	SELECT 
+		CODCORSO
+	FROM DE_CORSO
+	WHERE trim(lower(STRDESCRIZIONE)) = trim(lower(?))
+	AND ROWNUM &lt;= 1
+	ORDER BY CODCORSO ASC
+	
+"/>
+
+
+<STATEMENT 	name="BLEN_SELECT_CODTIPOINFO_CODDETTINFO"
+        	query="
+	SELECT 
+		ri.CODTIPOINFO,
+		di.CODDETTINFO
+	FROM 
+		DE_REL_INFO ri, 
+		DE_DETT_INFO di,
+		MA_CONSC_INF MACI,
+		MN_CONSC_INF MNCI
+	WHERE ri.CODDETTINFO=di.CODDETTINFO 
+	AND DI.CODDETTINFO = MACI.CODDETTINFO
+	AND MACI.COD_CONOSCENZA = MNCI.COD_CONOSCENZA(+)
+	AND LOWER(di.STRDESCRIZIONE) = LOWER(?)
+	AND ROWNUM &lt;= 1
+	ORDER BY CODTIPOINFO, CODDETTINFO
+
+"/>
+
+<STATEMENT 	name="BLEN_INSERT_VALIDITA_CV"
+        	query="
+	
+	INSERT INTO PR_VALIDITA (
+       PRGVALIDITA, 
+       CDNLAVORATORE, 
+       CODTIPOVALIDITA, 
+       DATINIZIOCURR, 
+       DATFINECURR, 
+       CODSTATOLAV, 
+       CDNUTINS, 
+       DTMINS, 
+       CDNUTMOD, 
+       DTMMOD
+    ) VALUES (
+    	S_PR_VALIDITA.NEXTVAL, 
+    	?, 
+    	'DL', 
+    	sysdate,
+        sysdate + ?,
+        'COM', 
+        ?,
+        SYSDATE, 
+        ?, 
+        SYSDATE
+	)
+	
+"/>
+
+<STATEMENT 	name="BLEN_EXISTS_SEDE_LEGALE"
+        	query="
+
+	select MAX(1) AS ESISTE
+	from an_unita_azienda
+	where flgsede = 'S'
+	and prgazienda = ?
+
+"/>
+
+<STATEMENT 	name="BLEN_SET_SEDE_LEGALE_UNITA_AZIENDA"
+        	query="
+
+	update an_unita_azienda
+	set dtmmod = sysdate,
+    	cdnutmod = ?,
+    	flgsede = 'S',
+    	numklounitaazienda = numklounitaazienda + 1
+	where prgunita = ? 
+	and prgazienda = ?
+
+"/>
+
+<STATEMENT 	name="BLEN_SELECT_CPI_COMPETENZA_LAV"
+        	query="
+
+	SELECT lavsto.codCpiTit codcpi
+	FROM an_lav_storia_inf lavsto
+	WHERE lavsto.cdnlavoratore = ?
+	and lavsto.datFine is null
+	and lavsto.codmonotipocpi = 'C' 
+	and rownum &lt;= 1
+	
+"/>
+
+<STATEMENT 	name="BLEN_EXISTS_TITOLO_STUDIO"
+        	query="
+
+	select MAX(1) AS ESISTE
+	from PR_STUDIO
+	where codtitolo = ?
+	and cdnlavoratore = ?
+
+"/>
+
+<STATEMENT 	name="BLEN_EXISTS_LINGUA"
+        	query="
+
+	select MAX(1) AS ESISTE
+	from PR_LINGUA
+	where codlingua = ?
+	and cdnlavoratore = ?
+
+"/>
+
+<STATEMENT 	name="BLEN_IS_EDILE_ATECO"
+        	query="
+	
+	select max(att.flgedile) FLGEDILE
+  	from do_richiesta_az ri
+	inner join an_unita_azienda un on un.prgazienda = ri.prgazienda and un.prgunita = ri.prgunita
+	inner join de_attivita att on att.codateco = un.codateco
+	where ri.prgrichiestaaz = ?
+	
+"/>
+
+<STATEMENT 	name="BLEN_IS_EDILE_CCNL"
+        	query="
+	
+	select max(con.flgedile) FLGEDILE
+  	from do_richiesta_az ri
+	inner join an_unita_azienda un on un.prgazienda = ri.prgazienda and un.prgunita = ri.prgunita
+	inner join DE_CONTRATTO_COLLETTIVO con on con.codccnl = un.codccnl
+	where ri.prgrichiestaaz = ?
+	
+"/>
+
+<STATEMENT 	name="BLEN_GET_PRGRICHIESTAAZ_BY_CODOFFERTA"
+        	query="
+	
+	select prgrichiestaaz
+	from cl_vacancy vacancy
+	where vacancy.codofferta = ?
+	
+"/>
+
+<STATEMENT 	name="BLEN_EXISTS_MANSIONE_LAV"
+        	query="
+
+	select MAX(1) AS ESISTE
+	from PR_MANSIONE
+	where codmansione = ?
+	and cdnlavoratore = ?
+
+"/>

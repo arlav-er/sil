@@ -1,0 +1,837 @@
+<!-- MODULES/COLLOCAMENTO_MIRATO.XML -->
+
+<!-- lista multiselezione convenzioni -->
+<MODULE name="CM_MULTI_LIST_CONVENZIONI" class="it.eng.sil.module.collocamentoMirato.ComboStatoConvenzioni">
+	<CONFIG pool="SIL_DATI">
+		<QUERY>
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.collocamentoMirato.DynComboStatoConvenzioni"/>
+		</QUERY>		
+	</CONFIG>
+</MODULE>
+
+<!-- lista multiselezione documenti convenzioni -->
+<MODULE name="CM_MULTI_LIST_CONV_DOC" class="it.eng.sil.module.collocamentoMirato.ComboStatoAttoConvenzioni">
+	<CONFIG pool="SIL_DATI">
+		<QUERY>
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.collocamentoMirato.DynComboStatoAttoConvenzioni"/>
+		</QUERY>				
+	</CONFIG>
+</MODULE>
+
+<!-- lista delle convenzioni -->
+<MODULE name="CM_LISTA_CONVENZIONI" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" rows="15" title="Lista delle Convenzioni">
+		<QUERIES>
+			<SELECT_QUERY>				
+				<STATEMENT_PROVIDER CLASS="it.eng.sil.module.collocamentoMirato.DynRicercaConvenzioni" />
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="DESCSTATO" label="Stato" />
+			<COLUMN name="CONV" label="Num/Anno" />
+			<COLUMN name="RAGIONESOCIALE" label="Azienda" />
+			<COLUMN name="DATCONVENZIONE" label="Data convenzione" />
+			<COLUMN name="DATSCADENZA" label="Data scadenza" />
+			<COLUMN name="PROVINCIA_ISCR" label="Ambito Territoriale"/>
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" confirm="FALSE" label="Dettaglio Convenzione">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="CMDatiGenConvPage" />
+				<PARAMETER name="CDNFUNZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNFUNZIONE" />	
+				<PARAMETER name="PROVINCIA_ISCR" scope="LOCAL" type="RELATIVE" value="PROVINCIA_ISCR" />
+				<PARAMETER name="PRGCONV" scope="LOCAL" type="RELATIVE" value="PRGCONV" />		
+			</SELECT_CAPTION>
+		</CAPTIONS>
+		<BUTTONS></BUTTONS>
+	</CONFIG>
+</MODULE>
+
+<!-- inserimento nuova convenzione -->
+<MODULE name="CM_INS_CONVENZIONE" class="it.eng.sil.module.collocamentoMirato.InsertConv">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_NEXTVAL statement="SELECT_PRGCONV_SEQUENCE"/>
+		<QUERY_INSERT_CONV statement="INS_CONVENZIONE">
+			<PARAMETER name="PRGCONV" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONV"/>
+			<PARAMETER name="anno" scope="SERVICE_REQUEST" type="RELATIVE" value="anno" />
+			<PARAMETER name="numero" scope="SERVICE_REQUEST" type="RELATIVE" value="numero" />
+			<PARAMETER name="prgAzienda" scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda" />
+			<PARAMETER name="prgUnita" scope="SERVICE_REQUEST" type="RELATIVE" value="prgUnita" />
+			<PARAMETER name="copertura" scope="SERVICE_REQUEST" type="RELATIVE" value="copertura" />
+			<PARAMETER name="lavoratori" scope="SERVICE_REQUEST" type="RELATIVE" value="lavoratori" />
+			<PARAMETER name="dataConv" scope="SERVICE_REQUEST" type="RELATIVE" value="dataConv" />
+			<PARAMETER name="statoConv" scope="SERVICE_REQUEST" type="RELATIVE" value="statoConv" />
+			<PARAMETER name="dataScad" scope="SERVICE_REQUEST" type="RELATIVE" value="dataScad" />
+			<PARAMETER name="durata" scope="SERVICE_REQUEST" type="RELATIVE" value="durata" />
+			<PARAMETER name="proroga" scope="SERVICE_REQUEST" type="RELATIVE" value="proroga" />
+			<PARAMETER name="modifica" scope="SERVICE_REQUEST" type="RELATIVE" value="modifica" />
+			<PARAMETER name="rinunciaDis" scope="SERVICE_REQUEST" type="RELATIVE" value="rinunciaDis" />
+			<PARAMETER name="rinunciaArt18" scope="SERVICE_REQUEST" type="RELATIVE" value="rinunciaArt18" />
+			<PARAMETER name="STRNOTE" scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTE" />
+			<PARAMETER name="PROVINCIA_ISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="PROVINCIA_ISCR" />
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+		</QUERY_INSERT_CONV>		
+	</CONFIG>
+</MODULE>
+
+<!-- dettaglio dati generali convenzioni -->
+<MODULE name="CM_DETT_CONVENZIONI" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_DATI_GENERALI_CONV">
+			<PARAMETER name="PRGCONV" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONV"/>
+		</QUERY>		
+	</CONFIG>
+</MODULE>
+
+<!-- dettaglio prospetto legato all'azienda in base al prgazienda, anno e provincia -->
+<MODULE name="CM_GET_PROSPETTO_INF" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_DATI_PROSPETTO_INF">
+			<PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+		</QUERY>		
+	</CONFIG>
+</MODULE>
+
+<!-- aggiornamento dettaglio dati generali convenzioni -->
+<MODULE name="CM_UPD_DATIGEN_CONVENZIONI" class="it.eng.sil.module.collocamentoMirato.UpdateConv">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_UPDATE_CONV statement="UPD_DATIGEN_CONVENZIONI">
+			<PARAMETER name="anno" scope="SERVICE_REQUEST" type="RELATIVE" value="anno" />
+			<PARAMETER name="numero" scope="SERVICE_REQUEST" type="RELATIVE" value="numero" />
+			<PARAMETER name="prgAzienda" scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda" />
+			<PARAMETER name="prgUnita" scope="SERVICE_REQUEST" type="RELATIVE" value="prgUnita" />
+			<PARAMETER name="copertura" scope="SERVICE_REQUEST" type="RELATIVE" value="copertura" />
+			<PARAMETER name="lavoratori" scope="SERVICE_REQUEST" type="RELATIVE" value="lavoratori" />
+			<PARAMETER name="dataConv" scope="SERVICE_REQUEST" type="RELATIVE" value="dataConv" />
+			<PARAMETER name="statoConv" scope="SERVICE_REQUEST" type="RELATIVE" value="statoConv" />
+			<PARAMETER name="dataScad" scope="SERVICE_REQUEST" type="RELATIVE" value="dataScad" />
+			<PARAMETER name="durata" scope="SERVICE_REQUEST" type="RELATIVE" value="durata" />
+			<PARAMETER name="proroga" scope="SERVICE_REQUEST" type="RELATIVE" value="proroga" />
+			<PARAMETER name="modifica" scope="SERVICE_REQUEST" type="RELATIVE" value="modifica" />
+			<PARAMETER name="rinunciaDis" scope="SERVICE_REQUEST" type="RELATIVE" value="rinunciaDis" />
+			<PARAMETER name="rinunciaArt18" scope="SERVICE_REQUEST" type="RELATIVE" value="rinunciaArt18" />
+			<PARAMETER name="STRNOTE" scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTE" />
+    		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    		<PARAMETER name="NUMKLOCONV" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOCONV" />
+    		<PARAMETER name="PRGCONV" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONV"/>	
+		</QUERY_UPDATE_CONV>
+	</CONFIG>
+</MODULE>
+
+<!-- estrazione numero della convenzione -->
+<MODULE name="CM_NUMERO_CONV" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_NUMERO_CONVENZIONE"/>					
+	</CONFIG>
+</MODULE>
+
+<!-- estrazione dell'azienda in presenza del prgazienda dal menu contestuale -->
+<MODULE name="CM_GetInfoUnitaAzienda" class="it.eng.sil.module.ido.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="CM_INFO_UNITA_AZIENDA">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgUnita"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_LOAD_CONV_DOC" class="it.eng.sil.module.ido.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="SELECT_DOC_FROM_CONV">
+		<PARAMETER name="STRCHIAVETABELLA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONV"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_SALVA_CONV_DOC" class="it.eng.sil.module.collocamentoMirato.SalvaDocConv">
+    <CONFIG pool="SIL_DATI" title="">    
+		<QUERY_SELECT_DOC statement="SELECT_PRGDOC_FROM_CONV">			
+        	<PARAMETER name="STRCHIAVETABELLA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONV"/>      							
+		</QUERY_SELECT_DOC>			            		
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_Annullamento_Conv_E_Doc" class="it.eng.sil.module.anag.AnnullaRichEDoc">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_ANNULLA_RICH statement="UPDATE_ANNULLAMENTO_CONV">    
+      <PARAMETER name="CODSTATORICHIESTA" type="ABSOLUTE" value="AN"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOCONV"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONV"/>       
+    </QUERY_ANNULLA_RICH>
+	<QUERY_SELECT_DOC statement="SELECT_PRGDOC_FROM_CONV">			
+    	<PARAMETER name="STRCHIAVETABELLA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONV"/>      							
+	</QUERY_SELECT_DOC>	
+	<QUERY_ANNULLA_DOC statement="UPDATE_DOC_ASS_CONV">
+    	<PARAMETER name="CODSTATOATTO" type="ABSOLUTE" value="AN"/>			
+	    <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>			
+    	<PARAMETER name="NUMKLODOCUMENTO" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLODOCUMENTO"/>
+    	<PARAMETER name="PRGDOCUMENTO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGDOCUMENTO"/>        	      							
+	</QUERY_ANNULLA_DOC>
+  </CONFIG>
+</MODULE>
+
+<!-- info azienda da convenzione -->
+<MODULE name="CM_INFO_AZ_DA_CONV" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_INFO_AZ_DA_CONV">
+			<PARAMETER name="PRGCONV" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONV"/>
+		</QUERY>		
+	</CONFIG>
+</MODULE>
+
+<MODULE name="CM_GETANDRICALCOLARIEPILOGOPROSP" class="it.eng.sil.module.collocamentoMirato.GetandRicalcolaRiepilogoProsp">
+	<CONFIG pool="SIL_DATI" title="">
+		<SELECT_PROSPETTO statement="GET_PROSPETTO_COLLEGATO">
+			<PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+			<PARAMETER name="DATCONVENZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="DATCONVENZIONE"/>
+			<PARAMETER name="DATSCADENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="DATSCADENZA"/> 
+			<PARAMETER name="DATSCADENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="DATSCADENZA"/>
+			<PARAMETER name="PRGCONV" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONV"/>
+		</SELECT_PROSPETTO>	
+		<RICALCOLO_PROSPETTO statement="RICALCOLO_RIEPILOGO_PROSP" />	
+    	<SELECT_RIEPILOGO statement="SELECT_RIEPILOGO_PROSPETTO">
+			<PARAMETER name="PRGPROSPETTOINF" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPROSPETTOINF" />
+		</SELECT_RIEPILOGO>			
+	</CONFIG>
+</MODULE>
+
+<!-- lista assunzioni convenzioni -->
+<MODULE name="CM_LISTA_CONV_ASSUNZIONI" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" rows="15" title="">
+		<QUERIES>
+			<SELECT_QUERY>				
+				<STATEMENT_PROVIDER CLASS="it.eng.sil.module.collocamentoMirato.ListaAssunzioni" />
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="NUMLAVORATORI" label="Num" />
+			<COLUMN name="LAV" label="Lavoratore" />
+			<COLUMN name="CATEGORIA" label="D/A" />
+			<COLUMN name="TIPO" label="Nu/no" />
+			<COLUMN name="DATASCAD" label="Entro il" />
+			<COLUMN name="STATOASS" label="Stato" />
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" confirm="FALSE" label="Dettaglio Assunzione">
+				<PARAMETER name="PRGCONVDETTAGLIO" scope="LOCAL" type="RELATIVE" value="PRGCONVDETTAGLIO" />		
+			</SELECT_CAPTION>
+	  		<CAPTION image="../../img/Reitera.gif" label="Reitera" confirm="FALSE">
+		  		<PARAMETER name="PAGE" type="ABSOLUTE" value="CMAssunzConvPage" />
+		  		<PARAMETER name="MODULE" type="ABSOLUTE" value="CM_LOAD_CONV_ASSUNZIONI" />
+				<PARAMETER name="CDNFUNZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNFUNZIONE" />
+		  		<PARAMETER name="PRGCONV" scope="LOCAL" type="RELATIVE" value="PRGCONV" />
+				<PARAMETER name="PRGCONVDETTAGLIO" scope="LOCAL" type="RELATIVE" value="PRGCONVDETTAGLIO" />
+				<PARAMETER name="REITERA" scope="ABSOLUTE" value="1"/>
+      		</CAPTION>
+			<DELETE_CAPTION image="../../img/del.gif" label="Cancella Assunzione" confirm="TRUE">	
+				<PARAMETER name="PRGCONVDETTAGLIO" scope="LOCAL" type="RELATIVE" value="PRGCONVDETTAGLIO" />
+			</DELETE_CAPTION>
+		</CAPTIONS>
+		<BUTTONS></BUTTONS>
+	</CONFIG>
+</MODULE> 
+
+<!-- combo per lo stato dell'assunzione-->
+<MODULE name="CM_COMBO_STATO_ASS" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI">
+		<QUERY statement="GET_COMBO_STATO_ASS"/>		
+	</CONFIG>
+</MODULE>
+
+<!-- combo per il contratto dell'assunzione-->
+<MODULE name="CM_COMBO_CONTRATTO_ASS" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI">
+		<QUERY statement="GET_COMBO_CONTRATTO_ASS"/>		
+	</CONFIG>
+</MODULE>
+
+<!-- inserimento delle assunzioni-->
+<MODULE name="CM_INS_CONV_ASSUNZIONI" class="it.eng.sil.module.collocamentoMirato.InsertAssunz">
+	<CONFIG pool="SIL_DATI" row="15" title="">
+		<QUERY_NEXTVAL statement="SELECT_PRGCONVDETTAGLIO_SEQUENCE"/>
+		<QUERY_INSERT_ASS statement="INS_ASSUNZIONE">
+			<PARAMETER name="PRGCONVDETTAGLIO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONVDETTAGLIO"/>
+			<PARAMETER name="PRGCONV" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONV"/>>
+			<PARAMETER name="numLavoratori" scope="SERVICE_REQUEST" type="RELATIVE" value="numLavoratori" />
+			<PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" />
+			<PARAMETER name="CODMONOCATEGORIA" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOCATEGORIA" />
+			<PARAMETER name="codMonoTipo" scope="SERVICE_REQUEST" type="RELATIVE" value="codMonoTipo" />
+			<PARAMETER name="datScadenza" scope="SERVICE_REQUEST" type="RELATIVE" value="datScadenza" />
+			<PARAMETER name="codStato" scope="SERVICE_REQUEST" type="RELATIVE" value="codStato" />
+			<PARAMETER name="CODMANSIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMANSIONE" />
+			<PARAMETER name="codContratto" scope="SERVICE_REQUEST" type="RELATIVE" value="codContratto" />
+			<PARAMETER name="numggProlungProva" scope="SERVICE_REQUEST" type="RELATIVE" value="numggProlungProva" />
+			<PARAMETER name="FLGINNALZAMENTOLIMITI" scope="SERVICE_REQUEST" type="RELATIVE" value="FLGINNALZAMENTOLIMITI" />
+			<PARAMETER name="STRNOTE" scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTE" />
+			<PARAMETER name="CODMONOLAVPROGRAM" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOLAVPROGRAM" />						
+		</QUERY_INSERT_ASS>		
+	</CONFIG>
+</MODULE>
+
+<!-- dettaglio delle assunzioni -->
+<MODULE name="CM_LOAD_CONV_ASSUNZIONI" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI">
+		<QUERY statement="GET_DETTAGLIO_ASSUNZIONE">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONVDETTAGLIO" />
+		</QUERY>		
+	</CONFIG>
+</MODULE>
+
+<!-- cancellazione delle assunzioni-->
+<MODULE name="CM_DEL_CONV_ASSUNZIONI" class="it.eng.sil.module.collocamentoMirato.DeleteAssunz">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_DELETE_ASS statement="DEL_ASSUNZIONE">
+			<PARAMETER name="PRGCONVDETTAGLIO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONVDETTAGLIO" />			
+		</QUERY_DELETE_ASS>
+	</CONFIG>
+</MODULE>
+
+<!-- cancellazione delle assunzioni-->
+<MODULE name="CM_REITERA_CONV_ASSUNZIONI" class="it.eng.sil.module.collocamentoMirato.ReiteraAssunz">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_REITERA_ASS statement="REITERA_ASSUNZIONE">			
+			<PARAMETER name="PRGCONVDETTAGLIO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONVDETTAGLIO" />			
+		</QUERY_REITERA_ASS>
+	</CONFIG>
+</MODULE>
+
+<!-- aggiornamento delle assunzioni-->
+<MODULE name="CM_UPD_CONV_ASSUNZIONI" class="it.eng.sil.module.collocamentoMirato.UpdateAssunz">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_UPDATE_ASS statement="UPD_ASSUNZIONE">
+			<PARAMETER name="PRGCONV" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONV"/>>
+			<PARAMETER name="numLavoratori" scope="SERVICE_REQUEST" type="RELATIVE" value="numLavoratori" />
+			<PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" />
+			<PARAMETER name="CODMONOCATEGORIA" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOCATEGORIA" />
+			<PARAMETER name="codMonoTipo" scope="SERVICE_REQUEST" type="RELATIVE" value="codMonoTipo" />
+			<PARAMETER name="datScadenza" scope="SERVICE_REQUEST" type="RELATIVE" value="datScadenza" />
+			<PARAMETER name="codStato" scope="SERVICE_REQUEST" type="RELATIVE" value="codStato" />
+			<PARAMETER name="CODMANSIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMANSIONE" />
+			<PARAMETER name="codContratto" scope="SERVICE_REQUEST" type="RELATIVE" value="codContratto" />
+			<PARAMETER name="numggProlungProva" scope="SERVICE_REQUEST" type="RELATIVE" value="numggProlungProva" />
+			<PARAMETER name="FLGINNALZAMENTOLIMITI" scope="SERVICE_REQUEST" type="RELATIVE" value="FLGINNALZAMENTOLIMITI" />
+			<PARAMETER name="CODMONOLAVPROGRAM" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOLAVPROGRAM" />
+			<PARAMETER name="STRNOTE" scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTE" />
+			<PARAMETER name="PRGCONVDETTAGLIO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONVDETTAGLIO" />			
+		</QUERY_UPDATE_ASS>
+	</CONFIG>
+</MODULE>
+
+<!-- lista avviamenti del lavoratore da poter associare all'assunzione -->
+<MODULE name="CM_AVVIAMENTI_ASS" class="it.eng.afExt.dispatching.module.impl.ListModule">
+	<CONFIG pool="SIL_DATI" rows="15" title="Lista degli Avviamenti associabili all'assunzione">
+		<QUERIES>
+       		<SELECT_QUERY statement="CERCA_AVV_ASS">
+       			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/> 
+        		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/> 
+        		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATSCADENZA"/>        
+       			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATSCADENZA"/> 
+       		</SELECT_QUERY>
+    	</QUERIES>		
+    	<COLUMNS>
+      		<COLUMN name="DATINIZIOMOV" label="Data Assunzione"/>
+      		<COLUMN name="DATFINEMOVEFFETTIVA" label="Data Cessazione"/> 
+      		<COLUMN name="CODCONTRATTO" label="Cod. Contratto"/>
+      		<COLUMN name="STRCONTRATTO" label="Contratto"/> 
+       		<COLUMN name="CODMANSIONE" label="Cod. Mansione"/>
+      		<COLUMN name="STRMANSIONE" label="Mansione"/> 
+    	</COLUMNS>
+    	<CAPTIONS>
+    		<SELECT_CAPTION image="../../img/add.gif" label="Aggiorna assunzione" confirm="TRUE">
+        		<PARAMETER name="CODCONTRATTO" scope="LOCAL" type="RELATIVE" value="CODCONTRATTO"/>
+        		<PARAMETER name="CODMANSIONE" scope="LOCAL" type="RELATIVE" value="CODMANSIONE"/>
+        		<PARAMETER name="STRMANSIONE" scope="LOCAL" type="RELATIVE" value="STRMANSIONE"/>      
+      		</SELECT_CAPTION> 
+		</CAPTIONS>
+	</CONFIG>
+</MODULE> 
+
+<!-- lista agevolazioni del lavoratore associate all'assunzione -->
+<MODULE name="CM_COMBO_AGEV_PRES" class="it.eng.sil.module.collocamentoMirato.CMListaAgevolazioniPresenti">
+  <CONFIG pool="SIL_DATI" rows="6" title="Agevolazioni associate">
+    <QUERIES>
+       <SELECT_QUERY statement="COMBO_AGEVOLAZIONI_PRESENTI">
+       	  <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONVDETTAGLIO" />
+       </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="codAgevolazione" label="Codice Agevolazione"/>
+      <COLUMN name="strDescrizione" label="Descrizione Agevolazione"/>
+    </COLUMNS>
+    <CAPTIONS>
+       <DELETE_CAPTION image="../../img/del.gif" label="Cancella Agevolazione" confirm="TRUE">
+			<PARAMETER name="CODAGEVOLAZIONE" scope="LOCAL" type="RELATIVE" value="CODAGEVOLAZIONE" />
+       </DELETE_CAPTION>
+    </CAPTIONS>    
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_COMBO_AGEVOLAZIONI" class="it.eng.sil.module.ComboGenerica">
+	<CONFIG pool="SIL_DATI">
+		<QUERIES>
+			<SELECT_QUERY statement="COMBO_AGEVOLAZIONI" />
+		</QUERIES>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="CM_LOAD_AGE_ASS" class="it.eng.sil.module.collocamentoMirato.InsertAgevolazione">
+  <CONFIG pool="SIL_DATI" title=""> 
+    <QUERY_SELECT_AGEVOLAZIONE statement="SELECT_AGEVOLAZIONE">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONVDETTAGLIO"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codAgevolazione"/>
+	</QUERY_SELECT_AGEVOLAZIONE>    
+    <QUERY_INSERT_AGEVOLAZIONI statement="INSERT_AGEVOLAZIONE">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONVDETTAGLIO"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codAgevolazione"/>
+	</QUERY_INSERT_AGEVOLAZIONI>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_DEL_AGE_ASS" class="it.eng.sil.module.collocamentoMirato.DeleteAgevolazione">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_DELETE_AGEVOLAZIONE statement="DEL_AGEVOLAZIONE">
+			<PARAMETER name="PRGCONVDETTAGLIO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONVDETTAGLIO"/>
+			<PARAMETER name="CODAGEVOLAZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="CODAGEVOLAZIONE"/>			
+		</QUERY_DELETE_AGEVOLAZIONE>
+	</CONFIG>
+</MODULE>
+
+<!-- **********************************************************************************
+                  MODULES  ISCRIZIONI COLLOCAMENTO MIRATO
+     ********************************************************************************** -->
+
+<MODULE name="CM_LOAD_ISCRIZIONI" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+  <CONFIG pool="SIL_DATI" title="Elenco Iscrizioni Collocamento Mirato" rows="15">
+	<QUERIES>
+		<SELECT_QUERY>				
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.collocamentoMirato.DynLoadIscrLAvL68" />
+		</SELECT_QUERY>
+	</QUERIES>
+    <COLUMNS>
+        <COLUMN name="DATINIZIO" label="Data inizio"/>
+        <COLUMN name="DESCRIZIONEISCR" label="Categoria"/>                        
+        <COLUMN name="TIPO" label="Tipo"/>            
+        <COLUMN name="DESCRIZIONEINV" label="Tipo invalidit&amp;agrave;"/> 
+        <COLUMN name="DATFINE" label="Data fine"/>
+        <COLUMN name="STATOATTO" label="Stato atto"/>                        
+        <COLUMN name="DESCRMOTIVOFINEATTO" label="Motivo chiusura"/> 
+        <COLUMN name="PROVINCIA_ISCR" label="Ambito Territoriale"/>
+    </COLUMNS>
+    <CAPTIONS>
+        <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+           <PARAMETER name="PAGE" type="ABSOLUTE" value="CMIscrizioniLavoratorePage" />
+           <PARAMETER name="MODULE" type="ABSOLUTE" value="CM_GET_DETT_ISCR" />
+           <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="LOCAL"/>
+           <PARAMETER name="CDNLAVINCHIARO" type="RELATIVE" value="CDNLAVINCHIARO" scope="LOCAL"/>
+           <PARAMETER name="selTutte" type="RELATIVE" value="selTutte" scope="SERVICE_REQUEST"/>
+           <PARAMETER name="CODSTATOATTO" type="RELATIVE" value="CODSTATOATTO" scope="LOCAL"/>
+           <PARAMETER name="prgCMIscr" type="RELATIVE" value="prgCMIscr" scope="LOCAL"/>
+           <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/> 
+           <PARAMETER name="PRGSPI" type="RELATIVE" value="PRGSPIMOD" scope="LOCAL"/>                
+        </SELECT_CAPTION>
+    </CAPTIONS>      
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_CHECK_CAN_ISCR" class="it.eng.sil.module.collocamentoMirato.CheckCanIscrLavL68" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="CHECK_CAN_ISCR" >
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>     
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_CHECK_CAN_ISCR_DECRYPT" class="it.eng.sil.module.collocamentoMirato.CheckCanIscrLavL68" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="CHECK_CAN_ISCR_DECRYPT" >
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/> 
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_GET_DETT_ISCR" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DETT_AM_CM_ISCR">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgCMIscr"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+    </QUERY>
+  </CONFIG>
+</MODULE> 
+
+<MODULE name="CM_GET_DETT_ISCR_CHIUSAL68" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DETT_AM_CM_ISCR">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgCMIscr"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORENCRYPT"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="COMBO_STATO_ATTO_ISCR_L68" class="it.eng.sil.module.collocamentoMirato.DynGenericIscrL68">
+	<CONFIG pool="SIL_DATI" >
+		<QUERY> 
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.collocamentoMirato.DynComboIscrL68"/>
+   		</QUERY> 
+	</CONFIG>
+</MODULE>
+
+<MODULE name="CM_GET_DE_TIPO_ISCR_D" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" >
+    <QUERY statement="GET_DE_CM_TIPO_ISCR_D"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_GET_DE_TIPO_ISCR_A" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" >
+    <QUERY statement="GET_DE_CM_TIPO_ISCR_A"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_GET_DE_TIPO_INVAL" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DE_CM_TIPO_INVALIDITA"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_GET_PROVINCIA_ISCR" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_AMB_TERR"/>
+  </CONFIG>
+</MODULE>
+
+
+
+
+<MODULE name="CM_GET_DE_ACC_SANIT" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DE_CM_ACCSANIT"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_GET_VERB_ACC" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_VERB_ACC" >
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+    </QUERY>
+  </CONFIG>
+</MODULE> 
+
+<MODULE name="CM_GET_AMB_TERR" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_AMB_TERR" >
+    </QUERY>
+  </CONFIG>
+</MODULE> 
+
+<MODULE name="CM_GET_DATANZIANITA68_ISCR_PREC_D" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DATANZIANITA68_ISCR_PREC_CM" >
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      	<PARAMETER name="CATEGORIA" scope="" type="ABSOLUTE" value="D"/>
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      	<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_GET_DATANZIANITA68_ISCR_PREC_A" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DATANZIANITA68_ISCR_PREC_CM" >
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      	<PARAMETER name="CATEGORIA" scope="" type="ABSOLUTE" value="A"/>
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      	<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_GET_CPI_COMP" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_CPI_COMP" >
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="CM_Motivo_Fine_Atto" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_Motivo_Fine_Atto"/>		
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_SAVE_ISCR"
+	class="it.eng.sil.module.collocamentoMirato.SaveIscrLavL68">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_PROC statement="GET_NUM_CM_ISCR" />
+		<QUERY_SEQUENCE statement="GET_NEW_PRG_CM_ISCR" />
+		<QUERY_INSERT_ISCR statement="QUERY_INSERT_ISCR" />
+		<QUERY_UPDATE_ISCR statement="UPD_CM_ISCR">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCMTIPOISCR" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATDATAINIZIO" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATDATAFINE" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOINVALIDITA" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMPERCINVALIDITA" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODACCERTSANITARIO" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATACCERTSANITARIO" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTE" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGSPIMOD" />
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOCMISCR" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATANZIANITA68" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATULTIMAISCR" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODMOTIVOFINEATTO" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGVERBALEACC" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSTATOATTO" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCMANNOTA" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATANZORDINARIAPREGRESSA" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCMISCR" />
+			
+		</QUERY_UPDATE_ISCR>
+		<QUERY_UPDATE_ISCR_DA_DIAGNOSI statement="UPD_CM_ISCR_DIAGNOSI">			
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOINVALIDITA" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMPERCINVALIDITA" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODACCERTSANITARIO" />			
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOCMISCR" />			
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCMISCR" />
+		</QUERY_UPDATE_ISCR_DA_DIAGNOSI>
+		<QUERY_DAT_VERB_ACC statement="SELECT_DAT_VERB_ACC">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGVERBALEACC" />
+		</QUERY_DAT_VERB_ACC>
+		<QUERY_SELECT_DOC statement="SELECT_PRGDOC_FROM_CM_ISCR">
+			<PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" />
+			<PARAMETER name="STRCHIAVETABELLA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCMISCR" />
+		</QUERY_SELECT_DOC>
+		<QUERY_UPD_STATO_ATTO_ISCR statement="UPD_STATO_ATTO_CM_ISCR">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSTATOATTO" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOCMISCR" />
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCMISCR" />
+		</QUERY_UPD_STATO_ATTO_ISCR>
+		<QUERY_PROC_FLAG statement="SET_FLAG_LAV_CM_ISCR" />
+		<QUERY_SEQUENCE_STORICO statement="GET_NEW_PRG_CM_ISCR_STORICO" />
+		<QUERY_INSERT_ISCR_STORICO statement="QUERY_INSERT_ISCR_STORICO">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCMISCRSTORICO" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCMISCR" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMPERCINVALIDITAOLD" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODACCERTSANITARIOOLD" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATACCERTSANITARIOOLD" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTEOLD" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOINVALIDITAOLD" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOMOTIVOMODIFICA" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGSPIMODOLD" />
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNUTMODOLD" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DTMMODOLD" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATANZIANITA68OLD" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGVERBALEACCOLD" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCMANNOTA" />
+		</QUERY_INSERT_ISCR_STORICO>
+		<QUERY_PROC_SCHEDA statement="AGGIORNA_SCHEDA_LAV_CM_ISCR" />
+	</CONFIG>
+</MODULE>
+
+<MODULE name="CM_GET_DETT_AM_CM_ISCR_ULTIMA_TIPO_D" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DETT_AM_CM_ISCR_ULTIMA" >
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      	<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+      	<PARAMETER name="CATEGORIA" scope="" type="ABSOLUTE" value="D"/>
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE> 
+
+<MODULE name="CM_GET_DETT_AM_CM_ISCR_ULTIMA_TIPO_A" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DETT_AM_CM_ISCR_ULTIMA" >
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      	<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+      	<PARAMETER name="CATEGORIA" scope="" type="ABSOLUTE" value="A"/>
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_CALCOLA_MESI_ANZ" class="it.eng.sil.module.collocamentoMirato.CalcolaMesiAnzLavL68">
+	<CONFIG pool="SIL_DATI"/>
+</MODULE>
+
+<MODULE name="CM_GetInfoDeDoc_IscrL68" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GetInfoDeDoc_IscrL68"/>
+  </CONFIG>
+</MODULE>
+
+<!-- lista dello storico modifiche di una Iscrizione L68 -->
+<MODULE name="CM_Storico_Mod_IscrL68" class="it.eng.afExt.dispatching.module.impl.ListModule">
+  <CONFIG pool="SIL_DATI" rows="15" title="Storico Modifiche Iscrizione">
+    <QUERIES>
+       <SELECT_QUERY statement="STORICO_MODIFICHE_ISCRL68">
+       	  <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCMISCR"/>
+       </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="DTMINS" label="Data Storicizz."/>
+	  <COLUMN name="DATANZIANITA68" label="Data anzianit&amp;agrave;"/>
+	  <COLUMN name="DESCRTIPOINV" label="Tipo invalidit&amp;agrave;"/>
+      <COLUMN name="NUMPERCINV" label="Percentuale invalidit&amp;agrave;"/>
+      <COLUMN name="DESC_ANNOTA" label="Annota per fuori lista"/> 
+      <COLUMN name="DATACCSAN" label="Data accert. sanitario"/>
+      <COLUMN name="DESCRACCSAN" label="Tipo accert. sanitario"/> 
+      <COLUMN name="DESCRVERBACC" label="Verbale accert."/>    
+      <COLUMN name="STRNOTE" label="Note"/>
+      <COLUMN name="DESCRSPIMOD" label="Operatore&amp;nbsp;di&lt;br&gt;riferimento"/> 
+      <COLUMN name="UTINS" label="Utente Storicizz."/>
+      <COLUMN name="DESCRMOTMODIFICA" label="Motivo Modifica"/>
+      <COLUMN name="UTMOD" label="Utente Modifica"/>     
+    </COLUMNS>   
+  </CONFIG>
+</MODULE>
+
+<!-- lista assunzioni -->
+<MODULE name="CM_LISTA_ASSUNZIONI" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" rows="15" title="Lista delle Assunzioni">
+		<QUERIES>
+			<SELECT_QUERY>				
+				<STATEMENT_PROVIDER CLASS="it.eng.sil.module.collocamentoMirato.DynRicercaAssunzioniGenerica" />
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRRAGIONESOCIALE" label="Denominazione Azienda" />
+			<COLUMN name="NUMLAVORATORI" label="Numero posti" />
+			<COLUMN name="CATEGORIA" label="D/A" />
+			<COLUMN name="TIPO" label="Nu/No" />
+			<COLUMN name="DATASCADASS" label="Entro il" />
+			<COLUMN name="DATACONV" label="Data convenzione" />
+			<COLUMN name="DATASCADCONV" label="Data scadenza" />	
+			<COLUMN name="PROVINCIA_ISCR" label="Ambito Territoriale" />		
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" confirm="FALSE" label="Dettaglio Convenzione">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="CMDatiGenConvPage" />
+				<PARAMETER name="CDNFUNZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNFUNZIONE" />	
+				<PARAMETER name="PRGCONV" scope="LOCAL" type="RELATIVE" value="PRGCONV" />	
+			</SELECT_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_GetParamCmIsc1" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" >
+    <QUERY statement="GET_PARAM_CONFIG_CM_ISC_1"/>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_Get_De_Cm_Annota" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" >
+    <QUERY statement="GET_DE_CM_ANNOTA"/>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_Get_Data_Anz_Disocc" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="Get_Data_Anz_Disocc" >
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      	<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>     
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+<!-- Modulo che calcola il punteggio presunto del lavoratore -->  
+<MODULE name="M_CMIscrizioniLavCalcolaPunteggioPresunto" class="it.eng.sil.module.ido.CMCalcolaPunteggioPresunto_Lav_Isc" >
+  <CONFIG pool="SIL_DATI" title="">
+   	<CM_DATI_ISCRIZIONE_C_P statement="CM_GET_DATI_ISCRIZIONE_C_P">		
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="tipoincrocio"/>	
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/> 
+	</CM_DATI_ISCRIZIONE_C_P>
+	
+   	<CM_CALCOLO_PUNTEGGIO_PRESUNTO_CM_ISCR statement="S_CM_CALCOLO_PUNTEGGIO_PRESUNTO_CM_ISCR"/>		
+			
+	
+   
+   <!--   <QUERY statement="GET_XXXXX" >
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      	<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>     
+    </QUERY> -->
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Get_Stato_Occup" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="S_Get_Stato_Occup" >
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+      	<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>  	     
+    </QUERY> 
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Get_Prg_Ultima_Iscrizione_Lav_tipo" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_PRG_ULTIMA_ISCR_LAV_TIPO">
+			<PARAMETER scope="SERVICE_RESPONSE" type="RELATIVE" value="CM_GET_DETT_ISCR.ROWS.ROW.codMonoTipoRagg"/>
+			<PARAMETER scope="SERVICE_RESPONSE" type="RELATIVE" value="CM_GET_DETT_ISCR.ROWS.ROW.CDNLAVORATORE"/>
+			<PARAMETER scope="SERVICE_RESPONSE" type="RELATIVE" value="CM_GET_DETT_ISCR.ROWS.ROW.CDNLAVORATORE"/>
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+			<PARAMETER scope="SERVICE_RESPONSE" type="RELATIVE" value="CM_GET_DETT_ISCR.ROWS.ROW.codMonoTipoRagg"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_Get_Last_Diagnosi_Funz" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_LAST_DIAGNOSI_FUNZ_LAV">
+			<PARAMETER scope="SERVICE_RESPONSE" type="RELATIVE" value="CM_GET_DETT_ISCR.ROWS.ROW.CDNLAVORATORE"/>
+			<PARAMETER scope="SERVICE_RESPONSE" type="RELATIVE" value="CM_GET_DETT_ISCR.ROWS.ROW.CDNLAVORATORE"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="CM_LISTA_ISCRIZIONI_DISABILI_L68" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="CM_GET_LISTA_ISCRIZIONI_DISABILI_L68">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnlavoratore" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnlavoratore" />
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_CONFIG_ANZIANITA_ORDINARIA_CM" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_NUM_CONFIG_LOC_PARAM">
+		<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="ANZORDCM"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="CM_LAV_IS_ISCRITTO" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="CM_GET_LAV_IS_ISCRITTO">
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnlavoratore" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_ConfigStampaIscrizioneL68" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="ST_GetConfig_Generica">
+			<PARAMETER name="CODTIPOCONFIG" type="ABSOLUTE" value="STMPIL68" scope=""/>
+      	</QUERY>
+   	</CONFIG>
+</MODULE>

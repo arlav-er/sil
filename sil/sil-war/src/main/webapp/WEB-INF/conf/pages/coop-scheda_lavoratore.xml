@@ -1,0 +1,569 @@
+﻿
+<PAGE distributed="false" name="CoopCaricaDatiPersonaliPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_COOP_GETLAVORATOREIR"/>
+		<MODULE name="M_COOP_GetDatiPersonali"/>		
+		<MODULE name="M_COOP_TestataSchedaLavoratore"/>		
+	</MODULES>
+	<DEPENDENCIES>	
+		<DEPENDENCE source="CoopCaricaDatiPersonaliPage" target="M_COOP_GetDatiPersonali">
+			<CONDITIONS>
+				<PARAMETER name="CARICA_SCHEDA_DA_POLO_MASTER"  scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="codProvinciaMaster" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="CoopCaricaDatiPersonaliPage" target="M_COOP_GETLAVORATOREIR">
+			<CONDITIONS>
+				<PARAMETER name="CARICA_SCHEDA_DA_POLO_MASTER"  scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="codProvinciaMaster" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_COOP_GETLAVORATOREIR" target="M_COOP_GetDatiPersonali">
+			<CONDITIONS>
+				<PARAMETER name="M_COOP_GETLAVORATOREIR.IS_OK"  scope="SERVICE_RESPONSE" type="RELATIVE" value="TRUE"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="codProvinciaMaster" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_COOP_GETLAVORATOREIR.ROWS.ROW.codProvinciaMaster" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_COOP_GetDatiPersonali" target="M_COOP_TestataSchedaLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="M_COOP_GetDatiPersonali.IS_OK"  scope="SERVICE_RESPONSE" type="RELATIVE" value="TRUE"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- questa page viene chiamata dal web service SchedaLavoratore tramite AdapterSoap -->
+<!--  descrizione degli attributi utilizzati dalla classe AccessoSchedaLavoratore
+		<MODULE name          = "AnagraficaLavoratore"             e' il nome del modulo
+				response_name = "AnagraficaLavoratore"             e' la key con cui il risultato viene inserito nella response e che finira' nel SessionContainer
+				page_ref      = "coopAnagDatiPersonaliPage"        e' la pagina che utilizzera' l'informazione memorizzata nella cache-SessionContainer
+				page_module   = "M_COOP_DatiPersonali_dalla_cache" e' il nome del modulo chiamato dalla page_ref che estrarra' l'info dalla cache
+				prefix_info   = ""                                 utilizzato per ora solo dal modulo M_COOP_ListTerritoriMansioni. 
+																   In genere i dati sono nel formato nome_modulo.rows.row; nel caso in cui 
+																   la classe di lettura inserisca nella propria serviceResponse i risultati 
+																   in modo diverso (Es.: nome_modulo.lav.dich_disp.rows.row) bisogna sapere
+								    							   come accedere alla singola riga. Unito al response_name, il prefix_info viene utilizzato 
+								    							   per una chiamata getAttributeAsVector. 
+																   Valore di default: ROWS.ROW
+																   Per i dettagli  vedere la classe TestataSchedaLavoratore.
+				module_insert = "M_InsertAnagrafica"               e' il modulo di inserimento dell'informazione. Gli verra' passato, come serviceRequest,
+																   il dettaglio del service_name associato (service_name.prefix_name)
+																   Es.: SourceBean serviceRequest = (SourceBean)cache.getAttributeAsVector("SERVICE_RESPONSE."+service_name+"."+prefix_name).get(0);
+																   nel caso in cui ci sia una riga.
+																   Vedere la classe InserimentoMassivoDaCache.
+			/>
+
+-->
+<PAGE name="coop_scheda_lavoratore" scope="REQUEST">
+	<MODULES>
+		<MODULE name          = "AnagraficaLavoratore" 
+				response_name = "AnagraficaLavoratore" 
+				page_ref      = "CoopAnagDatiPersonaliPage"
+				page_module   = "M_COOP_DatiPersonali_dalla_cache"
+				prefix_info   = ""
+				module_insert = "COOPInsertLavoratore" />
+		<!--MODULE name="M_GetCpiLavoratore"/>   non usato -->
+		<MODULE name="IndirizziLavoratore" response_name="IndirizziLavoratore" page_ref="CoopAnagIndirizziPage" page_module="M_COOP_AnagIndirizzi_dalla_cache"/>	<!-- anag indirizzi  -->
+		<MODULE name="RecapitiLavoratore"  response_name="RecapitiLavoratore"  page_ref="CoopAnagIndirizzoCorrispondezaPage" page_module="M_COOP_AnagRecapiti_dalla_cache"/>	<!-- anag recapiti -->
+		<MODULE name="TitoliStudioLavoratore" response_name="TitoliStudioLavoratore"  page_ref="CoopConoscenzeStudiPage" page_module="M_COOP_ConoscenzeStudi_dalla_cache" module_insert="CoopInsertPercorsiStudi" module_delete="CoopDeletePercorsiStudi"/>	<!-- conoscenze studi -->
+		<MODULE name="MansioniLavoratore" response_name="MansioniLavoratore" page_ref="CoopAmbitoProfessionaleMansioniPage" page_module="M_COOP_ListMansioni_dalla_cache" module_insert="CoopInsertMansione" module_delete="CoopDeleteMansione"/>
+		<MODULE name="ListaFormazioneProfessionaleLavoratore" response_name="ListaFormazioneProfessionaleLavoratore"  page_ref="CoopConoscenzeFormazioneProPage" page_module="M_COOP_ListForPro_dalla_cache" module_insert="CoopInsertFormazioneProfessionale" module_delete="CoopDeleteFormazioneProfessionale"/>	<!-- conoscenze formazione professionale -->
+		<!--MODULE name="M_CoopCaricaDettaglioForPro" response_name="FormazioneProfessionaleLavoratore"  page_ref="CoopConoscenzeFormazioneProPage" page_module="M_COOP_ListForPro_dalla_cache"/>< conoscenze formazione professionale dettaglio dalla lista -->
+		<MODULE name="ListaEsperienzeLavoratore" response_name="ListaEsperienzeLavoratore"  page_ref="CoopEsperienzePage" page_module="M_COOP_ListaEspLav_dalla_cache" module_insert="CoopInsertEsperienzaLavorativa" module_delete="CoopDeleteEsperienzaLavorativa"/>
+		<MODULE name="ListaEsperienzeNonLavorativeLavoratore" response_name="ListaEsperienzeNonLavorativeLavoratore"  page_ref="CoopEsperienzeNonLavPage" page_module="M_COOP_ListaEspNonLav_dalla_cache" module_insert="CoopInsertEsperienzaLavorativa" module_delete="CoopDeleteEsperienzaNonLavorativa"/>
+		<!-- MODULI AMBITI PROFESSIONALI -->							
+		<MODULE name="IndisponibilitaLavoratore"    response_name="IndisponibilitaLavoratore" page_ref="CoopAmbitoProfessionaleIndisponibilitaPage" page_module="M_COOP_ListIndisp_dalla_cache" module_insert="CoopInsertIndisponibilita" module_delete="CoopDeleteIndisponibilita"/>
+		<!-- moduli disponibilita' -->
+		<MODULE name="ListaContrattiMansioni" response_name="ListaContrattiMansioni" page_ref="CoopDisponibilitaRapportoPage" page_module="M_COOP_ListContrattiMansioni_dalla_cache"  module_insert="M_COOP_InsertContrattiInMansioni" module_delete="M_COOP_DeleteContrattiInMansioni"/>
+		<MODULE name="ListaOrariMansioni"     response_name="ListaOrariMansioni" page_ref="CoopDisponibilitaOrarioPage" page_module="M_COOP_ListOrariMansioni_dalla_cache" module_insert="M_COOP_InsertOrariInMansioni" module_delete="M_COOP_DeleteOrariInMansioni"/>
+		<MODULE name="ListaTurniMansioni"     response_name="ListaTurniMansioni" page_ref="CoopDisponibilitaTurniPage" page_module="M_COOP_ListTurniMansioni_dalla_cache"  module_insert="M_COOP_InsertTurniInMansioni" module_delete="M_COOP_DeleteTurniInMansioni"/>
+		<MODULE name="ListaTerritoriMansioni" response_name="ListaTerritoriMansioni" page_ref="CoopDisponibilitaTerritorioPage" page_module="M_COOP_ListTerritoriMansioni_dalla_cache" prefix_info="mansioni.rows.row" module_insert="M_COOP_InsertTerritoriInMansioni" module_delete="M_COOP_DeleteTerritoriInMansioni"/>
+		<MODULE name="ListaMobilitaGeoMansioni"    response_name="ListaMobilitaGeoMansioni" page_ref="CoopDisponibilitaMobilitaPage" page_module="M_COOP_ListMobGeoMansioni_dalla_cache" module_insert="M_COOP_InsertMobGeoInMansioni" module_delete="M_COOP_DeleteMobGeoInMansioni"/>
+		<!-- MODULI conoscenze -->
+		<MODULE name="CompetenzeLavoratore" response_name="CompetenzeLavoratore" page_ref="CoopConoscenzeCompetenzePage" page_module="M_COOP_GetLavoratoreCompetenze_dalla_cache" module_insert="InsertCompetenzeLavoratore" module_delete="DeleteCompetenzeLavoratore"/>
+		<MODULE name="AbilitazioniLavoratore" response_name="AbilitazioniLavoratore" page_ref="CoopConoscenzeAbilitazioniPage" page_module="M_COOP_GetLavoratoreAbilitazioni_dalla_cache" module_insert="InsertAbilitazioneLavoratore" module_delete="DeleteAbilitazioneLavoratore"/>
+		<MODULE name="InformaticaLavoratore" response_name="InformaticaLavoratore" page_ref="CoopConoscenzeInformaticaPage" page_module="M_COOP_ListConoscenzeInfo_dalla_cache" module_insert="InsertInformaticaLavoratore" module_delete="DeleteInformaticaLavoratore"/>
+		<MODULE name="LingueLavoratore" response_name="LingueLavoratore" page_ref="CoopConoscenzeLinguePage" page_module="M_COOP_ListConoscenzeLing_dalla_cache" module_insert="InsertLinguaLavoratore" module_delete="DeleteLinguaLavoratore"/>
+		<MODULE name="CreditiFormativiLavoratore" response_name="CreditiFormativiLavoratore" page_ref="CoopConoscenzeCreditiFormativiPage" page_module="M_COOP_ListConoscenzeCred_dalla_cache" module_insert="InsertCreditiFormativiLavoratore" module_delete="DeleteCreditiFormativiLavoratore"/>
+							
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="coop_scheda_lavoratore" target="AnagraficaLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="AnagraficaLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+<!--		<DEPENDENCE source="coop_scheda_lavoratore" target="M_GetCpiLavoratore"/>-->
+		<DEPENDENCE source="coop_scheda_lavoratore" target="IndirizziLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="IndirizziLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="coop_scheda_lavoratore" target="RecapitiLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="RecapitiLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="coop_scheda_lavoratore" target="TitoliStudioLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="TitoliStudioLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>		
+		<DEPENDENCE source="coop_scheda_lavoratore" target="ListaFormazioneProfessionaleLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="ListaFormazioneProfessionaleLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>		
+		<DEPENDENCE source="coop_scheda_lavoratore" target="ListaEsperienzeLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="ListaEsperienzeLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>		
+		<DEPENDENCE source="coop_scheda_lavoratore" target="ListaEsperienzeNonLavorativeLavoratore">		
+			<CONDITIONS>
+				<PARAMETER name="ListaEsperienzeNonLavorativeLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+
+		</DEPENDENCE>
+
+		<!-- conoscenze -->
+		<DEPENDENCE source="coop_scheda_lavoratore" target="CompetenzeLavoratore">		
+			<CONDITIONS>
+				<PARAMETER name="CompetenzeLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="coop_scheda_lavoratore" target="AbilitazioniLavoratore">		
+			<CONDITIONS>
+				<PARAMETER name="AbilitazioniLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="coop_scheda_lavoratore" target="InformaticaLavoratore">		
+			<CONDITIONS>
+				<PARAMETER name="InformaticaLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="coop_scheda_lavoratore" target="LingueLavoratore">		
+			<CONDITIONS>
+				<PARAMETER name="LingueLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="coop_scheda_lavoratore" target="CreditiFormativiLavoratore">		
+			<CONDITIONS>
+				<PARAMETER name="CreditiFormativiLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<!-- disponibilita' -->
+		<DEPENDENCE source="coop_scheda_lavoratore" target="ListaContrattiMansioni">
+			<CONDITIONS>
+				<PARAMETER name="ListaContrattiMansioni" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="coop_scheda_lavoratore" target="ListaOrariMansioni">		
+			<CONDITIONS>
+				<PARAMETER name="ListaOrariMansioni" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="coop_scheda_lavoratore" target="ListaTurniMansioni">		
+			<CONDITIONS>
+				<PARAMETER name="ListaTurniMansioni" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="coop_scheda_lavoratore" target="ListaTerritoriMansioni">		
+			<CONDITIONS>
+				<PARAMETER name="ListaTerritoriMansioni" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="coop_scheda_lavoratore" target="ListaMobilitaGeoMansioni">		
+			<CONDITIONS>
+				<PARAMETER name="ListaMobilitaGeoMansioni" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<!-- ambiti professionali -->
+		<DEPENDENCE source="coop_scheda_lavoratore" target="MansioniLavoratore">		
+			<CONDITIONS>
+				<PARAMETER name="MansioniLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="coop_scheda_lavoratore" target="IndisponibilitaLavoratore">		
+			<CONDITIONS>
+				<PARAMETER name="IndisponibilitaLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>		
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE name="CoopAnagDatiPersonaliPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_COOP_DatiPersonali_dalla_cache"/>
+		<MODULE name="M_GetStatiCivili"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CoopAnagDatiPersonaliPage" target="M_GetStatiCivili"/>
+		<DEPENDENCE source="CoopAnagDatiPersonaliPage" target="M_COOP_DatiPersonali_dalla_cache"/>		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CoopAnagIndirizziPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_COOP_AnagIndirizzi_dalla_cache"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CoopAnagIndirizziPage" target="M_COOP_AnagIndirizzi_dalla_cache"/>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="CoopAnagIndirizzoCorrispondezaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_COOP_AnagRecapiti_dalla_cache"/> 
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CoopAnagIndirizzoCorrispondezaPage" target="M_COOP_AnagRecapiti_dalla_cache"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CoopConoscenzeStudiPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_COOP_ConoscenzeStudi_dalla_cache"/> 
+    	<MODULE name="M_ListTitoloEstero"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CoopConoscenzeStudiPage" target="M_COOP_ConoscenzeStudi_dalla_cache"/>
+    	<DEPENDENCE source="CoopConoscenzeStudiPage" target="M_ListTitoloEstero"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CoopConoscenzeStudiDettaglioPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetTipoTitoli"/>
+		<MODULE name="M_GetStatiTitoliStudio"/>
+		<MODULE name="M_Map_Cod_Stato_Tit_studio_flagcompletato"/>
+		<MODULE name="M_COOP_DettaglioStudio_dalla_cache" />			
+		<MODULE name="M_COOP_ConoscenzeStudi_dalla_cache"/>
+	    <MODULE name="M_GetPrincTitolo"/>
+		<MODULE name="M_ListTitoloEstero"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CoopConoscenzeStudiDettaglioPage" target="M_ListTitoloEstero"/>
+		<DEPENDENCE source="CoopConoscenzeStudiDettaglioPage" target="M_GetStatiTitoliStudio"/>   
+		<DEPENDENCE source="CoopConoscenzeStudiDettaglioPage" target="M_Map_Cod_Stato_Tit_studio_flagcompletato"/> 
+		<DEPENDENCE source="CoopConoscenzeStudiDettaglioPage" target="M_GetTipoTitoli"/>
+		<DEPENDENCE source="CoopConoscenzeStudiDettaglioPage" target="M_COOP_ConoscenzeStudi_dalla_cache"/>
+		<DEPENDENCE source="CoopConoscenzeStudiDettaglioPage" target="M_COOP_DettaglioStudio_dalla_cache">
+		</DEPENDENCE>
+		<DEPENDENCE source="CoopConoscenzeStudiDettaglioPage" target="M_GetPrincTitolo"/>		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CoopConoscenzeFormazioneProPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_COOP_ListForPro_dalla_cache"/>
+    <MODULE name="M_COOP_DettaglioForPro_dalle_cache"/>
+	<!-- Moduli di lista di supporto -->
+    <MODULE name="M_ListForProCorso"/>
+    <MODULE name="M_ListForProTipoCorso"/>
+    <MODULE name="M_ListForProAmbDiscip"/>    
+  </MODULES>
+  <DEPENDENCIES>
+    <!-- Carica sempre la lista dei tipi, dei gradi e dei modi delle conoscenze info -->    
+    <!-- Per prima cosa carica la lista delle conoscenze -->
+    <DEPENDENCE source="CoopConoscenzeFormazioneProPage" target="M_COOP_ListForPro_dalla_cache">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/> 
+      </CONDITIONS>
+    </DEPENDENCE>
+    <!-- Carica una specifica conoscenza per poterla vedere  -->
+    <DEPENDENCE source="CoopConoscenzeFormazioneProPage" target="M_COOP_ListForPro_dalla_cache">
+    	<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_LoadForPro"/>
+      	</CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_COOP_ListForPro_dalla_cache" target="M_COOP_DettaglioForPro_dalle_cache">
+      	<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_LoadForPro"/>
+      	</CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="CoopConoscenzeFormazioneProPage" target="M_ListForProTipoCorso"/>
+    <DEPENDENCE source="CoopConoscenzeFormazioneProPage" target="M_ListForProAmbDiscip"/>
+	<DEPENDENCE source="CoopConoscenzeFormazioneProPage" target="M_ListForProCorso">
+     <CONDITIONS>
+       <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_ListForProCorso"/> 
+     </CONDITIONS>
+    </DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!-- Gestione Disponibilita' Contratti Mansioni -->
+<PAGE name="CoopDisponibilitaRapportoPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_COOP_ListContrattiMansioni_dalla_cache"/>
+	</MODULES>
+	<DEPENDENCIES>
+    	<DEPENDENCE source="CoopDisponibilitaRapportoPage" target="M_COOP_ListContrattiMansioni_dalla_cache"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- Gestione Disponibilita' Orari Mansioni -->
+<PAGE name="CoopDisponibilitaOrarioPage" scope="REQUEST">
+
+  <MODULES>
+    <MODULE name="M_COOP_ListOrariMansioni_dalla_cache"/>
+  </MODULES>
+
+  <DEPENDENCIES>
+    <DEPENDENCE source="CoopDisponibilitaOrarioPage" target="M_COOP_ListOrariMansioni_dalla_cache">
+    </DEPENDENCE>
+  </DEPENDENCIES>
+
+</PAGE>
+
+
+<!-- Gestione Disponibilita' Turni Mansioni -->
+<PAGE name="CoopDisponibilitaTurniPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_COOP_ListTurniMansioni_dalla_cache"/>
+	</MODULES>
+	<DEPENDENCIES>
+    	<DEPENDENCE source="CoopDisponibilitaTurniPage" target="M_COOP_ListTurniMansioni_dalla_cache"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- Gestione Territorio -->
+<PAGE name="CoopDisponibilitaTerritorioPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_COOP_ListTerritoriMansioni_dalla_cache"/>
+	</MODULES>
+	<DEPENDENCIES>
+    	<DEPENDENCE source="CoopDisponibilitaTerritorioPage" target="M_COOP_ListTerritoriMansioni_dalla_cache"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- Gestione Disponibilita' Mobilita' Geografica Mansioni -->
+<PAGE name="CoopDisponibilitaMobilitaPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_COOP_ListMobGeoMansioni_dalla_cache"/>    
+	</MODULES>
+	<DEPENDENCIES>
+    	<DEPENDENCE source="CoopDisponibilitaMobilitaPage" target="M_COOP_ListMobGeoMansioni_dalla_cache"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE name="CoopEsperienzePage" scope="REQUEST">
+	<MODULES>
+        <!--MODULE name="M_ListMansioni"/>< CDNLAVORATORE  la classe deve restare quella -->
+        <MODULE name="M_COOP_DettaglioEspLav_dalle_cache" /><!-- PRGESPLAVORO -->
+        <MODULE name="M_COOP_ListaEspLav_dalla_cache" /><!-- cdnLavoratore da sostituire con doSelectModulo-->
+                 
+  		<MODULE name="M_ListTipiMansione"/><!-- decodifica -->
+   		<MODULE name="M_GetTipiContratto"/><!-- decodifica -->
+		<MODULE name="M_GetTipiCCNL"/><!-- decodifica -->
+		<!--MODULE name="M_GetCCNL"/>< decodifica  scoperta: non utilizzato -->
+		<MODULE name="M_GetArea"/><!-- decodifica -->
+		<MODULE name="M_GetTipiOrario"/><!-- decodifica -->
+		<MODULE name="M_GetTipiCessazione"/><!-- decodifica -->
+		<MODULE name="M_GetTipiCertificato"/><!-- decodifica -->
+		<MODULE name="M_GetTipiNatGiuridica"/><!-- decodifica -->
+		<!--MODULE name="COOP_DE_MANSIONI"/>< decodifica sostituisce m_listMansioni-->
+	</MODULES>
+	<DEPENDENCIES>
+      
+	    <!-- recupero tipo mov. -->
+	    <!--DEPENDENCE source="CoopEsperienzePage"   target="M_GetTipoMov"/-->	    
+	    <!--DEPENDENCE source="CoopEsperienzePage"   target="M_GetEspLav"/-->
+	    <!--DEPENDENCE source="M_ListMansioni"       target="M_ListTipiMansione"/-->
+	    <DEPENDENCE source="CoopEsperienzePage"   target="M_ListTipiMansione"/>
+	    <DEPENDENCE source="M_ListTipiMansione"   target="M_GetTipiContratto"/>
+	    <DEPENDENCE source="M_GetTipiContratto"   target="M_GetTipiCCNL"/>
+	    <!--DEPENDENCE source="M_GetTipiCCNL"        target="M_GetCCNL"/-->
+	    <DEPENDENCE source="M_GetTipiCCNL"        target="M_GetArea"/>
+	    <DEPENDENCE source="M_GetArea"            target="M_GetTipiOrario"/>
+	    <DEPENDENCE source="M_GetTipiOrario"      target="M_GetTipiCessazione"/>
+	    <DEPENDENCE source="M_GetTipiCessazione"  target="M_GetTipiCertificato"/>
+	    <DEPENDENCE source="M_GetTipiCertificato" target="M_GetTipiNatGiuridica"/>
+	    <!--DEPENDENCE source="M_GetTipiCertificato" target="COOP_DE_MANSIONI"/-->
+	
+		<DEPENDENCE source="M_GetTipiNatGiuridica" target="M_COOP_ListaEspLav_dalla_cache">
+	    	<CONDITIONS>
+	        	<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+	        <CONSEQUENCES/>
+		</DEPENDENCE>
+	    <DEPENDENCE source="M_COOP_ListaEspLav_dalla_cache" target="M_COOP_DettaglioEspLav_dalle_cache">
+	    	<CONDITIONS>
+	        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_GETESPLAV"/>
+	        </CONDITIONS>
+	        <!--
+			<CONSEQUENCES>
+				<PARAMETER scope="SERVICE_RESPONSE" type="RELATIVE" value="M_COOP_ListaEspLav_dalla_cache" />
+				<PARAMETER name="NOME_MODULO_LISTA" type="ABSOLUTE" value="M_COOP_ListaEspLav_dalla_cache" />
+			</CONSEQUENCES>
+			-->
+		</DEPENDENCE>    
+	    <!--DEPENDENCE source="M_GetEspLav" target="M_ListMansioni"/-->	    
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Gestione Mansioni -->
+<PAGE name="CoopAmbitoProfessionaleMansioniPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_COOP_ListMansioni_dalla_cache"/>
+	</MODULES>
+	<DEPENDENCIES>
+    	<DEPENDENCE source="CoopAmbitoProfessionaleMansioniPage" target="M_COOP_ListMansioni_dalla_cache"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Gestione Indisponibilita'  -->
+<PAGE name="CoopAmbitoProfessionaleIndisponibilitaPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_COOP_ListIndisp_dalla_cache"/>
+	</MODULES>
+	<DEPENDENCIES>
+    	<DEPENDENCE source="CoopAmbitoProfessionaleIndisponibilitaPage" target="M_COOP_ListIndisp_dalla_cache"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CoopEsperienzeNonLavPage" scope="REQUEST">
+	<MODULES>
+        <!--MODULE name="M_ListMansioni"/> portarsi la decodifica dal dettaglio del tirocinio -->
+		<MODULE name="M_ListTipiMansione"/><!-- decodifica -->
+   		<MODULE name="M_GetTipiContrattoTirocinio"/><!-- decodifica -->
+   		<MODULE name="M_GetTipiCCNL"/><!-- decodifica -->
+   		<!--MODULE name="M_GetCCNL"/>< decodifica  scoperta: non utilizzato -->
+   		<MODULE name="M_GetArea"/><!-- decodifica -->
+   		<MODULE name="M_GetTipiOrario"/><!-- decodifica -->
+   		<MODULE name="M_GetTipiCessazione"/><!-- decodifica -->
+   		<MODULE name="M_GetTipiCertificato"/><!-- decodifica -->
+   		<MODULE name="M_GetTipiNatGiuridica"/><!-- decodifica -->
+   		
+        <MODULE name="M_COOP_ListaEspNonLav_dalla_cache" /><!-- lista -->
+        <MODULE name="M_COOP_DettaglioEspNonLav_dalla_cache" /><!-- dettaglio -->
+
+	</MODULES>
+	<DEPENDENCIES>
+       	<!--DEPENDENCE source="CurrTirociniMainPage" target="M_ListMansioni"/>-->
+		<DEPENDENCE source="CoopEsperienzeNonLavPage" target="M_ListTipiMansione"/>
+      	<DEPENDENCE source="M_ListTipiMansione" target="M_GetTipiContrattoTirocinio"/>
+	   	<DEPENDENCE source="M_GetTipiContrattoTirocinio" target="M_GetTipiCCNL"/>
+		<!--DEPENDENCE source="M_GetTipiCCNL" target="M_GetCCNL"/>-->
+	    <DEPENDENCE source="M_GetTipiCCNL" target="M_GetArea"/>
+	    <DEPENDENCE source="M_GetArea" target="M_GetTipiOrario"/>
+	    <DEPENDENCE source="M_GetTipiOrario" target="M_GetTipiCessazione"/>
+	    <DEPENDENCE source="M_GetTipiCessazione" target="M_GetTipiCertificato"/>
+	    <DEPENDENCE source="M_GetTipiCertificato" target="M_GetTipiNatGiuridica"/>
+
+      	<DEPENDENCE source="M_GetTipiNatGiuridica" target="M_COOP_ListaEspNonLav_dalla_cache">
+            <CONDITIONS>
+                <PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        	</CONDITIONS>
+      	<CONSEQUENCES/>
+		</DEPENDENCE>
+
+      	<DEPENDENCE source="M_COOP_ListaEspNonLav_dalla_cache" target="M_COOP_DettaglioEspNonLav_dalla_cache">
+            <CONDITIONS>
+                <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_GETESPLAV"/>
+          	</CONDITIONS>
+          	<!--
+			<CONSEQUENCES>
+				<PARAMETER scope="SERVICE_RESPONSE" type="RELATIVE" value="M_COOP_ListaEspNonLav_dalla_cache" />
+				<PARAMETER name="NOME_MODULO_LISTA" type="ABSOLUTE" value="M_COOP_ListaEspNonLav_dalla_cache" />
+			</CONSEQUENCES>
+			-->
+    	</DEPENDENCE> 
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- COMPETENZE -->
+<PAGE name="CoopConoscenzeCompetenzePage" scope="REQUEST">
+	<MODULES>
+ 		<MODULE name="M_COOP_GetLavoratoreCompetenze_dalla_cache"/>
+	</MODULES>	
+	<DEPENDENCIES>
+	    <DEPENDENCE source="CoopConoscenzeCompetenzePage" target="M_COOP_GetLavoratoreCompetenze_dalla_cache"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- ABILITAZIONI -->
+<PAGE name="CoopConoscenzeAbilitazioniPage" scope="REQUEST">
+	<MODULES>
+ 		<MODULE name="M_COOP_GetLavoratoreAbilitazioni_dalla_cache"/> 
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CoopConoscenzeAbilitazioniPage" target="M_COOP_GetLavoratoreAbilitazioni_dalla_cache"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- CONOSCENZE INFORMATICHE -->
+<PAGE name="CoopConoscenzeInformaticaPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_COOP_ListConoscenzeInfo_dalla_cache"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CoopConoscenzeInformaticaPage" target="M_COOP_ListConoscenzeInfo_dalla_cache"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- CONOSCENZE LINGUISTICHE -->
+<PAGE name="CoopConoscenzeLinguePage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_COOP_ListConoscenzeLing_dalla_cache"/>   
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CoopConoscenzeLinguePage" target="M_COOP_ListConoscenzeLing_dalla_cache"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- CREDITI FORMATIVI -->
+<PAGE name="CoopConoscenzeCreditiFormativiPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_COOP_ListConoscenzeCred_dalla_cache"/>
+	</MODULES>
+	<DEPENDENCIES>
+    	<DEPENDENCE source="CoopConoscenzeCreditiFormativiPage" target="M_COOP_ListConoscenzeCred_dalla_cache"/>
+	</DEPENDENCIES>
+</PAGE>
+<!-- Inserimento (o Aggiornamento) Scheda Lavoratore -->
+<PAGE name="CoopInserimentoMassivoDaCachePage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_COOP_InformazioniAssociate"/>
+    	<MODULE name="M_COOP_AggiornamentoMassivoDaCache"/>
+    	<MODULE name="M_COOP_InserimentoMassivoDaCache"/>
+	</MODULES>
+	<DEPENDENCIES>
+    	<DEPENDENCE source="CoopInserimentoMassivoDaCachePage" target="M_COOP_InserimentoMassivoDaCache">
+    		<CONDITIONS>
+                <PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+          	</CONDITIONS>
+        </DEPENDENCE>
+        <DEPENDENCE source="CoopInserimentoMassivoDaCachePage" target="M_COOP_InformazioniAssociate">
+    		<CONDITIONS>
+                <PARAMETER name="aggiorna" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+          	</CONDITIONS>
+        </DEPENDENCE>
+    	<DEPENDENCE source="M_COOP_InformazioniAssociate" target="M_COOP_AggiornamentoMassivoDaCache">
+    		<CONDITIONS>
+                <PARAMETER name="M_COOP_InformazioniAssociate.canUpdateLav" scope="SERVICE_RESPONSE" value="true"/>
+          	</CONDITIONS>
+        </DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CoopChiudiSchedaLavoratorePage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_COOP_ChiudiSchedaLavoratore"/>
+	</MODULES>
+	<DEPENDENCIES>
+    	<DEPENDENCE source="CoopChiudiSchedaLavoratorePage" target="M_COOP_ChiudiSchedaLavoratore"/>
+	</DEPENDENCIES>
+</PAGE>

@@ -1,0 +1,47 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<ui:composition xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui">
+	<div class="container-fluid header">
+		<div id="main-logo">
+			<img alt="Regione Umbria Logo" src="#{resource['umbria:images/logo.png']}"/>
+			<h1 class="hidden-xs hidden-sm">Agenzia Regionale per le Politiche Attive del Lavoro</h1>
+		</div>
+	</div>
+	<div id="sub-header">
+		<ui:fragment rendered="#{!sessionLogger.isUserLoggedIn()}">
+			<div class="sub-header-element">
+				Lavoro per Te Umbria		
+			</div>
+		</ui:fragment>
+		<ui:fragment rendered="#{sessionLogger.isUserLoggedIn()}">
+			<div class="sub-header-element hidden-xs">
+				Lavoro per Te Umbria		
+			</div>
+		</ui:fragment>
+		<ui:fragment rendered="#{sessionLogger.isUserLoggedIn()}">
+			<div id="menu">
+				<div class="btn-group">
+					<button data-toggle="dropdown" class="menu-header dropdown-toggle">
+						<ui:fragment rendered="#{sessionLogger.isAzienda()}">
+							#{sessionLogger.aziendaInfo.ragioneSociale}
+						</ui:fragment>
+						<ui:fragment rendered="#{not sessionLogger.isAzienda()}">
+							#{accountInfoBean.userInfo.nome} #{accountInfoBean.userInfo.cognome}
+						</ui:fragment>
+						<b class="fa fa-home fa-2 menu-icon pull-right"></b>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="#{accountInfoBean.urlHomePortale}">#{ui['shared.laMiaScrivania']}</a></li>
+						<li class="divider"></li>
+
+						<h:form>
+							<p:remoteCommand action="#{accountInfoBean.logout()}" name="logout"></p:remoteCommand>
+						</h:form>
+						<li class="external-link-underline"><a href="#" onclick="doLogout()">Logout</a></li>
+					</ul>
+				</div>
+			</div>
+		</ui:fragment>	
+	</div>
+</ui:composition>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="/secure/template/messages_index.xhtml">
+
+	<ui:param name="bean" value="#{utenteMessagesBean}" />
+
+	<ui:define name="tab_list">
+		<h:outputText value="#{txt['cittadino.messaggi.descrizione']}" escape="false" />
+		<h:inputHidden value="#{utenteMessagesBean}" />
+		<h:outputStylesheet library="css" name="pagination_datatable.css" />
+		<style type="text/css">
+			a.page-link{ text-decoration: none; }
+		</style>
+
+		<h:form id="hiddenForm" />
+		
+		<div id="tabs" class="widget_container">
+			<ul>
+				<ui:fragment rendered="#{utenteMessagesBean.checkAbilitazioneVisibile('SUPP')}">
+					<li>
+						<h:link id="supporto_link" href="#supporto_link"
+							outcome="_supporto" title="#{msg['cittadino.messaggi.supporto.titolo']}">
+							<f:param name="redo_by_session" value="#{param.redo_by_session}" />
+							<h:outputText
+								value="#{msg['cittadino.messaggi.supporto.titolo']}"
+								escape="false" />
+							<h:outputText id="supportoNonLetti" styleClass="boldText"
+								value=" (#{utenteMessagesBean.nuoviMsgSupporto})"
+								rendered="#{utenteMessagesBean.nuoviMsgSupporto > 0}" />
+						</h:link>
+					</li>
+				</ui:fragment>
+				<ui:fragment rendered="#{utenteMessagesBean.checkAbilitazioneVisibile('ESP')}">
+					<li>
+						<h:link id="esperto_link" outcome="_esperto"
+							title="#{msg['cittadino.messaggi.consulenza.titolo']}">
+							<f:param name="redo_by_session" value="#{param.redo_by_session}" />
+							<h:outputText
+								value="#{msg['cittadino.messaggi.consulenza.titolo']}"
+								escape="false" />
+							<h:outputText id="espertoNonLetti" styleClass="boldText"
+								value=" (#{utenteMessagesBean.nuoviMsgEsperto})"
+								rendered="#{utenteMessagesBean.nuoviMsgEsperto > 0}" />
+						</h:link>
+					</li>
+				</ui:fragment>
+				<li>
+					<h:link id="notifiche_link" outcome="_notifiche"
+						title="#{msg['cittadino.messaggi.notifiche.titolo']}">
+						<f:param name="redo_by_session" value="#{param.redo_by_session}" />
+						<h:outputText
+							value="#{msg['cittadino.messaggi.notifiche.titolo']}"
+							escape="false" />
+						<h:outputText id="notificheNonLetti" styleClass="boldText"
+							value=" (#{utenteMessagesBean.nuoviMsgNotifica})"
+							rendered="#{utenteMessagesBean.nuoviMsgNotifica > 0}" />
+					</h:link>
+				</li>
+				<li>
+					<h:link id="contatti_link" outcome="_contatti"
+						title="#{msg['cittadino.messaggi.contatti.titolo']}">
+						<f:param name="redo_by_session" value="#{param.redo_by_session}" />
+						<h:outputText
+							value="#{msg['cittadino.messaggi.contatti.titolo']}"
+							escape="false" />
+						<h:outputText id="contattiNonLetti" styleClass="boldText"
+							value=" (#{utenteMessagesBean.nuoviMsgContatti})"
+							rendered="#{utenteMessagesBean.nuoviMsgContatti > 0}" />
+					</h:link>
+				</li>	
+			</ul>
+		</div>
+		<script type="text/javascript">
+			function checkSezione() {
+				if ('#{sessionBean.assistenzaTecnica}' == 'true') {					
+					//seleziono il tab da visualizzare
+					$('#esperto_link').click();
+				}
+			}
+			
+			$(function() {
+				selectMasterTab('#messages_area_link');
+				checkSezione();
+			});					
+		</script>
+	</ui:define>
+</ui:composition>

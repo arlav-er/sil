@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--Created with Liquid XML Studio 6.1.18.0 - FREE Community Edition (http://www.liquid-technologies.com)-->
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="CodiceFiscaleType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]" />
+      <xs:pattern value="[0-9]{11}" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Stringa50Obbl">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="50" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Stringa100">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="100" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ComuneType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Z]{1}\d{3}" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="CittadinanzaType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{3}" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="CapType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{5}" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="EMailType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="80" />
+      <xs:pattern value="([A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*@[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*)?" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TelefonoType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="15" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ExtraUEType">
+    <xs:attribute name="titolosoggiorno" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="1" />
+          <xs:pattern value="\d{1}" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="numerotitolosogg">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="15" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="motivopermesso" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:length value="5" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="scadenzatitolosogg" type="xs:date" use="required" />
+  </xs:complexType>
+  <xs:complexType name="ResidenzaType">
+    <xs:sequence>
+      <xs:element name="comune" type="ComuneType" />
+      <xs:element name="Indirizzo" type="Stringa100" />
+      <xs:element name="cap" type="CapType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="IstanzaArt16Type">
+    <xs:sequence>
+      <xs:element name="numero" type="xs:int" />
+      <xs:element name="anno">
+        <xs:simpleType>
+          <xs:restriction base="xs:int">
+            <xs:totalDigits value="4" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="ListaCandidature">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="unbounded" name="Candidatura" type="CandidaturaType" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AnagraficaType">
+    <xs:sequence>
+      <xs:element name="codicefiscale" type="CodiceFiscaleType" />
+      <xs:element name="cognome" type="Stringa50Obbl" />
+      <xs:element name="nome" type="Stringa50Obbl" />
+      <xs:element name="sesso">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="1" />
+            <xs:enumeration value="F" />
+            <xs:enumeration value="M" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="datanascita" type="xs:date" />
+      <xs:element name="comune" type="ComuneType" />
+      <xs:element name="cittadinanza" type="CittadinanzaType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ContattiType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="email" type="EMailType" />
+      <xs:element minOccurs="0" name="telefono" type="TelefonoType" />
+      <xs:element minOccurs="0" name="cellulare" type="TelefonoType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ISEEType">
+    <xs:sequence>
+      <xs:element name="valore">
+        <xs:simpleType>
+          <xs:restriction base="xs:decimal">
+            <xs:fractionDigits value="3" />
+            <xs:totalDigits value="10" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="datainizio" type="xs:date" />
+      <xs:element minOccurs="0" name="numannoreddito" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="IstanzaType">
+    <xs:sequence>
+      <xs:element name="datacandidatura" type="xs:date" />
+      <xs:element name="annoprotocollo" type="xs:int" />
+      <xs:element name="protocollo">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="30" />
+            <xs:minLength value="1" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="idistanza">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="200" />
+            <xs:minLength value="1" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CandidaturaType">
+    <xs:sequence>
+      <xs:element name="Anagrafica" type="AnagraficaType" />
+      <xs:element name="Residenza" type="ResidenzaType" />
+      <xs:element name="Contatti" type="ContattiType" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ExtraUE" type="ExtraUEType" />
+      <xs:element minOccurs="0" maxOccurs="1" name="ISEE" type="ISEEType" />
+      <xs:element name="Istanza" type="IstanzaType" />
+    </xs:sequence>
+    <xs:attribute name="dataaggiornamento" type="xs:date" />
+  </xs:complexType>
+  <xs:complexType name="EsitoType">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" name="codice">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="2" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element minOccurs="1" maxOccurs="1" name="descrizione">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="250" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ResponseIstanzaArt16">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Esito" type="EsitoType" />
+        <xs:element minOccurs="0" maxOccurs="1" name="IstanzaArt16" type="IstanzaArt16Type" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

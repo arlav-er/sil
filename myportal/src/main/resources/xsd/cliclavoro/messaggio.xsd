@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- Versione XSD: Gennaio 2012 -->
+<xs:schema xmlns:cliclavoro="http://servizi.lavoro.gov.it/messaggio" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://servizi.lavoro.gov.it/messaggio" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="Messaggio">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="cliclavoro:Mittente" />
+                <xs:element ref="cliclavoro:Destinatario" />
+                <xs:element ref="cliclavoro:Corpo" />
+                <xs:element ref="cliclavoro:DatiSistema" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Mittente">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="cliclavoro:tiposoggetto" />
+                <xs:element ref="cliclavoro:Interlocutore" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Destinatario">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="cliclavoro:Interlocutore" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Interlocutore">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="cliclavoro:codicefiscale" minOccurs="0" />
+                <xs:element ref="cliclavoro:codiceintermediario" minOccurs="0" />
+                <xs:element ref="cliclavoro:denominazione" minOccurs="0" />
+                <xs:element ref="cliclavoro:indirizzo" minOccurs="0" />
+                <xs:element ref="cliclavoro:comune" minOccurs="0" />
+                <xs:element ref="cliclavoro:telefono" minOccurs="0" />
+                <xs:element ref="cliclavoro:email" minOccurs="0" />
+                <xs:element ref="cliclavoro:codiceoffertacandidatura" minOccurs="0" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Corpo">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="cliclavoro:testomessaggio" />
+                <xs:element ref="cliclavoro:contattopositivo" minOccurs="0" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="DatiSistema">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="cliclavoro:tipocomunicazione" />
+                <xs:element ref="cliclavoro:data" />
+                <xs:element ref="cliclavoro:codicemessaggio" />
+                <xs:element ref="cliclavoro:codicemessaggioprecedente" minOccurs="0" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!--Controlli generali -->
+    <xs:simpleType name="CodiceFiscale">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]" />
+            <xs:pattern value="[0-9]{11}" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="Si-No">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="SI" />
+            <xs:enumeration value="NO" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="Stringa11">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="11" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="Stringa15">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="15" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="mail">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1" />
+            <xs:maxLength value="256" />
+            <xs:pattern value="([A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*@[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*)?" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="Stringa100">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="100" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="Stringa200">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="200" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="Stringa2000">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="2000" />
+        </xs:restriction>
+    </xs:simpleType>
+    <!--Controlli riferiti a tabelle esterne -->
+    <xs:simpleType name="tiposoggettocheck">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="1" />
+            <xs:enumeration value="2" />
+            <xs:enumeration value="3" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="comunecheck">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[A-Z]{1}\d{3}" />
+            <xs:pattern value="[0]{4}" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="tipoComunicazionecheck">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="03" />
+            <xs:enumeration value="04" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="codicemessaggiocheck">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0-9]{25}" />
+        </xs:restriction>
+    </xs:simpleType>
+    <!--DATI PERSONALI DEL LAVORATORE -->
+    <!-- interlocutore -->
+    <xs:element name="codicefiscale" type="cliclavoro:CodiceFiscale" />
+    <xs:element name="codiceintermediario" type="cliclavoro:Stringa11" />
+    <xs:element name="denominazione" type="cliclavoro:Stringa100" />
+    <xs:element name="indirizzo" type="cliclavoro:Stringa100" />
+    <xs:element name="comune" type="cliclavoro:comunecheck" />
+    <xs:element name="telefono" type="cliclavoro:Stringa15" />
+    <xs:element name="email" type="cliclavoro:mail" />
+    <xs:element name="codiceoffertacandidatura" type="cliclavoro:codicemessaggiocheck" />
+    <!-- mittente -->
+    <xs:element name="tiposoggetto" type="cliclavoro:tiposoggettocheck" />
+    <!-- corpo -->
+    <xs:element name="testomessaggio" type="cliclavoro:Stringa2000" />
+    <xs:element name="contattopositivo" type="cliclavoro:Si-No" />
+    <!-- DATI SISTEMA -->
+    <xs:element name="codicemessaggio" type="cliclavoro:codicemessaggiocheck" />
+    <xs:element name="data" type="xs:dateTime" />
+    <xs:element name="tipocomunicazione" type="cliclavoro:tipoComunicazionecheck" />
+    <xs:element name="codicemessaggioprecedente" type="cliclavoro:codicemessaggiocheck" />
+</xs:schema>

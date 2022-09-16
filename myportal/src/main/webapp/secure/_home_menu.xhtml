@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<div id="home_menu">
+		<dl class="home_menu">
+			<dt class="home_menu_header">
+				<div id="home_menu_title" onclick="toggleMenu(event)">
+					<span class="home_menu_title_description">#{sessionBean.titleDescription}</span>
+					<c:if test="#{not utilsBean.isRER()}">
+						<h:graphicImage styleClass="home_menu_button"
+							value="/resources/images/home-icon-20.png" alt="apri menu'" />
+					</c:if>
+				</div>
+			</dt>
+			<dd class="home_menu_item">
+				<div class="text_item">
+					<ui:fragment rendered="#{sessionBean.utente}">
+						<ui:include src="utente/_home_menu_item.xhtml" />
+					</ui:fragment>
+					<ui:fragment rendered="#{sessionBean.azienda}">
+						<ui:include src="azienda/_home_menu_item.xhtml" />
+					</ui:fragment>
+					<ui:fragment rendered="#{sessionBean.provincia}">
+						<ui:include src="provincia/_home_menu_item.xhtml" />
+					</ui:fragment>
+					<ui:fragment rendered="#{sessionBean.coordinatore}">
+						<ui:include src="coordinatore/_home_menu_item.xhtml" />
+					</ui:fragment>
+					<ui:fragment rendered="#{sessionBean.consulente}">
+						<ui:include src="consulente/_home_menu_item.xhtml" />
+					</ui:fragment>
+					<ui:fragment rendered="#{sessionBean.regione}">
+						<ui:include src="regione/_home_menu_item.xhtml" />
+					</ui:fragment>
+					<ui:fragment rendered="#{sessionBean.certificatore}">
+						<ui:include src="certificatore/_home_menu_item.xhtml" />
+					</ui:fragment>
+					<ui:fragment rendered="#{sessionBean.patronato}">
+						<ui:include src="patronato/_home_menu_item.xhtml" />
+					</ui:fragment>
+					<ui:fragment rendered="#{sessionBean.soggettoPubblico}">
+						<ui:include src="soggetto_pubblico/_home_menu_item.xhtml" />
+					</ui:fragment>
+				</div>
+			</dd>
+			<dd style="clear: both;" />
+		</dl>
+	</div>
+   
+	<script type="text/javascript">
+		$(function() {
+			pollNotifications(#{sessionBean.principalId});
+			
+			homeMenu = true
+			block = false	
+			try {
+				var v = $(".home_menu_title_description")[0].innerHTML		
+				if(v.length > 25) $(".home_menu_title_description")[0].innerHTML =  v.slice(0, 23).replace(/\x60/g, "&gt;").replace(/\x38/g, "&amp;") + ".."
+			} catch (i) {
+			}
+
+			toggleMenu()
+			
+			$("body").bind("click", function(e) { 
+				!block &amp;&amp; homeMenu &amp;&amp; toggleMenu(e) 
+				block = false
+			})
+		});					
+				
+		function toggleMenu(e) {
+			var btn
+			
+			if(homeMenu) {		
+				e = e || window.event
+				e = e &amp;&amp; (e.target || e.srcElement)
+				
+				var p, pnl = $(".home_menu_item")[0] 
+				
+				p = e
+				
+				while(p) {
+					if(p === pnl) break
+					p = p.parentNode
+				}
+				
+				if(!p) {
+					$(".home_menu_item").css("display", "none")												
+					homeMenu = !homeMenu		
+				}
+			}
+			else{				
+				$(".home_menu_item").css("display", "")
+				homeMenu = !homeMenu
+			}
+			block			= true
+		}
+		
+	</script>
+</ui:composition>

@@ -1,0 +1,46 @@
+<STATEMENT name="TITOLOSTUDIOGG_AUTOCOMPLETE"
+	query="select tit.codtitolo as codice, tit.STRDESCRIZIONEPARLANTE as value
+	               from de_titolo tit
+                   inner join de_titolo tit_p on tit_p.codtitolo=substr(tit.codTitolo, 0, 2) || '000000'
+                   where Tit.FLGPFGG = 'S'
+                   and (lower(tit.STRDESCRIZIONEPARLANTE) like '%' || lower(?) || '%' or
+                   		lower(tit.STRDESCRIZIONE) like '%' || lower(?) || '%') 
+                   order by tit.STRDESCRIZIONEPARLANTE" />
+<STATEMENT name="TITOLOSTUDIOCONFDID_AUTOCOMPLETE"
+	query="select tit.codtitolo as codice, tit.STRDESCRIZIONEPARLANTE as value
+                   from de_titolo tit
+                   inner join de_titolo tit_p on tit_p.codtitolo=substr(tit.codTitolo, 0, 2) || '000000'
+                   where Tit.Flgpfconfdid = 'S'
+                   and (lower(tit.STRDESCRIZIONEPARLANTE) like '%' || lower(?) || '%' or
+                   		lower(tit.STRDESCRIZIONE) like '%' || lower(?) || '%') 
+                   order by tit.STRDESCRIZIONEPARLANTE" />
+ <STATEMENT name="PROF_SEL_PROFIL_DISPONIB_AUTOCOMPLETE"
+            query="      
+                  select 
+                         pg.cdnprofilo || '-' || pg.cdngruppo as codice,
+                         g.strdenominazione as value,
+                         p.strdenominazione as GRUPPO 
+                  from ts_profilo_gruppo PG,
+                         ts_gruppo G,
+                         ts_profilo P
+                  where G.cdngruppo = PG.cdngruppo
+                         and P.cdnprofilo = PG.cdnprofilo
+                         and pg.cdnprofilo || '-' || pg.cdngruppo not in 
+                         (
+                          select pu.cdnprofilo || '-' || pu.cdngruppo
+                          from ts_profilatura_utente pu
+                          where pu.cdnut = ?
+                         ) 
+                         and 
+                         (lower(g.strdenominazione) like '%' || lower(?) || '%'
+                         	or lower(p.strdenominazione) like '%' || lower(?) || '%'
+                         ) 
+                  order by 3, 2 " />
+<STATEMENT name="COMBO_FUNZIONI_MENU_AUTOCOMPLETE" 
+          query="
+				select to_char(cdnfunzione) as codice,
+				       f.strdescrizione || ' (' || tf.stretichetta || ')' as value
+				  from ts_funzione F, ts_tipo_funzione tf
+				  where f.strtipofunzione = tf.strtipofunzione
+				  and lower(f.strdescrizione) like '%' || lower(?) || '%' 
+				  order by tf.strtipofunzione , f.strdescrizione" />

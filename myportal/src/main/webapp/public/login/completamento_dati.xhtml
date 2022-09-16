@@ -1,0 +1,271 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/main.xhtml">
+
+	<ui:param name="cambioBean" value="#{cambioPasswordPublicBean}" />
+	<ui:define name="title">Completamento dati</ui:define>
+	<ui:define name="content">
+	
+	<f:loadBundle basename="conf.const" var="const" />
+	
+	<ui:fragment rendered="#{const['regione.cod'] == 22}">
+	<p><b>Hai eseguito l'autenticazione correttamente.<br/>
+	Abbiamo bisogno ancora di qualche dato prima di procedere con l'accreditamento al sistema.<br/>
+	Completa i dati mancanti tra quelli sotto riportati, accetta l'informativa e prosegui alla tua scrivania.</b></p>
+	</ui:fragment>
+	
+	<ui:fragment rendered="#{const['regione.cod'] != 22}">
+	<p><b>Complimenti.<br/>
+	Hai eseguito l'autenticazione tramite #{completamentoDatiBean.tipoProvider} correttamente.<br />
+	Abbiamo bisogno ancora di qualche dato prima di procedere con l'accreditamento al sistema.<br /> 
+	Completa i dati mancanti tra quelli sotto riportati, accetta l'informativa e prosegui alla tua scrivania.</b></p>
+	</ui:fragment>
+	
+		<cc:messages />
+		<h:form id="dati" styleClass="ui-widget">
+			<fieldset>
+				<legend>Dati account</legend>
+				<h:panelGrid columns="2" columnClasses="width50">
+													
+					<cc:inputText id="email" label="E-mail"  required="true"
+						value="#{completamentoDatiBean.data.email}" editingMode="#{completamentoDatiBean.editEmail}"
+						>
+						<f:validator validatorId="emailValidator" for="function" />
+						<f:validator validatorId="uniqueEmailValidator" for="function" />
+					</cc:inputText>
+					
+					<cc:inputText id="emailagain" label="Conferma E-mail"
+						execute=":dati:email" required="true"
+						value="#{completamentoDatiBean.data.emailConfirm}" editingMode="#{completamentoDatiBean.editEmail}">
+						<f:attribute name="first_id"
+							value="dati:email:inputText"></f:attribute>
+						<f:validator validatorId="emailValidator" for="function" />
+						<f:validator validatorId="repeatStringValidator" for="function" />
+					</cc:inputText>
+				</h:panelGrid>
+			</fieldset>
+			<fieldset>
+				<legend>Dati personali</legend>
+				<h:panelGrid columns="2" columnClasses="width50,width50">
+				
+					<cc:inputText id="codice_fiscale" required="true" value="#{completamentoDatiBean.data.codiceFiscale}" 
+						rendered="#{completamentoDatiBean.autenticazioneForte or completamentoDatiBean.tipoProvider=='ICAR' or completamentoDatiBean.tipoProvider=='SPID'}"
+						label="Codice Fiscale" maxlength="16">
+						<f:validator validatorId="codiceFiscaleValidator" for="function" />
+					</cc:inputText>
+									
+					<h:panelGroup rendered="#{completamentoDatiBean.autenticazioneForte}" />
+				
+					<cc:inputText id="nome" label="Nome" required="true"
+						value="#{completamentoDatiBean.data.nome}" />
+	
+					<cc:inputText id="cognome" label="Cognome" required="true"
+						value="#{completamentoDatiBean.data.cognome}" />
+	
+				
+					<cc:inputSuggestion id="comune_nascita" label="Comune o stato di nascita"
+						required="true" valueCod="#{completamentoDatiBean.data.comune.id}"
+						value="#{completamentoDatiBean.data.comune.descrizione}"
+						requiredMessage="Il comune di nascita e' obbligatorio" size="55"
+						disableAjax="false"
+						requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+						suggestionPath="comuni">
+						<f:validator validatorId="comuneSuggestionValidator" for="function" />
+					</cc:inputSuggestion>
+
+					<cc:inputSuggestion id="comune_domicilio"
+						label="Comune di domicilio" required="true"
+						valueCod="#{completamentoDatiBean.data.domicilio.id}"
+						value="#{completamentoDatiBean.data.domicilio.descrizione}"
+						requiredMessage="Il comune di domicilio e' obbligatorio" size="55"
+						disableAjax="false"
+						requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+						suggestionPath="comuni">
+						<f:validator validatorId="comuneSuggestionValidator" for="function" />
+						<f:ajax event="blur" onevent="change_comune"
+							listener="#{completamentoDatiBean.changeComuneDomicilio}"
+							execute=":dati:comune_domicilio"
+							render=":dati:provincia_riferimento" />
+					</cc:inputSuggestion>
+															
+					<cc:inputText id="data_nascita" label="Data di nascita" rendered="#{completamentoDatiBean.tipoProvider=='ICAR' or completamentoDatiBean.tipoProvider=='SPID'}"
+						required="true" type="dataNascita"
+						value="#{completamentoDatiBean.data.dataNascita}" />
+
+					<cc:inputText id="indirizzo_domicilio" label="Indirizzo domicilio" rendered="#{completamentoDatiBean.tipoProvider=='ICAR' or completamentoDatiBean.tipoProvider=='SPID'}"
+						maxlength="512" value="#{completamentoDatiBean.data.indirizzo}" />
+
+					<cc:inputSuggestion id="cittadinanza" label="Cittadinanza" rendered="#{completamentoDatiBean.tipoProvider=='ICAR' or completamentoDatiBean.tipoProvider=='SPID'}"
+						required="true"
+						value="#{completamentoDatiBean.data.cittadinanza.descrizione}"
+						valueCod="#{completamentoDatiBean.data.cittadinanza.id}"
+						requiredMessage="La cittadinanza è obbligatoria"
+						requiredMessageCod="E' necessario scegliere una cittadinanza dalla lista a tendina"
+						suggestionPath="cittadinanza"
+						valueChangeListener="#{completamentoDatiBean.changeCittadinanza}">
+						<f:validator validatorId="cittadinanzaSuggestionValidator"
+							for="function" />
+						<f:ajax execute="@this"
+							render=":dati:tipo_documento_identita"
+							event="change" for="function" onevent="spostaFocus" />
+					</cc:inputSuggestion>
+										
+					<h:panelGroup id="gap"/>
+					
+					<h:panelGroup id="tipo_documento_identita">
+					
+						<cc:inputText required="true"
+							rendered="#{completamentoDatiBean.data.cittadinanza.flgCee == 'S' and (completamentoDatiBean.tipoProvider=='ICAR' or completamentoDatiBean.tipoProvider=='SPID')}"
+							id="documento_identita" label="Documento d'identità"
+							value="#{completamentoDatiBean.data.documentoIdentita}" />
+
+						<h:panelGrid columns="2" columnClasses="width50,width50">							
+							<cc:inputSuggestion id="documento_soggiorno"
+								label="Titolo di soggiorno"
+								rendered="#{completamentoDatiBean.data.cittadinanza.flgCee == 'N' and (completamentoDatiBean.tipoProvider=='ICAR' or completamentoDatiBean.tipoProvider=='SPID')}"
+								required="true" showButton="true"
+								value="#{completamentoDatiBean.data.documentoSoggiorno.descrizione}"
+								valueCod="#{completamentoDatiBean.data.documentoSoggiorno.id}"
+								requiredMessage="Il titolo di soggiorno è obbligatorio"
+								requiredMessageCod="E' necessario scegliere un titolo di soggiorno dalla lista a tendina"
+								suggestionPath="titoloSoggiorno">
+								<f:validator validatorId="titoloSoggiornoSuggestionValidator"
+									for="function" />   
+								<f:ajax event="change" for="function" render=":dati:tipo_documento_identita"  onevent="spostaFocus"/>
+							</cc:inputSuggestion>
+							
+							<h:panelGroup id="raggruppa" layout="block"
+								style="vertical-align:top;"
+								rendered="#{completamentoDatiBean.data.cittadinanza.flgCee == 'N' and (completamentoDatiBean.tipoProvider=='ICAR' or completamentoDatiBean.tipoProvider=='SPID')}">
+								<br />
+								<h:panelGroup styleClass="ui-widget-content ui-corner-all" layout="block">
+									In caso di documento '<b>in rinnovo</b>' va inserita la data di scadenza del permesso di soggiorno originaria.<br />
+									In caso di documento '<b>in attesa di permesso</b>' va indicata la data 'convenzionale' <b>01/01/1900</b>.<br />
+									In caso di '<b>carta permanente</b>' si inserisce la data convenzionale <b>31/12/2099</b>.
+								</h:panelGroup>
+							</h:panelGroup>
+						</h:panelGrid>
+						
+						<cc:inputText id="numero_documento" label="Numero del documento"
+							required="true" rendered="#{completamentoDatiBean.data.cittadinanza.flgCee != null and (completamentoDatiBean.tipoProvider=='ICAR' or completamentoDatiBean.tipoProvider=='SPID')}"
+							value="#{completamentoDatiBean.data.numeroDocumento}">
+						</cc:inputText>
+
+						<cc:inputText id="data_scadenza_documento" required="true"
+							label="Data di scadenza" type="date" rendered="#{completamentoDatiBean.data.cittadinanza.flgCee != null and (completamentoDatiBean.tipoProvider=='ICAR' or completamentoDatiBean.tipoProvider=='SPID')}"
+							value="#{completamentoDatiBean.data.dataScadenzaDocumento}" />
+
+						<cc:inputText id="numero_assicurata" 
+							rendered="#{completamentoDatiBean.data.documentoSoggiorno.rinnovo and (completamentoDatiBean.tipoProvider=='ICAR' or completamentoDatiBean.tipoProvider=='SPID')}"
+							label="Numero assicurata/raccomandata" required="true"
+							value="#{completamentoDatiBean.data.numeroAssicurata}" />
+
+						<h:inputHidden id="rinnovo"	value="#{completamentoDatiBean.data.documentoSoggiorno.rinnovo}" />
+
+						<cc:inputText id="data_assicurata"
+							rendered="#{completamentoDatiBean.data.documentoSoggiorno.rinnovo and (completamentoDatiBean.tipoProvider=='ICAR' or completamentoDatiBean.tipoProvider=='SPID')}"
+							label="Data assicurata/raccomandata" type="date"
+							required="true"
+							value="#{completamentoDatiBean.data.dataAssicurata}" />											
+					</h:panelGroup>
+
+					
+				</h:panelGrid>
+				
+				<cc:selectOneMenu label="Provincia di riferimento" 
+					id="provincia_riferimento" style="display:none;" required="true"
+					value="#{completamentoDatiBean.data.provincia.id}"
+					requiredMessage="Indica la provincia di riferimento">
+					<f:selectItems value="#{utilsBean.province}" />
+				</cc:selectOneMenu>
+				
+				
+				
+			</fieldset>
+					
+			<br />
+
+			<ui:include src="/public/login/_informativa.xhtml">
+				<ui:param name="chiamante" value="cittadino" />
+			</ui:include>
+
+
+			<center>
+				<h:panelGrid columns="1">
+					<h:panelGroup>
+						<h:selectBooleanCheckbox id="informativa_ok" required="true"
+							requiredMessage="E' obbligatorio accettare l'informativa"
+							value="#{completamentoDatiBean.data.acceptInformativa}">
+							<f:validator validatorId="requiredCheckboxValidator"
+								for="function" />
+							<f:ajax execute="informativa_ok" event="blur"
+								render="informativa_effect" />
+						</h:selectBooleanCheckbox>
+						<h:outputLabel
+							value="Ho preso visione dell'informativa sulla privacy"
+							for="informativa_ok" />
+						<h:panelGroup id="informativa_effect" class="toggler"
+							style="display:none;">
+							<h:message id="informativa_message" for="informativa_ok"
+								errorClass="ui-state-error ui-corner-all"
+								infoClass="ui-state-highlight ui-corner-all">
+							</h:message>
+							<script type="text/javascript">
+								$(function() {
+									runEffectError(jq('dati:informativa_effect'));
+								}); 
+							</script>
+						</h:panelGroup>
+						<br />
+					</h:panelGroup>	
+				</h:panelGrid>
+				<h:commandLink action="#{completamentoDatiBean.registraUtente}"
+					value="Salva e vai alla mia scrivania" id="Scrivania" styleClass="buttonStyle checkButton" >
+				</h:commandLink>  
+				<h:commandLink action="#{sessionBean.logout}" immediate="true"
+					value="Torna alla pagina di login" id="logout" styleClass="buttonStyle checkButton" />
+				<br /> <br />
+			</center>
+		</h:form>
+
+
+
+
+
+	<script type="text/javascript">
+		//<![CDATA[
+		function spostaFocus(data) {
+			if (data.status == 'success') {
+				disegnaBottoni();
+				$('#dati\\:documento_identita\\:inputText, #dati\\:documento_soggiorno\\:inputText').focus();
+			}
+		}
+		
+		function change_comune(data) {
+			//console.log(data);
+//			alert("chiamata a change comune " + data);
+			if (!data || (data.status == 'success')) {
+				combo = $(jq("dati:provincia_riferimento:combobox"));
+				selected = combo.val();
+				comune = $(jq("dati:comune_domicilio:inputText")).val();
+				if (selected == "" && comune != "" && !combo.is(':disabled')) {
+					$(jq("dati:provincia_riferimento")).show().css('width','500');
+					$(jq("dati:provincia_riferimento:combobox:input")).val("Scegli una provincia");
+					$(jq("dati:provincia_riferimento:label")).html("#{txt['dati.provincia_riferimento.label']}");			
+ 				}	
+			}			
+		}
+
+ 
+		$(function() {
+			disegnaBottoni();
+			change_comune();			
+		});
+		//]]> 
+	</script>
+	</ui:define>
+	</ui:composition>

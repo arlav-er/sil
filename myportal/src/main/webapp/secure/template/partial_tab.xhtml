@@ -1,0 +1,52 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets" template="tab.xhtml">
+
+	<ui:define name="tabcontent">
+		<h:form id="#{form_id}">
+			<script type="text/javascript">
+				checkSwitch('#{tabBean.switchtab}');
+			</script>
+
+			<ui:insert name="form_data">
+				Nessun dato nella form
+			</ui:insert>
+
+			<h:commandLink styleClass="marginButton saveButton" action="#{tabBean.save}" value="Salva"
+				rendered="#{not tabBean.saved and tabBean.editing}" id="currentButton">
+				<f:ajax execute="@form" render="@form" onevent="refreshNumVacancyCompatibili" />
+			</h:commandLink>
+			<h:commandLink styleClass="marginButton editButton" action="#{tabBean.edit}" value="Modifica"
+				rendered="#{tabBean.saved and not tabBean.editing}" id="editButton">
+				<f:ajax execute="@form" render="@form" />
+			</h:commandLink>
+			<h:commandLink styleClass="marginButton updateButton" action="#{tabBean.update}" value="Aggiorna"
+				rendered="#{tabBean.saved and tabBean.editing}" id="updateButton">
+				<f:ajax execute="@form" render="@form" onevent="refreshNumVacancyCompatibili" />
+			</h:commandLink>
+			<h:commandLink styleClass="marginButton secondButton deleteButton" action="#{tabBean.delete}" value="Cancella"
+				rendered="#{tabBean.saved and tabBean.editing and tabBean.showDeleteButton}" id="deleteButton" onclick="return confirm('Sei sicuro di voler eliminare i dati?')">								
+			 	<f:param name="id" value="#{deleteId}"/> 
+				<f:ajax execute="@form" render="@form" onevent="showPanelCallbackAndRefresh"/>
+			</h:commandLink>
+						
+			<cc:messages />
+
+			<br />
+			<ui:insert name="javascript_data">
+				Nessun javascript
+			</ui:insert>
+
+			<ui:insert name="info_panel_data" />
+
+			<script type="text/javascript">
+				if ('#{tabBean.editing}' == 'true') {					
+					$(jq('#{form_id}') + " :input:visible:enabled:first").focus();
+				}
+			</script>
+		</h:form>
+		
+	</ui:define>
+</ui:composition>

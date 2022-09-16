@@ -1,0 +1,1825 @@
+<!-- 
+     **************************************************************************
+     SEZIONE DI CONFIGURAZIONE DEL DETTAGLIO GENERALE DEL MOVIMENTO PER LA
+     CONSULTAZIONE
+     **************************************************************************
+-->
+<!--MovDettaglioGeneraleConsultaPage_old-->
+<PAGE distributed="false" name="MovDettaglioGeneraleConsultaPage_OLD" scope="REQUEST">
+  <MODULES>
+    <!-- <MODULE name="M_MovCercaUltimoMovColl"/> -->
+    <MODULE name="M_MovGetDettMov"/>
+    <MODULE name="M_MovSalvaGenConsulta"/>
+    <MODULE name="ComboTipoMovimento"/>
+    <MODULE name="ComboTipoMovimentoColl"/>
+    <MODULE name="ComboTipoMovimentoSingolo"/>
+    <!-- recupero num successivo protocollo -->
+    <MODULE name="M_GetProtocollazione"/>
+    <!-- recupero informazioni sul dettaglio documenti-->
+    <MODULE name="DettagliDocumentoDaPrgMov"/>
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboMotAnnullamento"/>    
+    <MODULE name="M_GETDATI_TSGEN" />
+    <MODULE name="CercaMovimentiSuccessiviCompatibili" />
+  </MODULES>
+    
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="M_MovSalvaGenConsulta">
+      <CONDITIONS>
+        <PARAMETER name="ACTION" scope="SERVICE_REQUEST" value="aggiorna"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="M_MovSalvaGenConsulta" target="M_MovGetDettMov">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>      
+    
+    <!--Catena 2: Ricerca del movimento esistente nel DB-->
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="M_MovGetDettMov">
+      <CONDITIONS>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <!-- recupero info sul documento dato il prgmov -->
+    <DEPENDENCE source="M_MovGetDettMov" target="DettagliDocumentoDaPrgMov" >
+    <CONDITIONS/>
+        <CONSEQUENCES>
+	  	    <PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+        </CONSEQUENCES>
+      </DEPENDENCE>
+	  
+	<DEPENDENCE source="M_MovGetDettMov" target="CercaMovimentiSuccessiviCompatibili">
+	  <CONSEQUENCES>
+	  	<PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+	  	<PARAMETER name="cdnLavoratore" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.cdnLavoratore"/>
+	  	<PARAMETER name="prgAzienda" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgAzienda"/>
+	  	<PARAMETER name="prgUnita" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgUnita"/>
+	  	<PARAMETER name="datInizioMov" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.datInizioMov"/>
+	  </CONSEQUENCES>
+	</DEPENDENCE>
+    <!--Ricerca degli elementi per le combo della pagina-->
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboTipoMovimento">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboTipoMovimentoColl">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboTipoMovimentoSingolo">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboStatoAtto"/>    
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboMotAnnullamento"/>   
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="M_GetProtocollazione" />
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="M_GETDATI_TSGEN" />
+  </DEPENDENCIES>
+</PAGE>
+
+<!--MovDettaglioGeneraleConsultaPage NEW-->
+<PAGE distributed="false" name="MovDettaglioGeneraleConsultaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovGetDettMov"/>
+    <MODULE name="M_MovSalvaGenConsulta"/>
+    <MODULE name="ComboTipoMovimento"/>
+    <MODULE name="ComboTipoMovimentoColl"/>
+    <MODULE name="ComboTipoMovimentoSingolo"/>
+    <MODULE name="M_GetProtocollazione"/>
+    <MODULE name="DettagliDocumentoDaPrgMov"/>
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboStatoAttoPatronato"/>
+    <MODULE name="ComboMotAnnullamento"/>    
+    <MODULE name="M_GETDATI_TSGEN" />
+    <MODULE name="M_GetMovimentiSuccessiviCompatibili" />
+    <MODULE name="ComboTipoAgevolazioni" />
+    <MODULE name="ComboTipoCessazione"/>
+    <MODULE name="ComboTipoTrasformazione"/>
+    <MODULE name="M_MovGetApprendistato"/>
+    <MODULE name="ComboTipoOrario"/>
+    <MODULE name="M_MovGetDettMovOld"/>
+    <MODULE name="M_MovGetDettMovMissioni"/>
+    <MODULE name="M_MovGetDettMovAgevolazioni"/>
+    <MODULE name="M_Config_Ente_Promotore"/>
+    <MODULE name="ComboCodiceVariazione"/>
+    <MODULE name="ComboCategoriaAssObbligatoria"/>
+    <!--<MODULE name="ComboTipoEntePromotore"/>-->
+  </MODULES>
+    
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="M_MovSalvaGenConsulta">
+      <CONDITIONS>
+        <PARAMETER name="ACTION" scope="SERVICE_REQUEST" value="aggiorna"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+	 <DEPENDENCE source="M_MovSalvaGenConsulta" target="M_MovGetDettMov">
+     	<CONDITIONS/>
+      		<CONSEQUENCES/>
+    </DEPENDENCE>      
+   	<DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="M_MovGetDettMov">
+    	<CONDITIONS>
+      		</CONDITIONS>
+      		<CONSEQUENCES/>
+    </DEPENDENCE>
+	<DEPENDENCE source="M_MovGetDettMov" target="DettagliDocumentoDaPrgMov" >
+    <CONDITIONS/>
+    	<CONSEQUENCES>
+	  	    <PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+        </CONSEQUENCES>
+      </DEPENDENCE>
+	  <DEPENDENCE source="M_MovGetDettMov" target="M_GetMovimentiSuccessiviCompatibili">
+	  <CONSEQUENCES>
+	  	<PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+	  	<PARAMETER name="cdnLavoratore" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.cdnLavoratore"/>
+	  	<PARAMETER name="prgAzienda" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgAzienda"/>
+	  	<PARAMETER name="prgUnita" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgUnita"/>
+	  	<PARAMETER name="datInizioMov" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.datInizioMov"/>
+	  </CONSEQUENCES>
+	</DEPENDENCE>
+	<DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboTipoMovimento">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboTipoMovimentoColl">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboTipoMovimentoSingolo">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboStatoAtto"/>    
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboStatoAttoPatronato"/>    
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboMotAnnullamento"/>   
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="M_GetProtocollazione" />
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="M_GETDATI_TSGEN" />
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboTipoAgevolazioni" />
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboTipoCessazione" />
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboTipoTrasformazione" />
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="M_MovGetApprendistato" />
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboTipoOrario" />
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="M_MovGetDettMovOld" />
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="M_MovGetDettMovMissioni" />
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="M_MovGetDettMovAgevolazioni" />
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="M_Config_Ente_Promotore" />
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboCodiceVariazione" />
+    <DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboCategoriaAssObbligatoria" />
+    <!--<DEPENDENCE source="MovDettaglioGeneraleConsultaPage" target="ComboTipoEntePromotore" />-->
+   </DEPENDENCIES>
+</PAGE>
+
+<!-- 
+     **************************************************************************
+     SEZIONE DI CONFIGURAZIONE DELL'INSERIMENTO DEL DETTAGLIO GENERALE DEL MOVIMENTO
+     **************************************************************************
+-->
+<!--MovDettaglioGeneraleConsultaPage_OLD-->
+<PAGE distributed="false" name="MovDettaglioGeneraleInserisciPage_OLD" scope="REQUEST">
+  <MODULES>
+  <!--  <MODULE name="M_MovCercaUltimoMovColl"/> -->
+    <MODULE name="M_MovGetDettMov"/>
+    <!-- recupero num successivo protocollo -->
+    <MODULE name="M_GetProtocollazione"/>
+    <MODULE name="ComboTipoMovimento"/>
+    <MODULE name="ComboTipoMovimentoColl"/>
+    <MODULE name="ComboTipoMovimentoSingolo"/>
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboMotAnnullamento"/>
+    <MODULE name="M_GetMbCmEtaLav"/>
+  </MODULES>
+    
+  <DEPENDENCIES>
+    <!--Se sto inserendo un movimento collegato cerco l'ultimo movimento collegato e ne prelevo i dati
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_MovCercaUltimoMovColl">
+      <CONDITIONS>
+        <PARAMETER name="PROVENIENZA" scope="SERVICE_REQUEST" value="ListaMov"/>
+        <PARAMETER name="COLLEGATO" scope="SERVICE_REQUEST" value="precedente"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+     Si può provenire dalla lista dei movimenti, per cui agisce la dipendenza
+         specificata sopra, o si può provenire dalle linguette (si naviga da una 
+         linguetta ad un'altra) 
+   
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_MovCercaUltimoMovColl">
+      <CONDITIONS>
+        <PARAMETER name="PROVENIENZA" scope="SERVICE_REQUEST" value="linguetta"/>
+        <PARAMETER name="COLLEGATO" scope="SERVICE_REQUEST" value="precedente"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    -->
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_MovGetDettMov">
+      <CONDITIONS>         
+      </CONDITIONS>
+      <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_REQUEST" value="PRGMOVIMENTOPREC"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <!--Ricerca degli elementi per le combo della pagina-->
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboTipoMovimento">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoMovimentoColl">
+      <CONDITIONS/>
+      <CONSEQUENCES>
+      	<PARAMETER name="codMonoTempoMovPrec" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MOVGETDETTMOV.ROWS.ROW.CODMONOTEMPO"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboTipoMovimentoSingolo">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboStatoAtto"/>   
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboMotAnnullamento"/>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_GetProtocollazione" />
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_GetMbCmEtaLav">
+      <CONDITIONS>
+      	<PARAMETER name="PROVENIENZA" type="relative" scope="SERVICE_REQUEST" value="ListaMov"/>
+      </CONDITIONS>
+    <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_GetMbCmEtaLav">
+      <CONDITIONS>
+      	<PARAMETER name="PROVENIENZA" type="relative" scope="SERVICE_REQUEST" value="lavoratore"/>
+      </CONDITIONS>
+    <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_GetMbCmEtaLav">
+      <CONDITIONS>
+      	<PARAMETER name="PROVENIENZA" type="relative" scope="SERVICE_REQUEST" value="azienda"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+<!--  INIZIO Ristrutturazione interfaccia NEW gestione movimenti senza linguette  -->
+<PAGE distributed="false" name="MovDettaglioGeneraleInserisciPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovGetDettMov"/>
+    <!-- recupero num successivo protocollo -->
+    <MODULE name="M_GetProtocollazione"/>
+    <MODULE name="ComboTipoMovimento"/>
+    <MODULE name="ComboTipoMovimentoColl"/>
+    <MODULE name="ComboTipoMovimentoSingolo"/>
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboMotAnnullamento"/>
+    <MODULE name="M_GetMbCmEtaLav"/>
+    <MODULE name="M_GETDATI_TSGEN"/>
+    <MODULE name="ComboTipoOrario"/>
+    <MODULE name="ComboTipoGrado"/>
+  	<MODULE name="ComboCategoria"/>
+    <MODULE name="ComboTipoCessazione"/>
+    <MODULE name="ComboTipoAgevolazioni"/>
+    <MODULE name="ComboTipoTrasformazione"/>
+    <MODULE name="M_MovGetApprendistato"/>
+    <MODULE name="M_MovGetDettMovAgevolazioni"/>
+    <!--<MODULE name="ComboTipoEntePromotore"/>-->
+    <MODULE name="M_Config_Ente_Promotore"/>
+    <MODULE name="ComboCodiceVariazione"/>
+    <MODULE name="ComboCategoriaAssObbligatoria"/>
+    <MODULE name="M_CONFIG_DATA_NORMATIVA_297"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_MovGetDettMov">
+      <CONDITIONS>         
+      </CONDITIONS>
+      <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_REQUEST" value="PRGMOVIMENTOPREC"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_MovGetDettMov">
+      <CONDITIONS>
+        <PARAMETER name="COLLEGATO" scope="SERVICE_REQUEST" value="precedente"/>          
+      </CONDITIONS>
+      <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_REQUEST" value="PRGMOVIMENTOPREC"/>
+      </CONSEQUENCES>
+     </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_GETDATI_TSGEN">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_MovGetNumDurataApprendist"/>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboTipoOrario"/>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboTipoGrado"/>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboCategoria"/>
+    <!--<DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboTipoEntePromotore"/>-->
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_Config_Ente_Promotore"/>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_CONFIG_DATA_NORMATIVA_297"/>
+    <!--Ricerca degli elementi per le combo della pagina-->
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboTipoMovimento">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoMovimentoColl">
+      <CONDITIONS/>
+      <CONSEQUENCES>
+      	<PARAMETER name="codMonoTempoMovPrec" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MOVGETDETTMOV.ROWS.ROW.CODMONOTEMPO"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboTipoMovimentoSingolo">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboStatoAtto"/>   
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboMotAnnullamento"/>
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_GetProtocollazione" />
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_GetMbCmEtaLav"/>
+    
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboTipoAgevolazioni"/>
+    
+    
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboTipoCessazione">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboTipoTrasformazione"/>
+    
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_MovGetApprendistato">
+    <CONDITIONS>
+        <PARAMETER name="PRGMOVIMENTOPREC" scope="SERVICE_REQUEST" value="AF_DEFINED"/>          
+      </CONDITIONS>
+    <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_REQUEST" value="PRGMOVIMENTOPREC"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="M_MovGetDettMovAgevolazioni">
+    	<CONDITIONS>
+        	<PARAMETER name="PRGMOVIMENTOPREC" scope="SERVICE_REQUEST" value="AF_DEFINED"/>          
+      	</CONDITIONS>
+    	<CONSEQUENCES>
+        	<PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_REQUEST" value="PRGMOVIMENTOPREC"/>
+      	</CONSEQUENCES>
+    </DEPENDENCE>
+    
+     <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboCodiceVariazione"/>
+     <DEPENDENCE source="MovDettaglioGeneraleInserisciPage" target="ComboCategoriaAssObbligatoria"/>
+    
+ </DEPENDENCIES>
+</PAGE>
+<!--  FINE Ristrutturazione interfaccia gestione movimenti senza linguette  -->
+
+
+
+
+<!--
+    ***************************************************************************
+    INSERIMENTO DEL DETTAGLIO CESSSAZIONE
+    **************************************************************************
+-->
+<PAGE distributed="false" name="MovDettaglioCessazioneInserisciPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovGetDettMov"/>
+    <MODULE name="ComboTipoCessazione"/>
+    <MODULE name="ComboTipoGrado"/>
+    <MODULE name="M_GETDATI_TSGEN"/>
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboMotAnnullamento"/>
+    <MODULE name="M_GetTipoAss"/>
+    <MODULE name="ComboTipoOrario"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovDettaglioCessazioneInserisciPage" target="M_MovGetDettMov">
+      <CONDITIONS>
+        <PARAMETER name="COLLEGATO" scope="SERVICE_REQUEST" value="precedente"/>          
+      </CONDITIONS>
+      <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_REQUEST" value="PRGMOVIMENTOPREC"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <!--Moduli da eseguire sempre, comprese le combo-->
+    <DEPENDENCE source="MovDettaglioCessazioneInserisciPage" target="ComboTipoCessazione">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioCessazioneInserisciPage" target="ComboTipoOrario">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioCessazioneInserisciPage" target="ComboTipoGrado">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioCessazioneInserisciPage" target="M_GETDATI_TSGEN" />
+    <DEPENDENCE source="MovDettaglioCessazioneInserisciPage" target="ComboStatoAtto" />
+    <DEPENDENCE source="MovDettaglioCessazioneInserisciPage" target="ComboMotAnnullamento" />
+    <DEPENDENCE source="MovDettaglioCessazioneInserisciPage" target="M_GetTipoAss" />
+  </DEPENDENCIES>
+</PAGE>
+
+<!--
+    ***************************************************************************
+    PAGINA DI CONSULTAZIONE DELLA CESSAZIONE
+    ***************************************************************************
+-->
+<PAGE distributed="false" name="MovDettaglioCessazioneConsultaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovGetDettMov"/>
+    <MODULE name="ComboTipoCessazione"/>
+    <MODULE name="ComboTipoGrado"/>
+    <MODULE name="DettagliDocumentoDaPrgMov"/>
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboMotAnnullamento"/>
+    
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovDettaglioCessazioneConsultaPage" target="M_MovGetDettMov">
+      <CONDITIONS>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <!--Moduli da eseguire sempre, comprese le combo-->
+    <DEPENDENCE source="MovDettaglioCessazioneConsultaPage" target="ComboTipoCessazione">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioCessazioneConsultaPage" target="ComboTipoGrado">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioCessazioneConsultaPage" target="DettagliDocumentoDaPrgMov"/>
+    <DEPENDENCE source="MovDettaglioCessazioneConsultaPage" target="ComboStatoAtto"/>
+    <DEPENDENCE source="MovDettaglioCessazioneConsultaPage" target="ComboMotAnnullamento"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!--
+    ***************************************************************************
+    CONSULTAZIONE PAGINA DELL'AVVIAMENTO
+    ***************************************************************************
+-->
+<PAGE distributed="false" name="MovDettaglioAvviamentoConsultaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovGetDettMov"/>
+    <MODULE name="ComboTipoOrario"/>
+    <MODULE name="ComboTipoGrado"/>
+    <MODULE name="ComboNormativaSelettiva"/>
+    <MODULE name="ComboAgevolazioneSelettiva"/>
+    <MODULE name="CercaMovimentiSuccessiviCompatibili"/>    
+    <MODULE name="DettagliDocumentoDaPrgMov"/>    
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboMotAnnullamento"/>
+    <MODULE name="ComboCategoria"/>
+  </MODULES>
+  <DEPENDENCIES>      
+    <!--casi di navigazione sulla tabella dei movimenti o su quella di appoggio, o di consultazione del movimento collegato-->
+    <DEPENDENCE source="MovDettaglioAvviamentoConsultaPage" target="M_MovGetDettMov">
+      <CONDITIONS>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+	<DEPENDENCE source="M_MovGetDettMov" target="CercaMovimentiSuccessiviCompatibili">
+	  <CONSEQUENCES>
+	  	<PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+	  	<PARAMETER name="cdnLavoratore" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.cdnLavoratore"/>
+	  	<PARAMETER name="prgAzienda" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgAzienda"/>
+	  	<PARAMETER name="prgUnita" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgUnita"/>
+	  	<PARAMETER name="datInizioMov" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.datInizioMov"/>
+	  </CONSEQUENCES>
+	</DEPENDENCE>
+
+    <!--Moduli da eseguire sempre-->
+    <DEPENDENCE source="MovDettaglioAvviamentoConsultaPage" target="ComboTipoOrario">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioAvviamentoConsultaPage" target="ComboTipoGrado">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="MovDettaglioAvviamentoConsultaPage" target="ComboNormativaSelettiva">
+      <CONDITIONS>
+      </CONDITIONS>        
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_REQUEST" value="codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.codMonoTempo"/>        
+      </CONSEQUENCES>        
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioAvviamentoConsultaPage" target="ComboAgevolazioneSelettiva">
+      <CONDITIONS>
+      </CONDITIONS> 
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_REQUEST" value="codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.codMonoTempo"/>  
+      </CONSEQUENCES>
+    </DEPENDENCE>               
+    <DEPENDENCE source="MovDettaglioAvviamentoConsultaPage" target="DettagliDocumentoDaPrgMov"/>
+    <DEPENDENCE source="MovDettaglioAvviamentoConsultaPage" target="ComboStatoAtto"/>
+    <DEPENDENCE source="MovDettaglioAvviamentoConsultaPage" target="ComboMotAnnullamento"/>
+    <DEPENDENCE source="MovDettaglioAvviamentoConsultaPage" target="ComboCategoria"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<!--
+    ***************************************************************************
+    INSERIMENTO DETTAGLIO AVVIAMENTO 
+    ***************************************************************************
+-->
+<PAGE distributed="false" name="MovDettaglioAvviamentoInserisciPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovGetDettMov"/>
+    <MODULE name="ComboTipoOrario"/>
+    <MODULE name="ComboTipoGrado"/>  
+    <MODULE name="ComboNormativaSelettiva"/>
+    <MODULE name="ComboAgevolazioneSelettiva"/>
+    <MODULE name="M_GETDATI_TSGEN"/>
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboMotAnnullamento"/>
+    <MODULE name="ComboCategoria"/>
+    <MODULE name="M_MovGetNumDurataApprendist" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovDettaglioAvviamentoInserisciPage" target="M_MovGetDettMov">
+      <CONDITIONS>
+        <PARAMETER name="COLLEGATO" scope="SERVICE_REQUEST" value="precedente"/>         
+      </CONDITIONS>
+      <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_REQUEST" value="PRGMOVIMENTOPREC"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>        
+	<!-- INIZIO -->
+	<DEPENDENCE source="MovDettaglioAvviamentoInserisciPage" target="M_MovGetNumDurataApprendist">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <!-- FINE -->
+    <DEPENDENCE source="MovDettaglioAvviamentoInserisciPage" target="ComboNormativaSelettiva">
+      <CONDITIONS>
+      </CONDITIONS>        
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_REQUEST" value="codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_REQUEST" value="codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_REQUEST" value="codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_REQUEST" value="codMonoTempo"/>        
+      </CONSEQUENCES>        
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioAvviamentoInserisciPage" target="ComboAgevolazioneSelettiva">
+      <CONDITIONS>
+      </CONDITIONS> 
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_REQUEST" value="codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_REQUEST" value="codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_REQUEST" value="codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_REQUEST" value="codMonoTempo"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>       
+    <!--Moduli da eseguire sempre-->
+    <DEPENDENCE source="MovDettaglioAvviamentoInserisciPage" target="ComboTipoOrario">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioAvviamentoInserisciPage" target="ComboTipoGrado">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioAvviamentoInserisciPage" target="M_GETDATI_TSGEN" />
+    <DEPENDENCE source="MovDettaglioAvviamentoInserisciPage" target="ComboStatoAtto" />
+    <DEPENDENCE source="MovDettaglioAvviamentoInserisciPage" target="ComboMotAnnullamento" />
+    <DEPENDENCE source="MovDettaglioAvviamentoInserisciPage" target="ComboCategoria"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<!--
+    ***************************************************************************
+    INSERIMENTO TRASFORMAZIONE/PROROGA
+    ***************************************************************************
+-->
+<PAGE distributed="false" name="MovDettaglioTrasfProInserisciPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovGetDettMov"/>
+    <MODULE name="ComboTipoOrario"/>
+    <MODULE name="ComboTipoGrado"/>
+    <MODULE name="ComboTipoAgevolazioni"/> 
+    <MODULE name="M_GETDATI_TSGEN"/>
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboMotAnnullamento"/>
+    <MODULE name="M_GetTipoAss"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <!--Se l'inserimento è andato male devo comunque caricare la combo dei benefici, 
+    ma i campi mi arrivano dalla request-->
+    <DEPENDENCE source="MovDettaglioTrasfProInserisciPage" target="ComboAgevolazioneSelettiva">
+      <CONDITIONS>
+      </CONDITIONS> 
+      <CONSEQUENCES>
+        <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_REQUEST" value="codTipoAzienda"/>        
+        <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_REQUEST" value="codNatGiuridicaAz"/>        
+        <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_REQUEST" value="codTipoAss"/>        
+        <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_REQUEST" value="codMonoTempo"/>        
+      </CONSEQUENCES>
+    </DEPENDENCE> 
+
+    <DEPENDENCE source="MovDettaglioTrasfProInserisciPage" target="M_MovGetDettMov">
+      <CONDITIONS>
+        <PARAMETER name="COLLEGATO" scope="SERVICE_REQUEST" value="precedente"/>          
+      </CONDITIONS>
+      <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_REQUEST" value="PRGMOVIMENTOPREC"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>      
+
+    <!--Moduli da eseguire sempre, comprese le combo-->
+    <DEPENDENCE source="MovDettaglioTrasfProInserisciPage" target="ComboTipoOrario">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioTrasfProInserisciPage" target="ComboTipoGrado">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>        
+    <DEPENDENCE source="MovDettaglioTrasfProInserisciPage" target="ComboTipoAgevolazioni">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE> 
+    <DEPENDENCE source="MovDettaglioTrasfProInserisciPage" target="M_GETDATI_TSGEN" />
+    <DEPENDENCE source="MovDettaglioTrasfProInserisciPage" target="ComboStatoAtto" />
+    <DEPENDENCE source="MovDettaglioTrasfProInserisciPage" target="ComboMotAnnullamento" />
+    <DEPENDENCE source="MovDettaglioTrasfProInserisciPage" target="M_GetTipoAss" />
+  </DEPENDENCIES>
+</PAGE>
+
+
+
+<!--
+    ***************************************************************************
+    PAGINA PER L'INSERIMENTO DEL MOVIMENTO OLD (NON PER LA VALIDAZIONE)
+    ***************************************************************************
+-->
+<PAGE distributed="false" name="InserisciMovimentoCompletoPage_OLD" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovInserisciMovimentoCompleto"/>
+    <!-- RECUPERO DELLE INFO APPENA INSERITE DAL DB -->
+    <MODULE name="M_MovGetDettMov" />
+    <!-- COMBO DELLE VARIE PAGE -->
+    <!-- CES -->
+    <MODULE name="ComboTipoCessazione"/>
+    <MODULE name="ComboTipoGrado"/>
+    <!-- AVV -->
+    <MODULE name="ComboTipoOrario"/>
+    <MODULE name="ComboNormativaSelettiva"/>
+    <MODULE name="ComboAgevolazioneSelettiva"/>
+
+    <!-- TRASF/PRO -->
+    <MODULE name="ComboTipoAgevolazioni"/>
+    <!-- Per tutte -->
+    <MODULE name="M_GETDATI_TSGEN" />
+    <MODULE name="CercaMovimentiSuccessiviCompatibili" />    
+	<MODULE name="DettagliDocumentoDaPrgMov"/>    
+	<MODULE name="ComboStatoAtto"/>  
+	<MODULE name="ComboMotAnnullamento"/>  
+	<MODULE name="M_GetTipoAss"/>
+    <MODULE name="ComboCategoria"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="M_MovInserisciMovimentoCompleto"/>
+
+    <!-- RECUPERO DATI DA DB DA VISUALIZZARE IN CASO DI INSERIMENTO AVVENUTO -->
+    <DEPENDENCE source="M_MovInserisciMovimentoCompleto" target="M_MovGetDettMov">
+      <CONDITIONS>
+        <PARAMETER name="M_MOVINSERISCIMOVIMENTOCOMPLETO.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_RESPONSE" value="M_MovInserisciMovimentoCompleto.PRGMOVIMENTO"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+	<DEPENDENCE source="M_MovGetDettMov" target="CercaMovimentiSuccessiviCompatibili">
+	  <CONSEQUENCES>
+	  	<PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+	  	<PARAMETER name="cdnLavoratore" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.cdnLavoratore"/>
+	  	<PARAMETER name="prgAzienda" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgAzienda"/>
+	  	<PARAMETER name="prgUnita" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgUnita"/>
+	  	<PARAMETER name="datInizioMov" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.datInizioMov"/>
+	  </CONSEQUENCES>
+	</DEPENDENCE>
+    <!-- RECUPERO DATI COMBO IN CASO DI INSERIMENTO AVVENUTO -->
+    <!-- CES -->
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoCessazione">
+      <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="CES"/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoGrado">
+      <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="CES"/>
+    </DEPENDENCE>
+    <!-- AVV -->
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoOrario">
+      <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="AVV"/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboNormativaSelettiva">
+      <CONDITIONS>
+        <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="AVV"/>
+      </CONDITIONS>        
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codMonoTempo"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboAgevolazioneSelettiva">
+      <CONDITIONS>
+        <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="AVV"/>
+      </CONDITIONS> 
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codMonoTempo"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <!-- TRASF/PRO -->
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoAgevolazioni">
+      <CONDITIONS>
+        <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="TRA"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoAgevolazioni">
+      <CONDITIONS>
+        <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="PRO"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <!-- ***************************************************-->
+    
+    <!-- RECUPERO DATI COMBO IN CASO DI FALLITO INSERIMENTO -->
+    <!-- CES -->
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboTipoCessazione">
+      <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="CES"/>
+      <PARAMETER name="M_MOVINSERISCIMOVIMENTOCOMPLETO.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+    </DEPENDENCE>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboTipoGrado">
+      <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="CES"/>
+      <PARAMETER name="M_MOVINSERISCIMOVIMENTOCOMPLETO.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+    </DEPENDENCE>
+    <!-- AVV -->
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboTipoOrario">
+      <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="AVV"/>
+      <PARAMETER name="M_MOVINSERISCIMOVIMENTOCOMPLETO.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+    </DEPENDENCE>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboNormativaSelettiva">
+      <CONDITIONS>
+        <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="AVV"/>
+        <PARAMETER name="M_MOVINSERISCIMOVIMENTOCOMPLETO.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>        
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_REQUEST" value="codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_REQUEST" value="codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_REQUEST" value="codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_REQUEST" value="codMonoTempo"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboAgevolazioneSelettiva">
+      <CONDITIONS>
+        <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="AVV"/>
+        <PARAMETER name="M_MOVINSERISCIMOVIMENTOCOMPLETO.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+      </CONDITIONS> 
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_REQUEST" value="codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_REQUEST" value="codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_REQUEST" value="codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_REQUEST" value="codMonoTempo"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <!-- TRASF/PRO -->
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboTipoAgevolazioni">
+      <CONDITIONS/>
+        <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="TRA"/>
+        <PARAMETER name="M_MOVINSERISCIMOVIMENTOCOMPLETO.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboTipoAgevolazioni">
+      <CONDITIONS>
+        <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="PRO"/>
+        <PARAMETER name="M_MOVINSERISCIMOVIMENTOCOMPLETO.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="M_GETDATI_TSGEN"/>
+    <DEPENDENCE source="M_MovGetDettMov" target="DettagliDocumentoDaPrgMov">
+    	<CONDITIONS/>
+      <CONSEQUENCES>
+	  	<PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboStatoAtto"/>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboMotAnnullamento"/>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="M_GetTipoAss" />
+    
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboCategoria"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+
+<!--
+    ***************************************************************************
+    PAGINA PER L'INSERIMENTO DEL MOVIMENTO NEW (NON PER LA VALIDAZIONE)
+    ***************************************************************************
+-->
+
+<PAGE distributed="false" name="InserisciMovimentoCompletoPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovInserisciMovimentoCompleto"/>
+    <!-- RECUPERO DELLE INFO APPENA INSERITE DAL DB -->
+    <MODULE name="M_MovGetDettMov" />
+    <!-- COMBO DELLE VARIE PAGE -->
+    <!-- CES -->
+    <MODULE name="ComboTipoCessazione"/>
+    <!-- AVV -->
+    <MODULE name="ComboTipoOrario"/>
+    <!-- TRASF/PRO -->
+    <MODULE name="ComboTipoAgevolazioni"/>
+    <!-- Per tutte -->
+    <MODULE name="M_GETDATI_TSGEN" />
+    <MODULE name="M_GetMovimentiSuccessiviCompatibili" />    
+	<MODULE name="DettagliDocumentoDaPrgMov"/>    
+	<MODULE name="ComboStatoAtto"/>  
+	<MODULE name="ComboMotAnnullamento"/>
+	<MODULE name="M_GetProtocollazione" />  
+	<MODULE name="ComboCategoria"/>
+    <MODULE name="ComboTipoMovimento"/>
+    <MODULE name="ComboTipoMovimentoColl"/>
+    <MODULE name="ComboTipoMovimentoSingolo"/>
+    <MODULE name="M_GetTipoAss"/>
+    <MODULE name="ComboTipoTrasformazione"/>
+    <MODULE name="M_MovGetDettMovMissioni"/>
+    <MODULE name="M_MovGetDettMovAgevolazioni"/>
+    <MODULE name="M_Config_Ente_Promotore"/>
+    <MODULE name="ComboCodiceVariazione"/>
+    <MODULE name="ComboTipoEntePromotore"/>
+    <MODULE name="ComboCategoriaAssObbligatoria"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="M_MovInserisciMovimentoCompleto"/>
+
+    <!-- RECUPERO DATI DA DB DA VISUALIZZARE IN CASO DI INSERIMENTO AVVENUTO -->
+    <DEPENDENCE source="M_MovInserisciMovimentoCompleto" target="M_MovGetDettMov">
+      <CONDITIONS>
+        <PARAMETER name="M_MOVINSERISCIMOVIMENTOCOMPLETO.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_RESPONSE" value="M_MovInserisciMovimentoCompleto.PRGMOVIMENTO"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+	<DEPENDENCE source="M_MovGetDettMov" target="M_GetMovimentiSuccessiviCompatibili">
+	  <CONSEQUENCES>
+	  	<PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+	  	<PARAMETER name="cdnLavoratore" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.cdnLavoratore"/>
+	  	<PARAMETER name="prgAzienda" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgAzienda"/>
+	  	<PARAMETER name="prgUnita" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgUnita"/>
+	  	<PARAMETER name="datInizioMov" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.datInizioMov"/>
+	  </CONSEQUENCES>
+	</DEPENDENCE>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboTipoOrario"/>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="M_Config_Ente_Promotore"/>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboTipoAgevolazioni"/>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboCodiceVariazione"/>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboTipoEntePromotore"/>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboCategoriaAssObbligatoria"/>
+    
+    <!-- ***************************************************-->
+    
+    <!-- RECUPERO DATI COMBO IN CASO DI FALLITO INSERIMENTO -->
+    <!-- CES -->
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboTipoCessazione"/>
+      
+   	<DEPENDENCE source="InserisciMovimentoCompletoPage" target="M_GETDATI_TSGEN"/>
+    <DEPENDENCE source="M_MovGetDettMov" target="DettagliDocumentoDaPrgMov">
+    	<CONDITIONS/>
+      <CONSEQUENCES>
+	  	<PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboStatoAtto"/>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboMotAnnullamento"/>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboCategoria"/>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboTipoMovimento"/>
+    
+ 	<DEPENDENCE source="InserisciMovimentoCompletoPage" target="M_GetProtocollazione"/>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboTipoMovimentoColl"/>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboTipoMovimentoSingolo"/>
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="M_GetTipoAss" />
+    <DEPENDENCE source="InserisciMovimentoCompletoPage" target="ComboTipoTrasformazione"/>
+    <DEPENDENCE source="M_MovGetDettMov" target="M_MovGetDettMovMissioni">
+		<CONSEQUENCES>
+			<PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+	  	</CONSEQUENCES>
+	</DEPENDENCE>
+	
+	<DEPENDENCE source="M_MovGetDettMov" target="M_MovGetDettMovAgevolazioni">
+		<CONSEQUENCES>
+			<PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+	  	</CONSEQUENCES>
+	</DEPENDENCE>
+	
+  </DEPENDENCIES>
+</PAGE>
+
+
+
+<!--
+    ***************************************************************************
+    GESTIONE APPRENDISTATO
+    ***************************************************************************
+-->
+<PAGE distributed="false" name="MovApprendistatoPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovGetApprendistato" />
+    <MODULE name="M_GetDescQualificaSRQ" />
+    <MODULE name="M_GetDescMansioneSpec" />
+    <!-- <MODULE name="M_MovGetNumDurataApprendist" />-->
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovApprendistatoPage" target="M_MovGetApprendistato">
+    </DEPENDENCE>
+    <DEPENDENCE source="MovApprendistatoPage" target="M_GetDescQualificaSRQ">
+    	<CONDITIONS>
+        	<PARAMETER name="PRGMOVIMENTO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+      	</CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovApprendistatoPage" target="M_GetDescMansioneSpec">
+    	<CONDITIONS>
+        	<PARAMETER name="PRGMOVIMENTO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+      	</CONDITIONS>
+    </DEPENDENCE>
+     <!--  <DEPENDENCE source="MovApprendistatoPage" target="M_MovGetNumDurataApprendist">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE> -->
+  </DEPENDENCIES>
+</PAGE>
+
+<!--
+    ***************************************************************************
+    GETSIONE AVVIO BATCH GIORNALIERO DI CESSAZIONE MOVIMENTI
+    ***************************************************************************
+-->
+<PAGE distributed="false" name="AvviaBatchPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_AvviaBatch" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="AvviaBatchPage" target="M_AvviaBatch">
+      <CONDITIONS>
+        <PARAMETER name="avvia" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>  
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!--
+    ***************************************************************************
+    GETSIONE COMPETENZE
+    ***************************************************************************
+-->
+<PAGE distributed="false" name="CompetenzeAmminPage" scope="REQUEST">
+  <MODULES/>
+  <DEPENDENCIES/>
+</PAGE>
+
+<!--
+    ***************************************************************************
+    PAGES PER IL TRASFERIMENTO DEL RAMO AZIENDALE
+    ***************************************************************************
+-->
+
+<PAGE distributed="false" name="TrasfRamoSceltaAziendePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_TRGetAzProvenienza"/>
+		<MODULE name="M_TRGetUazProvenienza"/>
+		<MODULE name="M_TRGetAzDestinazione"/>
+		<MODULE name="M_TRGetUazDestinazione"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="TrasfRamoSceltaAziendePage" target="M_TRGetAzProvenienza">
+			<CONDITIONS>
+				<PARAMETER name="PRGAZIENDAPROVENIENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasfRamoSceltaAziendePage" target="M_TRGetUazProvenienza">
+			<CONDITIONS>
+				<PARAMETER name="PRGAZIENDAPROVENIENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="AF_DEFINED"/>
+				<PARAMETER name="PRGUNITAPROVENIENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>		
+		<DEPENDENCE source="TrasfRamoSceltaAziendePage" target="M_TRGetAzDestinazione">
+			<CONDITIONS>
+				<PARAMETER name="PRGAZIENDADESTINAZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasfRamoSceltaAziendePage" target="M_TRGetUazDestinazione">
+			<CONDITIONS>
+				<PARAMETER name="PRGAZIENDADESTINAZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="AF_DEFINED"/>
+				<PARAMETER name="PRGUNITADESTINAZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="TrasfRamoSceltaLavPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_TRGetListaLav"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="TrasfRamoSceltaLavPage" target="M_TRGetListaLav">
+			<CONDITIONS>
+			</CONDITIONS>
+		</DEPENDENCE>		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="TrasfRamoFiltroLavPage" scope="REQUEST">
+	<MODULES>
+	</MODULES>
+	<DEPENDENCIES>		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="TrasfRamoInfoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_TRComboMotivoCess"/>
+    	<MODULE name="M_GetProtocollazione"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="TrasfRamoInfoPage" target="M_TRComboMotivoCess">
+			<CONDITIONS>
+			</CONDITIONS>
+		</DEPENDENCE>
+    	<DEPENDENCE source="TrasfRamoInfoPage" target="M_GetProtocollazione" />		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="TrasfRamoTrasferisciPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_TRTrasferisci"/>
+		<MODULE name="M_TRGetListaMovLavTrasferiti"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="TrasfRamoTrasferisciPage" target="M_TRTrasferisci"/>
+		<DEPENDENCE source="M_TRTrasferisci" target="M_TRGetListaMovLavTrasferiti">
+			<CONDITIONS>
+				<PARAMETER name="M_TRTrasferisci.ERRORE_BLOCCANTE" scope="SERVICE_RESPONSE" type="RELATIVE" value="AF_NOT_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<!--
+    ***************************************************************************
+    FINE *** PAGES PER IL TRASFERIMENTO DEL RAMO AZIENDALE *** FINE
+    ***************************************************************************
+-->
+
+<!--
+    ***************************************************************************
+    PAGE PER IL CONTROLLO DELLE CHIAVI SUL DB
+    ***************************************************************************
+-->
+<PAGE distributed="false" name="ControllaEsistenzaChiavePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_MovControllaEsistenzaChiave"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ControllaEsistenzaChiavePage" target="M_MovControllaEsistenzaChiave">
+			<CONDITIONS>
+			</CONDITIONS>
+		</DEPENDENCE>		
+	</DEPENDENCIES>
+</PAGE>
+<!--
+    ***************************************************************************
+    FINE *** PAGE PER IL CONTROLLO DELLE CHIAVI SUL DB *** FINE
+    ***************************************************************************
+-->
+
+<!--Page per il recupero dei dati di un movimento via xmlhttp -->
+<PAGE distributed="false" name="MovRecuperoXMLHTTPDatiMovimentoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_MovGetDettMov"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="MovRecuperoXMLHTTPDatiMovimentoPage" target="M_MovGetDettMov">
+			<CONDITIONS>
+			</CONDITIONS>
+		</DEPENDENCE>		
+	</DEPENDENCIES>
+</PAGE>
+<!--
+    ***************************************************************************
+    PAGES PER LA RETTIFICA DEI MOVIMENTI OLD
+    ***************************************************************************
+-->
+<PAGE distributed="false" name="MovDettaglioGeneraleRettificaPage_OLD" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovGetDettMov"/>
+    <MODULE name="M_GetProtocollazione"/>
+    <MODULE name="ComboTipoMovimento"/>
+    <MODULE name="ComboTipoMovimentoColl"/>
+    <MODULE name="M_GetMbCmEtaLav"/>
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboMotAnnullamento"/>
+    <MODULE name="M_MovGetApprendistato"/>    
+    <!-- Modulo per ricavare il prgdocumento associato al movimento-->
+    <MODULE name="DettagliDocumentoDaPrgMov"/>
+  </MODULES>
+
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="M_MovGetDettMov">
+      <CONDITIONS>
+      	<PARAMETER name="PROVENIENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="AF_NOT_DEFINED"/>       
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <!-- Recupero dati relativi al documento associato-->
+  <DEPENDENCE source="M_MovGetDettMov" target="DettagliDocumentoDaPrgMov">
+   <CONDITIONS/>
+   <CONSEQUENCES>
+      <PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+   </CONSEQUENCES>
+</DEPENDENCE>
+    <!--Recupero dei dati dell'apprendistato-->
+    <DEPENDENCE source="M_MovGetDettMov" target="M_MovGetApprendistato">
+      <CONDITIONS/>
+      <CONSEQUENCES>
+		<PARAMETER name="CURRENTCONTEXT" type="ABSOLUTE" value="rettifica"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+
+
+    <!--Ricerca degli elementi per le combo della pagina-->
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboTipoMovimento">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoMovimentoColl">
+      <CONDITIONS/>
+      <CONSEQUENCES>
+      	<PARAMETER name="codMonoTempoMovPrec" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MOVGETDETTMOV.ROWS.ROW.CODMONOTEMPOAVV"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboTipoMovimentoColl">
+      <CONDITIONS>
+      	<PARAMETER name="PROVENIENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="linguetta"/>       
+      </CONDITIONS>
+      <CONSEQUENCES>
+      	<PARAMETER name="codMonoTempoMovPrec" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOTEMPOAVV"/>      	
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboStatoAtto"/>      
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="M_GetProtocollazione" />
+    <DEPENDENCE source="M_MovGetDettMov" target="M_GetMbCmEtaLav">
+      <CONDITIONS>
+      	<PARAMETER name="PROVENIENZA" type="relative" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>
+    <CONSEQUENCES>
+		<PARAMETER name="cdnLavoratore" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MOVGETDETTMOV.ROWS.ROW.CDNLAVORATORE"/>
+    </CONSEQUENCES>
+    </DEPENDENCE>    
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboMotAnnullamento"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!--
+    ***************************************************************************
+    PAGES PER LA RETTIFICA DEI MOVIMENTI NEW
+    ***************************************************************************
+-->
+<PAGE distributed="false" name="MovDettaglioGeneraleRettificaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovGetDettMov"/>
+    <MODULE name="M_GetProtocollazione"/>
+    <MODULE name="ComboTipoMovimento"/>
+    <MODULE name="ComboTipoMovimentoColl"/>
+    <MODULE name="M_GetMbCmEtaLav"/>
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboMotAnnullamento"/>
+    <MODULE name="M_MovGetApprendistato"/>   
+    <MODULE name="ComboTipoOrario"/>
+    <MODULE name="ComboTipoAgevolazioni"/>
+    <MODULE name="ComboTipoCessazione"/>
+    <MODULE name="ComboTipoTrasformazione"/>
+    <MODULE name="M_GETDATI_TSGEN"/>
+    <MODULE name="M_MovGetDettMovAgevolazioni"/>
+    <MODULE name="M_Config_Ente_Promotore"/>
+    <MODULE name="M_CONFIG_DATA_NORMATIVA_297"/>
+    <MODULE name="ComboCodiceVariazione"/>
+    <MODULE name="ComboCategoriaAssObbligatoria"/>
+    <!--<MODULE name="ComboTipoEntePromotore"/>-->
+    
+    <!-- Modulo per ricavare il prgdocumento associato al movimento-->
+    <MODULE name="DettagliDocumentoDaPrgMov"/>
+  </MODULES>
+
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="M_MovGetDettMov">
+      <CONDITIONS>
+      	<PARAMETER name="PROVENIENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="AF_NOT_DEFINED"/>       
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <!-- Recupero dati relativi al documento associato-->
+  <DEPENDENCE source="M_MovGetDettMov" target="DettagliDocumentoDaPrgMov">
+   <CONDITIONS/>
+   <CONSEQUENCES>
+      <PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+   </CONSEQUENCES>
+</DEPENDENCE>
+    <!--Recupero dei dati dell'apprendistato-->
+    <DEPENDENCE source="M_MovGetDettMov" target="M_MovGetApprendistato">
+      <CONDITIONS/>
+      <CONSEQUENCES>
+		<PARAMETER name="CURRENTCONTEXT" type="ABSOLUTE" value="rettifica"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_MovGetDettMov" target="M_MovGetDettMovAgevolazioni">
+      <CONDITIONS/>
+      <CONSEQUENCES>
+		<PARAMETER name="CURRENTCONTEXT" type="ABSOLUTE" value="rettifica"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <!--Ricerca degli elementi per le combo della pagina-->
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboTipoMovimento">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoMovimentoColl">
+      <CONDITIONS/>
+      <CONSEQUENCES>
+      	<PARAMETER name="codMonoTempoMovPrec" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MOVGETDETTMOV.ROWS.ROW.CODMONOTEMPOAVV"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboTipoMovimentoColl">
+      <CONDITIONS>
+      	<PARAMETER name="PROVENIENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="linguetta"/>       
+      </CONDITIONS>
+      <CONSEQUENCES>
+      	<PARAMETER name="codMonoTempoMovPrec" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOTEMPOAVV"/>      	
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboStatoAtto"/>      
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="M_GetProtocollazione" />
+    <DEPENDENCE source="M_MovGetDettMov" target="M_GetMbCmEtaLav">
+      <CONDITIONS>
+      	<PARAMETER name="PROVENIENZA" type="relative" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>
+    <CONSEQUENCES>
+		<PARAMETER name="cdnLavoratore" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MOVGETDETTMOV.ROWS.ROW.CDNLAVORATORE"/>
+    </CONSEQUENCES>
+    </DEPENDENCE>    
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboMotAnnullamento"/>
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboTipoOrario"/>
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboTipoAgevolazioni"/>
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboTipoCessazione"/>
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboTipoTrasformazione"/>
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="M_GETDATI_TSGEN" />
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="M_Config_Ente_Promotore" />
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="M_CONFIG_DATA_NORMATIVA_297" />
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboCodiceVariazione" />
+    <DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboCategoriaAssObbligatoria" />
+    <!--<DEPENDENCE source="MovDettaglioGeneraleRettificaPage" target="ComboTipoEntePromotore" />-->
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MovDettaglioAvviamentoRettificaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="ComboTipoOrario"/>
+    <MODULE name="ComboTipoGrado"/>  
+    <MODULE name="ComboNormativaSelettiva"/>
+    <MODULE name="ComboAgevolazioneSelettiva"/>
+    <MODULE name="M_GETDATI_TSGEN"/>
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboMotAnnullamento"/>
+    <MODULE name="ComboCategoria"/>
+    <!-- INIZIO -->
+    <MODULE name="M_MovGetNumDurataApprendist" />
+    <!-- FINE -->
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovDettaglioAvviamentoRettificaPage" target="ComboNormativaSelettiva">
+      <CONDITIONS>
+      </CONDITIONS>        
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_REQUEST" value="codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_REQUEST" value="codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_REQUEST" value="codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_REQUEST" value="codMonoTempo"/>        
+      </CONSEQUENCES>        
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioAvviamentoRettificaPage" target="ComboAgevolazioneSelettiva">
+      <CONDITIONS>
+      </CONDITIONS> 
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_REQUEST" value="codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_REQUEST" value="codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_REQUEST" value="codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_REQUEST" value="codMonoTempo"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>       
+    <!--Moduli da eseguire sempre-->
+    <DEPENDENCE source="MovDettaglioAvviamentoRettificaPage" target="ComboTipoOrario">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioAvviamentoRettificaPage" target="ComboTipoGrado">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioAvviamentoRettificaPage" target="M_GETDATI_TSGEN" />
+    <DEPENDENCE source="MovDettaglioAvviamentoRettificaPage" target="ComboStatoAtto" />
+    <DEPENDENCE source="MovDettaglioAvviamentoRettificaPage" target="ComboMotAnnullamento" />
+    
+    <DEPENDENCE source="MovDettaglioAvviamentoRettificaPage" target="ComboCategoria"/>
+    <!-- INIZIO -->
+	<DEPENDENCE source="MovDettaglioAvviamentoRettificaPage" target="M_MovGetNumDurataApprendist"/>
+    <!-- FINE -->
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MovDettaglioCessazioneRettificaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="ComboTipoCessazione"/>
+    <MODULE name="ComboTipoGrado"/>
+    <MODULE name="M_GETDATI_TSGEN"/>
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboMotAnnullamento"/>
+    <MODULE name="M_GetTipoAss"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <!--Moduli da eseguire sempre, comprese le combo-->
+    <DEPENDENCE source="MovDettaglioCessazioneRettificaPage" target="ComboTipoCessazione">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioCessazioneRettificaPage" target="ComboTipoGrado">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioCessazioneRettificaPage" target="M_GETDATI_TSGEN" />
+    <DEPENDENCE source="MovDettaglioCessazioneRettificaPage" target="ComboStatoAtto" />
+    <DEPENDENCE source="MovDettaglioCessazioneRettificaPage" target="ComboMotAnnullamento" />
+    <DEPENDENCE source="MovDettaglioCessazioneRettificaPage" target="M_GetTipoAss" />
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MovDettaglioTrasfProRettificaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="ComboTipoOrario"/>
+    <MODULE name="ComboTipoGrado"/>
+    <MODULE name="ComboTipoAgevolazioni"/> 
+    <MODULE name="M_GETDATI_TSGEN"/>
+    <MODULE name="ComboStatoAtto"/>
+    <MODULE name="ComboMotAnnullamento"/>
+    <MODULE name="M_GetTipoAss"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <!--Se l'inserimento è andato male devo comunque caricare la combo dei benefici, 
+    ma i campi mi arrivano dalla request-->
+    <DEPENDENCE source="MovDettaglioTrasfProRettificaPage" target="ComboAgevolazioneSelettiva">
+      <CONDITIONS>
+      </CONDITIONS> 
+      <CONSEQUENCES>
+        <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_REQUEST" value="codTipoAzienda"/>        
+        <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_REQUEST" value="codNatGiuridicaAz"/>        
+        <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_REQUEST" value="codTipoAss"/>        
+        <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_REQUEST" value="codMonoTempo"/>        
+      </CONSEQUENCES>
+    </DEPENDENCE> 
+
+    <!--Moduli da eseguire sempre, comprese le combo-->
+    <DEPENDENCE source="MovDettaglioTrasfProRettificaPage" target="ComboTipoOrario">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MovDettaglioTrasfProRettificaPage" target="ComboTipoGrado">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>        
+    <DEPENDENCE source="MovDettaglioTrasfProRettificaPage" target="ComboTipoAgevolazioni">
+      <CONDITIONS/>
+      <CONSEQUENCES/>
+    </DEPENDENCE> 
+    <DEPENDENCE source="MovDettaglioTrasfProRettificaPage" target="M_GETDATI_TSGEN" />
+    <DEPENDENCE source="MovDettaglioTrasfProRettificaPage" target="ComboStatoAtto" />
+    <DEPENDENCE source="MovDettaglioTrasfProRettificaPage" target="ComboMotAnnullamento" />
+    <DEPENDENCE source="MovDettaglioTrasfProRettificaPage" target="M_GetTipoAss" />
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="RettificaMovimentoPage_OLD" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovRettificaMovimento"/>
+    <!-- RECUPERO DELLE INFO APPENA INSERITE DAL DB -->
+    <MODULE name="M_MovGetDettMov" />
+    <!-- COMBO DELLE VARIE PAGE -->
+    <!-- CES -->
+    <MODULE name="ComboTipoCessazione"/>
+    <MODULE name="ComboTipoGrado"/>
+    <!-- AVV -->
+    <MODULE name="ComboTipoOrario"/>
+    <MODULE name="ComboNormativaSelettiva"/>
+    <MODULE name="ComboAgevolazioneSelettiva"/>
+    <!-- TRASF/PRO -->
+    <MODULE name="ComboTipoAgevolazioni"/>
+    <!-- Per tutte -->
+    <MODULE name="M_GETDATI_TSGEN" />
+    <MODULE name="CercaMovimentiSuccessiviCompatibili" />    
+	<MODULE name="DettagliDocumentoDaPrgMov"/>    
+	<MODULE name="ComboStatoAtto"/>
+	<MODULE name="ComboMotAnnullamento"/>
+    <MODULE name="ComboCategoria"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="RettificaMovimentoPage" target="M_MovRettificaMovimento"/>
+
+    <!-- RECUPERO DATI DA DB DA VISUALIZZARE IN CASO DI INSERIMENTO AVVENUTO -->
+    <DEPENDENCE source="M_MovRettificaMovimento" target="M_MovGetDettMov">
+      <CONDITIONS>
+        <PARAMETER name="M_MovRettificaMovimento.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_RESPONSE" value="M_MovRettificaMovimento.PRGMOVIMENTO"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+	<DEPENDENCE source="M_MovGetDettMov" target="CercaMovimentiSuccessiviCompatibili">
+	  <CONSEQUENCES>
+	  	<PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+	  	<PARAMETER name="cdnLavoratore" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.cdnLavoratore"/>
+	  	<PARAMETER name="prgAzienda" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgAzienda"/>
+	  	<PARAMETER name="prgUnita" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgUnita"/>
+	  	<PARAMETER name="datInizioMov" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.datInizioMov"/>
+	  </CONSEQUENCES>
+	</DEPENDENCE>
+    <!-- RECUPERO DATI COMBO IN CASO DI INSERIMENTO AVVENUTO -->
+    <!-- CES -->
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoCessazione">
+      <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="CES"/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoGrado">
+      <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="CES"/>
+    </DEPENDENCE>
+    <!-- AVV -->
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoOrario">
+      <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="AVV"/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboNormativaSelettiva">
+      <CONDITIONS>
+        <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="AVV"/>
+      </CONDITIONS>        
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codMonoTempo"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboAgevolazioneSelettiva">
+      <CONDITIONS>
+        <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="AVV"/>
+      </CONDITIONS> 
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_RESPONSE" value="M_MovGetDettMov.ROWS.ROW.codMonoTempo"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <!-- TRASF/PRO -->
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoAgevolazioni">
+      <CONDITIONS>
+        <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="TRA"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMov" target="ComboTipoAgevolazioni">
+      <CONDITIONS>
+        <PARAMETER name="M_MovGetDettMov.CODTIPOMOV" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="PRO"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <!-- ***************************************************-->
+    
+    <!-- RECUPERO DATI COMBO IN CASO DI FALLITO INSERIMENTO -->
+    <!-- CES -->
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboTipoCessazione">
+      <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="CES"/>
+      <PARAMETER name="M_MovRettificaMovimento.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+    </DEPENDENCE>
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboTipoGrado">
+      <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="CES"/>
+      <PARAMETER name="M_MovRettificaMovimento.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+    </DEPENDENCE>
+    <!-- AVV -->
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboTipoOrario">
+      <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="AVV"/>
+      <PARAMETER name="M_MovRettificaMovimento.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+    </DEPENDENCE>
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboNormativaSelettiva">
+      <CONDITIONS>
+        <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="AVV"/>
+        <PARAMETER name="M_MovRettificaMovimento.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>        
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_REQUEST" value="codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_REQUEST" value="codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_REQUEST" value="codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_REQUEST" value="codMonoTempo"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboAgevolazioneSelettiva">
+      <CONDITIONS>
+        <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="AVV"/>
+        <PARAMETER name="M_MovRettificaMovimento.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+      </CONDITIONS> 
+      <CONSEQUENCES>
+          <PARAMETER name="CODTIPOAZIENDA" type="relative" scope="SERVICE_REQUEST" value="codTipoAzienda"/>        
+          <PARAMETER name="CODNATGIURIDICA" type="relative" scope="SERVICE_REQUEST" value="codNatGiuridicaAz"/>        
+          <PARAMETER name="CODTIPOASS" type="relative" scope="SERVICE_REQUEST" value="codTipoAss"/>        
+          <PARAMETER name="CODMONOTEMPO" type="relative" scope="SERVICE_REQUEST" value="codMonoTempo"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <!-- TRASF/PRO -->
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboTipoAgevolazioni">
+      <CONDITIONS/>
+        <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="TRA"/>
+        <PARAMETER name="M_MovRettificaMovimento.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboTipoAgevolazioni">
+      <CONDITIONS>
+        <PARAMETER name="CODTIPOMOV" scope="SERVICE_REQUEST" type="ABSOLUTE" value="PRO"/>
+        <PARAMETER name="M_MovRettificaMovimento.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="RettificaMovimentoPage" target="M_GETDATI_TSGEN"/>
+    <DEPENDENCE source="M_MovGetDettMov" target="DettagliDocumentoDaPrgMov">
+    	<CONDITIONS/>
+      <CONSEQUENCES>
+	  	<PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboStatoAtto"/>
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboMotAnnullamento"/>
+    
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboCategoria"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="RettificaMovimentoPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovRettificaMovimento"/>
+    <MODULE name="M_MovGetDettMov" />
+    <MODULE name="ComboTipoCessazione"/>
+    <MODULE name="ComboTipoOrario"/>
+    <MODULE name="ComboTipoAgevolazioni"/>
+    <MODULE name="M_GETDATI_TSGEN" />
+    <MODULE name="M_GetMovimentiSuccessiviCompatibili" />    
+	<MODULE name="DettagliDocumentoDaPrgMov"/>    
+	<MODULE name="ComboStatoAtto"/>
+	<MODULE name="ComboMotAnnullamento"/>
+    <MODULE name="ComboCategoria"/>
+    <MODULE name="ComboTipoMovimento"/>
+    <MODULE name="M_GetProtocollazione"/>
+    <MODULE name="ComboTipoMovimentoColl"/>
+    <MODULE name="ComboTipoMovimentoSingolo"/>
+    <MODULE name="M_GetTipoAss"/>
+    <MODULE name="ComboTipoTrasformazione"/>
+    <MODULE name="M_MovRettificaMovimentoOld"/>
+    <MODULE name="M_MovGetDettMovOld"/>
+    <MODULE name="M_MovGetDettMovMissioni"/>
+    <MODULE name="M_MovGetDettMovAgevolazioni"/>
+    <MODULE name="ComboTipoEntePromotore"/>
+    <MODULE name="M_Config_Ente_Promotore"/>
+    <MODULE name="ComboCodiceVariazione"/>
+    <MODULE name="ComboCategoriaAssObbligatoria"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="RettificaMovimentoPage" target="M_MovRettificaMovimento"/>
+	<DEPENDENCE source="M_MovRettificaMovimento" target="M_MovGetDettMov">
+      <CONDITIONS>
+        <PARAMETER name="M_MovRettificaMovimento.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_RESPONSE" value="M_MovRettificaMovimento.PRGMOVIMENTO"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_MovRettificaMovimento" target="M_MovRettificaMovimentoOld">
+      <CONDITIONS>
+        <PARAMETER name="PRGMOVIMENTOLD" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        <PARAMETER name="M_MovRettificaMovimento.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_RESPONSE" value="M_MovRettificaMovimento.PRGMOVIMENTO"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_MovRettificaMovimento" target="M_MovGetDettMovOld">
+      <CONDITIONS>
+        <PARAMETER name="M_MovRettificaMovimento.PRGMOVIMENTO" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_RESPONSE" value="M_MovRettificaMovimento.PRGMOVIMENTO"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_MovRettificaMovimento" target="M_MovGetDettMovMissioni">
+       <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_RESPONSE" value="M_MovRettificaMovimento.PRGMOVIMENTO"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_MovRettificaMovimento" target="M_MovGetDettMovAgevolazioni">
+       <CONSEQUENCES>
+        <PARAMETER name="PRGMOVIMENTO" type="relative" scope="SERVICE_RESPONSE" value="M_MovRettificaMovimento.PRGMOVIMENTO"/>
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_MovGetDettMov" target="M_GetMovimentiSuccessiviCompatibili">
+	  <CONSEQUENCES>
+	  	<PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+	  	<PARAMETER name="cdnLavoratore" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.cdnLavoratore"/>
+	  	<PARAMETER name="prgAzienda" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgAzienda"/>
+	  	<PARAMETER name="prgUnita" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgUnita"/>
+	  	<PARAMETER name="datInizioMov" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.datInizioMov"/>
+	  </CONSEQUENCES>
+	</DEPENDENCE>
+	<DEPENDENCE source="RettificaMovimentoPage" target="ComboTipoCessazione"/>
+   	<DEPENDENCE source="RettificaMovimentoPage" target="ComboTipoOrario"/>
+   	<DEPENDENCE source="RettificaMovimentoPage" target="M_Config_Ente_Promotore"/>
+   	<DEPENDENCE source="RettificaMovimentoPage" target="ComboTipoEntePromotore"/>
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboTipoAgevolazioni"/>
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboCodiceVariazione"/>
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboCategoriaAssObbligatoria"/>
+ 	
+ 	<DEPENDENCE source="RettificaMovimentoPage" target="M_GETDATI_TSGEN"/>
+    
+    <DEPENDENCE source="M_MovGetDettMov" target="DettagliDocumentoDaPrgMov">
+    	<CONDITIONS/>
+      <CONSEQUENCES>
+	  	<PARAMETER name="prgMovimento" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMov.ROWS.ROW.prgMovimento"/>	  
+      </CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboStatoAtto"/>
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboMotAnnullamento"/>
+    
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboCategoria"/>
+   
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboTipoMovimento"/>
+    
+ 	<DEPENDENCE source="RettificaMovimentoPage" target="M_GetProtocollazione"/>
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboTipoMovimentoColl"/>
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboTipoMovimentoSingolo"/>
+    <DEPENDENCE source="RettificaMovimentoPage" target="M_GetTipoAss"/>
+    <DEPENDENCE source="RettificaMovimentoPage" target="ComboTipoTrasformazione"/>
+     </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="AmmCalcolaStatoOccAllaDataPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE name="M_CONFIG_DATA_NORMATIVA_297"/>
+    <MODULE name="M_CalcolaStatoOccupazionale"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="AmmCalcolaStatoOccAllaDataPage" target="M_CONFIG_DATA_NORMATIVA_297"/>
+    <DEPENDENCE source="M_CONFIG_DATA_NORMATIVA_297" target="M_CalcolaStatoOccupazionale">
+      <CONDITIONS>
+        <PARAMETER name="CALCOLA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>  
+  </DEPENDENCIES>
+</PAGE>
+<!--
+    ***************************************************************************
+    FINE *** PAGES PER LA RETTIFICA DEI MOVIMENTI *** FINE
+    ***************************************************************************
+-->
+
+<PAGE name="GeneraFileDBFPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetDeMbTipo" />
+    <MODULE name="M_ELENCOCPI" />
+    <!-- moduli aggiuntivi per MO -->
+    <MODULE name="M_MO_TIPO_LISTA" />
+    <MODULE name="M_MO_MOTIVO_FINE" />
+    <MODULE name="M_MO_MOTIVO_SCOR" />
+    <MODULE name="M_MO_PROVENIENZA" />
+    <MODULE name="M_MO_INDENNITA" />
+
+    <MODULE name="GeneraFileDBF" />
+  </MODULES>
+  
+  <DEPENDENCIES>
+    <DEPENDENCE source="GeneraFileDBFPage" target="M_GetDeMbTipo"/>
+    <DEPENDENCE source="GeneraFileDBFPage" target="M_ELENCOCPI"/>
+    <!-- moduli aggiuntivi per MO -->
+    <DEPENDENCE source="GeneraFileDBFPage" target="M_MO_TIPO_LISTA"/>
+    <DEPENDENCE source="GeneraFileDBFPage" target="M_MO_MOTIVO_FINE"/>
+    <DEPENDENCE source="GeneraFileDBFPage" target="M_MO_MOTIVO_SCOR"/>
+    <DEPENDENCE source="GeneraFileDBFPage" target="M_MO_PROVENIENZA"/>
+    <DEPENDENCE source="GeneraFileDBFPage" target="M_MO_INDENNITA"/>
+ 
+    <DEPENDENCE source="GeneraFileDBFPage" target="GeneraFileDBF"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="visualizzaMovimentoOldPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovGetDettMovOld" />
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="visualizzaMovimentoOldPage" target="M_MovGetDettMovOld"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="StampaLavOIPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE name="M_ElencoCPI"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="StampaLavOIPage" target="M_ElencoCPI"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="ListaLavOIPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE name="M_ListaLavOI"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="ListaLavOIPage" target="M_ListaLavOI"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="StampaLavTipoCondizionePage" scope="REQUEST">
+  <MODULES>
+  	<MODULE name="M_ElencoCPI"/>
+  	<MODULE name="M_TipoCondizione"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="StampaLavTipoCondizionePage" target="M_ElencoCPI"/>
+  	<DEPENDENCE source="StampaLavTipoCondizionePage" target="M_TipoCondizione"/> 
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="ListaTipoCondizionePage" scope="REQUEST">
+  <MODULES>
+  	<MODULE name="M_ListaTipoCondizione"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="ListaTipoCondizionePage" target="M_ListaTipoCondizione"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- ***************************************************************************
+                                Storico ISEE
+     *************************************************************************** -->
+<PAGE distributed="false" name="AsValoreISEEStoricoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_AsValoreISEEStorico" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AsValoreISEEStoricoPage" target="M_AsValoreISEEStorico" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="AsValoreISEEDettaglioModPage" scope="REQUEST">
+	<MODULES>
+	    <MODULE name="M_GetConfigIBAN" />
+	    <MODULE name="M_Load_ISEEStorico" />
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="AsValoreISEEDettaglioModPage" target="M_Load_ISEEStorico">
+			<CONDITIONS>
+				<PARAMETER name="PRGVALISEESTORICO" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="AsValoreISEEDettaglioModPage" target="M_GetConfigIBAN"/>
+	</DEPENDENCIES>
+</PAGE>

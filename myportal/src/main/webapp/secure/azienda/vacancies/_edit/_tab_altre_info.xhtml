@@ -1,0 +1,127 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/partial_tab.xhtml">
+
+	<ui:param name="form_id" value="altre_info"></ui:param>
+	<ui:param name="tabBean" value="#{vaAltreInformazioniBean}"></ui:param>
+	<ui:param name="deleteId" value="#{tabBean.data.idVaDatiVacancy}"></ui:param>
+
+	<ui:define name="form_data">
+		<h:panelGrid id="insert_form_1" columns="3" cellspacing="10"
+			columnClasses=",,width50">
+			<cc:selectOneRadio id="disp_trasferta"
+				editingMode="#{tabBean.editing}" value="#{tabBean.data.fuorisede}"
+				valueDescription="#{tabBean.data.getOpzione(tabBean.data.fuorisede)}"
+				label="Disponibile a trasferte?">
+				<f:selectItem id="trasfertaI" itemLabel="Indifferente"
+					itemValue="I"></f:selectItem>
+				<f:selectItem id="trasfertaS" itemLabel="Sì" itemValue="Y"></f:selectItem>
+				<f:selectItem id="trasfertaN" itemLabel="No" itemValue="N"></f:selectItem>
+			</cc:selectOneRadio>
+
+			<cc:selectOneRadio id="automunito" editingMode="#{tabBean.editing}"
+				valueDescription="#{tabBean.data.getOpzione(tabBean.data.automunito)}"
+				value="#{tabBean.data.automunito}" label="Automunito"
+				requiredMessage="Campo automunito obbligatorio">
+				<f:selectItem id="automunitoI" itemLabel="Indifferente"
+					itemValue="I" />
+				<f:selectItem id="automunitoS" itemLabel="Sì" itemValue="Y" />
+				<f:selectItem id="automunitoN" itemLabel="No" itemValue="N" />
+			</cc:selectOneRadio>
+
+			<cc:selectOneRadio id="motomunito" editingMode="#{tabBean.editing}"
+				valueDescription="#{tabBean.data.getOpzione(tabBean.data.motomunito)}"
+				value="#{tabBean.data.motomunito}" label="Motomunito"
+				requiredMessage="Campo motomunito obbligatorio">
+				<f:selectItem id="motomunitoI" itemLabel="Indifferente"
+					itemValue="I" />
+				<f:selectItem id="motomunitoS" itemLabel="Sì" itemValue="Y" />
+				<f:selectItem id="motomunitoN" itemLabel="No" itemValue="N" />
+			</cc:selectOneRadio>
+			
+			<cc:selectOneRadio id="vitto" editingMode="#{tabBean.editing}"
+				valueDescription="#{tabBean.data.getOpzione(tabBean.data.vitto)}"
+				value="#{tabBean.data.vitto}" label="Vitto"
+				requiredMessage="Campo vitto obbligatorio">
+				<f:selectItem id="vittoI" itemLabel="Indifferente" itemValue="I" />
+				<f:selectItem id="vittoS" itemLabel="Sì" itemValue="Y" />
+				<f:selectItem id="vittoN" itemLabel="No" itemValue="N" />
+			</cc:selectOneRadio>
+						
+			<cc:selectOneRadio id="alloggio" editingMode="#{tabBean.editing}"
+				valueDescription="#{tabBean.data.getOpzione(tabBean.data.alloggio)}"
+				value="#{tabBean.data.alloggio}" label="Alloggio"
+				requiredMessage="Campo alloggio obbligatorio">
+				<f:selectItem id="alloggioI" itemLabel="Indifferente" itemValue="I" />
+				<f:selectItem id="alloggioS" itemLabel="Sì" itemValue="Y" />
+				<f:selectItem id="alloggioN" itemLabel="No" itemValue="N" />
+			</cc:selectOneRadio>
+			
+			<h:panelGroup>
+				<cc:selectOneRadio value="#{tabBean.data.opzMilite}"
+					valueDescription="#{tabBean.data.getOpzione(tabBean.data.opzMilite)}"
+					label="Milite esente/assolto" rendered="#{tabBean.usaDecodificheSil()}">
+					<f:selectItem itemLabel="Sì" itemValue="Y"></f:selectItem>
+					<f:selectItem itemLabel="No" itemValue="N"></f:selectItem>
+				</cc:selectOneRadio>
+			</h:panelGroup>
+			
+			<cc:selectOneMenu required="false" label="Sesso"
+				value="#{tabBean.data.deGenere.id}" rendered="#{tabBean.usaDecodificheSil()}"
+				valueDescription="#{tabBean.data.deGenere.descrizione}">
+				<f:selectItems value="#{tabBean.deGenereList}" />
+				<f:ajax event="change" execute="@this" render=":altre_info:selectMotivoGenere" />
+			</cc:selectOneMenu>
+			
+			<cc:selectOneMenu id="selectMotivoGenere" required="false" label="Motivazione"
+				value="#{tabBean.data.deMotivoGenereSil.id}" rendered="#{tabBean.usaDecodificheSil()}"
+				valueDescription="#{tabBean.data.deMotivoGenereSil.descrizione}"
+				disabled="#{empty tabBean.data.deGenere.id}">
+				<f:selectItems value="#{tabBean.deMotivoGenereSilList}" />
+				<f:ajax event="change" execute="@this" render=":altre_info:motaMotivoGenere" />
+			</cc:selectOneMenu>
+			
+			<cc:inputTextarea id="motaMotivoGenere" maxlength="2000" label="Altre motivazioni"
+				value="#{tabBean.data.notaMotivoGenere}" richTextMode="false"
+				disabled="#{tabBean.isNotaMotivoGenereDisabled()}"
+				rows="3" required="false" rendered="#{tabBean.usaDecodificheSil()}">
+			</cc:inputTextarea>
+		</h:panelGrid>
+
+		<h:panelGrid id="insert_form_2" columns="2" cellspacing="10" columnClasses="width50,width50">
+			<cc:inputToken label="Agevolazioni" value="#{tabBean.data.listaAgevolazioniDTO}"
+				editingMode="#{tabBean.editing}">
+				<f:selectItems value="#{tabBean.agevolazioni}" />
+			</cc:inputToken>
+
+			<cc:inputTextarea id="ulterioriRequisiti" required="false"
+				richTextMode="false" label="Ulteriori Requisiti Preferenziali"
+				editingMode="#{tabBean.editing}" maxlength="1000"
+				value="#{tabBean.data.ulterioriRequisiti}">
+			</cc:inputTextarea>
+			
+			<cc:selectOneRadio id="nullaosta" editingMode="#{tabBean.editing}"
+				valueDescription="#{tabBean.data.getOpzione(tabBean.data.opzNullaOsta)}"
+				value="#{tabBean.data.opzNullaOsta}" label="Nulla osta ai sensi dell’art.9 comma 8 del d.l. 76/2013">
+				<f:selectItem id="automunitoS" itemLabel="Sì" itemValue="Y" />
+				<f:selectItem id="automunitoN" itemLabel="No" itemValue="N" />
+			</cc:selectOneRadio>
+			
+			<h:panelGroup></h:panelGroup>
+			
+		</h:panelGrid>
+	</ui:define>
+
+	<ui:define name="javascript_data">
+		<script type="text/javascript">
+			$(function() {
+				disegnaBottoni();
+				attachListener();
+				$('#Altre_informazioni a:visible:enabled:first').focus();
+			});
+		</script>
+	</ui:define>
+</ui:composition>

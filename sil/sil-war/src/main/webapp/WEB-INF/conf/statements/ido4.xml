@@ -1,0 +1,277 @@
+<!--Gestione ABILITAZIONI-->
+  <STATEMENT name="LOAD_ABIL_RICH" query="
+    SELECT A.CODABILITAZIONEGEN, A.PRGRICHIESTAAZ,          
+          case  
+         	when B.codtipoabilitazionegen = 'AL'
+				 then B.strdescrizione 	   
+		    when ma.codabilitazione is not null
+		         then (B.strdescrizione || ' (Min: ' || mn.des_desabilitazione || ')')	     
+		    else B.strdescrizione || ' (Min: nessuna corrispondenza)'
+		  end as STRDESCRIZIONE,
+          A.FLGINDISPENSABILE,
+          C.STRDESCRIZIONE DESCRIZIONETIPOABILITAZIONE,
+          decode (A.FLGINVIOCL,'S','SI',NULL) FLGINVIOCL
+    FROM DO_ABILITAZIONE_GEN A, DE_ABILITAZIONE_GEN B, DE_TIPO_ABILITAZIONE_GEN C,
+    ma_abilitazione ma, mn_abilitazione mn       
+    WHERE A.CODABILITAZIONEGEN=B.CODABILITAZIONEGEN AND
+          C.CODTIPOABILITAZIONEGEN = B.CODTIPOABILITAZIONEGEN AND
+          ma.codabilitazionegen = b.codabilitazionegen and 
+          ma.codabilitazione = mn.cod_abilitazione (+) and
+          A.PRGRICHIESTAAZ = ?
+  "/>
+
+  <STATEMENT name="SELECT_ABIL_RICH" query="
+    SELECT CODABILITAZIONEGEN 
+    FROM DO_ABILITAZIONE_GEN
+    WHERE CODABILITAZIONEGEN=?
+    AND PRGRICHIESTAAZ = ?
+  "/>
+
+  <STATEMENT name="SELECT_ABIL_RICHIESTA" query="
+    SELECT A.CODABILITAZIONEGEN, 
+    	   case   
+    	   when B.codtipoabilitazionegen = 'AL'
+				 then B.strdescrizione	   
+		    when ma.codabilitazione is not null
+		         then (B.strdescrizione || ' (Min: ' || mn.des_desabilitazione || ')')	     
+		    else B.strdescrizione || ' (Min: nessuna corrispondenza)'
+		   end as STRDESCRIZIONE,
+           A.FLGINDISPENSABILE,
+           C.STRDESCRIZIONE DESCRIZIONETIPOABILITAZIONE,
+           A.CDNUTINS,
+           TO_CHAR(A.DTMINS,'DD/MM/YYYY hh24:mi') DTMINS,
+           A.CDNUTMOD,
+           TO_CHAR(A.DTMMOD,'DD/MM/YYYY hh24:mi') DTMMOD,
+           A.FLGINVIOCL
+    FROM DO_ABILITAZIONE_GEN A, DE_ABILITAZIONE_GEN B, DE_TIPO_ABILITAZIONE_GEN C,
+         ma_abilitazione ma, mn_abilitazione mn
+    WHERE A.CODABILITAZIONEGEN=B.CODABILITAZIONEGEN AND
+          C.CODTIPOABILITAZIONEGEN = B.CODTIPOABILITAZIONEGEN AND
+          A.CODABILITAZIONEGEN = ? AND
+          ma.codabilitazionegen = b.codabilitazionegen and 
+          ma.codabilitazione = mn.cod_abilitazione (+) and
+          A.PRGRICHIESTAAZ = ?
+  "/>  
+
+  <STATEMENT name="UPDATE_ABIL_RICH" query="
+    UPDATE DO_ABILITAZIONE_GEN 
+    SET FLGINDISPENSABILE = ?,
+        CDNUTMOD = ?,
+        DTMMOD = SYSDATE,
+        FLGINVIOCL = ?
+    WHERE CODABILITAZIONEGEN=?
+    AND PRGRICHIESTAAZ = ?
+  "/>    
+
+  <STATEMENT name="INSERT_ABIL_RICH" query="
+    INSERT INTO DO_ABILITAZIONE_GEN (
+       CODABILITAZIONEGEN, PRGRICHIESTAAZ, FLGINDISPENSABILE, CDNUTINS, 
+       DTMINS, CDNUTMOD, DTMMOD,FLGINVIOCL) 
+    VALUES (?, ?, ?, ?,
+       SYSDATE, ?, SYSDATE,?)
+  "/>
+
+  <STATEMENT name="DELETE_ABIL_RICH" query="
+    DELETE FROM DO_ABILITAZIONE_GEN 
+    WHERE CODABILITAZIONEGEN=?
+    AND PRGRICHIESTAAZ=?"/>
+
+  <STATEMENT name="LIST_ABIL_DECOD" query="
+    SELECT
+      da.CODABILITAZIONEGEN AS CODICE,
+      case   	   
+      		when da.codtipoabilitazionegen = 'AL'
+				 then da.strdescrizione ||
+                  DECODE(
+                    SYSDATE, 
+                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                    ' (scaduto)',
+                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                    ' (scaduto)', 
+                    ''
+                  )
+			when ma.codabilitazione is not null
+				         then (da.strdescrizione || ' (Min: ' || mn.des_desabilitazione || ')' ||
+                  DECODE(
+                    SYSDATE, 
+                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                    ' (scaduto)',
+                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                    ' (scaduto)', 
+                    ''
+                  ))	     
+				    else  da.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)' ||
+                  DECODE(
+                    SYSDATE, 
+                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                    ' (scaduto)',
+                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                    ' (scaduto)', 
+                    ''
+                  )
+				end as descrizione
+    FROM DE_ABILITAZIONE_GEN da
+    inner join ma_abilitazione ma on ma.codabilitazionegen = da.codabilitazionegen
+	left join mn_abilitazione mn on mn.cod_abilitazione = ma.codabilitazione
+	ORDER BY strdescrizione"/>
+  
+  
+  
+  
+  
+  <!-- MANSIONI -->
+
+<STATEMENT
+        name="INSERT_IDO_MANSIONE"
+        query="insert into do_mansione
+                      (prgMansione, prgRichiestaAz, prgAlternativa, codMansione, 
+                      flgPubblica, codQualifica,
+                      cdnUtins, dtmins,
+                      cdnUtmod, dtmmod,FLGINVIOCL) 
+                      values 
+                      ( ?, ?, ?, ?,
+                       ?, ?,
+                       ?, SYSDATE,
+                       ?, SYSDATE,?)"/>
+
+
+
+<STATEMENT  
+            name="SELECT_UNIQUE_IDO_MANSIONE"
+            query="SELECT codMansione,prgmansione
+                   from do_mansione
+                   where codMansione=?
+                   and prgRichiestaAz=? 
+                   and prgAlternativa=?"/>
+
+<STATEMENT
+        name="SELECT_DO_MANSIONE_SEQUENCE"
+        query="SELECT
+               S_DO_MANSIONE.nextval AS prgMansione
+              FROM DUAL"/>
+
+
+<STATEMENT
+        name="GET_IDO_MANSIONI"
+        query=" select m.prgMansione, m.prgRichiestaAz, m.codMansione, 
+                       man.strDescrizione as desMansione, 
+                       man_p.strDescrizione desTipoMansione,
+                       m.flgPubblica, m.codQualifica, 
+                       m.cdnutins, to_char(m.dtmins,'DD/MM/YYYY hh24:mi') as dtmins, 
+                       m.cdnutmod, to_char(m.dtmmod, 'DD/MM/YYYY hh24:mi') as dtmmod,
+                       m.flgInvioCL
+                from do_mansione m
+                inner join de_mansione man on man.codMansione=m.codMansione
+                inner join de_mansione man_p on man_p.codMansione=substr(m.codMansione, 0, 5) || '00'
+                where m.prgmansione=? "/>    
+
+<STATEMENT
+        name="LIST_IDO_MANSIONI"
+        query=" select m.prgMansione, m.prgRichiestaAz, m.prgAlternativa, raz.prgAzienda,
+                       man.strDescrizione as desMansione, 
+                       man_p.strDescrizione as desTipoMansione,
+                       man.codMansione as codMansione,
+                       decode (m.flgInvioCL,'S','SI',NULL) flgInvioCL                           
+                from do_mansione m
+                inner join de_mansione man on man.codMansione=m.codMansione
+                inner join de_mansione man_p on man_p.codMansione=substr(m.codMansione, 0, 5) || '00'
+                inner join do_richiesta_az raz on m.prgRichiestaAz=raz.PRGRICHIESTAAZ
+                where m.prgRichiestaAz=? and
+                      m.prgAlternativa=?"/>
+
+<STATEMENT
+        name="LIST_IDO_MANSIONI_AS"
+        query=" select m.prgMansione, m.prgRichiestaAz, m.prgAlternativa, raz.prgAzienda,
+                       man.strDescrizione as desMansione, 
+                       man_p.strDescrizione as desTipoMansione,
+                       man.codMansione as codMansione
+                from do_mansione m
+                inner join de_mansione man on man.codMansione=m.codMansione
+                inner join de_mansione man_p on man_p.codMansione=substr(m.codMansione, 0, 5) || '00'
+                inner join do_richiesta_az raz on m.prgRichiestaAz=raz.PRGRICHIESTAAZ
+                where m.prgRichiestaAz=?" />
+
+<STATEMENT
+        name="LIST_IDO_MANSIONI_DETTAGLIO"
+        query=" select m.prgMansione, m.prgRichiestaAz, m.prgAlternativa, raz.prgAzienda,
+                       man.strDescrizione as desMansione, 
+                       man_p.strDescrizione as desTipoMansione
+                from do_mansione m
+                inner join de_mansione man on man.codMansione=m.codMansione
+                inner join de_mansione man_p on man_p.codMansione=substr(m.codMansione, 0, 5) || '00'
+                inner join do_richiesta_az raz on m.prgRichiestaAz=raz.PRGRICHIESTAAZ
+                where m.prgRichiestaAz=?"/>
+
+<STATEMENT
+        name="GET_IDO_TIPI_QUALIFICAPUB"
+        query=" SELECT codqualifica as codice, DECODE( GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, 
+                               STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...' ) 
+                      || DECODE (SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)',  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)', '') AS DESCRIZIONE
+                FROM DE_QUALIFICA_PUB
+                order by codQualifica " />
+
+
+
+<STATEMENT
+        name="SAVE_IDO_MANSIONI"
+        query="update do_mansione
+               set codMansione=?, 
+                   flgPubblica=?, 
+                   codQualifica=?,
+                   flgInvioCL=?,
+                   cdnUtmod=?, 
+                   dtmmod=SYSDATE
+                where prgMansione=?"/>
+
+<STATEMENT
+        name="DEL_IDO_MANSIONI"
+        query="delete from do_mansione
+               where prgMansione=?"/>
+               
+<STATEMENT name="VERIFICA_FLGCL"
+           query="select count(m.FLGINVIOCL) as contaFlag
+				  from DO_MANSIONE m
+				  where m.prgRichiestaAz=? and m.prgAlternativa=1"/>
+				  
+<STATEMENT name="UPDATE_FLGCL"
+           query="update do_mansione set 
+           				 FLGINVIOCL = NULL, 
+           				 cdnUtmod=?,  
+           				 dtmmod=SYSDATE 
+           		  where prgRichiestaAz=? and prgAlternativa=1"/>
+
+
+<STATEMENT name="VERIFICA_FLGCL_ABILITAZIONI"
+           query="select count(m.FLGINVIOCL) as contaFlag
+        		  from DO_ABILITAZIONE_GEN m
+                  where m.prgRichiestaAz=? "/>
+				  
+<STATEMENT name="UPDATE_FLGCL_ABILITAZIONI"
+           query="update DO_ABILITAZIONE_GEN set 
+           				 FLGINVIOCL = NULL, 
+           				 cdnUtmod=?,  
+           				 dtmmod=SYSDATE 
+           		  where prgRichiestaAz=? "/>
+<!-- /MANSIONI -->
+
+<STATEMENT
+        name="COUNT_MANSIONI"
+        query=" select count(1) numMansioni                           
+                from do_mansione m
+                inner join de_mansione man on man.codMansione=m.codMansione
+                inner join de_mansione man_p on man_p.codMansione=substr(m.codMansione, 0, 5) || '00'
+                inner join do_richiesta_az raz on m.prgRichiestaAz=raz.PRGRICHIESTAAZ
+                where m.prgRichiestaAz=? and
+                      m.prgAlternativa=? and flgInvioCL = 'S' "/>
+                      
+<STATEMENT
+        name="COUNT_COMUNI"
+        query=" SELECT count(1) numComuni
+                FROM DO_COMUNE JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = DO_COMUNE.CDNUTINS),
+                     DE_COMUNE, DE_PROVINCIA
+                WHERE DO_COMUNE.CODCOM=DE_COMUNE.CODCOM AND
+                      DE_PROVINCIA.CODPROVINCIA=DE_COMUNE.CODPROVINCIA AND
+                      DO_COMUNE.PRGRICHIESTAAZ=? and flgInvioCL = 'S' "/>
+                      

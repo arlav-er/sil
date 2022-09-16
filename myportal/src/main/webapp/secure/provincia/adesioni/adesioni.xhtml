@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	template="../../template/main_primefaces.xhtml"
+	>
+
+
+	<ui:define name="title">
+		<h:outputText value="Ricerca adesioni" escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+		<ui:param name="bean" value="#{cercaBdAdesioneBean}" />
+
+		<div class="widget_container">
+			<div class="ui-widget-content ui-widget ui-corner-all">
+				<div>
+					<!-- Form ricerca di attivazione da parte della redazione -->
+					<h:form id="adesioneForm">
+						<fieldset>
+							<legend>Ricerca adesioni:</legend>
+							<h:panelGrid columns="3" cellspacing="10">
+								<ui:fragment>
+									<p:outputLabel value="Nome"
+										for="nomeInput" />
+									<br/>
+									<p:inputText id="nomeInput" size="25"
+										value="#{bean.nome}">
+									</p:inputText>
+									<p:message for="nomeInput"></p:message>
+								</ui:fragment>
+								<ui:fragment>
+									<p:outputLabel value="Cognome"
+										for="cognomeInput" />
+									<br />
+									<p:inputText id="cognomeInput" size="25"
+										value="#{bean.cognome}">
+									</p:inputText>
+									<p:message for="cognomeInput"></p:message>
+								</ui:fragment>
+								<ui:fragment>
+									<p:outputLabel value="Codice fiscale"
+										for="codFiscaleInput" />
+									<br />
+									<p:inputText id="codFiscaleInput" size="16"
+										value="#{bean.codFiscale}">
+									</p:inputText>
+									<p:message for="codFiscaleInput"></p:message>
+								</ui:fragment>
+								
+								<ui:fragment>
+									<p:outputLabel value="Programma"
+										for="programmaInput" />
+									<br />
+									<p:selectOneMenu id="programmaInput"
+										value="#{bean.deBandoProgrammaDTO}"
+										converter="deBandoProgrammaConverter" style="width:100%">
+										<f:selectItem itemLabel="" itemValue="" />
+										<f:selectItems
+											value="#{bean.deBandoProgrammaDTOList}"
+											var="deBandoProgrammaDTO"
+											itemLabel="#{deBandoProgrammaDTO.descrizione}"
+											itemValue="#{deBandoProgrammaDTO}" />
+										<p:ajax event="change" update="switchPanelByChoiseProgramma"
+											listener="#{bean.switchShowedInputRelatedProgramma}"/>
+									</p:selectOneMenu>
+									<p:message for="programmaInput"></p:message>
+								</ui:fragment>
+								
+								<h:panelGroup id="switchPanelByChoiseProgramma">
+									<ui:fragment rendered="#{bean.showTipoDichiarazioneInput()}">
+										<p:outputLabel for="dichiarazioneBdAdesione" value="Dichiarazione" />
+										<br/>
+										<p:selectOneMenu id="dichiarazioneBdAdesione" value="#{bean.tipoDichiarazione}" 
+											widgetVar="dichiarazioneBdAdesioneWV" style="width:100%">
+											<f:selectItem itemLabel="" itemValue=""/>
+											<f:selectItems value="#{bean.getTipoDichiarazioneValues()}"/>
+										</p:selectOneMenu>
+										<p:message id="dichiarazioneBdAdesioneMsg" for="dichiarazioneBdAdesione" />
+									</ui:fragment>
+									<ui:fragment rendered="#{bean.showEtaOver30Input()}">
+										<p:outputLabel for="tipologiaEta" value="Dichiarazione" />
+										<br/>
+										<p:selectOneMenu id="tipologiaEta" value="#{bean.fasciaEta}" style="width:100%"
+											widgetVar="tipologiaEtaWV">
+											<f:selectItem itemLabel="" itemValue=""/>
+											<f:selectItem itemLabel="OVER 30" itemValue="OVER30"/>
+											<f:selectItem itemLabel="UNDER 30" itemValue="UNDER30"/>
+										</p:selectOneMenu>
+										<p:message id="tipologiaEtaMsg" for="tipologiaEta" />
+									</ui:fragment>
+								</h:panelGroup>
+								
+								<br/>
+								<ui:fragment>
+									<p:outputLabel value="Data adesione da" for="dataDa" />
+									<br />
+									<p:calendar id="dataDa" value="#{bean.dtAdesioneDa}" 
+										navigator="true"
+										pattern="dd-MM-yyyy"
+										showOn="button"/>
+									<p:message for="dataDa"></p:message>
+								</ui:fragment>
+								<ui:fragment>
+									<p:outputLabel value="Data adesione a" for="dataA" />
+									<br />
+									<p:calendar id="dataA" value="#{bean.dtAdesioneA}" 
+										navigator="true"
+										pattern="dd-MM-yyyy"
+										showOn="button"/>
+									<p:message for="dataA"></p:message>
+								</ui:fragment>
+								<ui:fragment>
+									<p:outputLabel value="CPI" for="cpi"/>
+									<br />
+									<p:selectCheckboxMenu id="cpi"
+										converter="deCpiDTOConverter"
+										filter="true"
+										filterMatchMode="startsWith"
+										value="#{bean.selectedDeCpiDTOs}"
+										style="width:100%">
+										<f:selectItems
+											value="#{bean.deCpiDTOs}"
+											var="deCpiDTO"
+											itemLabel="#{deCpiDTO.descrizione}"
+											itemValue="#{deCpiDTO}"/>
+									</p:selectCheckboxMenu>
+									<p:message for="cpi"></p:message>
+								</ui:fragment>
+								
+								<ui:fragment>
+									<p:commandButton value="Cerca" styleClass="m-r-1em white-icon"
+										actionListener="#{bean.cerca()}"
+										icon="ui-button-icon-primary ui-icon ui-icon-check"
+										update="@form :adesioniResultSet" />
+									<p:button value="Annulla" styleClass="white-icon"
+										icon="ui-button-icon-primary ui-icon ui-icon-close" />
+								</ui:fragment>
+							</h:panelGrid>
+						</fieldset>
+					</h:form>
+
+					
+					
+					<h:panelGroup id="adesioniResultSet" layout="block">
+						<h:form>
+							<ui:fragment rendered="#{empty bean.bdAdesioneDTOs}">
+								<fieldset>
+									<legend>Adesioni</legend>
+										<p>Nessuna adesione trovata.</p>
+								</fieldset>
+							</ui:fragment>
+							
+							<ui:fragment rendered="#{not empty bean.bdAdesioneDTOs}">
+								<fieldset>
+									<legend>Adesioni</legend>
+									<p:dataTable id="adesioniTable" var="dto"
+										value="#{bean.bdAdesioneDTOs}" rows="10"
+										paginator="true"
+										paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+										rowsPerPageTemplate="5,10,15">
+										<p:column headerText="Nome" sortBy="#{dto.nome}">
+											<h:outputText value="#{dto.nome}" />
+										</p:column>
+										<p:column headerText="Cognome"  sortBy="#{dto.cognome}">
+											<h:outputText value="#{dto.cognome}"/>
+										</p:column>
+										<p:column headerText="Codice fiscale" sortBy="#{dto.codiceFiscale}">
+											<h:outputText value="#{dto.codiceFiscale}" />
+										</p:column>
+										<p:column headerText="Programma" sortBy="#{dto.deBandoProgrammaDTO.descrizione}">
+											<h:outputText value="#{dto.deBandoProgrammaDTO.descrizione}" />
+										</p:column>
+										<p:column headerText="Dichiarazione" sortBy="#{dto.dichiarazione}">
+											<h:outputText value="#{dto.dichiarazione}" />
+										</p:column>
+										<p:column headerText="Data adesione" sortBy="#{dto.dtAdesione}">
+											<h:outputText value="#{dto.dtAdesione}">
+												<f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+											</h:outputText>
+										</p:column>
+										<p:column headerText="CPI" sortBy="#{dto.deCpiDTO.descrizione}">
+											<h:outputText value="#{dto.deCpiDTO.descrizione}" />
+										</p:column>
+									</p:dataTable>
+								</fieldset>
+								<div id="esportaAdesioniBtn">
+							  		<h:commandLink value="Esporta in Excel" styleClass="buttonStyle">
+				                    	<p:dataExporter type="xls" target="adesioniTable" fileName="adesioni" />
+					                </h:commandLink>
+								</div>
+							</ui:fragment>
+						</h:form>
+					</h:panelGroup>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

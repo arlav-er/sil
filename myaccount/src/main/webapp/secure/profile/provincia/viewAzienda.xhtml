@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:pretty="http://ocpsoft.com/prettyfaces"
+	template="/templates/#{godfatherBean.theme}/main.xhtml">
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{sessionLogger.grantAccessFor(sessionLogger.getProvinciaAccess())}" />
+	</f:metadata>
+	<ui:param name="pagetitle" value="Profile" />
+	<ui:define name="content">
+		<ui:fragment rendered="#{not empty param['saveSucess']}">
+			<script>
+			sucessMessage("#{ui['msg.updated']}")
+		</script>
+		</ui:fragment>
+		<div class="container-fluid">
+			<div class="panel-body profile-information">
+				<div class="col-md-2">
+
+					<div class="profile-pic text-center">
+						<h:panelGroup id="userProfilePic">
+							<h:panelGroup rendered="#{empty provinciaViewAziendaBean.aziendaInfo.logo}">
+								<h:graphicImage library="commons" name="images/profilePic.jpg"></h:graphicImage>
+							</h:panelGroup>
+							<h:panelGroup rendered="#{not empty provinciaViewAziendaBean.aziendaInfo.logo}">
+								<pretty:urlbuffer var="imgURL" mappingId="profilePicture">
+									<f:param id="type" value="azienda" />
+									<f:param id="id" value="#{provinciaViewAziendaBean.aziendaInfo.pfPrincipal.idPfPrincipal}" />
+									<f:param id="username" value="#{provinciaViewAziendaBean.aziendaInfo.pfPrincipal.username}" />
+								</pretty:urlbuffer>
+								<img src="#{imgURL}?#{utils.currentTimeMillis()}" />
+							</h:panelGroup>
+						</h:panelGroup>
+
+						<h3>
+							#{provinciaViewAziendaBean.aziendaInfo.ragioneSociale} <br />
+						</h3>
+
+					</div>
+				</div>
+
+				<div class="col-md-5">
+					<div class="panel panel-warning">
+						<div class="panel-heading">#{ui['prof.datiAzienda']}</div>
+						<div class="panel-body">
+							<ui:include src="viewAzienda/_datiAzienda.xhtml" />
+						</div>
+					</div>
+				</div>
+				<div class="col-md-5">
+					<div class="panel panel-warning">
+						<div class="panel-heading">#{ui['prof.datiAccount']}</div>
+						<div class="panel-body">
+							<ui:include src="viewAzienda/_datiAccount.xhtml" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel-body ricSare">
+				<h:panelGroup>
+					<ui:include src="viewAzienda/_ricSARE.xhtml" />
+				</h:panelGroup>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>
+

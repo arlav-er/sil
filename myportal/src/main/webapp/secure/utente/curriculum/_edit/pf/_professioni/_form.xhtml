@@ -1,0 +1,102 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:eng="http://java.sun.com/jsf/composite/components">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="gruppoProfessionale:autocomplete" value="Professioni" styleClass="col-sm-3 control-label">
+					<span class="ui-outputlabel-rfi">*</span>
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<eng:treeAutoComplete id="gruppoProfessionale"
+						value="#{curriculumVitaePfBean.cvProfessionePfSection.professioneAttiva.deBpMansione}"
+						converter="deBpMansioneConverter" forceSelection="true" var="deMansione" itemLabel="#{deMansione.descrizione}"
+						label="#{ui['sap.gruppoProfessionale']}" itemValue="#{deMansione}"
+						emptyMessage="#{ui['shared.emptyAutoComplete']}"
+						completeMethod="#{curriculumVitaePfBean.decodificheBean.completeDeBpMansioneLevel4Only}" size="55"
+						minQueryLength="2" styleClass="form-control" cache="true" required="true" ajaxEvent="itemSelect"
+						treeValue="#{mansioniSessionBean.deMansioneTreeNode}" bean="#{curriculumVitaePfBean.cvProfessionePfSection}"
+						treeSelectListener="gruppoProfessionaleNodeSelected" requiredMessage=" La professione è obbligatoria"></eng:treeAutoComplete>
+					<p:message id="gruppoProfessionaleMessage" for="gruppoProfessionale:autocomplete"></p:message>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="descMansione" value="Mansione desiderata" styleClass="col-sm-3 control-label">
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:inputText id="descMansione" maxlength="100" required="true"
+						requiredMessage="La mansione desiderata e' obbligatoria"
+						value="#{curriculumVitaePfBean.cvProfessionePfSection.professioneAttiva.descrizioneProfessione}"
+						styleClass="form-control">
+						<f:validateLength for="function" maximum="100" />
+					</p:inputText>
+					<p:message for="descMansione" />
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="esperienzaSett" value="Esperienza nel settore" styleClass="col-sm-3 control-label">
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:selectBooleanCheckbox id="esperienzaSett" styleClass="form-control"
+						value="#{curriculumVitaePfBean.cvProfessionePfSection.professioneAttiva.flagEspSettore}">
+					</p:selectBooleanCheckbox>
+					<p:message for="esperienzaSett" />
+				</div>
+			</div>
+		</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<p:outputLabel for="trasferta" value="Disponibilita trasferte" styleClass="col-sm-3 control-label">
+					</p:outputLabel>
+					<div class="col-md-9 col-lg-9">
+						<p:selectOneMenu id="trasferta"
+							value="#{curriculumVitaePfBean.cvProfessionePfSection.professioneAttiva.deTrasferta}"
+							converter="deTrasfertaConverter" filter="false" filterMatchMode="startsWith" style="width: 100%;">
+							<f:selectItem itemLabel="" itemValue="" />
+							<f:selectItems value="#{decodificheBean.findDeTrasfertaValidi()}" var="deTrasferta"
+								itemLabel="#{deTrasferta.descrizione}" itemValue="#{deTrasferta}" />
+						</p:selectOneMenu>
+						<p:message for="trasferta" />
+					</div>
+				</div>
+			</div>
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="note" value="Note" styleClass="col-sm-3 control-label">
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:inputTextarea id="note" required="false" styleClass="form-control compact-textarea" autoResize="false"
+						richTextMode="false" label="Note" maxlength="2000" counter="noteCount" counterTemplate="{0} caratteri rimanenti"
+						value="#{curriculumVitaePfBean.cvProfessionePfSection.professioneAttiva.noteDisponibilita}">
+						<f:validateLength for="function" maximum="2000" />
+					</p:inputTextarea>
+					<p:message for="note" />
+					<h:outputText id="noteCount" />
+				</div>
+			</div>
+		</div>
+		<div class="text-center">
+			<p:defaultCommand target="syncProfessione"></p:defaultCommand>
+			<p:commandLink id="syncProfessione" actionListener="#{curriculumVitaePfBean.cvProfessionePfSection.sync()}"
+				styleClass="btn btn-primary ui-button baby-btn uk-margin-top"
+				onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+				oncomplete="MyPortal.Curriculum.syncArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+				update="@(.ui-message)" process="@this, syncForm">                        
+	            #{ui['shared.save']}
+	        </p:commandLink>
+			<p:commandLink id="annulla" styleClass="btn btn-primary ui-button baby-btn uk-margin-top uk-margin-left"
+				onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+				oncomplete="MyPortal.Curriculum.cancelArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+				process="@this">                        
+                    Annulla
+					  <p:ajax update="syncForm, :professioniDesiderateForm:articles"
+					listener="#{curriculumVitaePfBean.cvProfessionePfSection.cancelEditProfessione()}" resetValues="true" />
+			</p:commandLink>
+			<p:remoteCommand name="updateArticles" update=":professioniDesiderateForm:articles" process="@this"></p:remoteCommand>
+		</div>
+	</div>
+</ui:composition>

@@ -1,0 +1,1096 @@
+ 
+<!-- Dichiarazione di sospensione -->
+
+	<!-- ricerca -->
+	
+<PAGE name="AmmRicercaDichSospPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_ELENCOCPI" /> <!-- modulo riutilizzato -->
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AmmRicercaDichSospPage" target="M_ELENCOCPI"/>		
+	</DEPENDENCIES>
+</PAGE> 
+
+
+	<!-- /ricerca -->
+
+
+<PAGE name="AmmListaContestualeDichSospPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_Amm_cercaDichSospContestuale" />
+		<MODULE name="M_AmmDelDichSosp" />	
+		<MODULE name="M_AmmHasDichSospStorico" />	
+	</MODULES>
+	<DEPENDENCIES>
+				<!-- cancellazione -->
+		<DEPENDENCE source="AmmListaContestualeDichSospPage" target="M_AmmDelDichSosp">		
+			<CONDITIONS>
+		          <PARAMETER name="prgDichSospensioneCanc" scope="SERVICE_REQUEST" value="AF_DEFINED"/>		          
+		      </CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="AmmListaContestualeDichSospPage" target="M_Amm_cercaDichSospContestuale"/>				
+		
+		<DEPENDENCE source="AmmListaContestualeDichSospPage" target="M_AmmHasDichSospStorico"/>				
+		
+	</DEPENDENCIES>
+</PAGE> 
+
+
+<PAGE name="AmmListaDichSospPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_Amm_cercaDichSosp" />
+		<MODULE name="M_AmmDelDichSosp" />		
+	</MODULES>
+	<DEPENDENCIES>		
+	<DEPENDENCE source="AmmListaDichSospPage" target="M_AmmDelDichSosp">		
+			<CONDITIONS>
+		          <PARAMETER name="prgDichSospensioneCanc" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		      </CONDITIONS>
+		</DEPENDENCE>		
+	<DEPENDENCE source="AmmListaDichSospPage" target="M_Amm_cercaDichSosp"/>		
+	</DEPENDENCIES>
+</PAGE> 
+
+
+<PAGE name="AmmDettDichSospPage" scope="REQUEST">
+	<MODULES>	
+		<MODULE name="M_AmmInsertDichSosp" />		
+    	<MODULE name="M_AmmUpdateDichSosp" />		
+		<MODULE name="M_AmmGetDichSosp" />	
+		<MODULE name="M_AmmGetDatiLavoratore" />		
+		<MODULE name="M_AmmHasDichSospStorico" />			
+		<MODULE name="M_GETDOCPROTOCOLLATO" />			
+	</MODULES>
+	<DEPENDENCIES>
+	
+	
+	<!-- INSERIMENTO DICHIARAZIONE -->
+	 <DEPENDENCE source="AmmDettDichSospPage" target="M_AmmInsertDichSosp">
+		      <CONDITIONS>
+		          <PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		      </CONDITIONS>
+	    </DEPENDENCE>	
+    <DEPENDENCE source="M_AmmInsertDichSosp" target="M_AmmGetDichSosp">
+	      <CONDITIONS>
+	      </CONDITIONS>
+	      <CONSEQUENCES>
+  	          <PARAMETER name="prgDichSospensione" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_AMMINSERTDICHSOSP.ROWS.ROW.DO_NEXTVAL"/>
+	      </CONSEQUENCES>
+     </DEPENDENCE>
+	    
+	    
+	
+	<!-- AGGIORNAMENTO DICHIARAZIONE -->
+		<DEPENDENCE source="AmmDettDichSospPage" target="M_AmmUpdateDichSosp">
+		      <CONDITIONS>
+		          <PARAMETER name="Salva" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		      </CONDITIONS>
+	    </DEPENDENCE>	
+       <DEPENDENCE source="M_AmmUpdateDichSosp" target="M_AmmGetDichSosp">
+	      <CONDITIONS>		      
+	      </CONDITIONS>
+        </DEPENDENCE>
+
+
+
+   <DEPENDENCE source="AmmDettDichSospPage" target="M_AmmGetDichSosp">
+	      <CONDITIONS>
+	          <PARAMETER name="prgDichSospensione" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	          <PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+	          <PARAMETER name="Salva" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+	      </CONDITIONS>
+	</DEPENDENCE>
+   <DEPENDENCE source="M_AmmGetDichSosp" target="M_AmmHasDichSospStorico">
+	      <CONDITIONS>
+	      </CONDITIONS>
+	      <CONSEQUENCES>  	          
+ 		      <PARAMETER name="cdnLavoratore" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_AmmGetDichSosp.ROWS.ROW.CDNLAVORATORE"/>
+	      </CONSEQUENCES>	      
+	</DEPENDENCE>
+
+
+   <DEPENDENCE source="AmmDettDichSospPage" target="M_AmmGetDatiLavoratore">
+	      <CONDITIONS>
+	          <PARAMETER name="contestuale" scope="SERVICE_REQUEST" type="ABSOLUTE" value="true"/>
+	      </CONDITIONS>
+	</DEPENDENCE>
+				
+		<DEPENDENCE source="AmmDettDichSospPage" target="M_GETDOCPROTOCOLLATO">
+			<CONDITIONS>
+	        	<PARAMETER name="prgDichSospensione" scope="SERVICE_REQUEST" type="RELATIVE" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE> 
+
+
+
+	<!-- storico -->
+			
+<PAGE name="AmmListaStoricoDichSospPage" scope="REQUEST">
+		<MODULES>
+		<MODULE name="M_Amm_GetListaDichSospStorico" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AmmListaStoricoDichSospPage" target="M_Amm_GetListaDichSospStorico"/>	
+	</DEPENDENCIES>
+</PAGE> 
+
+
+<PAGE name="AmmDettStoricoDichSospPage" scope="REQUEST">
+	<MODULES>
+	</MODULES>
+	<DEPENDENCIES>
+	</DEPENDENCIES>
+</PAGE> 
+
+   <!-- /storico -->
+   
+   <!-- pagine accessorie -->
+   
+   <!-- lavoratore -->
+ <PAGE name="AmmGetLavoratoreDichSospPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_AmmGetDatiLavoratore" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AmmGetLavoratoreDichSospPage" target="M_AmmGetDatiLavoratore"/>	
+	</DEPENDENCIES>
+</PAGE>   
+   
+   <!-- unita' aziendale -->
+ <PAGE name="AmmGetUnitaAziendaDichSospPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_AmmGetDatiUnitaAzienda" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AmmGetUnitaAziendaDichSospPage" target="M_AmmGetDatiUnitaAzienda"/>	
+	</DEPENDENCIES>
+</PAGE>   
+   
+   
+   
+   
+   
+   <!-- /pagine accessorie -->
+   
+<!-- /Dichiarazione di sospensione -->   
+
+
+
+<!-- Ricerca mobilità -->
+
+
+<PAGE name="MobilitaRicercaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetDeMbTipo" />
+    <MODULE name="M_ELENCOCPI" />
+    <!-- moduli aggiuntivi per MO -->
+    <MODULE name="M_MO_TIPO_LISTA" />
+    <MODULE name="M_MO_STATO" />
+    <MODULE name="M_MO_MOTIVO_FINE" />
+    <MODULE name="M_MO_MOTIVO_SCOR" />
+    <MODULE name="M_MO_PROVENIENZA" />
+    <MODULE name="M_MO_INDENNITA" />
+    <MODULE name="M_GetConfig_Mobilita" />
+    <MODULE name="M_GetConfigValue" />
+    
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="MobilitaRicercaPage" target="M_GetDeMbTipo"/>
+    <DEPENDENCE source="MobilitaRicercaPage" target="M_ELENCOCPI"/>
+    <!-- moduli aggiuntivi per MO -->
+    <DEPENDENCE source="MobilitaRicercaPage" target="M_MO_TIPO_LISTA"/>
+    <DEPENDENCE source="MobilitaRicercaPage" target="M_MO_STATO"/>
+    <DEPENDENCE source="MobilitaRicercaPage" target="M_MO_MOTIVO_FINE"/>
+    <DEPENDENCE source="MobilitaRicercaPage" target="M_MO_MOTIVO_SCOR"/>
+    <DEPENDENCE source="MobilitaRicercaPage" target="M_MO_PROVENIENZA"/>
+    <DEPENDENCE source="MobilitaRicercaPage" target="M_MO_INDENNITA"/>
+    <DEPENDENCE source="MobilitaRicercaPage" target="M_GetConfig_Mobilita"/>
+    <DEPENDENCE source="MobilitaRicercaPage" target="M_GetConfigValue">
+    	<CONSEQUENCES>
+    		<PARAMETER name="COD_TIPO_CONFIG"  type="ABSOLUTE" value="MBDUBBIO"/>
+    	</CONSEQUENCES>
+    </DEPENDENCE>
+    		
+    
+  </DEPENDENCIES>
+  <!--<MODULES>
+    <MODULE name="M_GetDeMbTipo" />
+    <MODULE name="M_Get181Cat" />
+    <MODULE name="M_GetStatoAtto" />
+    <MODULE name="M_ELENCOCPI" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="StatoOccRicercaPage" target="M_GetDeStatoOcc"/>
+    <DEPENDENCE source="StatoOccRicercaPage" target="M_Get181Cat"/>
+    <DEPENDENCE source="StatoOccRicercaPage" target="M_GetStatoAtto"/>
+    <DEPENDENCE source="StatoOccRicercaPage" target="M_ELENCOCPI"/>
+  </DEPENDENCIES>-->
+</PAGE>
+
+<PAGE name="MobilitaRisultRicercaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetDeMbTipo" />
+    <MODULE name="M_GetStatoMob" />
+    <MODULE name="M_MO_MOTIVO_FINE" />
+    <MODULE name="M_ELENCOCPI" />
+    <MODULE name="M_AggiornaMobRicerca" />
+    <MODULE name="M_MobilitaRicerca" />
+    <MODULE name="M_GetConfig_Mobilita" />
+    <!-- moduli aggiuntivi per MO 
+    <MODULE name="M_MobilitaSintesiParamTipoLista" /> -->                
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="MobilitaRisultRicercaPage" target="M_GetConfig_Mobilita"/>
+  	<DEPENDENCE source="M_GetConfig_Mobilita" target="M_AggiornaMobRicerca" >
+  		<CONDITIONS>
+  			<PARAMETER name="aggiorna_stato" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+  			<PARAMETER name="MESSAGE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+  		</CONDITIONS>
+  	</DEPENDENCE>
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_MobilitaRicerca"/>
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_GetStatoMob"/>
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_GetDeMbTipo"/>
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_MO_MOTIVO_FINE"/>
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_ELENCOCPI"/>
+    <!-- moduli aggiuntivi per MO 
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_MobilitaSintesiParamTipoLista"/> -->
+  </DEPENDENCIES>  
+</PAGE>
+
+<PAGE name="MobilitaRisultRicercaCsvPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_MobilitaRicercaSaveCsv" />
+	</MODULES>
+	<DEPENDENCIES>
+    	<DEPENDENCE source="MobilitaRisultRicercaCsvPage" target="M_MobilitaRicercaSaveCsv"/>
+    </DEPENDENCIES>
+</PAGE>
+<!-- /Ricerca mobilità -->
+
+<!-- Consulta mobilità da File Regionale -->
+<PAGE name="MobilitaConsultaFileRegPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_ELENCOTIPOMOB" />
+    <MODULE name="M_ELENCOCPI" />
+    <MODULE name="M_ELENCOPROVINCE" />
+    <MODULE keep="false" name="GetMobilitaRegFiltrate"/>
+    <MODULE keep="false" name="MobilitaDeleteListaFileReg"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="MobilitaConsultaFileRegPage" target="GetMobilitaRegFiltrate">
+        <CONDITIONS>
+          <PARAMETER name="CANCELLAFILTRATI" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>    
+    </DEPENDENCE>
+    <DEPENDENCE source="MobilitaConsultaFileRegPage" target="MobilitaDeleteListaFileReg">
+    	<CONDITIONS>
+			<PARAMETER name="CANCELLAFILTRATI" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	  	</CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="MobilitaConsultaFileRegPage" target="M_ELENCOTIPOMOB"/>
+    <DEPENDENCE source="MobilitaConsultaFileRegPage" target="M_ELENCOCPI"/>
+    <DEPENDENCE source="MobilitaConsultaFileRegPage" target="M_ELENCOPROVINCE"/>    
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MobilitaListaFileRegPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="MobilitaListaFileReg"/>
+  </MODULES>
+  
+  <DEPENDENCIES>
+    <DEPENDENCE source="MobilitaListaFileRegPage" target="MobilitaListaFileReg">
+      <CONDITIONS/>
+    </DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- /Consulta mobilità da File Regionale -->
+
+<!-- gestione dichiarazioni e attestazioni -->
+<PAGE name="ListaDichiarazioniPage" scope="REQUEST">
+  <MODULES>
+  <!-- non ricordo perche ho aggiunto questo modulo: parrebbe inutile (savino 08/04/2005) -->
+    <!--MODULE name="M_GetDatiLav" /-->
+    <MODULE name="ListaDichiarazioniLav" />
+  </MODULES>
+  <DEPENDENCIES>
+    <!--DEPENDENCE source="ListaDichiarazioniPage" target="M_GetDatiLav"/-->
+    <DEPENDENCE source="ListaDichiarazioniPage" target="ListaDichiarazioniLav">
+    	<CONSEQUENCES>
+    		<PARAMETER name="pagina"  type="ABSOLUTE" value="ListaDichiarazioniPage"/>
+    		<PARAMETER name="nascondiSepCampoLav"  type="ABSOLUTE" value="true"/>
+    	</CONSEQUENCES>
+    </DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="InsDichiarazionePage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="ComboTipoModello" />
+    <MODULE name="InserisciDichiarazione" />
+    <MODULE name="StampaDichAttNextval" />
+    <MODULE name="ComboStModelloStampa" />
+    <MODULE name="GetDeRelMod" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="InsDichiarazionePage" target="ComboTipoModello"/>    
+    <DEPENDENCE source="InsDichiarazionePage" target="StampaDichAttNextval">
+		<CONDITIONS>
+	    	<PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="StampaDichAttNextval" target="InserisciDichiarazione">
+    	<CONSEQUENCES>
+    		<PARAMETER name="prgStDichAtt"  type="RELATIVE" scope="SERVICE_RESPONSE" value="StampaDichAttNextval.rows.row.nextval"/>
+    	</CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="StampaDichAttNextval" target="ComboStModelloStampa"/>    
+    <DEPENDENCE source="StampaDichAttNextval" target="GetDeRelMod"/>    
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- pagina chiamata dalla funzione js syncXMLHTTPGETRequest() e che quindi restituisce un documento xml -->
+ <PAGE name="GetModelloStampaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="ComboStModelloStampa" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="GetModelloStampaPage" target="ComboStModelloStampa"/>	
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- ACCORPAMENTO LAVORATORI -->
+ <PAGE name="AccorpaLavRicercaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="GET_LAVORATORI" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AccorpaLavRicercaPage" target="GET_LAVORATORI">
+			<CONDITIONS>
+	    		<PARAMETER name="CDNLAVORATORE1" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    		<PARAMETER name="CDNLAVORATORE2" scope="SERVICE_REQUEST" value="AF_DEFINED"/>	    		
+	    		<PARAMETER name="CARICA_LAVORATORI" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+		</DEPENDENCE>	
+	</DEPENDENCIES>
+</PAGE>
+ <PAGE name="AccorpaLavDettaglioPage" scope="REQUEST">
+	<MODULES>
+		<MODULE NAME="GET_DETT_LAV_DA_ACCORPARE"/>
+	    <MODULE name="M_GetStatiCivili"/>	    
+        <MODULE name="M_TIPODICHDISP" />
+        <MODULE name="M_CONTRATTO" />        
+        <MODULE name="M_MOTFINEATTO" />        
+        <MODULE name="M_STATOATTODISPO" />
+        <MODULE name="M_LIST_GEST_ROSE_LAV1" />        
+        <MODULE name="M_LIST_GEST_ROSE_LAV2" />
+        <MODULE name="M_LIST_GEST_CIG_LAV1" /> 
+        <MODULE name="M_LIST_GEST_CIG_LAV2" />  
+        <MODULE name="M_DidInpsAccorpaLav1" />
+        <MODULE name="M_DidInpsAccorpaLav2" />
+        <MODULE name="M_DichNeetAccorpaLav1" />
+        <MODULE name="M_DichNeetAccorpaLav2" />
+        <MODULE name="M_SAPAccorpaLav1" />
+        <MODULE name="M_SAPAccorpaLav2" />
+        <!--
+        <MODULE name="M_GetDeIndispTemp" />
+        -->
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AccorpaLavDettaglioPage" target="GET_DETT_LAV_DA_ACCORPARE"/>	
+		<DEPENDENCE source="AccorpaLavDettaglioPage" target="M_GetStatiCivili"/>			
+		<DEPENDENCE source="AccorpaLavDettaglioPage" target="M_TIPODICHDISP"/>			
+		<DEPENDENCE source="AccorpaLavDettaglioPage" target="M_CONTRATTO"/>					
+		<DEPENDENCE source="AccorpaLavDettaglioPage" target="M_MOTFINEATTO"/>
+		<DEPENDENCE source="AccorpaLavDettaglioPage" target="M_STATOATTODISPO"/>
+		<DEPENDENCE source="AccorpaLavDettaglioPage" target="M_LIST_GEST_ROSE_LAV1"/>
+		<DEPENDENCE source="AccorpaLavDettaglioPage" target="M_LIST_GEST_ROSE_LAV2"/>
+		<DEPENDENCE source="AccorpaLavDettaglioPage" target="M_LIST_GEST_CIG_LAV1"/>
+		<DEPENDENCE source="AccorpaLavDettaglioPage" target="M_LIST_GEST_CIG_LAV2"/>
+		<DEPENDENCE source="AccorpaLavDettaglioPage" target="M_DidInpsAccorpaLav1">
+            <CONDITIONS>
+                <PARAMETER name="CDNLAVORATORE1" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+            </CONDITIONS>
+            
+        </DEPENDENCE>
+        <DEPENDENCE source="AccorpaLavDettaglioPage" target="M_DidInpsAccorpaLav2">
+            <CONDITIONS>
+                <PARAMETER name="CDNLAVORATORE2" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+            </CONDITIONS>
+             
+        </DEPENDENCE>
+        <DEPENDENCE source="AccorpaLavDettaglioPage" target="M_DichNeetAccorpaLav1">
+            <CONDITIONS>
+                <PARAMETER name="CDNLAVORATORE1" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+            </CONDITIONS>
+        </DEPENDENCE>
+        <DEPENDENCE source="AccorpaLavDettaglioPage" target="M_DichNeetAccorpaLav2">
+            <CONDITIONS>
+                <PARAMETER name="CDNLAVORATORE2" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+            </CONDITIONS>
+        </DEPENDENCE>
+        <DEPENDENCE source="AccorpaLavDettaglioPage" target="M_SAPAccorpaLav1">
+            <CONDITIONS>
+                <PARAMETER name="CDNLAVORATORE1" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+            </CONDITIONS>
+        </DEPENDENCE>
+        <DEPENDENCE source="AccorpaLavDettaglioPage" target="M_SAPAccorpaLav2">
+            <CONDITIONS>
+                <PARAMETER name="CDNLAVORATORE2" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+            </CONDITIONS>
+        </DEPENDENCE>
+		<!--	
+		<DEPENDENCE source="AccorpaLavDettaglioPage" target="M_GetDeIndispTemp"/>				
+		-->
+	</DEPENDENCIES>
+</PAGE>
+ <PAGE name="AccorpaLavEsitoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="ACCORPA_LAVORATORE" />      
+   	    <MODULE name="M_COOP_AccorpaLavoratoriIR" />
+   	    <MODULE name="M_GetCpiLavoratore"/>
+   	    <MODULE name="M_GetLavoratoreAnag"/>
+   	    <MODULE name="M_InsertInvioAutSAP"/>
+   	    <MODULE name="M_AccorpamentoGetUltimoInvioSAPSistema"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AccorpaLavEsitoPage" target="M_GetLavoratoreAnag">
+		    <CONDITIONS>
+		       <PARAMETER name="cdnLavInCuiAccorpare" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+		    <CONSEQUENCES>		    
+	    	<!-- cdnLavInCuiAccorpare e' il lavoratore a cui si accorpa: se non presente verra' inserito. -->
+        		<PARAMETER  name="cdnlavoratore" scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavInCuiAccorpare"/>
+	    	</CONSEQUENCES>
+		</DEPENDENCE> 
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_GetCpiLavoratore">
+	    	<CONDITIONS/>
+	    	<CONSEQUENCES>		    
+	    	<!-- cdnLavInCuiAccorpare e' il lavoratore a cui si accorpa: se non presente verra' inserito. -->
+        		<PARAMETER  name="cdnlavoratore" scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavInCuiAccorpare"/>
+	    	</CONSEQUENCES>
+	  	</DEPENDENCE>
+		<DEPENDENCE source="M_GetCpiLavoratore" target="ACCORPA_LAVORATORE">
+			<CONDITIONS>
+	    		<PARAMETER name="cdnLavInCuiAccorpare" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    		<PARAMETER name="cdnLavoratoreDaAccorpare" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+		</DEPENDENCE>	
+			  	
+	    <DEPENDENCE source="ACCORPA_LAVORATORE" target="M_COOP_AccorpaLavoratoriIR">
+			<CONDITIONS>
+	    		<PARAMETER name="ACCORPA_LAVORATORE.ESITO_ACCORPAMENTO" scope="SERVICE_RESPONSE" value="OK"/>
+		    </CONDITIONS>
+			<CONSEQUENCES>
+			    <!-- passo tutto il source bean: il parametro name non serve -->
+        		<PARAMETER  scope="SERVICE_RESPONSE" type="RELATIVE" value="M_GETCPILAVORATORE"/>
+        		<PARAMETER  scope="SERVICE_RESPONSE" type="RELATIVE" value="M_GETLAVORATOREANAG"/>
+    		</CONSEQUENCES>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="ACCORPA_LAVORATORE" target="M_InsertInvioAutSAP">
+			<CONDITIONS>
+	    		<PARAMETER name="ACCORPA_LAVORATORE.ESITO_ACCORPAMENTO" scope="SERVICE_RESPONSE" value="OK"/>
+		    </CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ACCORPA_LAVORATORE" target="M_AccorpamentoGetUltimoInvioSAPSistema">
+			<CONDITIONS>
+	    		<PARAMETER name="ACCORPA_LAVORATORE.ESITO_ACCORPAMENTO" scope="SERVICE_RESPONSE" value="OK"/>
+		    </CONDITIONS>
+		</DEPENDENCE>
+		
+	</DEPENDENCIES>
+</PAGE>
+<!-- FINE ACCORPAMENTO LAVORATORI -->
+
+<PAGE name="MovimentiLavoratore" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_MovimentiLavoratore" />        
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="MovimentiLavoratore" target="M_MovimentiLavoratore"/>		
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- QUALIFICA SRQ PER APPRENDISTATO -->
+<PAGE name="RicercaQualificaSRQPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_CercaQualificaCodSRQ"/>
+		<MODULE name="M_CercaQualificaDescSRQ"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaQualificaSRQPage" target="M_CercaQualificaCodSRQ">
+			<CONDITIONS>
+		       <PARAMETER name="tipoRicerca" scope="SERVICE_REQUEST" type="RELATIVE" value="codice"/>
+		    </CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="RicercaQualificaSRQPage" target="M_CercaQualificaDescSRQ">
+			<CONDITIONS>
+		       <PARAMETER name="tipoRicerca" scope="SERVICE_REQUEST" type="RELATIVE" value="descrizione"/>
+		    </CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>	
+
+<PAGE name="RicercaQualificaSRQAvanzataPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ListPadreQualificheSRQ"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaQualificaSRQAvanzataPage" target="M_ListPadreQualificheSRQ"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CurrAlberoQualifichePage" scope="REQUEST">
+	<MODULES>
+  		<MODULE name="M_AlberoQualificheSRQ"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CurrAlberoQualifichePage" target="M_AlberoQualificheSRQ"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- RICERCA AVVIAMENTI A SELEZIONE - MODULO AS -->
+<PAGE name="ASRicercaAvvSelezionePage" scope="REQUEST">
+	<MODULES>
+  		<MODULE name="M_STATO_AVVIAMENTO"/>
+  		<MODULE name="M_SMS_COMBO_CPI"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ASRicercaAvvSelezionePage" target="M_STATO_AVVIAMENTO"/>
+		<DEPENDENCE source="ASRicercaAvvSelezionePage" target="M_SMS_COMBO_CPI"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="ASListaAvvSelezionePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_LISTA_AVVIAMENTI"/>
+		<MODULE name="M_TIPO_MESS_EVIDENZA"/>			
+  	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ASListaAvvSelezionePage" target="M_LISTA_AVVIAMENTI"/>
+		<DEPENDENCE source="ASListaAvvSelezionePage" target="M_TIPO_MESS_EVIDENZA"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="AS_NuovaEvidenzaPage" scope="REQUEST">
+	<MODULES>		
+		<MODULE name="MTipiEvidenze"/>
+		<MODULE name="M_AS_INS_EVIDENZA"/>			
+  	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AS_NuovaEvidenzaPage" target="MTipiEvidenze"/>
+		<DEPENDENCE source="AS_NuovaEvidenzaPage" target="M_AS_INS_EVIDENZA">
+			<CONDITIONS>
+		       <PARAMETER name="SALVA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- è un a lista simile a quella degli avviamenti, ma ci si accede dal menu contestuale del lavoratore -->
+<PAGE name="ASListaContAvvSelezionePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_AS_LISTA_AVVIAMENTI_CONTESTUALE"/>					
+  	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ASListaContAvvSelezionePage" target="M_AS_LISTA_AVVIAMENTI_CONTESTUALE"/>		
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- questa page è un dettaglio degli avviamenti raggiungibile sia da menu contestuale che generale  -->
+<PAGE name="AS_DETTAGLIO_AVVIAMENTI_PAGE" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_AS_UPD_AVVIAMENTI"/>
+		<MODULE name="M_AS_AVVIAMENTI_QUALIFICA"/>
+		<MODULE name="M_AS_AVVIAMENTI_RAPPORTO"/>
+		<MODULE name="M_AS_AVVIAMENTI_ESITO"/>		
+		<MODULE name="M_AS_AVVIAMENTI_STATOATTO"/>
+		<!-- i successivi moduli servono per l'estrazione del valore da selezionare nella combo relativa -->
+		<MODULE name="M_AS_AVVIAMENTI_QUALIFICA_SEL"/>
+		<MODULE name="M_AS_AVVIAMENTI_RAPPORTO_SEL"/>		
+		<MODULE name="M_AS_AVVIAMENTI_ESITO_SEL"/>
+		<MODULE name="M_AS_AVVIAMENTI_NOTA_SEL"/>		 		
+  	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AS_DETTAGLIO_AVVIAMENTI_PAGE" target="M_AS_UPD_AVVIAMENTI">
+			<CONDITIONS>
+		       <PARAMETER name="btnAggiorna" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="AS_DETTAGLIO_AVVIAMENTI_PAGE" target="M_AS_AVVIAMENTI_QUALIFICA"/>	
+		<DEPENDENCE source="AS_DETTAGLIO_AVVIAMENTI_PAGE" target="M_AS_AVVIAMENTI_RAPPORTO"/>
+		<DEPENDENCE source="AS_DETTAGLIO_AVVIAMENTI_PAGE" target="M_AS_AVVIAMENTI_ESITO"/>
+		<DEPENDENCE source="AS_DETTAGLIO_AVVIAMENTI_PAGE" target="M_AS_AVVIAMENTI_STATOATTO"/>		
+		<DEPENDENCE source="AS_DETTAGLIO_AVVIAMENTI_PAGE" target="M_AS_AVVIAMENTI_QUALIFICA_SEL"/>
+		<DEPENDENCE source="AS_DETTAGLIO_AVVIAMENTI_PAGE" target="M_AS_AVVIAMENTI_RAPPORTO_SEL"/>
+		<DEPENDENCE source="AS_DETTAGLIO_AVVIAMENTI_PAGE" target="M_AS_AVVIAMENTI_ESITO_SEL"/>
+		<DEPENDENCE source="AS_DETTAGLIO_AVVIAMENTI_PAGE" target="M_AS_AVVIAMENTI_NOTA_SEL"/>			
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Ricerca Nulla Osta -->
+<PAGE distributed="false" name="CMRicercaNullaOstaPage" scope="REQUEST">
+  <MODULES>
+ 		<MODULE keep="false" name="M_InserisciLavNullaOsta"/>
+ 		<MODULE keep="false" name="M_InserisciAziendaNullaOsta"/>
+ 		<MODULE name="CM_GET_PROVINCIA_ISCR" />	
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="CMRicercaNullaOstaPage" target="CM_GET_PROVINCIA_ISCR" />	
+  	<DEPENDENCE source="CMRicercaNullaOstaPage" target="M_InserisciLavNullaOsta">
+		<CONDITIONS>
+			<PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		</CONDITIONS>
+	</DEPENDENCE>
+  	<DEPENDENCE source="CMRicercaNullaOstaPage" target="M_InserisciAziendaNullaOsta">
+		<CONDITIONS>
+			<PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			<PARAMETER name="PRGUNITA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		</CONDITIONS>
+	</DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CMListaNullaOstaPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE name="M_GetListaNullaOsta"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="CMListaNullaOstaPage" target="M_GetListaNullaOsta"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CMNullaOstaPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE keep="false" name="M_GetInfoDeDoc_NullaOsta"/>
+  	<MODULE keep="false" name="M_Insert_NullaOsta"/>
+  	<MODULE keep="false" name="M_Save_NullaOsta"/>
+  	<MODULE keep="false" name="M_InfoNullaOsta"/>
+  	<MODULE keep="false" name="SalvaNullaOstaDoc"/>
+  	<MODULE name="COMBO_STATO_ATTO_NULLA_OSTA"/>
+  	<MODULE name="M_TipologiaAss"/>
+  	<MODULE name="ComboTipoOrario"/>
+  	<MODULE name="ComboNormativaSelettiva"/>
+  	<MODULE name="ComboTipoGrado"/>
+  	<MODULE name="ComboAgevolazioneNullaOsta"/>
+  	<MODULE name="M_MotivoRichiesta"/>
+  	<MODULE name="M_GetProtocollazione"/>
+  	<MODULE name="CM_GET_PROVINCIA_ISCR" />	
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="CMNullaOstaPage" target="CM_GET_PROVINCIA_ISCR" />	
+  	<DEPENDENCE source="CMNullaOstaPage" target="M_GetInfoDeDoc_NullaOsta">
+		<CONDITIONS>
+			<PARAMETER name="nuovoNullaOsta" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		</CONDITIONS>
+	</DEPENDENCE>
+  	<DEPENDENCE source="CMNullaOstaPage" target="COMBO_STATO_ATTO_NULLA_OSTA"/>
+  	<DEPENDENCE source="CMNullaOstaPage" target="M_TipologiaAss"/>
+  	<DEPENDENCE source="CMNullaOstaPage" target="ComboTipoOrario"/>
+  	<DEPENDENCE source="CMNullaOstaPage" target="ComboNormativaSelettiva"/>
+  	<DEPENDENCE source="CMNullaOstaPage" target="ComboTipoGrado"/>
+  	<DEPENDENCE source="CMNullaOstaPage" target="ComboAgevolazioneNullaOsta"/>
+  	<DEPENDENCE source="CMNullaOstaPage" target="M_MotivoRichiesta"/>
+  	<DEPENDENCE source="CMNullaOstaPage" target="M_GetProtocollazione"/>
+  	
+  	<DEPENDENCE source="CMNullaOstaPage" target="M_Insert_NullaOsta">
+			<CONDITIONS>
+				<PARAMETER name="inserisciDoc" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+	<DEPENDENCE source="M_Insert_NullaOsta" target="M_InfoNullaOsta">
+		<CONDITIONS>
+			<PARAMETER name="inserisciDoc" scope="SERVICE_REQUEST" value="AF_DEFINED"/>	
+	    </CONDITIONS>	
+	     <CONSEQUENCES>
+	    	<PARAMETER name="PRGNULLAOSTA" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_Insert_NullaOsta.ROWS.ROW.PRGNULLAOSTA"/>
+	    </CONSEQUENCES>    
+	</DEPENDENCE>	
+	
+	<DEPENDENCE source="CMNullaOstaPage" target="M_Save_NullaOsta">
+		<CONDITIONS>
+	    	<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    </CONDITIONS>
+    </DEPENDENCE> 
+    <DEPENDENCE source="M_Save_NullaOsta" target="M_InfoNullaOsta">
+		<CONDITIONS>
+	    	<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    </CONDITIONS>
+    </DEPENDENCE> 
+    
+	<DEPENDENCE source="CMNullaOstaPage" target="M_InfoNullaOsta">
+		<CONDITIONS>
+	    	<PARAMETER name="PRGNULLAOSTA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+	    </CONDITIONS>
+    </DEPENDENCE> 
+    
+    <DEPENDENCE source="CMNullaOstaPage" target="SalvaNullaOstaDoc">
+		<CONDITIONS>
+			<PARAMETER name="aggiornaDoc" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		</CONDITIONS>
+	</DEPENDENCE>
+	<DEPENDENCE source="SalvaNullaOstaDoc" target="M_InfoNullaOsta">
+		<CONDITIONS>
+			<PARAMETER name="aggiornaDoc" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		</CONDITIONS>
+	</DEPENDENCE>
+</DEPENDENCIES>
+   
+</PAGE>
+
+<PAGE name="SelezionaAziendaNOPage">
+	<MODULES>
+		<MODULE name="M_GetTipiAzienda"/>
+        <MODULE name="M_GETTIPINATGIURIDICA"/>
+        <MODULE name="M_DeleteConvenzione"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="SelezionaAziendaNOPage" target="M_GetTipiAzienda"/>
+		<DEPENDENCE source="SelezionaAziendaNOPage" target="M_GETTIPINATGIURIDICA"/>
+		<DEPENDENCE source="SelezionaAziendaNOPage" target="M_DeleteConvenzione">
+			<CONDITIONS>
+				<PARAMETER name="prgNullaOsta" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+    	</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE> 
+
+<PAGE name="NullaOstaDatiAziendaRefreshPage">
+	<MODULES/>
+</PAGE>
+
+<PAGE name="SelLavNOPage">
+	<MODULES/>
+</PAGE>
+
+<PAGE name="NullaOstaListLavoratorePage">
+	<MODULES>
+		<MODULE name="M_GetLavIscrCMfromRic"/>
+		<MODULE name="M_GetLavIscrCMfromDet"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="NullaOstaListLavoratorePage" target="M_GetLavIscrCMfromRic">
+			<CONDITIONS>
+				<PARAMETER name="fromWhere" scope="SERVICE_REQUEST" type="RELATIVE" value="ricerca"/>				
+ 			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="NullaOstaListLavoratorePage" target="M_GetLavIscrCMfromDet">
+			<CONDITIONS>
+				<PARAMETER name="fromWhere" scope="SERVICE_REQUEST" type="RELATIVE" value="dettaglio"/>				
+ 			</CONDITIONS>
+		    <CONSEQUENCES/>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE> 
+
+<PAGE name="NullaOstaDatiLavRefreshPage">
+	<MODULES/>
+</PAGE>
+
+<PAGE name="RicercaAssunzioniPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_CercaAssunzioneCODASS"/>
+    	<MODULE name="M_CercaAssunzioneDESCRIZIONE"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaAssunzioniPage" target="M_CercaAssunzioneCODASS">
+			<CONDITIONS>
+				<PARAMETER name="codiceAss" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="RicercaAssunzioniPage" target="M_CercaAssunzioneDESCRIZIONE">
+			<CONDITIONS>
+				<PARAMETER name="strdenominazione" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+		    <CONSEQUENCES/>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE name="RicercaConvenzioniPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ASSOCIA_CONVENZIONI_NO"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaConvenzioniPage" target="M_ASSOCIA_CONVENZIONI_NO">
+			
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="RefreshConvenzioniPage">
+	<MODULES/>
+</PAGE>
+
+<PAGE name="NullaOstaListAziendePage">
+	<MODULES>
+		<MODULE name="M_NullaOstaGetAziende"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="NullaOstaListAziendePage" target="M_NullaOstaGetAziende"/>
+	</DEPENDENCIES>
+</PAGE> 
+
+<PAGE distributed="false" name="StampaNullaOstaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ST_MODELLO_NULLAOSTA"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="StampaNullaOstaPage" target="M_ST_MODELLO_NULLAOSTA"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MovTirocinioPage" scope="REQUEST">
+  	<MODULES>
+  		<MODULE name="M_MovGetApprendistato" />
+  		<MODULE name="M_GetConfig_Tirocinio" />
+  		<MODULE name="M_GetDescQualificaSRQ" />
+  		<MODULE name="ComboTipoSoggPromotore" />
+  		<MODULE name="ComboCategoriaTirocinante" />
+  		<MODULE name="ComboTipologiaTirocinio" />
+  		<MODULE name="ComboTipoEntePromotore" />
+  	</MODULES>
+  	<DEPENDENCIES>
+  		<DEPENDENCE source="MovTirocinioPage" target="M_MovGetApprendistato">
+			<CONDITIONS>
+        		<PARAMETER name="PRGMOVIMENTO" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+      		</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MovTirocinioPage" target="M_MovGetApprendistato">
+			<CONDITIONS>
+        		<PARAMETER name="PRGMOVIMENTOAPP" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+      		</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MovTirocinioPage" target="M_GetConfig_Tirocinio">
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetConfig_Tirocinio" target="M_GetDescQualificaSRQ">
+			<CONDITIONS>
+				<PARAMETER name="M_GetConfig_Tirocinio.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1"/>
+				<PARAMETER name="CODQUALIFICASRQ" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MovTirocinioPage" target="ComboTipoSoggPromotore"/>
+		<DEPENDENCE source="MovTirocinioPage" target="ComboCategoriaTirocinante"/>
+		<DEPENDENCE source="MovTirocinioPage" target="ComboTipologiaTirocinio"/>
+		<DEPENDENCE source="MovTirocinioPage" target="ComboTipoEntePromotore"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+
+<!-- *************************************************************************** 
+                                    CM Carico
+     *************************************************************************** -->
+
+<PAGE distributed="false" name="CMCaricoPage" scope="REQUEST">
+   <MODULES>
+   	    <MODULE name="M_Controllo_CM"/>	
+   	    <MODULE name="M_inserisci_carico"/>
+   	    <MODULE name="M_Load_Carico"/>
+   	    <MODULE name="M_Load_Lav_Carico"/>
+   	    <MODULE name="M_Save_Carico"/>
+   </MODULES>
+   <DEPENDENCIES>
+   		<DEPENDENCE source="CMCaricoPage" target="M_Controllo_CM"/>
+   		
+   		<DEPENDENCE source="CMCaricoPage" target="M_Load_Lav_Carico">
+	        <CONDITIONS>
+	            <PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+	        </CONDITIONS>  
+	        <CONSEQUENCES/>
+        </DEPENDENCE>  
+
+		<DEPENDENCE source="CMCaricoPage" target="M_Load_Carico">
+	        <CONDITIONS>
+	            <PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+	        </CONDITIONS>  
+	        <CONSEQUENCES/>
+        </DEPENDENCE>  
+				
+		<DEPENDENCE source="CMCaricoPage" target="M_inserisci_carico">
+			<CONDITIONS>
+				<PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_inserisci_carico" target="M_Load_Lav_Carico">
+			<CONDITIONS>
+				<PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>	
+		    </CONDITIONS>	
+		</DEPENDENCE>
+
+	    <DEPENDENCE source="CMCaricoPage" target="M_Save_Carico">
+			<CONDITIONS>
+		    	<PARAMETER name="aggiorna" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+		    <CONSEQUENCES/>
+	    </DEPENDENCE> 
+	    <DEPENDENCE source="M_Save_Carico" target="M_Load_Carico">
+			<CONDITIONS>
+		    	<PARAMETER name="aggiorna" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+		    <CONSEQUENCES/>
+	    </DEPENDENCE>
+   </DEPENDENCIES>
+</PAGE>
+
+
+
+<!-- *************************************************************************** 
+                                    CM Servizi
+     *************************************************************************** -->
+
+<PAGE distributed="false" name="CMServiziPage" scope="REQUEST">
+   <MODULES>
+   	    <MODULE name="M_Controllo_CM"/>	
+   	    <MODULE name="ListaServiziSelezionati" />
+   	    <MODULE name="M_Inserisci_CM_Servizio" />
+   	    <MODULE name="M_Aggiorna_CM_Servizio" />
+   	    <MODULE name="ComboServizi" />
+   	    <MODULE name="M_Delete_Servizio" />
+   	    <MODULE name="M_LoadServizioCM" />
+   </MODULES>
+   <DEPENDENCIES>
+   		<DEPENDENCE source="CMServiziPage" target="M_Controllo_CM"/>
+   		
+   		<DEPENDENCE source="CMServiziPage" target="ListaServiziSelezionati"/>
+    	
+    	<!-- Inserimento sercizi -->
+    	<DEPENDENCE source="CMServiziPage" target="M_Inserisci_CM_Servizio">
+		    <CONDITIONS>
+		    	<PARAMETER name="nuovoServizio" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+	    </DEPENDENCE>
+    	<DEPENDENCE source="M_Inserisci_CM_Servizio" target="ListaServiziSelezionati">
+		    <CONDITIONS>
+		    	<PARAMETER name="nuovoServizio" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+	    </DEPENDENCE>
+
+		<!-- Aggiornamento servizi -->
+    	<DEPENDENCE source="CMServiziPage" target="M_Aggiorna_CM_Servizio">
+		    <CONDITIONS>
+		    	<PARAMETER name="aggiornaServizio" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+	    </DEPENDENCE>
+		<DEPENDENCE source="M_Aggiorna_CM_Servizio" target="ListaServiziSelezionati">
+		    <CONDITIONS>
+		    	<PARAMETER name="aggiornaServizio" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+	    </DEPENDENCE>
+
+
+    	<!-- Cancellazione sercizo -->
+    	<DEPENDENCE source="CMServiziPage" target="M_Delete_Servizio">
+		    <CONDITIONS>
+		    	<PARAMETER name="eliminaServizio" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+	    </DEPENDENCE>
+    	<DEPENDENCE source="M_Delete_Servizio" target="ListaServiziSelezionati">
+		    <CONDITIONS>
+		    	<PARAMETER name="eliminaServizio" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+	    </DEPENDENCE>
+	    	    	    
+    	<DEPENDENCE source="CMServiziPage" target="ComboServizi"/>
+    	
+    	<DEPENDENCE source="CMServiziPage" target="M_LoadServizioCM">
+		    <CONDITIONS>
+		    	<PARAMETER name="CODSERVIZIO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+	    </DEPENDENCE>
+    	
+   </DEPENDENCIES>
+</PAGE>
+
+<!-- *************************************************************************** 
+                                   Obbligo di Istruzione
+     *************************************************************************** -->
+
+<PAGE distributed="false" name="ObbligoIstruzionePage"
+	scope="REQUEST">
+	<MODULES>
+		<MODULE name="ListaObbligoIstruzione" />
+		<MODULE name="M_COMBO_TIPO_CONDIZIONE" />
+		<MODULE name="M_GET_DETTAGLIO_CONDIZIONE" />
+		<MODULE name="M_Inserisci_Condizione" />
+		<MODULE name="M_AGGIORNA_CONDIZIONE" />
+		<MODULE name="M_DELETE_AM_OBBLIGO_ISTRUZIONE" />
+		<MODULE name="M_GET_ANLAVSTORIAINF_DA_CDNLAV" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ObbligoIstruzionePage"
+			target="M_COMBO_TIPO_CONDIZIONE"/>
+		<!--
+		<DEPENDENCE source="M_AGGIORNA_CONDIZIONE"
+			target="ListaObbligoIstruzione" />
+		<DEPENDENCE source="M_Inserisci_Condizione"
+			target="ListaObbligoIstruzione" />
+		<DEPENDENCE source="ObbligoIstruzionePage"
+			target="M_COMBO_TIPO_CONDIZIONE">
+			<CONDITIONS>
+				<PARAMETER name="APRIDIV" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		-->
+		<DEPENDENCE source="ObbligoIstruzionePage"
+			target="M_GET_DETTAGLIO_CONDIZIONE">
+			<CONDITIONS>
+				<PARAMETER name="bottonePremuto" scope="SERVICE_REQUEST"
+					value="dettaglio" />
+				<PARAMETER name="prgobbligoistruzione"
+					scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ObbligoIstruzionePage"
+			target="M_DELETE_AM_OBBLIGO_ISTRUZIONE">
+			<CONDITIONS>
+				<PARAMETER name="bottonePremuto" scope="SERVICE_REQUEST"
+					value="cancella" />
+				<PARAMETER name="prgobbligoistruzione"
+					scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ObbligoIstruzionePage"
+			target="M_GET_ANLAVSTORIAINF_DA_CDNLAV">
+			<CONDITIONS>
+				<PARAMETER name="bottonePremuto" scope="SERVICE_REQUEST"
+					value="inserisci" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GET_ANLAVSTORIAINF_DA_CDNLAV"
+			target="M_Inserisci_Condizione">
+			<CONDITIONS>
+				<PARAMETER name="bottonePremuto" scope="SERVICE_REQUEST"
+					value="inserisci" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVSTORIAINF"
+					scope="SERVICE_RESPONSE" type="RELATIVE"
+					value="M_GET_ANLAVSTORIAINF_DA_CDNLAV.ROWS.ROW.PRGLAVSTORIAINF" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="ObbligoIstruzionePage"
+			target="M_AGGIORNA_CONDIZIONE">
+			<CONDITIONS>
+				<PARAMETER name="bottonePremuto" scope="SERVICE_REQUEST"
+					value="aggiorna" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ObbligoIstruzionePage"
+			target="ListaObbligoIstruzione" />
+	</DEPENDENCIES>
+</PAGE>

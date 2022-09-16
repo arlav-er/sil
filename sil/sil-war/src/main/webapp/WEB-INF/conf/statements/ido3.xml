@@ -1,0 +1,736 @@
+<STATEMENT name="ListaLingueRichiesta"
+            query="SELECT PRGLINGUA,
+                          PRGRICHIESTAAZ,
+                          STRDENOMINAZIONE,                          
+                          case   	   
+                  				    when mal.cod_conoscenza is not null
+                  				         then (DGL.STRDESCRIZIONE || ' (Min: ' || mnl.des_conoscenza|| ')')	     
+                  				    else DGL.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+                  				end as DescrizioneLetto ,
+                           case   	   
+                  				    when mas.cod_conoscenza is not null
+                  				         then (DGs.STRDESCRIZIONE || ' (Min: ' || mns.des_conoscenza|| ')')	     
+                  				    else DGs.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+                  				end as DescrizioneScritto ,
+                           case   	   
+                  				    when map.cod_conoscenza is not null
+                  				         then (DGP.STRDESCRIZIONE || ' (Min: ' || mnp.des_conoscenza|| ')')	     
+                  				    else DGP.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+                  				end as DescrizioneParlato ,                                              
+                          DO_LINGUA.FLGINDISPENSABILE
+                          FROM DO_LINGUA,DE_LINGUA,DE_GRADO_LIN DGL, DE_GRADO_LIN DGS, DE_GRADO_LIN DGP,
+                          mn_grado_consc_lin mnl, ma_grado_consc_lin mal,
+                          mn_grado_consc_lin mns, ma_grado_consc_lin mas,
+                          mn_grado_consc_lin mnp, ma_grado_consc_lin map
+                          WHERE DO_LINGUA.CODLINGUA=DE_LINGUA.CODLINGUA AND
+                                DO_LINGUA.CDNGRADOLETTO=DGL.CDNGRADO(+) AND
+                                DO_LINGUA.CDNGRADOSCRITTO=DGS.CDNGRADO(+) AND
+                                DO_LINGUA.CDNGRADOPARLATO=DGP.CDNGRADO (+) AND 
+                                mal.cod_conoscenza = mnl.cod_conoscenza(+) and
+                                DGL.CDNGRADO = mal.cdngrado (+) AND
+                                mas.cod_conoscenza = mns.cod_conoscenza(+) and
+                                DGs.CDNGRADO = mas.cdngrado (+) AND
+                                map.cod_conoscenza = mnp.cod_conoscenza (+) and
+                                DGp.CDNGRADO = map.cdngrado (+) AND
+                                DO_LINGUA.PRGRICHIESTAAZ=? AND
+                                DO_LINGUA.PRGALTERNATIVA=?"/>
+
+
+<STATEMENT name="DeleteLinguaRichiestaAzienda"
+            query="DELETE FROM DO_LINGUA
+                          WHERE DO_LINGUA.PRGLINGUA=?"/>
+
+<STATEMENT name="GetLinguaRichiesta"
+            query="SELECT DO_LINGUA.PRGLINGUA,
+                          DO_LINGUA.PRGRICHIESTAAZ,
+                          DO_LINGUA.PRGALTERNATIVA,
+                          DO_LINGUA.CODLINGUA,
+                          DO_LINGUA.CDNGRADOLETTO,
+                          DO_LINGUA.CDNGRADOSCRITTO,
+                          DO_LINGUA.CDNGRADOPARLATO,
+                          DO_LINGUA.FLGINDISPENSABILE,
+                          DO_LINGUA.CDNUTINS,
+                          TO_CHAR(DTMINS, 'DD/MM/YYYY hh24:mi') as DTMINS,
+                          DO_LINGUA.CDNUTMOD,
+                          TO_CHAR(DTMMOD, 'DD/MM/YYYY hh24:mi') as DTMMOD
+                          FROM DO_LINGUA
+                          WHERE DO_LINGUA.PRGLINGUA=?"/>
+
+<STATEMENT name="UpdateLinguaRichiesta"
+            query="UPDATE DO_LINGUA
+                  SET CODLINGUA=?,
+                      CDNGRADOLETTO=?, 
+                      CDNGRADOSCRITTO=?,
+                      CDNGRADOPARLATO=?,
+                      FLGINDISPENSABILE=?,
+                      CDNUTMOD=?,
+                      DTMMOD=sysdate
+                  WHERE PRGLINGUA=?"/>
+
+<STATEMENT name="InsertLinguaRichiesta"
+            query="INSERT INTO DO_LINGUA (
+                     PRGLINGUA, PRGRICHIESTAAZ, PRGALTERNATIVA, CODLINGUA, CDNGRADOLETTO, 
+                     CDNGRADOSCRITTO, CDNGRADOPARLATO, FLGINDISPENSABILE, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD) 
+                VALUES (S_DO_LINGUA.nextval, ?, ?, ?, ?, ?, 
+                ?, ?, ?, sysdate, ?, sysdate)"/>
+
+<STATEMENT name="UpdateOrarioRichiesta"
+            query="
+    
+	UPDATE DO_ORARIO
+		SET FLGINVIOCL = ?,
+		CDNUTMOD = ?,
+		DTMMOD = SYSDATE
+	WHERE PRGRICHIESTAAZ = ?
+	  AND PRGORARIO = ?
+	
+"/>
+
+<STATEMENT name="SelectOrarioRichiesta"
+            query="
+            
+	SELECT DO_ORARIO.PRGORARIO,
+       	DO_ORARIO.CODORARIO,
+       	DO_ORARIO.PRGRICHIESTAAZ,
+       	DE_ORARIO.STRDESCRIZIONE 
+            || 
+            decode(DE_ORARIO.CODMONOORARIO,
+            'T',' (Min: Full Time)', 
+            'P',' (Min: Part Time)',
+            ' (Min: nessuna corrispondenza)') 
+            AS STRDESCRIZIONE,
+       	STRCOGNOME || ' ' || STRNOME || ' - ' || TO_CHAR(DO_ORARIO.DTMINS,'DD/MM/YYYY') AS STRINSERIMENTO,
+    	/*decode (DO_ORARIO.FLGINVIOCL,'S','SI',NULL) FLGINVIOCL*/
+    	DO_ORARIO.FLGINVIOCL,
+    	DO_ORARIO.cdnutins,
+    	DO_ORARIO.cdnutmod,
+    	TO_CHAR(DO_ORARIO.DTMINS,'DD/MM/YYYY hh24:mi') DTMINS,
+    	TO_CHAR(DO_ORARIO.DTMMOD,'DD/MM/YYYY hh24:mi') DTMMOD
+	FROM DO_ORARIO 
+	INNER JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = DO_ORARIO.CDNUTINS)
+	INNER JOIN DE_ORARIO ON (DO_ORARIO.CODORARIO = DE_ORARIO.CODORARIO)	   					
+	WHERE DO_ORARIO.PRGORARIO = ? 
+	AND DO_ORARIO.PRGRICHIESTAAZ= ?
+	
+"/>
+
+<STATEMENT name="ListaOrariRichiesta"
+            query="SELECT DO_ORARIO.PRGORARIO,
+					       DO_ORARIO.CODORARIO,
+					       DO_ORARIO.PRGRICHIESTAAZ,
+					       DE_ORARIO.STRDESCRIZIONE 
+                 || 
+                 decode(DE_ORARIO.CODMONOORARIO,
+                 'T',' (Min: Full Time)', 
+                 'P',' (Min: Part Time)',
+                 ' (Min: nessuna corrispondenza)') 
+                 AS STRDESCRIZIONE,
+					       STRCOGNOME || ' ' || STRNOME || ' - ' || TO_CHAR(DO_ORARIO.DTMINS,'DD/MM/YYYY') AS STRINSERIMENTO,
+			    decode (DO_ORARIO.FLGINVIOCL,'S','SI',NULL) FLGINVIOCL
+					  FROM DO_ORARIO 
+					  INNER JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = DO_ORARIO.CDNUTINS)
+					  INNER JOIN DE_ORARIO ON (DO_ORARIO.CODORARIO = DE_ORARIO.CODORARIO)	   					
+					  WHERE DO_ORARIO.PRGRICHIESTAAZ= ? "/>
+
+<STATEMENT name="InsertOrarioRichiesta"
+            query="INSERT INTO DO_ORARIO (
+                     PRGORARIO, CODORARIO, PRGRICHIESTAAZ, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD, FLGINVIOCL)
+                VALUES (S_DO_ORARIO.nextval, ?, ?, ?, sysdate, ?, sysdate, ?)"/>
+
+<STATEMENT name="DeleteOrarioRichiestaAzienda"
+            query="DELETE FROM DO_ORARIO
+                          WHERE DO_ORARIO.PRGORARIO=?"/>
+
+<STATEMENT name="SelectComuneRichiesta"
+           query="
+
+	SELECT DO_COMUNE.PRGCOMUNE,
+    	DO_COMUNE.CODCOM,
+    	DO_COMUNE.PRGRICHIESTAAZ,
+    	DE_COMUNE.STRDENOMINAZIONE,
+    	DE_PROVINCIA.STRTARGA AS PROVINCIA,
+    	STRCOGNOME || ' ' || STRNOME || ' - ' || TO_CHAR(DO_COMUNE.DTMINS,'DD/MM/YYYY') AS STRINSERIMENTO,
+    	DO_COMUNE.FLGINVIOCL,
+    	DO_COMUNE.CDNUTINS,
+    	DO_COMUNE.CDNUTMOD,
+    	TO_CHAR(DO_COMUNE.DTMINS,'DD/MM/YYYY hh24:mi') DTMINS,
+    	TO_CHAR(DO_COMUNE.DTMMOD,'DD/MM/YYYY hh24:mi') DTMMOD
+    FROM DO_COMUNE JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = DO_COMUNE.CDNUTINS),
+    	DE_COMUNE, DE_PROVINCIA
+    WHERE DO_COMUNE.CODCOM=DE_COMUNE.CODCOM AND
+    	DE_PROVINCIA.CODPROVINCIA=DE_COMUNE.CODPROVINCIA AND
+    	DO_COMUNE.PRGRICHIESTAAZ=?
+      AND PRGCOMUNE = ?
+
+"/>
+
+<STATEMENT name="UpdateComuneRichiesta"
+            query="
+    
+	UPDATE DO_COMUNE
+		SET FLGINVIOCL = ?,
+		CDNUTMOD = ?,
+		DTMMOD = SYSDATE
+	WHERE PRGRICHIESTAAZ = ?
+	  AND PRGCOMUNE = ?
+	
+"/>
+
+<STATEMENT name="ListaComuniRichiesta"
+            query="SELECT DO_COMUNE.PRGCOMUNE,
+                          DO_COMUNE.CODCOM,
+                          DO_COMUNE.PRGRICHIESTAAZ,
+                          DE_COMUNE.STRDENOMINAZIONE,
+                          DE_PROVINCIA.STRTARGA AS PROVINCIA,
+                          STRCOGNOME || ' ' || STRNOME || ' - ' || TO_CHAR(DO_COMUNE.DTMINS,'DD/MM/YYYY') AS STRINSERIMENTO,
+                          decode (DO_COMUNE.FLGINVIOCL,'S','SI',NULL) FLGINVIOCL
+                          FROM DO_COMUNE JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = DO_COMUNE.CDNUTINS),
+                               DE_COMUNE, DE_PROVINCIA
+                          WHERE DO_COMUNE.CODCOM=DE_COMUNE.CODCOM AND
+                                DE_PROVINCIA.CODPROVINCIA=DE_COMUNE.CODPROVINCIA AND
+                                DO_COMUNE.PRGRICHIESTAAZ=?"/>
+
+<STATEMENT name="DeleteComuneRichiesta"
+            query="DELETE FROM DO_COMUNE
+                          WHERE DO_COMUNE.PRGCOMUNE=?"/>
+
+<STATEMENT name="ListaProvinceRichiesta"
+            query="SELECT DO_PROVINCIA.PRGPROVINCIA,
+                          DO_PROVINCIA.CODPROVINCIA,
+                          DO_PROVINCIA.PRGRICHIESTAAZ,
+                          DE_PROVINCIA.STRDENOMINAZIONE,
+                          STRCOGNOME || ' ' || STRNOME || ' - ' || TO_CHAR(DO_PROVINCIA.DTMINS,'DD/MM/YYYY') AS STRINSERIMENTO
+                          FROM DO_PROVINCIA JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = DO_PROVINCIA.CDNUTINS),
+                               DE_PROVINCIA
+                          WHERE DO_PROVINCIA.CODPROVINCIA=DE_PROVINCIA.CODPROVINCIA AND
+                                DO_PROVINCIA.PRGRICHIESTAAZ=?"/>
+
+<STATEMENT name="DeleteProvinciaRichiesta"
+            query="DELETE FROM DO_PROVINCIA
+                          WHERE DO_PROVINCIA.PRGPROVINCIA=?"/>
+
+<STATEMENT name="InsertProvinciaRichiesta"
+            query="INSERT INTO DO_PROVINCIA (
+                     PRGPROVINCIA, PRGRICHIESTAAZ, CODPROVINCIA, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)
+                VALUES (S_DO_PROVINCIA.nextval, ?, ?, ?, sysdate, ?, sysdate)"/>
+
+<STATEMENT name="InsertComuneRichiesta"
+            query="INSERT INTO DO_COMUNE (PRGCOMUNE, CODCOM, PRGRICHIESTAAZ, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD,FLGINVIOCL)
+                   VALUES (S_DO_COMUNE.nextval, ?, ?, ?, sysdate, ?, sysdate,?)"/>
+
+<STATEMENT name="SELECT_UNIQUE_ORARIO"
+            query="SELECT PRGORARIO
+                   FROM DO_ORARIO
+                   WHERE CODORARIO=?
+                   AND PRGRICHIESTAAZ=?"/>
+
+<STATEMENT name="SELECT_UNIQUE_LINGUA"
+            query="SELECT PRGLINGUA
+                   FROM DO_LINGUA
+                   WHERE CODLINGUA=?
+                   AND PRGRICHIESTAAZ=?
+                   AND PRGALTERNATIVA=?"/>
+
+<STATEMENT name="SELECT_UNIQUE_PROVINCIA"
+            query="SELECT PRGPROVINCIA
+                   FROM DO_PROVINCIA
+                   WHERE CODPROVINCIA=?
+                   AND PRGRICHIESTAAZ=?"/>
+
+<STATEMENT name="SELECT_UNIQUE_COMUNE"
+            query="SELECT PRGCOMUNE
+                   FROM DO_COMUNE
+                   WHERE CODCOM=?
+                   AND PRGRICHIESTAAZ=?"/>
+
+<STATEMENT name="ListaContrattiRichiesta"
+            query="SELECT DO_CONTRATTO.PRGCONTRATTO,
+                          DO_CONTRATTO.CODCONTRATTO,
+                          DE_CONTRATTO.STRDESCRIZIONE,
+                          STRCOGNOME || ' ' || STRNOME || ' - ' || TO_CHAR(DO_CONTRATTO.DTMINS,'DD/MM/YYYY') AS STRINSERIMENTO,
+                          decode (DO_CONTRATTO.FLGINVIOCL,'S','SI',NULL) FLGINVIOCL
+                  FROM DO_CONTRATTO JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = DO_CONTRATTO.CDNUTINS), 
+                  	   DE_CONTRATTO
+                  WHERE DO_CONTRATTO.CODCONTRATTO=DE_CONTRATTO.CODCONTRATTO AND
+                        DO_CONTRATTO.PRGRICHIESTAAZ=? AND DO_CONTRATTO.PRGALTERNATIVA=?"/>
+
+<STATEMENT name="InsertContrattiRichiesta"
+            query="INSERT INTO DO_CONTRATTO (
+                     PRGCONTRATTO, CODCONTRATTO, PRGRICHIESTAAZ, PRGALTERNATIVA, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD,FLGINVIOCL)
+                VALUES (S_DO_CONTRATTO.nextval, ?, ?, ?, ?, sysdate, ?, sysdate,?)"/>
+
+<STATEMENT name="SelectUniqueContratto"
+            query="SELECT PRGCONTRATTO
+                   FROM DO_CONTRATTO
+                   WHERE CODCONTRATTO=?
+                   AND PRGRICHIESTAAZ=?
+                   AND PRGALTERNATIVA=?"/>
+
+<STATEMENT name="DeleteContrattoRichiesta"
+            query="DELETE FROM DO_CONTRATTO
+                          WHERE DO_CONTRATTO.PRGCONTRATTO=?"/>
+
+<STATEMENT name="ListaAgevolazioni"
+           query="select CODAGEVOLAZIONE as CODICE,
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_AGEVOLAZIONE
+                  WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                        AND FLGRICHIESTA='S'
+                  order by STRDESCRIZIONE"/>
+
+<STATEMENT name="ListaAgevolazioniRichiesta"
+            query="SELECT DO_AGEVOLAZIONE.PRGAGEVOLAZIONE,
+                          DO_AGEVOLAZIONE.CODAGEVOLAZIONE,
+                          DO_AGEVOLAZIONE.FLGINDISPENSABILE,
+                          DE_AGEVOLAZIONE.STRDESCRIZIONE
+                          FROM DO_AGEVOLAZIONE,DE_AGEVOLAZIONE
+                          WHERE DO_AGEVOLAZIONE.CODAGEVOLAZIONE=DE_AGEVOLAZIONE.CODAGEVOLAZIONE AND
+                                DO_AGEVOLAZIONE.PRGRICHIESTAAZ=? AND DO_AGEVOLAZIONE.PRGALTERNATIVA=?"/>
+
+<STATEMENT name="InsertAgevolazioniRichiesta"
+            query="INSERT INTO DO_AGEVOLAZIONE (
+                     PRGAGEVOLAZIONE, CODAGEVOLAZIONE, PRGRICHIESTAAZ, PRGALTERNATIVA, FLGINDISPENSABILE, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)
+                VALUES (S_DO_AGEVOLAZIONE.nextval, ?, ?, ?, ?, ?, sysdate, ?, sysdate)"/>
+
+<STATEMENT name="SelectUniqueAgevolazione"
+            query="SELECT PRGAGEVOLAZIONE
+                   FROM DO_AGEVOLAZIONE
+                   WHERE CODAGEVOLAZIONE=?
+                   AND PRGRICHIESTAAZ=?
+                   AND PRGALTERNATIVA=?"/>
+
+<STATEMENT name="DeleteAgevolazioneRichiesta"
+            query="DELETE FROM DO_AGEVOLAZIONE
+                          WHERE DO_AGEVOLAZIONE.PRGAGEVOLAZIONE=?"/>
+
+<STATEMENT name="GetDettaglioAgevolazione"
+            query="SELECT DO_AGEVOLAZIONE.PRGAGEVOLAZIONE,
+                      DO_AGEVOLAZIONE.PRGRICHIESTAAZ,
+                      DO_AGEVOLAZIONE.PRGALTERNATIVA,
+                      DO_AGEVOLAZIONE.CODAGEVOLAZIONE,
+                      DO_AGEVOLAZIONE.FLGINDISPENSABILE,
+                      DO_AGEVOLAZIONE.CDNUTINS,
+                      TO_CHAR(DO_AGEVOLAZIONE.DTMINS, 'DD/MM/YYYY hh24:mi') as DTMINS,
+                      DO_AGEVOLAZIONE.CDNUTMOD,
+                      TO_CHAR(DO_AGEVOLAZIONE.DTMMOD, 'DD/MM/YYYY hh24:mi') as DTMMOD
+                    FROM DO_AGEVOLAZIONE
+                    WHERE DO_AGEVOLAZIONE.PRGAGEVOLAZIONE=?"/>
+
+<STATEMENT name="UpdateAgevolazioneRichiesta"
+            query="UPDATE DO_AGEVOLAZIONE
+                  SET CODAGEVOLAZIONE=?,
+                      FLGINDISPENSABILE=?, 
+                      CDNUTMOD=?,
+                      DTMMOD=sysdate
+                  WHERE PRGAGEVOLAZIONE=?"/>
+
+<STATEMENT name="ListaInfoRichiesta"
+            query="SELECT  do_info.prginfo, de_tipo_info.strdescrizione AS descrizionetipo,
+		         de_dett_info.strdescrizione || decode(mn_consc_inf.des_conoscenza,'', ' (Min: nessuna corrispondenza)',null,' (Min: nessuna corrispondenza)',' (Min: ' || mn_consc_inf.des_conoscenza || ')') AS descrizionedett,
+		         de_grado_info.strdescrizione || decode(mn_grado_consc_inf.des_gradoconosc,'', ' (Min: nessuna corrispondenza)',null, ' (Min: nessuna corrispondenza)',' (Min: ' || mn_grado_consc_inf.des_gradoconosc || ')') AS descrizionegrado,
+		         do_info.flgindispensabile
+		    FROM do_info INNER JOIN de_tipo_info ON (do_info.codtipoinfo = de_tipo_info.codtipoinfo)
+		         LEFT JOIN de_dett_info ON (do_info.coddettinfo = de_dett_info.coddettinfo)
+		         INNER JOIN de_grado_info ON (do_info.cdngrado = de_grado_info.cdngrado)
+				 LEFT JOIN ma_consc_inf ON (do_info.coddettinfo = ma_consc_inf.coddettinfo)
+				 LEFT JOIN mn_consc_inf ON (ma_consc_inf.cod_conoscenza = mn_consc_inf.cod_conoscenza) 
+				 LEFT JOIN ma_grado_consc_inf ON (do_info.cdngrado = ma_grado_consc_inf.cdngrado)
+				 LEFT JOIN mn_grado_consc_inf ON (ma_grado_consc_inf.cod_gradoconosc = mn_grado_consc_inf.cod_gradoconosc)
+		   WHERE do_info.prgrichiestaaz = ? AND do_info.prgalternativa = ?
+		ORDER BY descrizionetipo, descrizionedett"/>
+
+<STATEMENT name="DeleteInfoRichiesta"
+            query="DELETE FROM DO_INFO
+                          WHERE DO_INFO.PRGINFO=?"/>
+
+<STATEMENT name="InsertInfoRichiesta"
+            query="INSERT INTO DO_INFO (
+                     PRGINFO, PRGRICHIESTAAZ, PRGALTERNATIVA, CODTIPOINFO,CODDETTINFO,CDNGRADO,FLGINDISPENSABILE, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)
+                VALUES (S_DO_INFO.nextval, ?, ?, ?, ?, ?, ?, ?, sysdate, ?, sysdate)"/>
+
+<STATEMENT name="SelectUniqueInfo"
+            query="SELECT PRGINFO
+                   FROM DO_INFO
+                   WHERE CODTIPOINFO=?
+                   AND CODDETTINFO=?
+                   AND PRGRICHIESTAAZ=?
+                   AND PRGALTERNATIVA=?"/>
+
+<STATEMENT name="GetDettaglioInfoRichiesta"
+            query="SELECT DO_INFO.PRGINFO, 
+                      DE_TIPO_INFO.STRDESCRIZIONE,
+                      DO_INFO.PRGRICHIESTAAZ,
+                      DO_INFO.PRGALTERNATIVA,
+                      DO_INFO.CODTIPOINFO,
+                      DO_INFO.CODDETTINFO AS CODICE,
+                      DO_INFO.CDNGRADO,
+                      DO_INFO.FLGINDISPENSABILE,
+                      DO_INFO.CDNUTINS, TO_CHAR(DO_INFO.DTMINS, 'DD/MM/YYYY hh24:mi')AS DTMINS,
+                      DO_INFO.CDNUTMOD,TO_CHAR(DO_INFO.DTMMOD, 'DD/MM/YYYY hh24:mi')AS DTMMOD
+                    FROM DO_INFO
+                      INNER JOIN DE_TIPO_INFO ON (DO_INFO.CODTIPOINFO=DE_TIPO_INFO.CODTIPOINFO)
+                    WHERE DO_INFO.PRGINFO=?"/>
+
+<STATEMENT name="UpdateInfoRichiesta"
+            query="UPDATE DO_INFO
+                  SET CODTIPOINFO=?,
+                      CODDETTINFO=?, 
+                      CDNGRADO=?,
+                      FLGINDISPENSABILE=?,
+                      CDNUTMOD=?,
+                      DTMMOD=sysdate
+                  WHERE PRGINFO=?"/>
+
+<STATEMENT name="ListaCompetenzeRichiesta"
+            query="SELECT DO_COMPETENZA.PRGCOMPETENZA, 
+                      DE_COMPETENZA.STRDESCRIZIONE AS DESCRIZIONECOMPETENZA,
+                      DE_COMPETENZA.CODTIPOCOMPETENZA,
+                      DO_COMPETENZA.CODCOMPETENZA,
+                      DO_COMPETENZA.PRGRICHIESTAAZ,
+                      DO_COMPETENZA.PRGALTERNATIVA,
+                      DO_COMPETENZA.FLGINDISPENSABILE,
+                      DO_COMPETENZA.CDNUTINS,
+                      TO_CHAR(DO_COMPETENZA.DTMINS, 'DD/MM/YYYY') as DTMINS,
+                      DO_COMPETENZA.CDNUTMOD,
+                      TO_CHAR(DO_COMPETENZA.DTMMOD, 'DD/MM/YYYY') AS DTMMOD
+                    FROM DO_COMPETENZA
+                      INNER JOIN DE_COMPETENZA ON (DO_COMPETENZA.CODCOMPETENZA=DE_COMPETENZA.CODCOMPETENZA)
+                    WHERE DO_COMPETENZA.PRGRICHIESTAAZ=? AND DO_COMPETENZA.PRGALTERNATIVA=?"/>
+
+<STATEMENT name="InsertCompetenzaRichiesta"
+            query="INSERT INTO DO_COMPETENZA (
+                     PRGCOMPETENZA, CODCOMPETENZA, PRGRICHIESTAAZ, PRGALTERNATIVA, FLGINDISPENSABILE, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)
+                VALUES (S_DO_COMPETENZA.nextval, ?, ?, ?, ?, ?, sysdate, ?, sysdate)"/>
+
+<STATEMENT name="SelectUniqueCompetenza"
+            query="SELECT PRGCOMPETENZA
+                   FROM DO_COMPETENZA
+                   WHERE CODCOMPETENZA=?
+                   AND PRGRICHIESTAAZ=?
+                   AND PRGALTERNATIVA=?"/>
+
+<STATEMENT name="DeleteCompetenzaRichiesta"
+            query="DELETE FROM DO_COMPETENZA
+                          WHERE PRGCOMPETENZA = ?"/>
+
+<STATEMENT name="GetDettaglioCompetenza"
+            query="SELECT DO_COMPETENZA.PRGCOMPETENZA,
+                      DE_COMPETENZA.STRDESCRIZIONE AS DESCRIZIONECOMPETENZA,
+                      DO_COMPETENZA.PRGRICHIESTAAZ,
+                      DO_COMPETENZA.PRGALTERNATIVA,
+                      DE_TIPO_COMPETENZA.CODTIPOCOMPETENZA,
+                      DE_TIPO_COMPETENZA.STRDESCRIZIONE AS DESCRIZIONETIPOCOMPETENZA,
+                      DO_COMPETENZA.CODCOMPETENZA,
+                      DO_COMPETENZA.FLGINDISPENSABILE,
+                      DO_COMPETENZA.CDNUTINS,
+                      TO_CHAR(DO_COMPETENZA.DTMINS, 'DD/MM/YYYY hh24:mi') as DTMINS,
+                      DO_COMPETENZA.CDNUTMOD,
+                      TO_CHAR(DO_COMPETENZA.DTMMOD, 'DD/MM/YYYY hh24:mi') as DTMMOD
+                    FROM DE_COMPETENZA
+                      INNER JOIN DO_COMPETENZA ON (DE_COMPETENZA.CODCOMPETENZA=DO_COMPETENZA.CODCOMPETENZA)
+                      INNER JOIN DE_TIPO_COMPETENZA ON (DE_COMPETENZA.CODTIPOCOMPETENZA=DE_TIPO_COMPETENZA.CODTIPOCOMPETENZA)
+                    WHERE DO_COMPETENZA.PRGCOMPETENZA=?"/>
+
+<STATEMENT name="UpdateCompetenzaRichiesta"
+            query="UPDATE DO_COMPETENZA
+                  SET CODCOMPETENZA=?,
+                      FLGINDISPENSABILE=?,
+                      CDNUTMOD=?,
+                      DTMMOD=sysdate
+                  WHERE PRGCOMPETENZA=?"/>
+
+  <!-- Seleziona tutti i tipi di contratto, 
+       inserendo "(scaduto)" nella descrizione
+       dei record che alla data corrente sono scaduti. 
+       Il campo DESCRIZIONE e' fisso a 45 caratteri,
+       dopo i quali viene inserito "..." se supera
+       questo limite. -->
+  <STATEMENT name="SELECT_CONTRATTI_RICHIESTA" query="
+    SELECT
+      CODCONTRATTO AS CODICE,
+      DECODE( 
+        GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...'
+      ) || 
+      DECODE (
+        SYSDATE, 
+        GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+        ' (scaduto)',
+        LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+        ' (scaduto)', 
+        ''
+       ) AS DESCRIZIONE
+    FROM DE_CONTRATTO
+    WHERE FLGRIUCHIESTA = 'S'
+    ORDER BY STRDESCRIZIONE
+    "/>
+
+<STATEMENT
+        name="GET_IDO_ETAESPERIENZA_DETTAGLIO_SINTETICO"
+        query="select r.prgAzienda, r.prgUnita, a.prgRichiestaAz, a.prgAlternativa, a.strNote, 
+                      a.flgEsperienza, a.numAnniEsperienza, 
+                      a.flgFormazioneprof, a.numda, a.numa, 
+                      a.codMotEta, a.strMotiveta,
+                      a.cdnUtins, TO_CHAR(a.dtmIns, 'DD/MM/YYYY') as dtmIns, 
+                      a.cdnutMod, TO_CHAR(a.dtmMod, 'DD/MM/YYYY') as dtmMod 
+               from do_alternativa a
+               inner join do_richiesta_az r on r.prgRichiestaAz=a.prgRichiestaAz 
+               where a.prgRichiestaAz=? order by prgAlternativa"/>
+
+<STATEMENT name="ListaStudiRichiestaDettaglio"
+            query="SELECT
+                          DO.PRGSTUDIO AS PRGSTUDIO,
+                          DO.PRGALTERNATIVA,
+                          DE.STRDESCRIZIONE AS DESCTITOLO,
+                          DO.STRSPECIFICA AS SPECIFICA,
+                          DO.FLGCONSEGUITO AS CONSEGUITO,
+                          DO.FLGINDISPENSABILE AS INDISPENSABILE
+                   FROM
+                          DO_STUDIO DO,
+                          DE_TITOLO DE
+                  WHERE
+                          DO.CODTITOLO = DE.CODTITOLO AND
+                          DO.PRGRICHIESTAAZ = ? order by prgAlternativa"/>
+
+<STATEMENT name="ListaFormazioneProfDettaglio"
+            query="SELECT
+                          DO.PRGFORMPROF AS PRGSTUDIO,
+                          DO.PRGALTERNATIVA,
+                          DE.STRDESCRIZIONE,
+                          DO.FLGINDISPENSABILE AS INDISPENSABILE
+                   FROM
+                          DO_FORMAZIONE_PROF DO,
+                          DE_CORSO DE
+                  WHERE
+                          DO.CODCORSO = DE.CODCORSO AND
+                          DO.PRGRICHIESTAAZ = ? order by prgAlternativa"/>
+
+<STATEMENT name="ListaInfoRichiestaDettaglio"
+            query="SELECT DO_INFO.PRGINFO,
+					   	   DO_INFO.PRGALTERNATIVA,
+					   	   DE_TIPO_INFO.STRDESCRIZIONE AS DESCRIZIONETIPO,
+					   	   de_dett_info.strdescrizione || decode(mn_consc_inf.des_conoscenza,'',' (Min: nessuna corrispondenza)',null, ' (Min: nessuna corrispondenza)',' (Min: ' || mn_consc_inf.des_conoscenza || ')') AS DESCRIZIONEDETT,
+					   	   de_grado_info.strdescrizione || decode(mn_grado_consc_inf.des_gradoconosc,'',' (Min: nessuna corrispondenza)',null,' (Min: nessuna corrispondenza)',' (Min: ' || mn_grado_consc_inf.des_gradoconosc || ')') AS DESCRIZIONEGRADO,
+					   	   DO_INFO.FLGINDISPENSABILE
+					  FROM DO_INFO
+				INNER JOIN DE_TIPO_INFO ON (DO_INFO.CODTIPOINFO = DE_TIPO_INFO.CODTIPOINFO)
+				LEFT JOIN DE_DETT_INFO ON (DO_INFO.CODDETTINFO = DE_DETT_INFO.CODDETTINFO)
+				INNER JOIN DE_GRADO_INFO ON (DO_INFO.CDNGRADO = DE_GRADO_INFO.CDNGRADO)
+				LEFT JOIN ma_consc_inf ON (do_info.coddettinfo = ma_consc_inf.coddettinfo)
+				LEFT JOIN mn_consc_inf ON (ma_consc_inf.cod_conoscenza = mn_consc_inf.cod_conoscenza) 
+				LEFT JOIN ma_grado_consc_inf ON (do_info.cdngrado = ma_grado_consc_inf.cdngrado)
+				LEFT JOIN mn_grado_consc_inf ON (ma_grado_consc_inf.cod_gradoconosc = mn_grado_consc_inf.cod_gradoconosc)
+			    WHERE DO_INFO.PRGRICHIESTAAZ = ? 
+				order by PRGALTERNATIVA, DESCRIZIONETIPO, DESCRIZIONEDETT"/>
+
+<STATEMENT name="ListaCompetenzeRichiestaDettaglio"
+            query="SELECT DO_COMPETENZA.PRGCOMPETENZA,
+                      DO_COMPETENZA.PRGALTERNATIVA,
+                      DE_COMPETENZA.STRDESCRIZIONE AS DESCRIZIONECOMPETENZA,
+                      DE_COMPETENZA.CODTIPOCOMPETENZA,
+                      DO_COMPETENZA.CODCOMPETENZA,
+                      DO_COMPETENZA.PRGRICHIESTAAZ,
+                      DO_COMPETENZA.FLGINDISPENSABILE,
+                      DO_COMPETENZA.CDNUTINS,
+                      TO_CHAR(DO_COMPETENZA.DTMINS, 'DD/MM/YYYY') as DTMINS,
+                      DO_COMPETENZA.CDNUTMOD,
+                      TO_CHAR(DO_COMPETENZA.DTMMOD, 'DD/MM/YYYY') AS DTMMOD
+                    FROM DO_COMPETENZA
+                      INNER JOIN DE_COMPETENZA ON (DO_COMPETENZA.CODCOMPETENZA=DE_COMPETENZA.CODCOMPETENZA)
+                    WHERE DO_COMPETENZA.PRGRICHIESTAAZ = ? order by PRGALTERNATIVA"/>
+
+<STATEMENT name="ListaContrattiRichiestaDettaglio"
+            query="SELECT DO_CONTRATTO.PRGCONTRATTO,
+                          DO_CONTRATTO.PRGALTERNATIVA,
+                          DO_CONTRATTO.CODCONTRATTO,
+                          DE_CONTRATTO.STRDESCRIZIONE
+                          FROM DO_CONTRATTO,DE_CONTRATTO
+                          WHERE DO_CONTRATTO.CODCONTRATTO=DE_CONTRATTO.CODCONTRATTO AND
+                                DO_CONTRATTO.PRGRICHIESTAAZ=? order by PRGALTERNATIVA"/>
+
+<STATEMENT name="ListaAgevolazioniRichiestaDettaglio"
+            query="SELECT DO_AGEVOLAZIONE.PRGAGEVOLAZIONE,
+                          DO_AGEVOLAZIONE.PRGALTERNATIVA,
+                          DO_AGEVOLAZIONE.CODAGEVOLAZIONE,
+                          DO_AGEVOLAZIONE.FLGINDISPENSABILE,
+                          DE_AGEVOLAZIONE.STRDESCRIZIONE
+                          FROM DO_AGEVOLAZIONE,DE_AGEVOLAZIONE
+                          WHERE DO_AGEVOLAZIONE.CODAGEVOLAZIONE=DE_AGEVOLAZIONE.CODAGEVOLAZIONE AND
+                                DO_AGEVOLAZIONE.PRGRICHIESTAAZ=? order by PRGALTERNATIVA"/>
+
+<STATEMENT name="ListaTerritoriRichiestaDettaglio"
+            query="SELECT DO_COMUNE.PRGCOMUNE AS PROGRESSIVO,
+                          DO_COMUNE.CODCOM AS CODICE,
+                          DO_COMUNE.PRGRICHIESTAAZ,
+                          'C' AS TIPOTERR,
+                          DE_COMUNE.STRDENOMINAZIONE || ' (' || DE_PROVINCIA.STRTARGA || ')' AS DESCRIZIONETERRITORIO
+                          FROM DO_COMUNE,DE_COMUNE, DE_PROVINCIA
+                          WHERE DO_COMUNE.CODCOM=DE_COMUNE.CODCOM AND
+                                DE_PROVINCIA.CODPROVINCIA=DE_COMUNE.CODPROVINCIA AND
+                                DO_COMUNE.PRGRICHIESTAAZ = ?
+                    UNION
+                    SELECT DO_PROVINCIA.PRGPROVINCIA AS PROGRESSIVO,
+                           DO_PROVINCIA.CODPROVINCIA AS CODICE,
+                           DO_PROVINCIA.PRGRICHIESTAAZ,
+                           'P' AS TIPOTERR,
+                           DE_PROVINCIA.STRDENOMINAZIONE AS DESCRIZIONETERRITORIO
+                           FROM DO_PROVINCIA, DE_PROVINCIA
+                           WHERE DO_PROVINCIA.CODPROVINCIA=DE_PROVINCIA.CODPROVINCIA AND
+                                 DO_PROVINCIA.PRGRICHIESTAAZ = ?"/>
+
+<STATEMENT name="ListaLingueRichiestaDettaglio"
+            query="SELECT PRGLINGUA,
+                          PRGRICHIESTAAZ,
+                          PRGALTERNATIVA,
+                          STRDENOMINAZIONE,
+                          case   	   
+                  				    when mal.cod_conoscenza is not null
+                  				         then (DGL.STRDESCRIZIONE || ' (Min: ' || mnl.des_conoscenza|| ')')	     
+                  				    else DGL.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+                  				end as DescrizioneLetto ,
+                           case   	   
+                  				    when mas.cod_conoscenza is not null
+                  				         then (DGs.STRDESCRIZIONE || ' (Min: ' || mns.des_conoscenza|| ')')	     
+                  				    else DGs.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+                  				end as DescrizioneScritto ,
+                           case   	   
+                  				    when map.cod_conoscenza is not null
+                  				         then (DGP.STRDESCRIZIONE || ' (Min: ' || mnp.des_conoscenza|| ')')	     
+                  				    else DGP.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+                  				end as DescrizioneParlato ,                          
+                          DO_LINGUA.FLGINDISPENSABILE
+                          FROM DO_LINGUA,DE_LINGUA,DE_GRADO_LIN DGL, DE_GRADO_LIN DGS, DE_GRADO_LIN DGP,
+                          mn_grado_consc_lin mnl, ma_grado_consc_lin mal,
+                          mn_grado_consc_lin mns, ma_grado_consc_lin mas,
+                          mn_grado_consc_lin mnp, ma_grado_consc_lin map
+                          WHERE DO_LINGUA.CODLINGUA=DE_LINGUA.CODLINGUA AND
+                                DO_LINGUA.CDNGRADOLETTO=DGL.CDNGRADO(+) AND
+                                DO_LINGUA.CDNGRADOSCRITTO=DGS.CDNGRADO(+) AND
+                                DO_LINGUA.CDNGRADOPARLATO=DGP.CDNGRADO (+) AND
+                                mal.cod_conoscenza = mnl.cod_conoscenza (+) and
+                                DGL.CDNGRADO = mal.cdngrado (+) AND
+                                mas.cod_conoscenza = mns.cod_conoscenza (+) and
+                                DGs.CDNGRADO = mas.cdngrado (+) AND
+                                map.cod_conoscenza = mnp.cod_conoscenza (+) and
+                                DGp.CDNGRADO = map.cdngrado (+) AND
+                                DO_LINGUA.PRGRICHIESTAAZ=?"/>
+
+<STATEMENT
+        name="GET_TESTATA_RICHIESTA_SINTETICO"
+        query="SELECT
+				  /* CAMPI AGGIUNTI RISPETTO A GET_TESTATA_RICHIESTA: */
+					RIC.CODQUALIFICA,
+					RIC.STRCOGNOMERIFPUBB,
+					RIC.STRNOMERIFPUBB,
+					RIC.STRTELRIFPUBB,
+					RIC.STRFAXRIFPUBB,
+					RIC.STREMAILRIFPUBB,
+					RIC.STRDATIAZIENDAPUBB,
+					RIC.STRLUOGOLAVORO,
+					RIC.STRFORMAZIONEPUBB,
+					RIC.STRCONOSCENZEPUBB,
+					RIC.STRNOTEORARIOPUBB,
+					RIC.STRRIFCANDIDATURAPUBB,
+				  /* ---- */
+                  RIC.PRGRICHIESTAAZ,
+                  RIC.NUMANNO,
+                  RIC.NUMRICHIESTA, NVL(RIC.NUMRICHIESTAORIG, RIC.NUMRICHIESTA) NUMRICHIESTAVIS,
+                  RIC.NUMSTORICO,
+                  RIC.PRGAZIENDA,
+                  RIC.PRGUNITA,
+                  RIC.codCpi,
+                  TO_CHAR(DATRICHIESTA,'DD/MM/YYYY') DATRICHIESTA,
+                  RIC.FLGART16,
+                  RIC.FLGPUBBLICATA,
+                  TO_CHAR(DATPUBBLICAZIONE,'DD/MM/YYYY') DATPUBBLICAZIONE,
+                  TO_CHAR(DATSCADENZAPUBBLICAZIONE,'DD/MM/YYYY') DATSCADENZAPUBBLICAZIONE,
+                  TO_CHAR(DATSCADENZA,'DD/MM/YYYY') DATSCADENZA,
+                  RIC.STRMANSIONEPUBB,
+                  RIC.NUMPROFRICHIESTI,
+                  RIC.STRLOCALITA,
+                  RIC.PRGSPI,
+                  RIC.STRCOGNOMERIFERIMENTO,
+                  RIC.STRNOMERIFERIMENTO,
+                  RIC.STRTELRIFERIMENTO,
+                  RIC.STRFAXRIFERIMENTO,
+                  RIC.STREMAILRIFERIMENTO,
+                  RIC.FLGAUTOMUNITO,
+                  RIC.FLGMOTOMUNITO,
+                  RIC.FLGMILITE,
+                  RIC.CODTRASFERTA,
+                  RIC.FLGFUORISEDE,
+                  RIC.FLGVITTOALLOGGIO,
+                  RIC.FLGVITTO,
+                  RIC.FLGTURISMO,
+                  RIC.STRSESSO,
+                  RIC.CODMOTGENERE,
+                  RIC.STRMOTIVSESSO,
+                  RIC.CODAREA,
+                  RIC.TXTFIGURAPROFESSIONALE,
+                  RIC.TXTCARATTERISTFIGPROF,
+                  RIC.TXTCONDCONTRATTUALE,
+                  RIC.TXTNOTEOPERATORE,
+                  RIC.cdnUtins,
+                  TO_CHAR(RIC.DTMINS,'DD/MM/YYYY hh24:mi') DTMINS,
+                  RIC.cdnUtmod,
+                  TO_CHAR(RIC.DTMMOD,'DD/MM/YYYY hh24:mi') DTMMOD,                  
+                  RIC.NUMKLORICHIESTAAZ,
+                  DE_EVASIONE_RICH.FLGINCROCIO,
+                  DO_EVASIONE.CDNSTATORICH
+              FROM
+                  DO_RICHIESTA_AZ RIC
+                  LEFT OUTER JOIN DO_EVASIONE ON (RIC.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+                  LEFT OUTER JOIN DE_EVASIONE_RICH ON (DO_EVASIONE.CODEVASIONE=DE_EVASIONE_RICH.CODEVASIONE)
+              WHERE 
+                  RIC.PRGRICHIESTAAZ = ? "/>
+
+<STATEMENT
+        name="GET_DIFFUSIONE_RICH"
+        query="SELECT DE_EVASIONE_RICH.STRDESCRIZIONE, DO_EVASIONE.PRGRICHIESTAAZ 
+			   FROM   DE_EVASIONE_RICH DE_EVASIONE_RICH, DO_EVASIONE DO_EVASIONE
+ 			   WHERE  (DE_EVASIONE_RICH.CODEVASIONE=DO_EVASIONE.CODEVASIONE) AND DO_EVASIONE.PRGRICHIESTAAZ=?"/>
+ 			   
+<STATEMENT
+        name="GET_INFO_UNITA_AZIENDA"
+        query="SELECT CODATECO
+			   FROM AN_UNITA_AZIENDA
+ 			   WHERE PRGAZIENDA = ? AND PRGUNITA = ?"/>
+ 			   
+<STATEMENT name="VERIFICA_FLGCL_CONTRATTO"
+           query="select count(m.FLGINVIOCL) as contaFlag
+				  from DO_CONTRATTO m
+				  where m.prgRichiestaAz=? and m.prgAlternativa=1"/>
+				  
+<STATEMENT name="UPDATE_FLGCL_CONTRATTO"
+           query="update DO_CONTRATTO set 
+           				 FLGINVIOCL = NULL, 
+           				 cdnUtmod=?,  
+           				 dtmmod=SYSDATE 
+           		  where prgRichiestaAz=? and prgAlternativa=1"/>
+           		  
+<STATEMENT name="VERIFICA_FLGCL_COMUNE"
+           query="select count(m.FLGINVIOCL) as contaFlag
+				  from DO_COMUNE m
+				  where m.prgRichiestaAz=? "/>
+				  
+<STATEMENT name="UPDATE_FLGCL_COMUNE"
+           query="update DO_COMUNE set 
+           				 FLGINVIOCL = NULL, 
+           				 cdnUtmod=?,  
+           				 dtmmod=SYSDATE 
+           		  where prgRichiestaAz=? "/>
+
+<STATEMENT name="VERIFICA_FLGCL_ORARIO"
+           query="select count(m.FLGINVIOCL) as contaFlag
+				  from DO_ORARIO m
+				  where m.prgRichiestaAz=? "/>
+				  
+<STATEMENT name="UPDATE_FLGCL_ORARIO"
+           query="update DO_ORARIO set 
+           				 FLGINVIOCL = NULL, 
+           				 cdnUtmod=?,  
+           				 dtmmod=SYSDATE 
+           		  where prgRichiestaAz=? "/>           		  

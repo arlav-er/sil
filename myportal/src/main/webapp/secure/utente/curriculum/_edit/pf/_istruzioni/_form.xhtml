@@ -1,0 +1,198 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	xmlns:eng="http://java.sun.com/jsf/composite/components">
+
+	<div class="row">
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="titoliDiStudio:autocomplete" value="Titolo"
+					styleClass="col-sm-3 control-label">
+					<span class="ui-outputlabel-rfi">*</span>
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<eng:treeAutoComplete id="titoliDiStudio"
+						value="#{curriculumVitaePfBean.cvIstruzionePfSection.istruzioneAttiva.deTitolo}"
+						converter="deTitoloConverter" forceSelection="true" var="deTitolo"
+						itemLabel="#{deTitolo.descrizione}"
+						label="#{ui['instruzioni.titoloDiStudio']}"
+						itemValue="#{deTitolo}"
+						emptyMessage="#{ui['shared.emptyAutoComplete']}"
+						completeMethod="#{curriculumVitaePfBean.autoCompleteBean.completeTitolo}"
+						size="55" minQueryLength="2" styleClass="form-control"
+						cache="true" required="true" ajaxEvent="itemSelect"
+						treeValue="#{titoliSessionBean.deTitoloTreeNode}"
+						bean="#{curriculumVitaePfBean.cvIstruzionePfSection}"
+						treeSelectListener="titoliDiStudioNodeSelected"
+						requiredMessage="Il titolo di studio è obbligatorio">
+					</eng:treeAutoComplete>
+					<p:message id="titoliDiStudioMessage"
+						for="titoliDiStudio:autocomplete"></p:message>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="areaTitoloDiStudio" value="Area"
+					styleClass="col-sm-3 control-label">
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:selectOneMenu id="areaTitoloDiStudio"
+						value="#{curriculumVitaePfBean.cvIstruzionePfSection.istruzioneAttiva.deAreaTitolo}"
+						converter="deAreaTitoloConverter" filter="true"
+						filterMatchMode="contains" style="width: 100%;" required="true"
+						requiredMessage="L' area del titolo di studio è obbligatoria"
+						emptyMessage="Nessuna area selezionata"
+						panelStyleClass="compact-select-one-menu-panel">
+						<f:selectItem itemLabel="" itemValue="" />
+						<f:selectItems
+							value="#{decodificheBean.findGroupedTipoAreaTitoli()}"
+							var="deAreaTitolo" itemLabel="#{deAreaTitolo.descrizione}"
+							itemValue="#{deAreaTitolo}" />
+					</p:selectOneMenu>
+					<p:message for="areaTitoloDiStudio" />
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="descrizioneTitolo" value="Descrizione titolo"
+					styleClass="col-sm-3 control-label">
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:inputText id="descrizioneTitolo" maxlength="100" required="true"
+						requiredMessage="La descrizione del titolo e' obbligatoria"
+						value="#{curriculumVitaePfBean.cvIstruzionePfSection.istruzioneAttiva.specifica}"
+						styleClass="form-control">
+						<f:validateLength for="function" maximum="100" />
+					</p:inputText>
+					<p:message for="descrizioneTitolo" />
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="annoCoseguimento" value="Anno conseguimento"
+					styleClass="col-sm-3 control-label">
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:inputText id="annoCoseguimento" maxlength="4" size="4"
+						converterMessage="Anno non valido" styleClass="form-control"
+						requiredMessage="Anno di conseguimento e' obbligatorio se non in corso"
+						value="#{curriculumVitaePfBean.cvIstruzionePfSection.istruzioneAttiva.numAnno}"
+						required="#{!curriculumVitaePfBean.cvIstruzionePfSection.istruzioneAttiva.flgInCorso}"
+						disabled="#{curriculumVitaePfBean.cvIstruzionePfSection.istruzioneAttiva.flgInCorso}">
+						<f:validator validatorId="annoPassatoValidator" for="function" />
+						<f:validateLength for="function" maximum="4" />
+					</p:inputText>
+					<p:message for="annoCoseguimento" />
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="inCorso" value="In corso"
+					styleClass="col-sm-3 control-label">
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:selectBooleanCheckbox id="inCorso" styleClass="form-control"
+						value="#{curriculumVitaePfBean.cvIstruzionePfSection.istruzioneAttiva.flgInCorso}">
+						<p:ajax update="annoCoseguimento votazione" process="@this"
+							listener="#{curriculumVitaePfBean.cvIstruzionePfSection.cleanAnnoConseguimento}" />
+					</p:selectBooleanCheckbox>
+					<p:message for="inCorso" />
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="tematicheTrattate"
+					value="Principali tematiche trattate"
+					styleClass="col-sm-3 control-label">
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:inputTextarea id="tematicheTrattate" required="false"
+						styleClass="form-control compact-textarea" autoResize="false"
+						counter="tematicheTrattateCount"
+						counterTemplate="{0} caratteri rimanenti"
+						requiredMessage="Le tematiche trattate sono obbligatorie"
+						richTextMode="false" label="Principali Tematiche trattate"
+						maxlength="4000"
+						value="#{curriculumVitaePfBean.cvIstruzionePfSection.istruzioneAttiva.tematicheTrattate}">
+						<f:validateLength for="function" maximum="4000" />
+					</p:inputTextarea>
+					<p:message for="tematicheTrattate" />
+					<h:outputText id="tematicheTrattateCount" />
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="nomeIstituto" value="Istituto"
+					styleClass="col-sm-3 control-label">
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:inputText id="nomeIstituto" styleClass="form-control"
+						requiredMessage="Il nome dell'istituto e' obbligatorio"
+						label="Istituto" maxlength="255"
+						value="#{curriculumVitaePfBean.cvIstruzionePfSection.istruzioneAttiva.nomeIstituto}">
+						<f:validateLength for="function" maximum="255" />
+					</p:inputText>
+					<p:message for="nomeIstituto" />
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="votazione" value="Votazione"
+					styleClass="col-sm-3 control-label">
+				</p:outputLabel>
+				<div class="ccol-md-9 col-lg-9">
+					<p:inputText id="votazione" required="false" maxlength="20"
+						styleClass="form-control" size="20"
+						requiredMessage="La votazione e' obbligatoria" label="Votazione"
+						disabled="#{curriculumVitaePfBean.cvIstruzionePfSection.istruzioneAttiva.flgInCorso}"
+						value="#{curriculumVitaePfBean.cvIstruzionePfSection.istruzioneAttiva.votazione}">
+						<f:validateLength for="function" maximum="20" />
+					</p:inputText>
+					<p:message for="votazione" />
+				</div>
+			</div>
+		</div>
+
+		<div class="text-center">
+			<p:defaultCommand target="syncIstruzione"></p:defaultCommand>
+			<p:commandLink id="syncIstruzione"
+				actionListener="#{curriculumVitaePfBean.cvIstruzionePfSection.sync()}"
+				styleClass="btn btn-primary ui-button baby-btn uk-margin-top"
+				onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+				oncomplete="MyPortal.Curriculum.syncArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+				update="@(.ui-message)" process="@this, syncForm">
+				#{ui['shared.save']}
+			</p:commandLink>
+
+
+			<p:commandLink id="annulla"
+				styleClass="btn btn-primary ui-button baby-btn uk-margin-top uk-margin-left"
+				onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+				oncomplete="MyPortal.Curriculum.cancelArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+				process="@this">
+				Annulla
+				<p:ajax update="syncForm, :istruzioniForm:articles"
+					listener="#{curriculumVitaePfBean.cvIstruzionePfSection.cancelEditIstruzione()}"
+					resetValues="true" />
+			</p:commandLink>
+
+
+			<p:remoteCommand name="updateArticles"
+				update=":istruzioniForm:articles" process="@this"></p:remoteCommand>
+		</div>
+	</div>
+
+</ui:composition>

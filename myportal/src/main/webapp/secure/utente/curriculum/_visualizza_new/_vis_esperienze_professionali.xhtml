@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+<ui:fragment rendered="#{not empty visCvBean.cvVisualizzaDTO.listaCvEsperienzeProfessionaliDTO}">
+	<h3 class="esperienze_professionali_titolo headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+		<span class="esperienze_professionali_brake_titolo ui-icon ui-icon-triangle-1-e"></span>
+		<a href="#">Esperienze professionali</a>
+	</h3>
+	
+	<div class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+		<ui:repeat value="#{visCvBean.cvVisualizzaDTO.listaCvEsperienzeProfessionaliDTO}"
+			var="esperienza_professionale" varStatus="status">
+			<ui:fragment rendered="#{not status.first}">
+				<hr />
+			</ui:fragment>
+			<table>
+				<tr>
+					<td style="width: 25%"></td>
+					<td style="width: 25%"></td>
+					<td style="width: 25%"></td>
+					<td style="width: 25%"></td>
+				</tr>
+				<tr>
+					<ui:fragment rendered="#{not empty esperienza_professionale.da}">
+						<td>
+							<label>Dal</label><br />
+							<h:outputText value="#{esperienza_professionale.da}">
+								<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+							</h:outputText>
+						</td>
+					</ui:fragment>
+					<ui:fragment rendered="#{not empty esperienza_professionale.a or esperienza_professionale.inCorso}">
+						<td>
+							<label>Al</label><br />
+							<h:outputText value="In corso" rendered="#{esperienza_professionale.inCorso}" />
+							<h:outputText value="#{esperienza_professionale.a}" rendered="#{not esperienza_professionale.inCorso}">
+								<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+							</h:outputText>
+						</td>
+					</ui:fragment>
+					<ui:fragment rendered="#{not empty esperienza_professionale.deAreaSil}">
+						<td>
+							<label>Area</label><br />
+							#{esperienza_professionale.deAreaSil.descrizione}
+						</td>
+					</ui:fragment>
+				</tr>
+				<tr>
+					<ui:fragment rendered="#{not empty esperienza_professionale.deContratto.descrizione}">
+						<td>
+							<label>Tipologia di contratto</label><br />
+							#{esperienza_professionale.deContratto.descrizione}
+						</td>
+					</ui:fragment>
+					<ui:fragment rendered="#{not empty esperienza_professionale.deContratto.flagTirocini}">
+						<td>
+							<label>Esperienza lavorativa</label><br />
+							#{esperienza_professionale.deContratto.flagTirocini ? 'No' : 'Sì'}
+						</td>
+					</ui:fragment>
+					<ui:fragment rendered="#{not empty esperienza_professionale.attivitaResponsabilita}">
+						<td colspan="2">
+							<label>Attività</label><br />
+							#{esperienza_professionale.attivitaResponsabilita}
+						</td>
+					</ui:fragment>
+				</tr>
+				<tr>
+					<ui:fragment rendered="#{not empty esperienza_professionale.strMansione}">
+						<td colspan="2">
+							<label>Gruppo professionale</label><br />
+							#{esperienza_professionale.strMansione}
+							<div tabindex="#{status.index+100}" title="?"
+								onclick="resolveCod('#{esperienza_professionale.codMansione}',this);return false;"
+								onkeypress="if(event.keyCode==13) resolveCod('#{esperienza_professionale.codMansione}',this);"
+								class="buttonStyle mansioneInfo">?
+							</div>
+						</td>
+					</ui:fragment>
+					<ui:fragment rendered="#{not empty esperienza_professionale.qualificaSvolta.descrizione}">
+						<td colspan="2">
+							<label>Qualifica svolta</label><br />
+							#{esperienza_professionale.qualificaSvolta.descrizione}
+						</td>
+					</ui:fragment>
+				</tr>
+				<tr>
+					<ui:fragment rendered="#{not empty esperienza_professionale.datoreLavoro}">
+						<td>
+							<label>Datore di lavoro</label><br />
+							#{esperienza_professionale.datoreLavoro}
+						</td>
+					</ui:fragment>
+					<ui:fragment rendered="#{not empty esperienza_professionale.deComuneDatore.descrizione}">
+						<td>
+							<label>Comune datore di lavoro</label><br />
+							#{esperienza_professionale.deComuneDatore.descrizione}
+						</td>
+					</ui:fragment>
+					<ui:fragment rendered="#{not empty esperienza_professionale.strAteco}">
+						<td>
+							<label>Area</label><br />
+							#{esperienza_professionale.strAteco}
+						</td>
+					</ui:fragment>
+				</tr>
+			</table>
+		</ui:repeat>
+	</div>
+	<div id="mansioneInfoDialog" style="display: none;">
+		<div id="mansioneInfoContent" />
+	</div>
+	<script type="text/javascript">	
+		function closeResolverInfoDiv(){
+			$(resolvInfoDiv).hide();			
+		}
+		
+		function inizializeResolver(elem){
+			json_url="#{request.contextPath}/secure/rest/resolve/mansioneInfo";
+		}
+		
+		var isResolver2init=true;
+		function resolveCod(cod,elem) { 
+			try {
+				if(isResolver2init){
+					//inizializzo il componente
+					inizializeResolver(elem);
+					isResolver2init=false;
+					}
+			} catch(e) {
+				//console.log('error:'+e);
+				inizializeResolver(elem);
+				isResolver2init=false;
+			}
+			settings={
+				    my:        "right top",
+				    at:        "right bottom",
+				    of:        $(elem),
+				    offset:		"0 0",
+				    collision: "none none"
+				};
+			$('#mansioneInfoDialog').dialog('close');
+			$.getJSON(json_url, ({term: cod,}),
+					function(data, textStatus, jqXHR) {
+							$('#mansioneInfoDialog').dialog({
+								title: data.titolo,
+								close: function(event, ui){
+									$(elem).focus();
+								 }
+								 });
+							$('#mansioneInfoContent').text(data.descrizione);
+							$('#mansioneInfoDialog').dialog('open');
+						  });
+		}
+
+		$(function() {
+			disegnaBottoni();
+			$( "#mansioneInfoDialog" ).dialog({
+				autoOpen: false,
+				modal: true
+				});
+		});
+	</script>
+</ui:fragment>
+</ui:composition>

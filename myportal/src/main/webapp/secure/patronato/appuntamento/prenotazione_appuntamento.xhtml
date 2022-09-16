@@ -1,0 +1,366 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="../../template/main_primefaces.xhtml">
+
+	<ui:define name="title">
+		<h:outputText
+			value="#{txt['patronato.app.prenotazione_appuntamento.titolo']}"
+			escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputStylesheet library="css" name="#{sessionBean.cssStyle}/myportalPrimeFacesPatronato.css" />
+		<h:form id="disponibilitaAppuntamentoPatronatoForm">
+			<div class="container-div">
+				<div style="margin: 1.5em;">
+					<h:panelGroup layout="block"
+						rendered="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.succeded and (not empty prenotazioneAppuntamentoPatronatoBean.slotDisponibili or prenotazioneAppuntamentoPatronatoBean.firstAvailable)}">
+						<table style="border-spacing: 1.5em; width: 50%;">
+							<tr>
+								<td>
+									<p:outputLabel for="codiceFiscaleOut" value="Codice Fiscale" />
+									<br />
+									<h:outputText id="codiceFiscaleOut" size="16"
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.codiceFiscale}" />
+								</td>
+								<td>
+									<p:outputLabel for="cognomeOut" value="Cognome" />
+									<br />
+									<h:outputText id="cognomeOut"
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.cognome}" />
+								</td>
+								<td>
+									<p:outputLabel for="nomeOut" value="Nome" />
+									<br />
+									<h:outputText id="nomeOut" required="true"
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.nome}" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<p:outputLabel for="dataNascOut" value="Data di nascita" />
+									<br />
+									<h:outputText id="dataNascOut"
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.dataNascita}">
+										<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</td>
+								<td>
+									<p:outputLabel for="comuneNascOut"
+										value="Comune o Stato di nascita" />
+									<br />
+									<h:outputText id="comuneNascOut"
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.descComuneNascita}" />
+								</td>
+								<td>
+									<p:outputLabel for="sessoOut" value="Sesso" />
+									<br />
+									<h:outputText id="sessoOut"
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.sesso}" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<p:outputLabel for="comuneDomOut" value="Comune di domicilio" />
+									<br />
+									<h:outputText id="comuneDomOut"
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.descComuneDomicilio}" />
+								</td>
+								<td>
+									<p:outputLabel for="indirizzoDomOut"
+										value="Indirizzo di domicilio" />
+									<br />
+									<h:outputText id="indirizzoDomOut"
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.indirizzoDomicilio}" />
+								</td>
+								<td>
+									<p:outputLabel for="cellOut" value="Cellulare" />
+									<br />
+									<p:inputText id="cellOut" required="false" maxlength="16"
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.cell}" />
+									<br />
+									<p:message for="cellIn" display="text" />
+								</td>
+							</tr>
+						</table>
+					</h:panelGroup>
+
+					<h:panelGroup layout="block"
+						rendered="#{not prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.succeded and (not empty prenotazioneAppuntamentoPatronatoBean.slotDisponibili or prenotazioneAppuntamentoPatronatoBean.firstAvailable)}">
+						<table style="width: 55%; border-spacing: 1.5em;">
+							<tr>
+								<td class="width30">
+									<p:outputLabel for="codiceFiscaleIn" value="Codice Fiscale" />
+									<br />
+									<p:inputText id="codiceFiscaleIn" size="16" required="true"
+										maxlength="16"
+										requiredMessage="Il codice fiscale è obbligatorio."
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.codiceFiscale}">
+										<f:validator
+											validatorId="codiceFiscaleCorrispondenzaValidator" />
+										<f:attribute name="nome" value="#{nomeComponent}" />
+										<f:attribute name="cognome" value="#{cognomeComponent}" />
+										<f:attribute name="sesso" value="#{sessoComponent}" />
+									</p:inputText>
+									<br />
+									<p:message for="codiceFiscaleIn" display="text" />
+								</td>
+								<td class="width30">
+									<p:outputLabel for="cognomeIn" value="Cognome" />
+									<br />
+									<p:inputText id="cognomeIn" required="true"
+										binding="#{cognomeComponent}"
+										requiredMessage="Il cognome è obbligatorio."
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.cognome}" />
+									<br />
+									<p:message for="cognomeIn" display="text" />
+								</td>
+								<td class="width30">
+									<p:outputLabel for="nomeIn" value="Nome" />
+									<br />
+									<p:inputText id="nomeIn" required="true"
+										binding="#{nomeComponent}"
+										requiredMessage="Il nome è obbligatorio."
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.nome}" />
+									<br />
+									<p:message for="nomeIn" display="text" />
+								</td>
+							</tr>
+							<tr>
+								<td class="width30">
+									<p:outputLabel for="dataNascIn" value="Data di nascita" />
+									<br />
+									<p:calendar id="dataNascIn" showOn="button" size="12"
+										required="true"
+										requiredMessage="La data di nascita è obbligatoria."
+										converterMessage="La data deve essere nel formato gg/mm/aaaa"
+										showOtherMonths="false" pattern="dd/MM/yyyy" navigator="true"
+										yearRange="c-100:c" styleClass="yellow-datepicker"
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.dataNascita}" />
+									<br />
+									<p:message for="dataNascIn" display="text" />
+								</td>
+								<td class="width30">
+									<p:outputLabel for="comuneNascIn"
+										value="Comune o Stato di nascita" />
+									<br />
+									<p:autoComplete id="comuneNascIn"
+										value="#{prenotazioneAppuntamentoPatronatoBean.comuneNascita}"
+										converter="deComuneConverter" forceSelection="true"
+										var="comune" itemLabel="#{comune.strDenominazioneConTarga}"
+										itemValue="#{comune}"
+										emptyMessage="#{ui['shared.emptyAutoComplete']}"
+										completeMethod="#{autoCompleteBean.completeComune}"
+										minQueryLength="3" styleClass="form-control" />
+									<br />
+									<p:message for="comuneNascIn" display="text" />
+								</td>
+								<td class="width30">
+									<p:outputLabel for="sessoIn" value="Sesso" />
+									<br />
+									<p:selectOneMenu id="sessoIn" required="true"
+										binding="#{sessoComponent}"
+										requiredMessage="Il sesso è obbligatorio."
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.sesso}">
+										<f:selectItem itemValue="M" itemLabel="M" />
+										<f:selectItem itemValue="F" itemLabel="F" />
+									</p:selectOneMenu>
+									<br />
+									<p:message for="sessoIn" display="text" />
+								</td>
+							</tr>
+							<tr>
+								<td class="width30">
+									<p:outputLabel for="comuneDomIn" value="Comune di domicilio" />
+									<br />
+									<p:autoComplete id="comuneDomIn"
+										value="#{prenotazioneAppuntamentoPatronatoBean.comuneDomicilio}"
+										required="true"
+										requiredMessage="Il comune di domicilio è obbligatorio."
+										converter="deComuneConverter" forceSelection="true"
+										var="comune" itemLabel="#{comune.strDenominazioneConTarga}"
+										itemValue="#{comune}"
+										emptyMessage="#{ui['shared.emptyAutoComplete']}"
+										completeMethod="#{autoCompleteBean.completeComune}"
+										minQueryLength="3" styleClass="form-control" />
+									<br />
+									<p:message for="comuneDomIn" display="text" />
+								</td>
+								<td class="width30">
+									<p:outputLabel for="indirizzoDomIn"
+										value="Indirizzo di domicilio" />
+									<br />
+									<p:inputText id="indirizzoDomIn" required="true"
+										requiredMessage="L'indirizzo di domicilio è obbligatorio."
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.indirizzoDomicilio}" />
+									<br />
+									<p:message for="indirizzoDomIn" display="text" />
+								</td>
+								<td class="width30">
+									<p:outputLabel for="cellIn" value="Cellulare" />
+									<br />
+									<p:inputText id="cellIn" required="false" maxlength="16"
+										requiredMessage="Il numero di cellulare è obbligatorio."
+										value="#{prenotazioneAppuntamentoPatronatoBean.datiLavoratoreAppuntamentoDTO.cell}" />
+									<br />
+									<p:message for="cellIn" display="text" />
+								</td>
+							</tr>
+						</table>
+					</h:panelGroup>
+
+					<h:panelGroup layout="block" id="no_slot_div"
+						rendered="#{empty prenotazioneAppuntamentoPatronatoBean.slotDisponibili and not prenotazioneAppuntamentoPatronatoBean.firstAvailable}">
+						<h2>
+							<h:outputText
+								value="Siamo spiacenti ma non risultano disponibilità." />
+							<h:outputText
+								rendered="#{not empty prenotazioneAppuntamentoPatronatoBean.dataDal or not empty prenotazioneAppuntamentoPatronatoBean.dataAl or not empty prenotazioneAppuntamentoPatronatoBean.mattinaOPomeriggio or not empty prenotazioneAppuntamentoPatronatoBean.codSportelloDistaccato}"
+								value=" Puoi riprovare modificando i parametri impostati." />
+						</h2>
+					</h:panelGroup>
+					<h:panelGroup layout="block" id="slot_div"
+						rendered="#{not empty prenotazioneAppuntamentoPatronatoBean.slotDisponibili}">
+						<h:outputText
+							value="Di seguito gli appuntamenti disponibili del giorno " />
+						<h:outputText
+							value="#{prenotazioneAppuntamentoPatronatoBean.dataCorrentePerSlot}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+						<h:outputText
+							value=" per il CPI di #{prenotazioneAppuntamentoPatronatoBean.deCpiDTO.descrizione}." />
+						<br />
+
+						<h:outputText
+							value="Centro per l'impiego di #{prenotazioneAppuntamentoPatronatoBean.deCpiDTO.descrizione} - #{prenotazioneAppuntamentoPatronatoBean.deCpiDTO.indirizzo}." />
+						<br />
+
+						<h:outputText
+							value="Per prenotare un appuntamento, selezionare quello desiderato e premere il pulsante &quot;Prenota&quot;." />
+						<br />
+
+						<h:dataTable id="slot_list" styleClass="dataTable"
+							style="margin: 1.5em 0em;"
+							value="#{prenotazioneAppuntamentoPatronatoBean.slotDisponibili}"
+							columnClasses="notSortable, notSortable, notSortable, notSortable sixty, notSortable fifteen"
+							var="slot">
+							<h:column>
+								<h:selectOneRadio onclick="dataTableSelectOneRadio(this);">
+									<f:selectItem itemValue="#{slot.identificativoSlot}" />
+									<f:ajax
+										listener="#{prenotazioneAppuntamentoPatronatoBean.slotValuechange(slot.identificativoSlot)}" />
+								</h:selectOneRadio>
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="Data" />
+								</f:facet>
+
+								<h:outputText
+									value="#{prenotazioneAppuntamentoPatronatoBean.XMLGregorianCalendarToDate(slot.dataAppuntamento)}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</h:outputText>
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="Orario" />
+								</f:facet>
+
+								<h:outputText value="#{slot.oraAppuntamento}" />
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="Presso" />
+								</f:facet>
+
+								<h:outputText value="#{slot.ambiente}"
+									rendered="#{not empty slot.ambiente}" />
+								<h:outputText value="Centro per l'Impiego"
+									rendered="#{empty slot.ambiente}" />
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="Sigla Op." />
+								</f:facet>
+
+								<h:outputText value="#{slot.siglaOperatore}" />
+							</h:column>
+						</h:dataTable>
+					</h:panelGroup>
+
+					<p:commandButton
+						rendered="#{not empty prenotazioneAppuntamentoPatronatoBean.slotDisponibili and not prenotazioneAppuntamentoPatronatoBean.firstAvailable}"
+						id="prenotaButton" value="Prenota"
+						styleClass="commandButtonMargin" alt="Prenota"
+						action="#{prenotazioneAppuntamentoPatronatoBean.prenotaAppuntamento}"
+						title="Prenota" ajax="false">
+					</p:commandButton>
+					<p:commandButton
+						rendered="#{prenotazioneAppuntamentoPatronatoBean.firstAvailable}"
+						id="prenotaPrimoDispButton" styleClass="commandButtonMargin"
+						value="Prenota primo appuntamento disponibile"
+						alt="Prenota primo appuntamento disponibile"
+						action="#{prenotazioneAppuntamentoPatronatoBean.prenotaAppuntamento}"
+						title="Prenota primo appuntamento disponibile" ajax="false">
+					</p:commandButton>
+					<h:panelGroup id="nextDayPanel">
+						<p:commandButton
+							rendered="#{not empty prenotazioneAppuntamentoPatronatoBean.slotDisponibili and not prenotazioneAppuntamentoPatronatoBean.firstAvailable}"
+							id="giornoSuccessivoButton" styleClass="commandButtonMargin"
+							value="Cerca disponibilità nei giorni successivi"
+							alt="Cerca disponibilità nei giorni successivi"
+							action="#{prenotazioneAppuntamentoPatronatoBean.giornoSuccessivo}"
+							title="Cerca disponibilità nei giorni successivi"
+							update="slot_div nextDayPanel" process="@this">
+						</p:commandButton>
+					</h:panelGroup>
+					<br />
+
+					<p:commandButton id="nuovaRicercaStessoLavButton"
+						styleClass="commandButtonMargin"
+						value="Effettua nuova ricerca per stesso lavoratore"
+						alt="Effettua nuova ricerca per stesso lavoratore"
+						action="#{prenotazioneAppuntamentoPatronatoBean.nuovaRicercaStessoLavoratore}"
+						title="Effettua nuova ricerca per stesso lavoratore" ajax="false"
+						immediate="true">
+					</p:commandButton>
+					<p:commandButton id="nuovaRicercaNuovoLavButton"
+						styleClass="commandButtonMargin"
+						value="Effettua nuova ricerca per nuovo lavoratore"
+						alt="Effettua nuova ricerca per nuovo lavoratore"
+						action="#{prenotazioneAppuntamentoPatronatoBean.nuovaRicercaNuovoLavoratore}"
+						title="Effettua nuova ricerca per nuovo lavoratore" ajax="false"
+						immediate="true">
+					</p:commandButton>
+					<br />
+				</div>
+			</div>
+
+			<script>
+				//<![CDATA[
+				function dataTableSelectOneRadio(radio) {
+					var radioId = radio.name.substring(radio.name
+							.lastIndexOf(':'));
+
+					for (var i = 0; i < radio.form.elements.length; i++) {
+						var element = radio.form.elements[i];
+
+						if (element.name.substring(element.name
+								.lastIndexOf(':')) == radioId) {
+							element.checked = false;
+						}
+					}
+
+					radio.checked = true;
+				}
+				//]]>
+			</script>
+		</h:form>
+	</ui:define>
+</ui:composition>

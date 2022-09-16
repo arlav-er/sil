@@ -1,0 +1,260 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<style type="text/css">
+		.selectOneMenuLong { width: 80%; }
+	</style>
+	
+	<cc:messages id="contattiRicevutiMessages" />	
+
+	<h:form id="contattiRicevutiForm">		
+		<ui:fragment rendered="#{empty contattiRicevutiBean.list}">
+			<h3 class="nessun_elemento_trovato">Nessun messaggio presente</h3>
+		</ui:fragment>
+		
+		<ui:fragment rendered="#{not empty contattiRicevutiBean.list}">
+			<div style="display: none;">
+				<h:inputHidden id="pageValue" value="#{contattiRicevutiBean.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{contattiRicevutiBean.changePage}" value="DUMMY FOR PAGINATION">
+					<f:ajax execute=":contattiRicevutiForm:pageValue" 
+						render=":contattiRicevutiForm:tabella :contattiRicevutiDetailForm" />
+				</h:commandButton>
+			</div>
+			
+			<script type="text/javascript">				
+				$(jq("contattiRicevutiForm:paginationBar")).pagination({							    
+					pages: #{contattiRicevutiBean.paginationHandler.pages()},						       
+					cssStyle: 'light-theme',
+					prevText: 'Prec.',
+					nextText: 'Succ.',
+					onPageClick: function (pageNumber, event) {
+						document.getElementById("contattiRicevutiForm:pageValue").value = pageNumber;
+						document.getElementById("contattiRicevutiForm:pageCommand").click();
+						$(jq("contattiRicevutiDetailForm")).hide();
+						$(jq("contattiRicevutiForm:tabella")).hide();					            
+						$(jq("contattiRicevutiForm:paginationLoader")).show();
+					}
+				});
+			</script>
+			
+			<h:panelGroup layout="block" id="paginationBar" 
+				class="widget_container ui-tabs ui-widget-content ui-corner-all" />
+			<br />
+			
+			<cc:waiting id="paginationLoader" hidden="true" waitMessage="Caricamento..." />	
+			
+			<h:panelGroup layout="block" id="tabella" class="dataTables_wrapper">	
+				<table class="dataTable">
+					<tr>
+						<th class="ui-state-default"></th>
+						<th class="ui-state-default">Oggetto</th>
+						<th class="ui-state-default">Mittente</th>
+						<th class="ui-state-default">Ricevuto il:</th>
+						<th class="ui-state-default">Risposta inviata il:</th>
+					</tr>
+					
+					<ui:repeat value="#{contattiRicevutiBean.list}" var="messaggio" varStatus="status">
+						<tr>
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{contattiRicevutiBean.view}">
+									<h:panelGroup styleClass="ui-icon ui-icon-arrowreturnthick-1-w fix-icon"
+										rendered="#{messaggio.last != messaggio}" />
+									<span class="ui-icon #{messaggio.letto ? 'ui-icon-mail-open' 
+										: 'ui-icon-mail-closed'} fix_icon" />
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":contattiRicevutiForm:tabella :contattiRicevutiDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{contattiRicevutiBean.view}">
+									<h:outputText value="#{messaggio.oggetto} &nbsp;"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}" />
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":contattiRicevutiForm:tabella :contattiRicevutiDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{contattiRicevutiBean.view}">
+									<h:outputText value="#{messaggio.mittente} &nbsp;"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}" />
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":contattiRicevutiForm:tabella :contattiRicevutiDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{contattiRicevutiBean.view}">
+									<h:outputText value="#{empty messaggio.dtmIns ? '&nbsp;' : messaggio.dtmIns}"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":contattiRicevutiForm:tabella :contattiRicevutiDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{contattiRicevutiBean.view}">
+									<h:outputText value="#{empty messaggio.dtmRisposta ? '&nbsp;' : messaggio.dtmRisposta}"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":contattiRicevutiForm:tabella :contattiRicevutiDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+						</tr>
+					</ui:repeat>
+				</table>
+				<script type="text/javascript">
+					$(jq("contattiRicevutiForm:paginationLoader")).hide();
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+		</ui:fragment>
+	</h:form>
+	<br />
+	
+	<cc:waiting id="contattiRicevutiDetailLoader" hidden="true" waitMessage="Caricamento..." />
+	
+	<h:form id="contattiRicevutiDetailForm">
+		<h:panelGroup styleClass="insertPanel" layout="block"
+			rendered="#{contattiRicevutiBean.showPanel}">
+			<h:panelGrid columns="2" cellspacing="10">
+				<h:panelGroup />
+				
+				<h:panelGroup/>
+				
+				<cc:inputText value="#{contattiRicevutiBean.data.oggetto}" label="Oggetto"
+					required="true" editingMode="#{contattiRicevutiBean.editing}"
+					maxlength="250" />
+				
+				<cc:inputText type="date" value="#{contattiRicevutiBean.data.dtmIns}"
+					label="Data ricezione" editingMode="false" />
+				
+				<h:panelGroup />					
+			</h:panelGrid>
+			
+			<h:panelGrid columns="1">
+				<h:panelGroup layout="block" styleClass="messageDiv"
+					rendered="#{not contattiRicevutiBean.editing}">
+					<span class="boldText">Mittente </span>
+					<h:outputText styleClass="mittente"
+						value="#{contattiRicevutiBean.data.mittente}" />				
+					<br />
+					
+					<div class="corpo">
+						#{contattiRicevutiBean.data.corpo}
+					</div>
+					 
+					<div class="messageDiv">
+						<h:outputLink value="#{contattiRicevutiBean.linkRiferimentoMessaggio}" 
+							disabled="#{contattiRicevutiBean.data.idCvDatiPersonali == null}">
+							<f:param name="id" value="#{contattiRicevutiBean.data.idCvDatiPersonali}" />
+							<h:outputText value="#{contattiRicevutiBean.testoLinkRiferimentoMessaggio}" 
+								rendered="#{contattiRicevutiBean.data.idCvDatiPersonali != null}"/>
+							<h:outputText value="#{contattiRicevutiBean.testoCvNonPresente}" 
+								rendered="#{contattiRicevutiBean.data.idCvDatiPersonali == null}" />
+						</h:outputLink>
+					</div>
+				</h:panelGroup>
+					
+				<h:panelGroup id="rispostePanel" layout="block"
+					rendered="#{not contattiRicevutiBean.editing}">
+					<ui:repeat var="risposta" value="#{contattiRicevutiBean.data.risposte}">
+						<h:panelGrid columns="2" cellspacing="10">
+							<cc:selectFlagCheckbox value="#{risposta.esito}" editingMode="false"
+								label="Disponibilità del lavoratore ad un colloquio" />
+							<cc:inputText label="Data invio" 
+								editingMode="false" value="#{risposta.dtmIns}" 
+								styleClass="mittente" type="date" datePattern="dd/MM/yyyy" />
+						</h:panelGrid>
+						
+						<div class="messageDiv">
+							<h:outputText value="Risposta:" styleClass="mittente" />																
+							<br />
+							
+							<div class="corpo">
+								#{risposta.corpo}
+							</div>
+						</div>
+					</ui:repeat>
+				</h:panelGroup>
+				
+				<h:outputText 
+					rendered="#{not sessionBean.isProprietary(contattiRicevutiBean.data.last)}"
+					value="#{msg['contatto_utente.messaggio']}" />
+				
+				<cc:selectOneRadio label="Sei disponibile ad un colloquio?" rendered="#{not sessionBean.isProprietary(contattiRicevutiBean.data.last)}"  
+					value="#{contattiRicevutiBean.risposta.esito}" required="true" disableAjax="true">
+					<f:selectItem itemValue="true" itemLabel="Si"/>
+					<f:selectItem itemValue="false" itemLabel="No"/>
+				</cc:selectOneRadio>
+				
+				<cc:inputTextarea style="width:81%" id="risposta_corpo" required="true"
+					maxlength="1000" label="Risposta:" disableAjax="true"
+					rendered="#{not sessionBean.isProprietary(contattiRicevutiBean.data.last)}"
+					value="#{contattiRicevutiBean.risposta.corpo}" richTextMode="false" />
+			</h:panelGrid>
+
+			<div id="buttons">
+				<h:commandLink styleClass="marginButton commentButton"
+					action="#{contattiRicevutiBean.send}" value="Invia risposta"
+					rendered="#{not sessionBean.isProprietary(contattiRicevutiBean.data.last)}">
+					<f:ajax execute="@form" onevent="onRispondi"
+						render=":contattiRicevutiDetailForm :contattiRicevutiForm:tabella :contattiRicevutiMessages" />
+				</h:commandLink>
+			
+				<h:commandLink id="closeBtn" action="#{contattiRicevutiBean.dontedit}" 
+					value="Chiudi" immediate="true"
+					styleClass="marginButton closeButton #{contattiRicevutiBean.editing ? 'secondButton' : ''}">
+					<f:ajax execute="@this" render="@form" onevent="onHideDetail" />
+				</h:commandLink>
+			</div>
+		</h:panelGroup>
+		<script type="text/javascript">
+			disegnaBottoni();
+		</script>
+	</h:form>
+
+	<script type="text/javascript">
+	//<![CDATA[
+		function onHideDetail(data) {
+			if (data.status == 'begin') {
+				$(jq("contattiRicevutiDetailForm")).slideUp("slow");
+			}
+		}
+		
+		function onShowDetail(data) {
+			if (data.status == 'begin') {
+				$(jq("contattiRicevutiDetailForm")).hide();
+				$(jq("contattiRicevutiDetailLoader")).show();
+			} else if (data.status == 'success') {
+				$(jq("contattiRicevutiDetailLoader")).hide();
+				PrimeFaces.scrollTo("contattiRicevutiDetailForm");
+			}
+		}	
+		
+		function onRispondi(data) {
+			if (data.status == 'begin') {
+				$(jq("contattiRicevutiDetailForm")).slideUp("slow");
+				$(jq("contattiRicevutiRispondiLoader")).show();
+			} else if (data.status == 'success') {
+				$(jq("contattiRicevutiRispondiLoader")).hide();
+			}
+		}
+	//]]> 
+	</script>
+</ui:composition>

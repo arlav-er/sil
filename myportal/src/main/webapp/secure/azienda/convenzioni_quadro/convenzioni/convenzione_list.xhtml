@@ -1,0 +1,71 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core"
+	template="../../../template/main_primefaces.xhtml">
+	<f:metadata>
+		<f:event listener="#{fbConvenzioneListBean.secureMeEntePromotore()}" type="preRenderView" />
+	</f:metadata>
+	<ui:param name="pagetitle" value="Gestione delle convenzioni" />
+	
+	<ui:define name="content">
+		<p:growl></p:growl>
+		<h:outputScript library="commons" name="js/jquery.history.js" target="head"></h:outputScript>
+		<h:outputScript library="commons" name="js/timeago.js" target="head"></h:outputScript>
+
+		<div class="container-fluid animated fadeIn uk-margin-top">
+			<h:form id="convenzioneListForm">	
+				<p:dataTable id="confTable" var="convenzione" value="#{fbConvenzioneListBean.fbConvenzioneList}" 
+					emptyMessage="Nessuna Convenzione stipulata">
+					<f:facet name="header">
+	            		Lista Convenzioni
+	        		</f:facet>
+	
+					<p:column headerText="Convenzione" width="200">
+						<h:outputText value="#{convenzione.codTipoConvenzione.descrizione}" />
+					</p:column>
+					<p:column headerText="Data stipula" width="200">
+						<h:outputText value="#{convenzione.dataStipula}">
+							<f:convertDateTime pattern="dd-MM-yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Stato" width="200">
+						<h:outputText value="#{convenzione.codStatoConv.descrizione}" />
+					</p:column>
+					<p:column headerText="Azioni" width="200">
+						<p:button style="width:30px;height:20px" outcome="convenzione_edit" 
+							icon="ui-icon ui-icon-pencil fix_icon" title="#{convenzione.isInLavorazione() ? 'Modifica' : 'Apri'}">
+							<f:param name="idConvenzione" value="#{convenzione.id}"></f:param>
+						</p:button>
+						
+						<p:commandButton id="deleteButton" rendered="#{convenzione.isInLavorazione()}" style="width:30px;height:20px"
+							actionListener="#{fbConvenzioneListBean.setConvenzioneDaEliminare(convenzione)}" icon="ui-icon-trash" title="Elimina"
+							oncomplete="PF('eliminaConvDialogWV').show();">
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+				<br />
+	
+				<ui:fragment rendered="#{fbConvenzioneListBean.canCreateConvenzione()}">
+					<p:button value="Aderisci" title="Aderisci" outcome="convenzione_edit" styleClass="margin-1em" />
+				</ui:fragment>
+				<ui:fragment rendered="#{not fbConvenzioneListBean.canCreateConvenzione()}">
+					<h4>Hai già aderito a una convenzione per ogni tipo. Non puoi aderire a nuove convenzioni.</h4>
+				</ui:fragment>
+				
+				<p:button outcome="home" styleClass="margin-1em" title="Torna alla scrivania"
+		value="Torna alla scrivania" />
+			</h:form>
+		</div>
+
+		<p:dialog id="eliminaConvDialog" widgetVar="eliminaConvDialogWV" header="Elimina Adesione" modal="true" width="400">
+			<p>Confermi l'eliminazione di questa adesione alla convenzione?</p>
+			<div class="text-center">
+				<p:commandButton value="Conferma eliminazione" title="Conferma eliminazione"
+					update=":convenzioneListForm:confTable" actionListener="#{fbConvenzioneListBean.confirmEliminaConvenzione}" styleClass="margin-1em"
+					onclick="PF('eliminaConvDialogWV').hide();">
+				</p:commandButton>
+				<p:commandButton value="Annulla" title="Annulla" onclick="PF('eliminaConvDialogWV').hide();" />
+			</div>
+		</p:dialog>
+	</ui:define>
+</ui:composition>
+

@@ -1,0 +1,51 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/main_primefaces.xhtml">
+	
+	<ui:define name="content">
+		<ui:include src="_header.xhtml" />
+		<div class="widget_container">
+			<div class="ui-widget-content ui-widget ui-corner-all">
+				<div class="margin-2em">
+					<h:form id="dichiarazioneNeetForm">
+						<ui:include src="_searchParams.xhtml" />
+						
+						<div class="text-center margin-2em buttons-div">
+							<p:commandButton value="Cerca" update="searchResultsDataTable @(.ui-message)" ajax="true"
+								onstart="onSearchStart()" oncomplete="onSearchComplete()"
+								actionListener="#{ygRegioneDichiarazioneNeetBean.doSearch}" />
+							
+							<h:graphicImage styleClass="loader-image" 
+								value="/resources/images/ajax-loader.gif" />
+						</div>
+						
+						<ui:include src="_searchResults.xhtml" />
+					</h:form>
+				</div>
+			</div>
+			<div>
+				<p:button outcome="home" styleClass="margin-1em" title="Torna alla scrivania"
+					value="Torna alla scrivania" />
+			</div>
+		</div>
+		<script>
+			$('.ui-selectonebutton .ui-corner-left input').click();
+			
+			function onSearchStart() {
+				$('.results-table').hide();
+				$('.buttons-div .ui-button').hide();
+				$('.loader-image').show();
+			}
+			
+			function onSearchComplete() {
+				$('.results-table').show();
+				$('.buttons-div .ui-button').show();
+				$('.loader-image').hide();
+			}
+		</script>
+	</ui:define>
+</ui:composition>

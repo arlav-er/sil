@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+</h:head>
+
+<f:metadata>
+	<f:event listener="#{ygDettaglioStoricoAdesioneBean.checkViewPage()}"
+		type="preRenderView" />
+</f:metadata>
+
+<h:body>
+	<ui:composition template="../../template/main.xhtml">
+
+		<f:loadBundle basename="conf.const" var="const" />
+		<ui:define name="title">
+			<h:outputText value="Dettaglio adesione" />
+		</ui:define>
+		
+		<ui:define name="content">
+			<div class="widget_container ui-tabs ui-widget-content ui-corner-all">
+				<div class="ninety page-max-width">
+					<table>
+						<tr>
+							<td class="width20" style="vertical-align: top;">
+								<label class="labelbold">Tipo:</label><br />
+								#{ygDettaglioStoricoAdesioneBean.ygAdesioneDTO.codMonoProv == 'I' ? 'Da Portale' : 'Da Cooperazione'}
+							</td>
+							<td class="width20" style="vertical-align: top;">
+								<label class="labelbold">Cittadino:</label><br />
+								#{ygDettaglioStoricoAdesioneBean.ygAdesioneDTO.codiceFiscale}<br />
+								#{ygDettaglioStoricoAdesioneBean.ygAdesioneDTO.pfPrincipal.cognome}
+								#{ygDettaglioStoricoAdesioneBean.ygAdesioneDTO.pfPrincipal.nome}
+							</td>
+							<td class="width20" style="vertical-align: top;">
+								<label class="labelbold">Data adesione:</label><br />
+								<h:outputText value="#{ygDettaglioStoricoAdesioneBean.ygAdesioneDTO.dtAdesione}">
+									<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+								</h:outputText>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<label class="labelbold">Regione adesione:</label><br />
+								#{ygDettaglioStoricoAdesioneBean.ygAdesioneDTO.deRegioneRifNotifica.denominazione}
+							</td>
+							<td>
+								<label class="labelbold">Stato adesione (Min.):</label><br />
+								#{ygDettaglioStoricoAdesioneBean.ygAdesioneDTO.deStatoAdesioneMin.descrizione}
+							</td>
+							<td>
+								<label class="labelbold">Data stato adesione (Min.):</label><br />
+								<h:outputText value="#{ygDettaglioStoricoAdesioneBean.ygAdesioneDTO.dtStatoAdesioneMin}">
+									<f:convertDateTime type="datetime" pattern="dd/MM/yyyy HH:mm:ss" />
+								</h:outputText>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			
+			<h1>Storico stato adesioni</h1>
+			<div class="widget_container ui-tabs ui-widget-content ui-corner-all">
+				<ui:fragment rendered="#{empty ygDettaglioStoricoAdesioneBean.ygAdesioneStoriaList}">
+					<h4>Nessuno storico disponibile</h4>
+				</ui:fragment>
+				
+				<table class="striped-table">
+					<tr>
+						<th>Data Modifica</th>
+						<th>Cod. Stato Adesione</th>
+						<th>Stato Adesione</th>
+						<th>Data Stato Adesione</th>
+					</tr>
+					<ui:repeat value="#{ygDettaglioStoricoAdesioneBean.ygAdesioneStoriaList}" var="storia">
+						<tr>
+							<td>
+								<h:outputText value="#{storia.dtInizio}">
+									<f:convertDateTime type="date" pattern="dd/MM/yyyy HH:mm:ss" />
+								</h:outputText>
+							</td>
+							<td>
+								#{storia.deStatoAdesioneMinDTO.id}
+							</td>
+							<td>
+								#{storia.deStatoAdesioneMinDTO.descrizione}
+							</td>
+							<td>
+								<h:outputText value="#{storia.dtStatoAdesione}">
+									<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+								</h:outputText>
+							</td>
+						</tr>
+					</ui:repeat>
+				</table>
+			</div>
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

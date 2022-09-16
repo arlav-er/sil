@@ -1,0 +1,215 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components" template="../../template/main.xhtml">
+
+	<ui:define name="title">
+		<h:outputText value="#{msg['cittadino.servizi.did.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+		<style>
+			.did-messages {
+				list-style-type: none;
+				width: 50%;
+			}
+		</style>
+		
+		<div class="violet_panel"></div>
+		<h:panelGroup id="elencoStampeDidGroup" layout="block" 
+			styleClass="ui-widget-content ui-corner-all elencoStampeDid">
+				<h3>Elenco dichiarazioni effettuate precedentemente</h3>
+				<ul style="padding-left: 20px;">
+					<ui:repeat var="stampa" value="#{didBean.stampeDid}">
+						<li class="stampaDid">
+							<div class="disabled">
+								<a href="#" tabindex="0" class="toggleLink"
+									onclick="fetchStampa('#{request.contextPath}/secure/rest/services/get_stampa?stampa_id=#{stampa.id}');return false;">
+									Dichiarazione del
+									<h:outputText value="#{stampa.dtmIns}">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+								</a>
+								<span class="toggleLink">
+									Dichiarazione del
+									<h:outputText value="#{stampa.dtmIns}">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+								</span>
+							</div>
+						</li>
+					</ui:repeat>
+				</ul>
+		</h:panelGroup>
+		<h:panelGroup layout="block" styleClass="ui-widget-content ui-corner-all" 
+			style="margin-top: 1em;">
+			<h:form id="richiediDIDForm">
+				<h3>Richiedi una nuova DID</h3>
+				
+				<p>
+					<h:selectBooleanCheckbox value="#{didBean.rischioDisoccupazione}">
+						<f:ajax execute="@this" render="@this rischioDisoccupazioneGroup" />
+					</h:selectBooleanCheckbox> 
+					<em>Dichiaro di essere a rischio di disoccupazione</em>
+				</p>
+				
+				<h:panelGroup id="rischioDisoccupazioneGroup">
+					<cc:inputText id="dataLicenziamentoInput" erroreSotto="true"
+						rendered="#{didBean.rischioDisoccupazione}" value="#{didBean.dataLicenziamento}" 
+						label="Data licenziamento *" type="date">
+					</cc:inputText>
+					<h:message id="dataLicenziamentoMsg" for="dataLicenziamentoInput" 
+						styleClass="ui-state-error ui-corner-all" style="display:block; width: 25%;"/>
+						
+					<cc:inputText id="dataLetteraLicenziamentoInput" erroreSotto="true"
+						rendered="#{didBean.rischioDisoccupazione}" value="#{didBean.dataLetteraLicenziamento}" 
+						label="Data lettera licenziamento *" type="date">
+					</cc:inputText>
+					<h:message id="dataLetteraLicenziamentoMsg" for="dataLetteraLicenziamentoInput" 
+						styleClass="ui-state-error ui-corner-all" style="display:block; width: 25%;"/>
+				</h:panelGroup>
+				
+				<h:messages globalOnly="true" styleClass="ui-state-error ui-corner-all" 
+					style="list-style-type: none; width: 50%;"/>
+				<h:commandButton id="didOnlineBtn" value="DID Online" styleClass="buttonStyle"
+					actionListener="#{didBean.updateScript}">
+					<f:ajax render="@form" update="@form" />
+				</h:commandButton>
+				
+				<h:outputScript rendered="#{not empty didBean.script}">
+					#{didBean.script}
+				</h:outputScript>
+				<script type="text/javascript">
+					disegnaBottoni();
+				</script>
+			</h:form>
+		</h:panelGroup>
+
+
+		<div id="answer" class="answer">
+			<ui:fragment rendered="false">
+				<cc:waiting id="waitDidRer" hidden="true"
+					waitMessage="Stiamo elaborando la richiesta di Dichiarazione di immediata disponibilità..."></cc:waiting>
+			</ui:fragment>
+			<ui:fragment rendered="true">
+				<cc:waiting id="waitDid" hidden="true"
+					waitMessage="Stiamo stipulando la Dichiarazione di immediata disponibilità con il Centro per l'impiego di riferimento...."></cc:waiting>
+			</ui:fragment>
+			<div id="waitStampa" style="display: none; text-align: center;">
+				<h:graphicImage value="/resources/images/ajax-loader-blue.gif" alt="loading..." />
+				<div class="did-msg-content">
+					<b>Stampa in corso...</b>
+				</div>
+			</div>
+			<div class="sanatoria_ok" style="display: none">
+				<h:graphicImage value="/resources/images/check.gif" alt="ok" />
+				<div class="did-msg-content">
+					<b>Sanatoria avvenuta con successo.</b>
+				</div>
+			</div>
+			<div class="ok" style="display: none">
+				<h:graphicImage value="/resources/images/check.gif" alt="ok" />
+				<div class="did-msg-content">
+					<b>Dati recuperati con successo.</b>
+				</div>
+			</div>
+			<div class="warning" style="display: none">
+				<h:graphicImage value="/resources/images/icons/warning.gif" alt="warning" />
+				<div class="did-msg-content"></div>
+			</div>
+			<div class="error" style="display: none">
+				<h:graphicImage value="/resources/images/error.png" alt="error" />
+				<b>Impossibile elaborare la richiesta.</b>
+				<div class="did-msg-content">
+				</div>
+			</div>
+			<div class="didAttiva" style="display: none; text-align: center;">
+				<div class="did-msg-content">
+				</div>
+			</div>
+			<div class="errorStampa" style="display: none; text-align: center;">
+				<h:graphicImage value="/resources/images/error.png" alt="error" />
+				<div class="did-msg-content">
+					<b>Impossibile elaborare la richiesta.</b><br />
+					<b>Ti invitiamo a contattare il Centro per l'impiego di riferimento.</b>
+				</div>
+			</div>
+			<div class="sana_redditi" style="display: none">
+				<b>Ultimo rapporto di lavoro comunicato presente nel sistema</b>
+				<div class="shadow-box lastMovimentoBox"></div>
+				<br />
+				<b>Dettaglio delle comunicazioni</b>
+				<table class="shadow-box">
+					<tr>
+						<th>Data inizio</th>
+						<th>Data fine</th>
+						<th>Tipo comunicazione</th>
+						<th>Azienda</th>
+						<th>Retribuzione mensile (lorda)</th>
+						<th>Totale</th>
+					</tr>
+				</table>
+				<div style="text-align: center; margin-top: 10px; display: none;" class="okButton">
+					<a style="margin-top: 10px;" href="#" class="buttonStyle"
+						onclick="return checkAndSanaReddito(#{sessionBean.connectedUtente.id},#{const['regione.cod']}, #{didBean.provinciaServiziAmm}, '#{didBean.dataFineDisabilitazioneMsgApp}');">
+						Dichiara il reddito </a>
+				</div>
+				<div id="reddito_alto_panel" title="Attenzione" style="display: none;">
+					<p>I dati inseriti non potranno più essere modificati. In caso di errore dovrai recarti al Centro per l'impiego
+						per la correzione.</p>
+					<a href="#"
+						onclick="sanaReddito(#{sessionBean.connectedUtente.id},#{const['regione.cod']}, #{didBean.provinciaServiziAmm}, '#{didBean.dataFineDisabilitazioneMsgApp}');return false;"
+						class="buttonStyle">OK</a>
+					<a href="#" onclick="$('#reddito_alto_panel').dialog('close');return false;" class="buttonStyle">Fammi
+						controllare...</a>
+				</div>
+			</div>
+		</div>
+		
+		<div id="dialogBadgeOttenuto" class="modal_dialog" title="Complimenti!">
+			<div>
+				<h:graphicImage value="/resources/images/badge1.png" style="float: left; margin: 5px;"/>
+				<p style="margin-top: 1em;">Hai ottenuto il riconoscimento 'Stipula DID'!</p>
+				<br />
+			</div>
+			<a class="buttonStyle" href="#{sessionBean.getUrlMyAccount()}/secure/account/badges"
+				target="_blank" onclick="$('#dialogBadgeOttenuto').dialog('close');">Vai ai riconoscimenti</a>
+			<a class="buttonStyle" onclick="$('#dialogBadgeOttenuto').dialog('close');">Annulla</a>
+		</div>
+
+		<ui:fragment rendered="#{const['regione.cod'] != 8}">
+			<script type="text/javascript">
+		//<![CDATA[
+			$(function() {				
+				//if (#{didBean.canLoadService} && #{empty didBean.stampeDid}) {
+				//	setTimeout("fetchStipulaDid(#{sessionBean.connectedUtente.id},#{const['regione.cod']}, #{didBean.provinciaServiziAmm}, '#{didBean.dataFineDisabilitazioneMsgApp}')",2000);
+				//}
+			});
+			//]]>
+		</script>
+		</ui:fragment>
+		<script type="text/javascript">
+		//<![CDATA[
+			$(function() {				
+				attivaLinkStampa();
+			});
+			//]]>
+		</script>
+		<ui:fragment rendered="#{const['regione.cod'] == 8}">
+			<script type="text/javascript">
+					//<![CDATA[
+					$(function() {
+						$('.ok').hide();
+						$('.warning').hide();
+						$('.error').hide();
+						$('.didAttiva').hide();
+					    $('.errorStampa').hide();
+ 						$("#waitDid").hide();
+ 						$("#waitDidRer").hide();
+					});
+					//]]>
+			</script>
+		</ui:fragment>
+		<h:link class="backButtonStyle" value="Torna indietro" title="Torna alla pagina dei servizi"
+			outcome="/secure/utente/servizi/index.xhtml" />
+	</ui:define>
+</ui:composition>

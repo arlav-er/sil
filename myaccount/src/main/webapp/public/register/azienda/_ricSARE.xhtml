@@ -1,0 +1,116 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui">
+
+	<h:panelGroup layout="block" styleClass="well" rendered="#{registerAzienda.checkSezioneSareAbilitata()}">
+		<h4>
+			<p:selectBooleanCheckbox id="activeSARE" value="#{registerAzienda.aziendaInfo.pfPrincipal.flagAbilitatoSare}"
+				widgetVar="activeSAREWV">
+				<p:ajax event="change" process="@this" update="basicDomicilioSAREGroup richiestaAccessoSAREGroup privacy"></p:ajax>
+			</p:selectBooleanCheckbox>
+			#{ui['regAz.ricAccessoSARE']} <ui:fragment rendered="#{utils.isPat()}">
+		Se hai dubbi clicca <a
+							href="https://www.agenzialavoro.tn.it/Servizi-on-line/SARE-Sistema-Informatico-per-le-Comunicazioni-Obbligatorie">qui</a>
+					</ui:fragment>
+		</h4>
+	 
+	</h:panelGroup>
+	<!-- START panel-->
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h5>
+						#{registerAzienda.checkSezioneSareAbilitata()?ui['regAz.basicTitle']:ui['regCit.datiPersonali']}
+						<ui:fragment rendered="#{registerAzienda.checkSezioneSareAbilitata()}">
+							<small class="big">#{ui['regAz.basicSubtitle']}</small>
+						</ui:fragment>
+					</h5>
+				</div>
+				<div class="panel-body">
+					<ui:include src="ricSARE/_basic.xhtml" />
+				</div>
+			</div>
+		</div>
+		<h:panelGroup id="basicDomicilioSAREGroup">
+			<h:panelGroup rendered="#{registerAzienda.aziendaInfo.pfPrincipal.flagAbilitatoSare}">
+				<div class="col-sm-6">
+					<div class="panel panel-default">
+						<div class="panel-heading">#{ui['regAz.basicDomiciTitle']}</div>
+						<div class="panel-body">
+							<ui:include src="ricSARE/_basicDomicilio.xhtml"></ui:include>
+						</div>
+					</div>
+				</div>
+			</h:panelGroup>
+		</h:panelGroup>
+
+	</div>
+	<!-- END panel-->
+	<h:panelGroup id="richiestaAccessoSAREGroup">
+		<h:panelGroup rendered="#{registerAzienda.aziendaInfo.pfPrincipal.flagAbilitatoSare}">
+			<div class="row">
+				<div class="col-sm-6">
+					<!-- START panel-->
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h5>
+								#{ui['shared.accessoSARE']} <small class="big">#{ui['regAz.accessSARETip']}</small>
+							</h5>
+						</div>
+						<div class="panel-body">
+							<ui:include src="ricSARE/_provRifSARE.xhtml" />
+							<ui:include src="ricSARE/_refAziendaSARE.xhtml" />
+						</div>
+					</div>
+					<!-- END panel-->
+				</div>
+				<div class="col-sm-6">
+					<!-- START panel-->
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h5>#{ui['regAz.ulterioriDatiAziendali']}</h5>
+						</div>
+						<div class="panel-body">
+							<ui:include src="ricSARE/_ulterioriDatiAziendali.xhtml" />
+						</div>
+					</div>
+					<!-- END panel-->
+				</div>
+				<h:panelGroup id="extraSections">
+					<h:panelGroup rendered="#{registerAzienda.showAgenziaSomministrazioneSection}">
+						<div class="col-sm-6">
+							<!-- START panel-->
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h5>#{ui['regAz.datiAgenziaSom']}</h5>
+								</div>
+								<div class="panel-body">
+									<ui:include src="ricSARE/_agenziaSomministrazione.xhtml" />
+								</div>
+							</div>
+							<!-- END panel-->
+						</div>
+					</h:panelGroup>
+					<h:panelGroup rendered="#{registerAzienda.showDatiSoggettoAbilitatoSection}">
+						<div class="col-sm-6">
+							<!-- START panel-->
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h5>#{ui['regAz.datiSoggettoAbilitato']}</h5>
+								</div>
+								<div class="panel-body">
+									<ui:include src="ricSARE/_datiSoggettoAbilitato.xhtml" />
+								</div>
+							</div>
+							<!-- END panel-->
+						</div>
+					</h:panelGroup>
+
+				</h:panelGroup>
+
+			</div>
+		</h:panelGroup>
+	</h:panelGroup>
+
+</ui:composition>

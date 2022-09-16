@@ -1,0 +1,176 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+	<h:panelGroup id="candidaturePanel" layout="block">
+		<fieldset>
+			<legend>#{fbSchedaFormBean.isEnteAccreditato() ? 'Le mie candidature' : 'Candidature'}</legend>
+          <ui:fragment>
+            <label><b>Gestione Esiti</b></label>
+              <p style="margin-left:30px">Per poter gestire le candidature è necessario selezionare il candidato/candidati idoneo ove trovato o lasciare tutti in candidati non selezionati<br/> in caso di inidoneità degli stessi.
+                 In entrambi i casi è necessario motivare l’idoneità o la non idoneità dei candidati.
+              </p>
+            </ui:fragment>
+			<ui:fragment rendered="#{not fbSchedaFormBean.fbSchedaFabbisogno.isChiusa()}">			
+				<h3>Sono ancora disponibili
+					#{fbSchedaFormBean.slotCandidaturaDisponibili}/#{fbSchedaFormBean.maxSlotCandidatura} posizioni per candidature.</h3>
+			</ui:fragment>
+
+			<ui:fragment rendered="#{fbSchedaFormBean.fbSchedaFabbisogno.isChiusa()}">
+				<h3>
+					Le candidature per questa scheda sono state chiuse dal Soggetto Ospitante in data
+					<h:outputText value="#{fbSchedaFormBean.fbSchedaFabbisogno.dtChiusura}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</h3>
+				<ui:fragment rendered="#{not empty fbSchedaFormBean.fbSchedaFabbisogno.motivoChiusura}">
+					<p>
+						<b>Motivo della chiusura: </b>#{fbSchedaFormBean.fbSchedaFabbisogno.motivoChiusura}
+					</p>					
+				</ui:fragment>				
+			</ui:fragment>
+			 <ui:fragment rendered ="#{not empty fbSchedaFormBean.fbSchedaFabbisogno.noteEsito}">
+				   <p>
+				         <b>Esiti: </b> #{fbSchedaFormBean.fbSchedaFabbisogno.noteEsito}</p>
+				</ui:fragment>
+			<h:panelGroup id="candidateData">
+				<p:dataTable value="#{fbSchedaFormBean.candidatureVisibili}" var="candidatura" pagination="false"
+					emptyMessage="Nessuna candidatura inserita" id="candidateList">
+					<p:column headerText="Soggetto promotore">
+				#{candidatura.soggettoPromotore}
+			</p:column>
+					<p:column headerText="Nome e cognome">
+				#{candidatura.nome} #{candidatura.cognome}
+			</p:column>
+					<p:column headerText="Codice fiscale">
+				#{candidatura.codiceFiscale} 
+			</p:column>
+					<p:column headerText="Email">
+				#{candidatura.email}
+			</p:column>
+					<p:column headerText="Data inserimento">
+						<h:outputText value="#{candidatura.dtmIns}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Azioni">
+						<ui:fragment
+							rendered="#{fbSchedaFormBean.isInsCandidaturaMode() 
+					and not fbSchedaFormBean.fbSchedaFabbisogno.isChiusa() }">
+							<p:commandButton title="Elimina candidatura" process="@this"
+								
+								actionListener="#{fbSchedaFormBean.setEliminaCandidate(candidatura)}" icon="ui-icon-trash">
+								<ui:param name="eliminaCandidates" value="#{candidatura}" />
+							</p:commandButton>
+							</ui:fragment>
+							<ui:fragment rendered="#{fbSchedaFormBean.isInCandidaturaAllegatoMode(candidatura.id)}">												   						    							    
+							    <p:commandButton immediate="true" ajax="false" id="download" icon="ui-icon-arrowthickstop-1-s" 
+							    process="@this">
+					                 <p:fileDownload value="#{fbSchedaFormBean.downloadStampaCandidateAllegato(candidatura.id)}" />
+				               </p:commandButton>
+				               <p:tooltip for="download" value="Scarica allegato" />
+						</ui:fragment>								
+		      </p:column>
+		      <p:column headerText="Idoneo">
+		         <p:selectBooleanCheckbox disabled="#{not fbSchedaFormBean.isOspitante() or not fbSchedaFormBean.isOspitanteMode() }" value="#{candidatura.flagIdoneo}">
+		            
+		         </p:selectBooleanCheckbox> 
+		      </p:column>		     
+				</p:dataTable><br/>
+				<center>
+				 <p:commandButton rendered="#{fbSchedaFormBean.isOspitanteMode() and fbSchedaFormBean.candidatureVisibili.size() gt 0}" value="Salva"  onclick="PF('salvacandidaturaFlagWV').show();"/>
+				 </center>
+			</h:panelGroup>
+		</fieldset>
+
+		<ui:fragment
+			rendered="#{fbSchedaFormBean.isInsCandidaturaMode() and fbSchedaFormBean.slotCandidaturaDisponibili gt 0}">
+			<fieldset>
+				<legend>Inserisci nuova candidatura</legend>
+				<table style="width: 100%; margin-bottom: 40px">
+					<tr>
+						<td style="width: 25%;"><p:outputLabel for="candNomeInput" value="Nome" styleClass="block-label" /> <p:inputText
+								id="candNomeInput" value="#{fbSchedaFormBean.nuovaCandidatura.nome}" maxlength="100" required="true"
+								requiredMessage="Il nome è obbligatorio">
+								<p:ajax event="blur" update="candNomeInputMessage" />
+							</p:inputText> <p:message for="candNomeInput" id="candNomeInputMessage" /></td>
+						<td style="width: 25%;"><p:outputLabel for="candCognomeInput" value="Cognome" styleClass="block-label" /> <p:inputText
+								id="candCognomeInput" value="#{fbSchedaFormBean.nuovaCandidatura.cognome}" maxlength="100" required="true"
+								requiredMessage="Il cognome è obbligatorio">
+								<p:ajax event="blur" update="candCognomeInputMessage" />
+							</p:inputText> <p:message for="candCognomeInput" id="candCognomeInputMessage" /></td>
+						<td style="width: 25%;"><p:outputLabel for="candCfInput" value="Codice fiscale" styleClass="block-label" />
+							<p:inputText id="candCfInput" value="#{fbSchedaFormBean.nuovaCandidatura.codiceFiscale}" maxlength="16"
+								required="true" requiredMessage="Il codice fiscale è obbligatorio">
+								<p:ajax event="blur" update="candCfInputMessage" />
+								<f:validator validatorId="codiceFiscaleAziendaValidator" />
+							</p:inputText> <p:message for="candCfInput" id="candCfInputMessage" /></td>
+						<td style="width: 25%;"><p:outputLabel for="candEmailInput" value="Email" styleClass="block-label" /> <p:inputText
+								id="candEmailInput" value="#{fbSchedaFormBean.nuovaCandidatura.email}" maxlength="255" required="true"
+								requiredMessage="La mail è obbligatoria">
+								<p:ajax event="blur" update="candEmailInputMessage" />
+								<f:validator validatorId="emailValidator"></f:validator>
+							</p:inputText> <p:message for="candEmailInput" id="candEmailInputMessage" /></td>
+					</tr>
+				</table>
+				<h:panelGroup id="uploadAllegatoPanel">
+				   <ui:fragment rendered="#{empty fbSchedaFormBean.allegatoUpload}">
+							<p:fileUpload fileUploadListener="#{fbSchedaFormBean.uploadAllegatoFile}" id="candidaturaUploadElement"
+								 sizeLimit="5242880" fileLimit="1" multiple="false" widgetVar="fileUploadWidgetVar"
+								dragDropSupport="false"  mode="advanced" allowTypes="/(\.|\/)(pdf)$/" required="true" requiredMessage="L' allegato è obbligatorio"
+								invalidSizeMessage="La dimensione del file dev'essere inferiore a 5 MB." label="Scegli Allegato" auto="true" 
+								invalidFileMessage="Il file deve essere un PDF" update="uploadAllegatoPanel" uploadLabel="Carica" cancelLabel="Elimina"> 
+							</p:fileUpload>
+							<p:message id="messageAllegato" for="candidaturaUploadElement"/>
+						</ui:fragment>
+						
+						<ui:fragment  rendered="#{not empty fbSchedaFormBean.allegatoUpload}">
+					  <p>#{fbSchedaFormBean.allegatoFileName}</p>
+					  <p:messages id="messages" globalOnly="true"></p:messages>
+					</ui:fragment>
+					<ui:fragment rendered="#{empty fbSchedaFormBean.allegatoUpload}">						
+						<p:messages id="messagesError" globalOnly="true"></p:messages>
+					</ui:fragment>  <br/>
+				</h:panelGroup>							
+				<p:commandButton value="Inserisci nuova candidatura" styleClass="margin-1em"
+					actionListener="#{fbSchedaFormBean.inserisciCandidatura}" process="candidaturePanel" update="candidaturePanel uploadAllegatoPanel" />
+			   <p:commandButton value="Elimina Allegato" actionListener="#{fbSchedaFormBean.uploadFileReset}" update="uploadAllegatoPanel"  process="@this"/>
+			   
+			</fieldset>
+		</ui:fragment>
+		<ui:fragment rendered="#{not fbSchedaFormBean.isEnteAccreditatoAttivo() and sessionBean.isEntePromotoreCalabria()}">
+			<p:outputLabel value="Per poter inserire nuove candidature è necessario avere un'adesione ad una Convenzione" styleClass="block-label" />
+		</ui:fragment>
+
+
+		<p:dialog id="eliminaCandidateDialog" widgetVar="eliminaCandidateDialogWV" modal="true" width="400"
+			header="Elimina candidatura">
+			<br />
+			<center>
+				<p>Confermi l'eliminazione del tuo candidato?</p>
+			</center>
+			<div class="text-center" style="padding: 10px;">
+				<p:commandButton value="Conferma" title="Conferma" process="@this" update=":schedaFbForm:schedaFbTabView:candidaturePanel"
+					actionListener="#{fbSchedaFormBean.eliminaCandidatura}" styleClass="margin-1em"
+					onclick="PF('eliminaCandidateDialogWV').hide();">
+				</p:commandButton>
+				<p:commandButton value="Annulla" title="Annulla" onclick="PF('eliminaCandidateDialogWV').hide();" />
+			</div>
+		</p:dialog>
+		
+	
+
+	</h:panelGroup>
+	
+	<script>
+       PrimeFaces.widget.FileUpload.prototype.reset = function() {
+         return this.init(this.cfg);
+       }
+         /* function onSalvaCompletes(args) {
+				if (args.success) {
+					PF('salvacandidaturaFlagWV').hide();
+					PF('salvataggioIdoneoDialogWV').show();
+				}
+			} */
+
+</script>
+</ui:composition>

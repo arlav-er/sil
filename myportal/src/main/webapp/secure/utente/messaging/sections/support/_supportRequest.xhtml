@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+	
+	<h:form styleClass="form-horizontal" enctype="multipart/form-data">
+		<p:remoteCommand name="initRequestSupport" actionListener="#{utenteMessagingBean.initRequestSupport()}" autoRun="true" process="@this" update="cv lettera"></p:remoteCommand>
+		<div class="panel panel-default">
+			<div class="panel-heading">#{ui['messaging.newRequestTitle']}</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<p:outputLabel for="subject" value="#{ui['shared.subject']}" styleClass="col-md-2 control-label" />
+					<div class="col-md-6">
+						<p:inputText id="subject" value="#{utenteMessagingBean.message.oggetto}" required="true" maxlength="250"
+							label="#{ui['shared.subject']}" styleClass="form-control" requiredMessage="Campo obbligatorio">
+						</p:inputText>
+						<p:message id="subjectMessage" for="subject"></p:message>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<p:outputLabel for="cv" value="#{ui['shared.cv']}" styleClass="col-md-2 control-label" />
+					<div class="col-md-6">
+						<p:selectCheckboxMenu id="cv" converter="cvDatiPersonaliConverter" filter="true" filterMatchMode="startsWith"
+							styleClass="form-control">
+							<f:selectItems value="#{utenteMessagingBean.cvDatiPersonaliList}" itemLabel="#{cv.descrizione}" itemValue="#{cv}" var="cv" />
+						</p:selectCheckboxMenu>
+						<p:message id="cvMessage" for="cv"></p:message>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<p:outputLabel for="lettera" value="#{ui['messaging.letteraPresen']}" styleClass="col-md-2 control-label" />
+					<div class="col-md-6">
+						<p:selectCheckboxMenu id="lettera" converter="cvLetteraAccConverter" filter="true" filterMatchMode="startsWith"
+							styleClass="form-control">
+							<f:selectItems value="#{utenteMessagingBean.cvLetteraAccList}" itemLabel="#{lettera.nome}" itemValue="#{lettera}" var="lettera" />
+						</p:selectCheckboxMenu>
+						<p:message id="letteraMessage" for="lettera"></p:message>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<p:outputLabel for="richiesta" value="#{ui['messaging.richiesta']}" styleClass="col-md-2 control-label" />
+					<div class="col-md-6">
+						<p:inputTextarea id="richiesta" value="#{utenteMessagingBean.message.corpo}" counter="display" maxlength="3000"
+							counterTemplate="{0} Caratteri diponibili." styleClass="form-control" autoResize="true" required="true"
+							requiredMessage="Campo obbligatorio" />
+						<h:outputText id="display" />
+						<p:message id="richiestaMessage" for="richiesta"></p:message>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<p:outputLabel for="attachment" value="#{ui['messaging.upload']}" styleClass="col-md-2 control-label" />
+					<div class="col-md-1">
+						<div class="user-image-btn">
+							<span class="btn ui-button btn-primary btn-file"> <i class="fa fa-upload"></i>
+							</span>
+							<div style="display: none">
+								<p:fileUpload id="attachment" widgetVar="uploadFile" auto="true" multiple="false"
+									process="@this" fileUploadListener="#{utenteMessagingBean.handleFileUpload}" sizeLimit="#{ui['file.size']}"
+									invalidSizeMessage="#{ui['file.invalidSizeMessage']}" invalidFileMessage="#{ui['file.invalidFileMessage']}" messageTemplate=".">
+								</p:fileUpload>
+							</div>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+					<div class="col-md-4 col-md-offset-2">
+						<div id="uploadMessages"></div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="panel-footer">
+				<p class="text-center">
+					<p:remoteCommand name="sendRichiestaRC" actionListener="#{utenteMessagingBean.sendRichiesta(utenteMessagingBean.typeSupport)}" update="@form"></p:remoteCommand>
+					<p:commandLink id="inviaBtn" styleClass="btn ui-button btn-primary" onclick="sendRichiestaRC()"
+						oncomplete="sendRichiestaComplete(xhr, status, args)">
+						<i class="fa fa-paper-plane"></i> #{ui['shared.invia']}
+					</p:commandLink>
+				</p>
+			</div>
+		</div>
+	</h:form>
+</ui:composition>
+

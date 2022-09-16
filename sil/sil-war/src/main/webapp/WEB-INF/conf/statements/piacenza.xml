@@ -1,0 +1,47 @@
+<!-- ***************************************************************************
+	Gestione del report solo x piacenza: REGISTRO PROTOCOLLO GIORNALIERO
+	*************************************************************************** -->
+<STATEMENT name="ST_GetReportProtocolloGiornaliero"
+	query="SELECT am_documento.numprotocollo AS numprotocollo,
+       TO_CHAR (am_documento.datprotocollo,
+                'dd/MM/yyyy'
+               ) AS dataprotocollazione,
+       TO_CHAR (am_documento.datinizio, 'dd/MM/yyyy') AS dataatto,
+       DECODE (NVL (am_documento.cdnlavoratore, 0),
+               0, NULL,
+                  an_lavoratore.strcognome
+               || '-'
+               || an_lavoratore.strnome
+               || '-'
+               || an_lavoratore.strcodicefiscale
+              ) AS lavoratore,
+       DECODE (NVL (am_documento.prgazienda, 0),
+               0, NULL,
+                  an_azienda.strragionesociale
+               || '-'
+               || an_azienda.strcodicefiscale
+              ) AS azienda,
+       de_doc_tipo.strdescrizione AS tipodocumento,
+       DECODE (am_documento.codmonoio,
+               'I', 'DOCUMENTO DI INPUT',
+               'O', 'DOCUMENTO DI OUTPUT',
+               NULL
+              ) AS ingresso_uscita,
+       de_cpi.strdescrizione AS riferimento,
+       am_documento.strenterilascio AS enteacqril
+  FROM am_documento,
+       de_doc_tipo,
+       de_cpi,
+       an_lavoratore,
+       an_azienda,
+       an_unita_azienda
+ WHERE am_documento.codcpi = de_cpi.codcpi(+)
+   AND am_documento.cdnlavoratore = an_lavoratore.cdnlavoratore(+)
+   AND am_documento.prgazienda = an_azienda.prgazienda(+)
+   AND am_documento.prgunita = an_unita_azienda.prgunita(+)
+   AND am_documento.prgazienda = an_unita_azienda.prgazienda(+)
+   AND am_documento.codtipodocumento = de_doc_tipo.codtipodocumento
+   AND am_documento.codstatoatto = 'PR'
+   AND am_documento.numprotocollo IS NOT NULL
+   AND TRUNC (am_documento.datprotocollo) = TO_DATE (?, 'DD/MM/YYYY')
+ order by numprotocollo asc " />

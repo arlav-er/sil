@@ -1,0 +1,77 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+
+	<div class="col-md-6">
+		<legend> #{ui['tirocini.datiOfferta']} </legend>
+		<div class="form-group">
+			<p:outputLabel for="dataRichiesta" value="#{ui['tirocini.dataRichiesta']}" styleClass="col-md-3 control-label" />
+			<div class="col-md-9">
+				<p:calendar id="dataRichiesta" value="#{provTirociniBean.searchDoTirocini.dataRichiesta}" label="#{ui['tirocini.dataRichiesta']}"
+					navigator="true" pattern="#{ui['shared.dateFormat']}" converterMessage="#{ui['shared.dateNotValid']}" size="20"
+					styleClass="form-control" locale="it" validator="dateValidator" requiredMessage="Campo obbligatorio">
+					<f:convertDateTime type="date" pattern="#{ui['shared.dateFormat']}" />
+				</p:calendar>
+				<p:message id="dataRichiestaMessage" for="dataRichiesta"></p:message>
+			</div>
+		</div>
+		<legend> #{ui['tirocini.luogoDiLavoro']} </legend>
+		<div class="form-group">
+			<p:outputLabel value="#{ui['shared.comune']}" styleClass="col-md-3 control-label" for="comune" />
+			<div class="col-md-9">
+				<p:autoComplete id="comune" value="#{provTirociniBean.searchDoTirocini.deComune}" converter="deComuneConverter" forceSelection="true"
+					var="comune" itemLabel="#{comune.strDenominazioneConTarga}" itemValue="#{comune}" emptyMessage="#{ui['shared.emptyAutoComplete']}"
+					completeMethod="#{autoCompleteBean.completeComune}" minQueryLength="2" styleClass="form-control" />
+				<p:message id="comuneMessage" for="comune"></p:message>
+			</div>
+		</div>
+		<div class="form-group">
+			<p:outputLabel value="#{ui['shared.provincia']}" styleClass="col-md-3 control-label" for="provincia" />
+			<div class="col-md-9">
+				<p:autoComplete id="provincia" value="#{provTirociniBean.searchDoTirocini.deProvincia}" converter="deProvinciaConverter"
+					forceSelection="true" var="provincia" itemLabel="#{provincia.denominazione}" itemValue="#{provincia}"
+					emptyMessage="#{ui['shared.emptyAutoComplete']}" completeMethod="#{autoCompleteBean.completeProvincia}" minQueryLength="2"
+					styleClass="form-control" />
+				<p:message id="provinciaMessage" for="provincia"></p:message>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<legend> #{ui['tirocini.ambitoProf']} </legend>
+		<div class="form-group">
+			<p:outputLabel value="#{ui['tirocini.qualifSRQ']}" styleClass="col-md-3 control-label" for="qualifSRQ" />
+			<div class="col-md-9">
+				<p:autoComplete id="qualifSRQ" value="#{provTirociniBean.searchDoTirocini.deQualificaSrq}" forceSelection="true"
+					var="deQualificaSrq" itemLabel="#{deQualificaSrq.descrizione}" itemValue="#{deQualificaSrq}"
+					emptyMessage="#{ui['shared.emptyAutoComplete']}" converter="deQualificaSrqConverter"
+					completeMethod="#{autoCompleteBean.completeQualificaSrq}" styleClass="form-control" maxResults="10" 
+					groupBy="#{autoCompleteBean.completeQualificaSrqGroupBy(deQualificaSrq)}"/>
+				<p:message id="qualifSRQMessage" for="qualifSRQ"></p:message>
+			</div>
+		</div>
+		<div class="form-group">
+			<p:outputLabel value="#{ui['tirocini.grupProf']}" styleClass="col-md-3 control-label" for="grupProf" />
+			<div class="col-md-9">
+				<p:autoComplete id="grupProf" value="#{provTirociniBean.searchDoTirocini.deMansione}" forceSelection="true" var="mansione"
+					itemLabel="#{mansione.descrizione}" itemValue="#{mansione}" emptyMessage="#{ui['shared.emptyAutoComplete']}"
+					converter="deMansioneConverter" completeMethod="#{autoCompleteBean.completeMansione}" styleClass="form-control"
+					groupBy="#{autoCompleteBean.completeMansioneGroupBy(mansione)}">
+					<p:ajax event="itemSelect" update="qualifISTAT" process="@this"></p:ajax>
+				</p:autoComplete>
+				<p:message id="grupProfMessage" for="grupProf"></p:message>
+			</div>
+		</div>
+		<div class="form-group">
+			<p:outputLabel value="#{ui['tirocini.qualifISTAT']}" styleClass="col-md-3 control-label" for="qualifISTAT" />
+			<div class="col-md-9">
+				<p:selectOneMenu id="qualifISTAT" value="#{provTirociniBean.searchDoTirocini.deMansioneMin}" style="width: 100%"
+					styleClass="form-control" converter="deMansioneMinConverter" filter="true" filterMatchMode="contains">
+					<f:selectItem itemLabel="#{empty provTirociniBean.mansioneMinList?'Selezionare prima il Gruppo professionale':''}" itemValue="" />
+					<f:selectItems value="#{provTirociniBean.mansioneMinList}" var="mansioneMin" itemLabel="#{mansioneMin.descrizione}"
+						itemValue="#{mansioneMin}" />
+				</p:selectOneMenu>
+				<p:message id="qualifISTATMessage" for="qualifISTAT"></p:message>
+			</div>
+		</div>		
+	</div>
+
+</ui:composition>

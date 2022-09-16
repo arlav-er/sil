@@ -1,0 +1,311 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<h:form id="form_certificati">
+		<h:outputText value="Non vi sono richieste di certificati"
+			rendered="#{empty certificatiBean.list}" />
+		<h:dataTable id="elenco_ticket"
+			rendered="#{not empty certificatiBean.list}"
+			columnClasses="notSortable,customcenter,customcenter, customcenter"
+			value="#{certificatiBean.list}" var="element">
+
+			<h:column>
+				<h:commandLink id="view" immediate="true" class="myClass"
+					action="#{certificatiBean.view}">
+					<h:panelGroup styleClass="ui-icon ui-icon-arrowreturnthick-1-w fix-icon" rendered="#{sessionBean.isGroupProprietary(element.last)}"></h:panelGroup>
+					<span
+						class="ui-icon #{element.letto ? 'ui-icon-mail-open' : 'ui-icon-mail-closed'} fix_icon"></span>
+					<f:param name="id" value="#{element.id}" />
+					<f:ajax execute="@this" render="@form" onevent="viewCallback" />
+				</h:commandLink>
+			</h:column>
+
+			<h:column>
+				<f:facet name="header">
+							Mittente
+						</f:facet>
+				<h:outputText value="#{element.mittente}"
+					styleClass="#{element.letto ? '' : 'boldText'}"></h:outputText>
+			</h:column>
+			
+			<h:column>
+				<f:facet name="header">
+							Oggetto
+						</f:facet>
+				<h:outputText value="#{element.ticket} - #{element.oggetto}"
+					styleClass="#{element.letto ? '' : 'boldText'}"></h:outputText>
+			</h:column>
+			
+			<h:column>
+				<f:facet name="header">
+							Data
+						</f:facet>
+				<h:outputText value="#{element.dtmIns}"
+					styleClass="#{element.letto ? '' : 'boldText'}">
+					<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+				</h:outputText>
+			</h:column>
+		</h:dataTable>
+		<br />
+	
+		<h:panelGroup id="ticketPanel" styleClass="insertPanel" layout="block">
+			<h:panelGroup id="ticketInnerPanel" style="display:none"
+				layout="block" rendered="#{certificatiBean.showPanel}">
+				<h:panelGrid id="view_form" columns="2" cellspacing="10">
+				<p class="hiddenStructure">
+						<a id="contenutoMessaggio" href="#contenutoMessaggio"></a>
+					</p>
+					<cc:inputText value="#{certificatiBean.data.ticket}"
+						label="Ticket n°:" editingMode="false" />
+					<cc:inputText type="date" value="#{certificatiBean.data.dtmIns}"
+						label="Data invio" editingMode="false" />
+					<cc:inputText value="#{certificatiBean.data.oggetto}" label="Certificato richiesto"
+						editingMode="#{certificatiBean.editing}" />
+						<h:panelGroup rendered="#{not empty certificatiBean.data.allegati}">
+						<h:outputLabel value="Certificati allegati" /><br />
+						<ui:repeat var="allegato" value="#{certificatiBean.data.allegati}">
+							<b><a href="#{request.contextPath}/faces/secure/getAttachment?attachment_id=#{allegato.id}"  title="Scarica certificato">
+							#{(allegato.filename != null) ? allegato.filename : 'allegato.bin'}
+							</a></b>							
+						</ui:repeat>
+					</h:panelGroup>
+				</h:panelGrid>
+				<h:panelGrid id="list_risposte"  columns="1">
+					<h:panelGroup layout="block" styleClass="messageDiv"
+						rendered="#{not certificatiBean.editing}">
+						<h:outputText
+							value="Richiesta di #{certificatiBean.data.mittente} - inviata il "
+							styleClass="mittente" />
+						<h:outputText value="#{certificatiBean.data.dtmIns}"
+							styleClass="mittente">
+							<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+						</h:outputText>
+						<br />
+						<h:panelGroup layout="block" styleClass="corpo">
+							#{certificatiBean.data.corpo}
+							</h:panelGroup>
+					</h:panelGroup>
+					<h:panelGroup id="rispostePanel" layout="block"
+						rendered="#{not certificatiBean.editing}">
+						<ui:repeat var="risposta" value="#{certificatiBean.data.risposte}">
+							<h:panelGroup layout="block" styleClass="messageDiv">
+								<h:outputText
+									value="Risposta di #{risposta.mittente} - inviata il "
+									styleClass="mittente" />
+								<h:outputText value="#{risposta.dtmIns}" styleClass="mittente">
+									<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+								</h:outputText>
+								<br />
+								<h:panelGroup layout="block" styleClass="corpo">
+									#{risposta.corpo}
+								</h:panelGroup>
+							</h:panelGroup>
+						</ui:repeat>
+					</h:panelGroup>
+					<cc:inputTextarea style="width:81%"  maxlength="1000"
+						rendered="#{certificatiBean.editing}" label="Note aggiuntive alla richiesta:"
+						value="#{certificatiBean.data.corpo}" richTextMode="false" />
+					<h:panelGroup rendered="#{(not certificatiBean.editing) and (not sessionBean.isProprietary(certificatiBean.data.last))}">	
+					    <cc:inputTextarea style="width:81%" id="risposta_corpo" disableAjax="true"
+							label="Risposta:"  maxlength="1000"						 
+							value="#{certificatiBean.risposta.corpo}" richTextMode="false" />
+						<a href="#" id="attachment_dialog_opener" title="Allega un certificato" onclick="return openAttachmentDialog();">Allega un certificato</a>
+						<span id="attached_file_link" style="display:none;">
+							<a id="name" href="#"></a>
+							<a href="#" title="Delete" onclick="return deleteAttachment();">X</a>
+						</span>
+						<br/>
+						<h:inputHidden value="#{certificatiBean.allegato.tempFilename}" id="tmp_filename" />	
+						<h:inputHidden value="#{certificatiBean.allegato.filename}" id="original_filename" />
+				    </h:panelGroup>
+				</h:panelGrid>
+
+				<h:panelGroup id="buttons">
+					<h:commandLink styleClass="marginButton commentButton" 
+						action="#{certificatiBean.send}" value="Invia risposta"
+						rendered="#{(not certificatiBean.editing) and (not sessionBean.isProprietary(certificatiBean.data.last))}">
+						<f:ajax execute="@form" onevent="disegnaBottoni"
+							render=":form_certificati:view_form :form_certificati:list_risposte :form_certificati:buttons"></f:ajax>
+					</h:commandLink>
+					<h:commandLink styleClass="marginButton closeButton #{((not certificatiBean.editing) and (not sessionBean.isProprietary(certificatiBean.data.last))) ? 'secondButton' : ''}"
+						action="#{certificatiBean.dontedit}" value="Chiudi" immediate="true"
+						id="closeButton" onclick="return hidePanel();">
+						<f:ajax render="@form"></f:ajax>
+					</h:commandLink>					
+				</h:panelGroup>
+			</h:panelGroup>
+		</h:panelGroup>
+		<script type="text/javascript">
+		/* <![CDATA[ */
+			myFocusIn = function() {
+				$(this).parent().parent().addClass("ui-state-hover");
+			}
+
+			myFocusOut = function() {
+				$(this).parent().parent().removeClass("ui-state-hover");
+			}
+
+			$('.myClass').focusin(myFocusIn);
+			$('.myClass').focusout(myFocusOut);
+			var numeroNuove = 0;
+
+			function deleteAttachment() {
+				if (confirm('Vuoi togliere il certificato?')) {			    	
+			    	$('#attachment_dialog_opener').show();
+					$('#attached_file_link #name').html();
+					$('#attached_file_link #name').attr('href','#');
+			    	$('#attached_file_link').hide();
+			    	$('#fileupload').val('');
+				}
+			}
+
+			function openAttachmentDialog() {
+				$('#attachment_dialog').dialog('open');
+			}
+		
+			function hidePanel() {
+				//$('[id$=ticketPanel]').slideUp('slow');
+				return true;	//todo non permette l'effetto
+			}
+
+			function viewCallback(data) {
+				if (data.status == 'success') {
+					disegnaBottoni();
+					showPanel('ticketInnerPanel');
+					pollNotifications(#{sessionBean.principalId});
+					$('#contenutoMessaggio').focus();
+				}
+			}
+
+			function rispostaCallback(data) {
+				if (data.status == 'success') {
+					disegnaBottoni();
+					showPanel('ticketInnerPanel');					
+				}
+			}
+
+			var justClicked = false;
+			var drawornot = {};	//devo disegnare?	
+			function drawCallback(options) {
+				if (drawornot[options["_iDisplayStart"]]) return;	//se ho già disegnato non farlo più
+				drawornot[options["_iDisplayStart"]] = true
+				var righe = $(jq('form_certificati:elenco_ticket' + " tr"));
+				righe.css('cursor','pointer');
+				righe.click(function(e) {	
+					if (justClicked) {
+						justClicked = false;
+						e.preventDefault();
+						return;
+					}
+					justClicked = true;					
+					$('[id$=view]',this).click();
+					if ($('.ui-icon-mail-closed',this).length > 0) {
+						$('.boldText',this).removeClass('boldText');					
+						$('.ui-icon-mail-closed',this).switchClass('ui-icon-mail-closed','ui-icon-mail-open');				
+						numeroNuove--;
+						if (numeroNuove > 0)	
+							$('#certificati_link').html('Richieste certificati <b>('+numeroNuove+')</b>');
+						else
+							$('#certificati_link').html('Richieste certificati');
+					}
+					
+				});
+				
+				righe.mouseover(function() {					
+					$(this).addClass('ui-state-hover');
+				});
+
+				righe.mouseout(function() {
+					$(this).removeClass('ui-state-hover');
+				});
+			}
+
+			$(function() {			
+				generateDataTable(jq('form_certificati:elenco_ticket'),{'bPaginate' : true, 
+																		'bFilter' : true,
+																		'bStateSave': false, 
+																        'iDisplayStart': 0,
+																		'bInfo' : true, 
+																		'oLanguage': {
+																				'sInfo': 'Messaggi da _START_ a _END_ di _TOTAL_'
+																		 },
+																		 'aoColumns': [   null,
+																			              null,
+																			              null,
+																			              { 'sType': 'uk_date' }
+																			          ],
+																		 'fnDrawCallback': drawCallback
+			    });			
+				var nuoviLink = $('#certificati_link b').html();
+				if (nuoviLink)
+					numeroNuove = parseInt(nuoviLink.replace('(','').replace(')',''));		
+		    	disegnaBottoni();		    	
+			});	
+		/*]]>*/ 
+		</script>
+
+		<cc:messages />
+	</h:form>
+	
+	<div id="attachment_dialog" title="Seleziona un Certificato">
+		<form name="attachmentUpload" id="attachmentUpload"
+			enctype="multipart/form-data"
+			action="#{request.contextPath}/secure/rest/uploadFileService/uploadAttachment"
+			method="post">
+			<label for="fileupload" title="Allegato"> Allegato </label> 
+			<input type="file" accept="*/*" name="fileupload" id="fileupload" />
+			
+			<button class="buttonStyle" type="submit" id="attachmentUploadBtn">Carica</button>
+		</form>
+	</div>
+	
+	<script type="text/javascript">
+		var requestContextPath = "#{request.contextPath}";
+	
+		$(function() {
+			
+			$('#attachment_dialog').dialog({
+				autoOpen: false,
+				modal: true
+			});
+						
+			var options = { 					
+				success: showResponse,  				
+				dataType:  'json',         
+				error:	errorResponse		
+			};
+ 			$('#attachmentUpload').ajaxForm(options); 
+		});			
+
+		// post-submit callback 
+		function showResponse(responseJson, statusText, xhr, $form)  { 
+			if(responseJson.statusCode==200){
+				paramUrl=jQuery.param({'file_name':responseJson.file_name,'timestamp':new Date().getTime()});
+		    	$(jq('form_certificati:tmp_filename')).val(responseJson.file_name);
+		    	$(jq('form_certificati:original_filename')).val(responseJson.original_file_name);
+		    	$.jnotify("File allegato correttamente!");
+		    	$.jnotify($(jq('form_certificati:original_filename')).val());
+		    			    	
+		    	$('#attachment_dialog_opener').hide();
+				$('#attached_file_link #name').html(responseJson.original_file_name);
+				$('#attached_file_link #name').attr('href',requestContextPath+ '/secure/rest/uploadFileService/getTmpAttachment?file_name='+responseJson.file_name);
+		    	$('#attached_file_link').show();
+		    	
+			} else {
+				$.jnotify("Errore: " + responseJson.error_code,'error',true);
+			}
+		    $( "#attachment_dialog" ).dialog('close');
+		}
+
+		function errorResponse(jqXHR, textStatus, errorThrown) {						
+			$.jnotify("Errore durante il caricamento dell'allegato","error",true);
+			$("#attachment_dialog" ).dialog('close');			        		 
+		};					
+	</script>
+	
+</ui:composition>

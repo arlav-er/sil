@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<ui:param name="form_id" value="ricerca_nuovo" />
+
+	<h:form id="#{form_id}">
+		<h:panelGroup id="panel" layout="block">
+			<h:panelGrid columns="6"
+				columnClasses="ricercaCosa, ricercaCosaInput, ricercaDove, ricercaCosaInput">
+				<h:outputText value="Cosa" />
+				<h:panelGrid columns="2">
+					<cc:infoSectionPanel target_id="cosa_info"
+						message="#{bean.info.testo}"/>
+					<cc:inputText id="cosa" disableLabel="true" required="false"
+						value="#{bean.data.cosa}"
+						title="Inserisci il titolo o le parole chiave dell'offerta."
+						styleClass="inner-shadow ricercaCosaInputText" />
+				</h:panelGrid>
+				<h:outputText value="Dove" />
+				<cc:inputSuggestion id="dove" disableLabel="true" required="false"
+					valueCod="#{bean.data.codComune}" value="#{bean.data.dove}"
+					suggestionPath="comuniSolr"
+					styleClass="inner-shadow ricercaDoveInputText">
+				</cc:inputSuggestion>
+
+				<h:commandLink id="searchButton" value="Cerca"
+					title="Cerca" action="#{bean.startSearch}"
+					styleClass="button_found searchButton">
+					<!-- render va solo sulla lista -->
+					<f:ajax execute="@form" render=" @this :form_lista_offerte"
+						onevent="startSearchNuovo"></f:ajax>
+				</h:commandLink>
+			</h:panelGrid>
+		</h:panelGroup>
+
+
+
+		<h:outputScript target="body">
+			//<![CDATA[
+/*
+			 * TODO:
+			 * per rendere la ricerca libera (come avviene su altri siti):
+			 * - la suggestion non dovrebbe scrivere "nessun dato trovato" e colorare di rosso.
+			 * - la ricerca con filtro vuoto non dovrebbe essere fatta
+			 */
+			 
+			var cosaDefaultText = 'CHE LAVORO VUOI FARE?';
+			var doveDefaultText = 'DOVE VUOI LAVORARE?';
+				
+			$(function() {		
+				checkInputNuovo();
+
+				$( '[id$=cosa\\:inputText]' ).focus();
+				$( '[id$=cosa\\:inputText]' ).focus(function() {
+					enableSuggestion($( '[id$=cosa\\:group]' ), cosaDefaultText);
+				});
+				$( '[id$=dove\\:inputText]' ).focus(function() {
+					enableSuggestion($( '[id$=dove\\:group]' ), doveDefaultText);
+				});
+
+				$( "[id$=cosa\\:inputText]" ).blur(function() {
+					resetSuggestion($( "[id$=cosa\\:group]" ), cosaDefaultText);
+				});
+				$( "[id$=dove\\:inputText]" ).blur(function() {
+					resetSuggestion($( "[id$=dove\\:group]" ), doveDefaultText);
+				});
+			});
+
+			function resetSuggestion(suggestion, defaultText) {
+				if ($( '[id$=inputHidden]', suggestion ).val() == '' && $( '[id$=inputText]', suggestion ).val() == '')
+				{
+					$( '[id$=inputText]', suggestion ).addClass('greyText');
+					$( '[id$=inputText]', suggestion ).val(defaultText);
+					$( '[id$=inputHidden]', suggestion ).val('');
+				}
+			}
+			function cancelSuggestion(data) {
+				if (data.status == 'begin') {
+					$(jq('form_lista_offerte:tabella_vacancy')).hide();
+				}
+				if (data.status == 'success') {
+					startSearchNuovo(data);
+					//console.log('hide');
+					$(jq('form_lista_offerte:tabella_vacancy')).hide();
+				}
+			}
+
+			function enableSuggestion(suggestion, defaultText) {
+				if ($( '[id$=inputText]', suggestion ).val() == defaultText)
+				{
+					$( '[id$=inputText]', suggestion ).removeClass('greyText');
+					$( '[id$=inputText]', suggestion ).val('');
+				}
+			}
+
+			function startSearchNuovo(data) {
+				if (data.status == 'begin') {
+					$(jq("mapStartPlace")).css('overflow', 'hidden');
+					$(jq("mapStartPlace")).css('height', '0px');
+					$( '[id$=lista_offerte]' ).css('display', 'none');
+					$( '[id$=loader_lista_offerte]' ).css('display', '');
+					$(jq("#{form_id}:emptyTable")).css('display', 'inline');
+					spostaMappa()
+					checkInput()
+				}
+				if (data.status == 'success') {
+					//console.log('start search nuovo');
+					$( '[id$=lista_offerte]' ).css('display', '');
+					$( '[id$=loader_lista_offerte]' ).css('display', 'none');
+					if(showMap){
+						mostraMappa()
+					}
+				}
+			}
+			
+			function checkInput(data) {
+				if ($( "[id$=cosa\\:inputText]" ).val() == "") {
+					$( "[id$=cosa\\:inputHidden]" ).val("");
+				}
+				if ($( "[id$=dove\\:inputText]" ).val() == "") {
+					$( "[id$=dove\\:inputHidden]" ).val("");
+				}
+				return true;
+			};
+
+			function checkInputNuovo() {
+				resetSuggestion($( "[id$=cosa\\:group]" ), cosaDefaultText)
+				resetSuggestion($( "[id$=dove\\:group]" ), doveDefaultText)
+				
+				return true;
+			};
+			//]]>
+		</h:outputScript>
+
+		<div id="cosa_info" class="helpPanelMessage" />
+	</h:form>
+
+</ui:composition>

@@ -1,0 +1,206 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<!--  Attributi da definire nell'interfaccia -->
+	<composite:interface>
+		<composite:attribute name="data" />
+		<composite:attribute name="old" />
+		<composite:attribute name="new" />
+		<composite:attribute name="bean" />
+		<composite:attribute name="editing" />
+		<composite:attribute name="required" />
+	</composite:interface>
+
+	<composite:implementation>
+
+		<h:panelGroup>
+			<fieldset>
+				<legend>Dati azienda</legend>
+				<h:panelGrid columns="2" columnClasses="width50">
+					<cc:inputText id="ragioneSociale" editingMode="#{cc.attrs.editing}"
+						label="Ragione sociale" subLabel="#{cc.attrs.old.ragioneSociale}"
+						disableSubLabel="#{disableSubLabel}"
+						value="#{cc.attrs.data.ragioneSociale}"
+						underLabel="#{cc.attrs.new.ragioneSociale}"
+						disableUnderLabel="#{disableUnderLabel}"
+						required="#{cc.attrs.required}"
+						requiredMessage="Inserire la Ragione sociale">
+					</cc:inputText>
+					<cc:inputText id="codice_fiscale" editingMode="false"
+						required="#{cc.attrs.required}" label="Codice fiscale"
+						maxlength="16" subLabel="#{cc.attrs.old.codiceFiscale}"
+						value="#{cc.attrs.data.codiceFiscale}"
+						underLabel="#{cc.attrs.new.codiceFiscale}">
+						<f:validator validatorId="codiceFiscaleAziendaValidator"
+							for="function" />
+					</cc:inputText>
+				</h:panelGrid>
+				<h:panelGrid columns="1" columnClasses="width50">
+					<cc:inputText value="#{cc.attrs.data.sedeOperativa.indirizzo}"
+						editingMode="#{cc.attrs.editing}"
+						subLabel="#{cc.attrs.old.sedeOperativa.indirizzo}"
+						underLabel="#{cc.attrs.new.sedeOperativa.indirizzo}"
+						required="#{cc.attrs.required}" maxlength="80" label="Indirizzo"
+						size="80" />
+				</h:panelGrid>
+				<h:panelGrid columns="2" columnClasses="width50">
+					<cc:inputText value="#{cc.attrs.data.sedeOperativa.cap}"
+						subLabel="#{cc.attrs.old.sedeOperativa.cap}"
+						underLabel="#{cc.attrs.new.sedeOperativa.cap}"
+						editingMode="#{cc.attrs.editing}" required="#{cc.attrs.required}"
+						maxlength="5" label="CAP" size="10">
+						<f:validator validatorId="capValidator" for="function" />
+					</cc:inputText>
+					<cc:inputSuggestion id="comune_sede_operativa"
+						required="#{cc.attrs.required}" size="55" label="Comune"
+						editingMode="#{cc.attrs.editing}"
+						subLabel="#{cc.attrs.old.sedeOperativa.comune.descrizione}"
+						valueCod="#{cc.attrs.data.sedeOperativa.comune.id}"
+						value="#{cc.attrs.data.sedeOperativa.comune.descrizione}"
+						underLabel="#{cc.attrs.new.sedeOperativa.comune.descrizione}"
+						suggestionPath="comuni">
+					</cc:inputSuggestion>
+					<cc:inputText value="#{cc.attrs.data.sedeOperativa.telefono}"
+						editingMode="#{cc.attrs.editing}"
+						subLabel="#{cc.attrs.old.sedeOperativa.telefono}"
+						underLabel="#{cc.attrs.new.sedeOperativa.telefono}"
+						required="#{cc.attrs.required}" maxlength="50" label="Telefono">
+						<f:validator validatorId="numeroTelefonicoValidator"
+							for="function" />
+						<f:validateBean disabled="false" for="function" />
+					</cc:inputText>
+					<cc:inputText value="#{cc.attrs.data.sedeOperativa.fax}"
+						editingMode="#{cc.attrs.editing}"
+						subLabel="#{cc.attrs.old.sedeOperativa.fax}"
+						underLabel="#{cc.attrs.new.sedeOperativa.fax}"
+						required="#{cc.attrs.required}" maxlength="50" label="Fax">
+						<f:validator validatorId="numeroTelefonicoValidator"
+							for="function" />
+					</cc:inputText>
+				</h:panelGrid>
+			</fieldset>
+		</h:panelGroup>
+		<h:panelGroup rendered="#{cc.attrs.bean.checkAbilitazioneVisibile('servizi_sare') and not cc.attrs.bean.aziendaAbilitataSare}">
+			<h:outputLabel value="Richiedo accesso SARE." id="accessoSARElbl"
+				for="accessoSARE" />
+			<h:selectBooleanCheckbox
+				disabled="#{sessionBean.connectedAzienda.abilitatoSare}"
+				value="#{cc.attrs.bean.aziendaAbilitataSare}"
+				valueChangeListener="#{cc.attrs.bean.changeListenerAccessoSARE}"
+				id="accessoSARE">
+				<f:ajax event="click" execute="@this"
+					render=":dati_azienda_form:accessoSAREcontainer dati_soggetto_sare avviso_accesso_sare" />
+			</h:selectBooleanCheckbox>
+		</h:panelGroup>
+		<h:panelGroup id="avviso_accesso_sare">
+			<h:panelGroup rendered="#{cc.attrs.bean.checkAbilitazioneVisibile('servizi_sare') and cc.attrs.bean.aziendaAbilitataSare}">
+				<br />Accesso SARE<br />
+		Per accedere al sistema SARE è necessario compilare le sezioni seguenti
+						</h:panelGroup>
+		</h:panelGroup>
+		<h:panelGroup>
+			<fieldset>
+				<legend>Dati richiedente</legend>
+				<h:panelGrid columns="2" columnClasses="width50">
+					<cc:inputText id="nome" label="Nome"
+						required="#{cc.attrs.required}" editingMode="#{cc.attrs.editing}"
+						value="#{cc.attrs.data.nomeRic}"
+						subLabel="#{cc.attrs.old.nomeRic}"
+						underLabel="#{cc.attrs.new.nomeRic}" maxlength="30" />
+
+					<cc:inputText id="cognome" label="Cognome"
+						required="#{cc.attrs.required}" editingMode="#{cc.attrs.editing}"
+						value="#{cc.attrs.data.cognomeRic}"
+						subLabel="#{cc.attrs.old.cognomeRic}"
+						underLabel="#{cc.attrs.new.cognomeRic}" maxlength="30" />
+
+					<cc:inputText label="Data di nascita" id="data_nascita"
+						editingMode="#{cc.attrs.editing}"
+						subLabel="#{cc.attrs.old.dataNascitaRic}"
+						underLabel="#{cc.attrs.new.dataNascitaRic}"
+						value="#{cc.attrs.data.dataNascitaRic}" type="date" size="20"
+						required="#{cc.attrs.required}">
+					</cc:inputText>
+					<cc:inputSuggestion id="comune_nascita"
+						label="Comune o stato di nascita"
+						editingMode="#{cc.attrs.editing}" required="#{cc.attrs.required}"
+						valueCod="#{cc.attrs.data.comuneNascitaRic.id}"
+						value="#{cc.attrs.data.comuneNascitaRic.descrizione}"
+						subLabel="#{cc.attrs.old.comuneNascitaRic.descrizione}"
+						underLabel="#{cc.attrs.new.comuneNascitaRic.descrizione}"
+						requiredMessage="Il comune di nascita e' obbligatorio" size="55"
+						requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+						suggestionPath="comuni">
+						<f:validator validatorId="comuneSuggestionValidator"
+							for="function">
+						</f:validator>
+					</cc:inputSuggestion>
+				</h:panelGrid>
+				<h:panelGroup id="dati_soggetto_sare">
+					<h:panelGroup rendered="#{cc.attrs.bean.aziendaAbilitataSare}">
+						<h:panelGrid columns="1">
+							<h:panelGroup>
+								<hr />Domiciliato per la carica in
+							</h:panelGroup>
+							<cc:inputText id="indirizzo_domicilio" label="Indirizzo"
+								subLabel="#{cc.attrs.old.indirizzoRic}"
+								underLabel="#{cc.attrs.new.indirizzoRic}"
+								editingMode="#{cc.attrs.editing}" maxlength="80" size="80"
+								required="#{cc.attrs.required}"
+								value="#{cc.attrs.data.indirizzoRic}" />
+						</h:panelGrid>
+						<h:panelGrid columns="2" columnClasses="width30">
+							<cc:inputText id="cap_domicilio" label="CAP" size="10"
+								subLabel="#{cc.attrs.old.capRic}"
+								underLabel="#{cc.attrs.new.capRic}"
+								editingMode="#{cc.attrs.editing}" maxlength="5"
+								required="#{cc.attrs.required}" value="#{cc.attrs.data.capRic}">
+								<f:validator validatorId="capValidator" for="function" />
+							</cc:inputText>
+							<cc:inputSuggestion id="comune_domicilio" label="Comune"
+								subLabel="#{cc.attrs.old.comune.descrizione}"
+								underLabel="#{cc.attrs.new.comune.descrizione}"
+								editingMode="#{cc.attrs.editing}"
+								value="#{cc.attrs.data.comune.descrizione}"
+								valueCod="#{cc.attrs.data.comune.id}"
+								required="#{cc.attrs.required}" size="55"
+								requiredMessage="Il comune e' obbligatorio"
+								requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+								suggestionPath="comuni">
+								<f:validator validatorId="comuneSuggestionValidator"
+									for="function" />
+							</cc:inputSuggestion>
+						</h:panelGrid>
+					</h:panelGroup>
+				</h:panelGroup>
+				<h:panelGrid columns="2" columnClasses="width50">
+					<cc:inputText id="dati_account_email"
+						editingMode="#{cc.attrs.editing}" label="E-mail registrazione"
+						required="#{cc.attrs.required}" value="#{cc.attrs.data.email}"
+						subLabel="#{cc.attrs.old.email}"
+						underLabel="#{cc.attrs.new.email}" maxlength="80">
+						<f:validator validatorId="emailValidator" for="function" />
+						<f:validator validatorId="noPecEmailValidator" for="function"/>
+						<f:attribute name="id_pf_principal" value="#{cc.attrs.data.id}" />
+						<f:validator validatorId="uniqueEmailValidator" for="function" />
+					</cc:inputText>
+					<!-- SPACER  -->
+					<cc:inputText id="domanda" value="#{cc.attrs.data.domanda}"
+						subLabel="#{cc.attrs.old.domanda}"
+						underLabel="#{cc.attrs.new.domanda}"
+						editingMode="#{cc.attrs.editing}" label="Domanda segreta" />
+					<cc:inputText id="risposta" value="#{cc.attrs.data.risposta}"
+						subLabel="#{cc.attrs.old.risposta}"
+						underLabel="#{cc.attrs.new.risposta}"
+						editingMode="#{cc.attrs.editing}" label="Risposta" />
+				</h:panelGrid>
+			</fieldset>
+		</h:panelGroup>
+	</composite:implementation>
+
+</ui:composition>

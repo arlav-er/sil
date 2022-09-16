@@ -1,0 +1,587 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:p="http://primefaces.org/ui"
+	template="../../template/main_primefaces.xhtml">
+
+	<ui:param name="bean" value="#{ricercaOfferteLavoroNewBean}" />
+	<ui:param name="mansioneBean" value="#{deMansioneBean}" />
+	<ui:param name="contrattoBean"
+		value="#{ricercaOfferteLavoroNewBean.usaDecodificheSil() ? deContrattoSilBean : deContrattoBean}" />
+	<ui:param name="orarioBean" value="#{ricercaOfferteLavoroNewBean.usaDecodificheSil() ? deOrarioSilBean : deOrarioBean}" />
+	<ui:param name="attivitaBean" value="#{deAttivitaBean}" />
+	<ui:param name="linguaBean" value="#{deLinguaBean}" />
+	<ui:param name="titoloBean" value="#{deTitoloBean}" />
+	<ui:param name="patenteBean"
+		value="#{ricercaOfferteLavoroNewBean.usaDecodificheSil() ? dePatenteSilBean : dePatenteBean}" />
+	<f:loadBundle basename="conf.const" var="const" />
+
+	<ui:define name="title">
+		<h:outputText value="#{msg['cittadino.ricerca_lavoro.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+
+		<h:outputStylesheet library="css" name="leaflet.css" />
+		<h:outputStylesheet library="css" name="MarkerCluster.css" />
+		<h:outputStylesheet library="css" name="MarkerCluster.Default.css" />
+
+
+		<h:outputScript library="js" name="leaflet.js" target="head" />
+		<h:outputScript library="js" name="leaflet.markercluster.js" target="head" />
+
+		<h:outputScript library="js" name="cerca.offerta.js" target="head" />
+		<h:outputScript library="js" name="primefaces.utils.js" target="head" />
+		<h:outputScript library="js" name="ricerca_vacancy.js" target="head" />
+		<f:loadBundle basename="messages.errors" var="err_msg" />
+		<h:outputText value="#{txt['ricerca_lavoro.descrizione']}" escape="false" />
+
+		<h:form id="form_lista_button">
+
+			<h:panelGroup id="filtri_table" style="width:800px;">
+				<p:separator rendered="#{not empty ricercaOfferteLavoroNewBean.listFiltriButton}" />
+				<h:panelGrid id="filtri_button">
+					<ui:repeat id="vacancy_filtri" value="#{ricercaOfferteLavoroNewBean.listFiltriButton}" var="filtroButton"
+						varStatus="status">
+						<p:commandButton id="btn_#{filtroButton.id}" icon="ui-icon-closethick" iconPos="right"
+							title="#{ricercaOfferteLavoroNewBean.decodeFiltroButton(filtroButton)}" value="#{ricercaOfferteLavoroNewBean.decodeFiltroButtonCutDescrizione(filtroButton)}"
+							alt="#{ricercaOfferteLavoroNewBean.decodeFiltroButton(filtroButton)}" styleClass="cleanButton"
+							update=":form_lista_button:filtri_table,:form_lista_offerte:riquadro_table,
+							        :form_lista_filtri:filtrationAccordion:contratto,
+							        :form_lista_filtri:filtrationAccordion:orario,
+							        :form_lista_filtri:filtrationAccordion:lingua,
+							        :form_lista_filtri:filtrationAccordion:titoli,
+							        :form_lista_filtri:filtrationAccordion:patente"
+							oncomplete="dataTableFiltri()">
+
+							<f:actionListener binding="#{ricercaOfferteLavoroNewBean.removeFiltroButton(filtroButton.id)}" />
+							<f:actionListener
+								binding="#{mansioneBean.aggiornaListaByButton(filtroButton.id,filtroButton.tipoCodifica,ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+							<f:actionListener
+								binding="#{contrattoBean.aggiornaListaByButton(filtroButton.id,filtroButton.tipoCodifica,ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+							<f:actionListener
+								binding="#{orarioBean.aggiornaListaByButton(filtroButton.id,filtroButton.tipoCodifica,ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+							<f:actionListener
+								binding="#{attivitaBean.aggiornaListaByButton(filtroButton.id,filtroButton.tipoCodifica,ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+							<f:actionListener
+								binding="#{linguaBean.aggiornaListaByButton(filtroButton.id,filtroButton.tipoCodifica,ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+							<f:actionListener
+								binding="#{titoloBean.aggiornaListaByButton(filtroButton.id,filtroButton.tipoCodifica,ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+							<f:actionListener
+								binding="#{patenteBean.aggiornaListaByButton(filtroButton.id,filtroButton.tipoCodifica,ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+
+						</p:commandButton>
+						<p:spacer width="5" height="35" />
+						<p:commandButton rendered="#{ricercaOfferteLavoroNewBean.checkButtonClean and status.last}" iconPos="right"
+							id="cleanButton" icon="ui-icon-closethick" title="Azzera i filtri" value="Azzera i filtri"
+							update=":form_lista_button:filtri_table,:form_lista_offerte:riquadro_table,:form_lista_filtri:filtrationAccordion:mansione,:form_lista_filtri:filtrationAccordion:contratto,:form_lista_filtri:filtrationAccordion:orario,:form_lista_filtri:filtrationAccordion:lingua,:form_lista_filtri:filtrationAccordion:titoli,:form_lista_filtri:filtrationAccordion:patente"
+							oncomplete="dataTableFiltri()">
+							<f:actionListener
+								binding="#{ricercaOfferteLavoroNewBean.removeAllFiltroButton(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+							<f:actionListener
+								binding="#{mansioneBean.removeAllListaByButton(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+							<f:actionListener
+								binding="#{contrattoBean.removeAllListaByButton(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+							<f:actionListener
+								binding="#{orarioBean.removeAllListaByButton(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+							<f:actionListener
+								binding="#{attivitaBean.removeAllListaByButton(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+							<f:actionListener
+								binding="#{linguaBean.removeAllListaByButton(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+							<f:actionListener
+								binding="#{titoloBean.removeAllListaByButton(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+							<f:actionListener
+								binding="#{patenteBean.removeAllListaByButton(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+						</p:commandButton>
+					</ui:repeat>
+
+				</h:panelGrid>
+			</h:panelGroup>
+		</h:form>
+
+		<p:separator />
+		<h:form id="form_search">
+			<h:panelGrid cellspacing="15px" columns="11"
+				columnClasses="width100,ricercaCosa, ricercaCosaInput, ,ricercaDove,ricercaCosaInput,,ricercaCosa,ricercaCosaInput,width50px,width50px"
+				style="margin-left:auto; margin-right:auto; width:750px; ">
+				<div />
+				<div />
+				<h:outputLabel for="cosa" value="Cosa" />
+
+				<p:inputText id="cosa" value="#{ricercaOfferteLavoroNewBean.data.cosa}"
+					title="Inserisci il titolo o le parole chiave dell'offerta." styleClass="inner-shadow ricercaCosaInputText"
+					required="false" />
+
+				<span />
+				<h:outputLabel for="dove" value="Dove" />
+				<p:autoComplete value="#{ricercaOfferteLavoroNewBean.data.dove}" id="dove"
+					completeMethod="#{autoCompleteBean.completeComuniSolrAndRegione}" styleClass="inner-shadow input-ricerca-dove" />
+				<span />
+
+				<h:outputLabel for="filtraScaduteSelect" value="Seleziona"
+					rendered="#{ricercaOfferteLavoroNewBean.mostraFiltraScaduteSelect()}" />
+				<p:selectOneMenu id="filtraScaduteSelect" value="#{ricercaOfferteLavoroNewBean.filtraDataScadenza}"
+					rendered="#{ricercaOfferteLavoroNewBean.mostraFiltraScaduteSelect()}">
+					<p:ajax process="@this" update="@this" />
+					<f:selectItem itemLabel="" itemValue="#{null}" />
+					<f:selectItem itemLabel="Solo valide" itemValue="#{true}" />
+					<f:selectItem itemLabel="Solo scadute" itemValue="#{false}" />
+				</p:selectOneMenu>
+
+				<p:commandButton id="searchButton" icon="ui-icon-search" title="Cerca" value="Cerca"
+					update=":form_lista_offerte:riquadro_table,:form_lista_filtri:filtrationAccordion:contratto,:form_lista_filtri:filtrationAccordion:orario,:form_lista_filtri:filtrationAccordion:lingua,:form_lista_filtri:filtrationAccordion:titoli,:form_lista_filtri:filtrationAccordion:patente"
+					oncomplete="dataTableFiltri()">
+					<f:actionListener binding="#{bean.startSearch()}" />
+					<f:actionListener
+						binding="#{mansioneBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+					<f:actionListener
+						binding="#{contrattoBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+					<f:actionListener
+						binding="#{orarioBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+					<f:actionListener
+						binding="#{attivitaBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+					<f:actionListener
+						binding="#{linguaBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+					<f:actionListener
+						binding="#{titoloBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+					<f:actionListener
+						binding="#{patenteBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}" />
+				</p:commandButton>
+				<div />
+				<p:commandButton id="searchButtonContado" icon="ui-icon-search" title="Cerca Settore Agricolo" styleClass="nowrap"
+	 				     value="Cerca Settore Agricolo" update=":form_lista_button:filtri_table,:form_lista_offerte:riquadro_table,:form_lista_filtri:filtrationAccordion,:form_lista_filtri:filtrationAccordion:mansione,:form_lista_filtri:filtrationAccordion:contratto,:form_lista_filtri:filtrationAccordion:orario,:form_lista_filtri:filtrationAccordion:lingua,:form_lista_filtri:filtrationAccordion:titoli,:form_lista_filtri:filtrationAccordion:patente"  
+	 				     oncomplete="dataTableFiltri()" rendered="#{utilsBean.isUmbria() or utilsBean.isCalabria() or utilsBean.isVDA() or utilsBean.isPuglia()}">
+			 		<f:actionListener binding="#{ricercaOfferteLavoroNewBean.startSearchContadini()}"/>
+			 		<f:actionListener binding="#{mansioneBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+    				<f:actionListener binding="#{contrattoBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+    				<f:actionListener binding="#{orarioBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+    				<f:actionListener binding="#{attivitaBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+    				<f:actionListener binding="#{linguaBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+    				<f:actionListener binding="#{titoloBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+    				<f:actionListener binding="#{patenteBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+   				</p:commandButton>
+				
+				<p:commandButton id="searchButtonContadoRER" icon="ui-icon-search" title="Cerca Settore Agricolo" styleClass="nowrap"
+	 				     value="Cerca Settore Agricolo" update=":form_lista_button:filtri_table,:form_lista_offerte:riquadro_table,:form_lista_filtri:filtrationAccordion,:form_lista_filtri:filtrationAccordion:mansione,:form_lista_filtri:filtrationAccordion:contratto,:form_lista_filtri:filtrationAccordion:orario,:form_lista_filtri:filtrationAccordion:lingua,:form_lista_filtri:filtrationAccordion:titoli,:form_lista_filtri:filtrationAccordion:patente"  
+	 				     oncomplete="dataTableFiltri()" rendered="#{utilsBean.isRER()}">
+			 		<f:actionListener binding="#{ricercaOfferteLavoroNewBean.startSearchContadiniNewVersion()}"/>
+			 		<f:actionListener binding="#{mansioneBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+    				<f:actionListener binding="#{contrattoBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+    				<f:actionListener binding="#{orarioBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+    				<f:actionListener binding="#{attivitaBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+    				<f:actionListener binding="#{linguaBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+    				<f:actionListener binding="#{titoloBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+    				<f:actionListener binding="#{patenteBean.aggiornaLista(ricercaOfferteLavoroNewBean.data.cosa,ricercaOfferteLavoroNewBean.data.dove)}"/>
+   				</p:commandButton>
+				
+				<h:panelGroup rendered="#{sessionBean.isUtente()}">
+					<p:spacer width="150" height="1" />
+					<p:commandButton id="saveButton" icon="ui-icon-disk" title="Salva ricerca" value="Salva ricerca"
+						oncomplete="PF('saveRicercaDialog').show();" update=":saveRicerca" />
+				</h:panelGroup>
+				<h:panelGroup rendered="#{sessionBean.isProvincia()}">
+					<span />
+				</h:panelGroup>
+
+			</h:panelGrid>
+		</h:form>
+
+		<div class="filter-liquid">
+			<div class="filtration-content">
+
+				<h:form style="display: none" id="changePageForm">
+					<h:inputHidden id="pageValue" value="#{ricercaOfferteLavoroNewBean.paginationHandler.currentPage}" />
+					<p:commandButton id="pageCommand" actionListener="#{ricercaOfferteLavoroNewBean.changePage()}" value="click me"
+						update=":form_lista_offerte:resultsContainer">
+					</p:commandButton>
+				</h:form>
+
+				<h:panelGroup id="tabella_vacancy">
+					<h:form id="form_lista_offerte">
+						<h:panelGroup id="riquadro_table" style="width:1000px;">
+							<h:outputLabel id="emptyTable" value="Nessun elemento trovato"
+								rendered="#{empty ricercaOfferteLavoroNewBean.offerteLavoro}" />
+							<script type="text/javascript">
+								if(showMap) {
+									showMap = false;		
+									mostraMappa();							
+								}							
+							</script>
+
+							<h:panelGroup rendered="#{not empty ricercaOfferteLavoroNewBean.offerteLavoro}">
+								<script type="text/javascript">
+									$(function() {							
+									    $("#pagination,#pagination_bottom").pagination({									    								   
+									    	pages: #{ricercaOfferteLavoroNewBean.paginationHandler.pages()},											    				      
+									        cssStyle: 'light-theme',
+									        prevText: 'Prec.',
+									        nextText: 'Succ.',
+									        onPageClick: function (pageNumber, event) {							        
+										        document.getElementById('changePageForm:pageValue').value = pageNumber;
+										        document.getElementById('changePageForm:pageCommand').click();
+											}																				
+									    });          
+
+									    $(function() {
+									        $("#pagination,#pagination_bottom").pagination('selectPage', #{ricercaOfferteLavoroNewBean.data.currentPage});
+									    });
+									    									   
+									});
+																		
+								</script>
+
+								<h:outputLabel id="resultTop" rendered="#{not empty bean.offerteLavoro}"
+									value="Risultato della ricerca: #{ricercaOfferteLavoroNewBean.rowsTotal}" />
+								<br />
+
+								<div style="height: 30px">
+									<div class="widget_container" id="pagination" style="float: left; width: 600px;"></div>
+
+									<h:panelGroup style="float: left" styleClass="buttonStyle"
+										rendered="#{not empty ricercaOfferteLavoroNewBean.offerteLavoro}">
+										<p:commandButton id="buttonMap" value="Visualizza risultato sulla mappa"
+											title="Visualizza risultato sulla mappa" onclick="mostraMappa();return false;"
+											onkeypress="mostraMappa();return false;" />
+
+									</h:panelGroup>
+								</div>
+								<br />
+							</h:panelGroup>
+
+							<h:panelGroup style="text-align: center;">
+								<ui:include src="/secure/loading.xhtml">
+									<ui:param name="loadingMessage" value="Loading.." />
+								</ui:include>
+							</h:panelGroup>
+
+							<h:panelGroup id="resultsContainer">
+
+								<h:inputText style="display:none" id="paramSOLR" readonly="true"
+									value="#{ricercaOfferteLavoroNewBean.paramSOLR}" />
+
+								<ui:repeat var="element" value="#{ricercaOfferteLavoroNewBean.offerteLavoro}" varStatus="status">
+									<p:panelGrid columns="2" columnClasses="list_colImg" id="listaRisultati" style="width:1000px;"
+										styleClass="panGrid">
+										<p:row>
+											<p:column>
+												<h:graphicImage id="foto" rendered="#{not empty element.idAziendaInfo}"
+													value="/secure/rest/getFoto?type=#{const['img.Type.Logo']}&amp;id=#{element.idAziendaInfo}&amp;size=normal"
+													alt="Nessun logo" styleClass="img_col2">
+												</h:graphicImage>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<h:link immediate="true" styleClass="idVaDatiVacancy_#{element.idVaDatiVacancy}"
+													outcome="/secure/azienda/vacancies/#{element.flagIdo?'view_pf':'visualizza'}.xhtml"
+													title="Visualizza l'offerta di lavoro in dettaglio">
+													<b> <h:outputText value="#{element.strMansione} " styleClass="upperCase" /></b>
+													<f:param name="id" value="#{element.idVaDatiVacancy}"></f:param>
+												</h:link>
+
+												<ui:fragment rendered="#{element.isFlgCandidatura()}">
+													<p:commandLink
+														rendered="#{not element.hasCandidatura and (not element.fromClicLavoro) and (not empty bean.myCurricula)}"
+														actionListener="#{ricercaOfferteLavoroNewBean.eseguiControlliCresco}"
+														oncomplete="onCandidatiBtnClicked(args);" title="Candidati per quest'offerta di lavoro"
+														update=":confermaCandidatura :controlliCrescoNonSuperati">
+														<f:setPropertyActionListener value="#{element.idVaDatiVacancy}"
+															target="#{ricercaOfferteLavoroNewBean.idVaDatiVacancy}" />
+														<f:setPropertyActionListener value="#{element.idAziendaInfo}"
+															target="#{ricercaOfferteLavoroNewBean.idAziendaInfo}" />
+														<f:setPropertyActionListener value="#{element.fromClicLavoro}"
+															target="#{ricercaOfferteLavoroNewBean.fromClicLavoro}" />
+														<h:graphicImage value="/resources/images/nonCandidato.png" styleClass="ui-image"
+															alt="Candidati per quest'offerta di lavoro" title="Candidati per quest'offerta di lavoro"
+															onmouseout="imageNonCandidato(this)" onmouseover="imageCandidato(this)" />
+													</p:commandLink>
+
+													<p:commandLink
+														rendered="#{not element.hasCandidatura and (not element.fromClicLavoro) and (empty bean.myCurricula)}"
+														onclick="return alert('Prima di poterti candidare per quest\'offerta di lavoro devi compilare un Curriculum.');"
+														title="Candidati per quest'offerta di lavoro">
+														<h:graphicImage value="/resources/images/nonCandidato.png" styleClass="ui-image"
+															alt="Candidati per quest'offerta di lavoro" title="Candidati per quest'offerta di lavoro"
+															onmouseout="imageNonCandidato(this)" onmouseover="imageCandidato(this)" />
+													</p:commandLink>
+
+													<p:commandLink
+														rendered="#{not element.hasCandidatura and element.fromClicLavoro and (not empty bean.myClicLavoroCurricula)}"
+														actionListener="#{ricercaOfferteLavoroNewBean.eseguiControlliCresco}"
+														oncomplete="onCandidatiBtnClicked(args);" title="Candidati per quest'offerta di lavoro"
+														update=":confermaCandidatura :controlliCrescoNonSuperati">
+														<f:setPropertyActionListener value="#{element.idVaDatiVacancy}"
+															target="#{ricercaOfferteLavoroNewBean.idVaDatiVacancy}" />
+														<f:setPropertyActionListener value="#{element.idAziendaInfo}"
+															target="#{ricercaOfferteLavoroNewBean.idAziendaInfo}" />
+														<f:setPropertyActionListener value="#{element.fromClicLavoro}"
+															target="#{ricercaOfferteLavoroNewBean.fromClicLavoro}" />
+														<h:graphicImage value="/resources/images/nonCandidato.png" styleClass="ui-image"
+															alt="Candidati per quest'offerta di lavoro" title="Candidati per quest'offerta di lavoro"
+															onmouseout="imageNonCandidato(this)" onmouseover="imageCandidato(this)" />
+													</p:commandLink>
+
+													<p:commandLink
+														rendered="#{not element.hasCandidatura and element.fromClicLavoro and (empty bean.myClicLavoroCurricula)}"
+														onclick="PF('noCandidaturaDialog').show();" title="Candidati per quest'offerta di lavoro">
+														<h:graphicImage value="/resources/images/nonCandidato.png" styleClass="ui-image"
+															alt="Candidati per quest'offerta di lavoro" title="Candidati per quest'offerta di lavoro"
+															onmouseout="imageNonCandidato(this)" onmouseover="imageCandidato(this)" />
+													</p:commandLink>
+												</ui:fragment>
+
+												<p:graphicImage alt="Nuova offerta di lavoro" id="imgNew" value="/resources/images/new.jpg" height="15px"
+													title="Nuova offerta di lavoro" rendered="#{element.newVacancy}" />
+												<h:outputText value="Aggiornato #{element.pubblicato}" styleClass="leftMargin" />
+
+												<p:spacer width="5" height="35" />
+
+												<ui:fragment rendered="#{utilsBean.isPAT()}">
+													<p:commandLink onclick="PF('segnalaCandidaturaDialogWv').show()" title="Segnala questo annuncio">
+														<f:setPropertyActionListener value="#{element}" target="#{ricercaOfferteLavoroNewBean.selVacancy}" />
+														<h:graphicImage value="/resources/images/share_to_friend.png" styleClass="ui-image"
+															alt="Segnala questo annuncio" title="Segnala questo annuncio" onmouseout="imageNonSegnala(this)"
+															onmouseover="imageSegnala(this)" />
+													</p:commandLink>
+												</ui:fragment>
+												<br />
+												<h:outputText value="#{element.datoreLavoro}" styleClass="boldText bottomMargin" />
+												<br />
+
+												<h:outputText escape="false" value="#{element.descrizioneLenght(250)}" styleClass="bottomMargin"
+													style="display: block; max-width: 650px; word-wrap: break-word;" />
+												<br />
+
+												<h:outputText value="Località: " styleClass="greyText" />
+												<h:outputText rendered="#{empty element.indirizzoLavoro}"
+													value="#{element.strComLavoro} - (Provincia di #{element.strProvinciaLavoro})" />
+												<h:outputText rendered="#{not empty element.indirizzoLavoro}"
+													value="#{element.strComLavoro} - (Provincia di #{element.strProvinciaLavoro}) - #{element.indirizzoLavoro} " />
+												<br />
+
+												<ui:fragment rendered="#{not empty element.strTipoContratto}">
+													<h:outputText value="Contratto: " styleClass="greyText" />
+													<h:outputText value="#{element.strTipoContratto}" />
+													<br />
+												</ui:fragment>
+
+												<h:outputText value="Scadenza: #{element.dataScadenzaString}" />
+												<br />
+												<br />
+											</p:column>
+										</p:row>
+									</p:panelGrid>
+								</ui:repeat>
+							</h:panelGroup>
+
+							<div style="height: 30px">
+								<div class="widget_container" id="pagination_bottom" style="float: left; width: 600px;"></div>
+							</div>
+
+						</h:panelGroup>
+					</h:form>
+					<p:spacer width="10" height="10" />
+				</h:panelGroup>
+
+				<div id="panelMapPlace" style="margin-left: 40px">
+					<div id="mapPlace" style="display: none">
+
+						<p:commandButton id="buttonTable" icon="ui-icon-calculator" title="Visualizza elenco" value="Visualizza elenco"
+							onclick="mostraTabella();return false;" onkeypress="mostraTabella();return false;">
+						</p:commandButton>
+
+						<script type="text/javascript">
+							if(window.maps) {
+								var center 	  = "#{utilsBean.mapCenter}".split(",")
+								var zoomLevel = "#{utilsBean.mapZoom}"
+								window.maps.lat = center[0];
+								window.maps.lng = center[1];
+								window.maps.zoom = zoomLevel;
+							}
+							</script>
+
+						<div id="map_Vacancy" class="map"></div>
+
+					</div>
+				</div>
+				<!-- panelMapPlace -->
+			</div>
+		</div>
+
+		<h:form id="form_lista_filtri">
+			<div class="filter-column">
+				<h:outputLabel id="labelFiltri" value="Filtri di ricerca avanzata" styleClass="testofiltri" />
+				<br />
+				<p:accordionPanel multiple="true" id="filtrationAccordion"
+					activeIndex="#{ricercaOfferteLavoroNewBean.idxAccordionOpen}">
+
+						<p:tab title="Gruppo professionale" rendered="#{not utilsBean.isRER()}">
+						<p:dataTable id="mansione" var="mansione" value="#{mansioneBean.deMansioneModel}"
+							filteredValue="#{mansioneBean.filteredDeMansione}" emptyMessage="Nessun risultato"
+							selection="#{mansioneBean.selectedMansioni}" scrollable="true" scrollHeight="200" scrollRows="10">
+
+							<p:ajax event="rowSelect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+							<p:ajax event="rowUnselect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+							<p:ajax event="rowSelectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+							<p:ajax event="rowUnselectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+							<p:column selectionMode="multiple" style="width:8%" />
+							<p:column filterBy="#{mansione.descrizione}" footerText=""> 
+							            #{mansione.descrizione}
+							        </p:column>
+						</p:dataTable>
+						</p:tab>
+					<p:tab title="Contratti">
+						<p:dataTable id="contratto" var="contratto" value="#{contrattoBean.deContrattoModel}"
+							filteredValue="#{contrattoBean.filteredDeContratto}" selection="#{contrattoBean.selectedContratti}"
+							emptyMessage="Nessun risultato" scrollable="true" scrollHeight="200" scrollRows="10">
+
+							<p:ajax event="rowSelect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+							<p:ajax event="rowUnselect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+							<p:ajax event="rowSelectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+							<p:ajax event="rowUnselectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+							<p:column selectionMode="multiple" style="width:8%" />
+							<p:column filterBy="#{contratto.descrizione}" footerText=""> 
+							            #{contratto.descrizione}
+							        </p:column>
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="Orario">
+						<p:dataTable id="orario" var="orario" value="#{orarioBean.deOrarioModel}"
+							filteredValue="#{orarioBean.filteredDeOrario}" selection="#{orarioBean.selectedOrari}"
+							emptyMessage="Nessun risultato" scrollable="true" scrollHeight="200" scrollRows="10">
+							<p:ajax event="rowSelect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+							<p:ajax event="rowUnselect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+							<p:ajax event="rowSelectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+							<p:ajax event="rowUnselectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+							<p:column selectionMode="multiple" style="width:8%" />
+							<p:column filterBy="#{orario.descrizione}" footerText=""> 
+							            #{orario.descrizione}
+							        </p:column>
+						</p:dataTable>
+					</p:tab>
+					<ui:remove>
+						<p:tab title="Settore">
+							<p:dataTable id="attivita" var="attivita" value="#{attivitaBean.deAttivitaModel}"
+								filteredValue="#{attivitaBean.filteredDeAttivita}" selection="#{attivitaBean.selectedAttivita}"
+								emptyMessage="Nessun risultato" scrollable="true" scrollHeight="200" scrollRows="10">
+								<p:ajax event="rowSelect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+									listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+								<p:ajax event="rowUnselect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+									listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+								<p:ajax event="rowSelectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+									listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+								<p:ajax event="rowUnselectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+									listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+								<p:column selectionMode="multiple" style="width:8%" />
+								<p:column filterBy="#{attivita.descrizione}" footerText=""> 
+							            #{attivita.descrizione}
+							        </p:column>
+							</p:dataTable>
+						</p:tab>
+					</ui:remove>
+					<p:tab title="Lingue">
+						<p:dataTable id="lingua" var="lingua" value="#{linguaBean.deLinguaModel}"
+							filteredValue="#{linguaBean.filteredDeLingua}" selection="#{linguaBean.selectedLingue}"
+							emptyMessage="Nessun risultato" scrollable="true" scrollHeight="200" scrollRows="10">
+							<p:ajax event="rowSelect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+							<p:ajax event="rowUnselect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+							<p:ajax event="rowSelectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+							<p:ajax event="rowUnselectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+							<p:column selectionMode="multiple" style="width:8%" />
+							<p:column filterBy="#{lingua.denominazione}" footerText=""> 
+							            #{lingua.denominazione}
+							        </p:column>
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="Titolo di studio">
+						<p:dataTable id="titoli" var="titoli" value="#{titoloBean.deTitoloModel}"
+							filteredValue="#{titoloBean.filteredDeTitolo}" selection="#{titoloBean.selectedTitoli}"
+							emptyMessage="Nessun risultato" scrollable="true" scrollHeight="200" scrollRows="10">
+							<p:ajax event="rowSelect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+							<p:ajax event="rowUnselect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+							<p:ajax event="rowSelectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+							<p:ajax event="rowUnselectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+							<p:column selectionMode="multiple" style="width:8%" />
+							<p:column filterBy="#{titoli.descrizioneParlante}" footerText=""> 
+							            #{titoli.descrizioneParlante}
+							        </p:column>
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="Patente">
+						<p:dataTable id="patente" var="patente" value="#{patenteBean.dePatenteModel}"
+							filteredValue="#{patenteBean.filteredDePatente}" selection="#{patenteBean.selectedPatente}"
+							emptyMessage="Nessun risultato" scrollable="true" scrollHeight="200" scrollRows="10">
+							<p:ajax event="rowSelect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+							<p:ajax event="rowUnselect" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+							<p:ajax event="rowSelectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.addRowSelected}" />
+							<p:ajax event="rowUnselectCheckbox" update=":form_lista_offerte:riquadro_table,:form_lista_button:filtri_table"
+								listener="#{ricercaOfferteLavoroNewBean.removeRowSelected}" />
+
+							<p:column selectionMode="multiple" style="width:8%" />
+							<p:column filterBy="#{patente.descrizione}" footerText=""> 
+							            #{patente.descrizione}
+							        </p:column>
+						</p:dataTable>
+					</p:tab>
+					<p:spacer width="10" height="10" />
+				</p:accordionPanel>
+			</div>
+		</h:form>
+
+		<p:messages id="messages" />
+		<ui:include src="/secure/_common/candidatura/_segnalaCandidatura.xhtml">
+			<ui:param name="bean" value="#{ricercaOfferteLavoroNewBean}" />
+		</ui:include>
+		<ui:include src="_confermaCandidatura.xhtml" />
+		<ui:include src="_no_candidatura.xhtml" />
+		<ui:include src="_save_ricerca.xhtml" />
+		<ui:include src="_controlliCrescoNonSuperati_dialog.xhtml" />
+
+		<script>
+			function onCandidatiBtnClicked(args) {
+				if (args.crescoSuperati) {
+					PF('confermaCandidaturaDialog').show();
+				} else {
+					PF('controlliCrescoNonSuperati').show();
+				}
+			}
+		</script>
+	</ui:define>
+
+</ui:composition>

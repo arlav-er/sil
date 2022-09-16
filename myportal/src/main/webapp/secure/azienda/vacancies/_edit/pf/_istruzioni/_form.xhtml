@@ -1,0 +1,84 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:eng="http://java.sun.com/jsf/composite/components">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="titoliDiStudio:autocomplete" value="Titolo" styleClass="col-sm-3 control-label">
+					<span class="ui-outputlabel-rfi">*</span>
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<ui:fragment rendered="#{!vacancyFormPfBean.isArchivedNoModify() and !vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}">
+						<eng:treeAutoComplete id="titoliDiStudio"
+							value="#{vacancyFormPfBean.vaIstruzioniSection.istruzioneAttiva.deTitolo}" converter="deTitoloConverter"
+							forceSelection="true" var="deTitolo" itemLabel="#{deTitolo.descrizione}"
+							label="#{ui['instruzioni.titoloDiStudio']}" itemValue="#{deTitolo}"
+							emptyMessage="#{ui['shared.emptyAutoComplete']}"
+							completeMethod="#{vacancyFormPfBean.autoCompleteBean.completeTitolo}" size="55" minQueryLength="2"
+							styleClass="form-control" cache="true" required="true" ajaxEvent="itemSelect"
+							treeValue="#{titoliSessionBean.deTitoloTreeNode}" bean="#{vacancyFormPfBean.vaIstruzioniSection}"
+							treeSelectListener="titoliDiStudioNodeSelected" requiredMessage="Il titolo di studio è obbligatorio">
+						</eng:treeAutoComplete>
+						<p:message id="titoliDiStudioMessage" for="titoliDiStudio:autocomplete"></p:message>
+					</ui:fragment>
+					<ui:fragment rendered="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}">
+						<p:inputText disabled="true" styleClass="form-control">
+						</p:inputText>
+					</ui:fragment>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="descrizioneTitolo" value="Descrizione titolo" styleClass="col-sm-3 control-label">
+					<i class="m-l-10 fa fa-info-circle info-circile"
+						title="Ambito disciplinare di dettaglio (es. “Laurea in economia indirizzo economia e finanza”)"
+						data-toggle="tooltip" data-placement="top" data-container="body"></i>
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:inputText id="descrizioneTitolo" maxlength="200" required="true"
+						disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}" requiredMessage="La descrizione del titolo e' obbligatoria"
+						value="#{vacancyFormPfBean.vaIstruzioniSection.istruzioneAttiva.specifica}" styleClass="form-control">
+						<f:validateLength for="function" maximum="200" />
+					</p:inputText>
+					<p:message for="descrizioneTitolo" />
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="tipoSceltaTit" value="Preferibile/Indispensabile" styleClass="col-sm-3 control-label">
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:selectOneRadio id="tipoSceltaTit" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+						value="#{vacancyFormPfBean.vaIstruzioniSection.istruzioneAttiva.tipoSceltaTitolo}" unselectable="true">
+						<f:selectItem itemLabel="Preferibile" itemValue="P" />
+						<f:selectItem itemLabel="Indispensabile" itemValue="I" />
+					</p:selectOneRadio>
+					<p:message for="tipoSceltaTit" />
+				</div>
+			</div>
+		</div>
+		<div class="text-center">
+			<p:defaultCommand target="syncIstruzione"></p:defaultCommand>
+			<p:commandLink id="syncIstruzione" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+				actionListener="#{vacancyFormPfBean.vaIstruzioniSection.sync()}"
+				styleClass="btn btn-primary ui-button baby-btn uk-margin-top"
+				onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+				oncomplete="MyPortal.Vacancy.syncArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+				update="@(.ui-message)" process="@this, syncForm">
+				#{ui['shared.save']}
+			</p:commandLink>
+			<p:commandLink id="annulla" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+				styleClass="btn btn-primary ui-button baby-btn uk-margin-top uk-margin-left"
+				onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+				oncomplete="MyPortal.Vacancy.cancelArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+				process="@this">
+				Annulla
+				<p:ajax update="syncForm, :istruzioniForm:articles"
+					listener="#{vacancyFormPfBean.vaIstruzioniSection.cancelEditIstruzione()}" resetValues="true" />
+			</p:commandLink>
+			<p:remoteCommand name="updateArticles" update=":istruzioniForm:articles" process="@this"></p:remoteCommand>
+		</div>
+	</div>
+</ui:composition>

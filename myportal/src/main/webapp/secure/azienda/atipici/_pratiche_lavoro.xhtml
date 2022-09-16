@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/tab.xhtml">
+
+	<ui:param name="bean" value="#{atipiciAziendaBean}" />
+
+	<ui:define name="tabcontent">
+		<h:form id="form">
+			<cc:messages id="messages" />
+
+			<h:outputText
+				value="#{msg['azienda.servizi_atipico.consulenza_lavoro.descrizione']}"
+				escape="false" />
+
+			<h:panelGroup rendered="#{bean.status == 'insert'}">
+
+				<h:panelGroup id="notifichePanel" styleClass="insertPanel"
+					layout="block">
+
+					<h:panelGrid columns="2" columnClasses="width30 width30"
+						rendered="true" id="tipoQuesito">
+
+						<h:outputLabel value="Tipo lavoro"
+							rendered="#{bean.richiesta.deTipoQuesito.id != 'LAVORO'}" />
+
+						<h:selectOneMenu value="#{bean.richiesta.tipoConsulenza.id}"
+							valueDescription="#{bean.richiesta.tipoConsulenza.description}"
+							disableInput="true" id="tipoConsulenza"
+							valueChangeListener="#{bean.changeTipoLavoro}"
+							rendered="#{bean.richiesta.deTipoQuesito.id != 'LAVORO'}">
+							<f:selectItems value="#{bean.tipiConsulenza}" />
+							<f:ajax event="change" execute="@this" render="@form"
+								onevent="disegnaBottoni" />
+						</h:selectOneMenu>
+
+						<br />
+						<br />
+					</h:panelGrid>
+
+					<ui:include src="/secure/atipici/corpo_pratica_atipici.xhtml">
+						<ui:param name="pratica" value="#{bean.richiesta}" />
+						<ui:param name="abean" value="#{bean}" />
+					</ui:include>
+
+					<br />
+					<h:panelGroup>
+
+						<br />
+						<br />
+						<h:commandLink styleClass="newRequestButton" id="saveLavoro"
+							value="Invia una nuova richiesta" action="#{bean.save}">
+							<f:ajax execute="@form" render="@form" onevent="init"></f:ajax>
+						</h:commandLink>
+
+						<h:commandLink styleClass="abortButton" style="margin-left:5px"
+							value="Annulla" action="#{bean.setStatus('list')}">
+							<f:ajax execute="@this" render="@form" onevent="init"></f:ajax>
+						</h:commandLink>
+					</h:panelGroup>
+				</h:panelGroup>
+
+				<br />
+				<br />
+
+			</h:panelGroup>
+
+			<h:panelGroup rendered="#{bean.status == 'list'}">
+				<br />
+				<br />
+
+				<h:dataTable id="pratiche_lavoro" value="#{bean.pratiche}"
+					rendered="#{not empty bean.pratiche}" var="pratica">
+
+					<h:column>
+						<f:facet name="header">
+							<h:outputText value="" />
+						</f:facet>
+						
+						<h:commandLink id="view" action="#{bean.view(pratica.id)}">
+							<span
+								class="ui-icon #{pratica.daLeggere ? 'ui-icon-mail-closed' : 'ui-icon-mail-open'}" />
+							<f:ajax execute="@this" render="@form" onevent="init"></f:ajax>
+						</h:commandLink>
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">ID</f:facet>
+						#{pratica.id}
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">
+							<h:outputText value="Titolo" />
+						</f:facet>
+						<h:outputText value="#{pratica.oggetto}"
+							styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">
+							<h:outputText value="Quesito" />
+						</f:facet>
+						<h:outputText value="#{pratica.corpo}"
+							styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">
+							<h:outputText value="Inviata" />
+						</f:facet>
+						<h:outputText value="#{pratica.dtInvio}"
+							styleClass="#{pratica.daLeggere ? 'boldText' : ''}">
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+						</h:outputText>
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">
+							<h:outputText value="Risposta ricevuta il" />
+						</f:facet>
+						<h:outputText value="#{pratica.dtRisposta}"
+							styleClass="#{pratica.daLeggere ? 'boldText' : ''}">
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+						</h:outputText>
+					</h:column>
+				</h:dataTable>
+				<br />
+				<br />
+
+				<h:commandLink styleClass="newAlertButton" value="Nuova richiesta"
+					action="#{bean.setStatus('insert')}">
+					<f:ajax execute="@this" render="@form" onevent="disegnaBottoni"></f:ajax>
+				</h:commandLink>
+			</h:panelGroup>
+
+			<br />
+			<br />
+			<h:panelGroup id="detail_lavoro" styleClass="insertPanel"
+				layout="block" rendered="#{bean.detail and bean.status == 'list'}">
+
+				<h:panelGrid columns="2" cellspacing="10">
+					<ui:include src="/secure/atipici/corpo_pratica_atipici.xhtml">
+						<ui:param name="readonly" value="true" />
+						<ui:param name="abean" value="#{bean}" />
+						<ui:param name="pratica" value="#{bean.messaggio}" />
+					</ui:include>
+				</h:panelGrid>
+
+				<h:panelGroup id="rispostePanel" layout="block"
+					rendered="#{not empty bean.messaggio.risposte}">
+					<ui:repeat var="risposta" value="#{bean.messaggio.risposte}">
+						<h:panelGroup layout="block" styleClass="messageDiv">
+							<h:panelGroup rendered="#{bean.messaggio.praticaRifiutata}">
+								<h:outputText value="La pratica è stata rifiutata"
+									styleClass="boldText" />
+								<br />
+								<br />
+							</h:panelGroup>
+							<h:outputText
+								value="Risposta di #{risposta.mittente} - inviata il "
+								styleClass="mittente" />
+							<h:outputText value="#{risposta.dtmIns}" styleClass="mittente">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+							</h:outputText>
+							<br />
+							<h:panelGroup layout="block" styleClass="corpo">
+								<h:panelGroup
+									rendered="#{bean.messaggio.consulenza.corpo != null}">
+									<h:outputText value="#{bean.messaggio.consulenza.corpo}" />
+									<br />
+									<br />
+								</h:panelGroup>
+								<h:outputText value="#{risposta.corpo}" />
+							</h:panelGroup>
+
+							<cc:upload readonly="#{true}" label="Allegato"
+								rendered="#{not empty risposta.allegati}"
+								idAllegato="#{risposta.allegati[0].id}"
+								value="#{risposta.allegati[0].filename}" />
+
+						</h:panelGroup>
+					</ui:repeat>
+				</h:panelGroup>
+
+				<br />
+				<h:panelGroup id="buttons">
+					<h:commandLink styleClass="marginButton closeButton"
+						action="#{bean.closeDetail}" value="Chiudi">
+						<f:ajax execute="@this" render="@this" onevent="hideDetail"></f:ajax>
+					</h:commandLink>
+				</h:panelGroup>
+
+			</h:panelGroup>
+
+		</h:form>
+
+		<script type="text/javascript">//<![CDATA[	
+
+			function hideDetail(data) {
+				if(data && ("status" in data && data.status != "success"))
+					return
+
+				$("[id$=detail_lavoro]").slideUp("slow")			
+			}
+			
+			function showDetail() {
+				$($.browser.msie || $.browser.mozilla || $.browser.opera ? "html" : "body").animate({ scrollTop:  $(document).height() },"slow")								
+				$("[id$=detail_lavoro]").slideDown("slow")			
+			}
+									
+			$(init = function(data) {
+			
+				if(data && ("status" in data && data.status != "success"))
+					return
+			
+				var table 	= $("#form\\:pratiche_lavoro")
+				var rows 		= $("#form\\:pratiche_lavoro tr")
+															
+				options =	{
+					bPaginate: true,
+					bFilter: true,
+					bInfo:		 true,
+					bStateSave: false, 					
+	   				iDisplayStart: 	0,
+					oLanguage: 			{ sInfo: "Messaggi da _START_ a _END_ di _TOTAL_" },	   			 					
+					aaSorting: [[1, 'desc'], [ 4, 'desc' ]],
+					aoColumns: [ 
+	          			{ bSortable: false },
+					    {sType: "numeric"},
+				   		null,
+				   		{ sType: "uk_date" },
+				   		{ sType: "uk_date" }
+	   			 	]
+				}
+																		
+				generateDataTable(table, options)
+				disegnaBottoni()
+					
+				rows.css("cursor", "pointer")
+				rows.mouseover(function() {	$(this).addClass("ui-state-hover") 		})
+				rows.mouseout(function() 	{ $(this).removeClass("ui-state-hover") })	
+				
+				rows.click(function() {
+					
+					if($("[id$=view]", this)[0]) {
+								
+						rows.unbind("click", arguments.callee)
+						$("[id$=view]", this).click()					
+						rows.click(arguments.callee)
+	
+						showDetail()
+						$(".ui-icon-mail-closed", this).switchClass("ui-icon-mail-closed", "ui-icon-mail-open")
+						$(".boldText", this).removeClass("boldText")
+					}
+				})		
+
+				$('.sorting_1').each(function(){ if($(this).next().find('span').hasClass('boldText')){ $(this).addClass('boldText') } } )	
+			})			
+		//]]>
+		</script>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,160 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="../../template/main_primefaces.xhtml">
+
+	<ui:param name="bean" value="#{vetrinaAziendaBean}"></ui:param>
+	
+	<ui:define name="title">
+		<h:outputText value="Vetrina" rendered="#{sessionBean.azienda}" />
+		<h:outputText value="Vetrina di #{bean.data.ragioneSociale}"
+			rendered="#{not sessionBean.azienda}" />
+	</ui:define>
+	<ui:define name="content">
+		<f:loadBundle basename="messages.errors" var="err_msg" />
+		<f:event listener="#{vetrinaAziendaBean.preRenderListener}"
+			type="preRenderView" />
+
+	  	<h:panelGroup id="vetrinaPG">
+			<div>
+				<f:subview id="classic"
+					rendered="#{bean.data.codiceTemplate != 'TABS'}">
+					<ui:include src="template/classic_new.xhtml" />
+				</f:subview>
+	
+				<f:subview id="tab" rendered="#{bean.data.codiceTemplate == 'TABS'}">
+					<ui:include src="template/tabs_new.xhtml" />
+				</f:subview>
+	
+	
+				 <p:button id="editButton" outcome="edit"
+					value="Modifica" title="Modifica" rendered="#{bean.canEdit}"/> 	
+				<br/>
+				<h:panelGroup id="buttonsPG">
+					<p:commandButton id="candidatiButton"
+						onclick="PF('candidaVacancyDialogWV').show();"
+						title="Invia un'autocandidatura a questa azienda" value="Invia un'autocandidatura a questa azienda" 
+						rendered="#{not bean.canEdit and not bean.hasCandidatura and (sessionBean.connectedUtente != null) and (not empty bean.myCurricula)}"/>
+					<p:commandButton 
+						onclick="alert('Prima di poter inviare un\'autocandidatura a quest\'azienda devi compilare un Curriculum.'); return false"
+						title="Invia un'autocandidatura a questa azienda" value="Invia un'autocandidatura a questa azienda"
+						rendered="#{not bean.canEdit and not bean.hasCandidatura and (sessionBean.connectedUtente != null) and (empty bean.myCurricula)}" />
+					<p:commandButton id="alreadyButton" disabled="true"
+						title="Hai già inviato un'autocandidatura a questa azienda" value="Hai già inviato un'autocandidatura a questa azienda"
+						rendered="#{bean.hasCandidatura}" />
+				</h:panelGroup>
+				<br/>
+	
+				<ui:fragment rendered="#{sessionBean.utente}">
+					<p:dialog id="candidaVacancyDialog" 
+						 modal="true" header="Invia una autocandidatura" widgetVar="candidaVacancyDialogWV">
+						<h:form id="candidaVacancyForm" enctype="multipart/form-data">
+						<div class="form-group">
+								<p:outputLabel id="curriculumLabel" for="curriculum" value="Seleziona un Curriculum" styleClass="control-label" />
+								<div>
+								   	<p:selectOneMenu id="curriculum" 
+										disableInput="true"
+										required="true"
+										value="#{bean.candidatura.idCvDatiPersonali}">
+										<f:selectItems value="#{bean.myCurricula}" />
+										<p:ajax  event="change" process="@this" update="curriculum"></p:ajax>
+									</p:selectOneMenu>
+								</div>
+							</div>
+							<br/>
+							<div class="form-group">
+								<p:outputLabel id="letteraLabel" for="lettera" value="Seleziona una lettera di presentazione" styleClass="control-label"/>
+								<div>
+									<p:selectOneMenu id="lettera"
+										disableInput="true"
+										value="#{bean.candidatura.idCvLetteraAcc}">
+										<f:selectItems value="#{bean.myLettere}" />
+										<p:ajax  event="change" process="@this" update="lettera"></p:ajax>
+									</p:selectOneMenu>
+									<p:message id="letteraMsg" for="lettera"/>
+								</div>
+							</div>
+
+							<br/>
+
+							<p:outputLabel value="Inserisci un allegato"/>
+							<div class="form-group">
+								<p:fileUpload id="uploadAllegatoAutocandidatura"
+									label="Scegli"
+									cancelLabel="Annulla"
+									dragDropSupport="false"
+									fileUploadListener="#{bean.uploadAllegatoFile}"
+									invalidSizeMessage="La dimensione del file dev'essere inferiore a 5 MB."
+									sizeLimit="5242880" 
+									update="filenamePG deleteAllegatoPG"
+									uploadLabel="Carica"
+									value="#{bean.allegatoUploaded}"
+									widgetVar="uploadAllegatoAutocandidaturaWV" 
+									>
+								</p:fileUpload>
+								<p:message id="messageAllegato" for="uploadAllegatoAutocandidatura"/>
+							</div>
+							<div class="form-group">
+								<h:panelGroup id="deleteAllegatoPG">
+									<p:commandButton id="deleteAllegatoBtn"
+										actionListener="#{bean.deleteAllegatoFile()}"
+										disabled="#{empty bean.allegatoUploaded}"
+										process="@this"
+										title="Rimuovi allegato"
+										update="filenamePG deleteAllegatoPG"
+										value="Rimuovi allegato"
+									/>
+								</h:panelGroup>
+								<h:panelGroup id="filenamePG">
+									<p:outputLabel id="filename" 
+										rendered="#{not empty bean.allegatoUploaded}" value="#{bean.allegatoUploaded.getFileName()}"/>
+							  	</h:panelGroup>
+							</div>
+							
+							<br/>
+							<h:panelGroup id="txt">
+								<p:outputLabel 
+									value="A seguito della candidatura sarà inviato un messaggio all'azienda interessata." />
+								<br/>
+								<p:outputLabel
+									value="Occorre pertanto compilare la sezione sottostante." />
+							</h:panelGroup>
+							<br/>
+							<br/>
+							
+							<p:outputLabel for="comment" value="Commento personale al messaggio"/>
+							<p:inputTextarea id="comment"
+								label="Commento personale al messaggio" 
+								required="true" requiredMessage="Campo obbligatorio" maxlength="2000"
+								value="#{bean.candidatura.commento}">
+								<p:ajax event="blur" update="commentMsg"/>
+							</p:inputTextarea>	
+							<p:message id="commentMsg" for="comment" />							
+							<br/>
+							<p:commandButton actionListener="#{bean.inviaAutocandidatura()}" rendered="#{bean.chekRER() == false}"
+								oncomplete="if(!args.validationFailed) PF('candidaVacancyDialogWV').hide();"
+								process="@form" 
+								update="@form :buttonsPG :messages" 
+						     	value="Invia autocandidatura">
+							   	<p:ajax event="click" update="@form"/>    
+							</p:commandButton>
+							<p:commandButton actionListener="#{bean.inviaAutocandidaturaRER()}" rendered="#{bean.chekRER() == true}"
+								oncomplete="if(!args.validationFailed) PF('candidaVacancyDialogWV').hide();"
+								process="@form"
+								update="@form :buttonsPG :messages"
+						     	value="Invia autocandidatura">
+							   	<p:ajax event="click" update="@form"/>    
+							</p:commandButton>
+							<p:commandButton onclick="PF('candidaVacancyDialogWV').hide();" value="Annulla" resetValues="true"/> 
+						</h:form>
+					</p:dialog>  
+				</ui:fragment>
+			</div>
+			<p:messages id="messages" globalOnly="true"/>
+		</h:panelGroup>
+		<p:button outcome="home" title="Torna alla scrivania" value="Torna alla scrivania"/>
+	</ui:define>
+</ui:composition>

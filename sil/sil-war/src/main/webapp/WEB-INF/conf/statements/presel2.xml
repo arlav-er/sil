@@ -1,0 +1,1268 @@
+<!-- ALBERI -->
+
+<STATEMENT name="GET_DE_TITOLO_PADRE"
+	query="select tit.codtitolo, tit.strdescrizione, nvl(tit.strdescrizioneparlante,tit.strdescrizione) as desTipologia, 
+               nvl(tit.flgLaurea,'N') as flglaurea, tit.codPadre, tit.cdnLivello 
+               from de_titolo tit               
+               WHERE tit.codtitolo = ?
+               ORDER BY tit.CODTITOLO" />
+
+
+<STATEMENT name="GET_DE_TITOLO"
+	query="select tit.codtitolo, tit.strdescrizione, nvl(tit.strdescrizioneparlante,tit.strdescrizione) as desTipologia, 
+               nvl(tit.flgLaurea,'N') as flglaurea, tit.codPadre, tit.cdnLivello
+               from de_titolo tit                
+               WHERE tit.codpadre = ?
+               ORDER BY tit.CODTITOLO" />
+
+
+<STATEMENT name="GET_DE_MANSIONE_PADRE"
+	query="select man.codMansione
+             , man.codMansione ||' - '||  man.strdescrizione 
+		        || DECODE (
+		          SYSDATE, 
+		          GREATEST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+		          ' (scaduto)',
+		          LEAST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+		          ' (scaduto)', 
+		          ''
+		        ) AS strdescrizione
+             , man_p.strDescrizione as desTipologia
+             , man.codPadre
+             , man.cdnLivello, man.flgIdo 
+               from de_mansione man
+               inner join de_mansione man_p on man_p.codmansione=substr(man.codMansione, 0, 5) || '00'
+               WHERE man.codMansione = ?
+               and man.flgmov = 'S'
+               ORDER BY man.codMansione" />
+
+<STATEMENT name="GET_DE_MANSIONE_PADRE_IDO"
+	query="select man.codMansione
+             , man.codMansione ||' - '||  man.strdescrizione 
+		        || DECODE (
+		          SYSDATE, 
+		          GREATEST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+		          ' (scaduto)',
+		          LEAST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+		          ' (scaduto)', 
+		          ''
+		        ) AS strdescrizione
+             , man_p.strDescrizione as desTipologia
+             , man.codPadre
+             , man.cdnLivello, man.flgIdo 
+               from de_mansione man
+               inner join de_mansione man_p on man_p.codmansione=substr(man.codMansione, 0, 5) || '00'
+               WHERE man.codMansione = ?
+               and man.flgido = 'S'
+               ORDER BY man.codMansione" />
+
+<STATEMENT name="GET_DE_MANSIONE_PADRE_FREQUENTE"
+	query="select man.codMansione
+             , man.codMansione ||' - '||  man.strdescrizione 
+		        || DECODE (
+		          SYSDATE, 
+		          GREATEST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+		          ' (scaduto)',
+		          LEAST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+		          ' (scaduto)', 
+		          ''
+		        ) AS strdescrizione
+             , man_p.strDescrizione as desTipologia
+             , man.codPadre
+             , man.cdnLivello, man.flgIdo 
+               from VW_de_mansione_flgFrequente man
+               inner join de_mansione man_p on man_p.codmansione=substr(man.codMansione, 0, 5) || '00'
+               WHERE man.codMansione = ?
+               and man.flgmov = 'S'
+               ORDER BY man.codMansione" />
+
+<STATEMENT name="GET_DE_MANSIONE_PADRE_FREQUENTE_IDO"
+	query="select man.codMansione
+             , man.codMansione ||' - '||  man.strdescrizione 
+		        || DECODE (
+		          SYSDATE, 
+		          GREATEST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+		          ' (scaduto)',
+		          LEAST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+		          ' (scaduto)', 
+		          ''
+		        ) AS strdescrizione
+             , man_p.strDescrizione as desTipologia
+             , man.codPadre
+             , man.cdnLivello, man.flgIdo
+               from VW_de_mansione_flgFrequente man
+               inner join de_mansione man_p on man_p.codmansione=substr(man.codMansione, 0, 5) || '00'
+               WHERE man.codMansione = ?
+               and man.flgido = 'S'
+               ORDER BY man.codMansione" />
+
+<STATEMENT name="GET_DE_MANSIONE"
+	query="select man.codMansione
+         , man.codMansione || ' - '|| man.strdescrizione
+	        || DECODE (
+	          SYSDATE, 
+	          GREATEST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+	          ' (scaduto)',
+	          LEAST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+	          ' (scaduto)', 
+	          ''
+	        ) AS strdescrizione
+         , man_p.strDescrizione as desTipologia
+         , man.codPadre
+         , man.cdnLivello, man.flgIdo 
+           from de_mansione man
+           inner join de_mansione man_p on man_p.codmansione=substr(man.codMansione, 0, 5) || '00'
+           WHERE man.codPadre = ?
+           and man.flgmov = 'S'
+           ORDER BY man.codMansione" />
+
+<STATEMENT name="GET_DE_MANSIONE_IDO"
+	query="select man.codMansione
+         , man.codMansione || ' - '|| man.strdescrizione
+	        || DECODE (
+	          SYSDATE, 
+	          GREATEST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+	          ' (scaduto)',
+	          LEAST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+	          ' (scaduto)', 
+	          ''
+	        ) AS strdescrizione
+         , man_p.strDescrizione as desTipologia
+         , man.codPadre
+         , man.cdnLivello, man.flgIdo
+           from de_mansione man
+           inner join de_mansione man_p on man_p.codmansione=substr(man.codMansione, 0, 5) || '00'
+           WHERE man.codPadre = ?
+           and man.flgido = 'S'
+           ORDER BY man.codMansione" />
+
+<STATEMENT name="GET_DE_MANSIONE_FREQUENTE"
+	query="select man.codMansione
+         , man.codMansione || ' - '|| man.strdescrizione 
+	        || DECODE (
+	          SYSDATE, 
+	          GREATEST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+	          ' (scaduto)',
+	          LEAST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+	          ' (scaduto)', 
+	          ''
+	        ) AS strdescrizione
+         , man_p.strDescrizione as desTipologia
+         , man.codPadre
+         , man.cdnLivello, man.flgIdo 
+           from VW_de_mansione_flgFrequente man
+           inner join de_mansione man_p on man_p.codmansione=substr(man.codMansione, 0, 5) || '00'
+           WHERE man.codPadre = ?
+           and man.flgmov = 'S'
+           ORDER BY man.codMansione" />
+
+<STATEMENT name="GET_DE_MANSIONE_FREQUENTE_IDO"
+	query="select man.codMansione
+         , man.codMansione || ' - '|| man.strdescrizione 
+	        || DECODE (
+	          SYSDATE, 
+	          GREATEST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+	          ' (scaduto)',
+	          LEAST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+	          ' (scaduto)', 
+	          ''
+	        ) AS strdescrizione
+         , man_p.strDescrizione as desTipologia
+         , man.codPadre
+         , man.cdnLivello, man.flgIdo 
+           from VW_de_mansione_flgFrequente man
+           inner join de_mansione man_p on man_p.codmansione=substr(man.codMansione, 0, 5) || '00'
+           WHERE man.codPadre = ?
+           and man.flgido = 'S'
+           ORDER BY man.codMansione" />
+
+<!-- /ALBERI -->
+
+<!-- TITOLI DI STUDIO -->
+
+<!-- NOTE: Dalla query sono stati rimosse le keyword JOIN e aggiunti i join 
+	nella where per renderla compatibile con le trasformazione del patto -->
+<STATEMENT name="GET_TITOLO"
+	query="SELECT prs.prgstudio, prs.cdnLavoratore, prs.codtitolo, prs.codtipotitolo, 
+                  prs.strspecifica, prs.stristscolastico, prs.codcom, prs.strlocalita,
+                  prs.strindirizzo, prs.numanno, prs.strvoto, prs.stresimi, prs.strtittesi,
+                  prs.strargtesi, prs.flglode, prs.codmonostato, prs.numannifreq, 
+                  prs.numanniprev, prs.strmotabbandono, prs.numesami, prs.flgprincipale,
+                  prs.codmonostatotit, prs.codtitoloold AS codtitoloold, prs.STRDESCRIZIONEOLD AS destitoloold,
+                  prs.cdnutins, TO_CHAR(prs.dtmins, 'DD/MM/YYYY hh24:mi') dtmins, prs.cdnutmod, 
+                  TO_CHAR(prs.dtmmod, 'DD/MM/YYYY hh24:mi') dtmmod, 
+                  com.strdenominazione  as strcom, trim(p.strIstat) as provincia, 
+                  tit.strdescrizione as destitolo, 
+                  tit2.strdescrizione as destipotitolo, tit2.flgLaurea as flgLaurea,
+                  tit_it.flgcompleto, tit_it.STRDESCRIZIONE as descrizione_stato   
+            FROM 
+              PR_STUDIO prs,
+              de_titolo tit,
+              de_titolo_italiano tit_it,
+              de_titolo tit2,
+              de_comune com,
+              de_provincia p
+            WHERE 
+              prgStudio=?
+              AND prs.codtitolo=tit.codtitolo
+              AND prs.codmonostato = tit_it.codmonostato
+              AND prs.codtipotitolo=tit2.codtitolo
+              AND prs.codcom=com.codcom(+)
+              AND com.codprovincia=p.codprovincia(+)" />
+<!--<STATEMENT name="GET_TITOLO" query="SELECT prs.prgstudio, prs.cdnLavoratore, 
+	prs.codtitolo, prs.codtipotitolo, prs.strspecifica, prs.stristscolastico, 
+	prs.codcom, prs.strlocalita, prs.strindirizzo, prs.numanno, prs.strvoto, 
+	prs.stresimi, prs.strtittesi, prs.strargtesi, prs.flglode, prs.codmonostato, 
+	prs.numannifreq, prs.numanniprev, prs.strmotabbandono, prs.numesami, prs.flgprincipale, 
+	prs.cdnutins, TO_CHAR(prs.dtmins, 'DD/MM/YYYY') dtmins, prs.cdnutmod, TO_CHAR(prs.dtmmod, 
+	'DD/MM/YYYY') dtmmod, com.strdenominazione as strcom, rtrim(p.strIstat) as 
+	provincia, tit.strdescrizione as destitolo, tit2.strdescrizione as destipotitolo, 
+	tit2.flgLaurea as flgLaurea FROM PR_STUDIO prs INNER JOIN de_titolo tit ON 
+	prs.codtitolo=tit.codtitolo INNER JOIN de_titolo tit2 ON prs.codtipotitolo=tit2.codtitolo 
+	LEFT JOIN de_comune com ON prs.codcom=com.codcom left join de_provincia p 
+	on com.codprovincia=p.codprovincia WHERE prgStudio=?"/> -->
+
+<STATEMENT name="GET_PRINCTITOLO"
+	query="SELECT prs.prgstudio, prs.codtitolo,  
+			dt.strdescrizione, dt.Flgpfconfdid, dt.FLGPFGG
+           FROM PR_STUDIO prs
+           inner join de_titolo dt on prs.codtitolo=dt.codtitolo
+           WHERE cdnlavoratore=?
+           and flgPrincipale='S' " />
+
+
+<STATEMENT name="SAVE_TITOLO"
+	query="UPDATE PR_STUDIO set
+                  codTipoTitolo=substr(?,0,2)||'000000',
+                  codTitolo=?,
+                  strSpecifica=?,
+                  flgPrincipale=?,
+                  codMonoStatoTit=?,
+                  strIstScolastico=?,
+                  strIndirizzo=?,
+                  strLocalita=?,
+                  codCom=?,
+                  codMonoStato=?,
+                  numAnniFreq=?,
+                  numAnniPrev=?,
+                  strMotAbbandono=?,
+                  numAnno=?,
+                  strVoto=?,
+                  strEsimi=?,
+                  strTitTesi=?,
+                  strArgTesi=?,
+                  flgLode=?,
+                  cdnUtmod=?, 
+                  dtmmod=SYSDATE
+                  where prgStudio=?" />
+
+
+<STATEMENT name="DEL_TITOLO"
+	query="DELETE FROM PR_STUDIO 
+           WHERE prgStudio=?" />
+
+<!-- NOTE: Dalla query sono stati rimosse le keyword JOIN e aggiunti i join 
+	nella where per renderla compatibile con le trasformazione del patto -->
+<STATEMENT name="GET_LAVORATORE_TITOLI"
+	query="SELECT DISTINCT prs.prgstudio, prs.codtitolo,
+        		 tit.strdescrizione AS destitolo,
+                 prs.codtipotitolo, tit2.strdescrizione AS destipotitolo,
+                 prs.strspecifica, prs.numanno numanno, NVL(prs.flgprincipale,' ') as flgprincipale,
+                 tit_it.strdescrizione as stato,
+                 tit.flglaurea,
+                 tit.strdescrizione||decode(prs.STRDESCRIZIONEOLD, NULL,'',' ('||prs.codtitoloold||'-'||prs.STRDESCRIZIONEOLD||') ') as destitolofull
+               FROM pr_studio prs,
+                 de_titolo tit,
+                 de_titolo_italiano tit_it,
+                 de_titolo tit2
+               WHERE 
+                 prs.codtitolo = tit.codtitolo
+                 AND prs.codMonoStato = tit_it.codmonostato
+                 AND prs.codtipotitolo = tit2.codtitolo
+                 AND prs.cdnlavoratore = ?            
+               ORDER BY 
+                 NVL (flgprincipale, ' ') DESC, NVL (prs.numanno, 0) DESC" />
+
+<STATEMENT name="GET_TIROCINI_LAVORATORE"
+	query="SELECT o.prgtirocinio,
+       o.cdnlavoratore,
+       o.codtipotirocinio,
+       tip.strdescrizione,
+       tip.strdescrizione
+       || DECODE (SYSDATE,
+                  GREATEST (SYSDATE, datfineval), ' (scaduto)',
+                  LEAST (SYSDATE, datinizioval), ' (non attivo)',
+                  '')
+          AS descrizione_tipo_tirocinio,
+       az.strragionesociale AS rag_soc_azienda,
+       az.strcodicefiscale AS cf_azienda,
+       TO_CHAR (o.datiniziotirocinio, 'DD/MM/YYYY') datiniziotirocinio,
+       TO_CHAR (o.datfinetirocinio, 'DD/MM/YYYY') datfinetirocinio,
+       o.strnoteprogetto,
+       o.numdurataore,
+       o.strsedepreferenza,
+       o.strcompetenzaacquisizione,
+       o.flgdocumentovalidazione,
+       o.strnota,
+       o.prgazienda,
+       o.prgunita,
+       o.dtmins,
+       o.cdnutins,
+       o.dtmmod,
+       o.cdnutmod,
+       o.numklotirocinio,
+       o.STRAREAPROF
+  FROM or_tirocinio o
+       LEFT JOIN de_tipo_tirocinio tip
+          ON o.codtipotirocinio = tip.codtipotirocinio
+       LEFT JOIN an_azienda az
+          ON az.prgazienda = o.prgazienda
+ WHERE o.cdnlavoratore = ?" />
+<!--<STATEMENT name="GET_LAVORATORE_TITOLI" query=" SELECT prs.prgstudio, 
+	prs.codtitolo, tit.strdescrizione as destitolo, prs.codtipotitolo, tit2.strdescrizione 
+	as destipotitolo, prs.strspecifica, prs.numanno numanno, prs.flgPrincipale, 
+	tit.flgLaurea FROM pr_studio prs INNER JOIN de_titolo tit ON prs.codtitolo=tit.codtitolo 
+	INNER JOIN de_titolo tit2 ON prs.codtipotitolo=tit2.codtitolo WHERE cdnLavoratore=? 
+	order by nvl(prs.flgprincipale,' ') desc, nvl(prs.numanno, 0) desc"/> -->
+	
+<STATEMENT name="GET_TIROCINIO"
+            query="  SELECT o.prgtirocinio,
+       o.PRGPERCORSO,
+       o.PRGCOLLOQUIO,
+       o.cdnlavoratore,
+       o.codtipotirocinio,
+       tip.strdescrizione,
+       tip.strdescrizione || DECODE(SYSDATE,
+                                    GREATEST(SYSDATE, tip.datfineval),
+                                    ' (scaduto)',
+                                    LEAST(SYSDATE, tip.datinizioval),
+                                    ' (non attivo)',
+                                    '') AS descrizione_tipo_tirocinio,
+       az.strragionesociale AS rag_soc_azienda,
+       az.strcodicefiscale AS cf_azienda,
+       az.strpartitaiva AS p_iva,
+       az.flgdatiok AS flgdatiok,
+       unita_az.strindirizzo AS indirizzo,
+       de_comune.strdenominazione AS comune,
+       tipo_az.codtipoazienda as codtipoazienda,
+       tipo_az.strdescrizione as strtipoazienda,
+       TO_CHAR(o.datiniziotirocinio, 'DD/MM/YYYY') datiniziotirocinio,
+       TO_CHAR(o.datfinetirocinio, 'DD/MM/YYYY') datfinetirocinio,
+       o.strnoteprogetto,
+       o.numdurataore,
+       o.strsedepreferenza,
+       o.strcompetenzaacquisizione,
+       o.flgdocumentovalidazione,
+       o.strnota,
+       o.prgazienda,
+       o.prgunita,
+       o.dtmins,
+       o.cdnutins,
+       o.dtmmod,
+       o.cdnutmod,
+       o.numklotirocinio,
+       o.prgunitasoggprom,
+       o.prgaziendasoggprom,
+       az2.strragionesociale AS rag_soc_SoggProm,
+       az2.strcodicefiscale AS cf_SoggProm,
+       az2.strpartitaiva AS p_iva_SoggProm,
+       az2.flgdatiok AS flgdati_ok_SoggProm,
+       unita_az2.strindirizzo AS indirizzoSoggProm,
+       dec2.strdenominazione AS comuneSoggProm,
+       tipo_az2.codtipoazienda as codtipoaziendaSoggProm,
+       tipo_az2.strdescrizione as strtipoaziendaSoggProm,
+       o.STRAREAPROF
+  FROM or_tirocinio o
+  LEFT JOIN de_tipo_tirocinio tip ON o.codtipotirocinio =    tip.codtipotirocinio
+  LEFT JOIN an_unita_azienda unita_az ON (unita_az.prgazienda = o.prgazienda and unita_az.prgunita= o.prgunita)  
+  LEFT JOIN an_azienda az ON az.prgazienda = unita_az.prgazienda  
+  LEFT JOIN de_tipo_azienda tipo_az ON tipo_az.codtipoazienda =   az.codtipoazienda  
+  LEFT JOIN de_comune ON de_comune.codcom = unita_az.codcom
+  
+  LEFT JOIN an_unita_azienda unita_az2 ON (unita_az2.prgazienda = o.prgaziendasoggprom and unita_az2.prgunita= o.prgunitasoggprom)  
+  LEFT JOIN an_azienda az2 ON az2.prgazienda = unita_az2.prgazienda  
+  LEFT JOIN de_tipo_azienda tipo_az2 ON tipo_az2.codtipoazienda =   az2.codtipoazienda  
+  LEFT JOIN de_comune dec2 ON dec2.codcom = unita_az2.codcom
+ WHERE o.prgtirocinio = ?" />
+
+<STATEMENT name="INSERT_TIROCINIO"
+	query="INSERT INTO OR_TIROCINIO
+                    (prgtirocinio,
+                     cdnlavoratore,
+                     codtipotirocinio,
+                     PRGCOLLOQUIO,
+                     PRGPERCORSO,
+                     datiniziotirocinio,
+                     datfinetirocinio,
+                     strnoteprogetto,
+                     numdurataore,
+                     strsedepreferenza,
+                     strcompetenzaacquisizione,
+                     flgdocumentovalidazione,
+                     strnota,
+                     prgazienda,
+                     prgunita,
+                     prgaziendasoggprom,
+                     prgunitasoggprom,                     
+                     dtmins,
+                     cdnutins,
+                     dtmmod,
+                     cdnutmod,
+                     STRAREAPROF)
+                  VALUES
+                     (S_OR_TIROCINIO.nextval,
+                     ?,
+                     ?,
+                     ?,
+                     ?,
+                     to_date(?, &apos;dd/mm/yyyy&apos;),
+                     to_date(?, &apos;dd/mm/yyyy&apos;),
+                     ?,
+                     ?,
+                     ?,
+                     ?,
+                     ?,
+                     ?,
+                     ?,
+                     ?,
+                     ?,
+                     ?,
+                     SYSDATE,
+                     ?,
+                     SYSDATE,
+                     ?,
+                     ?)" />
+                     
+<STATEMENT name="UPDATE_TIROCINIO"
+    query="UPDATE OR_TIROCINIO
+        SET CODTIPOTIROCINIO = ?,
+            PRGCOLLOQUIO = ?,
+            PRGPERCORSO = ?,
+            DATINIZIOTIROCINIO = to_date(?, &apos;dd/mm/yyyy&apos;),
+            DATFINETIROCINIO = to_date(?, &apos;dd/mm/yyyy&apos;),
+            STRNOTEPROGETTO = ?,
+            NUMDURATAORE = ?,
+            STRSEDEPREFERENZA = ?,
+            STRCOMPETENZAACQUISIZIONE = ?,
+            FLGDOCUMENTOVALIDAZIONE = ?,
+            STRNOTA = ?,
+            PRGAZIENDA = ?,
+            PRGUNITA = ?,
+            prgaziendasoggprom = ?,
+            prgunitasoggprom = ?,
+            DTMMOD = to_date(?, &apos;dd/mm/yyyy&apos;),
+            CDNUTMOD = ?,
+            STRAREAPROF = ?,
+            NUMKLOTIROCINIO = ?
+        WHERE PRGTIROCINIO = ?" />
+
+<STATEMENT name="DEL_TIROCINIO"
+	query="DELETE FROM OR_TIROCINIO 
+           WHERE prgTirocinio=?" />
+
+<STATEMENT name="GET_TIPO_TITOLI"
+	query=" SELECT codtitolo as codice, strdescrizione as descrizione, DECODE(flgLaurea,NULL,'N',flglaurea) AS flgLaurea
+                from DE_TITOLO
+                where cdnLivello=0
+                order by codice" />
+
+<STATEMENT name="GET_NEW_TITOLO"
+	query=" SELECT s_pr_studio.nextval as prgstudio from dual" />
+
+<STATEMENT name="INSERT_PR_STUDIO"
+	query="INSERT INTO PR_STUDIO
+                  (prgstudio,
+                  cdnLavoratore,
+                  codTipoTitolo,
+                  codTitolo,
+                  strSpecifica,
+                  flgPrincipale,
+                  codMonoStatoTit,
+                  strIstScolastico,
+                  strIndirizzo,
+                  strLocalita,
+                  codCom,
+                  codMonoStato,
+                  numAnniFreq,
+                  numAnniPrev,
+                  strMotAbbandono,
+                  numAnno,
+                  strVoto,
+                  strEsimi,
+                  strTitTesi,
+                  strArgTesi,
+                  flgLode,
+                  cdnUtins, dtmins,
+                  cdnUtmod, dtmmod)
+                  VALUES 
+                  ( ?,
+                    ?,
+                    substr(?,0,2)||'000000', ?, ?,  
+                    ?,
+                    ?,
+                    ?, ?, ?, ?,
+                    ?,
+                    ?, ?, ?, ?, ?, ?, 
+                    ?, ?, ?,
+                   ?, SYSDATE, 
+                   ?, SYSDATE 
+                   )" />
+
+
+<STATEMENT name="SELECT_UNIQUE_TITOLO_STUDIO"
+	query="SELECT prgstudio
+                   from PR_STUDIO
+                   where codTitolo=?
+                   and cdnLavoratore=? " />
+
+<STATEMENT name="DISASSERT_PRINCIPALE"
+	query="update pr_studio
+                   set flgPrincipale='N'
+                   where cdnLavoratore=?
+                   and flgPrincipale='S'" />
+
+
+<STATEMENT name="CERCA_TITOLOSTUDIO_CODTITOLO"
+	query="select tit.codtitolo, tit.strdescrizione, tit_p.strDescrizione as desTipologia, DECODE(tit.flglaurea,NULL,'N',tit.flglaurea) AS flglaurea
+                   from de_titolo tit
+                   inner join de_titolo tit_p on tit_p.codtitolo=substr(tit.codTitolo, 0, 2) || '000000'
+                   where lower(tit.codTitolo) like lower(?) || '%'
+                   order by strdescrizione" />
+
+<STATEMENT name="CERCA_TITOLOSTUDIO_DESTITOLO"
+	query="select tit.codtitolo, tit.strdescrizione, tit_p.strDescrizione as desTipologia, DECODE(tit.flglaurea,NULL,'N',tit.flglaurea) AS flglaurea
+                   from de_titolo tit
+                   inner join de_titolo tit_p on tit_p.codtitolo=substr(tit.codTitolo, 0, 2) || '000000'
+                   where lower(tit.strdescrizione) like '%' || lower(?) || '%' 
+                   order by strdescrizione" />
+
+
+
+<!-- TITOLI DI STUDIO -->
+
+
+<!-- ABILITAZIONI -->
+
+<STATEMENT name="GET_TIPI_ABILITAZIONE"
+	query="SELECT da.codtipoabilitazionegen as tipo, 
+				da.codabilitazionegen as codice, 
+				(da.strdescrizione  || ' (Min: ' ||NVL( mn.des_desabilitazione,'nessuna corrispondenza') || ')')
+				    as descrizione,
+				ma.codabilitazione
+				FROM de_abilitazione_gen da
+				left join ma_abilitazione ma on ma.codabilitazionegen = da.codabilitazionegen
+				left join mn_abilitazione mn on mn.cod_abilitazione = ma.codabilitazione
+				ORDER BY strdescrizione" />
+
+<STATEMENT name="GET_TIPI_GENABILITAZIONE"
+	query=" select codtipoabilitazionegen as codice, strdescrizione as descrizione 
+                from de_tipo_abilitazione_gen order by strdescrizione" />
+
+
+<STATEMENT name="GET_NEW_ABILITAZIONE"
+	query=" SELECT s_pr_abilitazione.nextval as prgabilitazione from dual" />
+
+
+<STATEMENT name="INSERT_PR_ABILITAZIONE"
+	query="INSERT INTO PR_ABILITAZIONE
+                  (prgabilitazione,
+                  cdnLavoratore,
+                  codabilitazionegen,
+                  strNote,
+                  cdnUtins, dtmins,
+                  cdnUtmod, dtmmod)
+                  VALUES 
+                  ( s_pr_abilitazione.nextval,
+                    ?,
+                    ?,
+                    ?,
+                   ?, SYSDATE, 
+                   ?, SYSDATE 
+                   )" />
+
+
+<STATEMENT name="SELECT_UNIQUE_ABILITAZIONE"
+	query="SELECT prgAbilitazione
+                   from pr_abilitazione
+                   where codAbilitazionegen=?
+                   and cdnLavoratore=? " />
+
+<STATEMENT name="GET_LAVORATORE_ABILITAZIONI"
+	query="select prab.prgabilitazione, 
+				prab.cdnlavoratore,
+				prab.codabilitazionegen,
+				prab.strnote,
+				prab.cdnutins,
+				prab.dtmins,
+				prab.cdnutmod,
+				prab.dtmmod,
+				(da.strdescrizione || ' (Min: ' || NVL(mn.des_desabilitazione,'nessuna corrispondenza') || ')')	as strdescrizione
+				from pr_abilitazione prab
+				inner join de_abilitazione_gen da on da.codabilitazionegen=prab.codabilitazionegen 
+				left join ma_abilitazione ma on ma.codabilitazionegen = da.codabilitazionegen
+				left join mn_abilitazione mn on mn.cod_abilitazione = ma.codabilitazione
+                WHERE cdnLavoratore=?" />
+
+<STATEMENT name="DEL_ABILITAZIONE"
+	query="DELETE FROM PR_ABILITAZIONE 
+           WHERE prgAbilitazione=?" />
+
+<STATEMENT name="GET_ABILITAZIONE"
+	query="select pra.prgabilitazione, pra.cdnlavoratore, pra.codabilitazionegen, pra.strnote, 
+			pra.cdnutins, TO_CHAR(pra.dtmins, 'DD/MM/YYYY hh24:mi') dtmins, pra.cdnutmod, 
+			TO_CHAR(pra.dtmmod, 'DD/MM/YYYY hh24:mi') dtmmod,
+			case   	   
+			    when ma.codabilitazione is not null
+			         then (cdab.strdescrizione || ' (Min: ' || mn.des_desabilitazione || ')')	     
+			    else cdab.strdescrizione || ' (Min: nessuna corrispondenza)'
+			end as desabilitazionegen, 
+			cdabgen.codtipoabilitazionegen, 
+			(cdab.strdescrizione || ' (Min: ' || NVL(mn.des_desabilitazione,'nessuna corrispondenza') || ')')	     
+			as destipoabilitazionegen                   
+			from pr_abilitazione pra
+			inner join de_abilitazione_gen cdab on pra.CODABILITAZIONEGEN = cdab.codabilitazionegen
+			inner join de_tipo_abilitazione_gen cdabgen on cdab.codtipoabilitazionegen=cdabgen.codtipoabilitazionegen
+			left join ma_abilitazione ma on ma.codabilitazionegen = cdab.codabilitazionegen
+			left join mn_abilitazione mn on mn.cod_abilitazione = ma.codabilitazione
+           WHERE prgAbilitazione=?" />
+
+
+<STATEMENT name="SAVE_ABILITAZIONE"
+	query="UPDATE PR_ABILITAZIONE set
+                  codAbilitazioneGen=?,
+                  strNote=?,
+                  cdnUtmod=?, 
+                  dtmmod=SYSDATE
+                  where prgAbilitazione=?" />
+
+<!-- ABILITAZIONI -->
+
+
+<!-- COMPETENZE -->
+<STATEMENT name="GET_TIPI_COMPETENZA"
+	query=" SELECT codtipocompetenza codice, strdescrizione descrizione 
+                FROM de_tipo_competenza ORDER BY STRDESCRIZIONE" />
+
+<STATEMENT name="GET_COMPETENZE"
+	query=" SELECT codcompetenza as CODICE, codtipocompetenza as TIPO, strdescrizione as DESCRIZIONE
+                FROM de_competenza ORDER BY STRDESCRIZIONE" />
+
+<STATEMENT name="GET_LAVORATORE_COMPETENZE"
+	query=" SELECT prc.prgCompetenza, prc.codcompetenza, dc.strdescrizione, prc.strdescrizione note,  dc.codtipocompetenza tipocompetenza
+                FROM pr_competenza prc
+                INNER JOIN de_competenza dc ON prc.codcompetenza=dc.codcompetenza
+                WHERE cdnLavoratore=?" />
+
+
+<STATEMENT name="GET_NEW_COMPETENZA"
+	query=" SELECT s_pr_competenza.nextval as prgcompetenza from dual" />
+
+<STATEMENT name="INSERT_PR_COMPETENZA"
+	query="INSERT INTO PR_COMPETENZA
+                  (prgcompetenza,
+                  cdnLavoratore,
+                  codcompetenza,
+                  strDescrizione,
+                  cdnUtins, dtmins,
+                  cdnUtmod, dtmmod)
+                  VALUES 
+                  ( s_pr_competenza.nextval,
+                    ?,
+                    ?,
+                    ?,
+                   ?, SYSDATE, 
+                   ?, SYSDATE 
+                   )" />
+
+
+<STATEMENT name="SELECT_UNIQUE_COMPETENZA"
+	query="SELECT prgcompetenza
+                   from pr_competenza
+                   where codCompetenza=?
+                   and cdnLavoratore=? " />
+
+<STATEMENT name="DEL_COMPETENZA"
+	query="DELETE FROM PR_COMPETENZA 
+           WHERE prgCompetenza=?" />
+
+<STATEMENT name="GET_COMPETENZA_SINGOLA"
+	query="SELECT prc.prgCompetenza, prc.codcompetenza,  prc.strdescrizione note,  
+                  prc.cdnutins, TO_CHAR(prc.dtmins, 'DD/MM/YYYY hh24:mi') dtmins, prc.cdnutmod, 
+                  TO_CHAR(prc.dtmmod, 'DD/MM/YYYY hh24:mi') dtmmod,
+                  dc.codtipocompetenza tipocompetenza
+           FROM pr_competenza prc
+           INNER JOIN de_competenza dc ON prc.codcompetenza=dc.codcompetenza
+           WHERE prgCompetenza=?" />
+
+
+<STATEMENT name="SAVE_COMPETENZA"
+	query="UPDATE PR_COMPETENZA set
+                  codCompetenza=?,
+                  strDescrizione=?,
+                  cdnUtmod=?, 
+                  dtmmod=SYSDATE
+                  where prgCompetenza=?" />
+<!-- /COMPETENZE -->
+
+<!-- ESPERIENZE LAVORATIVE -->
+<STATEMENT name="GET_TIPI_CONTRATTO"
+	query=" SELECT codContratto as codice, 
+                        DECODE( GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, 
+                               STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...' ) 
+                      || DECODE (SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)',  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)', '') AS DESCRIZIONE, flgAutonomo
+                FROM de_contratto
+                WHERE flgEspLav = 'S'
+                ORDER BY codcontratto" />
+
+<STATEMENT name="GET_COMBO_DE_TIPO_CONTRATTO"
+	query="  SELECT codtipocontratto as codice, 
+         codcontratto,
+         DECODE (GREATEST (LENGTH (strdescrizione), 45),
+                 45, strdescrizione,
+                 SUBSTR (strdescrizione, 1, 45) || '...')
+         || DECODE (SYSDATE,
+                    GREATEST (SYSDATE, datinizioval, datfineval), ' (scaduto)',
+                    LEAST (SYSDATE, datinizioval, datfineval), ' (scaduto)',
+                    '')
+            AS descrizione,
+         codmonotipo
+    FROM de_tipo_contratto
+ORDER BY codtipocontratto" />
+
+<STATEMENT name="GET_COMBO_DE_RAPLAV"
+    query="  SELECT codrapportolav as codice, 
+         DECODE (GREATEST (LENGTH (strdescrizione), 45),
+                 45, strdescrizione,
+                 SUBSTR (strdescrizione, 1, 45) || '...')
+         || DECODE (SYSDATE,
+                    GREATEST (SYSDATE, datinizioval, datfineval), ' (scaduto)',
+                    LEAST (SYSDATE, datinizioval, datfineval), ' (scaduto)',
+                    '')
+            AS descrizione
+    FROM de_rapporto_lav
+ORDER BY codice" />
+
+<STATEMENT name="GET_COMBO_DE_TIPO_TIROCINIO"
+	query="  SELECT codtipotirocinio AS codice,
+         codtipotirocinio,
+         de_tipo_tirocinio.strdescrizione
+         || DECODE (SYSDATE,
+                    GREATEST (SYSDATE, datfineval), ' (scaduto)',
+                    LEAST (SYSDATE, datinizioval), ' (non attivo)',
+                    '')
+            AS descrizione,
+         strdescrizione,
+         TO_CHAR (datfineval, 'DD/MM/YYYY') datfineval,
+         TO_CHAR (datinizioval, 'DD/MM/YYYY') datinizioval
+    FROM de_tipo_tirocinio
+ORDER BY codtipotirocinio" />
+
+
+<STATEMENT name="GET_COMBO_AZIONE"
+	query="  select orc.prgcolloquio||'-'||orpc.prgpercorso as codice,
+       orc.prgcolloquio,       
+       dea.strdescrizione || ' - ' ||
+       TO_CHAR(orpc.datstimata, 'DD/MM/YYYY') || ' - ' ||
+       dee.strdescrizione as descrizione
+  from or_percorso_concordato orpc
+ inner join or_colloquio orc on orc.prgcolloquio = orpc.prgcolloquio
+ inner join de_azione dea on dea.prgazioni = orpc.prgazioni
+ inner join de_esito dee on dee.codesito = orpc.codesito
+ where orc.cdnlavoratore = ?
+ ORDER BY orpc.datstimata desc " />
+
+
+<STATEMENT name="GET_TIPI_ATTIVITA"
+	query="SELECT codAteco as codice, 
+                       DECODE( GREATEST(LENGTH(STRDESCRIZIONE||' (scaduto)'),55) , 55, 
+                               STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 52) || '...' ) 
+                      || DECODE (SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)',  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)', '') AS DESCRIZIONE
+                FROM de_attivita
+                WHERE cdnlivello=0 AND DATFINEVAL &gt; trunc(sysdate)
+			ORDER BY DESCRIZIONE" />
+
+<STATEMENT name="GET_DE_ATTIVITA_PADRE"
+	query="SELECT att.codateco, 
+        				DECODE( GREATEST(LENGTH(att.strdescrizione ||' (scaduto)'),45) , 45, 
+                               att.strdescrizione, SUBSTR(att.strdescrizione, 1, 35) || '...' ) 
+                      || DECODE (SYSDATE, GREATEST(SYSDATE, att.DATINIZIOVAL, att.DATFINEVAL),
+                                ' (scaduto)',  LEAST(SYSDATE, att.DATINIZIOVAL, att.DATFINEVAL),
+                                ' (scaduto)', '') AS strdescrizione,  
+                  	  att_p.strdescrizione as desTipoAteco, 
+                  	  att.codPadre, att.cdnLivello 
+               FROM DE_ATTIVITA att
+               LEFT JOIN DE_ATTIVITA att_p on att_p.codAteco=att.CODPADRE 
+               WHERE att.codAteco=? 
+               ORDER BY att.codAteco" />
+
+
+<STATEMENT name="GET_DE_ATTIVITA"
+	query="SELECT att.codateco, 
+        			  DECODE( GREATEST(LENGTH(att.strdescrizione ||' (scaduto)'),45) , 45, 
+                               att.strdescrizione, SUBSTR(att.strdescrizione, 1, 35) || '...' ) 
+                      || DECODE (SYSDATE, GREATEST(SYSDATE, att.DATINIZIOVAL, att.DATFINEVAL),
+                                ' (scaduto)',  LEAST(SYSDATE, att.DATINIZIOVAL, att.DATFINEVAL),
+                                ' (scaduto)', '') AS strdescrizione, 
+                  	  att_p.strdescrizione as desTipoAteco, 
+                  	  att.codPadre, att.cdnLivello 
+               FROM DE_ATTIVITA att
+               LEFT JOIN DE_ATTIVITA att_p on att_p.codAteco=att.CODPADRE
+               WHERE att.codpadre=? 
+               ORDER BY att.codAteco" />
+
+
+<STATEMENT name="GET_TIPI_CCNL"
+	query=" SELECT codCcnl as codice, 
+        	   strDescrizione  
+			   || DECODE (
+		          SYSDATE, 
+		          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+		          ' (scaduto)',
+		          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+		          ' (scaduto)', 
+		          ''
+		        ) as descrizione
+                FROM de_contratto_collettivo
+                where codpadre='0'
+        				ORDER BY descrizione" />
+
+<STATEMENT name="GET_CCNL"
+	query="SELECT codPadre as tipo, codCcnl as codice, strDescrizione as descrizione, NUMDURATAAPPRENDIST  
+                FROM de_contratto_collettivo
+        				ORDER BY descrizione" />
+
+<STATEMENT name="GET_AREA"
+	query=" SELECT codarea as codice, strdescrizione as descrizione 
+                FROM de_area
+                ORDER BY DECODE(CODICE,'NT',1,0), STRDESCRIZIONE" />
+
+
+<STATEMENT name="GET_TIPI_ORARIO"
+	query="SELECT de_orario.codorario as codice, 
+	   	   				de_orario.strdescrizione || 
+	   	   				decode(de_orario.codmonoorario,    
+	   	   				'T',' (Min: Full Time)',
+	   	   				'P',' (Min: Part Time)',
+	   	   				' (Min: nessuna corrispondenza)')  as descrizione    
+  	  				FROM de_orario 				
+  				ORDER BY codice" />
+
+<STATEMENT name="GET_TIPI_CESSAZIONE"
+	query=" select CODMVCESSAZIONE AS codice, strdescrizione as descrizione 
+                FROM de_mv_cessazione
+                order by DECODE(CODICE,'NT',1,0), STRDESCRIZIONE" />
+
+<STATEMENT name="GET_TIPI_CERTIFICATO"
+	query=" SELECT codtipocertificato AS codice, strdescrizione AS descrizione
+                FROM de_tipo_corso
+                order by codtipocertificato" />
+
+
+<STATEMENT name="GET_TIPI_NATGIURIDICA"
+	query=" SELECT codnatgiuridica as codice, DECODE( GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, 
+                               STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...' ) 
+                      || DECODE (SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)',  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)', '') AS DESCRIZIONE
+                FROM de_nat_giuridica
+                order by DECODE(CODNATGIURIDICA,'NT',1,0) || DECODE(CODNATGIURIDICA,'AF',1,0), DESCRIZIONE" />
+
+<STATEMENT name="GET_ESP_LAVORO"
+	query=" SELECT el.prgEspLavoro, el.prgMansione, dm.strdescrizione as desMansione, 
+                       decode(el.nummeseinizio, null, to_char(el.numannoinizio), 
+					   							to_char(
+					   									decode(
+															    el.nummeseinizio, 1 , '0'||to_char(el.nummeseinizio), 
+																				  2 , '0'||to_char(el.nummeseinizio),
+																				  3 , '0'||to_char(el.nummeseinizio),
+																				  4 , '0'||to_char(el.nummeseinizio),
+																 				  5 , '0'||to_char(el.nummeseinizio),
+																 				  6 , '0'||to_char(el.nummeseinizio),
+																				  7 , '0'||to_char(el.nummeseinizio),
+																 				  8 , '0'||to_char(el.nummeseinizio),
+																 				  9 , '0'||to_char(el.nummeseinizio),
+																to_char(el.nummeseinizio)																																																																																									
+															   )
+													     ) || '/' || to_char(el.numannoinizio) 
+							  ) as numannoinizio,
+                       decode(el.nummesefine, null, to_char(el.numannofine), 
+					   							to_char(
+					   									decode(
+															    el.nummesefine, 1 , '0'||to_char(el.nummesefine), 
+																				2 , '0'||to_char(el.nummesefine),
+																				3 , '0'||to_char(el.nummesefine),
+																				4 , '0'||to_char(el.nummesefine),
+																 				5 , '0'||to_char(el.nummesefine),
+																 				6 , '0'||to_char(el.nummesefine),
+																				7 , '0'||to_char(el.nummesefine),
+																 				8 , '0'||to_char(el.nummesefine),
+																 				9 , '0'||to_char(el.nummesefine),
+																to_char(el.nummesefine)																																																																																									
+															   )
+													     ) || '/' || to_char(el.numannofine) 
+							  ) as numannofine,
+                       dc.strdescrizione desContratto 
+                FROM 
+                  pr_esp_lavoro el,
+                  pr_mansione m,
+                  de_mansione dm,
+                  de_contratto dc
+                WHERE 
+                  m.cdnlavoratore=?
+                  AND m.prgmansione=el.prgmansione
+                  AND m.codmansione=dm.codmansione
+                  AND el.codcontratto=dc.codcontratto(+)
+                  AND NVL(dc.flgtirocini,'N') &lt;&gt; 'S'
+                ORDER BY el.numannoinizio desc, el.nummeseinizio desc" />
+
+
+<STATEMENT name="GETSEQUENCE_ESPLAV"
+	query=" SELECT s_pr_esp_lavoro.nextval as prgesplavoro from dual" />
+
+
+
+<STATEMENT name="INSERT_ESP_LAVORO"
+	query="INSERT
+INTO   pr_esp_lavoro
+       (
+              prgesplavoro, prgmansione, codcontratto, codrapportolav,
+              codateco, codccnl, strriflegge, strdesattivita,
+              strlivello, codarea, nummeseinizio, numannoinizio,
+              nummesefine, numannofine, nummesi, numore,
+              numoresett, codorario, strcodfiscaleazienda, strpartitaivaazienda,
+              strragsocialeazienda, codcomazienda, strindirizzoazienda, codnatgiuridica,
+              strtipoclienti, numstipendio, flgcompletato, codmvcessazione,
+              strmotcessazione, codtipocertificato, cdnutins, dtmins,
+              cdnutmod, dtmmod
+       )
+       VALUES
+       (
+              ?, ?, ?, ?,
+              ?, ?, ?, ?,
+              ?, ?, ?, ?,
+              ?, ?, ?, ?,
+              ?, ?, ?, ?,
+              ?, ?, ?, ?,
+              ?, ?, ?, ?,
+              ?, ?, ?, SYSDATE,
+              ?, SYSDATE
+       )" />
+
+
+<STATEMENT name="DEL_ESPLAV"
+	query="DELETE FROM PR_ESP_LAVORO 
+           WHERE prgEspLavoro=?" />
+
+<STATEMENT name="SAVE_ESP_LAVORO"
+	query="UPDATE PR_ESP_LAVORO
+               SET PRGMANSIONE=?,
+                   CODCONTRATTO=?, 
+                   CODRAPPORTOLAV=?, 
+                   CODATECO=?, 
+                   CODCCNL=?, 
+                   STRRIFLEGGE=?, 
+                   STRDESATTIVITA=?, 
+                   STRLIVELLO=?, 
+                   CODAREA=?, 
+                   NUMMESEINIZIO=?, NUMANNOINIZIO=?, 
+                   NUMMESEFINE=?, NUMANNOFINE=?, 
+                   NUMMESI=?, NUMORE=?, NUMORESETT=?, 
+                   CODORARIO=?, 
+                   STRCODFISCALEAZIENDA=?, STRPARTITAIVAAZIENDA=?, STRRAGSOCIALEAZIENDA=?, 
+                   CODCOMAZIENDA=?, STRINDIRIZZOAZIENDA=?, 
+                   CODNATGIURIDICA=?, STRTIPOCLIENTI=?, NUMSTIPENDIO=?, 
+                   FLGCOMPLETATO=?, CODMVCESSAZIONE=?, 
+                   STRMOTCESSAZIONE=?, CODTIPOCERTIFICATO=?, 
+                   CDNUTMOD=?, DTMMOD=SYSDATE
+                  WHERE PRGESPLAVORO=?" />
+
+
+<STATEMENT name="UPDATE_FLAG_ESPERIENZA_MANSIONE"
+	query="update PR_MANSIONE
+               set flgEsperienza=?
+               where prgMansione=?" />
+
+<STATEMENT name="GET_ESPERIENZA_LAVORATIVA"
+	query="
+SELECT el.prgesplavoro, el.prgmansione,
+       el.codcontratto, el.codrapportolav,
+       c.flgautonomo, el.codateco,
+       DECODE (GREATEST (LENGTH (att.strdescrizione), 45), 45, att.strdescrizione, SUBSTR (att.strdescrizione, 1, 45) || '...') AS strdesateco,
+       DECODE (GREATEST (LENGTH (att2.strdescrizione), 45), 45, att2.strdescrizione, SUBSTR (att2.strdescrizione, 1, 45) || '...') AS tipo_ateco,
+       de_ccnl.codpadre AS tipo_ccnl, el.codccnl,
+       el.strriflegge, el.strdesattivita,
+       el.strlivello, el.codarea,
+       el.nummeseinizio, el.numannoinizio,
+       el.nummesefine, el.numannofine,
+       el.nummesi, el.numore,
+       el.numoresett, el.codorario,
+       el.strcodfiscaleazienda, el.strragsocialeazienda,
+       el.strpartitaivaazienda, el.codcomazienda,
+       com.strdenominazione AS strcomazienda, TRIM (p.stristat) AS provincia,
+       el.strindirizzoazienda, el.codnatgiuridica,
+       el.strtipoclienti, el.numstipendio,
+       el.flgcompletato, el.codmvcessazione,
+       el.strmotcessazione, el.codtipocertificato,
+       el.cdnutins, TO_CHAR (el.dtmins, 'DD/MM/YYYY hh24:mi') dtmins,
+       el.cdnutmod, TO_CHAR (el.dtmmod, 'DD/MM/YYYY hh24:mi') dtmmod
+FROM   pr_esp_lavoro el, de_comune com,
+       de_provincia p, de_contratto_collettivo de_ccnl,
+       de_attivita att, de_attivita att2,
+       de_contratto c
+WHERE  el.codcomazienda   = com.codcom(+)
+AND    com.codprovincia   = p.codprovincia(+)
+AND    de_ccnl.codccnl(+) = el.codccnl
+AND    att.codateco(+)    = el.codateco
+AND    att.codpadre       = att2.codateco(+)
+AND    el.codcontratto    = c.codcontratto(+)
+AND    el.prgesplavoro    = ?" />
+
+<!-- Versione della query con i JOIN nella sezione FROM, non piu' utilizzata 
+	perche' crea problemi col codice del patto che va a manipolare la query. 
+	<STATEMENT name="GET_ESPERIENZA_LAVORATIVA" query="SELECT el.prgEspLavoro, 
+	el.PRGMANSIONE, el.CODCONTRATTO, el.CODATECO, DECODE( GREATEST(LENGTH(att.strdescrizione),45) 
+	, 45, att.STRDESCRIZIONE, SUBSTR(att.strdescrizione, 1, 45) || '...' ) as 
+	strdesateco, DECODE( GREATEST(LENGTH(att2.strdescrizione),45) , 45, att2.STRDESCRIZIONE, 
+	SUBSTR(att2.strdescrizione, 1, 45) || '...' ) as tipo_ateco, de_ccnl.codpadre 
+	as tipo_ccnl, el.CODCCNL, el.STRRIFLEGGE, el.STRDESATTIVITA, el.STRLIVELLO, 
+	el.CODAREA, el.NUMMESEINIZIO, el.NUMANNOINIZIO, el.NUMMESEFINE, el.NUMANNOFINE, 
+	el.NUMMESI, el.NUMORE, el.NUMORESETT, el.CODORARIO, el.STRCODFISCALEAZIENDA, 
+	el.STRRAGSOCIALEAZIENDA, el.STRPARTITAIVAAZIENDA, el.CODCOMAZIENDA, com.strdenominazione 
+	as strcomazienda, trim(p.strIstat) as provincia, el.STRINDIRIZZOAZIENDA, 
+	el.CODNATGIURIDICA, el.STRTIPOCLIENTI, el.NUMSTIPENDIO, el.FLGCOMPLETATO, 
+	el.CODMVCESSAZIONE, el.STRMOTCESSAZIONE, el.CODTIPOCERTIFICATO, el.CDNUTINS, 
+	TO_CHAR(el.DTMINS, 'DD/MM/YYYY') dtmins, el.CDNUTMOD, TO_CHAR(el.DTMMOD, 
+	'DD/MM/YYYY') DTMMOD FROM pr_esp_lavoro el LEFT JOIN de_comune com on el.codComAzienda=com.codcom 
+	LEFT JOIN de_provincia p on com.codprovincia=p.codprovincia LEFT JOIN de_contratto_collettivo 
+	de_ccnl on de_ccnl.codccnl=el.codccnl LEFT JOIN de_attivita att on att.codateco=el.codateco 
+	LEFT JOIN de_attivita att2 on att2.codateco=substr(el.codateco,0,2)||'000' 
+	WHERE el.prgEspLavoro=?" /> -->
+
+
+<STATEMENT name="CERCA_ATECO_CODTITOLO"
+	query="select att.codateco, 
+                   decode(att.codAtecoDot,NULL,'',att.codAtecoDot||' - ')||DECODE( GREATEST(LENGTH(att.strdescrizione ||' (scaduto)' ),75) , 75, 
+                               att.STRDESCRIZIONE, SUBSTR(att.strdescrizione, 1, 75) || '...' )  || DECODE (SYSDATE, GREATEST(SYSDATE, att.DATINIZIOVAL, att.DATFINEVAL),
+                                ' (scaduto)',  LEAST(SYSDATE, att.DATINIZIOVAL, att.DATFINEVAL),
+                                ' (scaduto)', '')
+                               as strateco, 
+                  DECODE( GREATEST(LENGTH(att_p.strdescrizione ||' (scaduto)'),75) , 75, 
+                               att_p.STRDESCRIZIONE, SUBSTR(att_p.strdescrizione, 1, 75) || '...' ) || DECODE (SYSDATE, GREATEST(SYSDATE, att_p.DATINIZIOVAL, att_p.DATFINEVAL),
+                                ' (scaduto)',  LEAST(SYSDATE, att_p.DATINIZIOVAL, att_p.DATFINEVAL),
+                                ' (scaduto)', '') 
+                               as strTipoAteco
+                   from de_attivita att
+                   INNER JOIN DE_ATTIVITA att_p on att_p.codAteco=att.CODPADRE
+                   where att.codAteco like ? || '%' and att.codatecodot IS NOT NULL	
+                   order by strateco" />
+
+<STATEMENT name="CERCA_ATECO_DESATECO"
+	query="select att.codateco,  
+	   decode(att.codAtecoDot,NULL,'',att.codAtecoDot||' - ')||att.STRDESCRIZIONE || 
+	   DECODE (SYSDATE, GREATEST(SYSDATE, att.DATINIZIOVAL, att.DATFINEVAL), ' (scaduto)',  
+	                    LEAST(SYSDATE, att.DATINIZIOVAL, att.DATFINEVAL),' (scaduto)', '') as strateco,
+       att_p.STRDESCRIZIONE || 
+	   DECODE (SYSDATE, GREATEST(SYSDATE, att_p.DATINIZIOVAL, att_p.DATFINEVAL),
+        ' (scaduto)',  LEAST(SYSDATE, att_p.DATINIZIOVAL, att_p.DATFINEVAL),
+        ' (scaduto)', '') 
+       as strTipoAteco
+from de_attivita att
+INNER JOIN DE_ATTIVITA att_p on att_p.codAteco=att.CODPADRE
+where lower(att.strdescrizione) like '%' || lower(?) || '%' and att.codatecodot IS NOT NULL
+order by strateco" />
+
+
+
+<!-- /ESPERIENZE LAVORATIVE -->
+
+
+
+<!-- MANSIONI (da spostare) -->
+
+<STATEMENT name="CERCA_MANSIONE_CODMANSIONE"
+	query="select man.codMansione,
+					      man.STRDESCRIZIONE 
+						  || DECODE (
+				          SYSDATE, 
+				          GREATEST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+				          ' (scaduto)',
+				          LEAST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+				          ' (scaduto)', 
+				          ''
+				          ) as desMansione, 
+						  man_p.STRDESCRIZIONE as desTipoMansione, 
+						  man.flgFrequente
+					  from de_mansione man
+					 inner join de_mansione man_p on man_p.codMansione=substr(man.codMansione, 0, 5) || '00'
+					 where man.codMansione like ? || '%'
+					 order by desMansione" />
+
+<STATEMENT name="CERCA_MANSIONE_CODMANSIONE_FREQUENTE"
+	query="select man.codMansione, 
+              DECODE( GREATEST(LENGTH(man.strdescrizione),100) , 100, 
+                          man.STRDESCRIZIONE, SUBSTR(man.strdescrizione, 1, 100) || '...' ) 
+              || DECODE (
+		          SYSDATE, 
+		          GREATEST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+		          ' (scaduto)',
+		          LEAST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+		          ' (scaduto)', 
+		          ''
+		      ) as desMansione, 
+              DECODE( GREATEST(LENGTH(man_p.strdescrizione),100) , 100, 
+                          man_p.STRDESCRIZIONE, SUBSTR(man_p.strdescrizione, 1, 100) || '...' ) 
+                          as desTipoMansione, man.flgFrequente
+              from vw_de_mansione_flgFrequente man
+              inner join de_mansione man_p on man_p.codMansione=substr(man.codMansione, 0, 5) || '00'
+              where man.codMansione like ? || '%' 
+              AND UPPER(man.flgfrequente) = 'S'
+              order by desMansione" />
+
+
+
+
+<STATEMENT name="CERCA_MANSIONE_DESMANSIONE"
+	query="select man.codMansione,
+					      man.STRDESCRIZIONE 
+						  || DECODE (
+				          SYSDATE, 
+				          GREATEST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+				          ' (scaduto)',
+				          LEAST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+				          ' (scaduto)', 
+				          ''
+				          ) as desMansione, 
+						  man_p.STRDESCRIZIONE as desTipoMansione, man.flgFrequente
+					  from de_mansione man
+					 inner join de_mansione man_p on man_p.codMansione=substr(man.codMansione, 0, 5) || '00'
+					 where lower(man.strdescrizione) like '%' || lower(?) || '%'
+					 order by desMansione" />
+
+<STATEMENT name="CERCA_MANSIONE_DESMANSIONE_FREQUENTE"
+	query="select man.codMansione,
+					       man.STRDESCRIZIONE 
+				  || DECODE (
+		          SYSDATE, 
+		          GREATEST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+		          ' (scaduto)',
+		          LEAST(SYSDATE, man.DATINIZIOVAL, man.DATFINEVAL),
+		          ' (scaduto)', 
+		          ''
+		          ) as desMansione, 
+						   man_p.STRDESCRIZIONE as desTipoMansione, man.flgFrequente
+					  from vw_de_mansione_flgFrequente man
+					 inner join de_mansione man_p on man_p.codMansione=substr(man.codMansione, 0, 5) || '00'
+					 where lower(man.strdescrizione) like '%' || lower(?) || '%'
+					 AND UPPER(man.flgfrequente) = 'S'
+					 order by desMansione" />
+
+
+
+
+<!-- /MANSIONI (da spostare) -->
+
+<STATEMENT name="GET_TITOLO_ESTERO"
+	query=" SELECT codmonostatotit as codice, 
+                        DECODE( GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, 
+                               STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...' ) 
+                      || DECODE (SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)',  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)', '') AS DESCRIZIONE
+      FROM de_titolo_estero ORDER BY STRDESCRIZIONE" />
+
+
+
+<STATEMENT name="GET_TIROCINI_LAVORO"
+	query=" SELECT el.prgEspLavoro, el.prgMansione, dm.strdescrizione as desMansione, 
+                        decode(el.nummeseinizio, null, to_char(el.numannoinizio), 
+					   							to_char(
+					   									decode(
+															    el.nummeseinizio, 1 , '0'||to_char(el.nummeseinizio), 
+																				  2 , '0'||to_char(el.nummeseinizio),
+																				  3 , '0'||to_char(el.nummeseinizio),
+																				  4 , '0'||to_char(el.nummeseinizio),
+																 				  5 , '0'||to_char(el.nummeseinizio),
+																 				  6 , '0'||to_char(el.nummeseinizio),
+																				  7 , '0'||to_char(el.nummeseinizio),
+																 				  8 , '0'||to_char(el.nummeseinizio),
+																 				  9 , '0'||to_char(el.nummeseinizio),
+																to_char(el.nummeseinizio)																																																																																									
+															   )
+													     ) || '/' || to_char(el.numannoinizio) 
+							  ) as numannoinizio,
+                       decode(el.nummesefine, null, to_char(el.numannofine), 
+					   							to_char(
+					   									decode(
+															    el.nummesefine, 1 , '0'||to_char(el.nummesefine), 
+																				2 , '0'||to_char(el.nummesefine),
+																				3 , '0'||to_char(el.nummesefine),
+																				4 , '0'||to_char(el.nummesefine),
+																 				5 , '0'||to_char(el.nummesefine),
+																 				6 , '0'||to_char(el.nummesefine),
+																				7 , '0'||to_char(el.nummesefine),
+																 				8 , '0'||to_char(el.nummesefine),
+																 				9 , '0'||to_char(el.nummesefine),
+																to_char(el.nummesefine)																																																																																									
+															   )
+													     ) || '/' || to_char(el.numannofine) 
+							  ) as numannofine,
+                       dc.strdescrizione desContratto 
+                FROM 
+                  pr_esp_lavoro el,
+                  pr_mansione m,
+                  de_mansione dm,
+                  de_contratto dc
+                WHERE 
+                  m.cdnlavoratore=?
+                  AND m.prgmansione=el.prgmansione
+                  AND m.codmansione=dm.codmansione
+                  AND dc.flgtirocini= 'S'
+                  AND el.codcontratto=dc.codcontratto(+)
+                ORDER BY el.numannofine desc, el.nummesefine desc" />
+
+
+<!-- TIROCINI -->
+<STATEMENT name="GET_TIPI_CONTRATTO_TIROCINIO"
+	query=" SELECT 
+  codContratto as codice,
+  DECODE( GREATEST(LENGTH(STRDESCRIZIONE),
+  45) ,
+  45,
+  STRDESCRIZIONE,
+  SUBSTR(STRDESCRIZIONE,
+  1,
+  45) || '...' )                         || DECODE (SYSDATE,
+  GREATEST(SYSDATE,
+  DATINIZIOVAL,
+  DATFINEVAL),
+  ' (scaduto)',
+  LEAST(SYSDATE,
+  DATINIZIOVAL,
+  DATFINEVAL),
+  ' (scaduto)',
+  '') AS DESCRIZIONE
+FROM 
+  de_contratto de
+WHERE 
+  de.flgEspLav = 'N'   				
+  and de.flgtirocini = 'S'
+ORDER BY STRDESCRIZIONE" />
+
+<!-- recupero tipo movimento -->
+<STATEMENT name="GET_TIPO_MOV_ESP"
+	query="SELECT DISTINCT AM_MOVIMENTO.CODMONOMOVDICH
+               FROM AM_MOVIMENTO INNER JOIN PR_ASS_ESP_MOVI
+               ON AM_MOVIMENTO.PRGMOVIMENTO = PR_ASS_ESP_MOVI.PRGMOVIMENTO
+               WHERE PR_ASS_ESP_MOVI.PRGESPLAVORO = ?" />
+
+<STATEMENT name="GET_STATI_TITOLISTUDIO"
+	query="SELECT codmonostato as codice, strdescrizione as descrizione 
+					FROM DE_TITOLO_ITALIANO" />
+
+<STATEMENT name="GET_STATO_TITOLO_STUDIO_FLAGCOMPLETATO"
+	query="SELECT codmonostato as codice, FLGCOMPLETO AS FLAG 
+					FROM DE_TITOLO_ITALIANO" />

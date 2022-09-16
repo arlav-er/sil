@@ -1,0 +1,101 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/main_primefaces.xhtml">
+<ui:define name="content">
+	<div class="widget_container">
+		<h1>Checklist - Scheda fabbisogno</h1>
+			<h:form id="searchParamsForm">
+				<fieldset>
+					<legend>Cerca checklist</legend>
+					<table style="width: 75%;">
+						<tr>						  
+							
+							<td>
+								<p:outputLabel for="azOspInput" value="Azienda ospitante:" styleClass="block-label" />
+								<p:inputText id="azOspInput" value="#{fbChecklistListBean.searchParams.aziendaOspitante}"/>
+								<p:message for="azOspInput" />
+							</td>
+							<td>
+								<p:outputLabel for="statoInput" value="Stato:" styleClass="block-label" />
+								<p:selectOneMenu id="statoInput" value="#{fbChecklistListBean.searchParams.codStato}" >
+									<f:selectItem itemLabel="" itemValue="" />
+									<f:selectItems value="#{fbChecklistListBean.getStatiRicercabiliList()}" var="deStato"
+										itemLabel="#{deStato.descrizione}" itemValue="#{deStato.id}" />
+								</p:selectOneMenu>
+								<p:message for="statoInput" />
+							</td>
+							<td>
+								<p:outputLabel for="schedaFabbInput" value="Solo con scheda fabbisogno:" styleClass="block-label" />
+								<p:selectBooleanCheckbox id="schedaFabbInput" value="#{fbChecklistListBean.searchParams.soloSchedaFabbisogno}" />
+								<p:message for="schedaFabbInput" />
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<p:outputLabel for="dataDaInput" value="Data da:" styleClass="block-label" />
+								<p:calendar id="dataDaInput" value="#{fbChecklistListBean.searchParams.dataDa}" pattern="dd/MM/yyyy" />
+								<p:message for="dataDaInput" />
+							</td>
+							<td>
+								<p:outputLabel for="dataAInput" value="Data a" styleClass="block-label" />
+								<p:calendar id="dataAInput" value="#{fbChecklistListBean.searchParams.dataA}" pattern="dd/MM/yyyy" />
+								<p:message for="dataAInput" />
+							</td>				
+							 <td>
+								<p:outputLabel for="codeci" value="Codice fiscale:" styleClass="block-label" />
+								<p:inputText id="codeci" value="#{fbChecklistListBean.searchParams.codiceFiscale}" maxlength="16">
+								  <p:ajax event="blur" update="codeciMessage"/>
+								  <f:validator validatorId="codiceFiscaleAziendaValidator" />
+								</p:inputText>
+								<p:message for="codeci" id="codeciMessage"/>
+							</td>
+						</tr>
+					</table>
+					<div class="text-center">
+						<p:commandButton value="Cerca" actionListener="#{fbChecklistListBean.cerca}"
+							update="@form :checklistListForm" process="@form" />
+					</div>
+				</fieldset>
+			</h:form>
+		
+		<h:form id="checklistListForm">
+			<ui:fragment rendered="#{not empty fbChecklistListBean.checklists}">
+				<p:dataTable value="#{fbChecklistListBean.checklists}" var="checklist" paginator="true"
+					paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+					emptyMessage="Nessuna checklist trovata" rows="10" lazy="true" rowsPerPageTemplate="5, 10, 15"
+					paginatorAlwaysVisible="false">
+					<p:column headerText="Data Pubblicazione" sortBy="#{checklist.dtPubblicazione}">
+						<h:outputLabel value="#{checklist.dtPubblicazione}">
+						<f:convertDateTime pattern="dd/MM/yyy"/>
+						</h:outputLabel>
+					</p:column>
+					<p:column headerText="Azienda" sortBy="#{checklist.aziendaOspitante}">
+						<h:outputText value="#{checklist.aziendaOspitante}"/>
+					</p:column>
+					<p:column headerText="Codice Fiscale" sortBy="#{checklist.codiceFiscale}">
+					    <h:outputText value="#{checklist.codiceFiscale}"/>
+					</p:column>
+					<p:column headerText="Stato" sortBy="#{checklist.deStatoFbChecklist.descrizione}">
+						<h:outputText value="#{checklist.deStatoFbChecklist.descrizione}"/>
+					</p:column>
+					<p:column headerText="N.Scheda Fabbisogno">
+						<!-- <h:outputText value="#{checklist.fbSchedaFabbisognoList.size()}"/> -->
+						<p:button outcome="../scheda_fabbisogno/scheda_fb_list.xhtml?fbChecklistId=#{checklist.id}" value="0#{checklist.fbSchedaFabbisognoList.size()}" 
+						          rendered="#{checklist.fbSchedaFabbisognoList.size() gt 0}"/>
+					</p:column>
+					<p:column headerText="Azioni">
+						<p:button title="Dettaglio"  icon="ui-icon-search"
+							outcome="checklist_form?idFbChecklist=#{checklist.id}" />
+					</p:column>
+				</p:dataTable>
+			</ui:fragment>
+		</h:form>
+	</div>
+	<p:button outcome="home" styleClass="margin-1em" title="Torna alla scrivania"
+		value="Torna alla scrivania" />
+</ui:define>
+</ui:composition>

@@ -1,0 +1,501 @@
+<!-- Giovanni Landi -->
+<!-- Gestione Scadenziario -->
+<STATEMENT name="GetTipiScadenze"
+            query="SELECT DE_SCADENZA.CODSCADENZA,
+                          DE_SCADENZA.STRDESCRIZIONE,
+                          DE_SCADENZA.FLGAZIONECONTATTO,
+                          DE_SCADENZA.FLGAZIONEAPPUNTAMENTO,
+                          DE_SCADENZA.FLGAZIONEESITI,
+                          DE_SCADENZA.FLGVISTACOLLOQUI,
+                          DE_SCADENZA.FLGSCADENZA,
+                          DE_SCADENZA.FLGVERIFICA,
+                          TO_CHAR(DE_SCADENZA.DATINIZIOVAL, 'DD/MM/YYYY') DATINIZIOVAL,
+                          TO_CHAR(DE_SCADENZA.DATFINEVAL, 'DD/MM/YYYY') DATFINEVAL
+                          FROM DE_SCADENZA
+                          WHERE CODSCADENZA = ? AND
+                                to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                                to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)"/>
+
+<STATEMENT name="GetValiditaScad"
+            query="SELECT CODTIPOVALIDITA AS CODICE,
+                          STRDESCVALIDITA AS DESCRIZIONE
+                          FROM DE_TIPO_VALIDITA"/>
+                          
+
+<STATEMENT name="GetDettaglioValiditaScad"
+            query="SELECT DE_TIPO_VALIDITA.CODTIPOVALIDITA AS CODICE,
+                          DE_TIPO_VALIDITA.STRDESCVALIDITA AS DESCRIZIONE
+                          FROM DE_TIPO_VALIDITA
+                          WHERE CODTIPOVALIDITA = ?"/>
+                          
+<STATEMENT name="GetValiditaCurr"
+            query="SELECT CODSTATOLAV AS CODICE,
+      			   STRDESCRIZIONE AS DESCRIZIONE
+    			   FROM DE_STATO_SCHEDALAV
+    			   WHERE CODSTATOLAV = ?"/>
+                          
+<STATEMENT name="GetDettaglioCentroImpiego"
+            query="SELECT CODICE, DESCRIZIONE FROM (
+            	 SELECT DISTINCT CPI.CODCPI AS CODICE,
+						  CPI.STRDESCRIZIONE || ' - ' || CPI.CODCPI AS DESCRIZIONE
+						  FROM DE_CPI CPI, TS_GENERALE GEN, DE_COMUNE COM
+						  WHERE CPI.CODPROVINCIA = GEN.CODPROVINCIASIL
+						  AND CPI.CODCPI = COM.CODCPI
+						  AND TRUNC(SYSDATE) &lt;= TRUNC(CPI.DATFINEVAL)					 
+						  AND CPI.CODCPI = ?
+				   UNION
+				   	SELECT DISTINCT CPI.CODCPI AS CODICE,
+						  CPI.STRDESCRIZIONE || ' - ' || CPI.CODCPI || ' (SCADUTO)' AS DESCRIZIONE
+						  FROM DE_CPI CPI, TS_GENERALE GEN
+						  WHERE CPI.CODPROVINCIA = GEN.CODPROVINCIASIL
+						  AND TRUNC(CPI.DATFINEVAL) &lt;= TRUNC(SYSDATE) AND trunc(CPI.DATFINEVAL) &gt;= (select trunc(datscadcpi) from ts_generale)						 
+						  AND CPI.CODCPI = ?
+					)
+					ORDER BY DESCRIZIONE "/>  
+            			 
+<STATEMENT name="SELECT_AZIENDE_ASSOCIATE_APPUNTAMENTO_SCAD" 
+           query="SELECT AG_AGENDA.PRGAZIENDA, 
+                         AG_AGENDA.PRGUNITA,
+                         AN_AZIENDA.STRRAGIONESOCIALE,
+                         AN_AZIENDA.STRPARTITAIVA,
+                         AN_AZIENDA.STRCODICEFISCALE,
+                         DE_TIPO_AZIENDA.STRDESCRIZIONE,
+                         AN_UNITA_AZIENDA.STRINDIRIZZO,
+                         DE_COMUNE.STRDENOMINAZIONE AS DESCRIZIONECOMUNE
+                  FROM DE_COMUNE,DE_TIPO_AZIENDA,AG_AGENDA
+                  LEFT JOIN AN_AZIENDA ON (AG_AGENDA.PRGAZIENDA = AN_AZIENDA.PRGAZIENDA)
+                  LEFT JOIN AN_UNITA_AZIENDA ON (AG_AGENDA.PRGAZIENDA = AN_UNITA_AZIENDA.PRGAZIENDA
+                                                AND AG_AGENDA.PRGUNITA = AN_UNITA_AZIENDA.PRGUNITA)
+                  WHERE AG_AGENDA.CODCPI = ?
+                  AND AG_AGENDA.PRGAPPUNTAMENTO = ?
+                  AND AN_AZIENDA.CODTIPOAZIENDA = DE_TIPO_AZIENDA.CODTIPOAZIENDA
+                  AND AN_UNITA_AZIENDA.CODCOM = DE_COMUNE.CODCOM"/>
+
+<!--STATEMENT name="VerificaDataNonLavorativa"
+           query="select prggiornonl from ag_giornoNL
+           where codCPI = ? and 
+           ((numgg = to_number(to_char(to_date(?, 'dd/mm/yyyy'),'DD')) and 
+            nummm = to_number(to_char(to_date(?, 'dd/mm/yyyy'),'MM')) and 
+            numaaaa = to_number(to_char(to_date(?, 'dd/mm/yyyy'),'YYYY'))) or
+            (numgg = to_number(to_char(to_date(?, 'dd/mm/yyyy'),'DD')) and 
+             nummm = to_number(to_char(to_date(?, 'dd/mm/yyyy'),'MM')) and 
+             To_Date(?, 'dd/mm/yyyy') between datinizioVal and datFineval) or
+            (to_number(to_char(to_date(?, 'dd/mm/yyyy'),'D')) = numgsett and 
+            To_Date(?, 'dd/mm/yyyy') between datinizioVal and datFineval))"/-->
+            
+<STATEMENT name="VerificaDataNonLavorativa"
+		   query="select prggiornonl from ag_giornoNL
+           where (codCPI = ? or codcpi is null) 
+           and 
+           (
+            (
+            numgg = to_number(to_char(to_date(?, 'dd/mm/yyyy'),'DD')) and 
+            nummm = to_number(to_char(to_date(?, 'dd/mm/yyyy'),'MM')) and 
+            (numaaaa = to_number(to_char(to_date(?, 'dd/mm/yyyy'),'YYYY')) or numaaaa is null)
+            )
+            OR
+            (to_number(to_char(to_date(?, 'dd/mm/yyyy'),'D')) 
+            = 
+            mod(numGSett + (select decode(value, 'ITALY', 0, 'AMERICA', 1, 0)  from v$nls_parameters where parameter = 'NLS_TERRITORY'), 7)
+            )
+           ) and To_Date(?, 'dd/mm/yyyy') between datinizioVal and datFineval"
+/>
+
+<STATEMENT name="LISTA_COLLOQUI_LAV" 
+           query="SELECT DE_SERVIZIO.STRDESCRIZIONE AS DESCRIZIONESERVIZIO,
+                         AN_SPI.STRCOGNOME || ' ' || AN_SPI.STRNOME AS OPERATORE,
+                         TO_CHAR(DATCOLLOQUIO,'DD/MM/YYYY') AS DATACOLLOQUIO
+                  FROM OR_COLLOQUIO
+                  INNER JOIN DE_SERVIZIO ON (OR_COLLOQUIO.CODSERVIZIO = DE_SERVIZIO.CODSERVIZIO)
+                  INNER JOIN AN_SPI ON (OR_COLLOQUIO.PRGSPI = AN_SPI.PRGSPI)
+                  WHERE OR_COLLOQUIO.CDNLAVORATORE = ?
+                  AND OR_COLLOQUIO.CODCPI = ?
+                  ORDER BY DATCOLLOQUIO DESC"/>
+
+<STATEMENT name="ScadDettaglioMotivoContatto"
+            query="SELECT PRGMOTCONTATTO AS CODICE,
+                          STRDESCRIZIONE AS DESCRIZIONE
+                          FROM DE_MOTIVO_CONTATTOAG
+                          WHERE PRGMOTCONTATTO = ?"/>
+
+<STATEMENT name="ListaScadLavRicontattare"
+            query="SELECT contatto1.CDNLAVORATORE,
+                          an_spi.strcognome || ' ' || an_spi.strnome as NOMEOPERATORE,
+                          to_char(DATCONTATTO,'dd/mm/yyyy') as STRDATCONTATTO,
+                          to_char(DATENTROIL,'dd/mm/yyyy') as STRDATENTROIL 
+                          from ag_contatto contatto1
+                          inner join an_spi on (an_spi.prgspi = contatto1.prgspicontatto)
+                          where contatto1.CODCPICONTATTO = ? AND
+                                contatto1.DATENTROIL is not null AND
+                                contatto1.CDNLAVORATORE = ?
+                          AND NOT EXISTS (select contatto2.cdnlavoratore
+                                          from ag_contatto contatto2
+                                          where contatto2.DATCONTATTO &gt; contatto1.DATCONTATTO and
+                                                contatto2.prgcontatto &lt;&gt; contatto1.prgcontatto and
+                                                contatto2.CODCPICONTATTO = ? and
+                                                contatto2.DATENTROIL is not null and
+                                                contatto2.CDNLAVORATORE = ?)"/>
+
+<STATEMENT name="ListaScadSchedaLav"
+            query="SELECT an_lavoratore.CDNLAVORATORE,
+                          an_lavoratore.STRCOGNOME, 
+                          an_lavoratore.STRNOME, 
+                          an_lavoratore.STRCODICEFISCALE, 
+                          to_char(DATNASC,'dd/mm/yyyy') as DATNASC,
+                          DE_TIPO_VALIDITA.STRDESCVALIDITA,
+                          DE_STATO_SCHEDALAV.STRDESCRIZIONE as STRDESCCURRVALIDITA,
+                          to_char(DATINIZIOCURR,'dd/mm/yyyy') as STRDATINIZIOCURR,
+                          to_char(DATFINECURR,'dd/mm/yyyy') as STRDATFINECURR
+                   from pr_validita 
+                   inner join an_lavoratore on (an_lavoratore.CDNLAVORATORE = pr_validita.CDNLAVORATORE)
+                   inner join DE_TIPO_VALIDITA on (DE_TIPO_VALIDITA.CODTIPOVALIDITA = pr_validita.CODTIPOVALIDITA)
+                   inner join DE_STATO_SCHEDALAV on (DE_STATO_SCHEDALAV.CODSTATOLAV = pr_validita.CODSTATOLAV)
+                   where pr_validita.DATFINECURR is not null AND
+                         pr_validita.cdnlavoratore = ?
+                   order by DATFINECURR asc"/>
+
+<STATEMENT name="ListaScadPermessoSoggLav"
+            query="select an_lavoratore.CDNLAVORATORE,
+                          an_lavoratore.STRCOGNOME,
+                          an_lavoratore.STRNOME, 
+                          an_lavoratore.STRCODICEFISCALE,
+                          to_char(DATNASC,'dd/mm/yyyy') as DATNASC,
+                          to_char(DATRICHIESTA,'dd/mm/yyyy') as STRDATRICHIESTA,
+                          to_char(DATSCADENZA,'dd/mm/yyyy') as STRDATSCADENZA 
+                          from an_lavoratore 
+                          inner join AM_EX_PERM_SOGG on (an_lavoratore.CDNLAVORATORE = AM_EX_PERM_SOGG.CDNLAVORATORE)
+                          where NVL(AM_EX_PERM_SOGG.CODSTATUS, '1') in ('1', '3')
+                          AND AM_EX_PERM_SOGG.DATSCADENZA is not null
+                          AND an_lavoratore.CDNLAVORATORE = ? 
+                   order by DATSCADENZA desc"/>
+
+<STATEMENT name="GET_FILTROCPILAV"
+			query="select distinct de_cpi.codcpi as codice,de_cpi.strDescrizione || ' - ' || de_cpi.codcpi as descrizione
+				   from de_cpi, de_comune, de_provincia,an_lav_storia_inf
+				   where de_cpi.codcpi = de_comune.codcpi 
+				   and de_comune.codprovincia = de_provincia.codprovincia 
+				   and an_lav_storia_inf.codcpitit = de_cpi.codcpi
+				   and de_provincia.codregione =   (select de_provincia.CODREGIONE 
+							 						from   de_provincia 
+													inner join ts_generale on (de_provincia.codprovincia = ts_generale.CODPROVINCIASIL))
+				   and an_lav_storia_inf.datfine is null 
+				   and an_lav_storia_inf.cdnlavoratore=?
+				   order by descrizione"/>
+				   
+<STATEMENT name="GET_FILTROCPIAZI"
+			query="select distinct de_cpi.codcpi as codice,de_cpi.strDescrizione || ' - ' || de_cpi.codcpi as descrizione
+				   from de_cpi, de_comune, de_provincia,an_unita_azienda 
+				   where de_cpi.codcpi = de_comune.codcpi 
+				   and de_comune.codprovincia = de_provincia.codprovincia 
+				   and de_provincia.codregione = (select de_provincia.CODREGIONE 
+							 					  from   de_provincia 
+												  inner join ts_generale on (de_provincia.codprovincia = ts_generale.CODPROVINCIASIL))
+				   and an_unita_azienda.codcom = de_comune.codcom
+				   and PRGAZIENDA=? and PRGUNITA=?"/>
+				   
+				   			   
+<STATEMENT name="ListaScadAzioniConcordLav" 
+            query="SELECT an_lavoratore.CDNLAVORATORE,
+                          an_lavoratore.STRCOGNOME, 
+                          an_lavoratore.STRNOME, 
+                          an_lavoratore.STRCODICEFISCALE,
+                          to_char(DATNASC,'dd/mm/yyyy') as DATNASC,
+                          to_char(min(DATSTIMATA),'dd/mm/yyyy') as STRDATSTIMATA, 
+                          DE_AZIONE.STRDESCRIZIONE,
+                          decode (AM_LAV_PATTO_SCELTA.PRGLAVPATTOSCELTA,null,'','S') FlgPatto297,
+                          OR_COLLOQUIO.PRGCOLLOQUIO, OR_COLLOQUIO.DATCOLLOQUIO 
+                          from 
+						  OR_PERCORSO_CONCORDATO INNER JOIN OR_COLLOQUIO ON (OR_PERCORSO_CONCORDATO.PRGCOLLOQUIO = OR_COLLOQUIO.PRGCOLLOQUIO) 
+						  						 INNER JOIN AN_LAVORATORE ON (OR_COLLOQUIO.CDNLAVORATORE = AN_LAVORATORE.CDNLAVORATORE)
+                          						 INNER JOIN DE_AZIONE ON (OR_PERCORSO_CONCORDATO.PRGAZIONI = DE_AZIONE.PRGAZIONI) 
+						  						 LEFT JOIN AM_PATTO_LAVORATORE ON (AM_PATTO_LAVORATORE.CDNLAVORATORE = AN_LAVORATORE.CDNLAVORATORE) 
+						  						 LEFT JOIN AM_LAV_PATTO_SCELTA ON (AM_PATTO_LAVORATORE.CODCPI = OR_COLLOQUIO.CODCPI) 
+						  WHERE  
+						  	  OR_COLLOQUIO.CODCPI = ?
+                          AND OR_PERCORSO_CONCORDATO.CODESITORENDICONT = 'P'
+                          AND AM_PATTO_LAVORATORE.DATFINE IS NULL 
+                          AND AN_LAVORATORE.CDNLAVORATORE = ?
+					      AND TO_NUMBER (am_lav_patto_scelta.strchiavetabella) = or_percorso_concordato.prgpercorso
+					      AND am_lav_patto_scelta.codlsttab = 'OR_PER'
+                          AND not exists 
+                                  (select or_coll.prgcolloquio from OR_COLLOQUIO or_coll
+                                   where or_coll.cdnlavoratore = an_lavoratore.CDNLAVORATORE and 
+                                         or_coll.CODCPI = ? and
+                                         or_coll.datcolloquio &gt; OR_COLLOQUIO.DATCOLLOQUIO and
+                                         or_coll.prgcolloquio &lt;&gt; OR_COLLOQUIO.prgcolloquio)
+                         group by an_lavoratore.CDNLAVORATORE,
+                                  an_lavoratore.STRCOGNOME,
+                                  an_lavoratore.STRNOME,
+                                  an_lavoratore.STRCODICEFISCALE, 
+                                  DATNASC, DE_AZIONE.STRDESCRIZIONE,
+                                  decode (AM_LAV_PATTO_SCELTA.PRGLAVPATTOSCELTA,null,'','S'),
+                                  OR_COLLOQUIO.PRGCOLLOQUIO, OR_COLLOQUIO.DATCOLLOQUIO
+                        order by min(DATSTIMATA) asc"/>
+          
+<!--
+<STATEMENT name="ListaScadAzioniConcordLav"
+            query="SELECT an_lavoratore.CDNLAVORATORE,
+                          an_lavoratore.STRCOGNOME, 
+                          an_lavoratore.STRNOME, 
+                          an_lavoratore.STRCODICEFISCALE,
+                          to_char(DATNASC,'dd/mm/yyyy') as DATNASC,
+                          to_char(min(DATSTIMATA),'dd/mm/yyyy') as STRDATSTIMATA, 
+                          DE_AZIONE.STRDESCRIZIONE,
+                          AM_PATTO_LAVORATORE.FlgPatto297,
+                          OR_COLLOQUIO.PRGCOLLOQUIO, OR_COLLOQUIO.DATCOLLOQUIO 
+                          from OR_PERCORSO_CONCORDATO, OR_COLLOQUIO, AN_LAVORATORE,
+                          DE_AZIONE, AM_PATTO_LAVORATORE, AM_LAV_PATTO_SCELTA 
+                          WHERE OR_PERCORSO_CONCORDATO.PRGCOLLOQUIO = OR_COLLOQUIO.PRGCOLLOQUIO 
+                          AND OR_COLLOQUIO.CDNLAVORATORE = AN_LAVORATORE.CDNLAVORATORE 
+                          AND OR_PERCORSO_CONCORDATO.PRGAZIONI = DE_AZIONE.PRGAZIONI
+                          AND OR_COLLOQUIO.CODCPI = ?
+                          AND OR_PERCORSO_CONCORDATO.DATSTIMATA is not null 
+                          AND OR_PERCORSO_CONCORDATO.CODESITO is null 
+                          AND AM_PATTO_LAVORATORE.DATFINE IS NULL 
+                          AND AM_PATTO_LAVORATORE.CDNLAVORATORE = AN_LAVORATORE.CDNLAVORATORE 
+                          AND AM_PATTO_LAVORATORE.CODCPI = OR_COLLOQUIO.CODCPI
+                          AND AN_LAVORATORE.CDNLAVORATORE = ?
+                          AND not exists 
+                                  (select or_coll.prgcolloquio from OR_COLLOQUIO or_coll
+                                   where or_coll.cdnlavoratore = an_lavoratore.CDNLAVORATORE and 
+                                         or_coll.CODCPI = ? and
+                                         or_coll.datcolloquio &gt; OR_COLLOQUIO.DATCOLLOQUIO and
+                                         or_coll.prgcolloquio &lt;&gt; OR_COLLOQUIO.prgcolloquio)
+                         group by an_lavoratore.CDNLAVORATORE,
+                                  an_lavoratore.STRCOGNOME,
+                                  an_lavoratore.STRNOME,
+                                  an_lavoratore.STRCODICEFISCALE, 
+                                  DATNASC, DE_AZIONE.STRDESCRIZIONE,
+                                  AM_PATTO_LAVORATORE.FlgPatto297,
+                                  OR_COLLOQUIO.PRGCOLLOQUIO, OR_COLLOQUIO.DATCOLLOQUIO
+                        order by min(DATSTIMATA) asc"/>
+-->
+                        
+<STATEMENT name="ListaScadPrimoCollLav"
+            query="select AN_LAV1.CDNLAVORATORE,
+                          AN_LAV1.STRCOGNOME, 
+                          AN_LAV1.STRNOME, 
+                          AN_LAV1.STRCODICEFISCALE,
+                          to_char(DATNASC,'dd/mm/yyyy') as DATNASC,
+                          to_char(DISPONIBILITA1.DATDICHIARAZIONE,'dd/mm/yyyy') as STRDICHIARAZIONE,
+                          to_char(DATSCADCONFERMA,'dd/mm/yyyy') as SCADENZA 
+                          from AM_ELENCO_ANAGRAFICO, AN_LAV_STORIA_INF, AN_LAVORATORE AN_LAV1,
+                          AN_LAV_STORIA_INF_COLL, AM_DICH_DISPONIBILITA DISPONIBILITA1
+                          where DISPONIBILITA1.PRGELENCOANAGRAFICO = AM_ELENCO_ANAGRAFICO.PRGELENCOANAGRAFICO
+                          AND AM_ELENCO_ANAGRAFICO.CDNLAVORATORE = AN_LAV1.CDNLAVORATORE
+                          AND AN_LAV1.CDNLAVORATORE = AN_LAV_STORIA_INF.CDNLAVORATORE 
+                          AND AN_LAV_STORIA_INF.PRGLAVSTORIAINF = AN_LAV_STORIA_INF_COLL.PRGLAVSTORIAINF
+                          AND AN_LAV_STORIA_INF_COLL.STRCHIAVETABELLA = AM_ELENCO_ANAGRAFICO.PRGELENCOANAGRAFICO 
+                          AND AN_LAV_STORIA_INF_COLL.CODLSTTAB = 'EA' 
+                          AND AN_LAV_STORIA_INF.codCpiTit = ?
+                          AND DISPONIBILITA1.DATSCADCONFERMA IS NOT NULL 
+                          AND AM_ELENCO_ANAGRAFICO.DATCAN IS NULL 
+                          AND DISPONIBILITA1.DATFINE IS NULL 
+                          AND AN_LAV1.CDNLAVORATORE = ?
+                          AND not exists (select AN_LAV2.CDNLAVORATORE 
+                                          from AM_PATTO_LAVORATORE, AN_LAVORATORE AN_LAV2,
+                                               AM_DICH_DISPONIBILITA DISPONIBILITA2 
+                                          WHERE AM_PATTO_LAVORATORE.CODCPI = ?
+                                                AND AM_PATTO_LAVORATORE.PRGDICHDISPONIBILITA = DISPONIBILITA2.PRGDICHDISPONIBILITA
+                                                AND AN_LAV2.CDNLAVORATORE = AN_LAV1.CDNLAVORATORE 
+                                                AND AM_PATTO_LAVORATORE.CDNLAVORATORE = AN_LAV1.CDNLAVORATORE)
+                          AND not exists (select OR_COLLOQUIO.CDNLAVORATORE 
+                                          from OR_COLLOQUIO 
+                                          WHERE OR_COLLOQUIO.CODCPI = ?
+                                          AND OR_COLLOQUIO.CDNLAVORATORE = AN_LAV1.CDNLAVORATORE
+                                          AND OR_COLLOQUIO.DATCOLLOQUIO BETWEEN DISPONIBILITA1.DATDICHIARAZIONE
+                                          AND DISPONIBILITA1.DATSCADCONFERMA)
+                          order by DATSCADCONFERMA asc"/>
+
+<STATEMENT name="ListaScadStipulaPattoLav"
+            query="select AN_LAV1.CDNLAVORATORE,
+                          AN_LAV1.STRCOGNOME,
+                          AN_LAV1.STRNOME,
+                          AN_LAV1.STRCODICEFISCALE,
+                          to_char(DATNASC,'dd/mm/yyyy') as DATNASC,
+                          to_char(DISPONIBILITA1.DATDICHIARAZIONE,'dd/mm/yyyy') as STRDICHIARAZIONE ,
+                          to_char(DATSCADEROGAZSERVIZI,'dd/mm/yyyy') as SCADENZA 
+                          from AM_ELENCO_ANAGRAFICO, AN_LAV_STORIA_INF, AN_LAVORATORE AN_LAV1, 
+                          AN_LAV_STORIA_INF_COLL, AM_DICH_DISPONIBILITA DISPONIBILITA1 
+                          where DISPONIBILITA1.PRGELENCOANAGRAFICO = AM_ELENCO_ANAGRAFICO.PRGELENCOANAGRAFICO 
+                          AND AM_ELENCO_ANAGRAFICO.CDNLAVORATORE = AN_LAV1.CDNLAVORATORE 
+                          AND AN_LAV1.CDNLAVORATORE = AN_LAV_STORIA_INF.CDNLAVORATORE
+                          AND AN_LAV_STORIA_INF.PRGLAVSTORIAINF = AN_LAV_STORIA_INF_COLL.PRGLAVSTORIAINF 
+                          AND AN_LAV_STORIA_INF_COLL.STRCHIAVETABELLA = AM_ELENCO_ANAGRAFICO.PRGELENCOANAGRAFICO 
+                          AND AN_LAV_STORIA_INF_COLL.CODLSTTAB = 'EA' 
+                          AND AN_LAV_STORIA_INF.codCpiTit = ?
+                          AND DISPONIBILITA1.DATSCADEROGAZSERVIZI IS NOT NULL
+                          AND AM_ELENCO_ANAGRAFICO.DATCAN IS NULL 
+                          AND DISPONIBILITA1.DATFINE IS NULL
+                          AND AN_LAV1.CDNLAVORATORE = ?
+                          AND not exists (select AN_LAV2.CDNLAVORATORE 
+                                          from AM_PATTO_LAVORATORE, AN_LAVORATORE AN_LAV2,
+                                               AM_DICH_DISPONIBILITA DISPONIBILITA2 
+                                          WHERE AM_PATTO_LAVORATORE.CODCPI = ?
+                                                AND AM_PATTO_LAVORATORE.PRGDICHDISPONIBILITA = DISPONIBILITA2.PRGDICHDISPONIBILITA 
+                                                AND AN_LAV2.CDNLAVORATORE = AN_LAV1.CDNLAVORATORE 
+                                                AND AM_PATTO_LAVORATORE.CDNLAVORATORE = AN_LAV1.CDNLAVORATORE)
+                          order by DATSCADEROGAZSERVIZI asc"/>
+
+<STATEMENT name="ListaScadenzaPattoLav"
+            query="select AN_LAV1.CDNLAVORATORE,
+                          AN_LAV1.STRCOGNOME, 
+                          AN_LAV1.STRNOME, 
+                          AN_LAV1.STRCODICEFISCALE,
+                          to_char(DATNASC,'dd/mm/yyyy') as DATNASC,
+                          AM_PATTO1.FlgPatto297,
+                          to_char(DATSTIPULA,'dd/mm/yyyy') as STIPULA, 
+                          to_char(DATSCADCONFERMA,'dd/mm/yyyy') as SCADENZA 
+                          from AN_LAVORATORE AN_LAV1,
+                          AM_PATTO_LAVORATORE AM_PATTO1 
+                          where AM_PATTO1.CDNLAVORATORE = AN_LAV1.CDNLAVORATORE 
+                          AND AM_PATTO1.CODCPI = ?
+                          AND AM_PATTO1.DATFINE IS NULL
+                          AND AN_LAV1.CDNLAVORATORE = ?
+                   order by AM_PATTO1.DATSCADCONFERMA asc"/>
+
+<STATEMENT name="ListaVerNonDispTerritorio"
+            query="select pr_mansione.codMansione,
+                          de_mansione.strdescrizione as descrizioneMansione
+                          from an_lavoratore
+                          inner join pr_mansione on an_lavoratore.CDNLAVORATORE = pr_mansione.CDNLAVORATORE
+                          inner join de_mansione on pr_mansione.codmansione = de_mansione.codmansione 
+                          left outer join pr_dis_comune on pr_mansione.prgmansione = pr_dis_comune.prgmansione 
+                          left outer join pr_dis_provincia on pr_mansione.prgmansione = pr_dis_provincia.prgmansione
+                          left outer join pr_dis_regione on pr_mansione.prgmansione = pr_dis_regione.prgmansione 
+                          left outer join pr_dis_stato on pr_mansione.prgmansione = pr_dis_stato.prgmansione
+                          where (pr_mansione.FLGDISPONIBILE = 'S' 
+                                 or pr_mansione.FLGDISPONIBILE = 'P' 
+                                 or pr_mansione.FLGDISPONIBILE = 'L')
+                          and pr_dis_comune.prgdiscomune is null 
+                          and pr_dis_provincia.prgdisprovincia is null
+                          and pr_dis_regione.prgdisregione is null 
+                          and pr_dis_stato.prgdisstato is null 
+                          and an_lavoratore.cdnlavoratore = ?"/>
+
+<STATEMENT name="ListaVerAppStatoOccVariato"
+            query="select to_char(MIN(DTMDATAORA),'dd/mm/yyyy') as DATAAPPUNTAMENTO, 
+                          DE_STATO_OCCUPAZ.STRDESCRIZIONE as  STRDESCSTATOOCC 
+                          from AN_LAVORATORE AN_LAV1, AG_AGENDA AG_AG1, AG_LAVORATORE AG_LAV1,
+                          AM_STATO_OCCUPAZ, DE_STATO_OCCUPAZ
+                          where AG_AG1.PRGAPPUNTAMENTO = AG_LAV1.PRGAPPUNTAMENTO AND
+                          AG_AG1.CODCPI = AG_LAV1.CODCPI AND 
+                          AG_AG1.CODCPI = ? AND
+                          AG_LAV1.CDNLAVORATORE =  AN_LAV1.CDNLAVORATORE AND
+                          AN_LAV1.CDNLAVORATORE = ? AND
+                          AM_STATO_OCCUPAZ.CODSTATOOCCUPAZ = DE_STATO_OCCUPAZ.CODSTATOOCCUPAZ AND
+                          AM_STATO_OCCUPAZ.CDNLAVORATORE =  AN_LAV1.CDNLAVORATORE AND
+                          AM_STATO_OCCUPAZ.DATFINE IS NULL AND 
+                          AG_AG1.DTMDATAORA >= trunc(sysdate) AND 
+                          trunc(AM_STATO_OCCUPAZ.DATINIZIO) BETWEEN trunc(AG_AG1.DTMINS) AND trunc(AG_AG1.DTMDATAORA)
+                          GROUP BY DE_STATO_OCCUPAZ.STRDESCRIZIONE"/>
+
+
+<STATEMENT name="SCAD_GETSERVIZIO"
+          query="SELECT DE_SERVIZIO.CODSERVIZIO CODICE,
+                        DE_SERVIZIO.STRDESCRIZIONE ||
+                              DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                              LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                              ''
+                                     ) AS DESCRIZIONE,
+                              DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                               &apos;&apos;) AS STRSCADUTO,	
+                        datinizioval, 
+                        datfineval 
+                   FROM DE_SERVIZIO
+                   order by DECODE(STRSCADUTO,&apos;&apos;,0,1),STRDESCRIZIONE"/>
+
+<STATEMENT name="ListaVerEsclusiRosa"
+             query="SELECT DISTINCT 
+            			NOM.PRGROSA IDROSA,
+	   					RICH.NUMRICHIESTA || '/' || RICH.NUMANNO IDRICHIESTA,
+	   					NOM.STRMOTIVOCANC, 
+	   					TO_CHAR(NOM.DTMCANC, 'DD/MM/YYYY') DTMCANC,
+	   					TO_CHAR(DTMCANC, 'YYYY/MM/DD') DTMCANCHID 
+					FROM DO_NOMINATIVO NOM,
+						 DO_ROSA ROSA,
+						 DO_INCROCIO INC,
+						 DO_RICHIESTA_AZ RICH,	
+						 AM_ELENCO_ANAGRAFICO EA,
+						 AM_DICH_DISPONIBILITA DID					 
+					WHERE NOM.CDNLAVORATORE = ?
+					  AND NVL(NOM.CODTIPOCANC, 'null') != 'null'
+					  AND EA.CDNLAVORATORE = NOM.CDNLAVORATORE
+					  AND EA.PRGELENCOANAGRAFICO = DID.PRGELENCOANAGRAFICO
+					  AND NVL(TO_CHAR(EA.DATCAN), 'null') = 'null'
+					  AND NVL(TO_CHAR(DID.DATFINE), 'null') = 'null'
+					  AND NOM.DTMCANC >= DID.DATDICHIARAZIONE
+					  AND ROSA.PRGROSA = NOM.PRGROSA
+					  AND ROSA.PRGINCROCIO = INC.PRGINCROCIO
+					  AND RICH.PRGRICHIESTAAZ = INC.PRGRICHIESTAAZ
+					ORDER BY DTMCANCHID DESC, IDRICHIESTA DESC, IDROSA DESC"/>
+
+<STATEMENT name="ListaVerProntoIncNoMans"
+             query="SELECT  TO_CHAR(VAL.DATINIZIOCURR, 'DD/MM/YYYY') DATINIZIOCURR,  
+						    TO_CHAR(VAL.DATFINECURR, 'DD/MM/YYYY') DATFINECURR 
+					FROM AN_LAVORATORE LAV,  
+					     AN_LAV_STORIA_INF STO,  
+					     PR_VALIDITA VAL  
+					WHERE LAV.CDNLAVORATORE = ?
+					AND LAV.CDNLAVORATORE = VAL.CDNLAVORATORE 
+				    AND LAV.CDNLAVORATORE=STO.CDNLAVORATORE 
+				    AND NVL(TO_CHAR(STO.DATFINE), 'null') = 'null'  
+					AND VAL.CODTIPOVALIDITA='DL'  
+					AND VAL.CODSTATOLAV='COM'  
+					AND trunc(SYSDATE) BETWEEN trunc(VAL.DATINIZIOCURR) AND trunc(VAL.DATFINECURR)  
+					AND LAV.CDNLAVORATORE NOT IN (SELECT MAN.CDNLAVORATORE  
+	                							  FROM PR_MANSIONE MAN  
+								                  WHERE MAN.FLGDISPONIBILE='S' or MAN.FLGDISPONIBILE='P')"/>
+								                  
+<STATEMENT name="getInfoPerInvioSmsCig"
+		   query="select sms.CODTIPOSMS,
+					   deSms.STRDESCRIZIONE,
+					   sms.STR30MSG1,
+					   sms.STR30MSG2,
+					   sms.STR30MSG3,
+					   sms.STR30MSG4 
+				from ts_sms sms,
+					 de_tipo_sms deSms
+				where sms.CODMONOTIPORAGG = 'A'
+				  and sms.CODTIPOSMS = deSms.CODTIPOSMS"/>
+		   
+<STATEMENT name="getInfoLavoratorePerCig"
+		   query="select an_lavoratore.STRNOME,
+					   an_lavoratore.STRCOGNOME,
+					   an_lavoratore.STRCODICEFISCALE,
+					   nvl(ciLav.STRCELL,an_lavoratore.STRCELL) as STRCELL,
+					   'S' as ESISTECIG,
+					   to_char(ag_agenda.DTMDATAORA, 'dd/mm/yyyy') data, 
+					   to_char(ag_agenda.DTMDATAORA, 'hh:mi') ora,
+					   de_cpi.STRDESCRIZIONE
+				  from am_altra_iscr iscr, 
+				  	   an_lavoratore lav, 
+					   ci_lavoratore ciLav,
+					   ag_agenda, 
+					   ag_lavoratore, 
+					   an_lavoratore, 
+					   de_cpi
+				 where iscr.CODSTATO is null
+				   and iscr.CODTIPOISCR in ('O','S','M')
+				   and sysdate &lt; nvl(ISCR.DATCHIUSURAISCR, iscr.DatFine)
+				   and lav.CDNLAVORATORE = iscr.CDNLAVORATORE
+				   and iscr.PRGACCORDO = ciLav.PRGACCORDO (+)
+				   and iscr.cdnlavoratore = ?
+				   and iscr.CDNLAVORATORE = ciLav.CDNLAVORATORE (+)
+				   and iscr.cdnlavoratore = ag_lavoratore.CDNLAVORATORE
+				   and ag_agenda.CODCPI = ag_lavoratore.CODCPI 
+				   and ag_agenda.PRGAPPUNTAMENTO = ag_lavoratore.PRGAPPUNTAMENTO 
+				   and ag_lavoratore.CDNLAVORATORE = an_lavoratore.CDNLAVORATORE 
+				   and ag_agenda.CODCPI = de_cpi.CODCPI 
+				   and ag_lavoratore.CODCPI = ? 
+				   and ag_lavoratore.CDNLAVORATORE = iscr.cdnlavoratore 
+				   and ag_lavoratore.PRGAPPUNTAMENTO = ?
+				   and rownum = 1 "/>
+				   
+<STATEMENT name="SELECT_COMBO_TIPO_SMS"
+		   query="select deSms.CODTIPOSMS as CODICE,
+					   deSms.STRDESCRIZIONE as DESCRIZIONE
+				from ts_sms sms, de_tipo_sms deSms
+				where sms.CODTIPOSMS = deSms.CODTIPOSMS
+				  and sms.CODMONOTIPORAGG = 'A'"/>

@@ -1,0 +1,615 @@
+<PAGE name="RicercaReiezionePage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_RicercaCodiceReiezione"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaReiezionePage" target="M_RicercaCodiceReiezione">
+			<CONDITIONS>
+				<PARAMETER name="codiceReiezione" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+		</DEPENDENCE>
+  	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="ListaProfiliLavPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_ListaProfiliLav"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaProfiliLavPage" target="M_ListaProfiliLav">
+		</DEPENDENCE>
+  	</DEPENDENCIES>
+</PAGE>
+<PAGE name="RicercaProfiliMenuPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_ComboStatoProfilo"/>
+    	<MODULE name="M_GET_VCH_PROFILING"/>
+    	<MODULE name="M_ElencoCPI"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaProfiliMenuPage" target="M_ComboStatoProfilo"/>
+		<DEPENDENCE source="RicercaProfiliMenuPage" target="M_GET_VCH_PROFILING"/>
+		<DEPENDENCE source="RicercaProfiliMenuPage" target="M_ElencoCPI"/>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ListaProfiliLavOpPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ListaProfiliOp" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaProfiliLavOpPage" target="M_ListaProfiliOp"/>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ProfiloLavPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ComboSiNo"/>
+		<MODULE name="M_GetDimensioniNonAttive"/>
+		<MODULE name="M_GetInfoGeneraliProfilo"/>
+		<MODULE name="M_CalcolaProfilo"/>
+		<MODULE name="M_SalvaFlgLinguaProfilo"/>
+		<MODULE name="M_GetNumPersonalita"/>
+     </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ProfiloLavPage" target="M_ComboSiNo"/>
+		<DEPENDENCE source="ProfiloLavPage" target="M_GetDimensioniNonAttive"/>
+		<DEPENDENCE source="ProfiloLavPage" target="M_GetInfoGeneraliProfilo">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="calcolaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPage" target="M_GetNumPersonalita">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+  			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPage" target="M_CalcolaProfilo">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="calcolaProfilo" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="M_CalcolaProfilo" target="M_GetInfoGeneraliProfilo"/>
+	<DEPENDENCE source="ProfiloLavPage" target="M_SalvaFlgLinguaProfilo">
+			<CONDITIONS>
+ 				<PARAMETER name="salvaFlgLingua" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="M_SalvaFlgLinguaProfilo" target="M_GetInfoGeneraliProfilo">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaFlgLinguaProfilo.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ProfiloLavPageL1" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetInfoPrecompilateProfilo"/>
+		<MODULE name="M_GetInfoGeneraliProfilo"/>
+		<MODULE name="M_GetDomandeLinguetta"/>
+    	<MODULE name="M_GetDomandeRisposteLinguetta"/>
+    	<MODULE name="M_SalvaProfiloLinguetta"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ProfiloLavPageL1" target="M_GetInfoPrecompilateProfilo"/>
+		<DEPENDENCE source="ProfiloLavPageL1" target="M_GetInfoGeneraliProfilo">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+		<DEPENDENCE source="ProfiloLavPageL1" target="M_GetDomandeRisposteLinguetta">
+			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="1"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>		
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>		
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL1" target="M_GetDomandeLinguetta">
+ 			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="1"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL1" target="M_SalvaProfiloLinguetta">
+			<CONDITIONS>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetDomandeRisposteLinguetta">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetInfoGeneraliProfilo">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ProfiloLavPageL2" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetInfoGeneraliProfilo"/>
+		<MODULE name="M_GetDomandeLinguetta"/>
+    	<MODULE name="M_GetDomandeRisposteLinguetta"/>
+    	<MODULE name="M_SalvaProfiloLinguetta"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ProfiloLavPageL2" target="M_GetInfoGeneraliProfilo">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+		<DEPENDENCE source="ProfiloLavPageL2" target="M_GetDomandeRisposteLinguetta">
+			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="2"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>		
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>		
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL2" target="M_GetDomandeLinguetta">
+ 			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="2"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL2" target="M_SalvaProfiloLinguetta">
+			<CONDITIONS>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetDomandeRisposteLinguetta">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+  		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetInfoGeneraliProfilo">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ProfiloLavPageL3" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetInfoGeneraliProfilo"/>
+		<MODULE name="M_GetDomandeLinguetta"/>
+    	<MODULE name="M_GetDomandeRisposteLinguetta"/>
+    	<MODULE name="M_SalvaProfiloLinguetta"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ProfiloLavPageL3" target="M_GetInfoGeneraliProfilo">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+		<DEPENDENCE source="ProfiloLavPageL3" target="M_GetDomandeRisposteLinguetta">
+			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="3"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>		
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>		
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL3" target="M_GetDomandeLinguetta">
+ 			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="3"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL3" target="M_SalvaProfiloLinguetta">
+			<CONDITIONS>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetDomandeRisposteLinguetta">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+  		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetInfoGeneraliProfilo">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ProfiloLavPageL4" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetInfoGeneraliProfilo"/>
+		<MODULE name="M_GetDomandeLinguetta"/>
+    	<MODULE name="M_GetDomandeRisposteLinguetta"/>
+    	<MODULE name="M_SalvaProfiloLinguetta"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ProfiloLavPageL4" target="M_GetInfoGeneraliProfilo">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+		<DEPENDENCE source="ProfiloLavPageL4" target="M_GetDomandeRisposteLinguetta">
+			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="4"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>		
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>		
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL4" target="M_GetDomandeLinguetta">
+ 			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="4"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL4" target="M_SalvaProfiloLinguetta">
+			<CONDITIONS>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetDomandeRisposteLinguetta">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+  		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetInfoGeneraliProfilo">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ProfiloLavPageL5" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetInfoGeneraliProfilo"/>
+		<MODULE name="M_GetDomandeLinguetta"/>
+    	<MODULE name="M_GetDomandeRisposteLinguetta"/>
+    	<MODULE name="M_SalvaProfiloLinguetta"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ProfiloLavPageL5" target="M_GetInfoGeneraliProfilo">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+		<DEPENDENCE source="ProfiloLavPageL5" target="M_GetDomandeRisposteLinguetta">
+			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="5"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>		
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>		
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL5" target="M_GetDomandeLinguetta">
+ 			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="5"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL5" target="M_SalvaProfiloLinguetta">
+			<CONDITIONS>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetDomandeRisposteLinguetta">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+  		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetInfoGeneraliProfilo">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ProfiloLavPageL6" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetInfoGeneraliProfilo"/>
+		<MODULE name="M_GetDomandeLinguetta"/>
+    	<MODULE name="M_GetDomandeRisposteLinguetta"/>
+    	<MODULE name="M_SalvaProfiloLinguetta"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ProfiloLavPageL6" target="M_GetInfoGeneraliProfilo">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+		<DEPENDENCE source="ProfiloLavPageL6" target="M_GetDomandeRisposteLinguetta">
+			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="6"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>		
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>		
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL6" target="M_GetDomandeLinguetta">
+ 			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="6"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL6" target="M_SalvaProfiloLinguetta">
+			<CONDITIONS>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetDomandeRisposteLinguetta">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+  		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetInfoGeneraliProfilo">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ProfiloLavPageL7" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetInfoGeneraliProfilo"/>
+		<MODULE name="M_GetDomandeLinguetta"/>
+    	<MODULE name="M_GetDomandeRisposteLinguetta"/>
+    	<MODULE name="M_SalvaProfiloLinguetta"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ProfiloLavPageL7" target="M_GetInfoGeneraliProfilo">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+		<DEPENDENCE source="ProfiloLavPageL7" target="M_GetDomandeRisposteLinguetta">
+			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="7"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>		
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>		
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL7" target="M_GetDomandeLinguetta">
+ 			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="7"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL7" target="M_SalvaProfiloLinguetta">
+			<CONDITIONS>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+  		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetDomandeRisposteLinguetta">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+  		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetInfoGeneraliProfilo">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ProfiloLavPageL8" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetInfoGeneraliProfilo"/>
+		<MODULE name="M_GetDomandeLinguetta"/>
+    	<MODULE name="M_GetDomandeRisposteLinguetta"/>
+    	<MODULE name="M_SalvaProfiloLinguetta"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ProfiloLavPageL8" target="M_GetInfoGeneraliProfilo">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+		<DEPENDENCE source="ProfiloLavPageL8" target="M_GetDomandeRisposteLinguetta">
+			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="8"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>		
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>		
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL8" target="M_GetDomandeLinguetta">
+ 			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="8"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL8" target="M_SalvaProfiloLinguetta">
+			<CONDITIONS>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetDomandeRisposteLinguetta">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+  		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetInfoGeneraliProfilo">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ProfiloLavPageL9" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetInfoGeneraliProfilo"/>
+		<MODULE name="M_GetDomandeLinguetta"/>
+    	<MODULE name="M_GetDomandeRisposteLinguetta"/>
+    	<MODULE name="M_SalvaProfiloLinguetta"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ProfiloLavPageL9" target="M_GetInfoGeneraliProfilo">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+		<DEPENDENCE source="ProfiloLavPageL9" target="M_GetDomandeRisposteLinguetta">
+			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="9"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>		
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>		
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL9" target="M_GetDomandeLinguetta">
+ 			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="9"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL9" target="M_SalvaProfiloLinguetta">
+			<CONDITIONS>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetDomandeRisposteLinguetta">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+  		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetInfoGeneraliProfilo">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ProfiloLavPageL10" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetInfoGeneraliProfilo"/>
+		<MODULE name="M_GetDomandeLinguetta"/>
+    	<MODULE name="M_GetDomandeRisposteLinguetta"/>
+    	<MODULE name="M_SalvaProfiloLinguetta"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ProfiloLavPageL10" target="M_GetInfoGeneraliProfilo">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+		<DEPENDENCE source="ProfiloLavPageL10" target="M_GetDomandeRisposteLinguetta">
+			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="10"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>		
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>		
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL10" target="M_GetDomandeLinguetta">
+ 			<CONSEQUENCES>
+	    		<PARAMETER name="numLinguetta" type="ABSOLUTE" value="10"/>
+	    	</CONSEQUENCES>
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATOREPROFILO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="ProfiloLavPageL10" target="M_SalvaProfiloLinguetta">
+			<CONDITIONS>
+				<PARAMETER name="salvaProfilo" scope="SERVICE_REQUEST" value="AF_DEFINED"/>				
+ 			</CONDITIONS>
+ 		</DEPENDENCE>
+ 		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetDomandeRisposteLinguetta">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+  		<DEPENDENCE source="M_SalvaProfiloLinguetta" target="M_GetInfoGeneraliProfilo">
+ 			<CONSEQUENCES>
+				<PARAMETER name="PRGLAVORATOREPROFILO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SalvaProfiloLinguetta.PRGLAVORATOREPROFILO" />
+			</CONSEQUENCES>
+ 		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ScorePersonalitaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_CalcolaProfilo"></MODULE>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ScorePersonalitaPage" target="M_CalcolaProfilo"></DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="ListaMovModificabilePage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_ListaForzaMovModificabili"/>
+    	<MODULE name="M_ControllaModificheForzatura" />  
+    	<MODULE name="M_ListaForzatureErrateConMovimenti" />  
+    	<MODULE name="M_VerificaCateneMovLav"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaMovModificabilePage" target="M_ListaForzaMovModificabili">
+			<CONDITIONS>
+				<PARAMETER name="operazione"  scope="SERVICE_REQUEST"  value="AF_NOT_DEFINED"/>				
+ 			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ListaMovModificabilePage" target="M_ControllaModificheForzatura">
+			<CONDITIONS>
+				<PARAMETER name="operazione"  scope="SERVICE_REQUEST"  type="ABSOLUTE" value="FORZATURA"/>				
+ 			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_ControllaModificheForzatura" target="M_VerificaCateneMovLav">
+			<CONDITIONS>
+				<PARAMETER name="M_ControllaModificheForzatura.ESITO"  scope="SERVICE_RESPONSE"  type="ABSOLUTE" value="OK"/>				
+ 			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_ControllaModificheForzatura" target="M_ListaForzatureErrateConMovimenti">
+			<CONDITIONS>
+				<PARAMETER name="M_ControllaModificheForzatura.ESITO"  scope="SERVICE_RESPONSE"  type="ABSOLUTE" value="KO"/>				
+ 			</CONDITIONS>
+		</DEPENDENCE>	
+	<!-- 	<DEPENDENCE source="M_ControllaModificheForzatura" target="M_ListaForzaMovModificabili">
+		</DEPENDENCE>	 -->
+  	</DEPENDENCIES>
+</PAGE>
+<PAGE name="VerificaCateneMovLavPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_VerificaCateneMovLav"/>
+    </MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="VerificaCateneMovLavPage" target="M_VerificaCateneMovLav">
+		</DEPENDENCE>
+  	</DEPENDENCIES>
+</PAGE>

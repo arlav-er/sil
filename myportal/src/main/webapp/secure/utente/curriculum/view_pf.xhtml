@@ -1,0 +1,326 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" template="/WEB-INF/templates/#{utilsBean.bootstrapTemplate}/main.xhtml">
+	<ui:param name="pagetitle" value="Curriculum" />
+
+
+	<ui:define name="content">
+		<h:outputScript library="commons" name="js/utente/curriculum/curriculum.view.js" />
+		<h:outputScript library="commons" name="js/vendor/one-page-nav.js" />
+		<h:outputScript library="commons" name="js/vendor/jquery.sticky.js" />
+		<h:outputScript library="commons" name="js/vendor/hideMaxListItem-min.js" />
+		<div class="curriculum-main-bg">
+
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12 m-b-10">
+						<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.backTo}">
+							<a href="#{curriculumVitaePfViewBean.backTo}" class="torna-indietro-link">
+								<i class="fa fa-arrow-left" aria-hidden="true"></i>
+								Torna indietro
+							</a>
+						</ui:fragment>
+					</div>
+				</div>
+
+				<div class="curriculum-view-container">
+					<div class="curriculum-sidebox-wrap">
+						<div class="curriculum-sidebox">
+							<div class="user-info">
+								<ui:fragment
+									rendered="#{not empty curriculumVitaePfViewBean.cvDatiPersonali.idCvDatiPersonali
+                                and not empty curriculumVitaePfViewBean.cvDatiPersonali.foto}">
+									<div class="thumb">
+										<p:graphicImage cache="false" id="fotoCurriculum" value="#{curriculumVitaePfPhotoBean.image}">
+											<f:param name="paramId" value="#{curriculumVitaePfViewBean.cvDatiPersonali.idCvDatiPersonali}" />
+										</p:graphicImage>
+									</div>
+								</ui:fragment>
+								<div class="user-body">
+									<h5>#{curriculumVitaePfViewBean.getIntestatario()}</h5>
+								</div>
+							</div>
+							
+							<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.idAcCandidatura}">
+								<b>Riferimento candidatura:</b> #{curriculumVitaePfViewBean.idAcCandidatura}	
+							</ui:fragment>
+							
+							<ui:fragment
+								rendered="#{(sessionBean.isAzienda() or sessionBean.utente)  and not empty curriculumVitaePfViewBean.livelliValutazione.idAcCandidatura  and !curriculumVitaePfViewBean.checkAutoCandidatura()}">
+								<h:outputText
+									value="Candidatura n°  #{curriculumVitaePfViewBean.numCandidature}"
+									title="Candidatura n°  #{curriculumVitaePfViewBean.numCandidature}" />
+								<h:outputText
+									value=" di #{curriculumVitaePfViewBean.numTotalCandidature}"
+									title=" di #{curriculumVitaePfViewBean.numTotalCandidature}" />
+							</ui:fragment>
+							
+							<div>
+								<i class="fa fa-map-marker" aria-hidden="true" style="color: #ce1c18"></i>
+								#{curriculumVitaePfViewBean.cvDatiPersonali.deComuneDomicilio.denominazione}
+							</div>
+							<div>
+								<b>Provenienza:</b> #{curriculumVitaePfViewBean.cvDatiPersonali.provenienzaCurriculum.descrizione}
+							</div>
+							<ui:fragment rendered="#{sessionBean.isUtente() and curriculumVitaePfViewBean.cvDatiPersonali.flagInviato == false}">
+								<div class="m-t-10">
+									<span title="Data scadenza del curriculum" data-toggle="tooltip" data-placement="right" data-container="body">
+										<i class="fa fa-clock-o" aria-hidden="true" style="color: #499358; margin-right: 10px;"></i>
+										<h:outputFormat value="#{curriculumVitaePfViewBean.cvDatiPersonali.dtScadenza}">
+											<f:convertDateTime pattern="#{ui['shared.dateFormat']}" />
+										</h:outputFormat>
+									</span>
+								</div>
+							</ui:fragment>
+							<ui:fragment rendered="#{true}">
+								<ul class="options-menu no-vertical-bar left-align display-block view-menu">
+									<ui:remove>
+									<ui:fragment
+										rendered="#{sessionBean.isAzienda() and not empty curriculumVitaePfViewBean.idAcCandidatura  and curriculumVitaePfViewBean.checkModifiyAssegnaValutazioneSchedaVal()}">
+										<li>
+											<p:commandLink onclick="$('#sendEmailLavoratore-modal').modal('show')">
+											<f:param name="id" value="#{curriculumVitaePfViewBean.idAcCandidatura}" />
+												<i class="fa fa-reply" aria-hidden="true"></i>
+                                               Contatta lavoratore
+                                            </p:commandLink>
+										</li>
+									</ui:fragment>
+									</ui:remove>
+									<ui:fragment
+										rendered="#{sessionBean.isAzienda() and curriculumVitaePfViewBean.checkVisibilityContattaLavoratore()}">
+										<li><p:commandLink onclick="$('#sendEmailLavoratore-modal').modal('show')">
+												<i class="fa fa-reply" aria-hidden="true"></i>
+                                               Contatta lavoratore
+                                            </p:commandLink>
+										</li>
+									</ui:fragment>
+									<ui:fragment
+										rendered="#{sessionBean.isAzienda() and not empty curriculumVitaePfViewBean.idAcCandidatura and curriculumVitaePfViewBean.checkVisibilityAssegnaValutazioneSchedaVal() and !curriculumVitaePfViewBean.checkAutoCandidatura()}">
+										<li>
+											<p:commandLink onclick="$('#schedaValutazione-modal').modal('show')">
+											<f:param name="id" value="#{curriculumVitaePfViewBean.idAcCandidatura}" />
+												<i class="fa fa-id-card-o" aria-hidden="true"></i>
+												<ui:fragment rendered="#{curriculumVitaePfViewBean.checkModifiyAssegnaValutazioneSchedaVal()}">
+                                                Compila scheda valutazione
+                                                </ui:fragment>
+                                                <ui:fragment rendered="#{!curriculumVitaePfViewBean.checkModifiyAssegnaValutazioneSchedaVal()}">
+                                                Scheda valutazione
+                                                </ui:fragment>
+                                            </p:commandLink>
+										</li>
+									</ui:fragment>
+									<ui:remove>
+									 <ui:fragment
+										rendered="#{sessionBean.isAzienda() and curriculumVitaePfViewBean.checkVisibilityAssegnaValutazioneSchedaVal() and !curriculumVitaePfViewBean.checkAutoCandidatura()}">
+										<li>
+											<p:commandLink onclick="$('#valuta-modal').modal('show')">
+												
+												  <ui:fragment rendered="#{curriculumVitaePfViewBean.checkModifiyAssegnaValutazioneSchedaVal()}">                                            
+												   <i class="fa fa-star"></i>Assegna valutazione
+												  </ui:fragment>
+												
+												<ui:fragment rendered="#{!curriculumVitaePfViewBean.checkModifiyAssegnaValutazioneSchedaVal()}">                                            
+												   <i class="fa fa-star"></i>Valutazione
+												</ui:fragment>
+                                            </p:commandLink>
+										</li>
+									 </ui:fragment>
+									</ui:remove>
+									<ui:fragment
+										rendered="#{sessionBean.isAzienda() and curriculumVitaePfViewBean.checkVisibilityAssegnaValutazioneSchedaVal() and curriculumVitaePfViewBean.checkAutoCandidatura()}">
+										<li>
+											<p:commandLink onclick="$('#valuta-modal').modal('show')">
+												<i class="fa fa-star"></i>
+                                                Assegna valutazione
+                                            </p:commandLink>
+										</li>
+									</ui:fragment>
+									<li>
+										<p:commandLink
+											onclick="MyPortal.fetchStampa('#{request.contextPath}/secure/rest/services/getCurriculumUtente?curriculumId='+#{curriculumVitaePfViewBean.cvDatiPersonali.idCvDatiPersonali});return false;">
+											<i class="fa fa-print"></i>
+										Stampa
+									</p:commandLink>
+									</li>
+									<ui:fragment rendered="#{!sessionBean.isAzienda()}">
+										<li>
+											<h:link rendered="#{curriculumVitaePfViewBean.isModificaRendered()}"
+												outcome="#{curriculumVitaePfViewBean.redirectToView()}">
+												<i class="fa fa-pencil"></i>
+											Modifica
+										</h:link>
+										</li>
+									</ui:fragment>
+									<ui:fragment
+										rendered="#{curriculumVitaePfViewBean.checkAllegatoSelezionato}">
+										<li><h:form>
+												<p:commandLink ajax="false">
+													<i class="fa fa-download" aria-hidden="true"></i>
+											Allegato
+											<p:fileDownload
+														value="#{curriculumVitaePfViewBean.downloadAllegatoFile()}" />
+												</p:commandLink>
+											</h:form></li>
+									</ui:fragment>
+								</ul>
+							</ui:fragment>							
+						</div>
+					</div>
+
+					<div class="curriculum-nav-wrap hidden-sm hidden-xs">
+						<div class="curriculum-nav-sticky">
+							<div class="curriculum-nav-container">
+								<div class="curriculum-nav-scroll">
+									<nav id="curriculum-nav" class="curriculum-nav">
+										<ul class="clear-list">
+										   <li class="current">
+												<a href="#datiPrincipali" title="Dati principali" data-toggle="tooltip" data-placement="left" data-container="body">
+													<span class="fa fa-home"></span>
+												</a>
+											</li>
+											<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.cvIstruzioniSelezionate}">
+												<li class="current">
+													<a href="#istruzione" title="Istruzione" data-toggle="tooltip" data-placement="left" data-container="body">
+														<span class="fa fa-graduation-cap"></span>
+													</a>
+												</li>
+											</ui:fragment>
+											<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.cvFormazioniSelezionate}">
+												<li>
+													<a href="#formazione" title="Formazione" data-toggle="tooltip" data-placement="left" data-container="body">
+														<span class="fa fa-leanpub"></span>
+													</a>
+												</li>
+											</ui:fragment>
+											<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.lingueSelezionate}">
+												<li>
+													<a href="#lingue" title="Lingue" data-toggle="tooltip" data-placement="left" data-container="body">
+														<span class="fa fa-language"></span>
+													</a>
+												</li>
+											</ui:fragment>
+											<ui:fragment  rendered="#{not empty curriculumVitaePfViewBean.cvInformatica.dtmIns}">
+												<li>
+													<a href="#informatica" title="Informatica" data-toggle="tooltip" data-placement="left"
+														data-container="body">
+														<span class="fa fa-windows"></span>
+													</a>
+												</li>
+											</ui:fragment>
+											<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.esperienzeSelezionate}">
+												<li>
+													<a href="#esperienzeProfessionali" title="Esperienze Professionali" data-toggle="tooltip"
+														data-placement="left" data-container="body">
+														<span class="fa fa-building-o"></span>
+													</a>
+												</li>
+											</ui:fragment>
+											<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.cvProfessioniSelezionate}">
+												<li>
+													<a href="#professioniDesiderate" title="Professioni Desiderate" data-toggle="tooltip" data-placement="left"
+														data-container="body">
+														<span class="fa fa-briefcase"></span>
+													</a>
+												</li>
+											</ui:fragment>
+											<ui:fragment
+												rendered="#{not empty curriculumVitaePfViewBean.patentiSelezionate 
+											  or not empty curriculumVitaePfViewBean.patentiniSelezionati 
+											  or not empty curriculumVitaePfViewBean.albiSelezionati 
+											  or not empty curriculumVitaePfViewBean.cvDatiPersonali.noteAbilitazioni}">
+												<li><a href="#abilitazioni" title="Abilitazioni"
+													data-toggle="tooltip" data-placement="left"
+													data-container="body"> <span class="fa fa-car"></span>
+												</a></li>
+											</ui:fragment>
+											<ui:fragment rendered="#{curriculumVitaePfViewBean.isCompetenzeTrasversaliRendered()}">
+												<li>
+													<a href="#competenzeTrasversali" title="Altre Competenze" data-toggle="tooltip" data-placement="left"
+														data-container="body">
+														<span class="fa fa-id-card-o"></span>
+													</a>
+												</li>
+											</ui:fragment>
+											<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.cvAltreInfo.dtmIns}">
+												<li>
+													<a href="#altreInformazioni" title="Altre Informazioni" data-toggle="tooltip" data-placement="left"
+														data-container="body">
+														<span class="fa fa-info-circle"></span>
+													</a>
+												</li>
+											</ui:fragment>
+										</ul>
+									</nav>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="curriculum-info-container">
+						<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.cvDatiPersonali.dtmIns}">
+							<ui:include src="_view/_datiPrincipali.xhtml" />
+						</ui:fragment>
+
+						<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.cvIstruzioniSelezionate}">
+							<ui:include src="_view/_istruzione.xhtml" />
+						</ui:fragment>
+
+						<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.cvFormazioniSelezionate}">
+							<ui:include src="_view/_formazione.xhtml" />
+						</ui:fragment>
+
+						<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.lingueSelezionate}">
+							<ui:include src="_view/_lingue.xhtml" />
+						</ui:fragment>
+
+						<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.cvInformatica.dtmIns}">
+							<ui:include src="_view/_informatica.xhtml" />
+						</ui:fragment>
+
+						<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.esperienzeSelezionate}">
+							<ui:include src="_view/_esperienzeProfessionali.xhtml" />
+						</ui:fragment>
+
+						<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.cvProfessioniSelezionate}">
+							<ui:include src="_view/_professioniDesiderate.xhtml" />
+						</ui:fragment>
+
+						<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.patentiSelezionate 
+											  or not empty curriculumVitaePfViewBean.patentiniSelezionati 
+											  or not empty curriculumVitaePfViewBean.albiSelezionati 
+											  or not empty curriculumVitaePfViewBean.cvDatiPersonali.noteAbilitazioni}">
+							<ui:include src="_view/_abilitazioni.xhtml" />
+						</ui:fragment>
+
+						<ui:fragment rendered="#{curriculumVitaePfViewBean.isCompetenzeTrasversaliRendered()}">
+							<ui:include src="_view/_competenzeTrasversali.xhtml" />
+						</ui:fragment>
+
+						<ui:fragment rendered="#{not empty curriculumVitaePfViewBean.cvAltreInfo.dtmIns}">
+							<ui:include src="_view/_altreInformazioni.xhtml" />
+						</ui:fragment>
+
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		<ui:fragment
+			rendered="#{sessionBean.isAzienda() and not empty curriculumVitaePfViewBean.livelliValutazione.idAcCandidatura}">
+			<ui:include src="_view/_valuta.xhtml" />
+		</ui:fragment>
+	    <ui:fragment
+			rendered="#{sessionBean.isAzienda() and not empty curriculumVitaePfViewBean.idAcCandidatura}">
+			<ui:include src="_view/_schedaValutazione.xhtml" />			
+		</ui:fragment>
+		<ui:include src="_view/_sendEmailLavoratore.xhtml" />
+
+		<script class="loadScript">
+            $(function () {
+                MyPortal.CurriculumView.init();
+            });
+		</script>
+	</ui:define>
+</ui:composition>
+

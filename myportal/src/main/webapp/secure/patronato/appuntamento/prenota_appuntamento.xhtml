@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="../../template/main_primefaces.xhtml">
+
+	<ui:define name="title">
+		<h:outputText
+			value="#{txt['patronato.app.prenota_appuntamento.titolo']}"
+			escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputStylesheet library="css" name="#{sessionBean.cssStyle}/myportalPrimeFacesPatronato.css" />
+		<h:form id="prenotaAppuntamentoPatronatoForm">
+			<div class="container-div">
+				<table style="border-spacing: 1.5em; width: 55%;">
+					<tr>
+						<td class="width50">
+							<div class="marginLeft15">
+								<p:outputLabel for="provinciaMenu" value="Provincia" />
+								<br />
+								<p:selectOneMenu id="provinciaMenu" required="true"
+									requiredMessage="La provincia è obbligatoria."
+									value="#{appuntamentoPatronatoBean.codProvincia}">
+									<p:ajax update="cpiDiRiferimentoInput sportelloDistaccatoInput"
+										listener="#{appuntamentoPatronatoBean.onProvinciaSelezionata}" />
+									<f:selectItems
+										value="#{appuntamentoPatronatoBean.provinceAbilitateList}" />
+								</p:selectOneMenu>
+								<br />
+								<p:message for="provinciaMenu" display="text" />
+							</div>
+						</td>
+						<td class="width50"></td>
+					</tr>
+
+					<tr>
+						<td class="width50">
+							<div class="marginLeft15">
+								<p:outputLabel for="codiceFiscaleInput" value="CF" />
+								<br />
+								<p:inputText id="codiceFiscaleInput" maxlength="16" size="16"
+									required="true"
+									requiredMessage="Il Codice Fiscale è obbligatorio."
+									value="#{appuntamentoPatronatoBean.codiceFiscale}">
+									<f:validator validatorId="codiceFiscaleLunghezzaValidator" />
+								</p:inputText>
+								<br />
+								<p:message for="codiceFiscaleInput" display="text" />
+							</div>
+						</td>
+						<td class="width50 right-td">
+							<p:outputLabel for="cellulareInput" value="Cellulare" />
+							<br />
+							<p:inputText id="cellulareInput" size="16"
+								value="#{appuntamentoPatronatoBean.cellulare}" />
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan="2" class="centered">
+							<div style="font-size: 125%;">Puoi specificare alcune
+								preferenze sulla ricerca dell'appuntamento da prenotare.</div>
+						</td>
+					</tr>
+
+					<tr>
+						<td class="width50">
+							<div class="marginLeft15">
+								<p:outputLabel for="dataDalInput" value="Data dal" />
+								<br />
+								<p:calendar id="dataDalInput" showOn="button" size="10"
+									binding="#{dataDalComponent}" showOtherMonths="false"
+									converterMessage="La data deve essere nel formato gg/mm/aaaa"
+									pattern="dd/MM/yyyy" navigator="true" yearRange="c:c+2"
+									styleClass="yellow-datepicker"
+									value="#{appuntamentoPatronatoBean.dataDal}" />
+								<br />
+								<p:message for="dataDalInput" display="text" />
+							</div>
+						</td>
+						<td class="width50 right-td">
+							<p:outputLabel for="dataAlInput" value="Data Al" />
+							<br />
+							<p:calendar id="dataAlInput" showOn="button" size="10"
+								showOtherMonths="false" pattern="dd/MM/yyyy" navigator="true"
+								converterMessage="La data deve essere nel formato gg/mm/aaaa"
+								yearRange="c:c+2" styleClass="yellow-datepicker"
+								value="#{appuntamentoPatronatoBean.dataAl}">
+								<f:validator validatorId="twoDatesValidatorPrimefaces" />
+								<f:attribute name="otherDate" value="#{dataDalComponent}" />
+								<f:attribute name="lessOrEqual" value="true" />
+							</p:calendar>
+							<br />
+							<p:message for="dataAlInput" display="text" />
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan="2">
+							<div class="marginLeft7">
+								<p:outputLabel for="mattinaOPomeriggioInput"
+									value="Mattina o pomeriggio" />
+								<br />
+								<p:selectOneButton id="mattinaOPomeriggioInput"
+									value="#{appuntamentoPatronatoBean.mattinaOPomeriggio}">
+									<f:selectItem itemLabel="Indifferente" itemValue="" />
+									<f:selectItem itemLabel="Mattina" itemValue="M" />
+									<f:selectItem itemLabel="Pomeriggio" itemValue="P" />
+								</p:selectOneButton>
+								<br />
+								<p:message for="mattinaOPomeriggioInput" display="text" />
+							</div>
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan="2">
+							<div class="marginLeft7">
+								<p:outputLabel for="cpiDiRiferimentoInput"
+									value="CPI di riferimento" />
+								<br />
+								<p:selectOneMenu id="cpiDiRiferimentoInput" required="true"
+									requiredMessage="Il CPI di riferimento è obbligatorio."
+									value="#{appuntamentoPatronatoBean.codCpiRiferimento}">
+									<p:ajax update="sportelloDistaccatoInput"
+										listener="#{appuntamentoPatronatoBean.onCpiRiferimentoSelezionato}" />
+									<f:selectItems
+										value="#{appuntamentoPatronatoBean.cpiRiferimentoList}" />
+								</p:selectOneMenu>
+								<br />
+								<p:message for="cpiDiRiferimentoInput" display="text" />
+							</div>
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan="2">
+							<div class="marginLeft7">
+								<p:outputLabel for="sportelloDistaccatoInput"
+									value="Sportello distaccato" />
+								<br />
+								<p:selectOneMenu id="sportelloDistaccatoInput"
+									value="#{appuntamentoPatronatoBean.codSportelloDistaccato}">
+									<f:selectItems
+										value="#{appuntamentoPatronatoBean.sportelloDistaccatoList}" />
+								</p:selectOneMenu>
+								<br />
+								<p:message for="sportelloDistaccatoInput" display="text" />
+							</div>
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan="2">
+							<div class="marginLeft15">
+								<p:messages id="messages" globalOnly="true" />
+							</div>
+						</td>
+					</tr>
+
+					<tr>
+						<td class="width50">
+							<div class="marginLeft15">
+								<p:commandButton id="cercaButton" value="Cerca appuntamento"
+									alt="Cerca appuntamento"
+									action="#{appuntamentoPatronatoBean.verificaSlot}"
+									title="Cerca appuntamento" ajax="false">
+								</p:commandButton>
+							</div>
+						</td>
+						<td class="width50">
+							<p:commandButton id="prenotaButton" ajax="false"
+								value="Prenota primo appuntamento disponibile"
+								alt="Prenota primo appuntamento disponibile"
+								action="#{appuntamentoPatronatoBean.prenotaPrimoDisp}"
+								title="Prenota primo appuntamento disponibile" />
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan="2">
+							<span class="boldText">* campo obbligatorio</span>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</h:form>
+		<h:form>
+			<p:commandButton id="scrivaniaButton" ajax="false"
+				styleClass="commandButtonMargin redButton"
+				value="Torna alla Scrivania" alt="Torna alla Scrivania"
+				icon="ui-icon-arrowthick-1-w"
+				action="#{appuntamentoPatronatoBean.redirectHome}"
+				title="Torna alla Scrivania" />
+		</h:form>
+	</ui:define>
+</ui:composition>

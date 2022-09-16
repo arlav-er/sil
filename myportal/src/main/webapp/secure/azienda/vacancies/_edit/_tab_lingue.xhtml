@@ -1,0 +1,214 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/tab.xhtml">
+
+	<ui:param name="tabBean" value="#{vaLinguaBean}" />
+	<ui:param name="form_id" value="lingue" />
+	<ui:param name="deleteId" value="#{tabBean.data.idVaDatiVacancy}"></ui:param>
+
+	<ui:define name="tabcontent">
+		<h:form id="#{form_id}">
+			<script type="text/javascript">
+				checkSwitch('#{tabBean.switchtab}');
+			</script>
+			<h:inputHidden id="tabClick" value="#{tabBean.tabClick}">
+				<f:converter converterId="booleanConverter"></f:converter>
+			</h:inputHidden>
+			<h:panelGroup id="lingue_list" layout="block">
+				<h:outputText value="Nessun elemento inserito"
+					rendered="#{empty tabBean.list}"></h:outputText>
+				<h:dataTable id="table" rendered="#{not empty tabBean.list}"
+					columnClasses=",customcenter,customcenter,customcenter,customcenter,customcenter notSortable"
+					value="#{tabBean.list}" var="element">
+					<h:column>
+						<f:facet name="header">
+							Lingua
+						</f:facet>
+						<h:outputText value="#{element.strLingua}"></h:outputText>
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">
+							Livello lettura
+						</f:facet>
+						<h:outputText value="#{element.strGradoLinguaLetto}"></h:outputText>
+					</h:column>
+					<h:column>
+						<f:facet name="header">
+							Livello scrittura
+						</f:facet>
+						<h:outputText value="#{element.strGradoLinguaScritto}"></h:outputText>
+					</h:column>
+					<h:column>
+						<f:facet name="header">
+							Livello espressione orale
+						</f:facet>
+						<h:outputText value="#{element.strGradoLinguaParlato}"></h:outputText>
+					</h:column>
+					<h:column rendered="#{tabBean.usaDecodificheSil()}">
+						<f:facet name="header">
+							Indispensabile
+						</f:facet>
+						<h:outputText value="#{element.opzIndispensabile? 'Sì' : 'No'}"></h:outputText>
+					</h:column>
+
+					<h:column>
+						<h:commandLink styleClass="buttonStyle" immediate="true"
+							action="#{tabBean.edit}">
+							<span class="ui-icon ui-icon-pencil fix_icon"></span>
+							<f:param name="id" value="#{element.id}"></f:param>
+							<f:ajax execute="@this" render="@form"
+								onevent="showPanelCallback"></f:ajax>
+						</h:commandLink>
+
+						<h:commandLink styleClass="buttonStyle"
+							onclick="return document.getElementById('delete_item').open({id: #{element.id}},this);">
+							<span class="ui-icon ui-icon-trash fix_icon"></span>
+						</h:commandLink>
+					</h:column>
+
+				</h:dataTable>
+				<br />
+				<h:commandLink id="insertButton" value="Inserisci una nuova lingua"
+					rendered="#{not tabBean.showPanel}" styleClass="insertButton"
+					action="#{tabBean.showInsertPanel}">
+					<f:ajax execute="@this" render="@form" onevent="showPanelCallback"></f:ajax>
+				</h:commandLink>
+			</h:panelGroup>
+
+			<h:panelGroup id="istrPanel" styleClass="insertPanel" layout="block"
+				rendered="#{tabBean.showPanel}">
+				<h:panelGrid id="insert_form" columns="1" cellspacing="10"
+					style="display:none">
+
+					<cc:inputSuggestion id="str_lingua" label="Lingua" size="20"
+						valueCod="#{tabBean.data.codLingua}"
+						value="#{tabBean.data.strLingua}"
+						disabled="#{not tabBean.editing}" required="true"
+						showButton="true" requiredMessage="La lingua e' obbligatoria"
+						requiredMessageCod="E' necessario scelgliere una lingua dalla lista a tendina"
+						suggestionPath="lingua">
+						<f:attribute name="list" value="#{tabBean.list}"></f:attribute>
+						<f:attribute name="current" value="#{tabBean.data}"></f:attribute>
+						<f:validator validatorId="linguaSuggestionValidator"
+							for="function" />
+						<f:validator validatorId="uniqueValidator" for="function" />
+					</cc:inputSuggestion>
+
+					<h:panelGroup id="chk_madrelingua_indispensabile">
+						<div style="display: inline-block;" id="div_madrelingua">
+							<h:selectBooleanCheckbox value="#{tabBean.data.madrelingua}"
+								id="madrelingua" disabled="#{not tabBean.editing}" />
+							<h:outputLabel id="madrelingua_label" for="madrelingua">
+								<h:outputText value="Madrelingua" />
+							</h:outputLabel>
+						</div>
+						<h:panelGroup style="display: inline-block;" id="div_indispensabile"
+							rendered="#{tabBean.usaDecodificheSil()}">
+							<h:selectBooleanCheckbox value="#{tabBean.data.opzIndispensabile}"
+								id="indispensabile" disabled="#{not tabBean.editing}" />
+							<h:outputLabel id="indispensabile_label" for="indispensabile">
+								<h:outputText value="Indispensabile" />
+							</h:outputLabel>
+						</h:panelGroup>
+					</h:panelGroup>
+
+					<cc:selectOneMenu label="Livello lettura"
+						value="#{tabBean.data.codGradoLinguaLetto}" id="gradoLinguaLetto"
+						disabled="#{not tabBean.editing}" required="false"
+						title="Livello lettura"
+						requiredMessage="Campo livello lingua obbligatorio">
+						<f:selectItems value="#{tabBean.gradiLinguaOptions}" />
+					</cc:selectOneMenu>
+
+					<cc:selectOneMenu label="Livello scritta"
+						value="#{tabBean.data.codGradoLinguaScritto}"
+						id="gradoLinguaScritto" disabled="#{not tabBean.editing}"
+						required="false" title="Livello scrittura"
+						requiredMessage="Campo livello scrittura obbligatorio">
+						<f:selectItems value="#{tabBean.gradiLinguaOptions}" />
+					</cc:selectOneMenu>
+
+					<cc:selectOneMenu label="Livello espressione orale"
+						value="#{tabBean.data.codGradoLinguaParlato}"
+						id="gradoLinguaParlato" disabled="#{not tabBean.editing}"
+						required="false" title="Livello espressione orale"
+						requiredMessage="Campo Livello espressione orale obbligatorio">
+						<f:selectItems value="#{tabBean.gradiLinguaOptions}" />
+						<f:attribute name="madrelingua_id" value="#{form_id}:madrelingua" />
+						<f:attribute name="grado_letto_id"
+							value="#{form_id}:gradoLinguaLetto:combobox" />
+						<f:attribute name="grado_scritto_id"
+							value="#{form_id}:gradoLinguaScritto:combobox" />
+						<f:validator validatorId="gradoLinguaValidator" for="function" />
+					</cc:selectOneMenu>
+				</h:panelGrid>
+
+				<ui:include src="../../../_buttons.xhtml" />
+			</h:panelGroup>
+
+			<script type="text/javascript">	
+
+		
+						
+				function disableGradoLinguaCombos(){
+					//isChecked = $(this).is(':checked');
+					//disabledVal= isChecked?true:false;
+					disabledVal= $(this).is(':checked');
+					$(input2disable).each(function(index) {
+					    //alert(index + ': ' + $(this).val() + ', disabledVal:' + disabledVal);
+					    $(this).attr('disabled',disabledVal);
+					    $(this).data('disabled',disabledVal);
+					    $(this).toggleClass('ui-state-disabled');
+					});
+				}
+								
+				$(function() {		
+					disegnaBottoni();
+
+					generateDataTable(jq('#{form_id}:table'));
+					
+					attachListener();
+					
+					input2disable=[];
+					input2disable.push($(jq('#{form_id}:gradoLinguaLetto:combobox:input')));
+					input2disable.push($(jq('#{form_id}:gradoLinguaScritto:combobox:input')));
+					input2disable.push($(jq('#{form_id}:gradoLinguaParlato:combobox:input')));
+					
+					input2disable.push($(jq('#{form_id}:gradoLinguaLetto:combobox:button')));
+					input2disable.push($(jq('#{form_id}:gradoLinguaScritto:combobox:button')));
+					input2disable.push($(jq('#{form_id}:gradoLinguaParlato:combobox:button')));
+										
+					chkMadreLingua=$(jq('#{form_id}:madrelingua'));
+					chkMadreLingua.click(disableGradoLinguaCombos);
+					if(chkMadreLingua.is(':checked')) {
+						 disableGradoLinguaCombos();
+					}
+				});		
+
+				$('#Lingue a:visible:enabled:first').focus();		
+
+				var openDelete = function(params) {
+					var itemId = params.id;
+					$('[id$="delete_item\:modal_form\:objectId"]').val(itemId);
+				};		
+			</script>
+
+			<cc:messages />
+
+		</h:form>
+
+		<cc:modalDialog id="delete_item" title="Elimina la lingua"
+			openF="openDelete" message="Sei sicuro di voler eliminare la lingua?"
+			actionSubmit="#{vaLinguaBean.delete}" submitLabel="Elimina"
+			renderAjax=":lingue">
+			<h:inputHidden id="objectId"></h:inputHidden>
+			<h:outputText value="#{cc.attrs.message}"></h:outputText>
+		</cc:modalDialog>
+
+	</ui:define>
+
+</ui:composition>

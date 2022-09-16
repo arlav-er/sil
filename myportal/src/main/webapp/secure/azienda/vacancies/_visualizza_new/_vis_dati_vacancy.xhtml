@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<h3 id="dati_vacancy_titolo" aria-controls="dati_vacancy_content"
+		class="headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+		<span id="dati_vacancy_brake_titolo"
+			class="ui-icon ui-icon-triangle-1-e" /> <a href="#">#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.attivitaPrincipale}</a>
+	</h3>
+
+	<div id="dati_vacancy_content"
+		class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+		<h:outputText value="Nessun elemento inserito"
+			rendered="#{empty visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO}" />
+		<h:outputText rendered="#{not empty visVaBean.numCandidature}" 
+			value="#{visVaBean.numCandidature} candidature ricevute." />
+		<h:outputText value="L'offerta di lavoro risulta scaduta."
+			styleClass="loginErrato" rendered="#{visVaBean.vacancyScaduta}" />
+			
+		<ui:fragment rendered="#{not empty visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO}">
+			<table style="border-spacing: 10px;">
+				<tr>
+					<td style="width: 50%"></td>
+					<td style="width: 50%"></td>
+				</tr>
+				<tr>
+					<td>
+						<ui:fragment rendered="#{not empty visVaBean.vaVisualizzaDTO.idSvAziendaInfo 
+							and not empty visVaBean.vaVisualizzaDTO.ragioneSociale}">
+							<label>#{visVaBean.ragioneSocialeLabel}</label><br />
+							<h:link outcome="/secure/azienda/vetrina/view_new.xhtml"
+								title="Visualizza vetrina">
+								<h:outputText id="ragione_sociale_link"
+									value="#{visVaBean.vaVisualizzaDTO.ragioneSociale}" />
+								<f:param name="id"
+									value="#{visVaBean.vaVisualizzaDTO.idSvAziendaInfo}" />
+							</h:link>
+						</ui:fragment>
+						<ui:fragment rendered="#{empty visVaBean.vaVisualizzaDTO.idSvAziendaInfo 
+							and not empty visVaBean.vaVisualizzaDTO.ragioneSociale}">
+							<label>#{visVaBean.ragioneSocialeLabel}</label><br />
+							#{visVaBean.vaVisualizzaDTO.ragioneSociale}
+						</ui:fragment>
+					</td>
+					<td>
+						<label>Riferimento</label><br />
+						<h:outputText
+							value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.numeroRichiesta}/#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.anno} 
+							#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.deProvenienzaVacancyDTO.descrizione}"
+							rendered="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.deProvenienzaVacancySILDTO == null}" />
+						<h:outputText
+							value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.numeroRichiesta}/#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.anno} 
+							#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.deProvenienzaVacancyDTO.descrizione} (ex #{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.numeroRichiestaSIL}/#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.annoSIL} 
+							#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.deProvenienzaVacancySILDTO.descrizione})"
+							rendered="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.deProvenienzaVacancySILDTO != null}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>Qualifica richiesta</label><br />
+						<h:outputText value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.mansioneMin.descrizione}"
+							rendered="#{not empty visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.mansioneMin}" />
+					</td>
+					<td>
+						<label>Gruppo professionale</label><br />
+						#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.strMansione}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>Profilo richiesto</label><br />
+						#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.attivitaPrincipale}
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<label>Descrizione attività</label><br />
+						<h:outputText value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.descrizione}"
+							escape="false" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>Comune di lavoro</label><br />
+						#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.strComLavoro}
+					</td>
+					<td>
+						<label>Indirizzo di lavoro</label><br />
+						#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.indirizzoLavoro}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>Settore dell'azienda</label><br />
+						#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.attivitaMin.descrizione}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>Numero di lavoratori ricercati</label><br />
+						#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.numeroLavoratoriRicercati}
+					</td>
+					<td>
+						<label>Data aggiornamento</label><br />
+						<h:outputText value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.dataAggiornamento}"
+							rendered="#{not empty visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.dataAggiornamento}">
+							<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+						</h:outputText>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>Data di pubblicazione</label><br />
+						<h:outputText value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.dataPubblicazione}"
+							rendered="#{not empty visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.dataPubblicazione}">
+							<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+						</h:outputText>
+					</td>
+					<td>
+						<label>Data scadenza</label><br />
+						<h:outputText value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.scadenzaPubblicazione}"
+							rendered="#{not empty visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.scadenzaPubblicazione}">
+							<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+						</h:outputText>
+					</td>
+				</tr>
+				<ui:fragment rendered="#{utilsBean.isPAT()}">
+					<tr>
+						<td>
+							<label>Stato</label><br />
+							<h:outputText value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.getCodStatoVacancyEnum().getDescrizione()}"/>
+						</td>
+						
+						<ui:fragment rendered="#{utilsBean.isPAT() and visVaBean.isPubblicata() and sessionBean.isAzienda() and visVaBean.isScadenza()}">
+                 
+						<td>
+							<a href="#{visVaBean.welcomepageEndpoint()}">Visualizza in WelcomePage</a>
+						</td>
+					
+				</ui:fragment>
+					</tr>
+				</ui:fragment>
+												
+			</table>
+
+			<ui:fragment rendered="#{not empty visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.idPoi}">			
+				<div id="mapPlace" style="display: none">
+							<div id="mappa_vacancy" class="mapPoi"></div>
+							<script type="text/javascript">
+								$( window ).load(function() {
+										var maps={};
+										maps.lat = "#{visVaBean.mapLat}";
+										maps.lng = "#{visVaBean.mapLon}";
+										maps.zoom = "#{visVaBean.mapZoom}";
+										window.loadOnePoiOpenStreetMap('mappa_vacancy', 'mapPlace', maps);
+								});
+							</script>	
+			   </div>
+		  </ui:fragment>
+
+		</ui:fragment>
+	</div>
+</ui:composition>

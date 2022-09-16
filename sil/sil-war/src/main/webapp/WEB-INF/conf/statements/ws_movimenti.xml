@@ -1,0 +1,343 @@
+<STATEMENT
+        name="SELECT_MOVIMENTI"
+        query="select strazcodicefiscale, strazpartitaiva, strazragionesociale, codazateco, codazccnl, numazdipendenti, strpatinail, 
+			struaindirizzo, coduacom, struacap, struatel, struafax, struaemail, strualindirizzo, codualcom, strcodicefiscale, strcognome, strnome, strsesso, 
+			TO_CHAR(datnasc, 'YYYY-MM-DD') datnasc, codcomnasc, codcittadinanza, codcomdom, strindirizzodom, strcapdom, TO_CHAR(datscadenza, 'YYYY-MM-DD') datscadenza, 
+			codtipotitolo, codcpi, TO_CHAR(datcomunicaz, 'YYYY-MM-DD') datcomunicaz, TO_CHAR(datiniziomov, 'YYYY-MM-DD') datiniziomov, codtipomov, 
+			codmansione, strdesattivita, codcontratto, codmonotempo, flgsocio, codccnl, decretribuzionemen, numlivello, flglegge68, flglavdomicilio, 
+			flgAssObbl, codCatAssObbl, decretribuzioneann,
+			codagevolazione, codorario, codmvcessazione, TO_CHAR(datfinemov, 'YYYY-MM-DD') datfinemov, strnote, codtipoass, codnormativa, codgrado,
+			flgartigiana, TO_CHAR(datcfl, 'YYYY-MM-DD') datcfl, strnumcfl, strtipocfl, nummesiapprendistato, codmonoprov, strposinps, codstatoatto, 
+			flgasspropria,strazintcodicefiscale, strazintpartitaiva, strazintragionesociale, codazintateco, numazintdipendenti, codazinttipoazienda, 
+			struaintindirizzo, coduaintcom, struaintcap, straznumalbointerinali, strnumregistrocommitt, TO_CHAR(datregistrocommitt, 'YYYY-MM-DD') datregistrocommitt, 
+			flgretribuzionemenccnl, strluogodilavoro, codcpilav, TO_CHAR(datvisitamedica, 'YYYY-MM-DD') datvisitamedica, strappcodicefiscaletutore, 
+			strappcognometutore, strappnometutore, numappanniesptutore, strapplivellotutore, codappmansionetutore, codaztipoazienda, strazintnumcontratto, 
+			TO_CHAR(datazintiniziocontratto, 'YYYY-MM-DD') datazintiniziocontratto, TO_CHAR(datazintfinecontratto, 'YYYY-MM-DD') datazintfinecontratto, 
+			strazintrap, numazintsoggetti, strreferente, strnumprtprovincia, numggprevistiagr, numggeffettuatiagr, flgassdacess, flgtitolaretutore, numoresett, 
+			codcomnascdi, TO_CHAR(datnascdi, 'YYYY-MM-DD') datnascdi, strsessodi, codlavorazione, codlivelloagr, codcategoria, strversionetracciato, codqualificasrq, 
+			numprotesterno, numannoprotesterno, codtipocomunic, codcomunicazione, codtipodocex, strnumdocex, codmotivopermsoggex, codtipoenteprev, codtipotrasf, 
+			codtipocontratto, strcodicefiscaleazprec, strragionesocialeazprec, codcomazprec, strindirizzoazprec, strcapazprec, codatecoazprec, strpatazprec, 
+			strtelazprec, strfaxazprec, stremailazprec, TO_CHAR(datinizioraplav, 'YYYY-MM-DD') datinizioraplav, TO_CHAR(datfineproraplav, 'YYYY-MM-DD') datfineproraplav,
+			codsoggetto, codcomunicazioneprec, TO_CHAR(datcessraplav, 'YYYY-MM-DD') datcessraplav, codtiposomm, TO_CHAR(datconvenzione, 'YYYY-MM-DD') datconvenzione, 
+			numconvenzione, codtipomis, flglavoroagr, flgdistparziale, flgdistazestera, flgpa, flgsistemazionealloggiativa, flgpagamentorimpatrio,
+			flgazutilizestera, TO_CHAR(datfineaffittoramo, 'YYYY-MM-DD') datfineaffittoramo, strnumagsomministrazione,
+			flgsogginitalia, TO_CHAR(datfineperiodoformativo, 'YYYY-MM-DD') datfinepf, flglavoroinmobilita, 
+			flglavorostagionale, strcodfiscpromotoretir, flgprosecuzione, codvariazione,
+			STRDENOMINAZIONETIR, CODCATEGORIATIR, CODTIPOLOGIATIR, CODSOGGPROMOTOREMIN
+			from am_movimento_appoggio 
+			where strcodicefiscale = ?  "/>
+
+<STATEMENT name="GET_LAV_WS" query="SELECT an.strcodicefiscale,
+       an.strcognome,
+       an.strnome,
+       to_char(an.datnasc, 'YYYY-MM-DD') as DTNASC,
+       an.codcomnas,
+       com1.strdenominazione  as STRCOMNASC,
+       p1.strtarga as provNasc,
+       an.strsesso,
+       to_char(an.codcittadinanza) as codcittadinanza,       
+       AN.CODCOMRES CODCOMRES,
+       COM2.STRDENOMINAZIONE as STRCOMRES,
+       p2.strtarga as codProvRes,
+       an.strindirizzores,       
+       to_char(AN.CDNLAVORATORE) as CDNLAVORATORE,       
+       AN.CODCOMDOM CODCOMDOM,
+       COM3.STRDENOMINAZIONE as STRCOMDOM,
+       rtrim(p3.strIstat) as provDom,
+       AN.STRINDIRIZZODOM STRINDIRIZZODOM,       
+       dec.flgcee,
+       an.codcittadinanza as cittadinanza
+  FROM AN_LAVORATORE AN
+  LEFT JOIN DE_COMUNE COM1 ON AN.Codcomnas = COM1.CODCOM
+  left join de_provincia p1 on com1.codprovincia = p1.codprovincia
+  LEFT JOIN DE_COMUNE COM2 ON AN.CODCOMRES = COM2.CODCOM
+  left join de_com_montana dcmR on COM2.codcommontana = dcmR.codcommontana
+  left join de_provincia p2 on com2.codprovincia = p2.codprovincia
+  LEFT JOIN DE_COMUNE COM3 ON AN.CODCOMDOM = COM3.CODCOM
+  left join de_com_montana dcmD on COM3.codcommontana = dcmD.codcommontana
+  left join de_provincia p3 on com3.codprovincia = p3.codprovincia
+  left join de_cittadinanza dec on an.codcittadinanza =  dec.codcittadinanza
+ WHERE AN.strcodicefiscale = ? "  />
+ 
+ 
+ <STATEMENT name="GET_AZI_WS" query=" select az.strcodicefiscale,
+       az.strragionesociale,
+       auz.strindirizzo,
+       auz.codcom,
+       dc1.strdenominazione,
+       dp1.strtarga,
+       nvl(auz.strcap, dc1.strcap) as strcap,
+       auz.codateco,
+       auz.strtel,
+       auz.strfax,
+       auz.stremail,
+       az.STRNUMALBOINTERINALI,
+       az.codtipoazienda,
+       nvl(auz.flgsede,'N') as sede,
+       auz.prgazienda,
+       auz.prgunita  
+  from an_azienda az
+ inner join an_unita_azienda auz on az.prgazienda = auz.prgazienda
+ left join de_comune dc1 on  auz.codcom = dc1.codcom
+ left join de_provincia dp1 on dc1.codprovincia = dp1.codprovincia 
+  where az.prgazienda = ?  "  />
+ 
+ 
+ <STATEMENT name="GET_ULT_CATENA_MOV" query="{ call ? := PG_MOVIMENTI.ULTIMACATENA(?) }" />
+ 
+ 
+ 
+ 
+  <STATEMENT name="GET_MOV_WS"
+	query="select 
+       am.prgmovimento,
+       to_char(am.prgmovimento) as strprgmovimento,
+       am.prgazienda as prgaziendaM,
+       am.cdnlavoratore,
+       to_char(am.prgmovimentoprec) as prgmovimentoprec,
+       am.prgunita as prgunitaM,
+       am.codcpi,
+       am.codcpilav,
+       to_char(am.datcomunicaz, 'YYYY-MM-DD') as datcomunicaz,
+       to_char(am.datiniziomov, 'YYYY-MM-DD') as datiniziomov,
+       am.codtipomov,
+       am.codmansione,
+       am.strdesattivita,
+       am.codcontratto,
+       am.codmonotempo,
+       am.flgsocio,
+       am.codccnl,
+       to_char(am.decretribuzionemen) as decretribuzionemen, to_char(am.decretribuzioneann) as decretribuzioneann,
+       am.numlivello,
+       am.flglegge68, am.flgAssObbl, am.codCatAssObbl,
+       am.flglavdomicilio,
+       am.codagevolazione,
+       am.codorario,
+       am.codmvcessazione,
+       to_char(am.datfinemov, 'YYYY-MM-DD') as datfinemov,
+       am.strnote,
+       am.cdnutins,
+       am.dtmins,
+       am.cdnutmod,
+       am.dtmmod,
+       to_char(am.numklomov) as numklomov,
+       am.strmatricola,
+       am.codtipoass,
+       am.codnormativa,
+       am.codgrado,
+       am.codmonoprov,
+       am.strposinps,
+       am.strpatinail,
+       am.prgstatooccupaz,
+       to_char(am.datinizioavv, 'YYYY-MM-DD') as datinizioavv,
+       am.prgaziendautiliz,
+       am.prgunitautiliz,
+       am.strluogodilavoro,
+       am.flginterasspropria,
+       to_char(am.numggprevistiagr),
+       am.numggeffettuatiagr,
+       am.flgmodtempo,
+       am.flgmodreddito,
+       to_char(am.datfinemoveffettiva, 'YYYY-MM-DD') as datfinemoveffettiva,
+       am.codmonotipofine,
+       am.codmonomovdich,
+       am.numproroghe,
+       to_char(am.prgmovimentosucc) as prgmovimentosucc,
+       am.codmonotempomovprec,
+       am.codstatoatto,
+       am.decretribuzionemensanata,
+       am.datsitsanata,
+       am.codtipodich,
+       am.flgretribuzionemenccnl,
+       am.numggtramovcomunicazione,
+       am.strazintnumcontratto,
+       to_char(am.datazintiniziocontratto, 'YYYY-MM-DD') as datazintiniziocontratto,
+       to_char(am.datazintfinecontratto, 'YYYY-MM-DD') as datazintfinecontratto,
+       am.strazintrap,
+       am.numazintsoggetti,
+       am.numazintdipendenti,
+       am.datiniziomovprec,
+       am.strreferente,
+       am.codmonobatch,
+       am.prgdichlav,
+       am.datiniziomovsupreddito,
+       am.codtitolo,
+       am.prgmovimentorett,
+       am.codmotannullamento,
+       to_char(nvl(am.numoresett,0) ) as numoresett ,
+       am.codlavorazione,
+       am.codcategoria,
+       am.codqualificasrq,
+       TO_CHAR(am.datconvenzione, 'YYYY-MM-DD') datconvenzione,
+       am.codcomunicazione,
+       am.codente,
+       am.strcodiceenteprev,
+       am.codtipocontratto,
+       am.codtipotrasf,
+       TO_CHAR(am.datinizioraplav, 'YYYY-MM-DD') datinizioraplav,
+       am.datfineraplav,
+       am.codsoggetto,
+       am.codcomunicazioneprec,
+       am.datfineproraplav,
+       am.datcessraplav,
+       am.codtiposomm,
+       am.numconvenzione,
+       to_char(am.datfinedistacco, 'YYYY-MM-DD') as datfinedistacco,
+       am.prgaziendadist,
+       am.prgunitadist,
+       am.codmvcessazionebk,
+       am.codtipodocex,
+       am.strnumdocex,
+       am.codmotivopermsoggex,       
+       TO_CHAR(am.datscadenza, 'YYYY-MM-DD') datscadenza,
+       am.flglavoroagr,
+       am.flgdistparziale,
+       am.flgdistazestera,
+       am.flgpagamentorimpatrio,
+       am.flgazutilizestera,
+       am.datfineaffittoramo,
+       am.strnumagsomministrazione,
+       am.flgsistemazionealloggiativa,
+       am.codquestura,
+       am.codquesturalegrapp,
+       am.strsessolegrapp,
+       TO_CHAR(am.datnasclegrapp, 'YYYY-MM-DD') datnasclegrapp,
+       TO_CHAR(am.datscadenzalegrapp, 'YYYY-MM-DD') datscadenzalegrapp,
+       am.strnumdocexlegrapp,
+       am.codmotivopermsoggexlegrapp,
+       am.codcomnasclegrapp,
+       am.codcittadinanzalegrapp,
+       am.strcognomelegrapp,
+       am.strnomelegrapp,
+       am.codtipodocexlegrapp,
+       am.flgazestera,
+       am.strcfazestera,
+       am.strragsocazestera,
+       codtipoentepromotore,       
+       dtt.strdescrizione as desctipotra,
+       az.strcodicefiscale,
+       auz.strindirizzo,
+       az.strragionesociale,
+       auz.codcom,
+       dc1.strdenominazione,
+       dp1.strtarga,
+       auz.strcap,
+       auz.codateco,
+       auz.strtel,
+       auz.strfax,
+       auz.stremail,
+       az.STRNUMALBOINTERINALI,
+       az.codtipoazienda,
+       nvl(auz.flgsede, 'N') as sede,
+       auz.prgazienda,
+       auz.prgunita,
+       dmc.strdescrizione as desccessazione,
+       dsrq.strdescrizione as descsrq,
+        am.codtipodich,
+       am.datsitsanata,
+       to_char(am.DECRETRIBUZIONEMENSANATA) as DECRETRIBUZIONEMENSANATA,
+       am.PRGDICHLAV,
+       case
+         when (am.codtipodich is not null and amd.codstatoatto not in ('AN','AU','NS') ) then
+          'S'
+         else
+          'N'
+       end as redditoSanato,       
+        case
+         when (am.codtipodich in ('DDRN','DDRS') and am.datsitsanata is not null ) then
+          to_char(am.DECRETRIBUZIONEMENSANATA) 
+         when (am.codtipodich in ('DGRN') and am.datsitsanata is not null ) then
+           '0' 
+          when (am.codtipodich in ('DGRN') and am.datsitsanata is not null ) then
+           'nullo'         
+       end as retribuizioneMensile,
+       dec.flgcee,
+        case
+         when (am.prgaziendautiliz is null and am.prgunitautiliz is null and az.codtipoazienda = 'PA') then
+          'S'
+         when (am.prgaziendautiliz is not null and am.prgunitautiliz is not null and  azS.codtipoazienda = 'PA') then
+          'S'
+         else
+          'N'
+       end as pubblicaAm,         
+        case
+         when (am.codtipocontratto in ('C.01.00','C.02.00') ) then
+          'S'
+         else
+          'N'
+       end as tirocinio,       
+        case         
+         when (am.prgaziendautiliz is not null and am.prgunitautiliz is not null and  azS.codtipoazienda ='INT') then
+          'I'
+         when (am.prgaziendautiliz is null and am.prgunitautiliz is null and az.codtipoazienda = 'INT') then
+          'I'
+         else
+          'N'
+       end as tipoazigen,
+        case         
+         when (am.prgaziendautiliz is not null and am.prgunitautiliz is not null ) then
+          'S'        
+         else
+          'N'
+       end as aziUtilizatrice,
+       dtct.strdescrizione as descContratto
+  from am_movimento am
+  left join de_tipo_trasf dtt on am.codtipotrasf = dtt.codtipotrasf
+  left join an_azienda az on am.prgazienda = az.prgazienda
+  left join an_unita_azienda auz on (am.prgunita = auz.prgunita and az.prgazienda = auz.prgazienda)
+  left join an_azienda azD on am.prgaziendadist = azD.prgazienda
+  left join an_unita_azienda auzD on (am.prgunitadist = auzD.prgunita and az.prgazienda = auz.prgazienda) 
+  left join de_comune dc1 on auz.codcom = dc1.codcom
+  left join de_provincia dp1 on dc1.codprovincia = dp1.codprovincia
+  left join de_mv_cessazione dmc on am.codmvcessazione = dmc.codmvcessazione
+  left join DE_QUALIFICA_SRQ dsrq on am.codqualificasrq = dsrq.codqualificasrq
+  left join am_dich_lav amd on am.prgdichlav = amd.prgdichlav
+  left join de_cittadinanza dec on am.codcittadinanzalegrapp = dec.codcittadinanza
+  left join an_azienda azS on am.prgaziendautiliz = azS.prgazienda
+  left join an_unita_azienda auzS on (am.prgunitautiliz = auzS.prgunita and azS.Prgazienda = auzS.Prgazienda)
+  left join de_tipo_azienda dtaS on  azS.Codtipoazienda = dtaS.Codtipoazienda
+  left join de_tipo_contratto dtct on am.codtipocontratto = dtct.codtipocontratto
+ where am.prgmovimento = ? 
+ and rownum = 1" />
+ 
+ <STATEMENT name="GET_INFO_MOV_WS_PORTALE"
+	query="select am.prgmovimento, am.numklomov
+ 	from am_movimento am
+ 	where am.prgmovimento = ? 
+ 	and am.cdnutins = ? and codmonomovdich = 'C' and codcomunicazione is null "/>
+ 	
+ <STATEMENT name="GET_INFO_CITTADINANZA_WS_PORTALE"
+	query="select flgcee
+ 	from de_cittadinanza
+ 	where codcittadinanza = ? "/>
+ 	
+ <STATEMENT name="GET_INFO_ORARIO_WS_PORTALE"
+	query="select codorario, codmonoorario
+ 	from de_orario 	
+ 	where codorario = ? "/>
+ 
+ <STATEMENT name="GET_INFO_MANSIONE_WS_PORTALE"
+	query="select codmansione
+ 	from de_mansione 	
+ 	where codmansionedot = ? "/>
+ 	
+ <STATEMENT name="GET_INFO_CCNL_WS_PORTALE"
+	query="select codccnl, STRDESCRIZIONE
+ 	from de_contratto_collettivo 	
+ 	where codccnl = ? "/>
+ 	
+ <STATEMENT name="GET_INFO_ATECO_WS_PORTALE"
+	query="select codateco
+ 	from de_attivita 	
+ 	where codatecodot = ? "/>
+ 	
+ <STATEMENT name="GET_INFO_COMUNE_WS_PORTALE"
+	query="select strdenominazione
+ 	from de_comune 	
+ 	where codcom = ? "/>
+ 	
+ <STATEMENT name="GET_CODMANSIONEDOT_WS_APAPI"
+	query="select codmansionedot
+ 	from de_mansione 	
+ 	where codmansione = ? "/>
+ 	

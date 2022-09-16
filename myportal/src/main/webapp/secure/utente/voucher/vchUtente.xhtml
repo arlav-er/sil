@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/main_primefaces.xhtml">
+
+	<ui:define name="content">
+
+
+
+		<h1>Attivazione dei titoli d'acquisto</h1>
+
+		<div class="widget_container">
+			<div class="ui-widget-content ui-widget ui-corner-all">
+				<div style="margin: 2em">
+					<h:panelGroup id="vchRichiestaGroup" layout="block">
+						<fieldset>
+							<legend>Attivazioni precedenti:</legend>
+							<ui:fragment rendered="#{vchBean.getSizeList() > 0}">
+								<p:dataTable id="vchRichiestaTable" var="bean"
+									value="#{vchBean.vchRichiestaAttDTOList}">
+									<p:column headerText="Data richiesta">
+										<h:outputText value="#{bean.dtRichiesta}">
+											<f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+										</h:outputText>
+									</p:column>
+
+									<p:column headerText="Codice attivazione">
+										<h:outputText value="#{bean.codAttivazione}" />
+									</p:column>
+
+									<p:column headerText="CF Ente Scelto">
+										<h:outputText
+											value="#{bean.vchEntiAccreditati.codiceFiscaleEnte}" />
+									</p:column>
+
+									<p:column headerText="Ente">
+										<h:outputText
+											value="#{bean.vchEntiAccreditati.denominazione}, #{bean.vchEntiAccreditati.indirizzo}, #{bean.vchEntiAccreditati.comune.descrizione}" />
+									</p:column>
+								</p:dataTable>
+							</ui:fragment>
+
+							<ui:fragment rendered="#{vchBean.getSizeList() == 0}">
+								<p>Non sono stati effettuati dal cittadino precedenti
+									attivazioni di titoli tramite questo servizio.</p>
+							</ui:fragment>
+						</fieldset>
+					</h:panelGroup>
+
+					<!-- Form invocazione servizio -->
+					<h:form id="voucherForm">
+						<fieldset>
+							<legend>Attivazione di un Titolo Di Acquisto:</legend>
+							<table style="border-spacing: 1em; width: 80%">
+								<tr>
+									<td>
+										<p:messages id="messages" globalOnly="true" showDetail="true"
+											autoUpdate="true" closable="true" />
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<p:outputLabel value="Codice fiscale cittadino" />
+										<p>#{vchBean.utenteDTO.codiceFiscale}</p>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<p:outputLabel value="Scegli soggetto"
+											for="vchEnteAccreditato" />
+										<br />
+										<p:selectOneMenu var="bean" id="vchEnteAccreditato"
+											value="#{vchBean.vchEntiAccreditatiDTO}"
+											converter="vchEntiAccreditatiConverter" required="true"
+											requiredMessage="La scelta dell'ente è obbligatoria.">
+											<f:selectItem itemLabel="Seleziona un ente" itemValue="" />
+											<f:selectItems value="#{vchBean.vchEntiAccreditatiDTOList}"
+												var="vchEntiAccreditatiDTO"
+												itemLabel="#{vchEntiAccreditatiDTO.codiceFiscaleEnte}, #{vchEntiAccreditatiDTO.denominazione}, #{vchEntiAccreditatiDTO.indirizzo}, #{vchEntiAccreditatiDTO.comune.descrizione}"
+												itemValue="#{vchEntiAccreditatiDTO}" />
+
+											<p:column>
+												#{bean.codiceFiscaleEnte}, #{bean.denominazione}, #{bean.indirizzo}, #{bean.comune.descrizione}
+											</p:column>
+
+										</p:selectOneMenu>
+										<p:message for="vchEnteAccreditato"></p:message>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<p:outputLabel value="Codice attivazione"
+											for="codiceAttivazioneInput" />
+										<br />
+										<p:inputText id="codiceAttivazioneInput" size="25"
+											required="true" value="#{vchBean.codAttivazione}"
+											requiredMessage="Inserire il codice di attivazione."
+											converterMessage="Il codice di attivazione è formalmente non corretto">
+										</p:inputText>
+										<p:message for="codiceAttivazioneInput"></p:message>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<p:commandButton value="Attiva Titolo"
+											styleClass="m-r-1em white-icon"
+											actionListener="#{vchBean.attivaVch}"
+											icon="ui-button-icon-primary ui-icon ui-icon-check"
+											update="@(.ui-message) :vchRichiestaGroup" />
+
+										<p:button value="Annulla" styleClass="white-icon"
+											icon="ui-button-icon-primary ui-icon ui-icon-close" />
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+					</h:form>
+
+					<p:button outcome="/secure/utente/home.xhtml"
+						value="Torna indietro" title="Torna alla pagina dei servizi" />
+				</div>
+			</div>
+		</div>
+	</ui:define>
+
+</ui:composition>

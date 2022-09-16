@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components/"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" template="/secure/template/main.xhtml">
+
+	<ui:define name="title">
+		Offerte di lavoro compatibili con il tuo Curriculum
+	</ui:define>
+
+	<ui:define name="content">
+		<ui:param name="form_id" value="vacancies_form" />
+		<h:form id="#{form_id}" rendered="#{not empty vacancyCompatibiliBean.vaDatiVacancyDTOs}">
+		<h4>Questa pagina mostra al massimo le 100 offerte di lavoro più recenti fra quelle individuate come maggiormente attinenti al tuo CV.</h4>
+		<h4>Per visualizzare tutte le offerte effettuare una ricerca dall'apposita sezione <h:link outcome="ricerca_vacancy" value="Cerca offerte di lavoro"/></h4>
+			<h:dataTable id="va_list" value="#{vacancyCompatibiliBean.vaDatiVacancyDTOs}"
+				columnClasses="cv_col1, cv_col2, cv_col2, cv_col3 notSortable" var="vacancy">
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Profilo richiesto" />
+					</f:facet>
+
+					<h:outputText value="#{vacancy.attivitaPrincipale}" />
+				</h:column>
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Data Pubblicazione" />
+
+					</f:facet>
+					<h:outputText value="#{vacancy.dataPubblicazione}">
+						<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+					</h:outputText>
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Data Scadenza" />
+
+					</f:facet>
+					<h:outputText value="#{vacancy.scadenzaPubblicazione}">
+						<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+					</h:outputText>
+				</h:column>
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="" />
+					</f:facet>
+
+					<h:link styleClass="buttonStyle" outcome="/secure/azienda/vacancies/visualizza"  title="Visualizza">
+						<f:param name="id" value="#{vacancy.id}" />
+						<span class="ui-icon ui-icon-document fix_icon"></span>
+					</h:link>
+
+					<h:link styleClass="buttonStyle" outcome="/secure/azienda/vacancies/edit" rendered="#{not sessionBean.utente}" title="Modifica">
+						<f:param name="id" value="#{vacancy.id}" />
+						<span class="ui-icon ui-icon-pencil fix_icon"></span>
+					</h:link>
+
+					<h:commandLink styleClass="buttonStyle" title="Elimina" rendered="#{not sessionBean.utente}"
+						onclick="return document.getElementById('vacancies_delete').open(#{vacancy.id});">
+						<span class="ui-icon ui-icon-trash fix_icon"></span>
+					</h:commandLink>
+
+					<h:commandLink id="copia_cv_button" styleClass="buttonStyle" title="Copia" rendered="#{not sessionBean.utente}"
+						onclick="return document.getElementById('vacancies_copy').open(#{vacancy.id}, '#{vacancy.attivitaPrincipaleEscape}');">
+						<span class="ui-icon ui-icon-copy fix_icon"></span>
+					</h:commandLink>
+
+					<h:link id="visualizza_candidature_button" styleClass="buttonStyle" title="Visualizza le candidature" rendered="#{not sessionBean.utente}"
+						outcome="/secure/azienda/candidature/visualizza_lista.xhtml">
+						<f:param name="id" value="#{vacancy.id}"></f:param>
+						<span class="ui-icon ui-icon-search fix_icon"></span>
+					</h:link>
+				</h:column>
+			</h:dataTable>
+			<script type="text/javascript">
+				$(function() {
+					generateDataTable(jq('#{form_id}:va_list'),{
+					    "aaSorting": []
+					  });
+	
+					$('button.vacancy2toggle').click(function() {
+						  $('.vacancy2toggle').toggle();
+					});
+				});
+			</script>
+		</h:form>
+		<div class="formattedText">
+		<h:outputText value="Non sono state trovate offerte di lavoro compatibili con il tuo Curriculum."  rendered="#{empty vacancyCompatibiliBean.vaDatiVacancyDTOs}"  />
+		</div>
+		<cc:btnBack backTo="#{vacancyCompatibiliBean.backTo}" />
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,2529 @@
+<!--Recupera i dati di un movimento-->
+  <STATEMENT name="GET_DETT_MOV"
+             query="SELECT 
+            			  TO_CHAR(MOV.prgMovimento) prgMovimento,
+                          TO_CHAR(MOV.prgMovimentoPrec) prgMovimentoPrec,
+                          TO_CHAR(MOV.PrgMovimentoSucc) PrgMovimentoSucc,
+                          TO_CHAR(MOV.prgAzienda) prgAzienda,
+                          TO_CHAR(MOV.prgUnita) prgUnita,
+                          TO_CHAR(MOV.cdnLavoratore) cdnLavoratore,
+                          TO_CHAR(MOV.datComunicaz, 'DD/MM/YYYY') datComunicaz,
+                          TO_CHAR(MOV.datInizioMov, 'DD/MM/YYYY') datInizioMov,
+                          MOV.codTipoMov,
+                          MOV.strMatricola, MOV.codMonoTempo, TO_CHAR(MOV.datFineMov, 'DD/MM/YYYY') datFineMov,
+                          TO_CHAR(MOV.datFinePF, 'DD/MM/YYYY') datFinePF,
+                          MOV.codOrario, TO_CHAR(MOV.numOreSett) numOreSett, 
+                          MOV.codTipoContratto codTipoAss, MOV.codNormativa,
+                          MOV.codMansione, MOV.strDesAttivita,
+                          MOV.codContratto,  MOV.flgSocio, MOV.codCcnl,
+                          trim(TO_CHAR(MOV.decRetribuzioneMen, '999999999.999')) decRetribuzioneMen,
+                          TO_CHAR(MOV.decRetribuzioneAnn) decRetribuzioneAnn,
+                          (CASE WHEN (MOV.CODTIPOMOV &lt;&gt; 'CES' AND TIPOASS.NUMRETRIBUZIONEPROSP IS NOT NULL 
+                          			  AND MOV.CODTIPODICH IS NOT NULL AND MOV.DECRETRIBUZIONEANN IS NOT NULL AND MOV.DECRETRIBUZIONEMENSANATA IS NOT NULL) 
+						  	THEN TO_CHAR((MOV.DECRETRIBUZIONEMENSANATA * 12 * TIPOASS.NUMRETRIBUZIONEPROSP)) 
+						  WHEN (MOV.CODTIPOMOV &lt;&gt; 'CES' AND TIPOASS.NUMRETRIBUZIONEPROSP IS NOT NULL 
+						  		AND MOV.CODTIPODICH IS NULL AND MOV.DECRETRIBUZIONEANN IS NOT NULL) 
+						  	THEN TO_CHAR((MOV.DECRETRIBUZIONEANN * TIPOASS.NUMRETRIBUZIONEPROSP))
+						  ELSE NULL
+						  END) RETRIBUZIONEPROSPETTICA,
+                          TO_CHAR(MOV.numLivello) numLivello,
+                          MOV.flgLegge68, MOV.flgAssObbl, MOV.codCatAssObbl,
+                          MOV.flgLavDomicilio, MOV.codAgevolazione,
+                          MOV.codMvCessazione CODMVCESSAZIONE,
+                          MOV.strNote,
+                          MOV.codGrado, 
+                          MOV.CODMONOPROV, MOV.CODSTATOATTO,
+                          DE_CCNL.strDescrizione strCCNL,                   
+                          TO_CHAR(MOV.cdnUtIns) cdnUtIns, TO_CHAR(MOV.dtmIns, 'DD/MM/YYYY HH24:MI') dtmIns,
+                          TO_CHAR(MOV.cdnUtMod) cdnUtMod, TO_CHAR(MOV.dtmMod, 'DD/MM/YYYY HH24:MI') dtmMod,
+                          TO_CHAR(MOV.numKloMov) numKloMov,
+                          UAZ.STRNUMEROINPS strPosInps,
+                          AZ.STRPATINAIL strPatInail,
+                          TO_CHAR(MOV.PRGAZIENDAUTILIZ) prgAziendaUtiliz,
+                          MOV.STRLUOGODILAVORO strLuogoDiLavoro,
+                          MOV.STRAZINTNUMCONTRATTO STRAZINTNUMCONTRATTO,
+                          TO_CHAR(MOV.DATAZINTINIZIOCONTRATTO, 'DD/MM/YYYY') DATAZINTINIZIOCONTRATTO,
+                          TO_CHAR(MOV.DATAZINTFINECONTRATTO, 'DD/MM/YYYY') DATAZINTFINECONTRATTO,
+                          MOV.STRAZINTRAP,
+                          TO_CHAR(MOV.NUMAZINTSOGGETTI) NUMAZINTSOGGETTI,
+                          TO_CHAR(MOV.NUMAZINTDIPENDENTI) NUMAZINTDIPENDENTI,
+                          MOV.FLGINTERASSPROPRIA FLGINTERASSPROPRIA,
+                          TO_CHAR(MOV.PRGUNITAUTILIZ) PRGUNITAUTILIZ,
+                          TO_CHAR(MOV.DATINIZIOAVV, 'DD/MM/YYYY') DATAINIZIOAVV,
+                          TO_CHAR(MOV.DATINIZIOMOVPREC, 'DD/MM/YYYY') DATINIZIOMOVPREC,
+                          TO_CHAR(MOV.DATFINEMOVEFFETTIVA, 'DD/MM/YYYY') DATFINEMOVEFFETTIVA,
+                          MOV.CODMONOTIPOFINE CODMONOTIPOFINE,
+                          MOV.CODMONOMOVDICH CODMONOMOVDICH,
+                          to_char(MOV.NUMGGTRAMOVCOMUNICAZIONE) NUMGGTRAMOVCOMUNICAZIONE,
+                          TO_CHAR(MOV.NUMPROROGHE) NUMPROROGHE,                          
+                          MOV.CODMONOTEMPOMOVPREC CODMONOTEMPOAVV,
+                          MOV.STRREFERENTE STRREFERENTE,
+                          MOV.CODCPI CODCPI, MOV.CODCPILAV CODCPILAV,
+                          TO_CHAR(MOV.datFineMov, 'DD/MM/YYYY') datFineMovPrec,  
+	                      trim(TO_CHAR(MOV.DECRETRIBUZIONEMENSANATA, '9999999.999')) DECRETRIBUZIONEMENSANATA,   
+	                      TO_CHAR(MOV.DATSITSANATA, 'DD/MM/YYYY') DATSITSANATA, 
+	                      TO_CHAR(MOV.DATINIZIOMOVSUPREDDITO, 'DD/MM/YYYY') DATINIZIOMOVSUPREDDITO, 
+	                      TIPODICH.STRDESCRIZIONE TIPODICHSANATA,
+	                      TIPODICH.CODTIPODICH CODICEDICH,
+                          AZ.strCodiceFiscale strCodiceFiscaleAz,
+                          AZ.strPartitaIva strPartitaIvaAz,
+                          AZ.strRagioneSociale strRagioneSocialeAz,
+                          UAZ.CODCCNL codCCNLAz,
+                          AZ.codTipoAzienda codTipoAzienda,
+                          AZ.codNatGiuridica codNatGiuridicaAz,
+                          AZ.STRNUMALBOINTERINALI strNumAlboInterinali,
+                          AZ.flgDatiOk flgDatiOk,
+                          DE_CCNLAZ.STRDESCRIZIONE descrCCNLAz,
+                          TIPOAZ.strDescrizione DESCRTIPOAZIENDA,
+                          NATGIUR.STRDESCRIZIONE natGiuridicaAz, 
+                          UAZ.strIndirizzo strIndirizzoUAz,
+                          UAZ.STRNUMREGISTROCOMMITT strNumRegistroCommitt,
+                          COM.strDenominazione strComuneUAz,
+                          UAZ.strLocalita strLocalitaUAz,
+                          UAZ.strTel strTelUAz,
+                          UAZ.strFax strFaxUAz,
+                          UAZ.codAteco codAtecoUAz, 
+                          UAZ.STRCFAZESTERA CODFISCUAZESTERA, UAZ.STRRAGSOCAZESTERA RAGSOCUAZESTERA,
+                          AZ.strRagioneSociale || '-' || UAZ.strIndirizzo strEnteRilascio,
+                          ATECOAZ.STRDESCRIZIONE strDesAtecoUAz,                          
+                          COM.strDenominazione || '(' || RTRIM(PROV.strIstat) || ')' comProvUAz,
+                          COM.STRCAP strCapUaz, 
+                          LAV.strCodiceFiscale strCodiceFiscaleLav,
+                          LAV.strNome strNomeLav,
+                          LAV.strCognome strCognomeLav,
+                          LAV.flgCfOk flgCfOk,
+                          TO_CHAR(LAV.datNasc, 'DD/MM/YYYY') datNascLav,
+                          AZUTIL.strCodiceFiscale strCodiceFiscaleAzUtil,
+                          AZUTIL.strPartitaIva strPartitaIvaAzUtil,
+                          AZUTIL.strRagioneSociale strRagioneSocialeAzUtil,
+                          AZUTIL.codTipoAzienda codTipoAziendaUtil,
+                          TIPOAZUTIL.strDescrizione DESCRTIPOAZIENDAUTIL,
+                          UAZUTIL.strIndirizzo strIndirizzoUAzUtil,
+                          COMUTIL.strDenominazione strComuneUAzUtil,
+                          COMUTIL.strDenominazione || '(' || RTRIM(PROVUTIL.strIstat) || ')' comProvUAzUtil,
+                          DE_CCNLUTIL.STRDESCRIZIONE descrCCNLAzUtil,
+                          MANS.STRDESCRIZIONE descrMansione,
+                          TIPOMANS.STRDESCRIZIONE descrTipoMansione,
+                          TIPOASS.STRDESCRIZIONE descrTipoAss,
+                          MOV.CODTITOLO CODTIPOTITOLOlav,
+                          TO_CHAR(MOV.NUMGGPREVISTIAGR)  NUMGGPREVISTIAGR,
+                          TO_CHAR(MOV.NUMGGEFFETTUATIAGR)  NUMGGEFFETTUATIAGR,
+                          TO_CHAR(MOV.PrgMovimentoRett) PrgMovimentoRett,
+                          TO_CHAR(MOV.PRGDICHLAV) PRGDICHLAV,
+                          MOV.CODMOTANNULLAMENTO,
+						  MOV.CODCATEGORIA,
+						  MOV.CODLAVORAZIONE,
+						  MOV.CODQUALIFICASRQ,
+						  QUALSRQ.STRDESCRIZIONE DESCQUALIFICASRQ,
+                          TO_CHAR(DATCONVENZIONE, 'DD/MM/YYYY') DATCONVENZIONE,
+                          TO_CHAR(NUMCONVENZIONE) NUMCONVENZIONE,
+                          TO_CHAR(ART13.DATFINESGRAVIO, 'DD/MM/YYYY') DATFINESGRAVIO,
+                          TO_CHAR(ART13.DECIMPORTOCONCESSO) DECIMPORTOCONCESSO,
+						  MOV.CODCOMUNICAZIONE,
+						  MOV.CODCOMUNICAZIONEPREC,
+						  MOV.CODENTE,
+						  ENTE.STRDESCRIZIONE STRENTE,
+						  MOV.STRCODICEENTEPREV,
+						  MOV.CODTIPOCONTRATTO,
+						  TIPOASS.CODMONOTIPO codmonotipo, NVL(TIPOASS.FLGTI, 'N') FLGCONTRATTOTI, NVL(TIPOASS.FLGSOSPENSIONE2014, 'N') FLGSOSPENSIONE2014,
+						  MOV.CODTIPOTRASF, TO_CHAR(MOV.DATFINESOSP150, 'DD/MM/YYYY') DATFINESOSP150,
+						  TO_CHAR(MOV.DATINIZIORAPLAV, 'DD/MM/YYYY') DATINIZIORAPLAV,
+						  TO_CHAR(MOV.DATFINERAPLAV, 'DD/MM/YYYY') DATFINERAPLAV,
+						  MOV.CODSOGGETTO,
+						  MOV.DATFINEPRORAPLAV,
+						  MOV.DATCESSRAPLAV,
+						  MOV.CODTIPOSOMM,
+						  AZ.STRNUMAGSOMMINISTRAZIONE,
+						  decode (DE_STATO_OCCUPAZ_RAGG.codstatooccupazragg, DE_STATO_OCCUPAZ.codstatooccupaz, 
+			  		   			  DE_STATO_OCCUPAZ_RAGG.strdescrizione,
+				   				  (DE_STATO_OCCUPAZ_RAGG.strdescrizione || ': ' || DE_STATO_OCCUPAZ.strdescrizione)) 
+			  					   	AS descrStatoOcc,  
+						  TO_CHAR (OCC.DATINIZIO, 'DD/MM/YYYY') datInizioOcc, 
+			   			  TO_CHAR (OCC.DATANZIANITADISOC, 'DD/MM/YYYY') datAnzOcc,
+			   			  TO_CHAR (MOV.DATFINEDISTACCO, 'DD/MM/YYYY') datFineDistacco,
+						  TO_CHAR(MOV.PRGUNITADIST) PRGUNITADIST,
+						  TO_CHAR(MOV.PRGAZIENDADIST) PRGAZIENDADIST,
+						  MOV.CODTIPODOCEX, MOV.STRNUMDOCEX, MOV.CODMOTIVOPERMSOGGEX,
+						  TO_CHAR(MOV.DATSCADENZA, 'DD/MM/YYYY') DATSCADENZALav,
+						  MOV.FLGLAVOROAGR,
+						  MOV.FLGDISTPARZIALE,
+						  MOV.FLGDISTAZESTERA, MOV.FLGSISTEMAZIONEALLOGGIATIVA, MOV.FLGPAGAMENTORIMPATRIO,
+						  TO_CHAR(MOV.DATFINEAFFITTORAMO, 'DD/MM/YYYY') DATFINEAFFITTORAMO,
+						  MOV.CODQUESTURA QUESTURALAV,
+						  MOV.STRCOGNOMELEGRAPP COGNOMELEGRAPP, MOV.STRNOMELEGRAPP NOMELEGRAPP, MOV.CODCITTADINANZALEGRAPP,
+						  MOV.STRSESSOLEGRAPP SESSOLEGRAPP, to_char(MOV.DATNASCLEGRAPP, 'DD/MM/YYYY') DATANASCITALEGRAPP,
+						  MOV.CODCOMNASCLEGRAPP CODCOMNASCITALEGRAPP, to_char(MOV.DATSCADENZALEGRAPP, 'DD/MM/YYYY') DATASCADENZAPSLEGRAPP,
+						  MOV.CODTIPODOCEXLEGRAPP CODTIPODOCPSLEGRAPP, MOV.STRNUMDOCEXLEGRAPP STRNUMDOCPSLEGRAPP,
+						  MOV.CODMOTIVOPERMSOGGEXLEGRAPP CODMOTIVOPSLEGRAPP, MOV.CODQUESTURALEGRAPP QUESTURALEGRAPP,
+						  MOV.FLGAZESTERA, MOV.STRCFAZESTERA CODFISCAZESTERA, MOV.STRRAGSOCAZESTERA RAGSOCAZESTERA,
+						  MOV.CODTIPOENTEPROMOTORE,
+						  MOV.FLGLAVOROINMOBILITA,
+  						  MOV.FLGLAVOROSTAGIONALE,
+  						  MOV.FLGPROSECUZIONE,
+  						  MOV.CODVARIAZIONE,
+  						  MOV.FLGSOGGINITALIA,
+  						  TIR.CODTIPOLOGIATIR,
+  						  TIR.CODCATEGORIATIR,
+  						  TIR.STRDENOMINAZIONETIR,
+  						  MOV.CODSOGGPROMOTOREMIN, TIPOASS.CODCONTRATTO CODCONTRATTOTIPOASS,
+  						  case 
+				    		when trunc(MOV.datiniziomov) &gt;= (select trunc(dat150) from ts_generale) then '1'
+				    		else '0'
+				  		end gestionedecreto150
+					FROM AM_MOVIMENTO MOV,
+                       AN_AZIENDA AZ,
+                       AN_UNITA_AZIENDA UAZ,
+                       DE_CONTRATTO_COLLETTIVO DE_CCNLAZ,
+                       DE_ATTIVITA ATECOAZ,
+                       DE_COMUNE COM,
+                       DE_PROVINCIA PROV,
+                       AN_LAVORATORE LAV,
+                       DE_CONTRATTO_COLLETTIVO DE_CCNLUTIL,
+                       AN_AZIENDA AZUTIL,
+                       AN_UNITA_AZIENDA UAZUTIL,
+                       DE_COMUNE COMUTIL,
+                       DE_PROVINCIA PROVUTIL,
+                       DE_CONTRATTO_COLLETTIVO DE_CCNL,
+                       DE_TIPO_AZIENDA TIPOAZ,
+                       DE_TIPO_AZIENDA TIPOAZUTIL,
+                       DE_MANSIONE MANS,
+                       DE_MANSIONE TIPOMANS,
+                       DE_NAT_GIURIDICA NATGIUR,
+                       DE_TIPO_CONTRATTO TIPOASS,
+                       DE_TIPO_DICH TIPODICH,
+                       DE_QUALIFICA_SRQ QUALSRQ,
+                       CM_MOV_L68_ART13 ART13,
+                       AM_STATO_OCCUPAZ OCC,
+					   DE_STATO_OCCUPAZ,
+					   DE_STATO_OCCUPAZ_RAGG,
+					   DE_ENTE_PREVIDENZIALE ENTE,
+					   AM_MOVIMENTO_APPRENDIST TIR
+				WHERE MOV.prgMovimento = ?
+				  AND MOV.prgmovimento = TIR.prgmovimento (+)
+                  AND MOV.prgAzienda = AZ.prgAzienda (+)
+                  AND MOV.prgAzienda = UAZ.prgAzienda (+)
+                  AND MOV.prgUnita = UAZ.prgUnita (+)
+                  AND MOV.CODQUALIFICASRQ = QUALSRQ.CODQUALIFICASRQ (+)
+                  AND UAZ.CODCCNL = DE_CCNLAZ.CODCCNL (+)  
+                  AND UAZ.CODATECO = ATECOAZ.CODATECO (+)                   
+                  AND UAZ.codCom = COM.codCom (+)
+                  AND COM.codProvincia = PROV.codProvincia (+)
+                  AND MOV.cdnLavoratore = LAV.cdnLavoratore (+)
+                  AND MOV.codCcnl = DE_CCNL.CodCcnl(+)
+                  AND MOV.PRGAZIENDAUTILIZ = AZUTIL.prgAzienda (+)
+                  AND MOV.PRGAZIENDAUTILIZ = UAZUTIL.prgAzienda (+)
+                  AND MOV.PRGUNITAUTILIZ = UAZUTIL.prgUnita (+)
+                  AND UAZUTIL.codCom = COMUTIL.codCom (+)
+                  AND COMUTIL.codProvincia = PROVUTIL.codProvincia (+)
+                  AND UAZUTIL.CODCCNL = DE_CCNLUTIL.CODCCNL (+)
+                  AND AZ.CODTIPOAZIENDA = TIPOAZ.CODTIPOAZIENDA (+)
+                  AND AZUTIL.CODTIPOAZIENDA = TIPOAZUTIL.CODTIPOAZIENDA (+)
+                  AND MOV.CODMANSIONE = MANS.CODMANSIONE (+)
+                  AND TIPOMANS.CODMANSIONE (+) = SUBSTR(MOV.CODMANSIONE, 0, 5) || '00'
+                  AND AZ.CODNATGIURIDICA = NATGIUR.CODNATGIURIDICA (+)
+                  AND MOV.CODTIPOCONTRATTO = TIPOASS.CODTIPOCONTRATTO (+)
+                  AND MOV.CODTIPODICH = TIPODICH.CODTIPODICH (+)
+                  AND MOV.PRGMOVIMENTO = ART13.PRGMOVIMENTO (+)
+                  AND OCC.CDNLAVORATORE (+) = LAV.CDNLAVORATORE AND OCC.DATFINE IS NULL
+				  AND OCC.CODSTATOOCCUPAZ = DE_STATO_OCCUPAZ.CODSTATOOCCUPAZ (+)  
+                  AND de_stato_occupaz.codstatooccupazragg = de_stato_occupaz_ragg.codstatooccupazragg (+)
+                  AND MOV.CODENTE = ENTE.CODENTE (+)
+  "/>
+  
+<!--seleziona l'ultimo movimento collegato a partire da un prgmovimento valido (che deve essere indicato 6 volte...)-->
+  <STATEMENT name="GET_PRG_ULTIMO_MOV"
+            query="SELECT TO_CHAR(MAX(PrgMovimento)) ULTIMOPRGMOVIMENTOCOLLEGATO
+                  FROM AM_MOVIMENTO MOV
+                  WHERE MOV.PRGAZIENDA = (SELECT PRGAZIENDA FROM AM_MOVIMENTO WHERE prgMovimento = ?)
+                  AND MOV.PRGUNITA = (SELECT PRGUNITA FROM AM_MOVIMENTO WHERE prgMovimento = ?)
+                  AND MOV.CDNLAVORATORE = (SELECT CDNLAVORATORE FROM AM_MOVIMENTO WHERE prgMovimento = ?)
+                  AND datInizioMov = (SELECT MAX(datInizioMov) FROM AM_MOVIMENTO
+                                      WHERE PRGAZIENDA = (SELECT PRGAZIENDA FROM AM_MOVIMENTO WHERE prgMovimento = ?)
+                                      AND PRGUNITA = (SELECT PRGUNITA FROM AM_MOVIMENTO WHERE prgMovimento = ?)
+                                      AND CDNLAVORATORE = (SELECT CDNLAVORATORE FROM AM_MOVIMENTO WHERE prgMovimento = ?))
+  "/>
+
+<!--Recupera i dati di un movimento dalla tabella di appoggio-->
+  <STATEMENT name="GET_DETT_MOV_APP"
+            query="SELECT 
+                  TO_CHAR(PRGMOVIMENTOAPP) PRGMOVIMENTOAPP,
+                  STRCODICEFISCALE strCodiceFiscaleLav, 
+                  STRCOGNOME strCognomeLav, 
+                  STRNOME strNomeLav, 
+                  STRSESSO STRSESSOLAV, 
+                  TO_CHAR(DATNASC, 'DD/MM/YYYY') datNascLav,
+                  CODCOMNASC codComNascLav,
+                  COMNASCLAV.STRDENOMINAZIONE strComNascLav,
+                  MOV.CODCITTADINANZA codCittadinanzaLav,
+                  CITT.STRDESCRIZIONE strCittadinanzaLav,
+                  CITT.STRNAZIONE strNazioneLav,
+                  CODCOMDOM codComDomLav,
+                  COMDOMLAV.STRDENOMINAZIONE strComDomLav,
+                  PROVLAV.STRISTAT strProvDomLav,
+                  STRINDIRIZZODOM strIndirizzoDomLav,
+                  STRCAPDOM strCapDomLav,
+                  TO_CHAR(DATSCADENZA, 'DD/MM/YYYY') DATSCADENZALav,
+                  CODTIPOTITOLO CODTIPOTITOLOLav,
+                  MOV.CODCPI CODCPI, MOV.CODCPILAV CODCPILAV,
+                  CPILAV.STRDESCRIZIONE STRCPILAV,
+                  STRAZCODICEFISCALE strCodiceFiscaleAz,
+                  STRAZPARTITAIVA strPartitaIvaAz,
+                  STRAZRAGIONESOCIALE strRagioneSocialeAz,
+                  CODAZATECO codAtecoUAz,
+                  ATTUAZ.STRDESCRIZIONE descrAtecoUAz,
+                  CODAZCCNL codCCNLAz,
+                  COLL.STRDESCRIZIONE descrCCNLAz,
+                  TO_CHAR(NUMAZDIPENDENTI) NUMDIPENDENTIAz,
+                  STRUAINDIRIZZO strIndirizzoUAz,
+                  CODUACOM codComuneUAz,
+                  STRUACAP strCapUAz,
+                  STRUATEL strTelUAz,
+                  STRUAFAX strFaxUAz,
+                  STRUAEMAIL strEmailUAz,
+                  STRUALINDIRIZZO strIndirizzoSede,
+                  CODUALCOM codComSede,
+                  TO_CHAR(DATCOMUNICAZ, 'DD/MM/YYYY') DATCOMUNICAZ,
+                  TO_CHAR(DATINIZIOMOV, 'DD/MM/YYYY') DATINIZIOMOV,
+                  CODTIPOMOV,
+                  MOV.CODMANSIONE,
+                  STRDESATTIVITA,
+                  MOV.CODCONTRATTO,
+                  CODMONOTEMPO,
+                  FLGSOCIO,
+                  MOV.CODCCNL,
+                  trim(TO_CHAR(DECRETRIBUZIONEMEN, '999999999.999')) DECRETRIBUZIONEMEN,
+                  TO_CHAR(MOV.decRetribuzioneAnn) decRetribuzioneAnn,
+                  TO_CHAR(NUMLIVELLO) NUMLIVELLO,
+                  FLGLEGGE68, MOV.FLGASSOBBL, MOV.CODCATASSOBBL,
+                  FLGLAVDOMICILIO,
+                  CODAGEVOLAZIONE,
+                  CODORARIO,
+                  TO_CHAR(NUMORESETT) NUMORESETT,
+                  CODMVCESSAZIONE,
+                  decode(MOV.CODTIPOMOV,'CES','',TO_CHAR(DATFINEMOV, 'DD/MM/YYYY')) DATFINEMOV,
+                  MOV.STRNOTE,
+                  TO_CHAR(CDNUTINS) CDNUTINS,
+                  TO_CHAR(DTMINS, 'DD/MM/YYYY') DTMINS,
+                  TO_CHAR(CDNUTMOD) CDNUTMOD,
+                  TO_CHAR(DTMMOD, 'DD/MM/YYYY') DTMMOD,
+                  TO_CHAR(NUMKLOMOVAPP) NUMKLOMOVAPP,
+                  STRMATRICOLA,
+                  MOV.CODTIPOCONTRATTO CODTIPOASS,
+                  CODNORMATIVA,
+                  CODGRADO,
+                  FLGARTIGIANA,
+                  TO_CHAR(DATCFL, 'DD/MM/YYYY') DATCFL,
+                  STRNUMCFL,
+                  STRTIPOCFL,
+                  TO_CHAR(NUMMESIAPPRENDISTATO) NUMMESIAPPRENDISTATO,
+                  STRPOSINPS,
+                  STRPATINAIL,
+                  CODMONOPROV, 
+                  CODSTATOATTO,
+                  FLGASSPROPRIA FLGINTERASSPROPRIA, 
+                  STRAZINTCODICEFISCALE strCodiceFiscaleAzUtil, 
+                  STRAZRAGIONESOCIALE || 
+					CASE
+          				WHEN ((STRAZRAGIONESOCIALE is not null) and (STRUAINDIRIZZO is not null))
+          				THEN '-'
+					END
+				  || STRUAINDIRIZZO strEnteRilascio,
+                  STRAZINTPARTITAIVA strPartitaIvaAzUtil, 
+                  MOV.STRAZINTNUMCONTRATTO STRAZINTNUMCONTRATTO,
+                  TO_CHAR(MOV.DATAZINTINIZIOCONTRATTO, 'DD/MM/YYYY') DATAZINTINIZIOCONTRATTO,
+                  TO_CHAR(MOV.DATAZINTFINECONTRATTO, 'DD/MM/YYYY') DATAZINTFINECONTRATTO,
+                  MOV.STRAZINTRAP,
+                  MOV.CODAZINTATECO CODAZINTATECO,
+                  ATTUAZUTIL.STRDESCRIZIONE descrAtecoUAzUtil,
+                  TO_CHAR(MOV.NUMAZINTSOGGETTI) NUMAZINTSOGGETTI,
+                  TO_CHAR(MOV.NUMAZINTDIPENDENTI) NUMAZINTDIPENDENTI,
+                  STRAZINTRAGIONESOCIALE strRagioneSocialeAzUtil,  
+                  STRUAINTINDIRIZZO strIndirizzoUAzUtil, 
+                  CODUAINTCOM, 
+                  STRUAINTCAP, 
+                  STRAZNUMALBOINTERINALI strNumAlboInterinali,
+                  COMUAZ.strDenominazione || '(' || RTRIM(PROV.strIstat) || ')' comProvUAz,
+                  COMUAZ.strDenominazione strComuneUAz,
+                  COMUAZUTIL.strDenominazione strComuneUAzUtil,
+                  TIPOASS.STRDESCRIZIONE descrTipoAss,
+                  MOV.STRNUMREGISTROCOMMITT, 
+				  TO_CHAR(MOV.DATREGISTROCOMMITT, 'DD/MM/YYYY') DATREGISTROCOMMITT,
+				  FLGRETRIBUZIONEMENCCNL,
+				  STRLUOGODILAVORO strLuogoDiLavoro,
+				  DATVISITAMEDICA,
+				  CODAZINTTIPOAZIENDA codTipoAziendaUtil,
+				  STRAPPCODICEFISCALETUTORE,
+				  STRAPPCOGNOMETUTORE,
+				  STRAPPNOMETUTORE,
+			      FLGTITOLARETUTORE,
+				  NUMAPPANNIESPTUTORE,
+				  STRAPPLIVELLOTUTORE,
+				  CODAPPMANSIONETUTORE,
+				  CODAZTIPOAZIENDA codTipoAzienda,
+                  TIPOAZ.strDescrizione DESCRTIPOAZIENDA,				  
+				  MOV.STRREFERENTE STRREFERENTE,
+                  DE_CCNL.strDescrizione strCCNL,
+                  MANS.STRDESCRIZIONE descrMansione,
+                  TIPOMANS.STRDESCRIZIONE descrTipoMansione,	
+                  TIPOASS.CODMONOTIPO codmonotipo, NVL(TIPOASS.FLGSOSPENSIONE2014, 'N') FLGSOSPENSIONE2014,
+                  TO_CHAR(MOV.NUMGGPREVISTIAGR)  NUMGGPREVISTIAGR,
+                  TO_CHAR(MOV.NUMGGEFFETTUATIAGR)  NUMGGEFFETTUATIAGR,
+				  MOV.CODLAVORAZIONE,
+				  MOV.CODLIVELLOAGR,
+				  MOV.CODCATEGORIA,
+				  MOV.STRVERSIONETRACCIATO,
+                  MOV.PRGMOVIMENTOAPPCVE,
+                  MOV.CODQUALIFICASRQ,
+                  MOV.CODTIPOCOMUNIC,
+                  MOV.CODCOMUNICAZIONE,
+				  MOV.CODTIPODOCEX,
+				  MOV.STRNUMDOCEX,
+				  MOV.CODMOTIVOPERMSOGGEX,
+				  MOV.CODTIPOENTEPREV CODENTE,
+				  ENTE.STRDESCRIZIONE STRENTE,
+				  MOV.STRCODICEENTEPREV,
+				  MOV.CODTIPOTRASF,
+				  DE_TIPO_TRASF.FLGTRASFER,
+				  MOV.CODTIPOCONTRATTO,
+				  TO_CHAR(MOV.DATINIZIORAPLAV, 'DD/MM/YYYY') DATINIZIORAPLAV, 
+				  TO_CHAR(MOV.DATFINERAPLAV, 'DD/MM/YYYY') DATFINERAPLAV,
+				  MOV.DATFINEPRORAPLAV,
+				  MOV.DATCESSRAPLAV,
+				  MOV.CODTIPOSOMM, 
+				  MOV.CODSOGGETTO,
+				  MOV.CODCOMUNICAZIONEPREC,
+				  MOV.STRCODICEFISCALEAZPREC,
+				  MOV.CODCOMAZPREC,
+				  MOV.STRINDIRIZZOAZPREC,
+				  MOV.STRRAGIONESOCIALEAZPREC,
+				  TO_CHAR(MOV.DATCONVENZIONE, 'DD/MM/YYYY') DATCONVENZIONE,
+                  TO_CHAR(MOV.NUMCONVENZIONE) NUMCONVENZIONE,
+                  QUALSRQ.STRDESCRIZIONE DESCQUALIFICASRQ,
+                  MOV.CODTIPOMIS, MOV.FLGLAVOROAGR, MOV.FLGDISTPARZIALE, MOV.FLGDISTAZESTERA, 
+                  MOV.FLGPA, MOV.FLGSISTEMAZIONEALLOGGIATIVA, MOV.FLGPAGAMENTORIMPATRIO, MOV.FLGAZUTILIZESTERA,
+                  TO_CHAR(MOV.DATFINEAFFITTORAMO, 'DD/MM/YYYY') DATFINEAFFITTORAMO, MOV.STRNUMAGSOMMINISTRAZIONE,
+                  MOV.CODQUESTURA QUESTURALAV,
+				  MOV.STRCOGNOMELEGRAPP COGNOMELEGRAPP, MOV.STRNOMELEGRAPP NOMELEGRAPP, MOV.CODCITTADINANZALEGRAPP,
+				  MOV.STRSESSOLEGRAPP SESSOLEGRAPP, to_char(MOV.DATNASCLEGRAPP, 'DD/MM/YYYY') DATANASCITALEGRAPP,
+				  MOV.CODCOMNASCLEGRAPP CODCOMNASCITALEGRAPP, to_char(MOV.DATSCADENZALEGRAPP, 'DD/MM/YYYY') DATASCADENZAPSLEGRAPP,
+				  MOV.CODTIPODOCEXLEGRAPP CODTIPODOCPSLEGRAPP, MOV.STRNUMDOCEXLEGRAPP STRNUMDOCPSLEGRAPP,
+				  MOV.CODMOTIVOPERMSOGGEXLEGRAPP CODMOTIVOPSLEGRAPP, MOV.CODQUESTURALEGRAPP QUESTURALEGRAPP,
+				  MOV.FLGAZESTERA, MOV.STRCFAZESTERA CODFISCAZESTERA, MOV.STRRAGSOCAZESTERA RAGSOCAZESTERA,
+				  MOV.CODTIPOENTEPROMOTORE, MOV.FLGSOGGINITALIA, TO_CHAR(MOV.DATFINEPERIODOFORMATIVO, 'DD/MM/YYYY') DATFINEPF,
+			   	  MOV.FLGLAVOROINMOBILITA, MOV.FLGLAVOROSTAGIONALE, MOV.STRCODFISCPROMOTORETIR, MOV.FLGPROSECUZIONE, MOV.CODVARIAZIONE,
+			   	  MOV.STRDENOMINAZIONETIR, MOV.CODCATEGORIATIR, MOV.CODTIPOLOGIATIR, MOV.CODSOGGPROMOTOREMIN
+                  FROM AM_MOVIMENTO_APPOGGIO MOV,
+                       DE_CONTRATTO_COLLETTIVO COLL,
+                       DE_CONTRATTO_COLLETTIVO DE_CCNL,
+                       DE_COMUNE COMUAZ,
+                       DE_COMUNE COMUAZUTIL,
+                       DE_COMUNE COMNASCLAV,
+                       DE_COMUNE COMDOMLAV,
+                       DE_PROVINCIA PROV,
+					   DE_PROVINCIA PROVLAV,
+                       DE_TIPO_CONTRATTO TIPOASS,
+                       DE_CITTADINANZA CITT,
+                       DE_CPI CPILAV,
+                       DE_MANSIONE MANS,
+                       DE_MANSIONE TIPOMANS,
+                       DE_TIPO_AZIENDA TIPOAZ,
+                       DE_ATTIVITA ATTUAZ,
+                       DE_ATTIVITA ATTUAZUTIL,
+                       DE_QUALIFICA_SRQ QUALSRQ,
+                       DE_TIPO_TRASF,
+                       DE_ENTE_PREVIDENZIALE ENTE
+                  WHERE prgMovimentoApp = ?
+                    AND MOV.CODUACOM = COMUAZ.CODCOM (+)
+                    AND MOV.CODUAINTCOM = COMUAZUTIL.CODCOM (+)
+                    AND MOV.CODCOMNASC = COMNASCLAV.CODCOM (+)
+                    AND MOV.CODCOMDOM = COMDOMLAV.CODCOM (+) 
+                    AND COMDOMLAV.codProvincia = PROVLAV.codProvincia (+)				                   
+                    AND COMUAZ.codProvincia = PROV.codProvincia (+)
+                    AND MOV.CODTIPOCONTRATTO = TIPOASS.CODTIPOCONTRATTO (+)
+                    AND MOV.CODAZCCNL = COLL.CODCCNL (+)
+                    AND MOV.codCcnl = DE_CCNL.CodCcnl(+)                    
+                    AND MOV.CODCITTADINANZA = CITT.CODCITTADINANZA (+)
+                    AND MOV.CODCPILAV = CPILAV.CODCPI (+)
+                  	AND MOV.CODMANSIONE = MANS.CODMANSIONE (+)
+                  	AND MOV.CODQUALIFICASRQ = QUALSRQ.CODQUALIFICASRQ (+)
+                 	AND TIPOMANS.CODMANSIONE (+) = SUBSTR(MOV.CODMANSIONE, 0, 5) || '00'
+                    AND MOV.CODAZTIPOAZIENDA = TIPOAZ.CODTIPOAZIENDA (+)
+                    AND MOV.CODAZATECO = ATTUAZ.CODATECO (+)
+                    AND MOV.CODAZINTATECO = ATTUAZUTIL.CODATECO (+)
+                    AND MOV.CODTIPOTRASF = DE_TIPO_TRASF.CODTIPOTRASF (+)
+                    AND MOV.CODTIPOENTEPREV = ENTE.CODENTE (+)
+"/>
+
+<STATEMENT name="COMBO_TIPO_CONTRATTO"
+          query="select
+                      codContratto as codice,
+                      strdescrizione as descrizione	   
+                  from de_contratto
+                  order by strdescrizione
+"/>
+
+<!--Recupera la lista con le descrizioni dei tipi di agevolazione disponibili-->
+<STATEMENT name="COMBO_TIPO_ORARIO"
+            query="SELECT de_orario.codOrario as codice,
+					   	   de_orario.strdescrizione 
+                 || DECODE (SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+					   	   ' (scaduto)',  
+                 LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+					   	   ' (scaduto)', '') 
+                 || 
+                 decode(de_orario.codmonoorario,'T',' (Min: Full Time)', 
+                 'P',' (Min: Part Time)',                 
+                 ' (Min: nessuna corrispondenza )') AS DESCRIZIONE,
+					   	   codMonoOrario as tipoOrario	   
+				 	  from de_orario				 
+				     where flgMovimenti = 'S'  
+				       and SYSDATE between DATINIZIOVAL and DATFINEVAL
+				  order by strDescrizione"/>
+
+<!--Recupera la lista con le descrizioni dei tipi di agevolazione disponibili-->
+<STATEMENT name="COMBO_AGEVOLAZIONE_NULLAOSTA"
+            query="SELECT codAgevolazione as codice,
+                      strdescrizione as descrizione	   
+                  from de_agevolazione
+                  order by strDescrizione "/>
+
+<!--Recupera la lista con le descrizioni dei tipi di grado disponibili-->
+<STATEMENT name="COMBO_TIPO_GRADO"
+            query="SELECT codGrado as codice,
+                      strdescrizione || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_MV_GRADO
+                  order by strDescrizione
+"/>
+
+<!--Recupera la lista con le descrizioni dei tipi di agevolazioni disponibili-->
+<STATEMENT name="COMBO_TIPO_AGEVOLAZIONE"
+            query="SELECT codAgevolazione as codice,
+                      strdescrizione || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_AGEVOLAZIONE
+                  order by strDescrizione
+"/>
+
+<!--Recupera la lista completa dei tipi di agevolazioni (per la pagina di ricerca)-->
+<STATEMENT name="COMBO_TIPO_AGEVOLAZIONE_TOTALE"
+            query="SELECT codAgevolazione as codice,
+                      SUBSTR(strdescrizione || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;),1,35) || '...' AS DESCRIZIONE
+                  from DE_AGEVOLAZIONE
+                  order by strDescrizione
+"/>
+
+<!--Recupera la lista con le descrizioni dei tipi di Cessazione-->
+<STATEMENT name="COMBO_TIPO_CESSAZIONE"
+            query="SELECT 
+                          codMvCessazione as codice,
+                          codMvCessazione || ' - ' || strDescrizione || DECODE(GREATEST(SYSDATE, DATFINEVAL), SYSDATE, '(scaduto)', '') as descrizione	   
+                          from DE_MV_CESSAZIONE
+                          order by DATFINEVAL desc,codice asc                          
+"/>
+
+<!--Recupera la lista con le descrizioni dei tipi di contratto disponibili-->
+<STATEMENT
+        name="COMBO_TIPI_CONTRATTO"
+        query=" SELECT codContratto as codice, 
+                        DECODE( GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, 
+                               STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...' ) 
+                      || DECODE (SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)',  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)', '') AS descrizione
+                FROM de_contratto
+                WHERE flgMovimenti = 'S'
+                ORDER BY descrizione" />
+
+<!--Cancella un movimento nel database-->
+<STATEMENT name="CANCELLA_MOVIMENTO"
+            query="DELETE FROM AM_MOVIMENTO
+                   WHERE prgMovimento = ?
+  "/>
+
+<!--Controlla se può essere consultato l'archivio -->
+<STATEMENT name="CAN_CONSULT_ARCHIVIO_MOV"
+            query="SELECT STRVALORE 
+            		FROM TS_CONFIG_LOC 
+            		WHERE CODTIPOCONFIG = 'ARCHIVIO' 
+            		AND STRCODRIF = (SELECT CODPROVINCIASIL FROM TS_GENERALE)
+  "/>
+     
+<!--Inserisce un nuovo avviamento nel database-->
+<STATEMENT name="INSERISCI_AVVIAMENTO"
+            query="INSERT INTO AM_MOVIMENTO
+                   (prgMovimento, prgAzienda, prgUnita, cdnLavoratore, 
+                   datComunicaz, datInizioMov, codTipoMov, codMansione,
+                   strDesAttivita, codContratto, codMonoTempo, 
+                   codCcnl, decRetribuzioneMen, numLivello,
+                   codAgevolazione, codOrario, numOreSett, 
+                   datFineMov, NUMGGTRAMOVCOMUNICAZIONE,
+                   cdnUtIns, dtmIns, cdnUtMod, dtmMod, strMatricola,
+                   codTipoAss, prgStatoOccupaz,
+                   STRPOSINPS, STRPATINAIL, PRGAZIENDAUTILIZ, PRGUNITAUTILIZ,
+                   STRLUOGODILAVORO, FLGINTERASSPROPRIA, DATINIZIOAVV, CODMONOMOVDICH,
+                   NUMPROROGHE, CODMONOPROV, CODSTATOATTO, DATFINEMOVEFFETTIVA, 
+                   STRAZINTNUMCONTRATTO, DATAZINTINIZIOCONTRATTO, DATAZINTFINECONTRATTO, 
+                   STRAZINTRAP, NUMAZINTSOGGETTI, NUMAZINTDIPENDENTI, CODCPI)
+                   VALUES 
+                   (TO_NUMBER(?),TO_NUMBER(?),TO_NUMBER(?),TO_NUMBER(?),
+                    TO_DATE(?, 'DD/MM/YYYY'),TO_DATE(?, 'DD/MM/YYYY'),?,?,
+                    ?,?,?,
+                    ?,TO_NUMBER(?),?,
+                    ?,?,TO_NUMBER(?),
+                    TO_DATE(?, 'DD/MM/YYYY'),TO_NUMBER(?),
+                    TO_NUMBER(?),SYSDATE,TO_NUMBER(?),SYSDATE, ?,
+                    ?,?,?,?,
+                    ?, ?, TO_NUMBER(?), TO_NUMBER(?),
+                    ?, ?, TO_DATE(?, 'DD/MM/YYYY'), ?,
+                    0, ?, ?, TO_DATE(?, 'DD/MM/YYYY'),?, TO_DATE(?,'DD/MM/YYYY'), TO_DATE(?,'DD/MM/YYYY'), 
+                    ?, TO_NUMBER(?), TO_NUMBER(?), ?)"/>
+
+<!--Inserisce una nuova TrasfPro nel database-->
+<STATEMENT name="INSERISCI_TRASFPRO"
+            query="INSERT INTO AM_MOVIMENTO            
+                   (prgMovimento, prgMovimentoPrec,
+                   prgAzienda, prgUnita, cdnLavoratore, 
+                   datComunicaz, datInizioMov, codTipoMov, codMansione, strDesAttivita,
+                   codMonoTempo, codCcnl, decRetribuzioneMen, numLivello, codAgevolazione,
+                   codOrario, numOreSett, datFineMov, NUMGGTRAMOVCOMUNICAZIONE, 
+                   cdnUtIns, dtmIns, cdnUtMod, dtmMod,
+                   codGrado, codTipoAss, prgStatoOccupaz,
+                   STRPOSINPS, STRPATINAIL, PRGAZIENDAUTILIZ, PRGUNITAUTILIZ,
+                   STRLUOGODILAVORO, FLGINTERASSPROPRIA, DATINIZIOAVV, FLGMODTEMPO,
+                   FLGMODREDDITO, CODMONOMOVDICH, NUMPROROGHE, CODMONOTEMPOMOVPREC,
+                   CODMONOPROV, CODSTATOATTO, DATFINEMOVEFFETTIVA,
+                   STRAZINTNUMCONTRATTO, DATAZINTINIZIOCONTRATTO, DATAZINTFINECONTRATTO, 
+                   STRAZINTRAP, NUMAZINTSOGGETTI, NUMAZINTDIPENDENTI, CODCPI)
+                   VALUES 
+                   (TO_NUMBER(?),TO_NUMBER(?),
+                    TO_NUMBER(?),TO_NUMBER(?),TO_NUMBER(?),
+                    TO_DATE(?, 'DD/MM/YYYY'),TO_DATE(?, 'DD/MM/YYYY'),?,?,?,
+                    ?, ?, TO_NUMBER(?), ?, ?,
+                    ?,TO_NUMBER(?),TO_DATE(?, 'DD/MM/YYYY'), to_number(?),
+                    TO_NUMBER(?),SYSDATE,TO_NUMBER(?),SYSDATE,
+                    ?, ?, ?,
+                    ?, ?, TO_NUMBER(?), TO_NUMBER(?),
+                    ?, ?, TO_DATE(?, 'DD/MM/YYYY'), ?, 
+                    ?, ?, ?, ?,
+                    ?, ?, TO_DATE(?, 'DD/MM/YYYY'), 
+                    ?, TO_DATE(?,'DD/MM/YYYY'), TO_DATE(?,'DD/MM/YYYY'), 
+                    ?, TO_NUMBER(?), TO_NUMBER(?), ?)"/>
+
+<!--Inserisce una nuova Cessazione nel database-->
+<STATEMENT name="INSERISCI_CESSAZIONE"
+            query="INSERT INTO AM_MOVIMENTO          
+                   (prgMovimento, prgMovimentoPrec, 
+                   prgAzienda, prgUnita, cdnLavoratore, 
+                   datComunicaz, datInizioMov, codTipoMov, codMvCessazione,
+                   datFineMov, codMansione, codGrado, numLivello, NUMGGTRAMOVCOMUNICAZIONE,
+                   cdnUtIns, dtmIns, cdnUtMod, dtmMod,
+                   codTipoAss, prgStatoOccupaz,
+                   STRPOSINPS, STRPATINAIL, PRGAZIENDAUTILIZ, PRGUNITAUTILIZ,
+                   STRLUOGODILAVORO, FLGINTERASSPROPRIA, DATINIZIOAVV, CODMONOMOVDICH,
+                   CODMONOTEMPOMOVPREC, CODMONOPROV, CODSTATOATTO, DATFINEMOVEFFETTIVA, 
+                   STRAZINTNUMCONTRATTO, DATAZINTINIZIOCONTRATTO, DATAZINTFINECONTRATTO, 
+                   STRAZINTRAP, NUMAZINTSOGGETTI, NUMAZINTDIPENDENTI,
+                   CODCPI, codMonoTempo)
+                   VALUES 
+                   (TO_NUMBER(?),TO_NUMBER(?),
+                    TO_NUMBER(?),TO_NUMBER(?),TO_NUMBER(?),
+                    TO_DATE(?, 'DD/MM/YYYY'),TO_DATE(?, 'DD/MM/YYYY'),?,?,
+                    TO_DATE(?, 'DD/MM/YYYY'), ?, ?, ?, to_number(?),
+                    TO_NUMBER(?),SYSDATE,TO_NUMBER(?),SYSDATE,
+                    ?,?,
+                    ?, ?, TO_NUMBER(?), TO_NUMBER(?),
+                    ?, ?, TO_DATE(?, 'DD/MM/YYYY'), ?,
+                    ?, ? ,?, TO_DATE(?, 'DD/MM/YYYY'), 
+                    ?, TO_DATE(?,'DD/MM/YYYY'), TO_DATE(?,'DD/MM/YYYY'), 
+                    ?, TO_NUMBER(?), TO_NUMBER(?), ?, 'D')"/>
+
+<!--Aggiorna i dati generali di un movimento nel database-->
+<STATEMENT name="SALVA_GENERALE"
+            query="UPDATE AM_MOVIMENTO SET          
+                   prgAzienda = TO_NUMBER(?),
+                   prgUnita = TO_NUMBER(?),
+                   cdnLavoratore = TO_NUMBER(?),
+                   codTipoMov = ?,
+                   datComunicaz = TO_DATE(?, 'DD/MM/YYYY'),
+                   STRPOSINPS = ?,
+                   STRPATINAIL = ?,
+                   STRLUOGODILAVORO = ?,
+                   FLGINTERASSPROPRIA = ?,
+                   PRGAZIENDAUTILIZ = TO_NUMBER(?), 
+                   PRGUNITAUTILIZ = TO_NUMBER(?),
+                   cdnUtMod = TO_NUMBER(?),
+                   dtmMod = SYSDATE,
+                   numKloMov = TO_NUMBER(?) + 1,
+                   CODMONOMOVDICH = ?,
+                   CODSTATOATTO = ?,
+                   CODCPI = ?
+                   WHERE PrgMovimento = ?
+  "/>
+
+<!--Aggiorna un avviamento nel database-->
+<STATEMENT name="SALVA_AVVIAMENTO"
+            query="UPDATE AM_MOVIMENTO SET 
+                   datInizioMov = TO_DATE(?, 'DD/MM/YYYY'),
+                   codTipoMov = ?,
+                   codMansione = ?,
+                   strDesAttivita = ?,
+                   codContratto = ?,
+                   codMonoTempo = ?,
+                   codCcnl = ?,
+                   decRetribuzioneMen = TO_NUMBER(?),
+                   numLivello = ?,
+                   codAgevolazione = ?,
+                   codOrario = ?,
+                   numOreSett = TO_NUMBER(?), 
+                   datFineMov = TO_DATE(?, 'DD/MM/YYYY'),
+                   NUMGGTRAMOVCOMUNICAZIONE = to_number(?),
+                   cdnUtMod = TO_NUMBER(?),
+                   dtmMod = SYSDATE,
+                   numKloMov = TO_NUMBER(?) + 1, 
+                   strMatricola = ?,
+                   codTipoAss = ?,
+                   codNormativa = ?,
+                   codGrado = ?,
+                   CODCPI = ?
+                   WHERE PrgMovimento = ?
+  "/>
+  
+<!--Aggiorna una TrasfPro nel database-->
+<STATEMENT name="SALVA_TRASFPRO"
+            query="UPDATE AM_MOVIMENTO SET             
+                   datInizioMov = TO_DATE(?, 'DD/MM/YYYY'),
+                   codTipoMov = ?,
+                   codMansione = ?,
+                   codMonoTempo = ?,
+                   codCcnl = ?,
+                   decRetribuzioneMen= TO_NUMBER(?),
+                   numLivello = ?,
+                   codAgevolazione = ?,
+                   codOrario = ?,
+                   numOreSett = TO_NUMBER(?), 
+                   datFineMov = TO_DATE(?, 'DD/MM/YYYY'),
+                   cdnUtMod = TO_NUMBER(?),
+                   dtmMod = SYSDATE,
+                   numKloMov = TO_NUMBER(?) + 1, 
+                   codGrado = ?,
+                   flgModTempo = ?,
+                   flgModReddito = ?,
+                   CODCPI = ?
+                   WHERE PrgMovimento = ?
+  "/>
+
+<!--Aggiorna una Cessazione nel database-->
+<STATEMENT name="SALVA_CESSAZIONE"
+            query="UPDATE AM_MOVIMENTO SET   
+                   datInizioMov = TO_DATE(?, 'DD/MM/YYYY'),
+                   codTipoMov = ?,
+                   codMvCessazione = ?,
+                   datFineMov = TO_DATE(?, 'DD/MM/YYYY'),
+                   cdnUtMod = TO_NUMBER(?),
+                   dtmMod = SYSDATE,
+                   numKloMov = TO_NUMBER(?) + 1,
+                   CODCPI = ?
+                   WHERE PrgMovimento = ?
+  "/>
+
+<!-- Recupero dei dati per le combo-->  
+<STATEMENT name="COMBO_TIPO_AVVIAMENTO"
+          query="select
+                      codtipocontratto as codice,
+                      strdescrizione || '-' || codtipocontratto || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from de_tipo_contratto
+                  order by strDescrizione "/>
+
+<STATEMENT name="COMBO_NORMATIVA"
+          query="select
+                      codnormativa as codice,
+                      SUBSTR(strdescrizione || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;),1,30) || '...' AS DESCRIZIONE
+                  from de_normativa
+                  order by strDescrizione"/>
+
+<STATEMENT name="COMBO_TIPO_MOVIMENTO_SINGOLO"
+          query="select
+                      codtipomov as codice,
+                      strdescrizione as descrizione	   
+                  from de_mv_tipo_mov
+                  where codtipomov = 'AVV'
+                  order by strDescrizione "/> 
+
+
+<STATEMENT name="COMBO_COD_TIPO_COMUNIC"
+          query="select
+                      codtipocomunicazione as codice,
+                      codtipocomunicazione ||' - '|| strdescrizione ||
+                              DECODE(SYSDATE,
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                    '') as descrizione
+                  from de_tipo_comunicazione
+                  order by codice "/>
+
+<STATEMENT name="COMBO_TIPO_MOVIMENTO"
+          query="select
+                      codtipomov as codice,
+                      strdescrizione as descrizione	   
+                  from de_mv_tipo_mov
+                  order by strDescrizione "/> 
+
+
+
+ <!-- Giovanni D'Auria 03_02_05 aggiunta la query COMBO_MOTIVO_CESSAZIONE-->
+<STATEMENT name="COMBO_MOTIVO_CESSAZIONE"
+          query="select 
+					   CODMVCESSAZIONE as codice, 
+					   CODMVCESSAZIONE || ' - ' ||STRDESCRIZIONE  as descrizione	 
+				from de_mv_cessazione
+				order by CODMVCESSAZIONE"/>                    
+                  
+<!--Cancella un movimento dalla tabella di appoggio-->
+<STATEMENT name="CANCELLA_MOVIMENTO_APPOGGIO"
+            query="DELETE FROM AM_MOVIMENTO_APPOGGIO
+                   WHERE prgMovimentoApp = ?
+  "/>
+
+<!--Cancella un movimento dalla tabella dei risulatati da validazione-->
+<STATEMENT name="DELETE_RISULTATI_MOVIMENTO"
+            query="delete from am_risultato_movimento r 
+                   where r.PRGMOVIMENTOAPP = ?"/>
+
+<!--Cancella un movimento dalla tabella di appoggio-->
+<STATEMENT name="GET_PRGMOVIMENTOAPPCVE"
+            query="SELECT PRGMOVIMENTOAPPCVE FROM AM_MOVIMENTO_APPOGGIO
+                   WHERE prgMovimentoApp = ?
+  "/>
+
+<!--Cancella un movimento dalla tabella di archivio-->
+<STATEMENT name="GET_PRGMOVIMENTOARCCVE"
+            query="SELECT PRGMOVIMENTOAPPCVE FROM AM_MOV_APP_ARCHIVIO
+                   WHERE prgMovimentoApp = ?
+  "/>
+
+<STATEMENT name="CANCELLA_MOVIMENTO_ARCHIVIO"
+            query="DELETE FROM AM_MOV_APP_ARCHIVIO
+                   WHERE prgMovimentoApp = ?
+  "/>
+
+<!--Recupero del progressivo per l'inserimento dei movimenti nel DB-->
+<STATEMENT name="NEXTVALPRGMOVIMENTO"
+          query="select S_AM_MOVIMENTO.nextval as DO_NEXTVAL from dual"/>  
+
+<!--Recupero del progressivo per l'inserimento dei lavoratori nel DB-->
+<STATEMENT name="NEXTVALCDNLAVORATORE"
+          query="select S_AN_LAVORATORE.nextval as DO_NEXTVAL from dual"/> 
+
+<!--Recupero del progressivo per l'inserimento delle aziende nel DB-->
+<STATEMENT name="NEXTVALPRGAZIENDA"
+          query="select S_AN_AZIENDA.nextval as DO_NEXTVAL from dual"/> 
+
+<!--Recupero del progressivo per l'inserimento delle unita aziendali nel DB-->
+<STATEMENT name="NEXTVALPRGUNITA"
+          query="select MAX(PRGUNITA) + 1 AS DO_NEXTVAL
+                        FROM AN_UNITA_AZIENDA UAZ
+                        WHERE UAZ.prgAzienda = ?"/> 
+
+<!--Cerca un lavoratore nel DB a partire dai dati contenuti nella tabella di appoggio-->
+<STATEMENT name="FIND_LAVORATORE"
+          query="select LAV.CDNLAVORATORE 
+                 FROM AN_LAVORATORE LAV,
+                      AM_MOVIMENTO_APPOGGIO APP
+                 WHERE prgMovimentoApp = ?
+                 AND APP.strCodiceFiscale = LAV.strCodiceFiscale"/>
+
+<!--Cerca un'azienda nel DB a partire dai dati contenuti nella tabella di appoggio-->
+<STATEMENT name="FIND_AZIENDA"
+          query="select PRGAZIENDA 
+                 FROM AN_AZIENDA AZ,
+                      AM_MOVIMENTO_APPOGGIO APP
+                 WHERE prgMovimentoApp = ?
+                 AND upper(APP.strAzCodiceFiscale) = upper(AZ.strCodiceFiscale)
+                 AND upper(APP.strAzPartitaIva) = upper(AZ.strPartitaIva)"/>
+
+<!--Cerca un'unita aziendale nel DB a partire dai dati contenuti nella tabella di appoggio-->
+<STATEMENT name="FIND_UNITA_AZIENDA"
+          query="select PRGUNITA 
+                 FROM AN_UNITA_AZIENDA UAZ,
+                      AM_MOVIMENTO_APPOGGIO APP
+                 WHERE UAZ.prgAzienda = ?
+                 AND prgMovimentoApp = ?
+                 AND UAZ.codCom = APP.codUACom"/>
+
+<!--Cerca una sede aziendale nel DB a partire dai dati contenuti nella tabella di appoggio-->
+<STATEMENT name="FIND_SEDE_AZIENDA"
+          query="select PRGUNITA 
+                 FROM AN_UNITA_AZIENDA UAZ,
+                      AM_MOVIMENTO_APPOGGIO APP
+                 WHERE UAZ.prgAzienda = ?
+                 AND prgMovimentoApp = ?
+                 AND UAZ.codCom = APP.CODUALCOM"/>       
+
+<!--Aggiorna un movimento precedente collegato ad una TrasfPro nel database-->
+<STATEMENT name="AGGIORNA_PRECEDENTE_TRASFPRO"
+            query="UPDATE AM_MOVIMENTO SET  
+                   PRGMOVIMENTOSUCC = TO_NUMBER(?),
+                   CODMONOTIPOFINE = SUBSTR(?, 1, 1 ),
+                   DATFINEMOVEFFETTIVA = TO_DATE(?, 'DD/MM/YYYY') - 1,
+                   cdnUtMod = ?,
+                   dtmMod = sysdate,
+                   numKloMov = TO_NUMBER(?) + 1 
+                   WHERE PrgMovimento = TO_NUMBER(?)
+  "/>
+
+<!--Aggiorna un movimento precedente collegato ad una Cessazione nel database-->
+<STATEMENT name="AGGIORNA_PRECEDENTE_CESS"
+            query="UPDATE AM_MOVIMENTO SET 
+                   PRGMOVIMENTOSUCC = TO_NUMBER(?),                   
+                   CODMONOTIPOFINE = SUBSTR(?, 1, 1 ),
+                   DATFINEMOVEFFETTIVA = TO_DATE(?, 'DD/MM/YYYY'),
+                   cdnUtMod = ?,
+                   dtmMod = sysdate,
+                   numKloMov = TO_NUMBER(?) + 1 
+                   WHERE PrgMovimento = TO_NUMBER(?)
+  "/>
+<!--Aggiorna un movimento successivo orfano per collegarlo ad un precedente-->
+<STATEMENT name="UPDATE_MOV_DEST"
+            query="UPDATE AM_MOVIMENTO SET
+            		PRGMOVIMENTOPREC = TO_NUMBER(?),  
+            		DATINIZIOAVV = TO_DATE(?, 'DD/MM/YYYY'), 
+            		CODMONOTEMPOMOVPREC = ?, 
+            		DATINIZIOMOVPREC = TO_DATE(?, 'DD/MM/YYYY'), 
+            		FLGMODTEMPO = ?,
+            		FLGMODREDDITO = ?,         
+                    cdnUtMod = ?,
+                    dtmMod = sysdate,
+                    numKloMov = TO_NUMBER(?) + 1 
+                    WHERE PrgMovimento = TO_NUMBER(?)
+  "/>
+
+<!-- recupero dettaglio doc da prgmov -->
+<STATEMENT name="DETTAGLIO_DOC_PRGMOV"
+            query="select doc.prgdocumento, doc.codcpi,
+				       doc.cdnlavoratore,
+				       doc.prgazienda,
+				       doc.prgunita,
+				       doc.codtipodocumento,
+				       doc.flgautocertificazione,
+				       doc.strdescrizione,
+				       doc.flgdocamm,
+				       doc.flgdocidentifp,
+				       to_char(doc.datinizio, 'dd/mm/yyyy') datinizio,
+				       doc.strnumdoc,
+				       doc.strenterilascio,
+				       doc.codmonoio,
+				       to_char(doc.datacqril, 'dd/mm/yyyy') datacqril, 
+				       doc.codmodalitaacqril,
+				       doc.codtipofile,
+				       doc.strnomedoc,
+				       to_char(doc.datfine, 'dd/mm/yyyy') datfine,
+				       doc.numannoprot,
+				       doc.numprotocollo,
+				       doc.strnote,
+				       doc.cdnutins,
+				       to_char(doc.dtmins, 'dd/mm/yyyy') dtmins,
+				       doc.cdnutmod,
+				       to_char(doc.dtmmod, 'dd/mm/yyyy') dtmmod,
+				       to_char(doc.DATPROTOCOLLO, 'dd/mm/yyyy') datprot,
+				       to_char(doc.DATPROTOCOLLO, 'HH24:MI') oraprot,
+				       doc.numklodocumento,
+				       doc_coll.prgdocumentocoll,
+                       de_doc_ambito.STRDESCRIZIONE riferimento
+				   from am_documento doc, am_documento_coll doc_coll,
+                       de_doc_ambito, de_doc_tipo
+				   where doc_coll.prgdocumento = doc.prgdocumento 
+  	                   AND doc.codTipoDocumento = de_doc_tipo.CODTIPODOCUMENTO
+	                   AND de_doc_tipo.CODAMBITODOC = de_doc_ambito.CODAMBITODOC
+	                   AND doc.codtipodocumento IN ('MVTRA', 'MVPRO', 'MVCES', 'MVAVV')
+					   AND doc_coll.strChiaveTabella = ?
+                   order by doc.DATPROTOCOLLO, doc.prgdocumento" />
+                   
+<!-- COMBO STATO ATTO -->
+<STATEMENT name="COMBO_STATO_ATTO"
+            query="SELECT DESA.CODSTATOATTO CODICE, DESA.STRDESCRIZIONE DESCRIZIONE
+                   FROM DE_STATO_ATTO DESA, DE_STATO_ATTO_LST_TAB DESALT
+                   WHERE DESA.CODSTATOATTO = DESALT.CODSTATOATTO
+                         AND DESALT.CODLSTTAB = 'AM_MOV'
+                   order by DESA.STRDESCRIZIONE
+"/>
+
+<!-- COMBO STATO ATTO PATRONATO -->
+<STATEMENT name="COMBO_STATO_ATTO_PATRONATO" query="
+	
+	SELECT DESA.CODSTATOATTO CODICE, DESA.STRDESCRIZIONE DESCRIZIONE
+                 FROM DE_STATO_ATTO DESA, DE_STATO_ATTO_LST_TAB DESALT
+                 WHERE DESA.CODSTATOATTO = DESALT.CODSTATOATTO
+                       AND DESALT.CODLSTTAB = 'AM_MOV'
+                       AND desalt.flgpatronato = 'S'
+                 order by DESA.STRDESCRIZIONE
+	
+"/>
+
+<!-- COMBO STATO ATTO PARAMETRICO -->
+<STATEMENT name="COMBO_STATO_ATTO_PAR"
+            query="SELECT DESA.CODSTATOATTO CODICE, DESA.STRDESCRIZIONE DESCRIZIONE
+                   FROM DE_STATO_ATTO DESA, DE_STATO_ATTO_LST_TAB DESALT
+                   WHERE DESA.CODSTATOATTO = DESALT.CODSTATOATTO
+                         AND DESALT.CODLSTTAB = ?
+                   order by DESA.STRDESCRIZIONE
+"/>
+
+<!-- COMBO MOTIVAZIONE ANNULLAMENTO -->
+<STATEMENT name="COMBO_MOT_ANNULLAMENTO"
+            query="select CODMOTANNULLAMENTO as codice,
+					STRDESCRIZIONE || DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL), 
+											'(scaduto)', LEAST(SYSDATE, DATINIZIOVAL), 
+											'(scaduto)', '') AS DESCRIZIONE, 
+					datinizioval, 
+					datfineval
+                  from de_mot_annullamento
+                  order by STRDESCRIZIONE
+"/>
+
+<STATEMENT name="GET_AZIENDA_DA_CF"
+            query="SELECT az.prgazienda, az.strcodicefiscale, 
+                          az.strragionesociale, az.strpartitaiva, az.strpatinail,
+                          az.codnatgiuridica, DE_NAT_GIURIDICA.STRDESCRIZIONE as descGiuridica,
+                          az.codtipoazienda, DE_TIPO_AZIENDA.STRDESCRIZIONE as descTipoAzienda,
+                          az.strnumalbointerinali,
+                          az.FLGDATIOK 
+                   FROM AN_AZIENDA az
+                   LEFT JOIN DE_NAT_GIURIDICA on (DE_NAT_GIURIDICA.codnatgiuridica = az.codnatgiuridica)
+                   INNER JOIN DE_TIPO_AZIENDA on (DE_TIPO_AZIENDA.codtipoazienda = az.codtipoazienda)
+                   WHERE az.strcodicefiscale = ?"/>
+<!--Non più utilizzata
+<STATEMENT name="GET_UNITA_AZIENDA_DA_CF"
+            query="SELECT az.prgazienda, az.strcodicefiscale, az.strpartitaiva,
+                          az.codnatgiuridica, DE_NAT_GIURIDICA.STRDESCRIZIONE as descGiuridica,
+                          az.codtipoazienda, DE_TIPO_AZIENDA.STRDESCRIZIONE as descTipoAzienda,
+                          az.strpartitaiva, az.codccnl, de_contratto_collettivo.STRDESCRIZIONE as descCCNL,
+                          AN_UNITA_AZIENDA.PRGUNITA,
+                          AN_UNITA_AZIENDA.strnumeroinps,
+                          AN_UNITA_AZIENDA.strtel,
+                          AN_UNITA_AZIENDA.strfax,
+                          AN_UNITA_AZIENDA.codcom,
+                          AN_UNITA_AZIENDA.strcap,
+                      	  AN_UNITA_AZIENDA.STREMAIL,
+                          AN_UNITA_AZIENDA.codateco,
+                          AN_UNITA_AZIENDA.strindirizzo,
+                          AN_UNITA_AZIENDA.strlocalita,
+                          AN_UNITA_AZIENDA.STRNUMREGISTROCOMMITT, 
+                          COM.STRDENOMINAZIONE strDescrComune, 
+                          ATT.STRDESCRIZIONE strDescrAteco
+                   FROM AN_AZIENDA az
+                   LEFT JOIN AN_UNITA_AZIENDA on (AN_UNITA_AZIENDA.prgazienda = az.prgazienda)
+                   LEFT JOIN DE_NAT_GIURIDICA on (DE_NAT_GIURIDICA.codnatgiuridica = az.codnatgiuridica)
+                   INNER JOIN DE_TIPO_AZIENDA on (DE_TIPO_AZIENDA.codtipoazienda = az.codtipoazienda)
+                   LEFT JOIN de_contratto_collettivo on (de_contratto_collettivo.codccnl = az.codccnl),
+                   DE_COMUNE COM,
+                   DE_ATTIVITA ATT
+                   WHERE AN_UNITA_AZIENDA.codCom = COM.CODCOM AND
+                   		 AN_UNITA_AZIENDA.codAteco = ATT.codAteco AND
+                   		 az.strcodicefiscale = ? and
+                         AN_UNITA_AZIENDA.codcom = ?"/>
+-->
+<STATEMENT name="GET_LAVORATORE_DA_CF"
+            query="SELECT AN.CDNLAVORATORE CDNLAVORATORE, 
+                      AN.STRCODICEFISCALE STRCODICEFISCALE, 
+                      AN.STRCOGNOME STRCOGNOME, 
+                      AN.STRNOME STRNOME,
+                      TO_CHAR(DATNASC,'DD/MM/YYYY') DATNASC,
+                      AN.STRSESSO STRSESSO,
+                      AN.CODCOMNAS CODCOMNASC,
+                      AN.CODCITTADINANZA CODCITTADINANZA,
+                      AN.CODCOMDOM CODCOMDOM,
+                      AN.STRINDIRIZZODOM STRINDIRIZZODOM,
+                      AN.STRCAPDOM STRCAPDOM,
+                      AN.STRTELDOM STRTELDOM,
+                      AN.CODCOMRES CODCOMRES,
+                      AN.STRINDIRIZZORES STRINDIRIZZORES,
+                      AN.STRCAPRES STRCAPRES,
+                      AN.STRTELRES STRTELRES,
+                      AN.FLGCFOK,
+					  decode (de_stato_occupaz_ragg.codstatooccupazragg, de_stato_occupaz.codstatooccupaz, 
+			  		   		  de_stato_occupaz_ragg.strdescrizione,
+				   			  (de_stato_occupaz_ragg.strdescrizione || ': ' || de_stato_occupaz.strdescrizione)) 
+			  				  AS descrStatoOcc,  
+					  TO_CHAR (OCC.DATINIZIO, 'DD/MM/YYYY') datInizioOcc, 
+			   		  TO_CHAR (OCC.DATANZIANITADISOC, 'DD/MM/YYYY') datAnzOcc
+                   FROM AN_LAVORATORE AN,
+				   		AN_LAV_STORIA_INF INF,
+						am_stato_occupaz OCC,
+					    DE_STATO_OCCUPAZ,
+					    de_stato_occupaz_ragg
+                   WHERE AN.CDNLAVORATORE = INF.CDNLAVORATORE AND INF.DATFINE IS NULL
+		  		   		 AND OCC.CDNLAVORATORE (+) = INF.CDNLAVORATORE AND OCC.DATFINE IS NULL
+		  				 AND OCC.CODSTATOOCCUPAZ = DE_STATO_OCCUPAZ.CODSTATOOCCUPAZ (+)  
+                  		 AND de_stato_occupaz.codstatooccupazragg = de_stato_occupaz_ragg.codstatooccupazragg (+) 
+				   		 AND AN.STRCODICEFISCALE = ? "/>
+
+
+<STATEMENT name="RECUPERO_COD_MONOTIPOASS"
+           query="SELECT CODTIPOCONTRATTO, CODMONOTIPO, CODCONTRATTO, FLGTI FROM DE_TIPO_CONTRATTO WHERE DE_TIPO_CONTRATTO.CODTIPOCONTRATTO = ?" />
+           
+           
+<!--Recupera i dati di un movimento per il frame di consultazione-->
+  <STATEMENT name="GET_DETT_MOV_COLL"
+            query="SELECT 
+                          TO_CHAR(MOV.prgMovimento) prgMovimento,
+                          TO_CHAR(MOV.prgMovimentoPrec) prgMovimentoPrec,
+                          TO_CHAR(MOV.PrgMovimentoSucc) PrgMovimentoSucc,
+                          TO_CHAR(MOV.prgAzienda) prgAzienda,
+                          TO_CHAR(MOV.prgUnita) prgUnita,
+                          TO_CHAR(MOV.cdnLavoratore) cdnLavoratore,
+                          TO_CHAR(MOV.datComunicaz, 'DD/MM/YYYY') datComunicaz,
+                          TO_CHAR(MOV.datInizioMov, 'DD/MM/YYYY') datInizioMov,
+                          MOV.NUMGGTRAMOVCOMUNICAZIONE numggmovcomunicaz,
+                          MOV.codTipoMov,
+                          MOV.strMatricola,
+                          DECODE (MOV.codMonoTempo, 'D', 'Determinato', 'I', 'Indeterminato') tipoTempo,
+                          TO_CHAR(MOV.datFineMov, 'DD/MM/YYYY') datFineMov,
+                          TO_CHAR(MOV.DATFINEMOVEFFETTIVA, 'DD/MM/YYYY') datFineMovEff,
+                          ORARIO.STRDESCRIZIONE 
+                          || decode(orario.codmonoorario,
+                          'T',' (Min: Full Time)',
+                          'P',' (Min: Part Time)', 
+                          ' (Min: nessuna corrispondenza)') AS orario,
+						  TO_CHAR(MOV.NUMORESETT) numOreSett,
+                          ASS.STRDESCRIZIONE tipoAss,
+                          NORM.STRDESCRIZIONE normativa,
+                          (MANS.CODMANSIONE || ' - ' || MANS.STRDESCRIZIONE) mansione,
+                          MOV.STRDESATTIVITA attivita,
+                          GRADO.STRDESCRIZIONE grado,
+                          NUMLIVELLO livello,
+                          TO_CHAR(MOV.DECRETRIBUZIONEMEN) compenso,
+                          TO_CHAR(MOV.decRetribuzioneAnn) decRetribuzioneAnn,
+                          C_C_NL.STRDESCRIZIONE ccnl,
+                          AGEV.STRDESCRIZIONE benefici,
+                          CESS.STRDESCRIZIONE motivoCess,
+                          TO_CHAR(MOV.DTMINS, 'DD/MM/YYYY') DTMINS,
+                          MOV.CDNUTINS,
+                          TO_CHAR(MOV.DTMMOD, 'DD/MM/YYYY') DTMMOD,
+                          MOV.CDNUTMOD, MOV.FLGLAVOROAGR, MOV.FLGDISTPARZIALE, MOV.FLGDISTAZESTERA,
+                          de_tipo_trasf.strdescrizione   AS tipotrasformazione,
+                          de_mv_tipo_mov.strdescrizione   descrtipomovimento
+                  FROM AM_MOVIMENTO MOV,
+                  	   DE_ORARIO ORARIO,
+                  	   DE_TIPO_CONTRATTO ASS,
+                  	   DE_NORMATIVA NORM,
+                  	   DE_MANSIONE MANS,
+                  	   DE_MV_GRADO GRADO,
+                  	   DE_CONTRATTO_COLLETTIVO C_C_NL,
+                  	   DE_AGEVOLAZIONE AGEV,
+                  	   DE_MV_CESSAZIONE CESS,
+                  	   de_tipo_trasf,
+                  	   de_mv_tipo_mov
+                  WHERE MOV.prgMovimento = ?
+                  	AND MOV.codtipomov = de_mv_tipo_mov.codtipomov
+                    AND MOV.codtipotrasf = de_tipo_trasf.codtipotrasf (+)
+				    AND	MOV.CODORARIO = ORARIO.CODORARIO (+)                  	
+					AND MOV.CODTIPOCONTRATTO = ASS.CODTIPOCONTRATTO (+)
+					AND MOV.CODNORMATIVA = NORM.CODNORMATIVA (+)
+					AND MOV.CODMANSIONE = MANS.CODMANSIONE (+)
+					AND MOV.CODGRADO = GRADO.CODGRADO (+)
+					AND MOV.CODCCNL = C_C_NL.CODCCNL (+)
+					AND MOV.CODAGEVOLAZIONE = AGEV.CODAGEVOLAZIONE (+)
+					AND MOV.CODMVCESSAZIONE = CESS.CODMVCESSAZIONE (+)"/>
+  
+<STATEMENT name="GET_DATI_CFL_APP"
+            query="SELECT TO_CHAR(APP.DATCFL, 'DD/MM/YYYY') DATCFL, 
+            			  TO_CHAR(APP.STRNUMCFL) STRNUMCFL,
+            			  APP.CODMANSIONE CODMANSIONE,
+            			  APP.STRTIPOCFL STRTIPOCFL,
+            			  MANS.STRDESCRIZIONE DESCRMANSIONE	  
+                   FROM AM_MOVIMENTO_APPOGGIO APP,
+                   		DE_MANSIONE MANS
+                   WHERE PRGMOVIMENTOAPP = ?
+                   	 AND APP.CODMANSIONE = MANS.CODMANSIONE (+)
+                   "/> 
+                   
+<STATEMENT name="INSERT_AUTORIZZAZIONE_CFL"
+            query="INSERT INTO AN_AZI_AUTORIZZAZIONE
+            		(PRGAZIAUTORIZZAZIONE, CODMONOTIPO, PRGAZIENDA, PRGUNITA, 
+            		 DATAUTORIZZAZIONE, NUMAUTORIZZAZIONE, CODMANSIONE, STRLIVELLO, STRLIVELLOFINALE, 
+            		 CODTIPOCFL, NUMDURATACFL, DATFINEVALIDITA, CDNUTINS, DTMINS, 
+            		 CDNUTMOD, DTMMOD) 
+            		VALUES ( S_AN_AZI_AUTORIZZAZIONE.NEXTVAL, 'C', TO_NUMBER(?), TO_NUMBER(?), 
+            		 TO_DATE(?,'DD/MM/YYYY'), ?, ?, ?, ?,
+            		 ?, TO_NUMBER(?), ADD_MONTHS(TO_DATE(?,'DD/MM/YYYY'), TO_NUMBER(?)), TO_NUMBER(?), SYSDATE,
+            		 TO_NUMBER(?), SYSDATE
+            		)"/>
+<!--Serve per recuperare il codice dell'utente che si occupa di eseguire l'importazione batch di movimenti da SARE-->
+<STATEMENT name="GETUSERCODE_IMPORTMOV_BATCH"
+            query="SELECT CDNUT FROM TS_UTENTE WHERE STRLOGIN = 'IMPORTMOV'"/> 
+  
+<!--Recupera le DID per il lavoratore-->
+<STATEMENT name="GET_DID_LAV_PER_MOV_NON_COLL"
+            query="SELECT TO_CHAR(DISP.PRGDICHDISPONIBILITA) PRGDICHDISPONIBILITA, 
+            			  TO_CHAR(DISP.DATDICHIARAZIONE, 'DD/MM/YYYY') DATDICHIARAZIONE, 
+            			  TO_CHAR(DISP.DATFINE, 'DD/MM/YYYY') DATFINE  
+                   FROM AM_DICH_DISPONIBILITA DISP,
+                   		AM_ELENCO_ANAGRAFICO EA
+                   WHERE DISP.PRGELENCOANAGRAFICO = EA.PRGELENCOANAGRAFICO
+                   	 AND EA.CDNLAVORATORE = TO_NUMBER(?) 
+                   "/>   
+
+<STATEMENT name="CERCA_MOV_SUCC_COMP"
+            query="SELECT TO_CHAR(PRGMOVIMENTO) prgMovimentoSucc,
+						TO_CHAR(MOV.PRGAZIENDA) prgAziendaSucc,
+						TO_CHAR(MOV.PRGUNITA) prgUnitaSucc,
+						TO_CHAR(NUMKLOMOV) numKloMovSucc,
+						TO_CHAR(MOV.datInizioMov, 'DD/MM/YYYY') DATAINIZIOMOVSucc,
+						SUBSTR(MOV.codTipoMov, 1, 1 ) codMonoTipoMovSucc,
+						codTipoMov codTipoMovSucc,
+						codMonoTempo,
+						MOV.CODTIPOCONTRATTO CODTIPOASSSucc,
+						LAV.strCognome COGNOMELAV,
+						LAV.strNome NOMELAV,
+						LAV.strCodiceFiscale CODFISCLAV,
+						AZ.strRagioneSociale RAGSOCAZ,
+						UAZ.strIndirizzo || ', ' || COM.strDenominazione || '(' || RTRIM(PROV.strIstat) || ')' IndirAzienda,
+						MOV.CODMONOTIPOFINE CODMONOTIPOFINESucc,
+						TO_CHAR(datFineMov) datFineMov,
+						TO_CHAR(MOV.DATFINEMOVEFFETTIVA, 'DD/MM/YYYY') DATFINEMOVEFFETTIVASucc,
+						TO_CHAR(decRetribuzioneMen) decRetribuzioneMen, TO_CHAR(MOV.decRetribuzioneAnn) decRetribuzioneAnn
+					FROM AM_MOVIMENTO MOV,
+						AN_UNITA_AZIENDA UAZ, 
+						AN_AZIENDA AZ,
+						AN_LAVORATORE LAV, DE_COMUNE COM, DE_PROVINCIA PROV
+					WHERE MOV.CDNLAVORATORE = TO_NUMBER(?)
+						AND MOV.PRGAZIENDA = TO_NUMBER(?)
+						AND MOV.PRGUNITA = TO_NUMBER(?)
+						AND NVL(TO_CHAR(MOV.PRGMOVIMENTOPREC), 'null') = 'null'
+						AND MOV.DATINIZIOMOV >= TO_DATE(?, 'DD/MM/YYYY')
+						AND PRGMOVIMENTO != TO_NUMBER(?)
+						AND MOV.prgAzienda = AZ.prgAzienda
+						AND MOV.prgAzienda = UAZ.prgAzienda
+						AND MOV.prgUnita = UAZ.prgUnita
+						AND MOV.cdnLavoratore = LAV.cdnLavoratore
+						AND UAZ.codCom = COM.codCom
+						AND COM.codProvincia = PROV.codProvincia
+						AND MOV.CODTIPOMOV != 'AVV'
+						AND MOV.CODSTATOATTO = 'PR'
+						ORDER BY MOV.datInizioMov DESC, codTipoMov, COGNOMELAV, NOMELAV, RAGSOCAZ, IndirAzienda 
+                   "/>             
+            
+<STATEMENT name="GET_MOVIMENTI_SIMILI"   
+   query="SELECT mov.prgMovimento,  
+	    to_char(mov.datInizioMov, 'dd/mm/yyyy') datInizioMov,
+	    to_char(mov.datFineMov, 'dd/mm/yyyy') datFineMov,
+		to_char(mov.datFineMovEffettiva, 'dd/mm/yyyy') datFineMovEffettiva,
+		to_char(mov.datFineDistacco, 'dd/mm/yyyy') datFineDistacco,
+		to_char(mov.datComunicaz, 'dd/mm/yyyy') datComunicaz,  
+		mov.codMonoMovDich, 
+		mov.codMonoTempo, 
+		mov.codMonoTipoFine, 
+		mov.CODMVCESSAZIONE,
+		mov.prgAzienda, mov.prgUnita, mov.prgAziendaUtiliz, mov.prgUnitaUtiliz,
+		mov.codTipoTrasf,
+		lav.strcognome, lav.strnome, lav.strcodicefiscale,   
+		tab.numProtocollo,
+		az.strRagioneSociale, 
+		azu.strlocalita, azu.strIndirizzo, 
+		com.strDenominazione comune, com.strCap, 
+		pr.strDenominazione provincia , pr.strTarga
+	FROM am_movimento mov,  an_lavoratore lav, an_azienda az, an_unita_azienda azu, de_comune com, 
+	     de_provincia pr , ( select doc.numProtocollo, coll.strChiaveTabella 
+							 from am_documento doc , am_documento_coll coll 
+						     where doc.cdnLavoratore = ? and doc.prgDocumento = coll.prgDocumento  
+							    and coll.cdnComponente = (select cdncomponente from ts_componente where strpage = ? )
+				           ) tab
+	WHERE mov.CODSTATOATTO = 'PR' 		 
+      and mov.prgMovimento = tab.STRCHIAVETABELLA(+)
+	  and mov.cdnlavoratore = lav.cdnlavoratore 
+	  and mov.prgAzienda = az.prgAzienda 
+	  and az.prgAzienda = azu.prgAzienda 
+	  and azu.prgUnita = mov.prgUnita  
+	  and azu.codCom = com.codCom and com.codProvincia = pr.codProvincia
+	  and UPPER(CODTIPOMOV) = ? 
+	  and mov.DATINIZIOMOV = TO_DATE(?, 'DD/MM/YYYY')
+	  and mov.CDNLAVORATORE = ?
+"/>
+
+<STATEMENT name="GET_MOVIMENTI_TI_SOMMINISTRAZIONE"   
+   query="SELECT mov.prgMovimento,  
+	    to_char(mov.datInizioMov, 'dd/mm/yyyy') datInizioMov,
+	    to_char(mov.datFineMov, 'dd/mm/yyyy') datFineMov,
+		to_char(mov.datFineMovEffettiva, 'dd/mm/yyyy') datFineMovEffettiva,
+		to_char(mov.datComunicaz, 'dd/mm/yyyy') datComunicaz,  
+		mov.codMonoMovDich, 
+		mov.codMonoTempo, 
+		mov.prgAzienda, mov.prgUnita, mov.prgAziendaUtiliz, mov.prgUnitaUtiliz
+	FROM am_movimento mov
+	WHERE mov.CDNLAVORATORE = ?
+	  and mov.CODSTATOATTO = 'PR'
+	  and UPPER(CODTIPOMOV) != 'CES'
+	  and mov.codMonoTempo = 'I'
+      and mov.prgAzienda = ?
+	  and mov.prgAziendaUtiliz = ?
+	  and trunc(mov.DATFINERAPLAV) &lt; TO_DATE(?, 'DD/MM/YYYY')
+	  and mov.prgMovimentoSucc is null
+"/>
+
+<STATEMENT name="GET_MOVIMENTI_TI_SOMMINISTRAZIONE_UTILIZZ_IN_MISSIONE"   
+   query="SELECT mov.prgMovimento,  
+	    to_char(mov.datInizioMov, 'dd/mm/yyyy') datInizioMov,
+	    to_char(mov.datFineMov, 'dd/mm/yyyy') datFineMov,
+		to_char(mov.datFineMovEffettiva, 'dd/mm/yyyy') datFineMovEffettiva,
+		to_char(mov.datComunicaz, 'dd/mm/yyyy') datComunicaz,  
+		mov.codMonoMovDich, 
+		mov.codMonoTempo, 
+		mov.prgAzienda, mov.prgUnita, missione.prgAziendaUtiliz, missione.prgUnitaUtiliz
+	FROM am_movimento mov
+	inner join am_movimento_missione missione on (mov.prgmovimento = missione.prgmovimento)
+	WHERE mov.CDNLAVORATORE = ?
+	  and mov.CODSTATOATTO = 'PR'
+	  and UPPER(CODTIPOMOV) != 'CES'
+	  and mov.codMonoTempo = 'I'
+      and mov.prgAzienda = ?
+	  and missione.prgAziendaUtiliz = ?
+	  and trunc(missione.DATFINEMIS) &lt; TO_DATE(?, 'DD/MM/YYYY')
+	  and mov.prgMovimentoSucc is null
+"/>
+
+<!--Query per log dei risultati nella validazione / inserimento movimenti-->
+<STATEMENT name="GET_SINGLE_RESULT"
+            query="SELECT PRGRISULTATO, PRGVALIDAZIONEMASSIVA, PRGMOVIMENTO, PRGMOVIMENTOAPP, DTMINS, CDNUTINS,
+            		decode((SELECT COUNT(*) 
+            			FROM AM_MOVIMENTO_APPOGGIO AMRM2 
+           				WHERE AMRM2.PRGMOVIMENTOAPP = AMRM1.PRGMOVIMENTOAPP
+            			),0,1,0) AS VALIDATO
+            		FROM AM_RISULTATO_MOVIMENTO AMRM1
+            		WHERE PRGRISULTATO = ?"/>
+            		  
+<STATEMENT name="SET_RESULT"
+            query="INSERT INTO AM_RISULTATO_MOVIMENTO (PRGRISULTATO, PRGVALIDAZIONEMASSIVA, 
+            		PRGMOVIMENTO, PRGMOVIMENTOAPP, BLBRISULTATO, DTMINS, CDNUTINS, CODERRORE) 
+            		VALUES (?,?,?,?, EMPTY_BLOB(), SYSDATE,?,?)"/>
+   
+         		
+<STATEMENT name="GET_INFO_VAL_MASSIVA"
+            query="SELECT PRGVALIDAZIONEMASSIVA, NUMRECORD, FLGSTOPUTENTE, DTMINS, CDNUTINS
+            		FROM AM_VALIDAZIONE_MASSIVA
+            		WHERE PRGVALIDAZIONEMASSIVA = ?"/>           		
+            		
+<STATEMENT name="INSERT_NUOVA_VAL_MASSIVA"
+            query="INSERT INTO AM_VALIDAZIONE_MASSIVA (PRGVALIDAZIONEMASSIVA, NUMRECORD, DTMINS, CDNUTINS) 
+            		VALUES (?,?, SYSDATE,?)"/>
+            		  
+<STATEMENT name="SET_STOP_UTENTE"
+            query="UPDATE AM_VALIDAZIONE_MASSIVA 
+                      SET   FLGSTOPUTENTE = 'S'
+                      WHERE PRGVALIDAZIONEMASSIVA = ?"/> 
+                      
+<STATEMENT name="GET_DATI_VAL_MASSIVA"
+            query="SELECT PRGRISULTATO, PRGVALIDAZIONEMASSIVA, PRGMOVIMENTO, PRGMOVIMENTOAPP, DTMINS, CDNUTINS,
+            		decode((SELECT COUNT(*) 
+            			FROM AM_MOVIMENTO_APPOGGIO AMRM2 
+           				WHERE AMRM2.PRGMOVIMENTOAPP = AMRM1.PRGMOVIMENTOAPP
+            			),0,1,0) AS VALIDATO
+            		FROM AM_RISULTATO_MOVIMENTO AMRM1
+            		WHERE PRGVALIDAZIONEMASSIVA = ?
+            		ORDER BY PRGRISULTATO"/>
+
+<STATEMENT name="READ_BLOB_RISULTATO"
+            query="SELECT BLBRISULTATO
+					FROM AM_RISULTATO_MOVIMENTO
+					WHERE PRGRISULTATO = ?"/>            		
+
+<STATEMENT name="WRITE_BLOB_RISULTATO"
+            query="SELECT BLBRISULTATO 
+            		FROM AM_RISULTATO_MOVIMENTO
+					WHERE PRGRISULTATO = ? 
+					FOR UPDATE"/> 
+					
+<!--FINE Query per log dei risultati nella validazione / inserimento movimenti-->    
+<STATEMENT name="GET_MOVIMENTO_DA_APPOGGIO"
+            query="SELECT am_movimento_appoggio.cdnutins, am_movimento_appoggio.cdnutmod, codagevolazione, codappmansionetutore codmansionetutore, codazateco,
+		       codazccnl, codazintateco, codazinttipoazienda, codaztipoazienda,
+	    	   codccnl,
+			   		CASE
+               			WHEN (codccnl is not null) then codccnl
+            			ELSE 'NT'
+			   		END
+			   CODAZINTCCNL,
+	    	   codcittadinanza, codcomdom, codcomnasc, am_movimento_appoggio.codcontratto, am_movimento_appoggio.codcpi,
+		       codcpilav, codgrado, codmansione, codmonoprov, codmonotempo,
+		       codmvcessazione, codnormativa, codorario, codstatoatto, am_movimento_appoggio.codtipocontratto codtipoass,
+		       codtipomov, codtipotitolo, coduacom, coduaintcom, codualcom,
+		       TO_CHAR(am_movimento_appoggio.DATAZINTFINECONTRATTO, 'DD/MM/YYYY') DATAZINTFINECONTRATTO, datazintiniziocontratto, datcfl, datcomunicaz,
+		       DECODE (codtipomov, 'CES', '',  to_char(datfinemov,'DD/MM/YYYY')) datfinemov, datiniziomov,
+		       datnasc, datregistrocommitt, datscadenza, datvisitamedica,
+		       decretribuzionemen, TO_CHAR(am_movimento_appoggio.decRetribuzioneAnn) decRetribuzioneAnn, am_movimento_appoggio.strtracciato,
+		       am_movimento_appoggio.dtmins, am_movimento_appoggio.dtmmod, flgartigiana, flgassdacess,
+		       flgasspropria, flglavdomicilio, flglegge68, am_movimento_appoggio.flgAssObbl, am_movimento_appoggio.codCatAssObbl,
+		       flgretribuzionemenccnl,
+		       flgsocio, numappanniesptutore numanniesptutore, numazdipendenti, numazintdipendenti,
+		       numazintsoggetti, numggeffettuatiagr, numggprevistiagr,
+		       numggtramovcomunicazione, numklomovapp, numlivello,
+		       nummesiapprendistato, numoresett, prgmovimentoapp, prgmovimentoappcve,
+		       FLGTITOLARETUTORE,
+		       strappcodicefiscaletutore strcodicefiscaletutore, strappcognometutore strcognometutore, strapplivellotutore strlivellotutore,
+		       strappnometutore strnometutore, strazcodicefiscale, strazintcodicefiscale,
+		       strazintnumcontratto, strazintpartitaiva, strazintragionesociale,
+		       strazintrap, straznumalbointerinali, strazpartitaiva,
+		       strazragionesociale, strcapdom,
+		       strcodicefiscale, strcognome, strdesattivita, strindirizzodom,
+		       CASE
+          			WHEN ((strluogodilavoro is null) and (strazintragionesociale is not null))
+          				THEN strazintragionesociale || ' - ' || struaintindirizzo || '(' || comInt.strdenominazione || ')'
+					ELSE strluogodilavoro
+			   END
+		       strluogodilavoro, strmatricola, strnome, strnote, strnumcfl, strnumprtprovincia,
+		       strnumregistrocommitt, strpatinail, strposinps, strreferente, strsesso,
+		       strtipocfl, struacap, struaemail, struafax, struaindirizzo,
+		       struaintcap, struaintindirizzo, strualindirizzo, struatel, 
+		       am_movimento_appoggio.strualtel, am_movimento_appoggio.strualfax, am_movimento_appoggio.strualemail,
+		       am_movimento_appoggio.stremailreferente,
+		       STRAZRAGIONESOCIALE || 
+					CASE
+          				WHEN ((STRAZRAGIONESOCIALE is not null) and (STRUAINDIRIZZO is not null))
+          				THEN '-'
+					END
+			   || STRUAINDIRIZZO strEnteRilascio,
+			   CODLAVORAZIONE, CODLIVELLOAGR, CODCATEGORIA, 
+			   STRVERSIONETRACCIATO, CODCOMNASCDI, DATNASCDI, 
+			   STRSESSODI, CODQUALIFICASRQ, de_tipo_contratto.codMonoTipo codMonoTipo,
+			   NVL(de_tipo_contratto.FLGSOSPENSIONE2014, 'N') FLGSOSPENSIONE2014,
+			   de_tipo_contratto.flgti FLGCONTRATTOTI,
+			   am_movimento_appoggio.CODTIPOCOMUNIC,
+               am_movimento_appoggio.CODCOMUNICAZIONE,
+				am_movimento_appoggio.CODTIPODOCEX,
+				am_movimento_appoggio.STRNUMDOCEX,
+				am_movimento_appoggio.CODMOTIVOPERMSOGGEX,
+				am_movimento_appoggio.CODTIPOENTEPREV CODENTE,
+				ente.STRDESCRIZIONE STRENTE,
+				am_movimento_appoggio.STRCODICEENTEPREV,
+				am_movimento_appoggio.CODTIPOTRASF,
+				de_tipo_trasf.FLGTRASFER,
+				am_movimento_appoggio.CODTIPOCONTRATTO,
+				TO_CHAR(am_movimento_appoggio.DATINIZIORAPLAV, 'DD/MM/YYYY') DATINIZIORAPLAV, 
+				TO_CHAR(am_movimento_appoggio.DATFINERAPLAV, 'DD/MM/YYYY') DATFINERAPLAV,
+				am_movimento_appoggio.DATFINEPRORAPLAV,
+				am_movimento_appoggio.DATCESSRAPLAV,
+				am_movimento_appoggio.CODTIPOSOMM, 
+				am_movimento_appoggio.CODSOGGETTO,
+				am_movimento_appoggio.CODCOMUNICAZIONEPREC,
+				am_movimento_appoggio.STRCODICEFISCALEAZPREC,
+				am_movimento_appoggio.CODCOMAZPREC,
+				am_movimento_appoggio.STRINDIRIZZOAZPREC,
+				am_movimento_appoggio.STRRAGIONESOCIALEAZPREC,
+				TO_CHAR(am_movimento_appoggio.DATCONVENZIONE, 'DD/MM/YYYY') DATCONVENZIONE,
+                TO_CHAR(am_movimento_appoggio.NUMCONVENZIONE) NUMCONVENZIONE,
+			    NUMPROTESTERNO, NUMANNOPROTESTERNO,
+			    am_movimento_appoggio.CODTIPOMIS, am_movimento_appoggio.FLGLAVOROAGR,
+			    am_movimento_appoggio.FLGDISTPARZIALE, am_movimento_appoggio.FLGDISTAZESTERA,
+			    am_movimento_appoggio.FLGPA, am_movimento_appoggio.FLGSISTEMAZIONEALLOGGIATIVA, 
+			    am_movimento_appoggio.FLGPAGAMENTORIMPATRIO, am_movimento_appoggio.FLGAZUTILIZESTERA,
+			    TO_CHAR(am_movimento_appoggio.DATFINEAFFITTORAMO, 'DD/MM/YYYY') DATFINEAFFITTORAMO,
+			    am_movimento_appoggio.STRNUMAGSOMMINISTRAZIONE, 
+			    am_movimento_appoggio.CODQUESTURA QUESTURALAV,
+			    am_movimento_appoggio.STRCOGNOMELEGRAPP COGNOMELEGRAPP,
+			    am_movimento_appoggio.STRNOMELEGRAPP NOMELEGRAPP,
+			    am_movimento_appoggio.CODCITTADINANZALEGRAPP,
+			    am_movimento_appoggio.STRSESSOLEGRAPP SESSOLEGRAPP,
+			    to_char(am_movimento_appoggio.DATNASCLEGRAPP, 'DD/MM/YYYY') DATANASCITALEGRAPP,
+			    am_movimento_appoggio.CODCOMNASCLEGRAPP CODCOMNASCITALEGRAPP,
+			    to_char(am_movimento_appoggio.DATSCADENZALEGRAPP, 'DD/MM/YYYY') DATASCADENZAPSLEGRAPP,
+			    am_movimento_appoggio.CODTIPODOCEXLEGRAPP CODTIPODOCPSLEGRAPP,
+			    am_movimento_appoggio.STRNUMDOCEXLEGRAPP STRNUMDOCPSLEGRAPP,
+			    am_movimento_appoggio.CODMOTIVOPERMSOGGEXLEGRAPP CODMOTIVOPSLEGRAPP,
+			    am_movimento_appoggio.CODQUESTURALEGRAPP QUESTURALEGRAPP,
+			    am_movimento_appoggio.FLGAZESTERA, am_movimento_appoggio.STRCFAZESTERA CODFISCAZESTERA, 
+			    am_movimento_appoggio.STRRAGSOCAZESTERA RAGSOCAZESTERA, am_movimento_appoggio.CODTIPOENTEPROMOTORE,
+			    am_movimento_appoggio.FLGSOGGINITALIA, TO_CHAR(am_movimento_appoggio.DATFINEPERIODOFORMATIVO, 'DD/MM/YYYY') DATFINEPF,
+			   	am_movimento_appoggio.FLGLAVOROINMOBILITA, am_movimento_appoggio.FLGLAVOROSTAGIONALE, am_movimento_appoggio.STRCODFISCPROMOTORETIR,
+			   	am_movimento_appoggio.FLGPROSECUZIONE, am_movimento_appoggio.CODVARIAZIONE,
+			   	am_movimento_appoggio.STRDENOMINAZIONETIR, am_movimento_appoggio.CODCATEGORIATIR, am_movimento_appoggio.CODTIPOLOGIATIR, am_movimento_appoggio.CODSOGGPROMOTOREMIN
+  			FROM am_movimento_appoggio, de_tipo_contratto, de_tipo_trasf, de_comune comInt, 
+  				 de_ente_previdenziale ente
+            WHERE am_movimento_appoggio.CODTIPOCONTRATTO = de_tipo_contratto.CODTIPOCONTRATTO (+)
+                  and am_movimento_appoggio.CODTIPOTRASF = de_tipo_trasf.CODTIPOTRASF (+)
+                  and am_movimento_appoggio.coduaintcom = comInt.codcom (+)
+                  and am_movimento_appoggio.codtipoenteprev = ente.codente (+)
+                  and prgMovimentoApp = ?"/> 
+
+<STATEMENT name="GET_PROGRESSIVI_MOVIMENTI_APPOGGIO_VALIDATI_FINO_N_GIORNI"
+            query="(SELECT AM_MOVIMENTO_APPOGGIO.PRGMOVIMENTOAPP, NVL(AM_MOVIMENTO_APPOGGIO.DATINIZIOMOV, AM_MOVIMENTO_APPOGGIO.DATFINEMOV) DATINIZIOMOV,
+            		DECODE (AM_MOVIMENTO_APPOGGIO.CODTIPOMOV, 'AVV', 1, 'TRA', 2, 'PRO', 3, 'CES', 4) CODTIPOMOV, AM_MOVIMENTO_APPOGGIO.CODTIPOCOMUNIC,
+            		DECODE(AM_MOVIMENTO_APPOGGIO.CODTIPOCONTRATTO, 'C.01.00', 1, 2) CODICECONTRATTO, 
+            		AM_MOVIMENTO_APPOGGIO.STRCODICEFISCALE STRCODICEFISCALE, 
+            		DECODE (AM_MOVIMENTO_APPOGGIO.CODTIPOCOMUNIC, '01', 1, '03', 2, 3) CODICETIPOCOMUNIC
+					FROM AM_MOVIMENTO_APPOGGIO INNER JOIN AM_RISULTATO_MOVIMENTO ON (AM_MOVIMENTO_APPOGGIO.PRGMOVIMENTOAPP = AM_RISULTATO_MOVIMENTO.PRGMOVIMENTOAPP)
+					WHERE NVL(AM_MOVIMENTO_APPOGGIO.FLGASSDACESS, 'N') != 'S'
+					AND AM_RISULTATO_MOVIMENTO.CDNUTINS = 365) 
+					MINUS
+					(SELECT AM_MOVIMENTO_APPOGGIO.PRGMOVIMENTOAPP, NVL(AM_MOVIMENTO_APPOGGIO.DATINIZIOMOV, AM_MOVIMENTO_APPOGGIO.DATFINEMOV) DATINIZIOMOV,
+					DECODE (AM_MOVIMENTO_APPOGGIO.CODTIPOMOV, 'AVV', 1, 'TRA', 2, 'PRO', 3, 'CES', 4) CODTIPOMOV, AM_MOVIMENTO_APPOGGIO.CODTIPOCOMUNIC,
+					DECODE(AM_MOVIMENTO_APPOGGIO.CODTIPOCONTRATTO, 'C.01.00', 1, 2) CODICECONTRATTO, 
+					AM_MOVIMENTO_APPOGGIO.STRCODICEFISCALE STRCODICEFISCALE,
+					DECODE (AM_MOVIMENTO_APPOGGIO.CODTIPOCOMUNIC, '01', 1, '03', 2, 3) CODICETIPOCOMUNIC
+					FROM AM_MOVIMENTO_APPOGGIO INNER JOIN AM_RISULTATO_MOVIMENTO ON (AM_MOVIMENTO_APPOGGIO.PRGMOVIMENTOAPP = AM_RISULTATO_MOVIMENTO.PRGMOVIMENTOAPP)
+					WHERE NVL(AM_MOVIMENTO_APPOGGIO.FLGASSDACESS, 'N') != 'S' 
+					AND (TRUNC(SYSDATE) - TRUNC(AM_RISULTATO_MOVIMENTO.DTMINS) > ?)
+					AND AM_RISULTATO_MOVIMENTO.CDNUTINS = 365)
+					ORDER BY CODTIPOMOV, CODICETIPOCOMUNIC, 
+					CODICECONTRATTO, DATINIZIOMOV, STRCODICEFISCALE"/>
+
+<STATEMENT name="GET_PROGRESSIVI_MOVIMENTI_APPOGGIO"
+            query="SELECT AM_MOVIMENTO_APPOGGIO.PRGMOVIMENTOAPP, AM_MOVIMENTO_APPOGGIO.DATINIZIOMOV, AM_MOVIMENTO_APPOGGIO.CODTIPOCOMUNIC,
+            			NVL(AM_MOVIMENTO_APPOGGIO.DATINIZIOMOV, AM_MOVIMENTO_APPOGGIO.DATFINEMOV) DATASORT1, 
+            			AM_MOVIMENTO_APPOGGIO.STRCODICEFISCALE, AM_MOVIMENTO_APPOGGIO.CODTIPOCONTRATTO
+					FROM AM_MOVIMENTO_APPOGGIO LEFT JOIN AM_RISULTATO_MOVIMENTO ON (AM_MOVIMENTO_APPOGGIO.PRGMOVIMENTOAPP = AM_RISULTATO_MOVIMENTO.PRGMOVIMENTOAPP) 
+					WHERE NVL(AM_MOVIMENTO_APPOGGIO.FLGASSDACESS, 'N') != 'S' AND AM_RISULTATO_MOVIMENTO.PRGMOVIMENTOAPP IS NULL
+				   	ORDER BY DECODE(AM_MOVIMENTO_APPOGGIO.CODTIPOMOV, 'AVV', 1, 'TRA', 2, 'PRO', 3, 'CES', 4),
+					DECODE (AM_MOVIMENTO_APPOGGIO.CODTIPOCOMUNIC, '01', 1, '03', 2, 3), 
+					DECODE(AM_MOVIMENTO_APPOGGIO.CODTIPOCONTRATTO, 'C.01.00', 1, 2),
+					DATASORT1, AM_MOVIMENTO_APPOGGIO.STRCODICEFISCALE"/>
+
+<STATEMENT name="GET_PROGRESSIVI_MOVIMENTI_APPOGGIO_OLD"
+            query="SELECT AM_MOVIMENTO_APPOGGIO.PRGMOVIMENTOAPP,
+            		CASE
+	          			WHEN (AM_MOVIMENTO_APPOGGIO.DATINIZIOMOV is not null) THEN AM_MOVIMENTO_APPOGGIO.DATINIZIOMOV
+	          			ELSE AM_MOVIMENTO_APPOGGIO.DATFINEMOV
+					END
+					DATINIZIOMOV, AM_MOVIMENTO_APPOGGIO.CODTIPOCOMUNIC
+            		FROM AM_MOVIMENTO_APPOGGIO LEFT JOIN AM_RISULTATO_MOVIMENTO ON (AM_MOVIMENTO_APPOGGIO.PRGMOVIMENTOAPP = AM_RISULTATO_MOVIMENTO.PRGMOVIMENTOAPP) 
+					WHERE NVL(AM_MOVIMENTO_APPOGGIO.FLGASSDACESS, 'N') != 'S' AND AM_RISULTATO_MOVIMENTO.PRGMOVIMENTOAPP IS NULL
+				   	UNION
+				   	(
+					SELECT AM_MOVIMENTO_APPOGGIO.PRGMOVIMENTOAPP, 
+					CASE
+	          			WHEN (AM_MOVIMENTO_APPOGGIO.DATINIZIOMOV is not null) THEN AM_MOVIMENTO_APPOGGIO.DATINIZIOMOV
+	          			ELSE AM_MOVIMENTO_APPOGGIO.DATFINEMOV
+					END
+					DATINIZIOMOV, AM_MOVIMENTO_APPOGGIO.CODTIPOCOMUNIC
+					FROM AM_MOVIMENTO_APPOGGIO INNER JOIN AM_RISULTATO_MOVIMENTO ON (AM_MOVIMENTO_APPOGGIO.PRGMOVIMENTOAPP = AM_RISULTATO_MOVIMENTO.PRGMOVIMENTOAPP)
+					WHERE NVL(AM_MOVIMENTO_APPOGGIO.FLGASSDACESS, 'N') != 'S' 
+					MINUS
+					SELECT AM_MOVIMENTO_APPOGGIO.PRGMOVIMENTOAPP, 
+					CASE
+	          			WHEN (AM_MOVIMENTO_APPOGGIO.DATINIZIOMOV is not null) THEN AM_MOVIMENTO_APPOGGIO.DATINIZIOMOV
+	          			ELSE AM_MOVIMENTO_APPOGGIO.DATFINEMOV
+					END
+					DATINIZIOMOV, AM_MOVIMENTO_APPOGGIO.CODTIPOCOMUNIC
+					FROM AM_MOVIMENTO_APPOGGIO INNER JOIN AM_RISULTATO_MOVIMENTO ON (AM_MOVIMENTO_APPOGGIO.PRGMOVIMENTOAPP = AM_RISULTATO_MOVIMENTO.PRGMOVIMENTOAPP)
+					WHERE NVL(AM_MOVIMENTO_APPOGGIO.FLGASSDACESS, 'N') != 'S' AND TRUNC(AM_RISULTATO_MOVIMENTO.DTMINS) = TRUNC(SYSDATE) AND AM_RISULTATO_MOVIMENTO.CDNUTINS = 365
+					)
+				   	ORDER BY DATINIZIOMOV"/>
+
+<!--Statement utilizzato negli impatti per associare alla did un nuovo stato occupazioanale-->
+<STATEMENT name="AGGIORNA_DICH_DISP_IMPATTI_STORIA"  query="
+	update am_dich_disponibilita set prgStatoOccupaz = ?, numklodichdisp = ?, dtmMod = sysdate, cdnUtMod = ?
+	where prgDichDisponibilita = ?
+"/>                                                    
+
+<STATEMENT name="CANCELLA_MOVIMENTI_IN_APPOGGIO"
+           query="DELETE AM_REP_MOVIMENTI_APPOGGIO 
+           		  WHERE TRIM(IDSESSIONE) = ? " />
+
+<STATEMENT name="GET_PATH_LOG_VALIDAZIONE"
+           query="SELECT STRCONTESTOVALIDAZIONE
+           		  FROM TS_GENERALE " />
+           		  
+           		  
+<!-- Recupera i risultati dell'ultima validazione di un movimento non acnora validato presente nella tabella di appoggio -->
+<STATEMENT name="READ_BLOB_RISULTATO_VALIDAZIONE"
+            query="SELECT RIS.BLBRISULTATO,
+			       RIS.PRGMOVIMENTOAPP,
+				   RIS.PRGVALIDAZIONEMASSIVA,
+				   to_char(RIS.DTMINS,'dd/mm/yyyy HH24:MI:SS') DTMINS,
+				   RIS.CDNUTINS,
+				   UT.STRNOME as NOME_UT_INS,
+				   UT.STRCOGNOME as COGNOME_UT_INS
+			FROM AM_RISULTATO_MOVIMENTO RIS, TS_UTENTE UT
+			WHERE RIS.PRGMOVIMENTOAPP = ?
+			 AND UT.CDNUT = RIS.CDNUTINS
+			 AND RIS.DTMINS = ( SELECT MAX(RIS2.DTMINS) 
+			                       FROM AM_RISULTATO_MOVIMENTO RIS2 
+			                      WHERE RIS2.PRGMOVIMENTOAPP = ?
+								   )"/>
+
+<STATEMENT name="DichProtocollatoSelect" 
+			query="select am.CODSTATOATTO, do.NUMANNOPROT, do.NUMPROTOCOLLO, to_char(do.DTMINS,'dd/mm/yyyy') dataProt,
+	   				 	do.CODMONOIO, to_char(do.DTMINS,'hh24:mi') oraProt , da.STRDESCRIZIONE rif, do.PRGDOCUMENTO
+	  				 from am_dich_lav am, am_documento_coll dc, am_documento do, DE_DOC_AMBITO da,DE_DOC_TIPO de
+	  				 where am.PRGDICHLAV= ?
+					  	and dc.CDNCOMPONENTE=373
+					    and am.PRGDICHLAV=dc.STRCHIAVETABELLA
+					    and dc.PRGDOCUMENTO=do.PRGDOCUMENTO
+						AND de.CODTIPODOCUMENTO = 'DR02'
+				  		AND da.CODAMBITODOC = de.CODAMBITODOC"/>
+					    
+<!-- info di protocollo per la pagina di inserimento della dichiarazione di reddito sanato. Generalizzata per il caso docarea e 
+quindi per la assenza di dati nella AP_PROTOCOLLO -->			    
+<STATEMENT name="GetDichDaProtocollareSelect"
+			query="
+SELECT DECODE (ts_config_loc.decvalore, 2, 'S', 'N') flgprotocolloaut,
+       ts_generale.codtipofileestreport, (am_protocollo.numprotocollo + 1) numprotocollo,
+       am_protocollo.numannoprot, am_protocollo.numkloprotocollo,
+       TO_CHAR (SYSDATE, 'dd/mm/yyyy hh24:mi') AS dataoraprot,
+       ts_config_loc.decvalore tipo_registrazione_doc, de.strio, am.strdescrizione rif
+  FROM ts_generale, am_protocollo, ts_config_loc, de_doc_tipo de, de_doc_ambito am
+ WHERE am_protocollo.numannoprot = TO_CHAR (SYSDATE, 'yyyy')
+   AND ts_config_loc.strcodrif = ts_generale.codprovinciasil
+   AND ts_config_loc.codtipoconfig = 'TIPOPROT'
+   AND ts_config_loc.decvalore IN (2, 3)
+   AND de.codtipodocumento = 'DR02'
+   AND am.codambitodoc = de.codambitodoc
+UNION
+SELECT 'S' flgprotocolloaut, ts_generale.codtipofileestreport, 0 numprotocollo,
+       TO_NUMBER (TO_CHAR (SYSDATE, 'yyyy')) numannoprot, 0 numkloprotocollo,
+       TO_CHAR (SYSDATE, 'dd/mm/yyyy hh24:mi') AS dataoraprot,
+       ts_config_loc.decvalore tipo_registrazione_doc, de.strio, am.strdescrizione rif
+  FROM ts_generale, ts_config_loc, de_doc_tipo de, de_doc_ambito am
+ WHERE ts_config_loc.strcodrif = ts_generale.codprovinciasil
+   AND ts_config_loc.codtipoconfig = 'TIPOPROT'
+   AND ts_config_loc.decvalore IN (0, 1)
+   AND de.codtipodocumento = 'DR02'
+   AND am.codambitodoc = de.codambitodoc
+" />
+						  
+<STATEMENT name="getFlagNonScattanoImpattiMovOrfani"
+			query="select flgnonscattimpatticonmovorfani flag from ts_generale "
+/>
+
+<STATEMENT name="GET_CPI_VALIDAZIONE_MOV"
+        query="select ordineregione, codice, descrizione FROM (
+        		select distinct decode(de_provincia.codregione,(select de_provincia.CODREGIONE 
+		 								 								from   de_provincia 
+										 								inner join ts_generale on (de_provincia.codprovincia = ts_generale.CODPROVINCIASIL)),1,2) ordineregione,
+				       de_cpi.codcpi as codice,
+				       de_cpi.strDescrizione || ' - ' || de_cpi.codcpi as descrizione
+				  from de_cpi, de_comune, de_provincia, de_regione r
+				 where de_cpi.codcpi = de_comune.codcpi
+				   and de_comune.codprovincia = de_provincia.codprovincia
+				   and de_provincia.CODREGIONE = r.CODREGIONE
+				   and not de_cpi.codcpi = 'NT'
+				union
+				   select distinct decode(de_provincia.codregione,(select de_provincia.CODREGIONE 
+		 								 								from   de_provincia 
+										 								inner join ts_generale on (de_provincia.codprovincia = ts_generale.CODPROVINCIASIL)),1,2) ordineregione,
+				       de_cpi.codcpi as codice,				       
+				       de_cpi.strDescrizione || ' - ' || de_cpi.codcpi || ' (SCADUTO)' as descrizione
+				  from de_cpi, de_provincia, de_regione r
+				 where de_cpi.codprovincia = de_provincia.codprovincia
+				   and de_provincia.CODREGIONE = r.CODREGIONE
+				   and not de_cpi.codcpi = 'NT'
+				   and trunc(de_cpi.datfineval) &lt;= trunc(sysdate)
+				   and trunc(de_cpi.datfineval) &gt;= (select trunc(datscadcpi) from ts_generale)
+				   )
+				 order by ordineregione, descrizione"/>
+
+
+<STATEMENT name="GET_NKLOCK_MOV"
+          query="select (m.NUMKLOMOV + 1) NUMKLOMOV from am_movimento m where m.PRGMOVIMENTO = ?"/>
+          
+<STATEMENT name="UPDATE_MOV_DOPPIO"
+           query="update am_movimento
+					set CODMONOMOVDICH = ?,
+					    CDNUTMOD = ?,
+						DTMMOD = SYSDATE,
+						DATCOMUNICAZ = to_date(?,'dd/MM/yyyy'),
+						NUMKLOMOV = ?,
+						CODCOMUNICAZIONE = ?
+				  WHERE PRGMOVIMENTO = ?"/>
+					
+<STATEMENT name="GET_DOCUMENTO"
+          query="select doc.CODCPI CODCPI,
+						doc.CDNLAVORATORE CDNLAVORATORE,
+						doc.PRGAZIENDA PRGAZIENDA,
+						doc.PRGUNITA PRGUNITA,
+						doc.CODTIPODOCUMENTO CODTIPOMOV,
+						doc.FLGAUTOCERTIFICAZIONE FLGAUTOCERTIFICAZIONE,
+						doc.STRDESCRIZIONE STRDESCRIZIONE,
+						to_char(doc.DATINIZIO,'dd/mm/yyyy') DATINIZIOMOV,
+						doc.STRENTERILASCIO STRENTERILASCIO,
+						doc.CODMONOIO FLGCODMONOIO
+				   from am_documento doc , am_documento_coll coll 
+				  where doc.cdnLavoratore = ? 
+				    and doc.prgDocumento = coll.prgDocumento  
+				    and coll.cdnComponente = (select cdncomponente from ts_componente where strpage = ?)
+				    and coll.STRCHIAVETABELLA = ?
+					and not exists (
+					select 1 
+					from am_documento doc1, am_documento_coll coll1 
+					where doc1.prgDocumento = coll1.prgDocumento  
+					  and doc1.cdnLavoratore = doc.cdnLavoratore
+					  and coll1.cdnComponente = coll.cdnComponente
+					  and coll.STRCHIAVETABELLA = coll1.STRCHIAVETABELLA
+					  and (doc1.numannoprot > doc.numannoprot OR
+					       doc1.numannoprot = doc.numannoprot and doc1.numprotocollo > doc.numprotocollo )
+					)"/>
+
+<STATEMENT NAME="COMBO_LAVORAZIONE"
+       QUERY="SELECT T.CODLAVORAZIONE CODICE,
+			         STRDESCRIZIONE || DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL), ' (scaduto)', LEAST(SYSDATE, DATINIZIOVAL),  ' (non attivo)', '') AS DESCRIZIONE
+			    FROM DE_LAVORAZIONE_AGR T
+			ORDER BY DESCRIZIONE"
+/>
+
+<STATEMENT NAME="COMBO_CATEGORIA"
+       QUERY="SELECT T.CODCATEGORIA CODICE,
+			         STRDESCRIZIONE || DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL), ' (scaduto)', LEAST(SYSDATE, DATINIZIOVAL),  ' (non attivo)', '') AS DESCRIZIONE
+			    FROM DE_CATEGORIA_AGR T
+			ORDER BY DESCRIZIONE"
+/>
+
+<STATEMENT NAME="COMBO_LIVELLO_AGR"
+       QUERY="SELECT T.CODLIVELLO CODICE,
+			         STRDESCRIZIONE || ' - ' || T.CODLIVELLO || DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL), ' (scaduto)', LEAST(SYSDATE, DATINIZIOVAL),  ' (non attivo)', '') AS DESCRIZIONE
+			    FROM DE_LIVELLO_AGR T
+			ORDER BY DESCRIZIONE"
+/>
+
+<!-- ***************************************************************************
+                                ASValoreIseeStatements 
+     *************************************************************************** --> 
+<STATEMENT NAME="AS_LOAD_ISEE"
+       QUERY="SELECT TO_CHAR(DATINIZIOVAL,'dd/mm/yyyy') DATINIZIOVAL,
+			         TO_CHAR(DATFINEVAL,'dd/mm/yyyy') DATFINEVAL,
+			         NUMVALOREISEE,
+			         NUMANNO,
+			         STRNOTA,
+			         NUMPUNTIISEE,
+			         PRGVALOREISEE,
+			         NUMKLOVALOREISEE,
+			         CDNUTINS, TO_CHAR(DTMINS, 'DD/MM/YYYY HH24:MI') as DTMINSHH,
+                     CDNUTMOD, TO_CHAR(DTMMOD, 'DD/MM/YYYY HH24:MI') as DTMMODHH,
+                     STRIBANNAZIONE, STRIBANCONTROLLO, STRCINLAVORATORE, 
+	 				 STRABILAVORATORE, STRCABLAVORATORE, STRCCLAVORATORE			         
+			  FROM   AS_VALORE_ISEE
+			 WHERE   PRGVALOREISEE=?"
+/> 
+     
+<STATEMENT NAME="AS_GET_LISTA_VAL_ISEE"
+       QUERY="SELECT TO_CHAR(DATINIZIOVAL,'dd/mm/yyyy') strDATINIZIOVAL,
+			         TO_CHAR(DATFINEVAL,'dd/mm/yyyy') strDATFINEVAL,
+			         NUMVALOREISEE,
+			         NUMANNO,
+			         STRNOTA,
+			         NUMPUNTIISEE,
+			         PRGVALOREISEE,
+			         NUMKLOVALOREISEE
+			  FROM   AS_VALORE_ISEE
+			 WHERE   CDNLAVORATORE=?
+			 ORDER   BY DATINIZIOVAL DESC"
+/> 
+
+<STATEMENT name="AS_COMBO_MOTIVO_MODIFICA"
+	query="
+select 'A' as codice, 'Aggiornamento dati' as descrizione from dual
+union
+select 'E' as codice, 'Errore di digitazione' as descrizione from dual
+" />
+
+    
+<STATEMENT NAME="AS_GET_VAL_ISEE"
+       QUERY="	SELECT 	PRGVALOREISEE,
+       					TO_CHAR(DATINIZIOVAL,'dd/mm/yyyy') DATINIZIOVAL,
+       					TO_CHAR(DATFINEVAL,'dd/mm/yyyy') AS DATFINEVAL,
+       					NUMVALOREISEE,
+       					NUMANNO,
+       					STRNOTA,
+       					NUMPUNTIISEE,
+       					CDNUTINS,
+       					TO_CHAR(DTMINS,'dd/mm/yyyy') DTMINS,
+       					CDNUTMOD,
+       					TO_CHAR(dtmMod, 'DD/MM/YYYY') dtmMod,
+       					TO_CHAR(DTMINS, 'dd/mm/yyyy HH24:MI') DTMINShh,
+       					TO_CHAR(dtmMod, 'DD/MM/YYYY HH24:MI') dtmModhh,
+       					STRIBANNAZIONE, STRIBANCONTROLLO, STRCINLAVORATORE, 
+	 					STRABILAVORATORE, STRCABLAVORATORE, STRCCLAVORATORE,
+       					NUMKLOVALOREISEE
+				FROM 	AS_VALORE_ISEE 
+				WHERE 	CDNLAVORATORE=?					
+				ORDER BY PRGVALOREISEE DESC"
+/>  
+
+<STATEMENT name="AS_CALCOLA_PUNTEGGIO_ISEE"
+           query="{ call PG_INCROCIO.CALCOLOPUNTEGGIOISEE(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) }"
+/>   
+
+<!-- questo inserimento ora viene eseguito tramite una store procedure
+<STATEMENT NAME="AS_INS_VAL_ISEE"
+       QUERY="	INSERT INTO AS_VALORE_ISEE
+       					(	PRGVALOREISEE,
+       						CDNLAVORATORE,
+       						NUMVALOREISEE,
+       						NUMPUNTIISEE,
+       						DATINIZIOVAL,
+       						DATFINEVAL,       						
+       						NUMANNO,
+       						STRNOTA,
+       						CDNUTINS,
+       						DTMINS,
+       						CDNUTMOD,
+       						DTMMOD)
+       			VALUES	(	S_AS_VALORE_ISEE.NEXTVAL,
+       						?,
+       						?,
+       						?,       						
+       						TO_DATE(?,'DD/MM/YYYY'),
+       						TO_DATE(?,'DD/MM/YYYY'),
+       						?,
+       						?,
+       						?,       						
+       						SYSDATE,
+       						?,
+       						SYSDATE)"
+/>
+-->
+
+<STATEMENT NAME="AS_UPD_VAL_ISEE"
+       query="{ call PG_INCROCIO.AGGIORNAMENTOPUNTEGGIOISEE(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) }" 
+/>
+
+<!-- questo update ora viene eseguito tramite una store procedure
+<STATEMENT NAME="AS_UPD_VAL_ISEE"
+       QUERY="	UPDATE AS_VALORE_ISEE SET       						
+       						CDNLAVORATORE	= ?,
+       						NUMVALOREISEE	= ?,	
+       						NUMPUNTIISEE	= ?,
+       						DATINIZIOVAL	= to_date(?,'dd/mm/yyyy'),
+       						DATFINEVAL		= to_date(?,'dd/mm/yyyy'),      						
+       						NUMANNO			= ?,
+       						STRNOTA			= ?,
+       						CDNUTINS		= ?,
+       						DTMINS			= SYSDATE,
+       						CDNUTMOD		= ?,
+       						DTMMOD			= SYSDATE,      						
+       						NUMKLOVALOREISEE = NUMKLOVALOREISEE + 1
+       			WHERE PRGVALOREISEE = ?"
+/>
+-->
+
+<STATEMENT NAME="AS_UPD_VAL_ISEE_PREC"
+       query="{ call PG_INCROCIO.aggiornaDtFineRecordPrecedente(?,?,?) }"
+/>
+
+<STATEMENT NAME="AS_DEL_VAL_ISEE"
+       QUERY="	DELETE 
+       			FROM AS_VALORE_ISEE 
+       			WHERE PRGVALOREISEE = ?"
+       			
+/>
+
+<STATEMENT NAME="AS_DETT_ISEE"
+		QUERY="	SELECT 	TO_CHAR(DATINIZIOVAL,'dd/mm/yyyy') DATINIZIOVAL,
+       					TO_CHAR(DATFINEVAL,'dd/mm/yyyy')DATFINEVAL,
+       					NUMVALOREISEE,
+       					NUMANNO,
+       					STRNOTA,
+       					NUMPUNTIISEE,
+						cdnUtIns, 
+						TO_CHAR(dtmIns, 'DD/MM/YYYY HH24:MI') dtmIns,
+                        cdnUtMod, 
+                        TO_CHAR(dtmMod, 'DD/MM/YYYY HH24:MI') dtmMod,
+       					STRIBANNAZIONE, STRIBANCONTROLLO, STRCINLAVORATORE, 
+	 					STRABILAVORATORE, STRCABLAVORATORE, STRCCLAVORATORE 
+				FROM 	AS_VALORE_ISEE 
+				WHERE 	CDNLAVORATORE= ?
+				AND		PRGVALOREISEE= ?
+						ORDER BY PRGVALOREISEE DESC"
+/>
+
+<STATEMENT NAME="GET_INFO_MOBILITA_DA_VALIDARE"
+		QUERY="	SELECT STRAZCODICEFISCALE,
+		 			   CODUACOM,
+		 			   STRUAINDIRIZZO,
+		 			   STRCODICEFISCALE,
+		 			   TO_CHAR(DATINIZIO,'DD/MM/YYYY') DATINIZIO,
+		 			   TO_CHAR(DATFINE,'DD/MM/YYYY') DATFINE,
+		 			   TO_CHAR(DATFINEMOV,'DD/MM/YYYY') DATFINEMOV,
+		 			   CODTIPOMOB,
+		 			   FLGINDENNITA,
+		 			   TO_CHAR(DATINIZIOINDENNITA,'DD/MM/YYYY') DATINIZIOINDENNITA,
+		 			   TO_CHAR(DATFINEINDENNITA,'DD/MM/YYYY') DATFINEINDENNITA,
+		 			   TO_CHAR(DATCRT,'DD/MM/YYYY') DATCRT,
+		 			   TO_CHAR(DATMAXDIFF,'DD/MM/YYYY') DATMAXDIFF,
+		 			   STRNOTE
+				FROM AM_MOBILITA_ISCR_APP
+				WHERE PRGMOBILITAISCRAPP = ?"/>
+
+<STATEMENT NAME="GET_PROGRESSIVI_MOBILITA_APPOGGIO_VALIDAZIONE_MASSIVA"
+		QUERY="	SELECT PRGMOBILITAISCRAPP
+				FROM AM_MOBILITA_ISCR_APP"/>
+
+<STATEMENT NAME="GET_AZIENDA_MOBILITA_DA_VALIDARE"
+		QUERY="	SELECT PRGAZIENDA
+				FROM AN_AZIENDA
+				WHERE UPPER(STRCODICEFISCALE) = UPPER(?)"/>
+
+<STATEMENT NAME="GET_SEDE_LEGALE"
+		QUERY="	SELECT PRGUNITA, CODCOM, FLGSEDE
+				FROM AN_UNITA_AZIENDA
+				WHERE PRGAZIENDA = ? 
+				AND UPPER(CODCOM) = UPPER(?)
+				AND UPPER(STRINDIRIZZO) = UPPER(?)
+				ORDER BY DTMINS"/>	
+				
+<STATEMENT NAME="GET_SEDE_LEGALE_BYCOMUNE"
+		QUERY="	SELECT PRGUNITA, CODCOM, STRINDIRIZZO
+				FROM AN_UNITA_AZIENDA
+				WHERE PRGAZIENDA = ? 
+				AND UPPER(CODCOM) = UPPER(?)"/>					
+
+
+<STATEMENT NAME="GET_SEDE_AZIENDA_MOBILITA_DA_VALIDARE"
+		QUERY="	SELECT PRGUNITA, CODCOM, FLGSEDE, NUMKLOUNITAAZIENDA
+				FROM AN_UNITA_AZIENDA
+				WHERE PRGAZIENDA = ? 
+				AND UPPER(CODCOM) = UPPER(?)
+				AND UPPER(STRINDIRIZZO) = UPPER(?)
+				ORDER BY DTMINS ASC "/>	
+
+<STATEMENT NAME="GET_LAVORATORE_STORIA_MOBILITA_DA_VALIDARE"
+		QUERY="	SELECT CDNLAVORATORE
+				FROM AN_LAV_STORIA_INF
+				WHERE UPPER(STRCODICEFISCALEOLD) = UPPER(?)"/>	
+				
+<STATEMENT NAME="GET_LAVORATORE_MOBILITA_DA_VALIDARE"
+		QUERY="	SELECT CDNLAVORATORE
+				FROM AN_LAVORATORE
+				WHERE UPPER(STRCODICEFISCALE) = UPPER(?)"/>
+				
+<STATEMENT NAME="CERCA_MOBILITA_DA_VALIDARE_IN_MOB_ISCR"
+		QUERY="	SELECT 	MOB.PRGMOBILITAISCR, MOB.PRGAZIENDA, MOB.PRGUNITA, AZ.STRCODICEFISCALE, 
+				 	  	UAZ.CODCOM, UAZ.STRINDIRIZZO, TO_CHAR(MOB.DATINIZIOMOV,'DD/MM/YYYY') DATINIZIOMOV, 
+				 	  	TO_CHAR(MOB.DATFINEMOV,'DD/MM/YYYY') DATFINEMOV, 
+				 	  	TO_CHAR(MOB.DATINIZIO,'DD/MM/YYYY') DATINIZIOMOBILITA,
+					   	TO_CHAR(MOB.DATFINE,'DD/MM/YYYY') DATFINE, TO_CHAR(MOB.DATMAXDIFF,'DD/MM/YYYY') DATMAXDIFF, 
+					   	MOB.CODMOTIVODIFF, MOB.FLGINDENNITA, TO_CHAR(MOB.DATINIZIOINDENNITA,'DD/MM/YYYY') DATINIZIOINDENNITA, 
+						TO_CHAR(MOB.DATFINEINDENNITA,'DD/MM/YYYY') DATFINEINDENNITA, 
+						MOB.CODMANSIONE, MOB.CODCCNL, MOB.CODMOTIVOFINE, MOB.NUMKLOMOBISCR, MOB.CDNMBSTATORICH
+			 	FROM AM_MOBILITA_ISCR MOB, AN_AZIENDA AZ, AN_UNITA_AZIENDA UAZ
+				WHERE MOB.PRGAZIENDA = AZ.PRGAZIENDA (+)
+						AND MOB.PRGAZIENDA = UAZ.PRGAZIENDA (+)
+						AND MOB.PRGUNITA = UAZ.PRGUNITA (+)
+						AND CDNLAVORATORE  = ?"/>
+
+<STATEMENT NAME="DELETE_MOBILITA_VALIDATA"
+		QUERY="	DELETE FROM AM_MOBILITA_ISCR_APP WHERE PRGMOBILITAISCRAPP = ?"/>
+		
+<STATEMENT NAME="INS_MOBILITA_DA_VALIDAZIONE"		
+		QUERY=" INSERT INTO AM_MOBILITA_ISCR 
+                          (PRGMOBILITAISCR,
+                           CDNLAVORATORE,
+                           PRGMOVIMENTO,
+                           CODTIPOMOB,
+                           DATINIZIO,
+                           DATFINE,
+                           DATFINEORIG,
+                           FLGINDENNITA,
+                           DATINIZIOINDENNITA,
+                           DATFINEINDENNITA,
+                           DATCRT,
+                           STRNUMATTO,
+                           DATMAXDIFF,
+                           STRNOTE,
+                           CDNUTINS, DTMINS,
+                           CDNUTMOD, DTMMOD,
+                           CODMONOPROV,
+                           PRGAZIENDA, PRGUNITA, DATINIZIOMOV, DATFINEMOV, 
+                           CODMANSIONE, CODGRADO, CODCCNL, STRLIVELLO, CODMOTIVODIFF, 
+                           CODREGIONE, CODPROVINCIA, DATDOMANDA, DECORESETT, FLGNONIMPRENDITORE, FLGCASODUBBIO, CODMOTIVOFINE,
+                           CODDOMANDA
+                          )
+                  VALUES (? , ?, ?, ?,
+                          TO_DATE(?,'DD/MM/YYYY'),
+                          TO_DATE(?,'DD/MM/YYYY'),
+                          TO_DATE(?,'DD/MM/YYYY'),
+                          ?,TO_DATE(?,'DD/MM/YYYY'),
+                          TO_DATE(?,'DD/MM/YYYY'),
+                          TO_DATE(?,'DD/MM/YYYY'),
+                          ?,
+                          TO_DATE(?,'DD/MM/YYYY'),?,
+                          ?, SYSDATE,
+                          ?, SYSDATE,
+                          ?, ?, ?, TO_DATE(?,'DD/MM/YYYY'), TO_DATE(?,'DD/MM/YYYY'),
+                          ?, ?, ?, ?, ?, ?, ?, TO_DATE(?,'DD/MM/YYYY'), TO_NUMBER(?), ?, ?, ?, ?
+                         )"/>
+
+<!-- NELLA QUERY GET_DETT_MOBILITA_APPOGGIO VIENE PRESA LA PRIMA RIGA RITORNATA, PERCHE'
+NEL CASO IN CUI CODICE CITTADINANZA = 'NT' VENGONO RESTITUITE N RIGHE, DOVE N RAPPRESENTA
+IL NUMERO DI CODIFICHE NUOVE MAPPATE IN 'NT'
+ -->
+<STATEMENT NAME="GET_DETT_MOBILITA_APPOGGIO"
+		QUERY="	SELECT PRGMOBILITAISCRAPP, STRAZCODICEFISCALE,
+					   STRAZPARTITAIVA, STRAZRAGIONESOCIALE, STRAZNUMALBOINTERINALI, 
+					   'AZI' CODAZTIPOAZIENDA,
+					   STRUAINDIRIZZO, CODUACOM, COMUAZ.STRDENOMINAZIONE STRDESCRCOMUNE, 
+					   CODUAATECO as CODAZATECO, DEATT.STRDESCRIZIONE as STRDESCRATECO,  
+					   STRUACAP, STRUATEL, STRUAFAX, STRUAEMAIL,
+					   AM_MOBILITA_ISCR_APP.CODUACCNL CODAZCCNL, AM_MOBILITA_ISCR_APP.CODCCNL CODCCNL,
+					   COLL.STRDESCRIZIONE DESCCCNL, COLL1.STRDESCRIZIONE DESCCCNLMOV,
+					   STRUAPOSINPS STRPOSINPS, STRUANUMREGISTROCOMMITT STRNUMREGISTROCOMMITT,
+					   STRCODICEFISCALE, STRCOGNOME, STRNOME, STRSESSO, TO_CHAR(DATNASC,'DD/MM/YYYY') DATNASC,
+					   CODCOMNASC, COMNASCLAV.STRDENOMINAZIONE STRCOMNASC, AM_MOBILITA_ISCR_APP.CODCITTADINANZA CODCITTADINANZA,
+					   CITT.STRDESCRIZIONE, CITT.STRNAZIONE,
+					   CODCOMDOM, PROVLAV.STRISTAT STRPROVDOM, 
+					   COMDOMLAV.STRDENOMINAZIONE STRCOMDOM,
+					   STRINDIRIZZODOM,
+					   STRCAPDOM, STRTELDOM, CODCOMRES, STRINDIRIZZORES, STRCAPRES, STRTELRES, 
+					   TO_CHAR(DATSCADENZA,'DD/MM/YYYY') DATSCADENZA,
+					   DE_TITOLO.CODPADRE CODTIPOTITOLO, AM_MOBILITA_ISCR_APP.CODTIPOTITOLO CODTIPOTITOLOGENERICO, 
+					   AM_MOBILITA_ISCR_APP.CODCPI CODCPILAV, 
+					   DE_CPILAV.STRDESCRIZIONE STRCODCPILAV,
+					   STRCELL, AM_MOBILITA_ISCR_APP.STREMAIL,
+					   TO_CHAR(DATINIZIOMOV,'DD/MM/YYYY') DATINIZIOMOV,
+					   TO_CHAR(DATFINEMOV,'DD/MM/YYYY') DATFINEMOV,
+					   TO_CHAR(DATCOMUNICAZ,'DD/MM/YYYY') DATCOMUNICAZ,
+					   'AVV' CODTIPOMOV,
+					   'A.01.00' CODTIPOASS,
+					   'I' CODMONOTEMPO,
+					   MANSIONE.CODMANSIONE CODMANSIONE, MANSIONE.STRDESCRIZIONE DESCMANSIONE, 
+					   CODGRADO, STRLIVELLO,
+					   TO_CHAR(DATINIZIO,'DD/MM/YYYY') DATINIZIO,
+					   TO_CHAR(DATFINE,'DD/MM/YYYY') DATFINE,
+					   TO_CHAR(DATFINE,'DD/MM/YYYY') DATFINEORIG,
+					   CODMOTIVOFINE, FLGINDENNITA, 
+					   TO_CHAR(DATINIZIOINDENNITA,'DD/MM/YYYY') DATINIZIOINDENNITA,
+					   TO_CHAR(DATFINEINDENNITA,'DD/MM/YYYY') DATFINEINDENNITA,
+					   TO_CHAR(DATMAXDIFF,'DD/MM/YYYY') DATMAXDIFF, FLGDIFFERIMENTO,
+					   CODMOTIVODIFF, TO_CHAR(DATCRT,'DD/MM/YYYY') DATCRT, STRNUMATTO NUMCRT, STRNUMATTO,
+					   decode(CODENTEDETERMINA, 'BO', null, PROVENTE.CODPROVINCIA) PROVCRT,
+					   decode(CODENTEDETERMINA, 'BO', PROVENTE.CODREGIONE, null) REGIONECRT,
+					   CODENTEDETERMINA, CODTIPOMOB, AM_MOBILITA_ISCR_APP.STRNOTE,
+					   AM_MOBILITA_ISCR_APP.CODMONOPROV CODMONOPROVMOBILITA,
+					   AM_MOBILITA_ISCR_APP.FLGNONIMPRENDITORE FLGNONIMPRENDITORE,
+					   AM_MOBILITA_ISCR_APP.FLGCASODUBBIO FLGCASODUBBIO,
+					   AM_MOBILITA_ISCR_APP.CODDOMANDA
+				FROM AM_MOBILITA_ISCR_APP, DE_CONTRATTO_COLLETTIVO COLL, DE_CONTRATTO_COLLETTIVO COLL1,
+				 	 DE_TITOLO, DE_PROVINCIA PROVLAV, DE_CPI DE_CPILAV,
+				 	 DE_COMUNE COMNASCLAV, DE_COMUNE COMUAZ, DE_COMUNE COMDOMLAV,
+				 	 DE_CITTADINANZA CITT, DE_PROVINCIA PROVENTE, DE_MANSIONE MANSIONE, DE_ATTIVITA DEATT
+				WHERE AM_MOBILITA_ISCR_APP.CODTIPOTITOLO = DE_TITOLO.CODTITOLO (+)
+					  AND AM_MOBILITA_ISCR_APP.CODMANSIONE = MANSIONE.CODMANSIONE(+)
+					  AND AM_MOBILITA_ISCR_APP.CODUACOM = COMUAZ.CODCOM (+)
+					  AND AM_MOBILITA_ISCR_APP.CODCOMNASC = COMNASCLAV.CODCOM (+)
+					  AND AM_MOBILITA_ISCR_APP.CODCOMDOM = COMDOMLAV.CODCOM (+)
+					  AND COMDOMLAV.CODPROVINCIA = PROVLAV.CODPROVINCIA (+)
+					  AND AM_MOBILITA_ISCR_APP.CODCPI = DE_CPILAV.CODCPI (+)
+					  AND AM_MOBILITA_ISCR_APP.CODENTEDETERMINA = PROVENTE.STRTARGA(+)
+					  AND AM_MOBILITA_ISCR_APP.CODUAATECO = DEATT.CODATECO(+)
+            AND AM_MOBILITA_ISCR_APP.CODCCNL = COLL1.CODCCNL (+)
+            AND AM_MOBILITA_ISCR_APP.CODUACCNL = COLL.CODCCNL (+)
+				 	  AND PRGMOBILITAISCRAPP = ?
+				 	  AND ROWNUM = 1"/>
+
+<STATEMENT NAME="UPDATE_MOBILITA_DA_VALIDAZIONE"
+       QUERY="UPDATE AM_MOBILITA_ISCR SET       						
+       						CODTIPOMOB = ?,
+       						CDNUTMOD		= ?,
+                            DATCRT = TO_DATE(?,'DD/MM/YYYY'),
+                            STRNUMATTO = ?,
+                            CODREGIONE = ?,
+                            CODPROVINCIA = ?,
+       						DTMMOD = SYSDATE,
+       						PRGAZIENDA = ?,
+       						PRGUNITA = ?,
+       						DATINIZIOMOV = 
+       						(CASE 
+       							WHEN (? = '') THEN NULL
+       							ELSE  TO_DATE(?,'DD/MM/YYYY')
+       						END),
+       						DATFINEMOV = 
+       						(CASE 
+       							WHEN (? = '') THEN NULL
+       							ELSE  TO_DATE(?,'DD/MM/YYYY')
+       						END),
+       						CDNMBSTATORICH = null,
+       						NUMKLOMOBISCR = ?,
+       						CODMOTIVOFINE = 
+       						(CASE 
+       							WHEN (? is null) THEN CODMOTIVOFINE
+       							ELSE  ?
+       						END),
+       						DATFINE = 
+       						(CASE 
+       							WHEN (? = 'I') THEN DATINIZIO
+       							ELSE DATFINE
+       						END)
+       			WHERE PRGMOBILITAISCR = ?"/>
+       			
+<STATEMENT NAME="UPDATE_MOBILITA_DA_VALIDAZIONE_OLD"
+       QUERY="UPDATE AM_MOBILITA_ISCR SET       						
+       						CODTIPOMOB = ?,
+       						DATFINE = TO_DATE(?,'DD/MM/YYYY'),
+       						FLGINDENNITA = ?,
+       						DATINIZIOINDENNITA = TO_DATE(?,'DD/MM/YYYY'),
+       						DATFINEINDENNITA = TO_DATE(?,'DD/MM/YYYY'),
+       						DATMAXDIFF = TO_DATE(?,'DD/MM/YYYY'),
+       						CODMOTIVOFINE = ?,
+       						DATCRT = TO_DATE(?,'DD/MM/YYYY'),
+       						STRNUMATTO = ?,
+       						PRGMOVIMENTO = ?,
+       						CDNUTMOD		= ?,
+       						DTMMOD			= SYSDATE,
+       						CODMONOPROV	= ?,
+       						PRGAZIENDA = ?,
+       						PRGUNITA = ?,
+       						DATINIZIOMOV = TO_DATE(?,'DD/MM/YYYY'), 
+       						DATFINEMOV = TO_DATE(?,'DD/MM/YYYY'), 
+                            CODMANSIONE = ?, 
+                            CODGRADO = ?, 
+                            CODCCNL = ?, 
+                            STRLIVELLO = ?,
+                            DATFINEORIG = TO_DATE(?,'DD/MM/YYYY'),
+                            CODMOTIVODIFF = ?,
+                            CODREGIONE = ?,
+                            CODPROVINCIA = ?,
+                            NUMKLOMOBISCR = NUMKLOMOBISCR + 1
+       			WHERE PRGMOBILITAISCR = ?"/>
+
+<STATEMENT NAME="MOB_GET_CONFIG_LOC"
+		QUERY="	SELECT PRGCONFIGLOC, STRVALORE, NUM
+				FROM TS_CONFIG_LOC
+		WHERE CODTIPOCONFIG = 'MBVALMOV' AND
+		      STRCODRIF = (select codprovinciasil from ts_generale)"/>
+		      
+<STATEMENT NAME="CANCELLA_MOBILITA_APPOGGIO"
+		QUERY="DELETE FROM AM_MOBILITA_ISCR_APP WHERE PRGMOBILITAISCRAPP = ?"/>
+		
+<STATEMENT name="INSERT_NUOVA_VAL_MASSIVA_MOBILITA"
+    query="INSERT INTO AM_MOBILITA_RIS (PRGMOBILITARIS, CODAMBITOAPP, NUMRECORD, FLGSTOPUTENTE, DATINIZIO, DTMINS, CDNUTINS, DTMMOD, CDNUTMOD) 
+    		VALUES (?, ?, ?, ?, SYSDATE, SYSDATE, ?, SYSDATE, ?)"/>
+    		
+<STATEMENT name="SET_RESULT_VAL_MASS_MOBILITA"
+            query="INSERT INTO AM_MOBILITA_RIS_DETT (PRGMOBILITARISDETT, PRGMOBILITARIS, 
+            		PRGMOBILITAISCR, PRGMOBILITAISCRAPP, CODERRORE, CODTIPOERRORE, DTMINS, CDNUTINS, DTMMOD, CDNUTMOD, STRNOTE) 
+            		VALUES (?,?,?,?,?,?, SYSDATE,?, SYSDATE, ?, ?)"/>
+            		
+<STATEMENT name="GET_INFO_VAL_MASSIVA_MOBILITA"
+            query="SELECT PRGMOBILITARIS, NUMRECORD, FLGSTOPUTENTE, DTMINS, CDNUTINS
+            		FROM AM_MOBILITA_RIS
+            		WHERE PRGMOBILITARIS = ?"/>
+            		
+<STATEMENT name="GET_DATI_VAL_MASSIVA_MOBILITA"
+            query="SELECT PRGMOBILITARISDETT, PRGMOBILITARIS, RIS.PRGMOBILITAISCR, RIS.PRGMOBILITAISCRAPP, RIS.DTMINS, RIS.CDNUTINS,
+            		decode((SELECT COUNT(*) 
+            			FROM AM_MOBILITA_ISCR_APP RIS2 
+           				WHERE RIS2.PRGMOBILITAISCRAPP = RIS.PRGMOBILITAISCRAPP
+            			),0,1,0) AS VALIDATO,
+            		TS_TIPO_ERRORE.STRDESCRIZIONE TIPOERRORE,
+            		TS_ERRORE.CODERRORE CODERRORE,
+            		TS_ERRORE.STRDESCRIZIONE DESCERRORE,
+            		RIS.STRNOTE DETTAGLIOERRORE,
+            		AM_MOBILITA_ISCR.CODTIPOMOB CODTIPOMOBVAL,
+            		AN_AZIENDA.STRRAGIONESOCIALE STRAZRAGIONESOCIALEVAL,
+            		AN_UNITA_AZIENDA.STRINDIRIZZO STRUAINDIRIZZOVAL, 
+            		AN_LAVORATORE.STRCODICEFISCALE STRCODICEFISCALEVAL, 
+            		AN_LAVORATORE.STRCOGNOME STRCOGNOMEVAL, 
+            		AN_LAVORATORE.STRNOME STRNOMEVAL,
+            		AM_MOBILITA_ISCR_APP.CODTIPOMOB CODTIPOMOBNONVAL, 
+            		AM_MOBILITA_ISCR_APP.STRAZRAGIONESOCIALE STRAZRAGIONESOCIALENONVAL, 
+            		AM_MOBILITA_ISCR_APP.STRUAINDIRIZZO STRUAINDIRIZZONONVAL,
+            		AM_MOBILITA_ISCR_APP.STRCODICEFISCALE STRCODICEFISCALENONVAL, 
+            		AM_MOBILITA_ISCR_APP.STRCOGNOME STRCOGNOMENONVAL, 
+            		AM_MOBILITA_ISCR_APP.STRNOME STRNOMENONVAL,
+            		AN_AZIENDA.STRCODICEFISCALE STRCODICEFISCALEAZVAL,
+            		AN_UNITA_AZIENDA.CODCOM CODCOMUNEAZVAL,
+            		AM_MOBILITA_ISCR_APP.CODUACOM CODCOMUNEAZNONVAL,
+            		AM_MOBILITA_ISCR_APP.STRAZCODICEFISCALE STRCODICEFISCALEAZNONVAL
+            		FROM AM_MOBILITA_RIS_DETT RIS, 
+            		AM_MOBILITA_ISCR, AM_MOBILITA_ISCR_APP , AN_LAVORATORE,
+            		AN_AZIENDA, AN_UNITA_AZIENDA,
+            		TS_ERRORE, TS_TIPO_ERRORE
+            		WHERE PRGMOBILITARIS = ?
+            		      AND RIS.PRGMOBILITAISCR = AM_MOBILITA_ISCR.PRGMOBILITAISCR (+)
+            		      AND AM_MOBILITA_ISCR.CDNLAVORATORE = AN_LAVORATORE.CDNLAVORATORE (+)
+            		      AND RIS.PRGMOBILITAISCRAPP = AM_MOBILITA_ISCR_APP.PRGMOBILITAISCRAPP (+)
+            		      AND RIS.CODERRORE = TS_ERRORE.CODERRORE
+            			  AND RIS.CODTIPOERRORE = TS_TIPO_ERRORE.CODTIPOERRORE
+            			  AND AM_MOBILITA_ISCR.PRGAZIENDA = AN_AZIENDA.PRGAZIENDA (+)
+            			  AND AM_MOBILITA_ISCR.PRGAZIENDA = AN_UNITA_AZIENDA.PRGAZIENDA (+)
+            			  AND AM_MOBILITA_ISCR.PRGUNITA = AN_UNITA_AZIENDA.PRGUNITA (+)
+            		ORDER BY PRGMOBILITARISDETT"/>
+            	
+<STATEMENT name="SET_STOP_VALIDAZIONE_MOBILITA_UTENTE"
+            query="UPDATE AM_MOBILITA_RIS 
+                      SET  FLGSTOPUTENTE = 'S',
+                      	   NUMKLOMOBILITARIS = NUMKLOMOBILITARIS + 1 
+                      WHERE PRGMOBILITARIS = ?"/>
+
+<STATEMENT name="GET_RISULTATO_ULTIMA_VALIDAZIONE_MOB_UTENTE"
+            query="SELECT MAX(PRGMOBILITARIS) PRGMOBILITARIS
+            		FROM AM_MOBILITA_RIS
+            		WHERE CDNUTINS = ?"/>
+            		
+<!--Cancellazione di un veccho risultato di una validazione massiva mobilità -->
+<STATEMENT name="DELETE_RISULTATO_DETT_VECCHIA_VALIDAZIONE_MOB"
+            query="DELETE FROM AM_MOBILITA_RIS_DETT
+                   WHERE PRGMOBILITARIS = ?
+"/>
+
+<STATEMENT name="DELETE_RISULTATO_VECCHIA_VALIDAZIONE_MOB"
+            query="DELETE FROM AM_MOBILITA_RIS
+                   WHERE PRGMOBILITARIS = ?
+"/>
+
+<STATEMENT name="GET_TUTTI_MOVIMENTI_LAVORATORE_VALIDAZIONE_MOBILITA"
+            query="select am_movimento.PRGMOVIMENTO, am_movimento.CODTIPOMOV, 
+                am_movimento.PRGMOVIMENTOPREC, am_movimento.PRGMOVIMENTOSUCC,
+				am_movimento.CDNLAVORATORE, am_movimento.PRGAZIENDA, am_movimento.PRGUNITA, 
+				am_movimento.CODORARIO, am_movimento.CODCCNL, DE_CCNL.STRDESCRIZIONE strCCNL,
+				am_movimento.CODGRADO, am_movimento.NUMLIVELLO, am_movimento.CODMANSIONE,
+				mov1.CODGRADO CODGRADOCES, mov1.NUMLIVELLO NUMLIVELLOCES, mov1.CODMANSIONE CODMANSIONECES,
+				am_movimento.CODMONOTEMPO, to_char(am_movimento.DATINIZIOMOV , 'dd/mm/yyyy') as DATINIZIOMOV, 			
+				to_char(am_movimento.DATFINEMOV, 'dd/mm/yyyy') as DATFINEMOV,
+				to_char(am_movimento.DATFINEMOVEFFETTIVA, 'dd/mm/yyyy') as DATFINEMOVEFFETTIVA ,
+				am_movimento.CODMONOTIPOFINE, am_movimento.DATINIZIOMOV as dataSort, 
+				am_movimento.CODTIPOCONTRATTO CODTIPOASS, mov1.CODMVCESSAZIONE
+		from am_movimento, am_movimento mov1, DE_CONTRATTO_COLLETTIVO DE_CCNL
+		where am_movimento.prgMovimentoSucc = mov1.prgMovimento(+)
+			  AND am_movimento.CODCCNL = DE_CCNL.CODCCNL(+)
+			  AND am_movimento.CDNLAVORATORE = ?
+			  AND am_movimento.PRGAZIENDA = ?
+			  AND am_movimento.CODSTATOATTO = 'PR'
+"/>
+
+<STATEMENT name="DELETE_RISULTATO_MOBILITA_APPOGGIO"
+            query="DELETE FROM AM_MOBILITA_RIS_DETT
+                   WHERE PRGMOBILITAISCRAPP = ?
+"/>
+
+<STATEMENT name="DELETE_RISULTATO_MOBILITA_APPOGGIO_VALIDATA"
+            query="DELETE FROM AM_MOBILITA_RIS_DETT
+                   WHERE PRGMOBILITAISCR = ?
+"/>
+
+<STATEMENT name="GET_INFO_AZIENDA_PREC_DA_MOVIMENTO_APPOGGIO"
+            query="SELECT STRCODICEFISCALEAZPREC, CODCOMAZPREC, STRINDIRIZZOAZPREC
+				   FROM AM_MOVIMENTO_APPOGGIO 
+				   WHERE PRGMOVIMENTOAPP = ?
+"/>
+
+<STATEMENT name="GET_INFO_AZIENDA_PREC_PER_TRASFERIMENTO"
+            query="SELECT AZ.PRGAZIENDA, UAZ.PRGUNITA, CODCOM, STRINDIRIZZO 
+            	   FROM AN_AZIENDA AZ, AN_UNITA_AZIENDA UAZ 
+            	   WHERE AZ.PRGAZIENDA = UAZ.PRGAZIENDA 
+			             AND UPPER(AZ.STRCODICEFISCALE) = ?
+"/>
+
+<STATEMENT
+        name="GET_LISTA_UNITA_AZIENDA"
+        query="SELECT U.PRGUNITA, U.STRINDIRIZZO, U.CODCOM
+               FROM AN_UNITA_AZIENDA U
+               WHERE PRGAZIENDA = ?
+"/>
+
+<STATEMENT
+        name="GET_AZIENDA_FROM_CODICEFISCALE"
+        query="SELECT AZ.PRGAZIENDA
+               FROM AN_AZIENDA AZ
+               WHERE UPPER(AZ.STRCODICEFISCALE) = ?
+"/>
+
+<STATEMENT  name="UPDATE_RICH_DISPO_MOBILITA_ISCR"
+        query="UPDATE AM_MOBILITA_ISCR SET 
+                      AM_MOBILITA_ISCR.CDNUTMOD = ?,
+                      AM_MOBILITA_ISCR.DTMMOD = SYSDATE ,
+                      AM_MOBILITA_ISCR.NUMKLOMOBISCR = ? + 1,
+					  FLGSCHEDA = ?
+                WHERE AM_MOBILITA_ISCR.PRGMOBILITAISCR = ?"/>
+
+<STATEMENT  name="DE_PROVINCIA_PER_TARGA"
+        query="select to_char(codprovincia) codprovincia from de_provincia where strtarga = ?"/>
+        
+<STATEMENT  name="GET_DATI_AZI"
+ 			query="SELECT uaz.prgazienda prgazienda, uaz.codccnl ccnlaz, uaz.prgunita prgunita,
+         				  INITCAP (az.strragionesociale) AS strragionesociale,
+         				  az.strpartitaiva strpartitaiva, az.strcodicefiscale strcodicefiscale,
+         				  uaz.strindirizzo strindirizzo,
+         				  INITCAP (com.strdenominazione) AS comune_az, com.codcom codcom,
+         				  prov.stristat prov_az, az.codtipoazienda codtipoazienda,
+         				  detipoaz.strdescrizione descrtipoaz,
+         				  natgiur.strdescrizione natgiuraz,
+         				  az.strnumalbointerinali strnumalbointerinali,
+         				  uaz.strnumregistrocommitt strnumregistrocommitt, uaz.strtel strtel,
+         				  uaz.strfax strfax, com.strcap strcap,
+         				  deccnl.strdescrizione strdescrizioneccnl, 
+         				  uaz.codateco codateco, deatt.strdescrizione strdesatecouaz,
+         				  att2.strdescrizione AS tipoateco, az.strpatinail strpatinail,
+         				  uaz.strnumeroinps strnumeroinps, az.flgdatiok,
+         				  az.codnatgiuridica codnatgiuridica,
+         				  uaz.strriferimentosare strreferente, st.codcpitit codcpi,
+         				  prov.codregione codregione, uaz.STREMAIL strEmail, 
+         				  uaz.STRCFAZESTERA CODFISCAZESTERA, INITCAP (uaz.STRRAGSOCAZESTERA) RAGSOCAZESTERA 
+    				FROM an_azienda az,
+         				 an_unita_azienda uaz,
+         				 de_comune com,
+         				 de_provincia prov,
+         				 de_contratto_collettivo deccnl,
+         				 de_tipo_azienda detipoaz,
+         				 de_attivita deatt,
+         				 de_attivita att2,
+         				 de_nat_giuridica natgiur,
+         				 an_ua_storia_inf st
+   				  WHERE az.prgazienda = uaz.prgazienda
+     					AND uaz.prgazienda = st.prgazienda
+     					AND uaz.prgunita = st.prgunita
+     					AND uaz.codcom = com.codcom(+)
+     					AND com.codprovincia = prov.codprovincia(+)
+     					AND uaz.codccnl = deccnl.codccnl(+)
+     					AND az.codtipoazienda = detipoaz.codtipoazienda(+)
+     					AND uaz.codateco = deatt.codateco(+)
+     					AND az.codnatgiuridica = natgiur.codnatgiuridica(+)
+     					AND att2.codateco(+) = deatt.codpadre
+    	 				AND az.prgazienda = ?
+     					AND uaz.prgunita = ? "/>
+     					
+<STATEMENT
+        name="GET_MV_CESSAZIONE_PREC"
+        query="SELECT CODMVCESSAZIONE
+               FROM AM_MOVIMENTO
+               WHERE PRGMOVIMENTO = ?
+"/>
+
+<STATEMENT
+        name="GET_CONTRATTO_TEMPO"
+        query="SELECT coll.STRCHIAVETABELLAPARTENZA TEMPO 
+        	   FROM de_mv_tipo_ass_coll coll 
+        	   WHERE coll.codlsttabpartenza = 'DE_CONT' 
+        	   		 AND coll.codlsttab = 'TIPOCONT' 
+        	   		 AND STRCHIAVETABELLA = ?
+"/>
+
+<STATEMENT NAME="ST_GETCONFIG_TSARCHIVIA_MOV"
+		QUERY="SELECT PRGCONFIGLOC, STRVALORE, NUM
+				FROM TS_CONFIG_LOC
+		WHERE CODTIPOCONFIG = 'ARCHMOV' AND
+			  TRUNC(SYSDATE) BETWEEN TRUNC(DATINIZIOVAL) AND TRUNC(DATFINEVAL)
+		      AND STRCODRIF = (select codprovinciasil from ts_generale)"/>
+		      
+<STATEMENT NAME="ST_GETCONFIGURAZIONE_PROVINCIA"
+		QUERY="select to_char(ts_config_loc.num) num, ts_generale.codprovinciasil, ts_config_loc.strvalore
+				from ts_config_loc, de_tipo_config, ts_generale
+				where ts_generale.codprovinciasil = ts_config_loc.strcodrif
+				and de_tipo_config.codtipoconfig = ts_config_loc.codtipoconfig
+				and trunc(sysdate) between trunc(de_tipo_config.datinizioval) 
+				and trunc(de_tipo_config.datfineval)
+				and ts_config_loc.codtipoconfig = ?"/>
+				
+<STATEMENT name="GET_MOVIMENTI_SUCC_COMPATIBILI"
+            query="SELECT TO_CHAR(PRGMOVIMENTO) prgMovimentoSucc,
+						TO_CHAR(MOV.PRGAZIENDA) prgAziendaSucc,
+						TO_CHAR(MOV.PRGUNITA) prgUnitaSucc,
+						TO_CHAR(MOV.NUMKLOMOV) numKloMovSucc,
+						TO_CHAR(MOV.datInizioMov, 'DD/MM/YYYY') DATAINIZIOMOVSucc,
+						SUBSTR(MOV.codTipoMov, 1, 1 ) codMonoTipoMovSucc,
+						MOV.codTipoMov codTipoMovSucc,
+						MOV.codMonoTempo,
+						MOV.CODTIPOCONTRATTO CODTIPOASSSucc,
+						MOV.CODMONOTIPOFINE CODMONOTIPOFINESucc,
+						TO_CHAR(MOV.datFineMov) datFineMov,
+						TO_CHAR(MOV.DATFINEMOVEFFETTIVA, 'DD/MM/YYYY') DATFINEMOVEFFETTIVASucc,
+						TO_CHAR(MOV.decRetribuzioneMen) decRetribuzioneMen, TO_CHAR(MOV.decRetribuzioneAnn) decRetribuzioneAnn
+					FROM AM_MOVIMENTO MOV
+					WHERE MOV.CDNLAVORATORE = TO_NUMBER(?)
+						AND MOV.PRGAZIENDA = TO_NUMBER(?)
+						AND MOV.PRGUNITA = TO_NUMBER(?)
+						AND NVL(TO_CHAR(MOV.PRGMOVIMENTOPREC), 'null') = 'null'
+						AND MOV.DATINIZIOMOV >= TO_DATE(?, 'DD/MM/YYYY')
+						AND MOV.PRGMOVIMENTO != TO_NUMBER(?)
+						AND MOV.CODTIPOMOV != 'AVV'
+						AND MOV.CODSTATOATTO = 'PR' 
+                   "/>
+                  
+<STATEMENT name="GET_DOCEX_MOV_APP"
+            query="SELECT MOV.CODTIPODOCEX, 
+            			ST.STRDESCRIZIONE || 
+		  				DECODE(SYSDATE, GREATEST(SYSDATE, ST.DATFINEVAL),' (scaduto)',
+                        LEAST(SYSDATE, ST.DATINIZIOVAL), ' (scaduto)', '') AS STRDESCRTIPODOC,
+            			MOV.STRNUMDOCEX, MOV.CODMOTIVOPERMSOGGEX, 
+            			RIL.STRDESCRIZIONE || 
+		  				DECODE(SYSDATE, GREATEST(SYSDATE, RIL.DATFINEVAL),' (scaduto)',
+                        LEAST(SYSDATE, RIL.DATINIZIOVAL), ' (scaduto)', '') AS STRDESCRMOTIVOPERM,
+			            TO_CHAR(MOV.DATSCADENZA, 'DD/MM/YYYY') AS DATSCADENZA,
+						MOV.FLGSISTEMAZIONEALLOGGIATIVA, MOV.FLGPAGAMENTORIMPATRIO, 
+						MOV.CODQUESTURA,
+						QUEST.STRDESCRIZIONE || 
+		  				DECODE(SYSDATE, GREATEST(SYSDATE, QUEST.DATFINEVAL),' (scaduto)',
+                        LEAST(SYSDATE, QUEST.DATINIZIOVAL), ' (scaduto)', '') AS STRDESCRQUESTURA
+					FROM AM_MOVIMENTO_APPOGGIO MOV
+					LEFT JOIN DE_STATUS_STRANIERO ST ON (MOV.CODTIPODOCEX = ST.CODSTATUS)
+					LEFT JOIN DE_EX_MOTIVO_RIL RIL ON (MOV.CODMOTIVOPERMSOGGEX = RIL.CODMOTIVORIL)
+					LEFT JOIN DE_QUESTURA QUEST ON (MOV.CODQUESTURA = QUEST.CODQUESTURA)
+					WHERE MOV.PRGMOVIMENTOAPP = TO_NUMBER(?) 
+                   "/>
+             
+<STATEMENT name="GET_DOCEX_MOV"
+            query="SELECT MOV.CODTIPODOCEX, 
+            			ST.STRDESCRIZIONE || 
+		  				DECODE(SYSDATE, GREATEST(SYSDATE, ST.DATFINEVAL),' (scaduto)',
+                        LEAST(SYSDATE, ST.DATINIZIOVAL), ' (scaduto)', '') AS STRDESCRTIPODOC,
+            			MOV.STRNUMDOCEX, MOV.CODMOTIVOPERMSOGGEX, 
+            			RIL.STRDESCRIZIONE || 
+		  				DECODE(SYSDATE, GREATEST(SYSDATE, RIL.DATFINEVAL),' (scaduto)',
+                        LEAST(SYSDATE, RIL.DATINIZIOVAL), ' (scaduto)', '') AS STRDESCRMOTIVOPERM,
+			            TO_CHAR(MOV.DATSCADENZA, 'DD/MM/YYYY') AS DATSCADENZA,
+						MOV.FLGSISTEMAZIONEALLOGGIATIVA, MOV.FLGPAGAMENTORIMPATRIO, 
+						MOV.CODQUESTURA,
+						QUEST.STRDESCRIZIONE || 
+		  				DECODE(SYSDATE, GREATEST(SYSDATE, QUEST.DATFINEVAL),' (scaduto)',
+                        LEAST(SYSDATE, QUEST.DATINIZIOVAL), ' (scaduto)', '') AS STRDESCRQUESTURA
+					FROM AM_MOVIMENTO MOV
+					LEFT JOIN DE_STATUS_STRANIERO ST ON (MOV.CODTIPODOCEX = ST.CODSTATUS)
+					LEFT JOIN DE_EX_MOTIVO_RIL RIL ON (MOV.CODMOTIVOPERMSOGGEX = RIL.CODMOTIVORIL)
+					LEFT JOIN DE_QUESTURA QUEST ON (MOV.CODQUESTURA = QUEST.CODQUESTURA)
+					WHERE MOV.PRGMOVIMENTO = TO_NUMBER(?) 
+                   "/>
+                   
+<STATEMENT  name="AMSTR_GET_DE_MB_TIPO_PATRONATO"
+        query="SELECT DE_MB_TIPO.CODMBTIPO CODICE,
+                      case   	   
+						when ma.codlistespec is not null
+						  then (DE_MB_TIPO.STRDESCRIZIONE || ' (Min: ' || mn.des_listespec|| ')' )	     
+						  else DE_MB_TIPO.STRDESCRIZIONE || ' (Min: nessuna corrispondenza) '	 
+				      end as DESCRIZIONE, 
+                      DE_MB_TIPO.DATINIZIOVAL,
+                      DE_MB_TIPO.DATFINEVAL
+                      FROM DE_MB_TIPO 
+                      inner join ma_listespeciali ma on ma.codmbtipo= DE_MB_TIPO.codmbtipo
+					  left join mn_listespeciali mn on mn.cod_listespec= ma.codlistespec
+					  WHERE DE_MB_TIPO.CODMBTIPO IN (
+						SELECT TC.CODICE
+						FROM TS_CONFIG_CODIFICA TC
+						WHERE TC.NOMETABELLA='DE_MB_TIPO' AND TC.CODTIPOCONFIG = 'MBTPLTPT' AND TC.CONFIGURAZIONE = NVL(
+						(SELECT TL.NUM
+						FROM TS_CONFIG_LOC TL
+						WHERE TL.STRCODRIF = (SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE)
+						AND TL.CODTIPOCONFIG = 'MBTPLTPT'),0)
+						) 
+             order by datfineval desc, descrizione asc "/>
+             
+<STATEMENT name="COMBO_TIPO_ENTE_PROMOTORE"
+            query="
+            
+	SELECT codtipoentepromotore as codice,
+	       strdescrizione || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE,
+           DECODE(SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                  &apos;&apos;) as strscaduto
+	FROM DE_TIPO_ENTE_PROMOTORE
+	ORDER BY DECODE(STRSCADUTO,&apos;&apos;,0,1), DESCRIZIONE
+	
+"/>
+
+<STATEMENT name="COMBO_TIPO_SOGG_PROMOTORE"
+            query="
+	
+	SELECT codsoggpromotoremin as codice,
+       strdescrizione || DECODE(SYSDATE,    
+                        GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                        LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+	                    &apos;&apos;) AS descrizione
+	FROM DE_SOGG_PROMOTORE_MIN
+	ORDER BY descrizione
+	
+"/>
+
+<STATEMENT name="COMBO_CATEGORIA_TIROCINANTE"
+            query="SELECT codCategoriaTirocinio as codice,
+                      strdescrizione || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_CATEGORIA_TIROCINIO
+                  order by strDescrizione
+"/>
+
+<STATEMENT name="COMBO_TIPOLOGIA_TIROCINIO"
+            query="SELECT codTipoTirocinioMin as codice,
+                      strdescrizione || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_TIPO_TIROCINIO_MIN
+                  order by strDescrizione
+"/>
+
+<STATEMENT name="CANCELLA_AGEV_MOVIMENTO_APPOGGIO"
+            query="DELETE FROM AM_MOV_AGEV_APP
+                   WHERE prgMovimentoApp = ?
+"/>
+
+<STATEMENT name="CANCELLA_AGEV_MOVIMENTO_ARCHIVIO"
+            query="DELETE FROM AM_MOV_AGEV_APP_ARCHIVIO
+                   WHERE prgMovimentoApp = ?
+"/>
+
+<STATEMENT name="GET_INFO_CONTRATTO_MOVIMENTO"
+            query="select codmonotipo, codcontratto, flgti
+            		from de_tipo_contratto
+					where codtipocontratto = ?
+					and trunc(sysdate) between
+						trunc(datinizioval) and trunc(datfineval)
+"/>
+
+<STATEMENT NAME="GET_DESC_MANSIONE_SPEC"
+	QUERY="select mans.codMansione as codice,
+			mans.STRDESCRIZIONE as strdescrizione,
+			(select PG_UTILS.TROVA_TIPO_MANSIONE(mans.codMansione) from dual) as strDescrizioneTipo
+			from de_mansione mans
+			where mans.codMansione = ?"/>
+			
+<STATEMENT name="COMBO_CODICE_VARIAZIONE"
+            query="select codvariazione as codice,
+				strdescrizione as descrizione,
+				codtipomov
+				from DE_CODICE_VARIAZIONE
+				order by strdescrizione"/>
+				
+<STATEMENT name="GET_CESSAZIONE_ANNULLATA_DOC_DICH"
+   query="SELECT mov.prgMovimento, to_char(mov.datInizioMov, 'dd/mm/yyyy') datInizioMov
+	FROM am_movimento mov
+	WHERE mov.cdnlavoratore = ?
+	  and mov.codTipoMov = 'CES'
+	  and mov.CODSTATOATTO in ('AN', 'AU') 		 
+      and mov.prgAzienda = ?
+      and mov.prgUnita = ?
+      and mov.codmonomovdich in ('D', 'C')
+	  and mov.datiniziomov &lt; to_date(?, 'dd/mm/yyyy')
+	  order by mov.dtmins desc
+"/>
+
+<STATEMENT
+        name="SELECT_CERCA_LIVELLO_FROM_CCNL"
+        query="select de_livello_retribuzione.numlivello, de_livello_retribuzione.tipolivello, de_livello_retribuzione.strdescrizione, de_livello_retribuzione.mensilita
+               from de_livello_retribuzione
+               where de_livello_retribuzione.codccnl = ?
+                 and trunc(sysdate) between trunc(de_livello_retribuzione.datInizioVal) and trunc (nvl(de_livello_retribuzione.datFineVal, sysdate))
+                 order by de_livello_retribuzione.numlivello, de_livello_retribuzione.strdescrizione"
+/>            
+<STATEMENT name="GET_LIVELLO_FROM_CCNL" query="
+	              select lr.numlivello, lr.tipolivello, lr.codccnl, lr.strdescrizione, lr.LORDOMENSILE, lr.MENSILITA, lr.DIVISOREORARIO 
+				  from de_livello_retribuzione lr
+                  where lr.codccnl = UPPER(?) and lr.numlivello = UPPER(?)
+                  and trunc(sysdate) between trunc(lr.datInizioVal) and trunc (nvl(lr.datFineVal, sysdate)) "/>
+                  
+ <STATEMENT name="GET_CODORARIO" query="
+	             select codmonoorario from de_orario where codorario = ? "/>   
+	             
+<STATEMENT name="GET_CCNL_DE_LIVELLO_RETRIBUZIONE" query="
+	              select de_livello_retribuzione.numlivello, de_livello_retribuzione.tipolivello, de_livello_retribuzione.codccnl, de_livello_retribuzione.strdescrizione  , DE_LIVELLO_RETRIBUZIONE.LORDOMENSILE, DE_LIVELLO_RETRIBUZIONE.MENSILITA , DE_LIVELLO_RETRIBUZIONE.DIVISOREORARIO 
+                   from de_livello_retribuzione
+                  where de_livello_retribuzione.codccnl = ? "/>	                 
+	             
+ <STATEMENT name="GET_MOVIMENTO_DA_SANARE" query="
+                    select am_movimento.prgmovimento, am_movimento.codorario, am_movimento.numoresett, am_movimento.codccnl, am_movimento.numlivello 
+                   from am_movimento where prgmovimento = ? "/> 	                       
+                  

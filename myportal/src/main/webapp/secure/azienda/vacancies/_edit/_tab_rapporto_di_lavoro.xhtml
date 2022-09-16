@@ -1,0 +1,196 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/partial_tab.xhtml">
+
+	<ui:param name="form_id" value="rapporto_di_lavoro"></ui:param>
+	<ui:param name="tabBean" value="#{vaRapportoDiLavoroBean}"></ui:param>
+	<ui:param name="deleteId" value="#{tabBean.data.idVaDatiVacancy}"></ui:param>
+
+	<ui:define name="form_data">
+		<script type="text/javascript">
+		
+		function closeResolverInfoDiv(){
+			$(resolvInfoDiv).hide();
+		}
+		function inizializeResolver(){
+			json_url="#{request.contextPath}/secure/rest/resolve/contrattiInfo";
+			resolvInfoDiv=$(document.createElement('div')).css('display','none');
+			resolvInfoDivContent=$(document.createElement('div'));
+			resolvInfoDivCloser=$(document.createElement('div')).css('text-align','right')
+			.append(
+					$(document.createElement('div')).attr('tabindex',0).append('X').addClass('buttonStyle').button()
+					.click(closeResolverInfoDiv).keypress(closeResolverInfoDiv)
+					 );
+			resolvInfoDiv.append(resolvInfoDivContent).append(resolvInfoDivCloser);
+			jqMasterDiv=jq("#{form_id}:tipologieContratto");
+			$(jqMasterDiv).after(resolvInfoDiv);
+			}
+		
+		var isResolver2init=true;
+		function resolveCod(cod) { 
+			try {
+				if(isResolver2init){
+					//inizializzo il componente
+					inizializeResolver();
+					isResolver2init=false;
+					}
+			} catch(e) {
+				//console.log('error:'+e);
+				inizializeResolver();
+				isResolver2init=false;
+			}
+			settings={
+				    my:        "right top",
+				    at:        "right bottom",
+				    of:        jqMasterDiv+ " .token-input-list",
+				    offset:		"0 0",
+				    collision: "none none"
+				};
+			$('#contrattoInfoDialog').dialog('close');
+			$.getJSON(json_url, ({term: cod,}),
+					function(data, textStatus, jqXHR) {
+						$('#contrattoInfoDialog').dialog({ 
+								title: data.titolo,
+								close: function(event, ui){
+									//console.log('jqMasterDiv:'+jqMasterDiv);
+									//$('[id^="'+jqMasterDiv+'"] .token-input-input-token').focus();
+									$(jqMasterDiv+" .token-input-input-token").children().focus();
+								 }
+						 });
+						$('#contrattoInfoContent').text(data.descrizione);
+						$('#contrattoInfoDialog').dialog('open');
+						//console.log('data:'+JSON.stringify(data));
+						//$(resolvInfoDiv).text(data.descrizione);
+						//$(resolvInfoDiv).toggle();
+			  });
+		}
+		
+		function buildTokenFormatter(item) { 
+				//alert('item:'+JSON.stringify(item));
+				resolvInfoBtn=$(document.createElement('img')).attr('src','#{request.contextPath}/resources/images/info-icon-20.png');
+				$(resolvInfoBtn).attr('onclick','resolveCod("'+item.id+'")').attr('onkeypress','resolveCod("'+item.id+'")');
+				$(resolvInfoBtn).attr('onclick','resolveCod("'+item.id+'")');
+				/*
+				$(resolvInfoBtn).click(function () {
+						$.getJSON(json_url, {term: item.id,},
+							function(data, textStatus, jqXHR) {
+									console.log('data:'+JSON.stringify(data));
+									$(resolvInfoDiv).text(data.descrizione);
+									$(resolvInfoDiv).toggle();
+								  });
+				    });
+			    */
+				resolvInfoElemP=$(document.createElement('p'));
+				//.append(item.label);
+				//alert('resolvInfoElemP:'+JSON.stringify(resolvInfoElemP));
+				//alert('resolvInfoElemP:'+JSON.stringify(resolvInfoElemP));
+				resolvInfoElemDummy=$(document.createElement('div'));
+				resolvInfoElemLi=$(document.createElement('li')).attr('onkeypress','resolveCod("'+item.id+'")');
+				resolvInfoElemLi.append($(resolvInfoElemP).append(resolvInfoBtn).append(item.label));
+				resolvInfoElemDummy.append(resolvInfoElemLi);
+				//alert('resolvInfoElemFinal:'+JSON.stringify(resolvInfoElemFinal));
+				//resolvInfoElemFinal=$(resolvInfoElemLi).append(resolvInfoElemP);
+				//.append(resolvInfoBtn);
+				formatted = $(resolvInfoElemDummy).html();
+				//console.log('formatted:'+JSON.stringify(formatted));
+				return formatted;
+				//return "<li>" + item[this.propertyToSearch] + "</li>"; 
+			}
+
+			function infoResolverBuilder(codSel) {
+				codSel=$(jqCod2resolve).val();
+				if(codSel){
+					$('#contrattoInfoDialog').dialog('close');
+					$.getJSON(json_url, {term: codSel,},
+						function(data, textStatus, jqXHR) {
+								$('#contrattoInfoDialog').dialog({ 
+										title: data.titolo,
+										close: function(event, ui){
+											//console.log('event CLOSE');
+											$(jqMasterDiv).focus();
+										 }
+								 });
+								$('#contrattoInfoContent').text(data.descrizione);
+								$('#contrattoInfoDialog').dialog('open');
+								//console.log('data:'+JSON.stringify(data));
+								//$(resolvInfoDiv).text(data.descrizione);
+								//$(resolvInfoDiv).toggle();
+							  });
+					}
+			    }
+		    </script>
+		<h:panelGrid id="insert_form" columns="2" cellspacing="10">
+
+			<cc:selectOneMenu required="false"
+				label="Retribuzione annua lorda (€)"
+				value="#{tabBean.data.retribuzione.id}"
+				editingMode="#{tabBean.editing}"
+				valueDescription="#{tabBean.data.retribuzione.descrizione}">
+				<f:selectItems value="#{tabBean.retribuzioni}" />
+			</cc:selectOneMenu>
+			<h:panelGroup></h:panelGroup>
+
+			<cc:inputToken label="Tipologia di contratto" showButton="true"
+				id="tipologieContratto" value="#{tabBean.data.tipologieContratto}"
+				editingMode="#{tabBean.editing}" rendered="#{not tabBean.usaDecodificheSil()}"
+				extraParamJson="tokenFormatter:buildTokenFormatter,">
+				<f:selectItems value="#{tabBean.tipologieContratto}" />
+				<f:validator validatorId="contrattoValidator" for="function" />
+			</cc:inputToken>
+			<cc:inputToken label="Tipologia di contratto" showButton="true"
+				id="tipologieContrattoSil" value="#{tabBean.data.tipologieContratto}"
+				editingMode="#{tabBean.editing}" rendered="#{tabBean.usaDecodificheSil()}"
+				extraParamJson="tokenFormatter:buildTokenFormatter,">
+				<f:selectItems value="#{tabBean.tipologieContratto}" />
+				<f:validator validatorId="contrattoValidatorSil" for="function" />
+			</cc:inputToken>
+			
+			<h:panelGroup>
+				<cc:inputTextarea style="width: 75%" id="infoContratti" label="Info contratti" 
+					maxlength="2000" value="#{tabBean.data.infoContratti}" richTextMode="false" 
+					rows="3" required="false" rendered="#{tabBean.usaDecodificheSil()}"/>
+			</h:panelGroup>
+
+			<cc:inputToken label="Turni" value="#{tabBean.data.turni}"
+				showButton="true" id="turni" editingMode="#{tabBean.editing}">
+				<f:selectItems value="#{tabBean.turni}" />
+			</cc:inputToken>
+			<h:panelGroup>
+				<cc:inputTextarea style="width: 75%" id="InfoOrariTurni" label="Info orari - turni" 
+					maxlength="2000" value="#{tabBean.data.infoOrariTurni}" richTextMode="false" 
+					rows="3" required="false" rendered="#{tabBean.usaDecodificheSil()}"/>
+			</h:panelGroup>
+
+			<cc:inputToken label="Orari" value="#{tabBean.data.orari}"
+				showButton="true" id="orari" editingMode="#{tabBean.editing}">
+				<f:selectItems value="#{tabBean.orari}" />
+			</cc:inputToken>
+			<h:panelGroup></h:panelGroup>
+		</h:panelGrid>
+
+		<f:event listener="#{tabBean.checkDatiCliclavoroListener}"
+			type="postValidate" />
+
+		<div id="contrattoInfoDialog" style="display: none;">
+			<div id="contrattoInfoContent" />
+		</div>
+	</ui:define>
+
+	<ui:define name="javascript_data">
+		<script type="text/javascript"> 
+
+			$(function() {
+				disegnaBottoni();
+
+				attachListener();
+				$( "#contrattoInfoDialog" ).dialog({
+					autoOpen: false,
+					modal: true
+					});
+			});
+		</script>
+	</ui:define>
+</ui:composition>

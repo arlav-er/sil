@@ -1,0 +1,468 @@
+<PAGE distributed="false" name="SapVerificaEsistenzaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_SapCallVerificaEsistenzaSap" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="SapVerificaEsistenzaPage" target="M_SapCallVerificaEsistenzaSap">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST"
+					value="M_SapCallVerificaEsistenzaSap" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="SapPortaleVerificaEsistenzaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_SapCallVerificaEsistenzaSapPortale" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="SapPortaleVerificaEsistenzaPage" target="M_SapCallVerificaEsistenzaSapPortale">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST"
+					value="M_SapCallVerificaEsistenzaSapPortale" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="SapPortaleVisualizzaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_SapCallVisualizzaSapPortale" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="SapPortaleVisualizzaPage" target="M_SapCallVisualizzaSapPortale">
+			<CONDITIONS>
+				<PARAMETER name="idSap" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="SapPortaleImportaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_SapCallVisualizzaSapPortale" />
+		<MODULE keep="false" name="M_GetProssimoLavoratore" />
+		<MODULE keep="false" name="M_InsertSAPLavoratoreAnagIndirizzi" />
+		<MODULE keep="false" name="M_COOP_PutLavoratoreIR" />
+		<MODULE keep="false" name="M_GetLavoratoreAnag" />
+		<MODULE keep="false" name="M_GetLavoratoreIndirizzi" />
+		<MODULE keep="false" name="M_GetLavoratoreRecapiti" />
+		<MODULE name="M_SelectSAPForPro"/>
+		<MODULE name="M_SelectSAPEspLav"/>
+		<MODULE keep="false" name="M_ListConoscenzeLing" />
+		<MODULE name="M_SelectSAPConInf"/>
+		<MODULE name="M_SelectSAPAbilitaPatenti" />
+		<MODULE name="M_SelectSAPAbilitaPatentini" />
+		<MODULE name="M_SelectSAPAbilitaAlbi" />
+		<MODULE name="M_SelectSAPTitStu"/>
+
+		<!-- SIL: decodifiche -->
+		<MODULE keep="false" name="M_ListSAPGradoLingue" />
+		<MODULE keep="false" name="M_ListSAPC2GradoLingue" />
+		<MODULE keep="false" name="M_ListOrari" />
+		<MODULE keep="false" name="M_ListTurni" />
+		<MODULE keep="false" name="M_GetStatiTitoliStudio" />
+		<MODULE keep="false" name="M_ListSAPEspTipiContratto" />
+		<MODULE name="M_ListSAP01AbilitaPatenti" />
+		<MODULE name="M_ListSAPPTPropOrari" />
+		<MODULE name="M_ListSAPFTPropOrari" />
+
+		<!-- SIL: insert -->
+		<MODULE name="M_InsertSAPTitStu"/>
+		<MODULE name="M_InsertSAPForPro"/>
+		<MODULE name="M_InsertSAPLingue"/>
+		<MODULE name="M_InsertSAPConInf"/>
+		<MODULE name="M_InsertSAPAbilita"/>
+		<MODULE name="M_InsertSAPEspLav"/>
+		<MODULE name="M_InsertSAPPropen"/>
+		
+	</MODULES>
+	<DEPENDENCIES>
+
+		<!-- SAP -->
+		<DEPENDENCE source="SapPortaleImportaPage" target="M_SapCallVisualizzaSapPortale">
+			<CONDITIONS>
+				<PARAMETER name="idSap" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="SapPortaleImportaPage" target="M_GetLavoratoreAnag">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="SapPortaleImportaPage" target="M_GetLavoratoreIndirizzi">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="SapPortaleImportaPage" target="M_GetLavoratoreRecapiti">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>		
+		
+		<DEPENDENCE source="SapPortaleImportaPage"	target="M_GetProssimoLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="insert_lav" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetProssimoLavoratore" target="M_InsertSAPLavoratoreAnagIndirizzi">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="insert_lav" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_InsertSAPLavoratoreAnagIndirizzi" target="M_COOP_PutLavoratoreIR">
+			<CONDITIONS>
+				<PARAMETER name="coopAbilitata" scope="SERVICE_REQUEST"	value="true" />
+				<PARAMETER name="M_INSERTSAPLAVORATOREANAGINDIRIZZI.operationResult"
+					scope="SERVICE_RESPONSE" value="SUCCESS" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore" />
+				<PARAMETER name="codCPI" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_InsertSAPLavoratoreAnagIndirizzi.codCPI" />					
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="M_InsertSAPLavoratoreAnagIndirizzi" target="M_GetLavoratoreAnag">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		
+		<DEPENDENCE source="M_InsertSAPLavoratoreAnagIndirizzi" target="M_GetLavoratoreIndirizzi">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_InsertSAPLavoratoreAnagIndirizzi" target="M_GetLavoratoreRecapiti">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>						
+		
+		<!-- SIL: decodifiche -->
+		<DEPENDENCE source="SapPortaleImportaPage" target="M_ListSAPGradoLingue">
+			<CONDITIONS />
+		</DEPENDENCE>
+		<DEPENDENCE source="SapPortaleImportaPage" target="M_ListSAPC2GradoLingue">
+			<CONDITIONS />
+		</DEPENDENCE>
+		<DEPENDENCE source="SapPortaleImportaPage" target="M_ListOrari">
+			<CONDITIONS />
+		</DEPENDENCE>
+		<DEPENDENCE source="SapPortaleImportaPage" target="M_ListTurni">
+			<CONDITIONS />
+		</DEPENDENCE>
+		<DEPENDENCE source="SapPortaleImportaPage" target="M_GetStatiTitoliStudio">
+			<CONDITIONS />
+		</DEPENDENCE>
+		<DEPENDENCE source="SapPortaleImportaPage" target="M_ListSAPEspTipiContratto">
+			<CONDITIONS />
+		</DEPENDENCE>
+		<DEPENDENCE source="SapPortaleImportaPage" target="M_ListSAP01AbilitaPatenti">
+			<CONDITIONS />
+		</DEPENDENCE>		
+		<DEPENDENCE source="SapPortaleImportaPage" target="M_ListSAPPTPropOrari">
+			<CONDITIONS />
+		</DEPENDENCE>		
+		<DEPENDENCE source="SapPortaleImportaPage" target="M_ListSAPFTPropOrari">
+			<CONDITIONS />
+		</DEPENDENCE>		
+
+		<!-- SIL: insert -->
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPTitStu">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/>  
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="allFrm"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPTitStu">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/> 
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="frmTitStu"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPForPro">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/>  
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="allFrm"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPForPro">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/> 
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="frmForPro"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPLingue">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/>  
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="allFrm"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPLingue">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/> 
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="frmLingue"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPConInf">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/>  
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="allFrm"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPConInf">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/> 
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="frmConInf"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPAbilita">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/>  
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="allFrm"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPAbilita">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/> 
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="frmAbilita"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPEspLav">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/>  
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="allFrm"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPEspLav">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/> 
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="frmEspLav"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>			
+		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPPropen">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/>  
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="allFrm"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_InsertSAPPropen">
+			<CONDITIONS>
+				<PARAMETER name="operation" scope="SERVICE_REQUEST" value="AF_DEFINED"/> 
+				<PARAMETER name="manage" scope="SERVICE_REQUEST" value="frmPropen"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>			
+						
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_SelectSAPTitStu">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_SelectSAPConInf">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>	
+		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_SelectSAPForPro">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_SelectSAPEspLav">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_SelectSAPAbilitaPatenti">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_SelectSAPAbilitaPatentini">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_SelectSAPAbilitaAlbi">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_ListConoscenzeLing">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag.ROWS.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>			
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="RicercaErroriSapPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ELENCOCPI" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaErroriSapPage" target="M_ELENCOCPI"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ListaErroriSapPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ListaErroriInvioSap" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaErroriSapPage" target="M_ListaErroriInvioSap"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ImportaSapVerificaEsistenzaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ImportaSapCallVerificaEsistenzaSap" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ImportaSapVerificaEsistenzaPage" target="M_ImportaSapCallVerificaEsistenzaSap">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_ImportaSapCallVerificaEsistenzaSap" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- IMPORTAZIONE SAP DA UN FILE XML O FILE ZIP -->
+<PAGE name="ImportazioneMassivaSAPPage" scope="REQUEST">
+	<MODULES>
+<!-- 		<MODULE name="M_CheckSap2"/> -->
+    	<MODULE name="M_CONFIG_IMPORTAZIONE_SAP"/>
+    	<MODULE name="M_ImportazioneMassivaSAP"/>
+    	<MODULE name="M_GetRisultatiImportazioneSAP"/>
+    </MODULES>
+    <DEPENDENCIES>
+<!--     	<DEPENDENCE source="ImportazioneMassivaSAPPage" target="M_CheckSap2"> -->
+<!--     	</DEPENDENCE> -->
+    	<DEPENDENCE source="ImportazioneMassivaSAPPage" target="M_CONFIG_IMPORTAZIONE_SAP">
+    	</DEPENDENCE>
+      	<DEPENDENCE source="M_CONFIG_IMPORTAZIONE_SAP" target="M_ImportazioneMassivaSAP">
+			<CONDITIONS>
+				<PARAMETER name="IMPORTA" scope="SERVICE_REQUEST" value="true"/>
+				<PARAMETER name="M_CONFIG_IMPORTAZIONE_SAP.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CONFIG_IMPORTAZIONE_SAP" target="M_GetRisultatiImportazioneSAP">
+			<CONDITIONS>
+				<PARAMETER name="VISUALIZZARISULTATI" scope="SERVICE_REQUEST" value="S"/>
+				<PARAMETER name="M_CONFIG_IMPORTAZIONE_SAP.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_ImportazioneMassivaSAP" target="M_GetRisultatiImportazioneSAP">
+			<CONSEQUENCES>
+		    	<PARAMETER name="PROGRESSIVO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_ImportazioneMassivaSAP.PROGRESSIVO"/>
+		    </CONSEQUENCES>
+		</DEPENDENCE>
+    </DEPENDENCIES>
+</PAGE>

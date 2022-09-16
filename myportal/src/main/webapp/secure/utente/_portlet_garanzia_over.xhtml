@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/template_portlet.xhtml">
+
+	<ui:define name="portlet_title">
+		<h:outputText value="#{txt['cittadino.portlet.garanzia_over.titolo']}"
+			escape="false" />
+	</ui:define>
+
+	<ui:define name="portlet_content">
+
+		<div style="text-align: justify;">
+			<h:outputText
+				value="#{txt['cittadino.portlet.garanzia_over.descrizione']}"
+				escape="false" />
+			<br />
+			<br />
+			
+			<ui:fragment rendered="#{empty ygOverPortletBean.adesione and utilsBean.isUmbria()}">
+				<h:link
+					rendered="#{utenteHomeBean.checkAbilitazioneVisibile('ua_btn')}" 
+					styleClass="buttonStyle"
+					outcome="/secure/utente/yg/garanzia_over/informativa.xhtml"
+					title="Aderisci a UMBRIATTIVA ADULTI">Aderisci a UMBRIATTIVA ADULTI</h:link>
+			</ui:fragment>	
+			
+			<ui:fragment rendered="#{empty ygOverPortletBean.adesione and !utilsBean.isUmbria()}">
+				<h:link 
+					styleClass="buttonStyle"
+					outcome="/secure/utente/yg/garanzia_over/informativa.xhtml"
+					title="Aderisci">Aderisci a Pacchetto Adulti</h:link>
+			</ui:fragment>	
+			
+			<ui:fragment rendered="#{not empty ygOverPortletBean.adesione 
+				and empty ygOverPortletBean.adesione.dtAdesione}">
+				<p><b>#{ygOverAdesioneBean.adesione.strMessInterfaccia}</b></p>
+				<h:link 
+					rendered="#{utenteHomeBean.checkAbilitazioneVisibile('ua_btn')}" 
+					styleClass="buttonStyle"
+					outcome="/secure/utente/yg/garanzia_over/adesione.xhtml"
+					title="Nuova adesione">Invia una nuova richiesta</h:link>
+			</ui:fragment>	
+			
+			<ui:fragment rendered="#{not empty ygOverPortletBean.adesione 
+				and not empty ygOverPortletBean.adesione.dtAdesione}">
+				<ui:fragment rendered="#{not ygOverPortletBean.adesione.flgPresoInCarico}">
+					<p><b>La tua iscrizione a Umbriattiva Adulti è avvenuta in modo corretto. 
+						A seguito della tua adesione, sarà cura di  ARPAL Umbria effettuare ulteriori verifiche
+						del possesso dei requisiti  necessari per beneficiare degli strumenti previsti da Umbriattiva.
+						Ricordati di prendere un appuntamento col CPI. In mancanza di tale appuntamento
+						non potrai attivare i percorsi di politica attiva previsti da tale programma.</b></p>
+					<ui:fragment rendered="#{!utilsBean.isUmbria()}">
+						<p style="color: red;"><b>In caso di assenza di date disponibili per la prenotazione, 
+							gli utenti verranno prenotati dal Centro per l'Impiego in ordine cronologico 
+							di adesione e degli appuntamenti fissati ne sarà data successiva comunicazione.</b></p>
+					</ui:fragment>
+					<ui:fragment rendered="#{utilsBean.isUmbria()}">
+						<p style="color: red;"><b>In caso di assenza di date disponibili per la prenotazione, attendere la disponibilità di nuove date che saranno pubblicate in questa sezione.</b></p>
+					</ui:fragment>					
+					
+					<br />
+					<h:link styleClass="buttonStyle"
+						outcome="/secure/utente/yg/garanzia_over/appuntamento.xhtml"
+						title="Prenota appuntamento">Prenota appuntamento</h:link>
+				</ui:fragment>
+				
+				<ui:fragment rendered="#{ygOverPortletBean.adesione.flgPresoInCarico}">
+					<p><b>La tua iscrizione a Umbriattiva Adulti è avvenuta in modo corretto.
+					A seguito della tua adesione, sarà cura di  ARPAL Umbria effettuare ulteriori 
+					verifiche del possesso dei requisiti  necessari per beneficiare degli strumenti previsti da Umbriattiva.
+						Hai un appuntamento fissato per il
+						<h:outputText value="#{ygOverPortletBean.appuntamento.data}">
+							<f:convertDateTime pattern="dd.MM.yyyy" />
+						</h:outputText></b>
+					</p>
+					<br />
+					<h:link styleClass="buttonStyle"
+						outcome="/secure/utente/yg/garanzia_over/appuntamento.xhtml"
+						title="Dettagli appuntamento">Dettagli appuntamento</h:link>
+				</ui:fragment>	
+			</ui:fragment>			
+		</div>
+				
+		<script type="text/javascript">
+				$(function() {
+					disegnaBottoni();
+				});
+		</script>
+	</ui:define>
+</ui:composition>

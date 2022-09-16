@@ -1,0 +1,828 @@
+<STATEMENT name="SQL_COMBO_ENTE_PREVIDENZIALE"
+            query="SELECT codente as codice, STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+				   FROM de_ente_previdenziale 
+				   order by STRDESCRIZIONE
+"/> 
+<STATEMENT name="SQL_COMBO_CCNL"
+            query="SELECT CODCCNL as codice, STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+				   FROM DE_CONTRATTO_COLLETTIVO 
+				   order by STRDESCRIZIONE
+"/> 
+<STATEMENT name="SQL_COMBO_DE_CESSAZIONE"
+            query="select CODMVCESSAZIONE as codice,
+					STRDESCRIZIONE || DECODE(GREATEST(SYSDATE, DATFINEVAL), SYSDATE,  &apos;(scaduto) &apos;, &apos;&apos;) as descrizione
+					from de_mv_cessazione
+				order by STRDESCRIZIONE
+"/> 
+<STATEMENT name="SQL_COMBO_DE_TIPO_TRASF"
+            query="select CODTIPOTRASF as codice,
+					STRDESCRIZIONE || DECODE(GREATEST(SYSDATE, DATFINEVAL), SYSDATE,  &apos;(scaduto) &apos;, &apos;&apos;) as descrizione
+					from DE_TIPO_TRASF
+				order by STRDESCRIZIONE
+"/> 
+<!-- REDDITO DI CITTADINANZA -->
+<STATEMENT name="INSERT_AMRDC" 
+	query="INSERT
+    INTO AM_RDC
+      (
+      	PRGRDC ,
+        STRSESSO ,
+        STRCAPRES ,
+        STRCOGNOME ,
+        CODCOMRES ,
+        DTMMOD ,
+        STRNOME ,
+        STRCODICEFISCALE ,
+        DATRENDICONTAZIONE ,
+        CODMONORUOLO ,
+        STRCFRICHIEDENTE ,
+        CODCOMNASC ,
+        STRINDIRIZZODOM ,
+        STRCAPDOM ,
+        STREMAIL ,
+        DATDOMANDA ,
+        STRTEL ,
+        CODCPIMIN ,
+        STRPROTOCOLLOINPS ,
+        CODCITTADINANZA ,
+        STRCODSAP ,
+        DATINVIO ,
+        STRIDCOMUNICAZIONE ,
+        CODSTATOINPS ,
+        CODCOMDOM ,
+        CDNUTINS ,
+        CDNLAVORATORE ,
+        DATNASC ,
+        STRINDIRIZZORES ,
+        CDNUTMOD ,
+        DTMINS,
+        STRFONTE,
+        DATTRASFORMAZIONE,
+        CODTIPODOMANDA,
+        DATVARIAZIONESTATO
+      )
+      VALUES
+      (
+      	?,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        sysdate ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        sysdate,
+        ?,
+        to_date(?, 'dd/mm/yyyy'),
+        ?,
+        to_date(?, 'dd/mm/yyyy')  
+)	
+"/> 
+<STATEMENT name="LavoratoreNotificheRDC"
+	query="SELECT rdc.PRGRDC,
+			  rdc.STRCODICEFISCALE,
+			  rdc.STRCOGNOME,
+			  rdc.STRNOME,
+			  rdc.CODMONORUOLO,
+			  DECODE(rdc.CODMONORUOLO, 'R', 'Richiedente',
+                    'M', 'Altro membro nucleo familiare',
+                    'T', 'Tutor',
+                    '') as DESCRCODMONORUOLO, 
+			  TO_CHAR(rdc.DATDOMANDA, 'dd/mm/yyyy') AS STRDATDOMANDA,
+			  TO_CHAR(rdc.DATRENDICONTAZIONE, 'dd/mm/yyyy') as STRDATRENDICONTAZIONE,
+			  rdc.STRPROTOCOLLOINPS,
+			  rdc.CODSTATOINPS,
+			  rdc.STRTEL
+			FROM AM_RDC rdc 
+     		 WHERE   rdc.CDNLAVORATORE = ? or
+       			upper(rdc.STRCFRICHIEDENTE) = ( 
+       				select upper(lav.STRCODICEFISCALE) from AN_LAVORATORE lav
+         			where lav.CDNLAVORATORE = ?
+      			)
+			ORDER BY rdc.DATDOMANDA desc, rdc.PRGRDC DESC
+"/>
+<STATEMENT name="INSERT_AMRDC_ANLAVORATORE" query="
+	INSERT INTO AN_LAVORATORE (
+	  CDNLAVORATORE,    
+	STRCODICEFISCALE ,
+	STRCOGNOME,        
+	STRNOME   ,       
+	STRSESSO  ,             
+	DATNASC    ,              
+	CODCOMNAS   ,            
+	CODCITTADINANZA  ,
+	CODCOMRES        ,
+	CODCOMDOM         ,      
+	CDNUTINS     ,     
+	DTMINS     ,      
+	CDNUTMOD ,          
+	DTMMOD,
+	STRINDIRIZZORES,
+	STRCAPRES,
+	STRINDIRIZZODOM,
+	STRCAPDOM,
+	STREMAIL,
+	STRCELL,
+	FLGINVIOSMS,
+	STRTELALTRO
+	)
+	VALUES (
+	?,
+  UPPER(?),
+  UPPER(?),
+  UPPER(?),
+  ?,
+   TO_DATE(?,'DD/MM/YYYY'),
+   ?,
+   ?,
+   ?,
+   ?,
+   ?,
+  SYSDATE,
+    ?,
+  SYSDATE,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?,
+  ?
+)
+"/>   
+<STATEMENT name="NotificaRDC_NumKlo"
+	query="SELECT PRGRDC, CDNLAVORATORE,  NUMKLORDC
+		FROM AM_RDC
+       	WHERE  PRGRDC = ? 
+"/>  
+<STATEMENT name="UPDATE_AMRDC_CDNLAV" query="
+	UPDATE AM_RDC SET CDNLAVORATORE = ?, NUMKLORDC = ? +1, 
+		DTMMOD = sysdate, CDNUTMOD = ? 
+	    WHERE PRGRDC = ?
+"/>
+<STATEMENT name="NotificaRDCFromPrg"
+	query="SELECT  rdc.PRGRDC,  rdc.STRIDCOMUNICAZIONE, 
+			   TO_CHAR( rdc.DATINVIO, 'dd/mm/yyyy') AS STRDATINVIO,
+			    rdc.STRPROTOCOLLOINPS,   rdc.CODSTATOINPS, 
+			    mn_rdc_stato_inps.strdescrizione AS strdescrstatoinps,
+			   TO_CHAR( rdc.DATDOMANDA, 'dd/mm/yyyy') AS STRDATDOMANDA,
+			   TO_CHAR( rdc.DATRENDICONTAZIONE, 'dd/mm/yyyy') AS STRDATRENDICONTAZIONE,
+			    rdc.STRCFRICHIEDENTE,  rdc.CODMONORUOLO,
+			    rdc.STRCODICEFISCALE,  rdc.STRCOGNOME,   rdc.STRNOME,
+			    rdc.CODCITTADINANZA,  rdc.CODCOMNASC,
+		       TO_CHAR( rdc.DATNASC, 'dd/mm/yyyy') AS STRDATNASC,   rdc.STRSESSO, 
+		        rdc.STRINDIRIZZORES,  rdc.CODCOMRES,  rdc.STRCAPRES,
+		        rdc.STRINDIRIZZODOM,  rdc.CODCOMDOM,  rdc.STRCAPDOM, 
+		        rdc.STRCODSAP,  rdc.CODCPIMIN,  rdc.STRTEL,  rdc.STREMAIL,  rdc.CDNLAVORATORE,
+		       DE_CITTADINANZA.STRDESCRIZIONE AS NAZIONALITA,TO_CHAR( rdc.DTMINS, 'dd/mm/yyyy') AS STRDATARICEZIONESIL,
+		       com1.STRDENOMINAZIONE AS STRCOMNAS,
+		       com2.STRDENOMINAZIONE AS STRCOMRES,
+		       com3.STRDENOMINAZIONE AS STRCOMDOM,
+		       mn_st_cpi.STRDENOMINAZIONE AS DESCRCPIMIN,
+		       DECODE( rdc.CODMONORUOLO, 'R', 'Richiedente',
+                    'M', 'Altro membro nucleo familiare',
+                    'T', 'Tutor',
+                    '') as DESCRCODMONORUOLO,          
+        		t1.STRCOGNOME || ' ' || t1.STRNOME || ' - ' ||  TO_CHAR(rdc.DTMINS, 'dd/mm/yyyy hh24:mi') as utenteInserimento,
+        		t2.STRCOGNOME || ' ' || t2.STRNOME || ' - ' ||  TO_CHAR(rdc.DTMMOD, 'dd/mm/yyyy hh24:mi') as utenteModifica,
+        		rdc.STRFONTE, TO_CHAR( rdc.DATTRASFORMAZIONE, 'dd/mm/yyyy') AS STRDATAPASSAGGIO,
+        		rdc.CODTIPODOMANDA, 
+        		TO_CHAR( rdc.DATVARIAZIONESTATO, 'dd/mm/yyyy') AS STRDATAVARIAZIONESTATO
+		FROM AM_RDC rdc
+		left join DE_CITTADINANZA on ( rdc.CODCITTADINANZA = DE_CITTADINANZA.CODCITTADINANZA)
+        left join de_comune com1 on ( rdc.CODCOMNASC = com1.CODCOM)
+        left join de_comune com2 on ( rdc.CODCOMRES = com2.CODCOM)
+        left join de_comune com3 on ( rdc.CODCOMDOM = com3.CODCOM)
+        left join mn_st_cpi on ( rdc.CODCPIMIN = mn_st_cpi.CODCPIMIN)
+        left join ts_utente t1 on (  rdc.CDNUTINS = t1.CDNUT)
+        left join ts_utente t2 on ( rdc.CDNUTMOD = t2.CDNUT) 
+        left join mn_rdc_stato_inps on (rdc.CODSTATOINPS = mn_rdc_stato_inps.CODSTATOINPS)
+       	WHERE  rdc.PRGRDC =? 
+"/>
+<STATEMENT name="ComboRuoloRdc"
+	query="select 'R' as codice, 'Richiedente' as descrizione from dual 
+			union 
+			select 'M' as codice, 'Altro membro nucleo familiare' as descrizione from dual 
+			union 
+			select 'T' as codice, 'Tutor' as descrizione from dual 
+			order by descrizione desc
+"/>
+<STATEMENT name="UltimaNotificaRDC"
+	query="select  PRGRDC,
+			  STRCODICEFISCALE,
+			  STRCFRICHIEDENTE,
+			  CODMONORUOLO,
+			  DESCRCODMONORUOLO, 
+			  STRDATDOMANDA,
+			  STRPROTOCOLLOINPS,
+			  CODSTATOINPS 
+        from(
+			SELECT rdc.PRGRDC,
+			  rdc.STRCODICEFISCALE,
+			  rdc.STRCFRICHIEDENTE,
+			  rdc.CODMONORUOLO,
+			  DECODE(rdc.CODMONORUOLO, 'R', 'Richiedente',
+                    'M', 'Altro membro nucleo familiare',
+                    'T', 'Tutor',
+                    '') as DESCRCODMONORUOLO, 
+			  TO_CHAR(rdc.DATDOMANDA, 'dd/mm/yyyy') AS STRDATDOMANDA,
+			  rdc.STRPROTOCOLLOINPS,
+			  rdc.CODSTATOINPS
+			FROM AM_RDC rdc 
+     		WHERE   rdc.CDNLAVORATORE = ?
+     			 or upper(rdc.STRCODICEFISCALE) = (select  upper(STRCODICEFISCALE) from AN_LAVORATORE where CDNLAVORATORE = ?)
+			ORDER BY rdc.DATDOMANDA desc, rdc.PRGRDC DESC
+      ) where rownum = 1
+"/>
+<STATEMENT name="NotificheRDC_PerStorico"
+	query="SELECT rdc.PRGRDC,
+			  rdc.NUMKLORDC,
+			  rdc.CDNLAVORATORE,
+			  trunc(rdc.DATINVIO) as DATINVIO 
+			FROM AM_RDC rdc 
+     		 WHERE   upper(rdc.STRCODICEFISCALE) = upper(?) AND upper(rdc.STRPROTOCOLLOINPS) = upper(?) AND upper(rdc.CODMONORUOLO) = upper(?)
+			ORDER BY rdc.DATINVIO desc, rdc.PRGRDC DESC
+"/>
+<STATEMENT name="INSERT_AMRDC_STORICO" 
+	query="INSERT
+    INTO AM_RDC_STORICO
+      (
+      	PRGRDCSTORICO ,
+      	PRGRDC,
+        STRSESSO ,
+        STRCAPRES ,
+        STRCOGNOME ,
+        CODCOMRES ,
+        STRNOME ,
+        STRCODICEFISCALE ,
+        DATRENDICONTAZIONE ,
+        CODMONORUOLO ,
+        STRCFRICHIEDENTE ,
+        CODCOMNASC ,
+        STRINDIRIZZODOM ,
+        STRCAPDOM ,
+        STREMAIL ,
+        DATDOMANDA ,
+        STRTEL ,
+        CODCPIMIN ,
+        STRPROTOCOLLOINPS ,
+        CODCITTADINANZA ,
+        STRCODSAP ,
+        DATINVIO ,
+        STRIDCOMUNICAZIONE ,
+        CODSTATOINPS ,
+        CODCOMDOM ,
+        CDNLAVORATORE ,
+        DATNASC ,
+        STRINDIRIZZORES,
+        STRFONTE,
+        DATTRASFORMAZIONE,
+        CODTIPODOMANDA,
+        DATVARIAZIONESTATO
+      )
+      VALUES
+      (
+      	?,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy'),
+        ? ,
+        to_date(?, 'dd/mm/yyyy')
+)	
+"/> 
+<STATEMENT name="UPDATE_AMRDC" 
+	query="UPDATE AM_RDC
+    SET STRSESSO         = ? ,
+      STRCAPRES          = ? ,
+      STRCOGNOME         = ? ,
+      NUMKLORDC          = ? +1 ,
+      CODCOMRES          = ? ,
+      DTMMOD             = sysdate ,
+      STRNOME            = ? ,
+      STRCODICEFISCALE   = ? ,
+      DATRENDICONTAZIONE =  to_date(?, 'dd/mm/yyyy')  ,
+      CODMONORUOLO       = ? ,
+      STRCFRICHIEDENTE   = ? ,
+      CODCOMNASC         = ? ,
+      STRINDIRIZZODOM    = ? ,
+      STRCAPDOM          = ? ,
+      STREMAIL           = ? ,
+      DATDOMANDA         =  to_date(?, 'dd/mm/yyyy')  ,
+      STRTEL             = ? ,
+      CODCPIMIN          = ? ,
+      STRPROTOCOLLOINPS  = ? ,
+      CODCITTADINANZA    = ? ,
+      STRCODSAP          = ? ,
+      DATINVIO           =  to_date(?, 'dd/mm/yyyy')  ,
+      STRIDCOMUNICAZIONE = ? ,
+      CODSTATOINPS       = ? ,
+      CODCOMDOM          = ? ,
+      DATNASC            =  to_date(?, 'dd/mm/yyyy')  ,
+      STRINDIRIZZORES    = ? ,
+      CDNUTMOD           = ? ,
+      STRFONTE 			 = ? ,
+      DATTRASFORMAZIONE  =  to_date(?, 'dd/mm/yyyy'),
+      CODTIPODOMANDA = ?,
+      DATVARIAZIONESTATO  = to_date(?, 'dd/mm/yyyy')
+    WHERE PRGRDC         = ?
+"/> 
+<STATEMENT name="INSERT_LOG_COMUNICAZIONE_AM_RDC"
+		   query="INSERT INTO TS_WS_ERR
+				  		 (PRGWSERR, 
+				   DTMELABORAZIONE, 
+				       CODMONOTIPO, 
+		    STRCODICECOMUNICAZIONE, 
+		    TXTTRACCIATOXML,
+		    STRSQLCODE,
+		    STRSQLERRM)VALUES(
+		    ?, SYSDATE, ?,?, TO_CLOB(?), ?, ?)"/>
+<STATEMENT name="INSERT_AMRDC_STORICO_MEMBRI" 
+	query="INSERT
+    INTO AM_RDC_STORICO
+      (
+      	PRGRDCSTORICO ,
+      	PRGRDC,
+        STRSESSO ,
+        STRCAPRES ,
+        STRCOGNOME ,
+        CODCOMRES ,
+        STRNOME ,
+        STRCODICEFISCALE ,
+        DATRENDICONTAZIONE ,
+        CODMONORUOLO ,
+        STRCFRICHIEDENTE ,
+        CODCOMNASC ,
+        STRINDIRIZZODOM ,
+        STRCAPDOM ,
+        STREMAIL ,
+        DATDOMANDA ,
+        STRTEL ,
+        CODCPIMIN ,
+        STRPROTOCOLLOINPS ,
+        CODCITTADINANZA ,
+        STRCODSAP ,
+        DATINVIO ,
+        STRIDCOMUNICAZIONE ,
+        CODSTATOINPS ,
+        CODCOMDOM ,
+        CDNLAVORATORE ,
+        DATNASC ,
+        STRINDIRIZZORES ,
+        STRFONTE,
+        DATTRASFORMAZIONE,
+        CODTIPODOMANDA,
+        DATVARIAZIONESTATO
+      )
+      VALUES
+      (
+      	?,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        sysdate ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy'),
+        ? ,
+        to_date(?, 'dd/mm/yyyy')
+)	
+"/> 
+<STATEMENT name="UPDATE_AMRDC_MEMBRI" 
+	query="UPDATE AM_RDC
+    SET STRSESSO         = ? ,
+      STRCAPRES          = ? ,
+      STRCOGNOME         = ? ,
+      NUMKLORDC          = ? +1 ,
+      CODCOMRES          = ? ,
+      DTMMOD             = sysdate ,
+      STRNOME            = ? ,
+      STRCODICEFISCALE   = ? ,
+      DATRENDICONTAZIONE =  to_date(?, 'dd/mm/yyyy')  ,
+      CODMONORUOLO       = ? ,
+      STRCFRICHIEDENTE   = ? ,
+      CODCOMNASC         = ? ,
+      STRINDIRIZZODOM    = ? ,
+      STRCAPDOM          = ? ,
+      STREMAIL           = ? ,
+      DATDOMANDA         =  to_date(?, 'dd/mm/yyyy')  ,
+      STRTEL             = ? ,
+      CODCPIMIN          = ? ,
+      STRPROTOCOLLOINPS  = ? ,
+      CODCITTADINANZA    = ? ,
+      STRCODSAP          = ? ,
+      DATINVIO           =  sysdate ,
+      CODSTATOINPS       = ? ,
+      CODCOMDOM          = ? ,
+      DATNASC            =  to_date(?, 'dd/mm/yyyy')  ,
+      STRINDIRIZZORES    = ? ,
+      CDNUTMOD           = ? ,
+      STRFONTE 			 = ? ,
+      DATTRASFORMAZIONE  =  to_date(?, 'dd/mm/yyyy') ,
+      CODTIPODOMANDA     = ?,
+      DATVARIAZIONESTATO  =  to_date(?, 'dd/mm/yyyy')
+    WHERE PRGRDC         = ?
+"/> 
+<STATEMENT name="INSERT_AMRDC_MEMBRI" 
+	query="INSERT
+    INTO AM_RDC
+      (
+      	PRGRDC ,
+        STRSESSO ,
+        STRCAPRES ,
+        STRCOGNOME ,
+        CODCOMRES ,
+        DTMMOD ,
+        STRNOME ,
+        STRCODICEFISCALE ,
+        DATRENDICONTAZIONE ,
+        CODMONORUOLO ,
+        STRCFRICHIEDENTE ,
+        CODCOMNASC ,
+        STRINDIRIZZODOM ,
+        STRCAPDOM ,
+        STREMAIL ,
+        DATDOMANDA ,
+        STRTEL ,
+        CODCPIMIN ,
+        STRPROTOCOLLOINPS ,
+        CODCITTADINANZA ,
+        STRCODSAP ,
+        DATINVIO ,
+        STRIDCOMUNICAZIONE ,
+        CODSTATOINPS ,
+        CODCOMDOM ,
+        CDNUTINS ,
+        CDNLAVORATORE ,
+        DATNASC ,
+        STRINDIRIZZORES ,
+        CDNUTMOD ,
+        DTMINS,
+        STRFONTE,
+        DATTRASFORMAZIONE,
+        CODTIPODOMANDA,
+        DATVARIAZIONESTATO
+      )
+      VALUES
+      (
+      	?,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        sysdate ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+       	sysdate ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        to_date(?, 'dd/mm/yyyy') ,
+        ? ,
+        ? ,
+        sysdate,
+        ? ,
+        to_date(?, 'dd/mm/yyyy'),
+         ? ,
+        to_date(?, 'dd/mm/yyyy')
+)	
+"/> 
+<STATEMENT name="GET_CPI_MIN_FROM_CODCPI" 
+	query="SELECT mn.codcpimin
+			FROM mn_st_cpi mn
+			WHERE mn.codcpimin IN
+ 		 (SELECT DISTINCT CODCPIMIN FROM DE_CPI WHERE CODCPI= ?)"
+/>
+<STATEMENT name="RDC_ESISTENZA_CODICE_COMUNE"
+	query="select CODCOM from DE_COMUNE where upper(codcom) = upper(?) 
+"/>
+<!-- Eventi Condizionalità RDC -->
+<STATEMENT name="INSERT_AM_CONDIZIONALITA" 
+	query="INSERT
+    INTO AM_CONDIZIONALITA
+      (
+        DATDOMANDA ,
+        CODEVENTOCOND ,
+        STRPROTOCOLLOINPS ,
+        STRNOTE ,
+        CDNUTINS ,
+        CDNLAVORATORE ,
+        DTMMOD ,
+        CODCPI ,
+        PRGCONDIZIONALITA ,
+        DATEVENTO ,
+        PRGPERCORSO,
+        CDNUTMOD ,
+        PRGCOLLOQUIO ,
+        DTMINS ,
+        STRCFOPERATORE ,
+        CODDOMCONDIZIONALITA
+      )
+      VALUES
+      (
+        to_date(?, 'dd/mm/yyyy') ,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        sysdate ,
+        ?,
+        ?,
+        to_date(?, 'dd/mm/yyyy') ,
+        ?,
+        ?,
+        ?,
+        sysdate ,
+        ?,
+        ?
+      )
+"/> 
+<STATEMENT name="UPDATE_AM_CONDIZIONALITA" 
+	query="UPDATE AM_CONDIZIONALITA
+    SET DATDOMANDA          = to_date(?, 'dd/mm/yyyy') ,
+      CODEVENTOCOND         = ? ,
+      STRPROTOCOLLOINPS     = ? ,
+      STRNOTE               = ? ,    
+      DTMMOD                = sysdate ,
+      DATEVENTO             = to_date(?, 'dd/mm/yyyy') ,
+      PRGPERCORSO           = ? ,
+      CDNUTMOD              = ? ,
+      PRGCOLLOQUIO          = ? ,
+      STRCFOPERATORE        = ? ,
+      CODDOMCONDIZIONALITA  = ?,
+      NUMKLOCOND            = ? + 1
+    WHERE PRGCONDIZIONALITA = ?
+"/> 
+<STATEMENT name="GET_AM_CONDIZIONALITA" 
+	query="SELECT 	TO_CHAR(DATDOMANDA, 'dd/mm/yyyy') as STRDATADOMANDA ,
+        STRPROTOCOLLOINPS ,
+        AM_CONDIZIONALITA.STRNOTE ,
+        AN_LAVORATORE.STRCODICEFISCALE ,
+        TO_CHAR(DATEVENTO, 'dd/mm/yyyy') as STRDATEVENTO ,
+        STRCFOPERATORE ,
+        DE_CPI.CODCPIMIN || ' - ' || DE_CPI.STRDESCRIZIONEMIN as STRCPI,
+        TO_CHAR(DATINVIO, 'dd/mm/yyyy hh24:mi') as STRDATINVIO,
+        DE_SERVIZIO.STRDESCRIZIONE as TIPOPROGRAMMA,
+        DE_DOM_CONDIZIONALITA.CODDOMCONDIZIONALITA  || '$' || nvl(DE_DOM_CONDIZIONALITA.STRNOMETABELLA, '') as TIPODOMANDA,
+       	DE_DOM_CONDIZIONALITA.CODDOMCONDIZIONALITA as CODTIPODOMANDA,
+        AM_CONDIZIONALITA.CODEVENTOCOND as TIPOEVENTO,
+	    TO_CHAR(OR_COLLOQUIO.DATCOLLOQUIO, 'dd/mm/yyyy') as STRDATINIZIOPROGRAMMA ,
+	    TO_CHAR(OR_COLLOQUIO.DATFINEPROGRAMMA, 'dd/mm/yyyy') as STRDATFINEPROGRAMMA ,
+	    t1.STRCOGNOME || ' ' || t1.STRNOME || ' - ' ||  TO_CHAR(AM_CONDIZIONALITA.DTMINS, 'dd/mm/yyyy hh24:mi') as utenteInserimento,
+        t2.STRCOGNOME || ' ' || t2.STRNOME || ' - ' ||  TO_CHAR(AM_CONDIZIONALITA.DTMMOD, 'dd/mm/yyyy hh24:mi') as utenteModifica ,
+        MN_YG_EVENTO.STRDESCRIZIONE as STRESITOMIN,
+        DE_ESITO.STRDESCRIZIONE as STRESITO,
+        DE_AZIONE.STRDESCRIZIONE as STRATTIVITA,
+        TO_CHAR(OR_PERCORSO_CONCORDATO.DATAVVIOAZIONE, 'dd/mm/yyyy') as STRDATAVVIO,
+        TO_CHAR(OR_PERCORSO_CONCORDATO.dateffettiva, 'dd/mm/yyyy') as STRDATEFFETTIVA,
+        AM_CONDIZIONALITA.NUMKLOCOND, AM_CONDIZIONALITA.PRGPERCORSO, AM_CONDIZIONALITA.PRGCOLLOQUIO,
+        (trunc(sysdate) - trunc(datinvio)) +1  as differenzaGiorni,
+        TO_CHAR(datinviocanc, 'dd/mm/yyyy hh24:mi') as strdatinviocanc
+       FROM AM_CONDIZIONALITA 
+  	   INNER JOIN DE_CONDIZIONALITA ON (DE_CONDIZIONALITA.CODEVENTO = AM_CONDIZIONALITA.CODEVENTOCOND)
+       INNER JOIN DE_DOM_CONDIZIONALITA ON (DE_DOM_CONDIZIONALITA.CODDOMCONDIZIONALITA = AM_CONDIZIONALITA.CODDOMCONDIZIONALITA)
+       INNER JOIN DE_CPI ON (DE_CPI.CODCPI = AM_CONDIZIONALITA.CODCPI)
+       INNER JOIN AN_LAVORATORE on (AN_LAVORATORE.CDNLAVORATORE = AM_CONDIZIONALITA.CDNLAVORATORE)
+       LEFT OUTER JOIN TS_UTENTE t1 on ( AM_CONDIZIONALITA.CDNUTINS = t1.CDNUT)
+       LEFT OUTER JOIN TS_UTENTE t2 on ( AM_CONDIZIONALITA.CDNUTMOD = t2.CDNUT)
+       LEFT OUTER JOIN OR_COLLOQUIO ON (OR_COLLOQUIO.PRGCOLLOQUIO = AM_CONDIZIONALITA.PRGCOLLOQUIO)
+       LEFT OUTER JOIN DE_SERVIZIO ON (DE_SERVIZIO.CODSERVIZIO = OR_COLLOQUIO.CODSERVIZIO)
+       LEFT OUTER JOIN OR_PERCORSO_CONCORDATO ON (OR_PERCORSO_CONCORDATO.PRGPERCORSO = AM_CONDIZIONALITA.PRGPERCORSO)
+       LEFT OUTER JOIN DE_AZIONE ON (DE_AZIONE.PRGAZIONI = OR_PERCORSO_CONCORDATO.PRGAZIONI)
+       LEFT OUTER JOIN DE_AZIONE_RAGG  ON (DE_AZIONE_RAGG.PRGAZIONIRAGG = DE_AZIONE.PRGAZIONERAGG)
+       LEFT OUTER JOIN DE_ESITO  ON (DE_ESITO .CODESITO  = OR_PERCORSO_CONCORDATO.CODESITO) 
+	   LEFT OUTER JOIN MN_YG_EVENTO on (DE_ESITO .CODEVENTOMIN = MN_YG_EVENTO.CODEVENTO)
+    WHERE PRGCONDIZIONALITA = ?
+"/> 
+<STATEMENT name="LIST_AM_CONDIZIONALITA" 
+	query="SELECT 
+	        PRGCONDIZIONALITA ,
+	        TO_CHAR(DATEVENTO, 'dd/mm/yyyy') as STRDATEVENTO ,
+	        AM_CONDIZIONALITA.CODEVENTOCOND || ' - ' || DE_CONDIZIONALITA.STRDESCRIZIONE as TIPOEVENTO,
+	        STRPROTOCOLLOINPS ,
+	        DE_DOM_CONDIZIONALITA.STRDESCRIZIONE as TIPODOMANDA,
+	        DE_CPI.CODCPIMIN || ' - ' || DE_CPI.STRDESCRIZIONEMIN as STRCPI,
+	        case when DATINVIOCANC is null then
+	        	TO_CHAR(AM_CONDIZIONALITA.DATINVIO, 'dd/mm/yyyy hh24:mi') 
+            else 
+            	'Evento annullato ' || TO_CHAR(AM_CONDIZIONALITA.DATINVIOCANC, 'dd/mm/yyyy hh24:mi') 
+            end as STRDATINVIO,
+	        DE_SERVIZIO.STRDESCRIZIONE as TIPOPROGRAMMA,
+	        TO_CHAR(OR_COLLOQUIO.DATCOLLOQUIO, 'dd/mm/yyyy') as STRDATINIZIOPROGRAMMA ,
+	        TO_CHAR(OR_COLLOQUIO.DATFINEPROGRAMMA, 'dd/mm/yyyy') as STRDATFINEPROGRAMMA,
+	        DE_CPI.CODCPI        
+       FROM AM_CONDIZIONALITA 
+       INNER JOIN DE_CONDIZIONALITA ON (DE_CONDIZIONALITA.CODEVENTO = AM_CONDIZIONALITA.CODEVENTOCOND)
+       INNER JOIN DE_DOM_CONDIZIONALITA ON (DE_DOM_CONDIZIONALITA.CODDOMCONDIZIONALITA = AM_CONDIZIONALITA.CODDOMCONDIZIONALITA)
+       INNER JOIN DE_CPI ON (DE_CPI.CODCPI = AM_CONDIZIONALITA.CODCPI)
+       LEFT OUTER JOIN OR_COLLOQUIO ON (OR_COLLOQUIO.PRGCOLLOQUIO = AM_CONDIZIONALITA.PRGCOLLOQUIO)
+       LEFT OUTER JOIN DE_SERVIZIO ON (DE_SERVIZIO.CODSERVIZIO = OR_COLLOQUIO.CODSERVIZIO)
+       WHERE AM_CONDIZIONALITA.CDNLAVORATORE = ? 
+       ORDER BY AM_CONDIZIONALITA.DATEVENTO DESC, AM_CONDIZIONALITA.CODEVENTOCOND
+"/> 
+<STATEMENT name="COMBO_DE_CONDIZIONALITA"
+            query="select CODEVENTO as codice,
+					CODEVENTO || ' - ' || STRDESCRIZIONE || DECODE(GREATEST(SYSDATE, DATFINEVAL), SYSDATE,  &apos;(scaduto) &apos;, &apos;&apos;) as descrizione
+					from DE_CONDIZIONALITA
+				order by CODEVENTO
+"/> 
+<STATEMENT name="COMBO_DE_DOM_CONDIZIONALITA"
+            query="SELECT CODDOMCONDIZIONALITA || '$' || nvl(STRNOMETABELLA, '') as codice,
+					STRDESCRIZIONE || DECODE(GREATEST(SYSDATE, DATFINEVAL), SYSDATE,  &apos;(scaduto) &apos;, &apos;&apos;) as descrizione
+					from DE_DOM_CONDIZIONALITA
+				order by STRDESCRIZIONE
+"/>
+<STATEMENT name="GET_CF_OPERATORE_CPI"
+	query="  select tl.STRVALORE
+				from ts_config_loc tl
+				where tl.codtipoconfig='CFCONDIZ'
+				and tl.strcodrif in (select com.codprovincia
+				from de_cpi cpi
+				inner join de_comune com on (cpi.codcom=com.codcom)
+				where cpi.codcpi=?
+				)" 
+/>
+<STATEMENT name="GET_INFO_LAV_COND"
+	query="select lav.STRCODICEFISCALE, de_cpi.CODCPIMIN ||' - ' || de_cpi.STRDESCRIZIONEMIN as cpiTitolare, de_cpi.CODCPI , de_cpi.CODCPIMIN
+				from an_lavoratore lav
+				inner join AN_LAV_STORIA_INF on (AN_LAV_STORIA_INF.CDNLAVORATORE = lav.CDNLAVORATORE and AN_LAV_STORIA_INF.datfine is null)
+				inner join de_cpi on (AN_LAV_STORIA_INF.CODCPITIT = de_cpi.codcpi)
+				where lav.CDNLAVORATORE = ?" 
+/>
+<STATEMENT name="LIST_AM_CONDIZIONALITA_FROM_PERCORSO" 
+	query="SELECT 
+	        PRGCONDIZIONALITA ,
+	        TO_CHAR(DATEVENTO, 'dd/mm/yyyy') as STRDATEVENTO ,
+	        AM_CONDIZIONALITA.CODEVENTOCOND || ' - ' || DE_CONDIZIONALITA.STRDESCRIZIONE as STRTIPOEVENTO,
+	        case when DATINVIOCANC is null then
+	        	TO_CHAR(AM_CONDIZIONALITA.DATINVIO, 'dd/mm/yyyy hh24:mi') 
+            else 
+            	'Evento annullato ' || TO_CHAR(AM_CONDIZIONALITA.DATINVIOCANC, 'dd/mm/yyyy hh24:mi') 
+            end as STRDATINVIO, de_cpi.codcpi
+       FROM AM_CONDIZIONALITA 
+       INNER JOIN DE_CONDIZIONALITA ON (DE_CONDIZIONALITA.CODEVENTO = AM_CONDIZIONALITA.CODEVENTOCOND)
+       INNER JOIN de_cpi ON ( de_cpi.codcpi = am_condizionalita.codcpi )
+       WHERE AM_CONDIZIONALITA.CDNLAVORATORE = ? 
+   	    AND AM_CONDIZIONALITA.PRGPERCORSO = ? 
+   	    AND AM_CONDIZIONALITA.PRGCOLLOQUIO = ?
+       ORDER BY AM_CONDIZIONALITA.DATEVENTO DESC, AM_CONDIZIONALITA.CODEVENTOCOND
+"/> 
+<STATEMENT name="GET_CPI_MINISTERIALE_UTLOG"
+	query="select de_cpi.CODCPIMIN ||' - ' || de_cpi.STRDESCRIZIONEMIN as descrCPI, de_cpi.CODCPI , de_cpi.CODCPIMIN
+				from  de_cpi  
+				where de_cpi.codcpi=?" 
+/>
+<STATEMENT name="LIST_STORICO_NOTIFICHE_RDC" 
+	query="SELECT PRGRDC,
+  CDNLAVORATORE,
+  STRCODICEFISCALE,
+  STRCOGNOME,
+  STRNOME,
+  CODMONORUOLO,
+  DECODE(CODMONORUOLO, 'R', 'Richiedente', 'M', 'Altro membro nucleo familiare', '') AS DESCRCODMONORUOLO,
+  TO_CHAR(DATDOMANDA, 'dd/mm/yyyy')                                                  AS STRDATDOMANDA,
+  TO_CHAR(DATRENDICONTAZIONE, 'dd/mm/yyyy')                                          AS STRDATRENDICONTAZIONE,
+  TO_CHAR(DTMINS, 'dd/mm/yyyy')                                          AS STRDATARICEZIONESIL,
+  STRPROTOCOLLOINPS,
+  CODSTATOINPS,
+  STRTEL
+FROM AM_RDC rdc
+WHERE upper(STRCODICEFISCALE) = upper(?) OR  upper(STRCFRICHIEDENTE) = upper(?) 
+ORDER BY  DTMINS ASC, DATRENDICONTAZIONE DESC,
+  STRPROTOCOLLOINPS ASC,
+  DATDOMANDA DESC
+"/> 
+<STATEMENT name="ComboStatoRdc"
+	query="SELECT
+	    codstatoinps     AS codice,
+	    strdescrizione   AS descrizione
+		FROM
+		    mn_rdc_stato_inps
+		WHERE
+		    trunc(sysdate) BETWEEN trunc(datinizioval) AND trunc(datfineval)
+"/>
+<STATEMENT name="UPDATE_AM_CONDIZIONALITA_INVIO_ANPAL" 
+	query="UPDATE AM_CONDIZIONALITA
+    SET    
+      DTMMOD                = sysdate ,
+      DATINVIO              = sysdate ,
+      CDNUTMOD              = ? ,
+      NUMKLOCOND            = ? + 1
+    WHERE PRGCONDIZIONALITA = ?
+"/>
+
+<STATEMENT name="COMBO_DE_DOM_CONDIZIONALITA_NoTabella"
+            query="SELECT CODDOMCONDIZIONALITA as codice,
+					STRDESCRIZIONE || DECODE(GREATEST(SYSDATE, DATFINEVAL), SYSDATE,  &apos;(scaduto) &apos;, &apos;&apos;) as descrizione
+					from DE_DOM_CONDIZIONALITA
+				order by STRDESCRIZIONE
+"/>
+
+<STATEMENT name="UPDATE_AM_CONDIZIONALITA_CANCELLA_EVENTO" 
+	query="UPDATE AM_CONDIZIONALITA
+    SET    
+      DTMMOD                = sysdate ,
+      DATINVIOCANC          = sysdate ,
+      CDNUTINVIOCANC		= ? ,
+      CDNUTMOD              = ? ,
+      NUMKLOCOND            = ? + 1
+    WHERE PRGCONDIZIONALITA = ?
+"/>
+<STATEMENT name="ComboTipoDomDescrInpsRdc"
+            query="select CODTIPODOMINPS as codice,
+					CODTIPODOMINPS || ' - ' || STRDESCRIZIONE || DECODE(GREATEST(SYSDATE, DATFINEVAL), SYSDATE,  &apos;(scaduto) &apos;, &apos;&apos;) as descrizione
+					from MN_RDC_TIPODOM_INPS
+				order by CODTIPODOMINPS
+"/> 

@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WL5G3N0:definitions name="RicercaCO" 
+targetNamespace="http://servizi.lavoro.gov.it/RicercaCO/2.0" 
+xmlns:WL5G3N0="http://schemas.xmlsoap.org/wsdl/" 
+xmlns:WL5G3N1="http://servizi.lavoro.gov.it/RicercaCO/2.0" 
+xmlns:WL5G3N2="http://www.w3.org/2006/05/addressing/wsdl" 
+xmlns:WL5G3N3="http://schemas.xmlsoap.org/wsdl/soap/">
+<!-- 
+NOTA BENE
+IL PRESENTE FILE è STATO CORRETTO A MANO A PARTIRE DA QUELLO MINISTERIALE
+CHE NON CONSENTIVA DI GENERARE CORRETTAMENTE LE CLASSI JAVA
+PERTANTO NON DEVE ESSERE SOSTITUITO, MA ADEGUATO.
+MODIFICHE: 
+SO - apportato il suffisso _Type per ST e CT
+FV - apposto il prefisso "tns:" per gli elementi che non venivano referenziati correttamente
+ -->
+  <WL5G3N0:types>
+    <xsd:schema elementFormDefault="qualified" 
+    targetNamespace="http://servizi.lavoro.gov.it/RicercaCO/2.0" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" 
+    xmlns:wsa10="http://www.w3.org/2005/08/addressing" 
+    xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" 
+    xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" 
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" 
+    xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+    xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" 
+    xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" 
+    xmlns:tns="http://servizi.lavoro.gov.it/RicercaCO/2.0" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" 
+    xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/">
+      <xsd:simpleType name="CodiceFiscale_Type">
+        <xsd:restriction base="xs:string">
+          <xsd:pattern value="[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]"/>
+          <xsd:minLength value="16"/>
+          <xsd:maxLength value="16"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="CodiceFiscaleProvvisorio_Type">
+        <xsd:restriction base="xs:string">
+          <xsd:pattern value="[0-9]{11}"/>
+          <xsd:minLength value="11"/>
+          <xsd:maxLength value="11"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="CodiceFiscaleSoggettoFisico_Type">
+        <xsd:union memberTypes="tns:CodiceFiscale_Type tns:CodiceFiscaleProvvisorio_Type"/>
+      </xsd:simpleType>
+      <xsd:element name="COPerLavoratore">
+        <xsd:complexType>
+          <xsd:sequence>
+          	<xsd:element minOccurs="1" name="CodiceFiscale"
+          		type="tns:CodiceFiscaleSoggettoFisico_Type" />
+          	<xsd:element minOccurs="1" name="DataInizio"
+          		type="xs:date" />
+          	<xsd:element minOccurs="1" name="DataFine" type="xs:date" />
+          	
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="COPerLavoratoreResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" name="COPerLavoratoreResult" nillable="true">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element minOccurs="0" maxOccurs="1" name="COLavoratore" type="tns:COLavoratore_Type" nillable="false"/>
+                  <xsd:element minOccurs="1" maxOccurs="1" name="Esito" type="tns:Esito_Type"/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:complexType name="Esito_Type">
+        <xsd:sequence>
+          <xsd:element name="Codice" type="xs:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Messaggio" type="xs:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="COLavoratore_Type">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="UNILAV" type="tns:UNILAV_Type" nillable="false"/>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="UNIMARE" type="tns:UNIMARE_Type" nillable="false"/>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="UNISOMM" type="tns:UNISOMM_Type" nillable="false"/>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="UNIURG" type="tns:UNIURG_Type" nillable="false"/>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="VARDATORI" type="tns:VARDATORI_Type" nillable="false"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="UNILAV_Type">
+        <xsd:sequence>
+          <xsd:element minOccurs="1" maxOccurs="1" name="DatoreLavoro_CodiceFiscale" type="xs:string" nillable="false"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="DatoreLavoro_Denominazione" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="DatoreLavoro_PA" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="DatoreLavoro_SedeLavoro_CAP" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="DatoreLavoro_SedeLavoro_ComuneNazione" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="DatoreLavoro_SedeLavoro_Indirizzo" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="DatoreLavoro_Settore" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="DatoreLavoroDistaccatario_CodiceFiscale" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Invio_CodiceComunicazione" type="xs:string" nillable="false"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Invio_CodiceComunicazionePrecedente" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Invio_ForzaMaggiore" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Lavoratore_Cittadinanza" type="xs:string" nillable="false"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Lavoratore_CodiceFiscale" type="xs:string" nillable="false"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Lavoratore_Cognome" type="xs:string" nillable="false"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Lavoratore_Nascita_ComuneNazione" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Lavoratore_Nascita_Data" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Lavoratore_Nome" type="xs:string" nillable="false"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Lavoratore_Sesso" type="xs:string" nillable="false"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="LavoratoreCoobbligato_CodiceFiscale" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_Agevolazioni" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_CCNL" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_Cessazione_CodiceCausa" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_Cessazione_Data" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_DataFine" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_DataInizio" type="xs:string" nillable="false"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_EntePrevidenziale" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_LavoroAgricoltura" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_OreSettimanaliMedie" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_Proroga_DataFine" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_SocioLavoratore" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_TipologiaContrattuale" type="xs:string" nillable="false"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_TipoOrario" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_Trasformazione_CodiceTrasformazione" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="Rapporto_Trasformazione_Data" type="xs:string" nillable="true"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="SYS_DATARICEZIONE" type="xs:dateTime" nillable="false"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="SYS_DATARIFERIMENTO" type="xs:dateTime" nillable="false"/>
+          <xsd:element minOccurs="1" maxOccurs="1" name="SYS_TIPOMODULO" type="xs:string" nillable="false"/>
+        </xsd:sequence>
+        <xsd:attribute name="rowOrder" type="xs:int"/>
+      </xsd:complexType>
+      <xsd:complexType name="UNIMARE_Type">
+        <xsd:sequence>
+          <xsd:element name="DatoreLavoro_CodiceFiscale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="DatoreLavoro_Denominazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="DatoreLavoro_Settore" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoroDistaccatario_CodiceFiscale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_SedeLavoro_NaveTipo" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_SedeLavoro_NaveInternazionale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_SedeLavoro_NaveStazzaMin5Ton" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_SedeLavoro_NaveDenominazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_SedeLavoro_NaveNIMO" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_SedeLavoro_NaveNIscrizione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_SedeLavoro_NaveLuogoIscr" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_RapportoTerraComandata" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_SedeLavoro_TerraComuneNazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_SedeLavoro_TerraCAP" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_SedeLavoro_TerraIndirizzo" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Invio_CodiceComunicazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Invio_CodiceComunicazionePrecedente" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Invio_ForzaMaggiore" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Lavoratore_Cittadinanza" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Lavoratore_CodiceFiscale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Lavoratore_Cognome" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Lavoratore_Nascita_ComuneNazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Lavoratore_Nascita_Data" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Lavoratore_Nome" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Lavoratore_Sesso" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Lavoratore_CategoriaIscrizione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Lavoratore_NumeroMatricola" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Lavoratore_LuogoMatricola" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_Agevolazioni" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_CCNL" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_Cessazione_CodiceCausa" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_Cessazione_Data" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_ContrattoVerbale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_DataFine" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_DataInizio" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Rapporto_EntePrevidenziale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_Proroga_DataFine" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_SocioLavoratore" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_TipologiaContrattuale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Rapporto_Trasformazione_CodiceTrasformazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_Trasformazione_Data" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="SYS_DATARICEZIONE" type="xs:dateTime" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="SYS_DATARIFERIMENTO" type="xs:dateTime" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="SYS_TIPOMODULO" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+        </xsd:sequence>
+        <xsd:attribute name="rowOrder" type="xs:int"/>
+      </xsd:complexType>
+      <xsd:complexType name="UNISOMM_Type">
+        <xsd:sequence>
+          <xsd:element name="AgenziaSomministrazione_CodiceFiscale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="AgenziaSomministrazione_Denominazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="AgenziaSomministrazione_SedeLavoro_CAP" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="AgenziaSomministrazione_SedeLavoro_ComuneNazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="AgenziaSomministrazione_SedeLavoro_Indirizzo" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DittaUtilizzatrice_CodiceFiscale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DittaUtilizzatrice_Denominazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DittaUtilizzatrice_PA" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DittaUtilizzatrice_SedeLavoro_CAP" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DittaUtilizzatrice_SedeLavoro_ComuneNazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DittaUtilizzatrice_SedeLavoro_Indirizzo" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DittaUtilizzatrice_Settore" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Invio_CodiceComunicazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Invio_CodiceComunicazionePrecedente" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Lavoratore_Cittadinanza" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Lavoratore_CodiceFiscale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Lavoratore_Cognome" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Lavoratore_Nascita_ComuneNazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Lavoratore_Nascita_Data" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Lavoratore_Nome" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Lavoratore_Sesso" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="RapportoAgenziaSomm_CessazioneData" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoAgenziaSomm_CodiceEntePrevidenziale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoAgenziaSomm_NMatricola" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoAgenziaSomm_NAgenziaSomm" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoAgenziaSomm_IndennitaDisponibilita" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoAgenziaSomm_DataFine" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoAgenziaSomm_DataInizio" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="RapportoAgenziaSomm_Proroga_DataFine" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoAgenziaSomm_TipologiaContrattuale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoDittaUtilizzatrice_CCNL" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoDittaUtilizzatrice_CodiceAgevolazioni" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoDittaUtilizzatrice_CodiceTrasformazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoDittaUtilizzatrice_DataCessazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoDittaUtilizzatrice_DataFineMissione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoDittaUtilizzatrice_DataFineProroga" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoDittaUtilizzatrice_DataInizioMissione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoDittaUtilizzatrice_DataTrasformazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoDittaUtilizzatrice_LavoroInAgricoltura" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoDittaUtilizzatrice_TipoOrario" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoDittaUtilizzatrice_TipoOrario_OreSett" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="RapportoAgenziaDittaUtilizzatrice_NContrattoSomm" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="SYS_DATARICEZIONE" type="xs:dateTime" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="SYS_DATARIFERIMENTO" type="xs:dateTime" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="SYS_TIPOMODULO" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+        </xsd:sequence>
+        <xsd:attribute name="rowOrder" type="xs:int"/>
+      </xsd:complexType>
+      <xsd:complexType name="UNIURG_Type">
+        <xsd:sequence>
+          <xsd:element name="DatoreLavoro_CodiceFiscale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="DatoreLavoro_Denominazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Invio_CodiceComunicazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Lavoratore_CodiceFiscale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Lavoratore_Cognome" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Lavoratore_Nome" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Rapporto_DataInizio" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="SYS_DATARICEZIONE" type="xs:dateTime" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="SYS_DATARIFERIMENTO" type="xs:dateTime" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="SYS_TIPOMODULO" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+        </xsd:sequence>
+        <xsd:attribute name="rowOrder" type="xs:int"/>
+      </xsd:complexType>
+      <xsd:complexType name="VARDATORI_Type">
+        <xsd:sequence>
+          <xsd:element name="DatoreLavoro_CodiceFiscale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="DatoreLavoro_Denominazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_PA" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_SedeLavoro_CAP" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_SedeLavoro_ComuneNazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_SedeLavoro_Indirizzo" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoro_Settore" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoroPrecedente_CodiceFiscale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoroPrecedente_Denominazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="DatoreLavoroPrecedente_Settore" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="TrasferimentoAzienda_CodiceTrasferimento" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="TrasferimentoAzienda_DataInizio" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Invio_CodiceComunicazione" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Invio_CodiceComunicazionePrecedente" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Lavoratore_CodiceFiscale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Lavoratore_Cognome" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Lavoratore_Nome" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Rapporto_Agevolazioni" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_CCNL" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_DataFine" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_DataInizio" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="Rapporto_EntePrevidenziale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_LavoroAgricoltura" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_SocioLavoratore" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="Rapporto_TipologiaContrattuale" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+          <xsd:element name="SYS_DATARICEZIONE" type="xs:dateTime" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="SYS_DATARIFERIMENTO" type="xs:dateTime" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <xsd:element name="SYS_TIPOMODULO" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+        </xsd:sequence>
+        <xsd:attribute name="rowOrder" type="xs:int"/>
+      </xsd:complexType>
+    </xsd:schema>
+    <!-- secondo schema inline -->
+    <xsd:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://schemas.microsoft.com/2003/10/Serialization/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://schemas.microsoft.com/2003/10/Serialization/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/">
+      <xsd:element name="anyType" nillable="true" type="xs:anyType"/>
+      <xsd:element name="anyURI" nillable="true" type="xs:anyURI"/>
+      <xsd:element name="base64Binary" nillable="true" type="xs:base64Binary"/>
+      <xsd:element name="boolean" nillable="true" type="xs:boolean"/>
+      <xsd:element name="byte" nillable="true" type="xs:byte"/>
+      <xsd:element name="dateTime" nillable="true" type="xs:string"/>
+      <xsd:element name="decimal" nillable="true" type="xs:decimal"/>
+      <xsd:element name="double" nillable="true" type="xs:double"/>
+      <xsd:element name="float" nillable="true" type="xs:float"/>
+      <xsd:element name="int" nillable="true" type="xs:int"/>
+      <xsd:element name="long" nillable="true" type="xs:long"/>
+      <xsd:element name="QName" nillable="true" type="xs:QName"/>
+      <xsd:element name="short" nillable="true" type="xs:short"/>
+      <xsd:element name="string" nillable="true" type="xs:string"/>
+      <xsd:element name="unsignedByte" nillable="true" type="xs:unsignedByte"/>
+      <xsd:element name="unsignedInt" nillable="true" type="xs:unsignedInt"/>
+      <xsd:element name="unsignedLong" nillable="true" type="xs:unsignedLong"/>
+      <xsd:element name="unsignedShort" nillable="true" type="xs:unsignedShort"/>
+      <xsd:element name="char" nillable="true" type="tns:char"/>
+      <xsd:simpleType name="char">
+        <xsd:restriction base="xs:int"/>
+      </xsd:simpleType>
+      <xsd:element name="duration" nillable="true" type="tns:duration"/>
+      <xsd:simpleType name="duration">
+        <xsd:restriction base="xs:duration">
+          <xsd:pattern value="\-?P(\d*D)?(T(\d*H)?(\d*M)?(\d*(\.\d*)?S)?)?"/>
+          <xsd:minInclusive value="-P10675199DT2H48M5.4775808S"/>
+          <xsd:maxInclusive value="P10675199DT2H48M5.4775807S"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:element name="guid" nillable="true" type="tns:guid"/>
+      <xsd:simpleType name="guid">
+        <xsd:restriction base="xs:string">
+          <xsd:pattern value="[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:attribute name="FactoryType" type="xs:QName"/>
+      <xsd:attribute name="Id" type="xs:ID"/>
+      <xsd:attribute name="Ref" type="xs:IDREF"/>
+    </xsd:schema>
+    <!-- Terzo schema inline -->
+    <xsd:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:tns="http://servizi.lavoro.gov.it/RicercaCO/2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/">
+      <xsd:element name="DataSet" nillable="true">
+        <xsd:complexType>
+          <xsd:annotation>
+            <xsd:appinfo>
+              <ActualType Name="DataSet" Namespace="http://schemas.datacontract.org/2004/07/System.Data" xmlns="http://schemas.microsoft.com/2003/10/Serialization/"/>
+            </xsd:appinfo>
+          </xsd:annotation>
+          <xsd:sequence>
+            <xsd:any/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </WL5G3N0:types>
+  <WL5G3N0:message name="IRicercaCO_COPerLavoratore_InputMessage">
+    <WL5G3N0:part name="parameters" element="WL5G3N1:COPerLavoratore"/>
+  </WL5G3N0:message>
+  <WL5G3N0:message name="IRicercaCO_COPerLavoratore_OutputMessage">
+    <WL5G3N0:part name="parameters" element="WL5G3N1:COPerLavoratoreResponse"/>
+  </WL5G3N0:message>
+  <WL5G3N0:portType name="IRicercaCO">
+    <WL5G3N0:operation name="COPerLavoratore">
+      <WL5G3N0:input message="WL5G3N1:IRicercaCO_COPerLavoratore_InputMessage" WL5G3N2:Action="COPerLavoratore"/>
+      <WL5G3N0:output message="WL5G3N1:IRicercaCO_COPerLavoratore_OutputMessage" WL5G3N2:Action="http://servizi.lavoro.gov.it/RicercaCO/IRicercaCO/COPerLavoratoreResponse"/>
+    </WL5G3N0:operation>
+  </WL5G3N0:portType>
+  <WL5G3N0:binding name="basicHttpBindingSettings" type="WL5G3N1:IRicercaCO">
+    <WL5G3N3:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <WL5G3N0:operation name="COPerLavoratore">
+      <WL5G3N3:operation style="document" soapAction="COPerLavoratore"/>
+      <WL5G3N0:input>
+        <WL5G3N3:body use="literal"/>
+      </WL5G3N0:input>
+      <WL5G3N0:output>
+        <WL5G3N3:body use="literal"/>
+      </WL5G3N0:output>
+    </WL5G3N0:operation>
+  </WL5G3N0:binding>
+  <WL5G3N0:service name="basicHttpBindingSettingsQSService">
+    <WL5G3N0:documentation>OSB Service</WL5G3N0:documentation>
+    <WL5G3N0:port name="basicHttpBindingSettingsQSPort" binding="WL5G3N1:basicHttpBindingSettings">
+      <WL5G3N3:address location="https://pdwstest.lavoro.gov.it/PortaApplicativaWCF/PortaApplicativaSVC.svc"/>
+    </WL5G3N0:port>
+  </WL5G3N0:service>
+</WL5G3N0:definitions>

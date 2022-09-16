@@ -1,0 +1,3133 @@
+<!-- ==========================================================================================
+                                  Patto/Accordo
+     ========================================================================================== -->
+<MODULE name="PattoRicercaElAnagraf" class="it.eng.sil.module.patto.PattoRicercaElAnagraf" />
+
+<MODULE name="ListaPattoLav" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+    <CONFIG pool="SIL_DATI" title="" rows="15">
+      <QUERIES>
+          <SELECT_QUERY>   
+           <STATEMENT_PROVIDER CLASS="it.eng.sil.module.patto.DynamicPattoLav"/>
+          </SELECT_QUERY>
+      </QUERIES>
+      <COLUMNS>
+          <COLUMN name="STRCOGNOME" label="Cognome"/>            
+          <COLUMN name="STRNOME" label="Nome"/>
+          <COLUMN name="STRCODICEFISCALE" label="Codice Fiscale"/>                        
+          <COLUMN name="STRDATSTIPULA" label="Data Stipula"/>            
+          <COLUMN name="CODSTATOATTO" label="Stato Patto/Accordo"/>                        
+          <COLUMN name="DATSCADCONFERMA" label="Data Scadenza&lt;BR&gt;&amp;nbsp;Conferma"/>
+          <COLUMN name="DATFINE" label="Data Fine Atto"/>  
+          <COLUMN name="MOTIVOFINEATTO" label="Motivo Fine Atto"/>                          
+      </COLUMNS>
+      <CAPTIONS>
+          <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+             <PARAMETER name="PAGE"   type="ABSOLUTE" value="PAttoLavDettaglioPage" scope=""/>
+             <!--PARAMETER name="MODULE" type="ABSOLUTE" value="M_GetPattoLav"         scope=""/-->
+             <PARAMETER name="prgPattoLavoratore" type="RELATIVE" value="prgPattoLavoratore" scope="LOCAL"/>                
+             <PARAMETER name="CDNFUNZIONE"        type="RELATIVE" value="CDNFUNZIONE"  scope="SERVICE_REQUEST"/> 
+             <PARAMETER name="CDNLAVORATORE"      type="RELATIVE" value="CDNLAVORATORE"      scope="LOCAL"/>
+             <PARAMETER name="CODSERVIZIO" type="RELATIVE" value="CODSERVIZIO" scope="LOCAL" />
+             <!-- POPUP EVIDENZE -->
+             <PARAMETER name="APRI_EV" type="ABSOLUTE" value="1" scope=""/>
+          </SELECT_CAPTION>
+          <!--
+          <DELETE_CAPTION confirm="TRUE" label="Cancella">
+            <PARAMETER name="PAGE" type="ABSOLUTE" value="ListaPattoLavPage" scope=""/>
+            <PARAMETER name="NUMKLODICHDISP" type="RELATIVE" value="NUMKLODICHDISP" scope="LOCAL"/>
+            <PARAMETER name="PRGPATTOLAVORATORE" type="RELATIVE" value="PRGPATTOLAVORATORE" scope="LOCAL"/>
+            <PARAMETER name="CANCELLA" type="ABSOLUTE" value="TRUE"/>
+          </DELETE_CAPTION>
+          -->
+      </CAPTIONS>
+      <BUTTONS>
+          <INSERT_BUTTON imagE="" label="Nuova Ricerca" confirm="FALSE">
+              <PARAMETER name="PAGE" type="ABSOLUTE" value="PattoRicercaPattoLavPage" /> 
+              <!--PARAMETER name="inserisci" type="ABSOLUTE" value="1" /-->
+      <PARAMETER name="cdnFunzione" type="relative" value="cdnFunzione" scope="SERVICE_REQUEST"/>              
+          </INSERT_BUTTON> 
+          <!-- 
+          <BUTTON imagE="" label="CONVOCAZIONI PER CONF." confirm="FALSE">
+              <PARAMETER name="PAGE" type="ABSOLUTE" value="UnderConstructionPage" scope="" />    
+          </BUTTON> 
+          -->
+     </BUTTONS>  
+  </CONFIG>
+</MODULE>
+
+
+
+<MODULE name="PattoRicercaPattoLav" class="it.eng.sil.module.patto.PattoRicercaPattoLav" />
+
+
+<!-- M_GetPattoLav -->
+<MODULE name="M_GetPattoLav" class="it.eng.sil.module.patto.GetPattoLavMultiSelect">
+  <CONFIG pool="SIL_DATI" title="">
+	  <QUERIES>
+	  	  
+	    <SELECT_FROM_CDNLAVORATORE statement="GET_UltimoPattoLav">
+	          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+	    </SELECT_FROM_CDNLAVORATORE>	    
+	    <SELECT_FROM_PRGPATTOLAVORATORE statement="GET_PattoLav">
+	          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>    
+	    </SELECT_FROM_PRGPATTOLAVORATORE>
+	    
+	    <SELECT_NO_ACCORDO_FROM_CDNLAVORATORE statement="GET_UltimoPattoLav_No_Accordo">
+	          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+	    </SELECT_NO_ACCORDO_FROM_CDNLAVORATORE>	    
+	    <SELECT_NO_ACCORDO_FROM_PRGPATTOLAVORATORE statement="GET_PattoLav_No_Accordo">
+	          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>    
+	    </SELECT_NO_ACCORDO_FROM_PRGPATTOLAVORATORE>
+	    
+	  </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<!-- M_GetPattoAzienda -->
+<MODULE name="M_GetPattoAzienda" class="it.eng.sil.module.patto.GetPattoAzienda">
+  <CONFIG pool="SIL_DATI" title="">
+      <QUERY statement="GET_PATTO_AZIENDA">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda"/>    
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+
+<!-- M_GetUltimoPattoLav
+<MODULE name="M_GetUltimoPattoLav" class="it.eng.sil.module.patto.GetUltimoPattoLav">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_UltimoPattoLav">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnlavoratore"/>    
+    </QUERY>
+  </CONFIG>
+</MODULE> -->
+
+<!-- M_MotFinAtto -->
+<MODULE name="M_MotFineAttoPatto" class="it.eng.sil.module.patto.MotFinAtto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="PATTO_GET_DE_MOT_FINEATTO"/>
+  </CONFIG>
+</MODULE>
+
+<!-- M_MotFinAttoAzienda -->
+<MODULE name="M_MotFineAttoPattoAzienda" class="it.eng.sil.module.patto.MotFinAtto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="PATTO_GET_DE_MOT_FINEATTO_AZIENDA"/>
+  </CONFIG>
+</MODULE>
+
+<!-- M_StatoAttoPatto -->
+<MODULE name="M_StatoAttoPatto" class="it.eng.sil.module.patto.StatoAtto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="PATTO_GET_Stato_Atto"/><!--
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="tipoStato"/>    
+    </QUERY>-->
+  </CONFIG>
+</MODULE>
+
+<!-- M_StatoAttoPatto -->
+<MODULE name="M_StatoAttoPattoAzienda" class="it.eng.sil.module.patto.StatoAtto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="PATTO_GET_Stato_Atto_Azienda"/><!--
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="tipoStato"/>    
+    </QUERY>-->
+  </CONFIG>
+</MODULE>
+
+<!-- Informazioni sullo stato del lavoratore (dichiarazione disponibilita', stato occupazionale, cpi titolare dei dati) -->
+<MODULE name="M_GetInfCorrPatto" class="it.eng.sil.module.patto.GetInfCorrPatto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="PATTO_GET_INFCORR">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnlavoratore"/>    
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<!-- Modulo per ricavare eventuali dati per verificare la possibilita di stipulare un accordo generico -->
+<MODULE name="M_GetInfoPerAccGen" class="it.eng.sil.module.patto.GetInfoPerAccGen">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_INFO_PER_ACC_GEN">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnlavoratore"/>    
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<!-- Modulo per ricavare lo stato occupazionale alla data stipula accordo generico aperto -->
+<MODULE name="M_GetInfoStatoOccPerAccGen" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_STATO_OCC_ALLA_STIPULA_ACCORDO">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnlavoratore"/>    
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<!-- M_SavePattoLAv -->
+<MODULE name="M_SavePattoLav" class="it.eng.sil.module.patto.SavePattoLav">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY_SELECT statement="GET_MAX_DATA_FINE_PATTO_STORICIZZATO">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOLAVORATORE"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_SELECT>
+    <QUERY_SELECT_PROFILING_150 statement="GET_FASCIA_PROFILING_150">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="INDICESVANTAGGIO150"/>
+    </QUERY_SELECT_PROFILING_150>
+    <QUERY_UPDATE statement="UPDATE_PATTOLAV">                      
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datStipula"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codStatoAtto"/>      
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATSCADCONFERMA"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codMotivoFineAtto"/>       
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strNote"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOPATTOLAVORATORE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>     
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOPATTO"/>
+      <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="INDICESVANTAGGIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="INDICESVANTAGGIO2"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATRIFERIMENTOINDICE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODVCHPROFILING"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="decDoteProcessoAssegnato"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="decDoteProcessoResidua"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="decDoteRisultatoAssegnato"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="decDoteRisultatoResidua"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGLAVORATOREPROFILO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datInizioNaspi"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="decAssegnoNaspi"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="noteElemAttivazione"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="INDICESVANTAGGIO150"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATRIFERIMENTOINDICE150"/> 
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codSedeSoggAcc"/> 
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codFiscaleSoggAcc"/> 
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strNoteEnte"/> 
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMPROFILING"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCODABIPORTALE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgPattoOnLine"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOLAVORATORE"/> 
+    </QUERY_UPDATE>
+  </CONFIG>
+</MODULE>
+
+<!-- M_InsertPattoLav -->
+<MODULE name="M_InsertPattoLav" class="it.eng.sil.module.patto.InsertPattoLav">
+  <CONFIG pool="SIL_DATI" title="">
+  	<SELECT_NEW_PRGPATTOLAV statement="GET_NEW_PATTOLAV">
+    </SELECT_NEW_PRGPATTOLAV>
+    <QUERY_INSERT statement="INSERT_PATTOLAV">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOLAVORATORE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDichDisponibilita"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datStipula"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codStatoAtto"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgStatoOccupaz"/> 
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgComunicazEsiti"/>      
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codMotivoFineAtto"/>      
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datScadConferma"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datFine"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strNote"/>      
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgPatto297"/>        
+      <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codTipoPatto"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codServizio"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="INDICESVANTAGGIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="INDICESVANTAGGIO2"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATRIFERIMENTOINDICE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codCodificaPatto"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODVCHPROFILING"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="decDoteProcessoAssegnato"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="decDoteProcessoResidua"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="decDoteRisultatoAssegnato"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="decDoteRisultatoResidua"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGLAVORATOREPROFILO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datInizioNaspi"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="decAssegnoNaspi"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="noteElemAttivazione"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="INDICESVANTAGGIO150"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATRIFERIMENTOINDICE150"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codSedeSoggAcc"/> 
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codFiscaleSoggAcc"/> 
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strNoteEnte"/> 
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="INDICESVANTAGGIO150"/> 
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCODABIPORTALE"/> 
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgPattoOnLine"/> 
+    </QUERY_INSERT>
+    <SELECT_SCHEDA_PARTECIPANTE statement="GET_SCHEDA_PARTECIPANTE_ULTIMO_PATTO_PROT_APERTO">
+    	 <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </SELECT_SCHEDA_PARTECIPANTE>
+    <SELECT_SVANTAGGI_PARTECIPANTE statement="GET_SCHEDA_SVANTAGGI_ULTIMO_PATTO_PROT_APERTO">
+    	 <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </SELECT_SVANTAGGI_PARTECIPANTE>    
+	<QUERY_INSERT_SCHEDA_PARTECIPANTE statement="INSERT_SCHEDA_PARTECIPANTE">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOLAVORATORE" />
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCONTRATTO" />
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSTUDIO" />
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODDURATA" />
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODOCCUPAZIONE" />
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTESCHEDA" />
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGCONFERMA" />
+		<PARAMETER scope="SESSION" value="_CDUT_" type="RELATIVE" />
+		<PARAMETER scope="SESSION" value="_CDUT_" type="RELATIVE" />
+	</QUERY_INSERT_SCHEDA_PARTECIPANTE>
+    <QUERY_INSERT_SVANTAGGIO statement="INSERT_SVANTAGGIO_SCHEDA">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOLAVORATORE"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSVANTAGGIO"/>
+		<PARAMETER scope="SESSION" value="_CDUT_" type="RELATIVE"/>
+		<PARAMETER scope="SESSION" value="_CDUT_" type="RELATIVE"/>
+    </QUERY_INSERT_SVANTAGGIO>	  
+	<GET_STATO_OCC statement="GET_STATO_OCCUPAZ">
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </GET_STATO_OCC>
+  </CONFIG>
+</MODULE>
+
+<!-- M_InsertPattoAzienda -->
+<MODULE name="M_InsertPattoAzienda" class="it.eng.sil.module.patto.InsertPattoLav">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT statement="INSERT_PATTOAZIENDA">
+    
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda"/>
+
+
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datStipula"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datScadConferma"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codMotivoFineAtto"/> 
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datFine"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codStatoAtto"/>  
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strNote"/>   
+      <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+    
+    </QUERY_INSERT>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_GetDatiProfilingDid" class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DATI_PROFILING_DID">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+<!-- M_DeletePattoLav -->        
+<MODULE name="M_DeletePattoLav" class="it.eng.sil.module.patto.DeletePAttoLav">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DELETE_PATTOLAV">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<!-- M_GetProssimoPattoLav -->
+<MODULE name="M_GetProssimoPattoLav" class="it.eng.sil.module.patto.GetProssimoPattoLav">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_NEW_PATTOLAV"/>
+  </CONFIG>
+</MODULE>
+
+
+
+<!-- ==========================================================================================
+                                  Elenco Angrafico
+     ========================================================================================== -->
+
+  <MODULE name="ListaElAnag" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+      <CONFIG pool="SIL_DATI" title="ESITO RICERCA ELENCO ANAGRAFICO LAVORATORI" rows="20">
+        <QUERIES>
+            <SELECT_QUERY>   
+             <STATEMENT_PROVIDER CLASS="it.eng.sil.module.patto.DynamicElAnagraf"/>
+            </SELECT_QUERY>
+        </QUERIES>
+        <COLUMNS>
+            <COLUMN name="STRCOGNOME" label="Cognome"/>            
+            <COLUMN name="STRNOME" label="Nome"/>                    
+            <COLUMN name="STRCODICEFISCALE" label="Codice Fiscale"/>                        
+            <COLUMN name="DATNASC" label="Data di&lt;BR&gt;&amp;nbsp;nascita"/>
+            <COLUMN name="DATINIZIO" label="Data inserimento"/>
+        </COLUMNS>
+        <CAPTIONS>
+            <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+               <PARAMETER name="PAGE" type="ABSOLUTE" value="ElAnagDettaglioPage" scope=""/>
+                <PARAMETER name="MODULE" type="ABSOLUTE" value="M_GetElAnag" scope=""/>
+                <PARAMETER name="prgElencoAnagrafico" type="RELATIVE" value="prgElencoAnagrafico" scope="LOCAL"/>
+                <PARAMETER name="CDNLAVORATORE"      type="RELATIVE" value="CDNLAVORATORE"      scope="LOCAL"/>
+                <PARAMETER name="CDNFUNZIONE"   type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+                <!-- POPUP EVIDENZE -->
+                <PARAMETER name="APRI_EV" type="ABSOLUTE" value="1" scope=""/>
+            </SELECT_CAPTION>
+            <!--
+            <DELETE_CAPTION confirm="TRUE" label="Cancella">
+              <PARAMETER name="PAGE" type="ABSOLUTE" value="AnagDeletePage" scope=""/>
+                <PARAMETER name="MODULE" type="ABSOLUTE" value="M_DeleteElAnag" scope=""/>
+                <PARAMETER name="NUMKLODICHDISP" type="RELATIVE" value="NUMKLODICHDISP" scope="LOCAL"/>                
+                <PARAMETER name="PRGDICHDISPONIBILITA" type="RELATIVE" value="PRGDICHDISPONIBILITA" scope="LOCAL"/>                                
+            </DELETE_CAPTION>
+            -->
+        </CAPTIONS>
+        <BUTTONS>
+            <INSERT_BUTTON imagE="" label="Nuova Ricerca" confirm="FALSE">
+                <PARAMETER name="PAGE" type="ABSOLUTE" value="PattoRicercaElAnagrafPage" scope="" />
+                <!--PARAMETER name="inserisci" type="ABSOLUTE" value="1" scope="SERVICE_REQUEST"/-->
+            </INSERT_BUTTON> 
+        </BUTTONS> 
+    </CONFIG>
+  </MODULE>
+
+<!-- M_GetElAnag -->
+<MODULE name="M_GetElAnag" class="it.eng.sil.module.patto.GetElAnag">
+  <CONFIG pool="SIL_DATI" title="">
+  <QUERIES>
+    <!-- 14/06/2004 Sostituita dallo statement di seguito che dettermina solo 
+    se esiste un prgElencoAngrafico con datCan null
+    <SELECT_CDNLAVORATORE statement="GET_ULTIMOELANAG">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+    </SELECT_CDNLAVORATORE>
+    -->
+    <SELECT_PRGELANAG_DA_CDNLAV statement="GET_ULTIMOELANAG_DA_CDNLAV">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+    </SELECT_PRGELANAG_DA_CDNLAV>
+    
+    <SELECT_PROGRESSIVO statement="GET_ELANAG">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgElencoAnagrafico"/>    
+    </SELECT_PROGRESSIVO>
+
+    
+  </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<!-- M_GetDeMotFineAtto -->
+<MODULE name="M_GetDeMotFineAtto" class="it.eng.sil.module.patto.GetDeMotFineAtto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="ELANAG_GET_DE_MOT_FINEATTO"/>
+  </CONFIG>
+</MODULE>
+
+<!-- M_GetUltimoElAnag
+<MODULE name="M_GetUltimoElAnag" class="it.eng.sil.module.patto.GetUltimoElAnag">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_ULTIMOELANAG">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+    </QUERY>
+  </CONFIG>
+</MODULE> -->
+
+<!-- M_GetCPIcorr -->
+<MODULE name="M_GetCPIcorr" class="it.eng.sil.module.patto.GetCPIcorr">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="EANAG_GET_CPI_CORR">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<!-- M_SaveElAnag -->
+<MODULE name="M_SaveElAnag" class="it.eng.sil.module.patto.SaveElAnag">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_UPDATE statement="UPDATE_ELANAG">                         
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datInizio"/>      
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DTMCAN"/>      
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdntipocan"/>    
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strNote"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOELENCOANAG"/>      
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgElencoAnagrafico"/>
+    </QUERY_UPDATE>
+    <QUERY_UPDATE_PRIVACY statement="UPDATE_PRIVACY">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgAutoriz"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datFinePrivacy"/>    	
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOPRIVACY"/> 
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPrivacy"/>           
+    </QUERY_UPDATE_PRIVACY>
+    <QUERY_INSERT_PRIVACY statement="INSERT_PRIVACY">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datPrivacy"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datFinePrivacy"/>    	
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgAutoriz"/>    
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>	
+    </QUERY_INSERT_PRIVACY>
+    <QUERY_SELECT_PATTO statement="GET_PATTO_APERTO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    	
+    </QUERY_SELECT_PATTO>
+    <QUERY_CHIUDI_PATTO statement="CHIUSURA_PATTO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datfine"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datfine"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="UE" name="codMotivoFineAtto"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="UE" name="codMotivoFineAtto"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    	
+    </QUERY_CHIUDI_PATTO>
+    <QUERY_CHIUDI_DICH_DISP statement="CHIUSURA_DICH_DISP">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datfine"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datfine"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="UE" name="codMotivoFineAtto"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    	
+    </QUERY_CHIUDI_DICH_DISP>
+    <QUERY_SELECT_DICH_DISP statement="GET_DICH_DISP">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_SELECT_DICH_DISP>
+    
+    <QUERY_SELECT_STATO_OCCUPAZ_DISOC statement="GET_STATO_OCC_DISOC_INOC">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_SELECT_STATO_OCCUPAZ_DISOC>
+    <QUERY_INSERT_STATO_OCCUPAZ_DEFAULT statement="INSERT_STATO_OCC_DEFAULT">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datinizio"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="C1" name="CODSTATOOCCUPAZ"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="A" name="CODMONOPROVENIENZA"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTESTATOOCCUPAZ"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGPENSIONATO"/>
+    </QUERY_INSERT_STATO_OCCUPAZ_DEFAULT>
+  </CONFIG>
+</MODULE>
+
+
+<!-- M_Update_Storia_Coll -->
+<MODULE name="M_Insert_Storia_Coll" class="it.eng.sil.module.patto.InsertColl">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="INSERT_COLL">                         
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGINSERTCOLL"/>      
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgElaAnagPrecedente"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+
+<!-- M_InsertElAnag -->
+<MODULE name="M_InsertElAnag" class="it.eng.sil.module.patto.InsertElAnag">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT statement="INSERT_ELANAG">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datInizio"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strNote"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="dtmCan"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnTipoCan"/>
+      <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+<!--      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="numKloElencoAnag"/>-->
+    </QUERY_INSERT>
+    <QUERY_UPDATE_PRIVACY statement="UPDATE_PRIVACY">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgAutoriz"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datFinePrivacy"/>    	
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOPRIVACY"/> 
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPrivacy"/>           
+    </QUERY_UPDATE_PRIVACY>
+    <QUERY_INSERT_PRIVACY statement="INSERT_PRIVACY">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datPrivacy"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datFinePrivacy"/>    	
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgAutoriz"/>  
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>  	
+    </QUERY_INSERT_PRIVACY>
+  </CONFIG>
+</MODULE>
+
+
+
+<!-- M_DeleteElAnag -->        
+<MODULE name="M_DeleteElAnag" class="it.eng.sil.module.patto.DeleteDispo">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_DELETE statement="DELETE_DISPO">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDichDisponibilita"/>
+    </QUERY_DELETE>
+  </CONFIG>
+</MODULE>
+
+
+
+
+<!-- ==========================================================================================
+                                  Dichiarazione di Disponobilità
+     ========================================================================================== -->
+<!-- M_GetProssimaDispo
+<MODULE name="M_GetProssimaElAnag" class="it.eng.sil.module.patto.GetProssimoElAnag">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_NEW_ELANAG"/>
+  </CONFIG>
+</MODULE> -->
+
+<MODULE name="PattoRicercaDispo" class="it.eng.sil.module.patto.PattoRicercaDispo" />
+
+<MODULE name="ListaDispo" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+    <CONFIG pool="SIL_DATI" title="" rows="15">
+      <QUERIES>
+          <SELECT_QUERY>   
+           <STATEMENT_PROVIDER CLASS="it.eng.sil.module.patto.DynamicDisponibilita"/>
+          </SELECT_QUERY>
+      </QUERIES>
+      <COLUMNS>
+          <COLUMN name="STRCOGNOME" label="Cognome"/>            
+          <COLUMN name="STRNOME" label="Nome"/>                    
+          <COLUMN name="STRCODICEFISCALE" label="Codice Fiscale"/>                        
+          <COLUMN name="DDICH" label="Data&lt;BR&gt;dich."/>
+          <COLUMN name="DESCTIPODISP" label="Tipo"/>
+          <COLUMN name="DCONF" label="Data&lt;BR&gt;scadenza primo&lt;BR&gt;colloquio orientamento"/>
+          <COLUMN name="DSCEROG" label="Data scadenza&lt;BR&gt;stipula patto"/>
+          <COLUMN name="DFINE" label="Data&lt;BR&gt;fine atto"/>
+          <COLUMN name="MOTIVOFINE" label="Motivo&lt;BR&gt;fine atto"/>   
+      </COLUMNS>
+      <CAPTIONS>
+          <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+             <PARAMETER name="PAGE"          type="ABSOLUTE" value="DispoDettaglioPage" scope=""/>
+             <PARAMETER name="MODULE"        type="ABSOLUTE" value="M_GetDispo"         scope=""/>
+             <PARAMETER name="CODCPI"        type="RELATIVE" value="CODCPI"             scope="LOCAL"/>                
+             <PARAMETER name="prgDichDisponibilita" type="RELATIVE" value="prgDichDisponibilita" scope="LOCAL"/>                                
+             <PARAMETER name="CDNUTINS"      type="RELATIVE" value="CDNUTINS"       scope="LOCAL"/>                                
+             <PARAMETER name="CDNUTMOD"      type="RELATIVE" value="CDNUTMOD"       scope="LOCAL"/>                                                
+             <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE"  scope="LOCAL"/>
+             <PARAMETER name="CDNFUNZIONE"   type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+             <!-- POPUP EVIDENZE -->
+             <PARAMETER name="APRI_EV" type="ABSOLUTE" value="1" scope=""/>
+          </SELECT_CAPTION>
+          <!--
+          <DELETE_CAPTION confirm="TRUE" label="Cancella">
+              <PARAMETER name="PAGE" type="ABSOLUTE" value="AnagDeletePage" scope=""/>
+              <PARAMETER name="MODULE" type="ABSOLUTE" value="M_DeleteLavoratore" scope=""/>
+              <PARAMETER name="NUMKLODICHDISP" type="RELATIVE" value="NUMKLODICHDISP" scope="LOCAL"/>                
+              <PARAMETER name="PRGDICHDISPONIBILITA" type="RELATIVE" value="PRGDICHDISPONIBILITA" scope="LOCAL"/>                                
+              <PARAMETER name="CDNFUNZIONE"   type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+          </DELETE_CAPTION>          
+          -->
+      </CAPTIONS>
+      <BUTTONS>
+        <INSERT_BUTTON imagE="" label="Nuova Ricerca" confirm="FALSE">
+            <PARAMETER name="PAGE" type="ABSOLUTE" value="PattoRicercaDispoPage" scope="" />
+            <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/> 
+            <!--PARAMETER name="inserisci" type="ABSOLUTE" value="1" /-->
+        </INSERT_BUTTON> 
+        <!--
+        <BUTTON imagE="" label="CONVOCAZIONI PER CONF." confirm="FALSE">
+              <PARAMETER name="PAGE" type="ABSOLUTE" value="UnderConstructionPage" scope="" />    
+        </BUTTON> 
+        <BUTTON imagE="" label="CONVOCAZIONI PER SERVIZI" confirm="FALSE">
+              <PARAMETER name="PAGE" type="ABSOLUTE" value="UnderConstructionPage" scope="" />    
+        </BUTTON> 
+        -->
+       </BUTTONS> 
+  </CONFIG>
+</MODULE>
+
+
+<!-- M_GetDISPO -->
+<MODULE name="M_GetDispo" class="it.eng.sil.module.patto.GetDispo">
+  <CONFIG pool="SIL_DATI" title="">
+  <QUERIES>
+
+    <!-- 14/06/2004 Sostituita con lo statement sosttostante per velocizzare il recuperodei dati
+    <SELECT_CDNLAVORATORE statement="GET_ULTIMO_AN_DISPO">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+    </SELECT_CDNLAVORATORE>
+    -->
+    <SELECT_PRGDICDISPO_CDNLAVORATORE statement="GET_ULTIMO_AN_DISPO_DA_CDNLAV">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+    </SELECT_PRGDICDISPO_CDNLAVORATORE>
+    
+    <SELECT_PROGRESSIVO statement="GET_AN_DISPO">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDichDisponibilita"/>    
+    </SELECT_PROGRESSIVO>
+    
+  </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<!-- Controlla se alcuni campi della DID sono cambiati: se si chiude quella corrente
+     e ne propone una con i nuovi dati -->
+<MODULE name="M_ControllaDatiDID" class="it.eng.sil.module.patto.ControllaDID">
+  <CONFIG pool="SIL_DATI" title="">
+  </CONFIG>
+</MODULE>
+
+<!-- M_GetUltimoDISPO
+<MODULE name="M_GetUltimoDispo" class="it.eng.sil.module.patto.GetUltimoDispo">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_ULTIMO_AN_DISPO">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+    </QUERY>
+  </CONFIG>
+</MODULE> -->
+
+<MODULE name="M_GetInfValideDispo" class="it.eng.sil.module.patto.GetInfValideDispo">
+  <CONFIG pool="SIL_DATI" title="">
+  <!--
+    <QUERY statement="DISPO_GET_INFVALIDE">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+    </QUERY>
+   -->
+   <SELECT_PRGELANAG_DA_CDNLAV_DISPO statement="GET_ULTIMOELANAG_DA_CDNLAV">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+   </SELECT_PRGELANAG_DA_CDNLAV_DISPO>
+   <QUERY_EA statement="GET_ELANAG"><!--GET_ULTIMOELANAG-->
+          <!--<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>-->    
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgElencoAnagrafico"/>
+   </QUERY_EA>
+   <QUERY_STATO_OCC statement="GET_STATO_OCCUPAZ">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+   </QUERY_STATO_OCC>
+   <QUERY_CM_ISCR statement="AMSTR_GET_AM_CM_ISCR">
+   		<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+   	 	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+   	 	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+   </QUERY_CM_ISCR>
+  </CONFIG>
+</MODULE>
+
+<!-- M_MotFinAtto -->
+<MODULE name="M_MotFineAtto" class="it.eng.sil.module.patto.MotFinAtto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DISPO_GET_MotFinAtto"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_checkRiaperturaDid" class="it.eng.sil.module.patto.CheckRiaperturaDid">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="checkSePossibileRiaperturaDid"/>
+  </CONFIG>	
+</MODULE>
+
+<!-- M_SaveDispo -->
+<MODULE name="M_SaveDispo" class="it.eng.sil.module.patto.SaveDispo">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_UPDATE statement="UPDATE_DISPO">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPODICHDISP"/>        
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODULTIMOCONTRATTO"/>        
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATSCADCONFERMA"/>        
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATSCADEROGAZSERVIZI"/>        
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINE"/>        
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODMOTIVOFINEATTO"/>       
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSTATOATTO"/>        
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datDichiarazione"/>    
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strNote"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLODICHDISP"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMDELIBERA"/>
+      <!-- where -->
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDichDisponibilita"/>
+    </QUERY_UPDATE>
+    <QUERY_SELECT_STATO_OCCUPAZ_DISOC statement="GET_STATO_OCC_DISOC_INOC">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_SELECT_STATO_OCCUPAZ_DISOC>
+    <QUERY_INSERT_STATO_OCCUPAZ_DEFAULT statement="INSERT_STATO_OCC_DEFAULT">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datinizio"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSTATOOCCUPAZ"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="D" name="CODMONOPROVENIENZA"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTESTATOOCCUPAZ"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGPENSIONATO"/>
+    </QUERY_INSERT_STATO_OCCUPAZ_DEFAULT>
+	<QUERY_SELECT_PATTO statement="GET_PATTO_APERTO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    	
+    </QUERY_SELECT_PATTO>
+    <QUERY_CHIUDI_PATTO statement="CHIUSURA_PATTO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datfine"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datfine"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codMotivoFineAtto"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codMotivoFineAtto"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    	
+    </QUERY_CHIUDI_PATTO>
+    <QUERY_SELECT_CODSTATOATTO_DID statement="GET_INFO_DID">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDichDisponibilita"/>
+    </QUERY_SELECT_CODSTATOATTO_DID>
+  </CONFIG>
+</MODULE>
+
+<!-- M_InsertDispo -->
+<MODULE name="M_InsertDispo" class="it.eng.sil.module.patto.InsertDispo">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT statement="INSERT_DISPO">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDichDisponibilita"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datDichiarazione"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgElencoAnagrafico"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgStatoOccupaz"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codTipoDichDisp"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CodUltimoContratto"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datScadConferma"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datScadErogazServizi"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datFine"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codStatoAtto"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codMotivoFineAtto"/>      
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strNote"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cat181"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="numdelibera"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgRischioDisoccupazione"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datLicenziamento"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgDidL68"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgLavoroAutonomo"/>
+    </QUERY_INSERT>
+    <QUERY_NEXTVAL statement="QUERY_NEXTVAL_STATEMENT">
+    </QUERY_NEXTVAL>
+    <QUERY_UPDATE statement="UPDATE_COLL">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDichDisponibilita"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGDOCUMENTO"/>
+    </QUERY_UPDATE>
+    <QUERY_SELECT_AM_DOC_COLL statement="SELECT_COLL">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_SELECT_AM_DOC_COLL>
+    <QUERY_INSERT_AM_DOC_COLL statement="INSERT_AM_DOC_COLL">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDocumento"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDichDisponibilita"/>
+    </QUERY_INSERT_AM_DOC_COLL>
+    <QUERY_INSERT_PRIVACY statement="INSERT_PRIVACY">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datPrivacy"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datFine"/>    	
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgAutoriz"/> 
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>   	
+    </QUERY_INSERT_PRIVACY>
+    <QUERY_SELECT_PRIVACY statement="AUTORIZZAZIONE_PRIVACY">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    	
+    </QUERY_SELECT_PRIVACY>    
+    <!--
+    <QUERY_INSERT_STATO_OCCUPAZ statement="INSERT_STATO_OCC_DEFAULT2">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgStatoOccupaz"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datinizio"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSTATOOCCUPAZ"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    </QUERY_INSERT_STATO_OCCUPAZ>
+    -->
+    <QUERY_MOVIMENTI statement="GET_MOVIMENTI_LAVORATORE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_MOVIMENTI>
+    <QUERY_INSERT_EA statement="INSERT_ELANAG2">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgElencoAnagrafico"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datInizio"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strNote"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="dtmCan"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnTipoCan"/>
+      <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+    </QUERY_INSERT_EA>
+    <QUERY_NEXT_AM_STATO_OCC statement="GET_NEXT_AM_STATO_OCC"/>      
+    <QUERY_NEXT_AM_EA statement="GET_NEXT_AM_ELENCO_ANAGRAFICO"/>
+    <!-- non permette l'inserimento per un lavoratore di una did PA aperta se esiste gia' una -->
+    <QUERY_SELECT_DID_PA_APERTA statement="GET_DID_PA_APERTA">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgElencoAnagrafico"/>
+    </QUERY_SELECT_DID_PA_APERTA>
+  </CONFIG>
+</MODULE>
+
+
+
+<!--M_HasStorDid-->
+<MODULE name="M_HasStorDid" class="it.eng.sil.module.patto.HasStorDid" >
+ <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="PATTO_HAS_STOR_DID" >
+      <PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY>
+ </CONFIG>
+</MODULE> 
+
+<!-- M_DeleteLavoratore -->        
+<MODULE name="M_DeleteDispo" class="it.eng.sil.module.patto.DeleteDispo">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DELETE_DISPO">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDichDisponibilita"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+<!-- M_GetProssimoDispo -->
+<MODULE name="M_GetProssimoDispo" class="it.eng.sil.module.patto.GetProssimoDispo">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_NEW_DISPO"/>
+  </CONFIG>
+</MODULE>
+
+<!-- M_StatoAttoDispo -->
+<MODULE name="M_StatoAttoDispo" class="it.eng.sil.module.patto.StatoAtto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DISPO_GET_Stato_Atto"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Protocollato" class="it.eng.sil.module.patto.GetProtocollo">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY>
+      <STATEMENT_PROVIDER CLASS="it.eng.sil.module.patto.GetProtocolloDynStatement"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ProtocollatoAzienda" class="it.eng.sil.module.patto.StatoAtto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_PROTOCOLLO_AZIENDA">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PAGE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPODOCUMENTO"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<!-- M_GetinfoStatoOccupaz -->
+<MODULE name="M_GetInfoStatoOccupaz" class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_INFO_STATO_OCCUPAZ_DIC">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDichDisponibilita"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<!-- ==========================================================================================
+                    MODULI GENERALI: utilizzati da tutte le pagine del patto
+     ========================================================================================== -->
+<!-- M_ElencoCPI -->
+<MODULE name="M_ElencoCPI" class="it.eng.sil.module.patto.ElencoCPI">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_CPI"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetDeProfiling150" class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DE_PROFILING_150"/>
+  </CONFIG>
+</MODULE>
+
+<!-- M_TIpoDichDisp -->
+<MODULE name="M_TipoDichDisp" class="it.eng.sil.module.patto.TipoDichDisp">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_TipoDichDisp"/>
+  </CONFIG>
+</MODULE>
+
+<!-- Decodifica per tag af:list tipi di contratti -->
+<MODULE name="M_Contratto" class="it.eng.sil.module.patto.Contratto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_Contratto"/>
+  </CONFIG>
+</MODULE>
+
+<!-- M_StatoOccupaz -->
+<MODULE name="M_StatoOccupaz" class="it.eng.sil.module.patto.StatoOccupaz">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_StatoOccupaz"/>
+  </CONFIG>
+</MODULE>
+
+
+
+
+
+
+<!-- M_Get_Inf_lavoratore *********** non viene piu' usato -->
+<!--
+<MODULE name="M_Get_Inf_lavoratore" class="it.eng.sil.module.patto.GetInfLavoratore">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_InfLavoratore">
+      <PARAMETER scope="SESSION" type="RELATIVE" value="cdnLavoratore"/>                  
+    </QUERY>
+  </CONFIG>
+</MODULE>
+-->
+
+
+<!-- M_ElencoVincoli -->
+<MODULE name="M_ElencoVincoli" class="it.eng.sil.module.patto.ElencoVincoli">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_VINCOLI"/>    
+  </CONFIG>
+</MODULE>
+
+<!-- Appuntamenti presi dal lavoratore col cpi per il patto -->
+<MODULE name="M_ElencoAppuntamenti" class="it.eng.sil.module.patto.ElencoAppuntamenti">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY>
+      <STATEMENT_PROVIDER CLASS="it.eng.sil.module.patto.DynamicElencoAppuntamentiStatement"/>
+    </QUERY>
+    <!--
+    <QUERY statement="GET_APPUNTAMENTI">
+       <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>                       
+    </QUERY>       
+    -->
+  </CONFIG>
+</MODULE>
+
+<!-- M_ElencoAzioni -->
+<MODULE name="M_ElencoAzioni" class="it.eng.sil.module.patto.ElencoAzioni">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_AZIONI">
+           <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>                       
+    </QUERY>       
+  </CONFIG>
+</MODULE>
+
+<!-- M_ElencoMansioni -->
+<MODULE name="M_ElencoMansioni" class="it.eng.sil.module.patto.ElencoMansioni">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_MANSIONI">         
+           <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE"      scope="SERVICE_REQUEST"/>                       
+           <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE"      scope="SERVICE_REQUEST"/>                       
+           <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE"      scope="SERVICE_REQUEST"/>                              
+           <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE"      scope="SERVICE_REQUEST"/>                              
+           <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE"      scope="SERVICE_REQUEST"/>                              
+           <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE"      scope="SERVICE_REQUEST"/>                             
+           <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE"      scope="SERVICE_REQUEST"/>                              
+           <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE"      scope="SERVICE_REQUEST"/>  
+           <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE"      scope="SERVICE_REQUEST"/>             
+    </QUERY>       
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ElencoIndisponibilita" class="it.eng.sil.module.patto.ElencoIndisponibilita">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_INDISPONIBILITA">
+           <!--PARAMETER scope="SESSION" type="RELATIVE" value="PRGPATTOLAVORATORE"/-->
+           <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+    </QUERY>       
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_CondizioneOccupazionale" class="it.eng.sil.module.patto.CondizioneOccupazionale">
+  <CONFIG pool="SIL_DATI" title="">    
+    <QUERIES>
+    <!-- ******** NON E' PIU' UTILIZZATA ORA C'E' LA CLASSE CHE SI OCCUPA DI CIO'
+        <SELECT_QUERY0 statement="GET_InfoCorrentiPopUp">
+             <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+             <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+        </SELECT_QUERY0>    
+     -->
+        <QUERY_OBBLIGO_FORMATIVO statement="GET_PATTO_OBBLIGO_FORMATIVO">
+            <!--PARAMETER scope="SESSION" type="RELATIVE" value="PRGPATTOLAVORATORE"/-->
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+        </QUERY_OBBLIGO_FORMATIVO>  
+        <!--<SELECT_QUERY2 statement="GET_MODALITA_ASSOLV"/>-->
+        <QUERY_PERM_SOGG statement="GET_PATTO_PERM_SOGG">
+            <!--PARAMETER scope="SESSION" type="RELATIVE" value="PRGPATTOLAVORATORE"/-->
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+        </QUERY_PERM_SOGG>        
+<!--        <SELECT_QUERY4 statement="GET_MOTIVO_RIL"/>-->
+
+<!--        <SELECT_QUERY5 statement="GET_STATO_RIC"/>-->
+        <QUERY_STATO_OCCUPAZIONALE statement="GET_PATTO_STATO_OCCUPAZ">
+            <!--PARAMETER scope="SESSION" type="RELATIVE" value="PRGPATTOLAVORATORE"/-->
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+        </QUERY_STATO_OCCUPAZIONALE>
+<!--
+        <SELECT_QUERY7 statement="GET_DE_STATO_OCC" />
+
+        <SELECT_QUERY8 statement="GET_181_CAT" />
+        <SELECT_QUERY9 statement="AMSTR_GET_STATO_ATTO" />
+-->
+        <QUERY_ISCR_MOBILITA statement="GET_PATTO_MOBILITA_ISCR">
+            <!--PARAMETER scope="SESSION" type="RELATIVE" value="PRGPATTOLAVORATORE"/-->
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+        </QUERY_ISCR_MOBILITA>
+<!--
+        <SELECT_QUERY11 statement="AMSTR_GET_DE_MB_TIPO"/>
+        
+        <SELECT_QUERY12 statement="AMSTR_GET_DE_MB_TIPO"/>
+        <SELECT_QUERY13 statement="AMSTR_GET_DE_CM_TIPO_ISCR"/>
+        <SELECT_QUERY14 statement="AMSTR_GET_DE_CM_TIPO_INVALIDITA"/>
+        -->
+        <QUERY_INDISP_TEMP statement="GET_PATTO_INDISP_TEMP">
+            <!--PARAMETER scope="SESSION" type="RELATIVE" value="PRGPATTOLAVORATORE"/-->
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+        </QUERY_INDISP_TEMP>
+        <!--
+        <SELECT_QUERY16 statement="AMSTR_GET_DE_INDISP_TEMP"/>-->
+        
+        <QUERY_ESPERIENZE_LAV statement="GET_PATTO_ESP_LAV">
+            <!--PARAMETER scope="SESSION" type="RELATIVE" value="PRGPATTOLAVORATORE"/-->
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+        </QUERY_ESPERIENZE_LAV>
+        <QUERY_TITOLI_STUDIO statement="GET_PATTO_LAVORATORE_TITOLI">
+            <!--PARAMETER scope="SESSION" type="RELATIVE" value="PRGPATTOLAVORATORE"/-->
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+        </QUERY_TITOLI_STUDIO>        
+        <QUERY_FORMAZIONE_PROF statement="GET_PATTO_CORSO">
+            <!--PARAMETER scope="SESSION" type="RELATIVE" value="PRGPATTOLAVORATORE"/-->
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+        </QUERY_FORMAZIONE_PROF>
+         <QUERY_ISRC_COLLOCAMENTO_MIRATO statement="GET_PATTO_AM_CM_ISCR">
+            <!--PARAMETER scope="SESSION" type="RELATIVE" value="PRGPATTOLAVORATORE"/-->
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+        </QUERY_ISRC_COLLOCAMENTO_MIRATO>
+    </QUERIES>
+  </CONFIG>
+</MODULE>
+
+
+<!--
+Modulo che gestisce la cancellazione di un patto stipulato da un lavoratore ed estintosi
+       (lo ritroviamo nella lista dello storico del patto)
+   PER IL MOMENTO NON FA NIENTE ***************************************************
+   ********************************************************************************
+-->
+<MODULE name="M_DelPattoInformazioniStoriche" class="it.eng.sil.module.patto.DeletePattoLavoratore">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERIES>
+    <DELETE_PATTO_LAV statement="DEL_PATTO_LAVORATORE">
+           <PARAMETER name="PRGPATTOLAVORATORE" type="RELATIVE" value="PRGPATTOLAVORATORE" scope="SERVICE_REQUEST"/>                       
+    </DELETE_PATTO_LAV>
+    <DELETE_LAV_PATTO_SCELTA statement="DEL_PATTO_SCELTA">
+           <PARAMETER name="PRGPATTOLAVORATORE" type="RELATIVE" value="PRGPATTOLAVORATORE" scope="SERVICE_REQUEST"/>                       
+    </DELETE_LAV_PATTO_SCELTA>      
+    </QUERIES>
+  </CONFIG>
+</MODULE>
+
+
+
+<!--
+    LISTA DEI PATTI CONCLUSI DI UN LAVORATORE
+-->
+<MODULE name="M_PattoInformazioniStoriche" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+      <CONFIG pool="SIL_DATI" title="" rows="20">
+            <QUERIES>
+                <SELECT_QUERY statement="GET_PATTO_INF_STORICHE"> 
+                    <STATEMENT_PROVIDER CLASS="it.eng.sil.module.patto.DynamicPattoInformazioniStoricheStatement"/>
+                </SELECT_QUERY>
+            </QUERIES>
+            <COLUMNS>
+                <COLUMN name="DATSTIPULA" label="Data stipula"/>        
+                <COLUMN name="DATFINE" label="Data fine"/>
+                <COLUMN name="TIPOPATTO" label="Tipologia"/>
+                <COLUMN name="STATOPATTO" label="Stato patto/accordo"/>
+                <COLUMN name="motivofine" label="Motivo fine patto/accordo"/>                
+            </COLUMNS>
+            <CAPTIONS>
+                <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+                   <PARAMETER name="PAGE" type="ABSOLUTE" value="PattoLavDettaglioInformazioniStorichePage" scope=""/>
+                    <!--<PARAMETER name="MODULE" type="ABSOLUTE" value="M_GetPattoLav" scope=""/> 10/09/04-->
+                    <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="LOCAL"/>
+                    <!--<PARAMETER name="prgElencoAnagrafico" type="RELATIVE" value="prgElencoAnagrafico" scope="LOCAL"/> -->                
+                    <PARAMETER name="prgPattoLavoratore" type="RELATIVE" value="prgpattolavoratore" scope="LOCAL"/>
+					<PARAMETER name="CDNFUNZIONE" type="ABSOLUTE" value="251"/>
+                </SELECT_CAPTION>             
+                
+                <DELETE_CAPTION label="Cancella" confirm="true">
+					<PARAMETER name="PAGE" type="ABSOLUTE" value="PattoInformazioniStorichePage" scope=""/>
+					<PARAMETER name="CANCELLA" type="ABSOLUTE" value="CANCELLA" scope=""/>
+					<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="LOCAL"/>                    
+					<PARAMETER name="prgPattoLavoratore" type="RELATIVE" value="prgpattolavoratore" scope="LOCAL"/>
+					<PARAMETER name="NUMKLOPATTOKLAVORATORE" type="RELATIVE" value="NUMKLOPATTOKLAVORATORE" scope="LOCAL"/>
+                </DELETE_CAPTION>                 
+            </CAPTIONS>            
+    </CONFIG>
+  </MODULE>
+  
+ <!--
+STORICO ELENCO ANAGRAFICO LAVORATORE
+-->
+    <MODULE name="M_ElAnagLavInformazioniStoriche" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+      <CONFIG pool="SIL_DATI" title="" rows="20">
+        <QUERIES>
+             <SELECT_QUERY> 
+                  <STATEMENT_PROVIDER CLASS="it.eng.sil.module.patto.DynamicElencoAnagraficoStoricoStatement"/>
+             </SELECT_QUERY>
+        </QUERIES>
+        <COLUMNS>
+        	<COLUMN name="DATAISCR" label="Data iscr."/>
+        	<COLUMN name="DATACAN" label="Data canc."/>
+            <COLUMN name="CPI" label="Cpi"/>                         
+            <COLUMN name="MOTIVOFINE" label="Motivo cancellazione"/> 
+        </COLUMNS>
+        <CAPTIONS>
+        	<SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="AnagLavDettaglioInformazioniStorichePage" scope=""/>
+				<!--PARAMETER name="MODULE" type="ABSOLUTE" value="M_GetElAnag" scope=""/-->
+				<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="LOCAL"/>                
+				<PARAMETER name="prgElencoAnagrafico" type="RELATIVE" value="prgElencoAnagrafico" scope="LOCAL"/>                
+			</SELECT_CAPTION>
+      
+			<!--
+			************************************************************************
+				DEVE ESSERE POSSIBILE CANCELLARE UN LAVORATORE DALLA ANAGRAFICA?
+			************************************************************************
+			<DELETE_CAPTION label="Cancella" confirm="true">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="AnagLavInformazioniStorichePage" scope=""/>
+				<PARAMETER name="CANCELLA" type="ABSOLUTE" value="CANCELLA" scope=""/>
+				<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="LOCAL"/>                    
+				<PARAMETER name="prgPattoLavoratore" type="RELATIVE" value="prgpattolavoratore" scope="LOCAL"/>
+				<PARAMETER name="NUMKLOPATTOKLAVORATORE" type="RELATIVE" value="NUMKLOPATTOKLAVORATORE" scope="LOCAL"/>
+			</DELETE_CAPTION>            
+			-->
+        </CAPTIONS>        
+    </CONFIG>
+  </MODULE>
+
+<MODULE name="M_DispoLavInformazioniStoriche" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+    <CONFIG pool="SIL_DATI" title="" rows="20">
+      <QUERIES>
+          <SELECT_QUERY> 
+                  <STATEMENT_PROVIDER CLASS="it.eng.sil.module.patto.DynamicDichDisponibiitaStoricoStatement"/>                  
+          </SELECT_QUERY>
+      </QUERIES>
+      <COLUMNS>          
+          <COLUMN name="DATDICHIARAZIONE" label="Data dich."/>          
+          <COLUMN name="DATFINE" label="Data fine"/>          
+          <COLUMN name="TIPODICHIARAZIONE" label="Tipo dich."/> 
+          <COLUMN name="STATOATTO" label="Stato atto"/>                    
+          <COLUMN name="MOTIVOFINE" label="Motivo fine atto"/> 
+                                  
+      </COLUMNS>
+      <CAPTIONS>
+          <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+             <PARAMETER name="PAGE"          type="ABSOLUTE" value="DispoLavDettaglioInformazioniStorichePage" />
+             <!--<PARAMETER name="MODULE"        type="ABSOLUTE" value="M_GetDispo"/> 10/09/04-->
+             <!--<PARAMETER name="CODCPI"        type="RELATIVE" value="CODCPI"             scope="LOCAL"/> -->                
+             <PARAMETER name="prgDichDisponibilita" type="RELATIVE" value="prgDichDisponibilita" scope="LOCAL"/>             
+             <PARAMETER name="cdnLavoratore"      type="RELATIVE" value="cdnLavoratore"      scope="SERVICE_REQUEST"/>       
+             <PARAMETER name="CODTIPODOCUMENTO"   type="ABSOLUTE" value="IM" />
+             <PARAMETER name="flag_competenza"    type="RELATIVE" value="flag_competenza"      scope="SERVICE_REQUEST"/>
+             <PARAMETER  name="didchiusa" type="ABSOLUTE" value="true" />
+          </SELECT_CAPTION>  
+          
+          <!--
+			************************************************************************
+				BISOGNO ANCORA SCRIVERE IL MODULO DI CANCELLAZIONE
+			************************************************************************
+			<DELETE_CAPTION label="Cancella" confirm="true">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="DispoLavInformazioniStorichePage" scope=""/>
+				<PARAMETER name="CANCELLA" type="ABSOLUTE" value="CANCELLA" scope=""/>
+				<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="LOCAL"/>                    
+				<PARAMETER name="prgDichDisponibilita" type="RELATIVE" value="prgDichDisponibilita" scope="LOCAL"/>
+				<PARAMETER name="NUMKLOPATTOKLAVORATORE" type="RELATIVE" value="NUMKLOPATTOKLAVORATORE" scope="LOCAL"/>
+			</DELETE_CAPTION>            
+			-->        
+      </CAPTIONS>      
+  </CONFIG>
+</MODULE>
+
+
+<!--M_HasStorElAnag-->
+<MODULE name="M_HasStorElAnag" class="it.eng.sil.module.patto.HasStorElAnag" >
+ <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="PATTO_HAS_STOR_ELANAG" >
+      <PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY>
+ </CONFIG>
+</MODULE> 
+
+
+
+
+<!--
+utilizzo sempre il modulo ElencoAzioni dato che gestisce la operazione di select
+-->
+<MODULE name="M_PattoDettaglioStorico" class="it.eng.sil.module.patto.ElencoAzioni">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_PATTO_DETTAGLIO_INF_STORICHE">
+           <PARAMETER name="PRGPATTOLAVORATORE" type="RELATIVE" value="PRGPATTOLAVORATORE" scope="SERVICE_REQUEST"/>                       
+    </QUERY>       
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetTabelleNonLegateAlPatto" 
+        class="it.eng.sil.module.patto.GetInfoVarieNonLegate" >
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY_INDISP_TEMP statement="GET_INDISP_TEMP_NON_LEGATE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_INDISP_TEMP>
+    <QUERY_CM_ISCR statement="GET_AM_CM_ISCR_NON_LEGATE">
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_CM_ISCR>
+    <QUERY_PR_STUDIO statement="GET_PR_STUDIO_NON_LEGATE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_PR_STUDIO>   
+    <QUERY_PR_ESP_LAV statement="GET_PR_ESP_LAVORO_NON_LEGATE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_PR_ESP_LAV> 
+    <QUERY_PR_CORSO statement="GET_PR_CORSO_NON_LEGATE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_PR_CORSO>
+    <QUERY_PR_MANSIONE statement="GET_PR_MANSIONI_NON_LEGATE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_PR_MANSIONE>
+    <QUERY_AM_MB_IS statement="GET_AM_MOBILITA_ISCR_NON_LEGATE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_AM_MB_IS>
+    <QUERY_AM_OBBFO statement="GET_AM_OBBLIGO_FORMATIVO_NON_LEGATE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_AM_OBBFO>
+    <QUERY_AM_EX_PS statement="GET_AM_EX_PS_NON_LEGATE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_AM_EX_PS>
+    <QUERY_PR_IND statement="GET_PR_IND_NON_LEGATE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_PR_IND>
+    <QUERY_OR_PER statement="GET_OR_PER_NON_LEGATE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_OR_PER>
+    <QUERY_AG_LAV statement="GET_APPUNTAMENTI_NON_LEGATI">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_AG_LAV>
+    <!-- situazione particolare: ho i dati di una tabella, de_impegno, che viene utilizzata in due sezioni distinte
+         (azioni del cpi ed azioni del lavoratore) -->
+    <QUERY_DE_IMPE_C statement="GET_IMPEGNI_CPI_NON_LEGATI_AL_PATTO">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_DE_IMPE_C>
+    <QUERY_DE_IMPE_L statement="GET_IMPEGNI_LAV_NON_LEGATI_AL_PATTO">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_DE_IMPE_L>    
+    <QUERY_GET_PATTO_APERTO statement="GET_PATTO_APERTO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+	</QUERY_GET_PATTO_APERTO> 
+    <QUERY_GET_PATTO_AZIENDA_APERTO statement="GET_PATTO_APERTO_AZIENDA">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda"/>
+	</QUERY_GET_PATTO_AZIENDA_APERTO> 
+
+    <QUERY_DE_IMPE_C_AZ statement="GET_IMPEGNI_CPI_NON_LEGATI_AL_PATTO_AZIENDA">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda"/>
+    </QUERY_DE_IMPE_C_AZ>
+    
+    <QUERY_DE_IMPE_AZ statement="GET_IMPEGNI_AZIENDA_NON_LEGATI_AL_PATTO">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda"/>
+    </QUERY_DE_IMPE_AZ>   
+    
+  </CONFIG>
+</MODULE>
+
+
+<!--
+utilizzo sempre il modulo ElencoAzioni dato che gestisce la operazione di select
+-->
+<MODULE name="M_DispoDettaglioStorico" class="it.eng.sil.module.patto.ElencoAzioni">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_AN_DISPO"><!--GET_DISPO_DETTAGLIO_INF_STORICHE-->
+           <PARAMETER name="PRGDICHDISPONIBILITA" type="RELATIVE" value="PRGDICHDISPONIBILITA" scope="SERVICE_REQUEST"/>                       
+    </QUERY>       
+  </CONFIG>
+</MODULE>
+
+
+<!--
+utilizzo sempre il modulo ElencoAzioni dato che gestisce la operazione di select
+-->
+<MODULE name="M_ElAnagDettaglioStorico" class="it.eng.sil.module.patto.ElencoAzioni">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_ELANAG_STORICO"><!--GET_EL_ANAG_DETTAGLIO_INF_STORICHE-->
+    	<!--10/09/04 Non viene più utilizata questa: "GET_ELANAG" in quanto seleziona quella attualmente aperta, e non quella storicizzata -->
+           <PARAMETER name="PRGELENCOANAGRAFICO" type="RELATIVE" value="PRGELENCOANAGRAFICO" scope="SERVICE_REQUEST"/>                       
+    </QUERY>       
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_DelLavPattoScelta" class="it.eng.sil.module.patto.DelLavPattoScelta">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DEL_LAV_PATTO_SCELTA">
+           <PARAMETER type="RELATIVE" value="PRGLAVPATTOSCELTA" scope="SERVICE_REQUEST"/>                       
+    </QUERY>       
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_InsertAmLavPattoScelta" class="it.eng.sil.module.patto.InsertAmLavPattoScelta">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT statement="INS_LAV_PATTO_SCELTA_COMPLETO">
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_PATTO_LAVORATORE"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="COD_LST_TAB"/>	
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_TAB"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCHIAVETABELLA2"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCHIAVETABELLA3"/>
+    </QUERY_INSERT>      
+    <QUERY_SELECT statement="GET_PATTO_APERTO">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY_SELECT>
+    <QUERY_SELECT_IMPEGNI_CORR_AZIONI statement="GET_IMPEGNI_AZIONI_COL">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PROGRESSIVO"/><!-- PROGRESSIVO=PRGPERCORSO -->
+    </QUERY_SELECT_IMPEGNI_CORR_AZIONI>
+    <QUERY_SELECT_IMPEGNI_CORR_SERVIZI statement="GET_IMPEGNI_SERVIZI_COL">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PROGRESSIVO"/><!-- PROGRESSIVO=PRGAPPUNTAMENTO -->
+    </QUERY_SELECT_IMPEGNI_CORR_SERVIZI>
+    <QUERY_SELECT_IMPEGNO_PATTO statement="GET_IMPEGNO_PATTO">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOLAVORATOREIMP"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODIMPEGNOPATTO"/>
+    </QUERY_SELECT_IMPEGNO_PATTO>    
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_DeleteAmLavPattoScelta" class="it.eng.sil.module.patto.DeleteAmLavPattoScelta">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_DELETE statement="DEL_LAV_PATTO_SCELTA">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_LAV_PATTO_SCELTA"/>
+    </QUERY_DELETE>
+	<QUERY_SELECT statement="GET_PATTO_APERTO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+	</QUERY_SELECT>
+  <QUERY_SELECT_INFO statement="GET_INFO_LAV_PATTO_SCELTA">
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_LAV_PATTO_SCELTA"/>
+  </QUERY_SELECT_INFO>
+  <QUERY_SELECT_IMPEGNI_LEGATI_AZIONE statement="GET_IMPEGNI_LEGATI_AZIONE">
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_LAV_PATTO_SCELTA"/>
+  </QUERY_SELECT_IMPEGNI_LEGATI_AZIONE>
+  <QUERY_SELECT_IMPEGNI_LEGATI_SERVIZIO statement="GET_IMPEGNI_LEGATI_SERVIZIO">
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_LAV_PATTO_SCELTA"/>
+  </QUERY_SELECT_IMPEGNI_LEGATI_SERVIZIO>
+  <QUERY_SELECT_IMPEGNI_MEMO statement="GET_IMPEGNO_PATTO">
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOLAVORATORE"/>
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCHIAVETABELLA"/>
+  </QUERY_SELECT_IMPEGNI_MEMO>
+  <QUERY_SELECT_IMPEGNI_IN_SERVIZIO statement="GET_IMPEGNI_SERVIZI">
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODIMPEGNO"/>
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOLAVORATORE"/>
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_LAV_PATTO_SCELTA"/>
+  </QUERY_SELECT_IMPEGNI_IN_SERVIZIO>
+  <QUERY_SELECT_IMPEGNI_IN_AZIONE statement="GET_IMPEGNI_AZIONI">
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODIMPEGNO"/>
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOLAVORATORE"/>
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_LAV_PATTO_SCELTA"/>
+  </QUERY_SELECT_IMPEGNI_IN_AZIONE>
+  <QUERY_DELETE_IMPEGNO_LEGATO statement="DELETE_IMPEGNO">
+    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_LAV_PATTO_SCELTA_IMPEGNO"/>
+  </QUERY_DELETE_IMPEGNO_LEGATO>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetImpegniLegatiAlPatto" class="it.eng.sil.module.patto.GetImpegniLegatiAlPatto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="GET_IMPEGNI_LEGATI_AL_PATTO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetDeTipoPatto" class="it.eng.sil.module.patto.GetDeTipoPatto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="GET_DE_TIPO_PATTO"/>		
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ST_CONF_STAMPA_PATTO" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_NUM_CONFIG_LOC_PARAM">
+		<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="STP_PAT"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_Lav_Iscrizioni_Cig" class="it.eng.sil.module.patto.LoadIscrCig">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="LOAD_ISCR_CIG">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Motivo_Chiusura" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DE_MOT_CHIUSURA"/>		
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Esito_Coll" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DE_ESITO_COLL"/>		
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_De_Linea_Azione" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DE_LINEA_AZIONE"/>		
+  </CONFIG>
+</MODULE>
+
+<!-- lista di decodifica per comboBox -->
+<MODULE name="M_De_List_Servizi" class="it.eng.sil.module.patto.ListDeServizio">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DE_LIST_SERVIZI"/>		
+  </CONFIG>
+</MODULE>
+
+<!-- Seleziona il prgspi a partire dal cdnut (progressivo dell'operatore che sta 
+     operando in quel momento, info che è presente in sessione -->
+<MODULE name="M_Select_PrgSPI_Da_CDNUT" class="it.eng.sil.module.patto.GetPrgSpiDaCdnUt">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="Select_PrgSPI_Da_CDNUT">
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    </QUERY_SELECT>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Configurazione_CIG" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="CONFIGURAZIONE_CIG"/>		
+  </CONFIG>
+</MODULE>
+
+<!-- ricerca per dettaglio di un colloquio -->
+<MODULE name="M_Load_Colloquio" class="it.eng.sil.module.patto.LoadColloquio">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="LOAD_COLLOQUIO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Insert_Colloquio" class="it.eng.sil.module.patto.InsertColloquio">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT_UNICO_CIG_COLLOQUIO statement="UNICO_CIG_COLLOQUIO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAltraIscr"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+	</QUERY_SELECT_UNICO_CIG_COLLOQUIO>
+	<QUERY_SELECT_CHECK_SERVIZIO_INI statement="GET_SERVIZIO_INI">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codServizio"/>
+	</QUERY_SELECT_CHECK_SERVIZIO_INI>	
+	<QUERY_SELECT_CHECK_SERVIZIO_REI statement="GET_SERVIZIO_REI">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codServizio"/>
+	</QUERY_SELECT_CHECK_SERVIZIO_REI>
+	<QUERY_SELECT_CHECK_SERVIZIO_UMBAT statement="GET_SERVIZIO_UMBAT">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codServizio"/>
+	</QUERY_SELECT_CHECK_SERVIZIO_UMBAT>		
+	<QUERY_SELECT_EXIST_PROGRAMMA_APERTO statement="GET_PROGRAMMA_COLLOQUIO_APERTO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codServizio"/>
+	</QUERY_SELECT_EXIST_PROGRAMMA_APERTO>
+    <QUERY_INSERT_COLLOQUIO statement="INSERT_COLLOQUIO">		
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codCpi"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datColloquio"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgSpi"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codServizio"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strnote"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAltraIscr"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datChiusuraPer"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codMotivoChiusuraPer"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codEsitoColl"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codLineaAz"/>
+		<PARAMETER scope="SESSION" value="_CDUT_" type="RELATIVE"/>
+		<PARAMETER scope="SESSION" value="_CDUT_" type="RELATIVE"/>    
+	</QUERY_INSERT_COLLOQUIO>	
+	<QUERY_INSERT_SCHEDA_COLLOQUIO statement="INSERT_SCHEDA_COLLOQUIO">		
+	  <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+	  <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strDesAspir"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strRisPotenz"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strVincLav"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strVincEst"/>    
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strObiettivo"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strAzioniCon"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRANALISILAVORO"/>
+	</QUERY_INSERT_SCHEDA_COLLOQUIO>
+	<QUERY_NEXTVAL statement="OR_COLLOQUIO_NEXTVAL"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Delete_Colloquio" class="it.eng.sil.module.patto.DeleteColloquio">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT_COLLOQUIO statement="LOAD_COLLOQUIO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+	</QUERY_SELECT_COLLOQUIO>	
+    <QUERY_DELETE_COLLOQUIO statement="DELETE_COLLOQUIO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+	</QUERY_DELETE_COLLOQUIO>
+	<QUERY_DELETE_SCHEDA_COLLOQUIO statement="DELETE_SCHEDA_COLLOQUIO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+	</QUERY_DELETE_SCHEDA_COLLOQUIO>	
+	<QUERY_DELETE_PERCORSI statement="DELETE_PERCORSI">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+	</QUERY_DELETE_PERCORSI>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Save_Colloquio" class="it.eng.sil.module.patto.SaveColloquio">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT_UNICO_CIG_COLLOQUIO statement="UNICO_CIG_COLLOQUIO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAltraIscr"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+	</QUERY_SELECT_UNICO_CIG_COLLOQUIO>
+	<QUERY_SELECT_EXIST_PROGRAMMA_APERTO statement="GET_PROGRAMMA_COLLOQUIO_APERTO_AGGIORNA">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codServizio"/>
+	</QUERY_SELECT_EXIST_PROGRAMMA_APERTO>	
+    <QUERY_UPDATE_COLLOQUIO statement="UPDATE_COLLOQUIO">                         
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datcolloquio"/>
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgspi"/>      
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codservizio"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strnote"/> 
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAltraIscr"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datChiusuraPer"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codMotivoChiusuraPer"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codEsitoColl"/>   
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codLineaAz"/>  
+      	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_" />       
+      	<!--PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="dtmmod"/-->
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="numklocolloquio"/>     
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+    </QUERY_UPDATE_COLLOQUIO>
+    <QUERY_UPDATE_SCHEDA_COLLOQUIO statement="UPDATE_SCHEDA_COLLOQUIO">                  
+	    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strDesAspir"/>
+	    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strRisPotenz"/>
+	    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strVincLav"/>
+	    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strVincEst"/>    
+	    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strObiettivo"/>      
+	    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strAzioniCon"/>
+	    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRANALISILAVORO"/>
+	    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>      
+    </QUERY_UPDATE_SCHEDA_COLLOQUIO>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_YG_CheckUtente" class="it.eng.sil.module.patto.CheckUtenteYG">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_List_Colloqui" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+    <CONFIG pool="SIL_DATI" title="" rows="20">
+      <QUERIES>
+          <SELECT_QUERY>   
+          	<STATEMENT_PROVIDER CLASS="it.eng.sil.module.patto.DynamicListColloqui"/>
+          </SELECT_QUERY>
+      </QUERIES> 
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Check_CIG_In_Colloquio" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="CHECK_CIG_IN_COLLOQUIO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Prestazione_CIG" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DE_PRESTAZIONI_CIG"/>		
+  </CONFIG>
+</MODULE>
+
+<!-- il prgPercorso e' di fatto la chiave primaria? posso utilizzare soltanto quella per accedere al record unico da  
+     cancellare? -->
+<MODULE name="M_DeletePercorso" class="it.eng.sil.module.patto.DeletePercorso">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT_CORSO_CIG statement="GET_CORSO_CIG">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPercorso"/>
+	</QUERY_SELECT_CORSO_CIG>    
+    <QUERY_SELECT_CIG statement="GET_PRESAINCARICO_CIG">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPercorso"/>
+	</QUERY_SELECT_CIG>
+	<QUERY_SELECT_AZIONI_IN_CORSO statement="GET_ALL_AZIONI_PROGRAMMA_IN_CORSO_DELETE">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+  	</QUERY_SELECT_AZIONI_IN_CORSO>
+  	<QUERY_GET_MAX_DATA_CONCLUSIONE statement="GET_MAX_DATA_CONCLUSIONE_PROGRAMMA">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+  	</QUERY_GET_MAX_DATA_CONCLUSIONE>
+  	<QUERY_SELECT_EXIST_PROGRAMMA_APERTO statement="GET_PROGRAMMA_APERTO_DA_COLLOQUIO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+	</QUERY_SELECT_EXIST_PROGRAMMA_APERTO>
+  	<QUERY_UPDATE_RIAPRI_CHIUDI_PROGRAMMA statement="UPDATE_RIAPRI_CHIUDI_PROGRAMMA">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATAFINECOLLPROGRAMMA"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOCOLLPROGRAMMA"/>
+  		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+  	</QUERY_UPDATE_RIAPRI_CHIUDI_PROGRAMMA>
+    <QUERY_DELETE statement="DELETE_PERCORSO">
+		<!--PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/-->
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPercorso"/>
+	</QUERY_DELETE>
+	<!-- cancellazione associazione al patto -->
+	<DELETE_LAV_PATTO_SCELTA statement="DEL_LAV_PATTO_SCELTA">
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_LAV_PATTO_SCELTA"/>
+    </DELETE_LAV_PATTO_SCELTA>    
+    <QUERY_SELECT_INFO statement="GET_INFO_LAV_PATTO_SCELTA">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_LAV_PATTO_SCELTA"/>
+  	</QUERY_SELECT_INFO>
+  	<QUERY_SELECT_ISCRIZIONE statement="GET_INFO_ISCR_CORSO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPercorso"/>
+  	</QUERY_SELECT_ISCRIZIONE>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_InsertPercorso" class="it.eng.sil.module.patto.InsertPercorso">
+  <CONFIG pool="SIL_DATI" title="">	
+    <QUERY_SELECT_MAX_PRESTAZIONE statement="GET_NUMMAXRIPETIZIONI_PRESTAZIONI">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZICIG"/>
+  	</QUERY_SELECT_MAX_PRESTAZIONE>	
+    <QUERY_SELECT_PRESTAZIONE statement="GET_NUMRIPETIZIONIESISTENTI_PRESTAZIONI_INSERT">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZICIG"/>
+  	</QUERY_SELECT_PRESTAZIONE>
+  	<QUERY_GET_ESITO_CONCLUSO statement="GET_ESITO_AZIONE">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODESITO"/>
+  	</QUERY_GET_ESITO_CONCLUSO>
+  	<QUERY_GET_INFO_COLLOQUIO statement="GET_INFO_COLLOQUIO">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+  	</QUERY_GET_INFO_COLLOQUIO>
+  	<QUERY_SELECT_AZIONI_IN_CORSO statement="GET_ALL_AZIONI_PROGRAMMA_IN_CORSO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+  	</QUERY_SELECT_AZIONI_IN_CORSO>
+  	<QUERY_UPDATE_RIAPRI_CHIUDI_PROGRAMMA statement="UPDATE_RIAPRI_CHIUDI_PROGRAMMA">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATAFINECOLLPROGRAMMA"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOCOLLPROGRAMMA"/>
+  		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+  	</QUERY_UPDATE_RIAPRI_CHIUDI_PROGRAMMA>
+  	<QUERY_SELECT_EXIST_PROGRAMMA_APERTO statement="GET_PROGRAMMA_APERTO_DA_COLLOQUIO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+	</QUERY_SELECT_EXIST_PROGRAMMA_APERTO>
+	<QUERY_NEXTVAL statement="OR_PERCORSO_CONCORDATO_NEXTVAL"/>
+	<!-- inserimento associazione al patto -->
+	<INSERT_LAV_PATTO_SCELTA statement="INS_LAV_PATTO_SCELTA_COMPLETO">
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_PATTO_LAVORATORE"/>
+	    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="COD_LST_TAB"/>	
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_TAB"/>    
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCHIAVETABELLA2"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCHIAVETABELLA3"/>          
+    </INSERT_LAV_PATTO_SCELTA>      
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListPercorsi" class="it.eng.afExt.dispatching.module.impl.ListModule">
+  <CONFIG pool="SIL_DATI" title="Percorsi Inseriti" rows="-1">
+    <QUERIES>
+    	<SELECT_QUERY statement="LIST_PERCORSI_CONCORDATI">
+      		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgcolloquio"/>
+  		</SELECT_QUERY>  
+  	 </QUERIES>   
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_UpdatePercorso" class="it.eng.sil.module.patto.UpdatePercorso">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT_CIG statement="GET_PRESAINCARICO_CIG">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPercorso"/>
+	</QUERY_SELECT_CIG>   
+    <QUERY_SELECT_MAX_PRESTAZIONE statement="GET_NUMMAXRIPETIZIONI_PRESTAZIONI">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZICIG"/>
+  	</QUERY_SELECT_MAX_PRESTAZIONE>	
+    <QUERY_SELECT_PRESTAZIONE statement="GET_NUMRIPETIZIONIESISTENTI_PRESTAZIONI_UPDATE">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZICIG"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPercorso"/>
+  	</QUERY_SELECT_PRESTAZIONE>
+  	<QUERY_SELECT_AZIONI_IN_CORSO statement="GET_ALL_AZIONI_PROGRAMMA_IN_CORSO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+  	</QUERY_SELECT_AZIONI_IN_CORSO>
+  	<QUERY_GET_MAX_DATA_CONCLUSIONE statement="GET_MAX_DATA_CONCLUSIONE_PROGRAMMA">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+  	</QUERY_GET_MAX_DATA_CONCLUSIONE>
+  	<QUERY_SELECT_EXIST_PROGRAMMA_APERTO statement="GET_PROGRAMMA_APERTO_DA_COLLOQUIO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+	</QUERY_SELECT_EXIST_PROGRAMMA_APERTO>
+  	<QUERY_UPDATE_RIAPRI_CHIUDI_PROGRAMMA statement="UPDATE_RIAPRI_CHIUDI_PROGRAMMA">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATAFINECOLLPROGRAMMA"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOCOLLPROGRAMMA"/>
+  		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>
+  	</QUERY_UPDATE_RIAPRI_CHIUDI_PROGRAMMA>
+    <QUERY_UPDATE statement="UPDATE_PERCORSO_CONCORDATO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datStimata"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzioni"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codEsito"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codEsitoRendicont"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datEffettiva"/>		
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strNote"/>
+		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZICIG"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgMediatore"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgAbilita"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgProgrammaq"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOLOGIADURATA"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMYGDURATAMIN"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMYGDURATAMAX"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMYGDURATAEFF"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgGruppo"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="numPartecipanti"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strCodiceFiscaleEnte"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datAdesioneGG"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquioAdesione"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPercorsoAdesione"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datAvvioAzione"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgOperatorePROPSpi"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgOperatoreAVVSpi"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgOperatoreCONCSpi"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datDichAzione"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codEnte"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGRDC"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPercorso"/>
+	</QUERY_UPDATE>
+	<!-- cancellazione associazione al patto -->
+	<DELETE_LAV_PATTO_SCELTA statement="DEL_LAV_PATTO_SCELTA">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_LAV_PATTO_SCELTA"/>
+    </DELETE_LAV_PATTO_SCELTA>
+    <QUERY_SELECT_INFO statement="GET_INFO_LAV_PATTO_SCELTA">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_LAV_PATTO_SCELTA"/>
+  	</QUERY_SELECT_INFO>
+    <INSERT_LAV_PATTO_SCELTA statement="INS_LAV_PATTO_SCELTA_COMPLETO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_PATTO_LAVORATORE"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="COD_LST_TAB"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_TAB"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCHIAVETABELLA2"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCHIAVETABELLA3"/>
+    </INSERT_LAV_PATTO_SCELTA>      
+  </CONFIG>
+</MODULE>
+
+
+<!-- percorso concordato legato o meno al patto --> 
+<MODULE name="M_GetPercorso" class="it.eng.sil.module.patto.GetPercorso">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_PERCORSO_CONCORDATO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPercorso"/>
+	</QUERY>
+	<!-- cancellazione associazione al patto -->
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_DeletePercorsi" class="it.eng.sil.module.patto.DeletePercorsi">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_DELETE statement="DELETE_PERCORSI">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>		
+	</QUERY_DELETE>
+	<!-- cancellazione associazione al patto -->
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_DeEsito" class="it.eng.sil.module.patto.GetDeEsito">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DE_ESITO"/>		
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_DEESITORENDICONT" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DE_ESITORENDICONT"/>		
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_GetCittadinanza" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_AN_LAV_CITTADINANZA">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY>		
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_DeAzioni_NoGroup" class="it.eng.sil.module.patto.GetDeAzioni">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DE_AZIONE_NOGROUP"/>		
+  </CONFIG>
+</MODULE>
+<MODULE name="M_DeAzioni" class="it.eng.sil.module.patto.GetDeAzioni">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DE_AZIONE"/>		
+  </CONFIG>
+</MODULE>
+<MODULE name="M_PattoApertoNote" class="it.eng.sil.module.patto.GetPattoApertoNote">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="PATTO_APERTO_NOTE">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+<MODULE name="M_UpdateNotePatto" class="it.eng.sil.module.patto.UpdateNotePatto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_UPDATE_NOTE_AZIONI statement="QUERY_UPDATE_NOTE_AZIONI">       
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTEAZIONI"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgpattolavoratore"/>
+    </QUERY_UPDATE_NOTE_AZIONI>
+    <QUERY_UPDATE_NOTE_IMPEGNI statement="QUERY_UPDATE_NOTE_IMPEGNI">       	
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTEIMPEGNI"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgpattolavoratore"/>
+    </QUERY_UPDATE_NOTE_IMPEGNI>
+    <QUERY_UPDATE_NOTE_AMBITO_PROF statement="QUERY_UPDATE_NOTE_AMBITO_PROF">       	
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTEAMBITOPROF"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgpattolavoratore"/>
+    </QUERY_UPDATE_NOTE_AMBITO_PROF>
+    <QUERY_UPDATE_NOTE_SITUAZIONE_AMM statement="QUERY_UPDATE_NOTE_SITUAZIONE_AMM">       	
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTESITUAZIONEAMM"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgpattolavoratore"/>
+    </QUERY_UPDATE_NOTE_SITUAZIONE_AMM>
+    <QUERY_UPDATE_NOTE_FORMAZIONE_PROF statement="QUERY_UPDATE_NOTE_FORMAZIONE_PROF">
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strnoteformprof"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgpattolavoratore"/>
+    </QUERY_UPDATE_NOTE_FORMAZIONE_PROF>
+    <QUERY_UPDATE_NOTE_LAV_PATTO statement="UPDATE_NOTE_LAV_PATTO_SCELTA">
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRALTREINF"/>
+  	    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGLAVPATTOSCELTA"/>
+    </QUERY_UPDATE_NOTE_LAV_PATTO>
+  </CONFIG>
+</MODULE>
+
+<!-- estrae la autorizzazione al trattamento dei dati personali del lavoratore, se esite ed e' aperta -->
+<MODULE name="M_AutPrivacy" class="it.eng.sil.module.patto.GetAutorizzazionePrivacy">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="AUTORIZZAZIONE_PRIVACY">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    	
+    </QUERY>
+  </CONFIG>
+</MODULE>
+<MODULE name="M_AutPrivacyStorico" class="it.eng.sil.module.patto.GetAutorizzazionePrivacy">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_PRIVACY">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPrivacy"/>    	
+    </QUERY>
+  </CONFIG>
+</MODULE>
+<!-- decodifica de_azioni_ragg -->
+<MODULE name="M_DeAzioniRagg" class="it.eng.sil.module.patto.GetAzioniRagg">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_AZIONI_RAGG"/>
+  </CONFIG>
+</MODULE>
+<MODULE name="M_DeAzioniRagg_NonScad" class="it.eng.sil.module.patto.GetAzioniRagg">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_AZIONI_RAGG_NOT_SCAD"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_DeAzioniRagg_CodServizio" class="it.eng.sil.module.patto.GetAzioniRagg">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_AZIONI_RAGG_CODSERVIZIO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>    	
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_DeAzioniRagg_CodServizio_Dett" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_AZIONI_RAGG_CODSERVIZIO_DETTAGLIO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIONERAGG"/>	
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetAzioni" class="it.eng.sil.module.patto.GetAzioni">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_AZIONI_FROM_RAGG">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzioneRagg"/>    	
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_UltimoStoricoDispo" class="it.eng.sil.module.patto.GetUltimoStoricoDispo">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_ULTIMO_STORICO_DISPO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    	
+    </QUERY>
+  </CONFIG>
+</MODULE>
+<MODULE name="M_GetCartaIdentitaValida" class="it.eng.sil.module.patto.GetCartaIdentitaValida">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_CARTA_IDENTITA_VALIDA">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    	
+    </QUERY>
+  </CONFIG>
+</MODULE>
+<!--
+<MODULE name="M_GetCartaIdentita" class="it.eng.sil.module.patto.GetCartaIdentita">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_CARTA_IDENTITA">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    	
+    </QUERY>
+  </CONFIG>
+</MODULE>
+-->
+<MODULE name="M_UpdatePrivacy" class="it.eng.sil.module.patto.UpdatePrivacy">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_UPDATE statement="UPDATE_PRIVACY">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgAutoriz"/>
+    	<!--<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datFine"/>-->    	
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datInizio"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOPRIVACY"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPrivacy"/>	
+    </QUERY_UPDATE>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_InsertPrivacy" class="it.eng.sil.module.patto.InsertPrivacy">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT statement="INSERT_PRIVACY">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>       	 
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datInizio"/>    
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datFine"/>    
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="flgAutoriz"/>  
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>      	
+    </QUERY_INSERT>
+  </CONFIG>
+</MODULE>
+<MODULE name="M_DELETEPRIVACY" class="it.eng.sil.module.patto.DeletePrivacy">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_DELETE statement="DELETE_PRIVACY">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPrivacy"/>       	     	
+    </QUERY_DELETE>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_LISTAPRIVACYSTORICO" class="it.eng.afExt.dispatching.module.impl.ListModule" >
+    <CONFIG pool="SIL_DATI" title="ESITO RICERCA PRIVACY LAVORATORE" rows="20">
+      <QUERIES>
+          <SELECT_QUERY statement="GET_PRIVACY_STORICO">   
+           	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+          </SELECT_QUERY>
+      </QUERIES>
+      <COLUMNS>                            
+          <COLUMN name="DATINIZIO" label="Data inizio"/>            
+          <COLUMN name="DATFINE" label="Data fine"/>
+          <COLUMN name="FLGAUTORIZ" label="Autorizzazione"/>                                  
+      </COLUMNS>
+      <CAPTIONS>
+          <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+             <PARAMETER name="PAGE"   type="ABSOLUTE" value="PRIVACYDETTAGLIOPAGE"/>            
+             <PARAMETER name="prgPrivacy" type="RELATIVE" value="prgPrivacy" scope="LOCAL"/>                
+             <PARAMETER name="CDNFUNZIONE"        type="RELATIVE" value="CDNFUNZIONE"  scope="SERVICE_REQUEST"/> 
+             <PARAMETER name="CDNLAVORATORE"      type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+			 <PARAMETER name="FROM_PAGE"   type="ABSOLUTE" value="PRIVACYRICERCASTORICOPAGE"/>                         
+          </SELECT_CAPTION>
+          <DELETE_CAPTION confirm="TRUE" label="Cancella">
+             <PARAMETER name="PAGE" type="ABSOLUTE" value="PRIVACYRICERCASTORICOPAGE" scope=""/>                        
+             <PARAMETER name="DELETE" type="ABSOLUTE" value="1" scope=""/>                        
+             <PARAMETER name="prgPrivacy" type="RELATIVE" value="prgPrivacy" scope="LOCAL"/>                
+	         <PARAMETER name="CDNFUNZIONE"        type="RELATIVE" value="CDNFUNZIONE"  scope="SERVICE_REQUEST"/> 
+	         <PARAMETER name="CDNLAVORATORE"      type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>                              
+          </DELETE_CAPTION>
+      </CAPTIONS>      
+  </CONFIG>
+</MODULE>
+
+
+<!-- M_SavePattoAzienda -->
+<MODULE name="M_SavePattoAzienda" class="it.eng.sil.module.patto.SavePattoLav">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_UPDATE statement="UPDATE_PATTOAZIENDA">      
+
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datStipula"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codStatoAtto"/>      
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATSCADCONFERMA"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINE"/>      
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codMotivoFineAtto"/>       
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strNote"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOPATTOUNITAAZIENDALE"/>  
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOUNITAAZIENDA"/>
+    </QUERY_UPDATE>
+  </CONFIG>
+</MODULE>
+
+
+
+<MODULE name="M_GetImpegniAziendaLegatiAlPatto" class="it.eng.sil.module.patto.GetImpegniLegatiAlPatto">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="GET_IMPEGNI_AZIENDA_LEGATI_AL_PATTO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_PattoApertoAziendaNote" class="it.eng.sil.module.patto.GetPattoApertoNote">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="PATTO_APERTO_NOTE_AZIENDA">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_UpdateNoteAziendaPatto" class="it.eng.sil.module.patto.UpdateNotePattoImpegniAzienda">
+    <CONFIG pool="SIL_DATI" title="">
+         <QUERY statement="UPDATE_NOTE_AZIENDA_PATTO">
+        
+                  <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTEIMPEGNI"/>
+                  <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+                  <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOPATTOUNITAAZIENDALE"/>
+                  <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+         </QUERY>
+     </CONFIG>
+</MODULE>
+
+<MODULE name="M_DeleteAziendaPattoScelta" class="it.eng.sil.module.patto.DeleteAziendaPattoScelta">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_DELETE statement="DEL_AZIENDA_PATTO_SCELTA">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_PATTO_SCELTA_UNITA_AZIENDA"/>
+    </QUERY_DELETE>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_InsertAziendaPattoScelta" class="it.eng.sil.module.patto.InsertAziendaPattoScelta">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT statement="INS_AZIENDA_PATTO_SCELTA">
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_PATTO_AZIENDA"/>
+	    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="COD_LST_TAB"/>	
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_TAB"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCHIAVETABELLA2"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCHIAVETABELLA3"/>
+    </QUERY_INSERT>      
+    <QUERY_SELECT statement="GET_PATTO_APERTO_AZIENDA">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda"/>
+    </QUERY_SELECT> 
+  </CONFIG>
+</MODULE>
+
+<!-- Estrazione numGG -->
+<MODULE name="M_GetNumGG" class="it.eng.sil.module.patto.GetDatiGenDich">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="GET_DATI_GEN_DICH">
+  		
+    </QUERY_SELECT> 
+  </CONFIG>
+</MODULE>
+<!-- fine -->
+
+<!-- Nuovo patto da precedente -->
+<MODULE name="DUPLICA_PATTO_MOD" class="it.eng.sil.module.patto.DuplicaPatto">
+  <CONFIG pool="SIL_DATI" title="">
+    <SELECT_AM_PATTO_LAV statement="SELECT_AM_PATTO_LAV_ST">
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOLAVORATORE"/>
+    </SELECT_AM_PATTO_LAV>
+    <INSERT_AM_PATTO_LAV statement="DUPLICATE_AM_PATTO_LAV">
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOLAVORATORE"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGDICHDISPONIBILITA"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATSTIPULA"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSTATOATTO"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGSTATOOCCUPAZ"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGCOMUNICAZESITI"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODMOTIVOFINEATTO"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATSCADCONFERMA"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINE"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTE"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNUTINS"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DTMINS"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNUTMOD"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DTMMOD"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGPATTO297"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOPATTO"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTEAMBITOPROF"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTESITUAZIONEAMM"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTEAZIONI"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTEIMPEGNI"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+    </INSERT_AM_PATTO_LAV> 
+    <SELECT_AM_LAV_PATTO_SCELTA statement="SELECT_AM_LAV_PATTO_SCELTA_ST">
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOLAVORATORE"/>
+    </SELECT_AM_LAV_PATTO_SCELTA>
+    <INSERT_AM_LAV_PATTO_SCELTA statement="DUPLICATE_AM_LAV_PATTO_SCELTA">
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPATTOLAVORATORE"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODLSTTAB"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCHIAVETABELLA"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCHIAVETABELLA2"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGLAVPATTOSCELTAINFCOLL"/>              
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCHIAVETABELLA3"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRALTREINF"/>              
+    </INSERT_AM_LAV_PATTO_SCELTA>
+    <SELECT_NEW_PRGPATTOLAV statement="GET_NEW_PATTOLAV">
+    </SELECT_NEW_PRGPATTOLAV>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ModifichePattoMansioni" class="it.eng.sil.module.patto.ModifichePattoMansioni">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_MODIFICHE_PATTO_MANSIONI">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ModifichePattoAzioni" class="it.eng.sil.module.patto.ModifichePattoAzioni">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_MODIFICHE_PATTO_AZIONI">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+<MODULE name="M_ModifichePattoAppuntamenti" class="it.eng.sil.module.patto.ModifichePattoAzioni">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_MODIFICHE_PATTO_AGENDA">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_PattoProtocollatoModificato" class="it.eng.sil.module.patto.PattoProtocollatoModificato">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="PATTO_PROTOCOLLATO_MODIFICATO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_PattoAperto" class="it.eng.sil.module.patto.PattoProtocollatoModificato">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_PATTO_APERTO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    	    	
+    </QUERY>
+  </CONFIG>
+</MODULE>
+<MODULE name="M_PattiStoricizzati" class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_PATTI_STORICIZZATI">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    	    	
+    </QUERY>
+  </CONFIG>
+</MODULE>
+<!-- Recupera gli impegni associati al patto -->
+<MODULE name="M_GetImpegniLegatiPatto" class="it.eng.sil.module.patto.GetImpegniLegatiPatto">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERIES>	  
+	    <SELECT_FROM_CDNLAVORATORE statement="GET_IMPEGNI_ASSOCIATI_PATTO_DACDNLAV">
+	          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+	    </SELECT_FROM_CDNLAVORATORE>	    
+	    <SELECT_FROM_PRGPATTOLAVORATORE statement="GET_IMPEGNI_ASSOCIATI_PATTO">
+	          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>    
+	    </SELECT_FROM_PRGPATTOLAVORATORE>
+	</QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetAzioneLegatePatto" class="it.eng.sil.module.patto.GetAzioniLegatePatto">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERIES>	  
+	    <SELECT_FROM_CDNLAVORATORE statement="GET_AZIONI_ASSOCIATI_PATTO_DACDNLAV">
+	          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+	    </SELECT_FROM_CDNLAVORATORE>	    
+	    <SELECT_FROM_PRGPATTOLAVORATORE statement="GET_AZIONI_ASSOCIATI_PATTO">
+	          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>    
+	    </SELECT_FROM_PRGPATTOLAVORATORE>
+	</QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetPercorsiColloquio" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY statement="GET_PERCORSI_COLLOQUIO">	  	    
+	    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgColloquio"/>    
+	    <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+	</QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetPattoInfoCollegate" class="it.eng.sil.module.patto.GetPattoInfoCollegate">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY>
+  		<STATEMENT_PROVIDER CLASS="it.eng.sil.module.patto.DynamicRicercaAmLavPattoScelta"/>	    
+  		<!--  
+  		PARAMETRI NECESSARI: PROGRESSIVO_PATTO, CODICE_TABELLA, STRCHIAVETABELLA
+  		-->
+	</QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_InfoProtocollo" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY statement="GET_INFO_PROTOCOLLAZIONE">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCHIAVETABELLA"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PAGE_COLLEGATA"/>
+	</QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_RiapriDid" class="it.eng.sil.module.patto.RiapriDid">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY_UPDATE statement="riapriDid">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="numKloDid"/>
+  		<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="note"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codMotivoRiapertura"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgElencoAnagrafico"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgElencoAnagrafico"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDichDisponibilita"/>
+	</QUERY_UPDATE>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_getMotivoRiaperturaDid" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_MOT_RIAPERTURADID"/>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_getStatoAttoDid" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_COD_STATO_ATTO_DID"/>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_getMotivoAnnullamentoDid" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_MOT_ANNULLAMENTO_DID"/>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_AnnullaDid" class="it.eng.sil.module.patto.AnnullaDid">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY_UPDATE statement="annullaDid">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="numKloDid"/>
+  		<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="statoAtto"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="motivoAnnullamento"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDichDisponibilita"/>
+	</QUERY_UPDATE>
+	<!-- Non piu' usato per l'utilizzo della classe Documento
+	<QUERY_ANNULA_DOCUMENTO statement="annullaDocumento">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="statoAtto"/>
+  		<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgDocumento"/>
+	</QUERY_ANNULA_DOCUMENTO>
+	<QUERY_ANNULLA_PATTO statement="annullaPatto">
+  		<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="statoAtto"/>
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPatto"/>
+	</QUERY_ANNULLA_PATTO>
+	-->
+  </CONFIG>
+</MODULE>
+
+
+
+<MODULE name="M_IscrizioniMobilita" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="Iscrizioni_Mobilita">
+	          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+<MODULE name="M_stati_occupazionali_intervalli" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="STATI_OCCUPAZIONALI_INTERVALLI">
+	          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>	
+
+
+<!-- patto storicizzato nuova versione -->
+<MODULE name="SituazioneLavoratoreStorico" class="it.eng.sil.module.patto.CondizioneOccupazionale">
+  <CONFIG pool="SIL_DATI" title="">    
+    <QUERIES>
+        <QUERY_OBBLIGO_FORMATIVO statement="GET_PATTO_OBBLIGO_FORMATIVO_STORICO">            
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+        </QUERY_OBBLIGO_FORMATIVO>  
+        <QUERY_PERM_SOGG statement="GET_PATTO_PERM_SOGG_STORICO">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+        </QUERY_PERM_SOGG>        
+        <QUERY_STATO_OCCUPAZIONALE statement="GET_PATTO_STATO_OCCUPAZ_STORICO">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+        </QUERY_STATO_OCCUPAZIONALE>
+        <QUERY_ISCR_MOBILITA statement="GET_PATTO_MOBILITA_ISCR_STORICO">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+        </QUERY_ISCR_MOBILITA>
+        <QUERY_INDISP_TEMP statement="GET_PATTO_INDISP_TEMP_STORICO">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+        </QUERY_INDISP_TEMP>
+        <QUERY_ESPERIENZE_LAV statement="GET_PATTO_ESP_LAV_STORICO">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+        </QUERY_ESPERIENZE_LAV>
+        <QUERY_TITOLI_STUDIO statement="GET_PATTO_LAVORATORE_TITOLI_STORICO">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+        </QUERY_TITOLI_STUDIO>        
+        <QUERY_FORMAZIONE_PROF statement="GET_PATTO_CORSO_STORICO">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+        </QUERY_FORMAZIONE_PROF>
+         <QUERY_ISRC_COLLOCAMENTO_MIRATO statement="GET_PATTO_AM_CM_ISCR_STORICO">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+        </QUERY_ISRC_COLLOCAMENTO_MIRATO>
+    </QUERIES>
+  </CONFIG>
+</MODULE>
+<MODULE name="NotePattoStoricizzato" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="NOTE_PATTO_STORICIZZATO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+<MODULE name="InfoProtocolloPattoStoricizzato" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="INFO_PROTOCOLLO_PATTO_STORICIZZATO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="PattoElencoMansioniStorico" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="PATTO_ELENCO_MANSIONI_STORICO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    </QUERY>       
+  </CONFIG>
+</MODULE>
+
+<MODULE name="PattoElencoIndisponibilitaStorico" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="PATTO_ELENCO_INDISPONIBILITA_STORICO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    </QUERY>       
+  </CONFIG>
+</MODULE>
+
+<MODULE name="PattoElencoAppuntamentiStorico" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="PATTO_ELENCO_APPUNTAMENTI_STORICO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    	<!--PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NONFILTRARE"/-->
+    </QUERY>  
+  </CONFIG>
+</MODULE>
+
+<!-- M_ElencoAzioni -->
+<MODULE name="PattoElencoAzioniStorico" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="PATTO_AZIONI_STORICO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+    </QUERY>       
+  </CONFIG>
+</MODULE>
+
+<MODULE name="PattoImpegniStorico" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="PATTO_IMPEGNI_STORICO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgPattoLavoratore"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE>
+
+<!-- Modules per le iscrizioni al Collocamento Mirato chiuse che possono essere riaperte-->
+<MODULE name="CMIscrLavL68Chiuse" class="it.eng.sil.module.patto.CMCheckIscrLavL68Chiuse">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_PROC statement="CHECK_LAV_CM_ISCR_CHIUSE"/>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_LOAD_ISCRCHIUSEL68" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+  <CONFIG pool="SIL_DATI" title="Ultime Iscrizioni Al Collocamento Mirato" rows="2">
+	<QUERIES>
+		<SELECT_QUERY>				
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.patto.DynLoadIscrChiuseL68" />
+		</SELECT_QUERY>
+	</QUERIES>
+    <COLUMNS>
+        <COLUMN name="DATINIZIO" label="Data inizio"/>
+        <COLUMN name="DESCRIZIONEISCR" label="Categoria"/>                        
+        <COLUMN name="TIPO" label="Tipo"/>            
+        <COLUMN name="DESCRIZIONEINV" label="Tipo invalidit&amp;agrave;"/> 
+        <COLUMN name="DATFINE" label="Data fine"/>
+        <COLUMN name="DESCRMOTIVOFINEATTO" label="Motivo chiusura"/>           
+    </COLUMNS>
+    <CAPTIONS>
+        <SELECT_CAPTION image="../../img/add.gif" label="Scegli" confirm="false">
+        	<PARAMETER name="FROM_PAGE" type="RELATIVE" value="FROM_PAGE" scope="SERVICE_REQUEST" />
+        	<PARAMETER name="PAGE" type="ABSOLUTE" value="CMIscrLavL68ChiusePage" />
+           	<PARAMETER name="MODULE" type="ABSOLUTE" value="CM_INSERT_ISCRL68" />
+           	<PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/> 
+           	<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/> 
+           	<PARAMETER name="CDNLAVORATORENCRYPT" type="RELATIVE" value="CDNLAVORATORENCRYPT" scope="LOCAL"/>
+           	<PARAMETER name="DATANZIANITA68" type="RELATIVE" value="dataDichDid" scope="SERVICE_REQUEST"/>
+            <PARAMETER name="OLDPRGCMISCR" type="RELATIVE" value="PRGCMISCR" scope="LOCAL"/>
+        </SELECT_CAPTION>
+    </CAPTIONS>      
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_INSERT_ISCRL68" class="it.eng.sil.module.patto.InsertIscrLavL68DaDid" >
+  <CONFIG pool="SIL_DATI" title="" >
+    <QUERY_PROC statement="GET_NUM_CM_ISCR"/>
+    <QUERY_SEQUENCE statement="GET_NEW_PRG_CM_ISCR"/> 
+    <QUERY_SELECT_OLD_ISCR statement="GET_DETT_AM_CM_ISCR">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="OLDPRGCMISCR"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORENCRYPT"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+    </QUERY_SELECT_OLD_ISCR>    
+    <QUERY_INSERT_ISCR statement="QUERY_INSERT_ISCR"/>
+	<QUERY_DAT_VERB_ACC statement="SELECT_DAT_VERB_ACC">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGVERBALEACC"/>	
+    </QUERY_DAT_VERB_ACC>    
+    <QUERY_PROC_FLAG statement="SET_FLAG_LAV_CM_ISCR"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="GET_VERB_ACC_CM_ISCR" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="CM_ISCR_VERB_ACC" >
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGVERBALEACC"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+
+<!-- lista di decodifica Stato del Programma -->
+<MODULE name="M_GetProgrammi" class="it.eng.sil.module.ComboGenerica">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DE_Programmi"/>		
+  </CONFIG>
+</MODULE>
+
+<!-- Corsi Iscritti -->
+<!-- <MODULE name="M_GetCorsiIscritti" class="it.eng.sil.module.ComboGenerica">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DE_corsi_iscritti">		
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgcolloquio"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgpercorso"/>    	    	
+    </QUERY>
+  </CONFIG>
+</MODULE>   -->
+
+
+
+<MODULE name="M_GetCorsiIscritti"	class="it.eng.afExt.dispatching.module.impl.ListModule">
+	<CONFIG pool="SIL_DATI" title="Iscritto ai Corsi" rows="15" >		
+	    <QUERIES>
+	     <SELECT_QUERY statement="DE_corsi_iscritti">
+	         <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgcolloquio"/>
+	         <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgpercorso" />
+	     </SELECT_QUERY>
+        </QUERIES>
+		<COLUMNS>
+		    <COLUMN name="strtitolocorso" label="Corso" />
+		    <COLUMN name="datiniziocorso" label="Data Inizio" />
+		    <COLUMN name="datfinecorso" label="Data Fine" />	
+		    <COLUMN name="stredizionecorso" label="Edizione" />		    	    
+		    <COLUMN name="strsedeformazione" label="Sede" />
+		    <COLUMN name="numore" label="Numero Ore" />			       				
+		</COLUMNS>	
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_Get_Profiling_Patto" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_PROFILING_PATTO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY>		
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Get_Profiling_Patto_Cruscotto" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_PROFILING_PATTO_CRUSCOTTO">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY>		
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_COMBO_MN_YG_TIPOLOGIA_DURATA" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_MN_YG_TIPOLOGIA_DURATA"/>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_CheckSapYG" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">   
+  	<QUERY statement="CHECK_INVIO_SAP">
+
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY> 	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_InvioSapYG" class="it.eng.sil.module.patto.InviaSapYG">
+  <CONFIG pool="SIL_DATI" title="">    	
+
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Partecipante_GG_WS_DATIOBB"
+    class="it.eng.sil.module.patto.PartecipanteGGDatiObb">
+    <CONFIG pool="SIL_DATI" title="">
+        <GET_GG_COND_OBB statement="GET_Partecipante_GG_CondObb">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_GG_COND_OBB>
+        <GET_GG_COND_OBB_UMBRIA statement="GET_Partecipante_GG_CondObb_UMBRIA">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_GG_COND_OBB_UMBRIA>
+        <GET_DOTE_COND_OBB statement="GET_Partecipante_Dote_CondObb">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_DOTE_COND_OBB>
+        <GET_COND_OBB_TN statement="GET_Partecipante_CondObb_TN">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_COND_OBB_TN>              
+    </CONFIG>
+</MODULE>
+
+<MODULE name="M_PARTECIPANTE_GG_WS"
+    class="it.eng.sil.module.patto.PartecipanteGG">
+    <CONFIG pool="SIL_DATI" title="">
+        <GET_GG_DATIGIOVANE_ANLAV statement="GET_Partecipante_GG_DatiGiovane_anlav">
+        	<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_GG_DATIGIOVANE_ANLAV>
+        <GET_GG_DATIGIOVANE_PERMSOGG statement="GET_Partecipante_GG_DatiGiovane_perm_sogg">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_GG_DATIGIOVANE_PERMSOGG>
+        <GET_GG_DATIGIOVANE_CODPROVINCIA
+            statement="GET_Partecipante_GG_DatiGiovane_codprovincia">
+        </GET_GG_DATIGIOVANE_CODPROVINCIA>
+        <GET_GG_DATIGIOVANE_TITSTUDIO
+            statement="GET_Partecipante_GG_DatiGiovane_titstudio">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_GG_DATIGIOVANE_TITSTUDIO>
+        <GET_GG_DATIPROFILING_PATTO statement="GET_Partecipante_GG_DatiProfiling_patto">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_GG_DATIPROFILING_PATTO>
+        <GET_GG_DATIPROFILING_PATTO_DYN statement="GET_Partecipante_GG_DatiProfiling_Patto_Dynamic">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_GG_DATIPROFILING_PATTO_DYN>
+        <GET_GG_POLITICHEATTIVENONVALIDE statement="GET_Partecipante_GG_PoliticheAttiveNonValide">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_GG_POLITICHEATTIVENONVALIDE>
+        <GET_GG_MOVIMENTAZIONE statement="GET_Partecipante_GG_Movimentazione">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_GG_MOVIMENTAZIONE>
+        <GET_AZ_PATTO_ATTIVAZIONE_REG_GG statement="GET_Partecipante_GG_PattoAttivazione_Reg">
+        	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_AZ_PATTO_ATTIVAZIONE_REG_GG>
+        <GET_DATI_CONFERIMENTO_DID statement="GET_DATI_PROFILING_DID">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_DATI_CONFERIMENTO_DID>
+        <GET_GG_CRED_WS statement="GET_Partecipante_GG_CredWS">
+        </GET_GG_CRED_WS>
+    </CONFIG>
+</MODULE>
+
+<MODULE name="M_Rendicontazione_WS" class="it.eng.sil.module.patto.RendicontazioneWS">
+    <CONFIG pool="SIL_DATI" title="">
+    	<XML_GET_PARTECIPANTE statement="GET_PARTECIPANTE">
+    		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </XML_GET_PARTECIPANTE>
+        <XML_GET_Partecipante_GG_DatiGiovane_codprovincia statement="GET_Partecipante_GG_DatiGiovane_codprovincia">
+        </XML_GET_Partecipante_GG_DatiGiovane_codprovincia>
+        <XML_GET_PARTECIPANTE_PROFILING_PATTO statement="GET_PARTECIPANTE_PROFILING_PATTO">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </XML_GET_PARTECIPANTE_PROFILING_PATTO>
+        <XML_GET_Partecipante_GG_Movimentazione statement="GET_Partecipante_GG_Movimentazione">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </XML_GET_Partecipante_GG_Movimentazione>   
+        <XML_GET_WS_CREDENTIALS statement="GET_WS_CREDENTIALS">
+            <PARAMETER scope="LOCAL" type="ABSOLUTE" name="CODSERVIZIO" value="RENDICONTAZIONE" />
+        </XML_GET_WS_CREDENTIALS>
+    </CONFIG>
+</MODULE>
+
+<MODULE name="M_ConfigDurataAzione" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="ST_Get_Valore_Config_Generica">
+			<PARAMETER name="CODTIPOCONFIG" type="ABSOLUTE" value="DURAT_AZ" scope=""/>
+      	</QUERY>
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ConfigFormalizzazioneCompetenze" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="ST_GetConfig_Generica">
+			<PARAMETER name="CODTIPOCONFIG" type="ABSOLUTE" value="GG_A03FC" scope=""/>
+      	</QUERY>
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetAdesioniGG_Update" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="Get_Lista_Adesioni_GG_Update">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgpercorso"/>
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgcolloquio"/>
+		</QUERY>
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetAdesioniGG_Insert" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="Get_Lista_Adesioni_GG_Insert">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		</QUERY>
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetInfoLavAdesioneGG" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="WS_GET_CODICEFISCALE_LAVORATORE">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		</QUERY>
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetInfoRegioneGG" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="WS_GET_REGIONE_ADESIONE_GG">
+		</QUERY>
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetDatiUltimaAdesioneGG" class="it.eng.sil.module.anag.GetStatoAdesioneGG">
+	<CONFIG pool="SIL_DATI" title="">
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_SetStatoAdesioneGG" class="it.eng.sil.module.anag.SetStatoAdesioneGG">
+	<CONFIG pool="SIL_DATI" title="">
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetStatoAdesioneGGMin" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_STATI_ADESIONE_GG_MIN"/>	  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetTuttiStatoAdesioneGGMin" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_TUTTI_STATI_ADESIONE_GG_MIN"/>	  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetStatoAdesioneNuovoGGMin" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_STATI_ADESIONE_NUOVO_GG_MIN">
+			<PARAMETER scope="SERVICE_RESPONSE" type="RELATIVE" value="M_GetDatiUltimaAdesioneGG.YG_STATO"/>
+		</QUERY>
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetStatoAdesioneNuovoFromOld" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_STATI_ADESIONE_NUOVO_GG_MIN">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="currStato"/>
+		</QUERY>
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_CheckStatoPoliticheAttiveGG" class="it.eng.sil.module.anag.CheckStatoAdesione">
+	<CONFIG pool="SIL_DATI" title="">
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetUltimaAdesioneGGSistema" class="it.eng.sil.module.anag.UltimaAdesioneSistema">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_DATA_ULTIMA_ADESIONE_PERCORSO">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+		</QUERY>
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetUltimoInvioSAPSistema" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_DATA_ULTIMA_INVIO_SAP">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+		</QUERY>
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_InviaSAPDaCruscotto" class="it.eng.sil.module.anag.InviaSAPCruscotto">
+	<CONFIG pool="SIL_DATI" title="">
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_InsiemeAzioniCruscotto" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+    <CONFIG pool="SIL_DATI" title="" rows="-1">
+    	<QUERIES>
+          	<SELECT_QUERY>   
+          		<STATEMENT_PROVIDER CLASS="it.eng.sil.module.anag.DynamicAzioniCruscotto"/>
+          	</SELECT_QUERY>
+      	</QUERIES>
+      	<COLUMNS>
+          	<COLUMN name="datColloquio" label="Data colloquio"/>            
+          	<COLUMN name="datStimata" label="Data stimata"/>
+          	<COLUMN name="descAzione" label="Azione"/>                        
+          	<COLUMN name="descEsito" label="Esito"/>            
+          	<COLUMN name="datAdesione" label="Data adesione"/>                       
+      	</COLUMNS>
+ 	</CONFIG>
+</MODULE>
+
+<MODULE name="M_DeAzioni_Politiche_Attive" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DE_AZIONE_POLITICHE_ATTIVE"/>		
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_MotFineAttoSms" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DISPO_GET_MOTFINEATTO_SMS"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetInfoColloquio" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_INFO_COLLOQUIO">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCOLLOQUIO"/>
+		</QUERY>
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_CONFIG_VOUCHER" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_NUM_CONFIG_LOC_PARAM">
+		<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="VOUCHER"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_CONFIG_MAPPSERV" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_NUM_CONFIG_LOC_PARAM">
+		<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="MAPPSERV"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GET_VCH_PROFILING" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_Profiling_Voucher"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GET_DOTE_VCH_PROFILING" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_Dote_Profiling_Voucher"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetModelloVoucher" class="it.eng.sil.module.voucher.ModelloVoucher">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_Modello_Voucher_Valido_Associato">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIONE"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetCodiceAttivazioneVoucher" class="it.eng.sil.module.voucher.GetCodiciAttivazione">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY_ENTE_AZIONE statement="GET_Ente_Accreditato_Azione_Voucher">
+  	</QUERY_ENTE_AZIONE>
+    <QUERY_CODICE_ATTIVAZIONE statement="GET_Codice_Attivazione_Voucher">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGLAVPATTOSCELTA"/>
+    </QUERY_CODICE_ATTIVAZIONE>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_AssegnaVoucher" class="it.eng.sil.module.voucher.AssegnaVoucher">
+	<CONFIG pool="SIL_DATI" title="">
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ANNULLA_VOUCHER_AZIONE" class="it.eng.sil.module.voucher.AnnullaVoucher">
+	<CONFIG pool="SIL_DATI" title="">
+   	</CONFIG>
+</MODULE>
+
+<MODULE name="M_DettaglioVoucher" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_Dettaglio_Voucher">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGVOUCHER"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ProrogaVoucher" class="it.eng.sil.module.voucher.ProrogaVoucher">
+	<CONFIG pool="SIL_DATI" title="">
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GET_MOTIVO_ANNULL_VOUCHER" class="it.eng.sil.module.ComboGenerica">
+  <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+      <SELECT_QUERY statement="GET_COMBO_MOTIVO_ANNULLAMENTO_VOUCHER">
+      </SELECT_QUERY>
+    </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_CONFIG_PACCHETTO_ADULTI" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_NUM_CONFIG_LOC_PARAM">
+			<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="PACCO_AD"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GET_DATI_STATISTICI_PATTO" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_DATI_STATISTICI_PATTO">
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+ 
+<MODULE name="M_GetConfigOperatoriAzioni" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="ST_GETCONFIGURAZIONE_PROVINCIA">
+    	<PARAMETER name="CODTIPOCONFIG" type="ABSOLUTE" value="AZOPERAT" scope=""/>
+    </QUERY>	  
+  </CONFIG>
+</MODULE>
+ 
+<MODULE name="M_GET_OPERATORI_SPI" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="COMBO_GET_OPERATORI_SPI"/>		
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GET_OPERATORE_SPI_TS_UTENTE" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_OPERATORE_SPI_TS_UTENTE">
+    	<PARAMETER scope="SESSION"  type="RELATIVE" value="_CDUT_"/>		
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GET_VCH_PROFILING_FROM_PROFILO" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_PROFILING_PATTO_FROM_PROFILO_LAVORATORE">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_AccorpamentoGetUltimoInvioSAPSistema" class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+      <QUERY statement="SELECT_SP_LAV">
+         <PARAMETER name="cdnLavInCuiAccorpare" scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavInCuiAccorpare"/>
+      </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_CONFIG_SCHEDA_PARTECIPANTE" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_NUM_CONFIG_LOC_PARAM">
+		<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="SCHPART"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetPrestazioniAssociatePOC" class="it.eng.sil.module.patto.PrestazioniAssociatePOC">
+  <CONFIG pool="SIL_DATI" title="">
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_CONFIG_DID_L68" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_NUM_CONFIG_LOC_PARAM">
+		<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="DIDL68"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<!-- Movimenti Get Lista Enti Accreditati -->
+<MODULE name="M_PattoGetListaEnteAccreditato" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" title="Lista Enti Accreditati" rows="20">
+    <QUERIES> 
+      <SELECT_QUERY>   
+        <STATEMENT_PROVIDER CLASS="it.eng.sil.module.patto.RicercaEnteAccreditato"/>
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+       <COLUMN name="strcodicefiscale" label="Codice Fiscale"/>
+	   <COLUMN name="strdenominazione" label="Ragione Sociale" />
+	   <COLUMN name="STRINDIRIZZO" label="Indirizzo"/>
+	   <COLUMN name="Strcap" label="CAP"/>
+	   <COLUMN name="strTel" label="Telefono"/> 
+	   <COLUMN name="comune" label="Comune"/>
+	</COLUMNS>
+    <CAPTIONS>
+     <SELECT_CAPTION image="../../img/add.gif" label="Scegli" confirm="TRUE">
+        <PARAMETER name="PAGE" scope="" type="ABSOLUTE" value="PattoRicercaRefreshPage"/>
+        <PARAMETER name="cdnFunzione" scope="SERVICE_REQUEST" type="RELATIVE" value="cdnFunzione"/>                
+        <PARAMETER name="AGG_FUNZ" scope="SERVICE_REQUEST" type="ABSOLUTE" value="aggiornaSoggettoAcc"/>         
+        <PARAMETER name="enteCF" scope="LOCAL" type="RELATIVE" value="strcodicefiscale"/>         
+        <PARAMETER name="enteRagSoc" scope="LOCAL" type="RELATIVE" value="strdenominazione"/>
+        <PARAMETER name="enteCodSede" scope="LOCAL" type="RELATIVE" value="codsede"/>
+        <PARAMETER name="enteIndirizzo" scope="LOCAL" type="RELATIVE" value="STRINDIRIZZO"/>   
+        <PARAMETER name="enteTel" scope="LOCAL" type="RELATIVE" value="strTel"/>                             
+        <PARAMETER name="enteComune" scope="LOCAL" type="RELATIVE" value="comune"/>
+        <PARAMETER name="enteTarga" scope="LOCAL" type="RELATIVE" value="Strtarga"/>        
+      </SELECT_CAPTION> 
+    </CAPTIONS>
+	</CONFIG>
+</MODULE>
+<MODULE name="M_CONFIG_PATTO_ENTE_ACC" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_NUM_CONFIG_LOC_PARAM">
+		<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="ENTE_ACC"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+<MODULE name="M_CONFIG_PATTO_DAT_SCAD" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_NUM_CONFIG_LOC_PARAM">
+		<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="DTSCPTNL"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+<MODULE name="M_CONFIG_SAP_DID" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="ST_GETCONFIGURAZIONE_PROVINCIA">
+		<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="SAP_DID"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_Config_MODAZPT" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+      <QUERY statement="ST_GetConfig">
+	      <PARAMETER name="CODTIPOCONFIG" type="ABSOLUTE" value="MODAZPT" scope=""/>
+      </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_CONFIG_UMB_NGE_AZ" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_NUM_CONFIG_LOC_PARAM">
+		<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="UMBNGEAZ"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_RIAPRI_PATTO" class="it.eng.sil.module.patto.RiapriPatto">
+	<CONFIG pool="SIL_DATI" title="">
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_CONFIG_CANCELLA_ASSOCIAZIONI" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_NUM_CONFIG_LOC_PARAM">
+		<PARAMETER scope="SERVICE_REQUEST" type="ABSOLUTE" value="DELASSAZ"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+<MODULE name="M_Accreditamento_DATIOBB" class="it.eng.sil.module.doSelectModule">
+    <CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_PATTI_AREA1">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+<MODULE name="M_Accreditamento_Formazione_WS" class="it.eng.sil.module.patto.AccreditamentoArea1">
+    <CONFIG pool="SIL_DATI" title="">
+        <GET_ANAG_LAV statement="GET_AN_LAVORATORE_ANAG_SIFER">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_ANAG_LAV>
+        <GET_CODPROVINCIA statement="GET_Partecipante_GG_DatiGiovane_codprovincia">
+        </GET_CODPROVINCIA>
+        <GET_DATIPROFILING_PATTO statement="GET_EnteAccreditato_SIFER_Dati_patto_Area1">
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+            <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+        </GET_DATIPROFILING_PATTO>
+    </CONFIG>
+</MODULE>
+<MODULE name="M_GetVerificaNeetGGSistema" class="it.eng.sil.module.doSelectModule">
+    <CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GetVerificaNeetGGSistema">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+<MODULE name="M_ComboMinEsitoNeet" class="it.eng.sil.module.doSelectModule">
+    <CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="SELECT_COMBO_MN_YG_ESITO_NEET">
+		</QUERY>
+	</CONFIG>
+</MODULE>
+<MODULE name="M_ComboVerificaNeet" class="it.eng.sil.module.doSelectModule">
+    <CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="SELECT_COMBO_DE_VERIFICA_NEET">
+		</QUERY>
+	</CONFIG>
+</MODULE>
+<MODULE name="M_GestioneNeetGG" class="it.eng.sil.module.neet.gg.GestioneNeetGG">
+	<CONFIG pool="SIL_DATI" title="">
+	</CONFIG>
+</MODULE>
+<MODULE name="M_StoricoNeetGG" class="it.eng.afExt.dispatching.module.impl.ListModule">
+	<CONFIG pool="SIL_DATI" title="Storico Verifiche Condizioni NEET" rows="20">
+		<QUERIES>
+		    <SELECT_QUERY statement="GET_ALL_NEET_GG">
+				<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+		    </SELECT_QUERY>
+	    </QUERIES>
+		<COLUMNS>
+			<COLUMN name="strDatVerifica" label="Data verifica" />
+			<COLUMN name="strTipoVerificaNeet" label="Tipo verifica" />
+			<COLUMN name="strDatRif" label="Data riferimento" />
+			<COLUMN name="strFlgNeet" label="Esito verifica NEET" />
+			<COLUMN name="strEsitoMin" label="Esito min." />
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" label="" confirm="false">
+				<PARAMETER name="PAGE"          type="ABSOLUTE" value="DettaglioNeetGGPage"/>
+				<PARAMETER name="PRGVERIFICANEET" type="RELATIVE" scope="LOCAL" value="PRGVERIFICANEET" />
+		        <PARAMETER name="CDNFUNZIONE"   type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+		        <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+			</SELECT_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+<MODULE name="M_DettaglioNeetGG" class="it.eng.sil.utils.gg.SelectGG">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GetVerificaNeetGGFromPrg">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGVERIFICANEET"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+<MODULE name="M_Accreditamento_AZIONI" class="it.eng.sil.module.doSelectModule">
+    <CONFIG pool="SIL_DATI" title="" >
+		<QUERY statement="GET_AZIONI_AREA1">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+		</QUERY>
+	</CONFIG>
+</MODULE>

@@ -1,0 +1,39 @@
+<STATEMENT name="GET_TIPO_CERTIFICAZIONI"
+	query="select codtipocertificato as codice, strdescrizione || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE,
+						DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                               &apos;&apos;) AS STRSCADUTO		
+			from de_tipo_corso
+			order by DECODE(STRSCADUTO,&apos;&apos;,0,1),STRDESCRIZIONE
+"/>
+
+
+<STATEMENT name="SELECT_COMBO_COMUNI_PROVINCIA"
+	query="select CODCOM as CODICE, 
+                  STRDENOMINAZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE,
+						DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                               &apos;&apos;) AS STRSCADUTO		
+                  from DE_COMUNE 
+                  WHERE
+				    codprovincia = (
+				        SELECT
+				            codprovinciasil
+				        FROM
+				            ts_generale
+				    ) 
+				  AND TRUNC(SYSDATE) BETWEEN TRUNC(DATINIZIOVAL) AND TRUNC(DATFINEVAL)
+				    order by DECODE(STRSCADUTO,&apos;&apos;,0,1), STRDENOMINAZIONE" />
+				    
+<STATEMENT name="ST_CONFIG_CONF_FP_CODED" 
+	query=" select strvalore, ts_generale.codprovinciasil
+				from ts_config_loc, de_tipo_config, ts_generale
+				where ts_generale.codprovinciasil = ts_config_loc.strcodrif
+				and de_tipo_config.codtipoconfig = ts_config_loc.codtipoconfig
+				and ts_config_loc.codtipoconfig = 'FP_CODED'  "/>

@@ -1,0 +1,235 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/main_primefaces.xhtml">
+
+	<ui:define name="content">
+		<ui:include src="_header.xhtml" />
+		<div class="widget_container">
+			<div class="ui-widget-content ui-widget ui-corner-all">
+				<div style="margin: 2em">
+					<fieldset>
+						<legend>Dati ente</legend>
+						<table style="border-spacing: 1em; width: 80%">
+							<tr>
+								<td>
+									<p:outputLabel value="Ragione Sociale" />
+									<br />
+									<h:outputText
+										value="#{ygViewDichiarazioneNeetBean.dichiarazione.strRagioneSocialeEnte}" />
+								</td>
+								<td>
+									<p:outputLabel value="Codice fiscale"></p:outputLabel>
+									<br />
+									<h:outputText
+										value="#{ygViewDichiarazioneNeetBean.dichiarazione.strCodiceFiscaleEnte}" />
+								</td>
+							</tr>
+						</table>
+					</fieldset>
+
+					<fieldset>
+						<legend>Dati della dichiarazione:</legend>
+						<table style="border-spacing: 1em; width: 80%">
+							<tr>
+								<td>
+									<p:outputLabel value="Numero di protocollo"></p:outputLabel>
+									<br />
+									<h:outputText value="#{ygViewDichiarazioneNeetBean.dichiarazione.id}">
+									</h:outputText>
+								</td>
+								<td>
+									<p:outputLabel value="Data della dichiarazione"></p:outputLabel>
+									<br />
+									<h:outputText
+										value="#{ygViewDichiarazioneNeetBean.dichiarazione.dtDichiarazione}">
+										<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</td>
+								<td>
+									<p:outputLabel value="Stato della dichiarazione"></p:outputLabel>
+									<br />
+									<h:outputText value="#{ygViewDichiarazioneNeetBean.dichiarazione.strDescrizioneStatoDichiarazione}">
+									</h:outputText>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<p:outputLabel value="Nome" />
+									<br />
+									<h:outputText
+										value="#{ygViewDichiarazioneNeetBean.dichiarazione.strNomeLav}" />
+								</td>
+								<td>
+									<p:outputLabel value="Cognome"></p:outputLabel>
+									<br />
+									<h:outputText
+										value="#{ygViewDichiarazioneNeetBean.dichiarazione.strCognomeLav}" />
+								</td>
+								<td>
+									<p:outputLabel value="Codice Fiscale"></p:outputLabel>
+									<br />
+									<h:outputText
+										value="#{ygViewDichiarazioneNeetBean.dichiarazione.strCodiceFiscaleLav}" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<p:outputLabel value="Data di nascita"></p:outputLabel>
+									<br />
+									<h:outputText
+										value="#{ygViewDichiarazioneNeetBean.dichiarazione.dtNascitaLav}">
+										<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</td>
+								<td>
+									<p:outputLabel value="Comune di nascita"></p:outputLabel>
+									<br />
+									<ui:fragment rendered="#{not empty ygViewDichiarazioneNeetBean.dichiarazione.deComuneNascitaDTO.descrizione}">
+										<h:outputText
+											value="#{ygViewDichiarazioneNeetBean.dichiarazione.deComuneNascitaDTO.descrizione}">
+										</h:outputText>
+									</ui:fragment>
+									<ui:fragment rendered="#{empty ygViewDichiarazioneNeetBean.dichiarazione.deComuneNascitaDTO.descrizione}">
+										-----
+									</ui:fragment>
+								</td>
+							</tr>
+						</table>
+					</fieldset>
+
+					<ui:include src="_viewVerificaStatoNeetTable.xhtml" />
+
+					<h:form id="uploadDocumentoIdentitaForm">
+						<fieldset>
+							<legend>Scansione del documento di identità</legend>
+							<ui:fragment
+								rendered="#{not empty ygViewDichiarazioneNeetBean.dichiarazione.extDocumentoFile}">
+								<p>#{ygViewDichiarazioneNeetBean.dichiarazione.extDocumentoFileName}</p>
+								<p:commandButton styleClass="commandButtonMargin white-icon"
+									value="Scarica documento"
+									icon="ui-button-icon-primary ui-icon ui-icon-circle-triangle-s"
+									alt="Scarica documento" title="Scarica documento" ajax="false">
+									<p:fileDownload
+										value="#{ygViewDichiarazioneNeetBean.getDocumentoIdentita()}" />
+								</p:commandButton>
+							</ui:fragment>
+							<ui:fragment
+								rendered="#{empty ygViewDichiarazioneNeetBean.dichiarazione.extDocumentoFile}">
+								<ui:fragment
+									rendered="#{not ygViewDichiarazioneNeetBean.dichiarazione.flgCancellata}">
+									<p>Perchè la dichiarazione sia completa, devi caricare una
+										scansione del documento di identità del lavoratore.
+										(Dimensione massima: 5 MB)</p>
+									<p:fileUpload id="documentoIdentitaFileUpload" styleClass="neet-fileupload"
+										fileUploadListener="#{ygViewDichiarazioneNeetBean.documentoIdentitaUploaded}"
+										sizeLimit="5242880" allowTypes="/(\.|\/)(gif|jpe?g|png|pdf|bmp)$/"
+										dragDropSupport="false" fileLimit="1" multiple="false" update="@form" 
+										label="Carica documento" auto="true"
+										invalidSizeMessage="La dimensione del file dev'essere inferiore a 5 MB."
+										invalidFileMessage="Il file deve essere un'immagine o un PDF.">
+									</p:fileUpload>
+								</ui:fragment>
+								<ui:fragment
+									rendered="#{ygViewDichiarazioneNeetBean.dichiarazione.flgCancellata}">
+									<p>La dichiarazione è cancellata, non è possibile caricare
+										un documento.</p>
+								</ui:fragment>
+							</ui:fragment>
+							<p:messages />
+						</fieldset>
+					</h:form>
+
+					<h:form id="uploadDichiarazioneFirmataForm"
+						enctype="multipart/form-data">
+						<fieldset>
+							<legend>Scansione della dichiarazione firmata</legend>
+							<ui:fragment
+								rendered="#{not empty ygViewDichiarazioneNeetBean.dichiarazione.extUploadNeetFile}">
+								<p:commandButton styleClass="commandButtonMargin white-icon"
+									value="Scarica dichiarazione firmata"
+									icon="ui-button-icon-primary ui-icon ui-icon-circle-triangle-s"
+									alt="Scarica dichiarazione firmata"
+									title="Scarica dichiarazione firmata" ajax="false">
+									<p:fileDownload
+										value="#{ygViewDichiarazioneNeetBean.getDichiarazioneFirmata()}" />
+								</p:commandButton>
+							</ui:fragment>
+
+							<ui:fragment
+								rendered="#{empty ygViewDichiarazioneNeetBean.dichiarazione.extUploadNeetFile}">
+								<ui:fragment
+									rendered="#{not ygViewDichiarazioneNeetBean.dichiarazione.flgCancellata}">
+									<p>Una volta firmata la dichiarazione NEET, puoi caricare
+										una sua scansione. (Dimensione massima: 5 MB)</p>
+									<p:fileUpload id="dichiarazioneFirmataFileUpload" styleClass="neet-fileupload"
+										fileUploadListener="#{ygViewDichiarazioneNeetBean.dichiarazioneFirmataUploaded}"
+										sizeLimit="5242880" allowTypes="/(\.|\/)(gif|jpe?g|png|pdf|bmp)$/"
+										dragDropSupport="false" fileLimit="1" multiple="false" update="@form" 
+										label="Carica dichiarazione firmata" auto="true"
+										invalidSizeMessage="Dimensione massima: 5 MB."
+										invalidFileMessage="Il file deve essere un'immagine o un PDF.">
+									</p:fileUpload>
+								</ui:fragment>
+								<ui:fragment
+									rendered="#{ygViewDichiarazioneNeetBean.dichiarazione.flgCancellata}">
+									<p>La dichiarazione è cancellata, non è possibile caricare
+										la stampa firmata.</p>
+								</ui:fragment>
+							</ui:fragment>
+							<p:messages />
+						</fieldset>
+					</h:form>
+
+					<h:form id="buttonsForm">
+						<div>
+							<p:commandButton alt="Stampa dichiarazione"
+								value="Stampa dichiarazione" title="Stampa dichiarazione"
+								ajax="false"
+								icon="ui-button-icon-primary ui-icon ui-icon-document"
+								styleClass="m-r-1em white-icon" immediate="true"
+								rendered="#{not ygViewDichiarazioneNeetBean.dichiarazione.flgCancellata}">
+								<p:fileDownload
+									value="#{ygViewDichiarazioneNeetBean.getStampaPdf()}">
+								</p:fileDownload>
+							</p:commandButton>
+
+							<p:commandButton value="Torna indietro" ajax="false"
+								action="main?faces-redirect=true" styleClass="m-r-1em white-icon" immediate="true"
+								icon="ui-button-icon-primary ui-icon ui-icon-close" />
+
+							<p:commandButton value="Cancella dichiarazione" immediate="true"
+								icon="ui-button-icon-primary ui-icon ui-icon-trash"
+								styleClass="white-icon"
+								rendered="#{not ygViewDichiarazioneNeetBean.dichiarazione.flgCancellata}"
+								onclick="PF('cancellaDichiarazioneDialogWV').show();">
+							</p:commandButton>
+						</div>
+					</h:form>
+				</div>
+			</div>
+		</div>
+		<p:dialog id="cancellaDichiarazioneDialog"
+			widgetVar="cancellaDichiarazioneDialogWV" modal="true"
+			header="Conferma cancellazione">
+			<h:form id="cancellaDichiarazioneForm">
+				<p>Sei sicuro di voler cancellare questa dichiarazione?</p>
+				<div class="text-center">
+					<p:commandButton value="Sì" ajax="false" action="main?faces-redirect=true"
+						immediate="true"
+						icon="ui-button-icon-primary ui-icon ui-icon-trash"
+						styleClass="m-r-1em white-icon"
+						actionListener="#{ygViewDichiarazioneNeetBean.cancellaDichiarazione}">
+					</p:commandButton>
+					<p:commandButton value="No"
+						icon="ui-button-icon-primary ui-icon ui-icon-close"
+						immediate="true" styleClass="white-icon"
+						onclick="cancellaDichiarazioneDialogWV.close();" />
+				</div>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>

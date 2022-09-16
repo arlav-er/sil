@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	xmlns:pretty="http://ocpsoft.com/prettyfaces">
+
+	<p:dataTable id="usersTable" var="utenteInfo" value="#{accreditamentoForteUtentiBean.lazyDataModel}" paginator="true" rows="10"
+		paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+		rowsPerPageTemplate="5,10,15" lazy="true" widgetVar="usersTableWV" styleClass="default-data-table"
+		emptyMessage="#{ui['shared.noResults']}" rowIndexVar="rowIndex">
+
+		<p:column sortBy="#{utenteInfo.cognome}" headerText="Dati azienda" width="65%">
+			<div class="row">
+				<div class="col-md-6">
+					<ul>
+						<li>Nome: #{utenteInfo.pfPrincipal.nome} #{utenteInfo.pfPrincipal.cognome}</li>
+						<li>Username: #{utenteInfo.pfPrincipal.username}</li>
+						<li>CF: #{utenteInfo.codiceFiscale}</li>
+					</ul>
+				</div>
+				<div class="col-md-6">
+					<ul>				
+						<li>Data di Nascita: #{utenteInfo.dtNascita}</li>
+						<li>Telefono: #{utenteInfo.telCasa}</li>
+						<li>Email: #{utenteInfo.pfPrincipal.email}</li>
+					</ul>
+				</div>
+			</div>
+			<h:panelGroup rendered="#{not empty utenteInfo.pfPrincipal.registrazioneForteToken}">
+				<div class="row text-center">
+					<p>Codice da inviare all'utente: 
+						#{utenteInfo.pfPrincipal.registrazioneForteToken}
+					</p>
+				</div>
+			</h:panelGroup>
+		</p:column>
+
+		<p:column headerText="Accreditamento forte" styleClass="text-center" width="15%">
+			<ui:fragment rendered="#{utenteInfo.pfPrincipal.flagAbilitatoServizi}">	
+				Abilitato
+			</ui:fragment>
+			
+			<ui:fragment rendered="#{!utenteInfo.pfPrincipal.flagAbilitatoServizi
+				and utenteInfo.readyForAbilitazioneForte and !utenteInfo.pfPrincipal.flagAbilitaPec}">	
+				<p:commandLink styleClass="ui-button btn btn-primary action-abilita-link-#{rowIndex}" 
+					onstart="onAbilitaNoPecStart(#{rowIndex})" oncomplete="onAbilitaNoPecComplete(#{rowIndex})"
+					actionListener="#{accreditamentoForteUtentiBean.abilitaUtenteNoPec(utenteInfo)}"
+					update="usersTable" global="false">
+					Abilita
+				</p:commandLink>
+				<h:graphicImage styleClass="action-abilita-loader-#{rowIndex}" library="#{godfatherBean.theme}" 
+					name="images/loader.gif" alt="loader" style="display: none" />
+			</ui:fragment>
+			<ui:fragment rendered="#{!utenteInfo.pfPrincipal.flagAbilitatoServizi
+				and utenteInfo.readyForAbilitazioneForte and utenteInfo.pfPrincipal.flagAbilitaPec
+				and empty utenteInfo.pfPrincipal.registrazioneForteToken}">	
+				<p:commandLink styleClass="ui-button btn btn-primary" global="false"
+					actionListener="#{accreditamentoForteUtentiBean.setUtenteDaAbilitareConPec(
+						utenteInfo)}"
+					onclick="PF('abilitaPecDialogWV').show();">
+					Abilita
+				</p:commandLink>
+			</ui:fragment>
+			<ui:fragment rendered="#{!utenteInfo.pfPrincipal.flagAbilitatoServizi
+				and utenteInfo.pfPrincipal.flagAbilitaPec and utenteInfo.readyForAbilitazioneForte
+				and not empty utenteInfo.pfPrincipal.registrazioneForteToken}">
+				Abilitato
+			</ui:fragment>
+			
+			<ui:fragment rendered="#{!utenteInfo.pfPrincipal.flagAbilitatoServizi
+				and !utenteInfo.readyForAbilitazioneForte}">
+				Dati mancanti
+			</ui:fragment>
+		</p:column>
+		
+		<p:column headerText="Visualizza dati" styleClass="text-center">
+			<pretty:urlbuffer var="accreditamentoForteViewUtenteURL" mappingId="accreditamentoForteViewUtente">
+				<f:param id="viewUtenteId" value="#{utenteInfo.idPfPrincipal}"></f:param>
+			</pretty:urlbuffer>
+			<a href="#{accreditamentoForteViewUtenteURL}" target="_blank" class="ui-button btn btn-primary small"> <i class="fa fa-edit"></i>
+			</a>
+		</p:column>
+		
+		<p:column headerText="Modifica dati" styleClass="text-center">
+			<pretty:urlbuffer var="accreditamentoForteEditUtenteURL" mappingId="accreditamentoForteEditUtente">
+				<f:param id="editUtenteId" value="#{utenteInfo.idPfPrincipal}"></f:param>
+			</pretty:urlbuffer>
+			<a href="#{accreditamentoForteEditUtenteURL}" target="_blank" class="ui-button btn btn-primary small"> <i class="fa fa-edit"></i>
+			</a>
+		</p:column>
+	</p:dataTable>
+</ui:composition>
+

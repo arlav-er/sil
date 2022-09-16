@@ -1,0 +1,117 @@
+<MODULE name="MODULE_LISTA_DELEGHE_PER_LAVORATORE" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+
+	<CONFIG pool="SIL_DATI" title="Lista delle deleghe" rows="10">
+	
+	    <QUERIES>
+            <SELECT_QUERY>   
+             	<STATEMENT_PROVIDER CLASS="it.eng.sil.module.delega.SPListaDeleghePerLavoratoreSelezionato"/>
+            </SELECT_QUERY>
+        </QUERIES>
+        
+	    <COLUMNS>    	        
+	        <COLUMN name="DATAACQUISIZIONEDELEGA" label="Data acquisizione delega"/>
+	        <COLUMN name="DATAFINEDELEGA" label="Data fine delega"/>
+	        <COLUMN name="INSERIMENTO" label="Inserimento"/>							        	        
+		</COLUMNS>
+		
+		<CAPTIONS>     
+	      <DELETE_CAPTION image="../../img/del.gif" confirm="TRUE" label="Rimuovi la delega">
+	          <PARAMETER name="IDDELEGA" scope="LOCAL" type="RELATIVE" value="IDDELEGA"/>
+	          <PARAMETER name="ISDATAFINENULL" scope="LOCAL" type="RELATIVE" value="ISDATAFINENULL"/>	          
+	      </DELETE_CAPTION>
+		</CAPTIONS>	 
+		
+    	<!-- 
+    	<BUTTONS>
+      		<INSERT_BUTTON image="" label="Nuova delega" confirm="FALSE">
+          		<PARAMETER name="PAGE" type="ABSOLUTE" value="PAGE_XXXXXXXXXXXXXXX" scope="" />
+          	</INSERT_BUTTON>
+        </BUTTONS>
+         -->   
+        
+  	</CONFIG>
+</MODULE>
+
+<MODULE name="MODULE_INSERT_NEW_DELEGA" class="it.eng.sil.module.delega.ModuleInsertNewDelega">
+  <CONFIG pool="SIL_DATI" title="">    
+  	<QUERY_INSERT statement="STATEMENT_INSERT_NEW_DELEGA">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNDELEGA" />
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" />
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNUTINS" />
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNUTMOD" />
+    </QUERY_INSERT>
+    <QUERY_UPDATE statement="STATEMENT_UPDATE_ALTRA_DELEGA_END_DATE">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNDELEGA" />
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" />
+    </QUERY_UPDATE>  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MODULE_GET_DELEGA_FROM_GRUPPO" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="STATEMENT_GET_DELEGA_FROM_GRUPPO">
+			<PARAMETER type="RELATIVE" value="CDNGRUPPO" scope="SERVICE_REQUEST" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="MODULE_CHECK_DELEGA_ATTIVA" class="it.eng.sil.module.delega.DelegaAttivaTipoGruppo">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="STATEMENT_CHECK_DELEGA_ATTIVA">
+			<PARAMETER type="RELATIVE" value="TIPOGRUPPOUSER" scope="SERVICE_REQUEST" />
+			<PARAMETER type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="MODULE_CHECK_NOT_DELEGA_ATTIVA" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="STATEMENT_CHECK_NOT_DELEGA_ATTIVA">
+			<PARAMETER type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="MODULE_DELETE_DELEGA" class="it.eng.sil.module.delega.ModuleDeleteDelega">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_DELETE statement="STATEMENT_DELETE_DELEGA">
+	  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CANCELLADELEGA" />
+	    </QUERY_DELETE>
+	    <QUERY_UPDATE statement="STATEMENT_UPDATE_DELEGA_PER_DELETE">	    	
+	    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNUTMOD" />
+	    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" />	    	
+	    </QUERY_UPDATE>
+	</CONFIG>	
+</MODULE>
+
+<MODULE name="M_LISTA_TIPO_PATRONATO" 
+        class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="GET_LISTA_TIPO_PATRONATO"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_LISTA_UFFICIO_PATRONATO" 
+        class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="GET_LISTA_UFFICIO_PATRONATO"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_LISTA_OPERATORE_PATRONATO" 
+        class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="GET_LISTA_OPERATORE_PATRONATO"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_LISTA_PRATICHE_PATRONATI"
+        class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" rows="15" title="LISTA PRATICHE PATRONATI">
+    <QUERIES>
+      <SELECT_QUERY>
+        <STATEMENT_PROVIDER CLASS="it.eng.sil.module.delega.ListaPratichePatronatoDynStmt"/>
+      </SELECT_QUERY>
+    </QUERIES>
+  </CONFIG>
+</MODULE>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<xsd:schema
+	xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="https://sifer.regione.emilia-romagna.it/WebService/Crisi/PartecipanteCrisi"
+	xmlns:tns="https://sifer.regione.emilia-romagna.it/WebService/Crisi/PartecipanteCrisi"
+	xmlns:tipo="https://sifer.regione.emilia-romagna.it/WebService/Crisi/tipologie"
+	xmlns:lista="https://sifer.regione.emilia-romagna.it/WebService/Crisi/liste"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	
+	<xsd:import namespace="https://sifer.regione.emilia-romagna.it/WebService/Crisi/tipologie" schemaLocation="tipologie.xsd"/>
+	<xsd:import namespace="https://sifer.regione.emilia-romagna.it/WebService/Crisi/liste" schemaLocation="liste.xsd"/>
+	
+	<xsd:annotation>
+		<xsd:documentation>
+			Valore in MINUTI per il campo "durata" dell'elemento "servizio".
+		</xsd:documentation>
+	</xsd:annotation>
+	
+	<xsd:element name="PartecipanteCrisi">
+		<xsd:complexType>
+			<xsd:sequence>
+			
+				<xsd:element name="partecipante">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="codice_fiscale" type="tipo:codice_fiscale_type"/>
+
+							<xsd:element name="accorpamento" minOccurs="0" maxOccurs="unbounded">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="codice_fiscale_accorpato" type="tipo:codice_fiscale_type"/>
+										<xsd:element name="data_accorpamento" type="tipo:date_type"/>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							
+							<xsd:element name="cognome" type="tipo:varchar_type"/>
+							<xsd:element name="nome" type="tipo:varchar_type"/>
+							<xsd:element name="sesso" type="tipo:sesso_type"/>
+							<xsd:element name="nascita__data" type="tipo:date_type"/>					
+							<xsd:element name="nascita__codice_catastale" type="tipo:codice_catastale_type"/>
+							<xsd:element name="cittadinanza" minOccurs="0" type="tipo:codice_istat_nazione_type" nillable="true"/>
+							<xsd:element name="cittadinanza_seconda" minOccurs="0" type="tipo:codice_istat_nazione_type" nillable="true"/>
+							
+							<xsd:element name="telefono_cellulare" type="xsd:string" nillable="true"/>
+							<xsd:element name="email" type="tipo:email_type" nillable="true"/>
+							
+							<xsd:element name="residenza__codice_catastale" type="tipo:codice_catastale_type" nillable="true"/>
+							<xsd:element name="residenza__indirizzo" type="tipo:varchar_type" nillable="true"/>
+							<xsd:element name="residenza__cap" type="tipo:cap_type" nillable="true"/>
+							<xsd:element name="residenza__telefono" type="tipo:varchar_type" nillable="true"/>
+							
+							<xsd:element name="domicilio__codice_catastale" type="tipo:codice_catastale_type" nillable="true"/>
+							<xsd:element name="domicilio__indirizzo" type="tipo:varchar_type" nillable="true"/>
+							<xsd:element name="domicilio__cap" type="tipo:cap_type" nillable="true"/>
+							<xsd:element name="domicilio__telefono" type="tipo:varchar_type" nillable="true"/>
+							
+							<xsd:element name="titolo_studio" type="lista:titolo_studio" nillable="true"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				
+				<xsd:element name="accordo" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="azienda__codice_fiscale" type="tipo:codice_fiscale_type" nillable="true"/>
+							<xsd:element name="azienda__ragione_sociale" type="tipo:varchar_type" nillable="true"/>
+							<xsd:element name="azienda__codice_catastale" type="tipo:codice_catastale_type" nillable="true"/>
+							<xsd:element name="azienda__indirizzo" type="tipo:varchar_type" nillable="true"/>
+							<xsd:element name="azienda__cap" type="tipo:cap_type" nillable="true"/>
+							
+							<xsd:element name="tipo_contratto" type="tipo:tipo_contratto_type" nillable="true"/>
+														
+							<xsd:element name="cassa_integrazione__tipo" type="lista:tipo_cassa_integrazione"/>
+							<xsd:element name="cassa_integrazione__data_inizio" type="tipo:date_type" nillable="true"/>
+							<xsd:element name="cassa_integrazione__data_fine" type="tipo:date_type" nillable="true"/>
+							<xsd:element name="cassa_integrazione__periodi" type="xsd:string" nillable="true"/>
+														
+							<xsd:element name="presa_in_carico__data" type="tipo:date_type" nillable="true"/>
+							<xsd:element name="presa_in_carico__cpi_sportello" type="lista:cpi_sportello" nillable="true"/>
+							<xsd:element name="presa_in_carico__fine" type="tipo:date_type" nillable="true"/>
+							
+							<xsd:element name="servizio" minOccurs="0" maxOccurs="unbounded">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="tipo" type="lista:tipo_servizio"/>
+										<xsd:element name="durata" type="xsd:positiveInteger"/>
+										<xsd:element name="mediatore" type="tipo:si_no_type" nillable="true"/>
+										<xsd:element name="disabile" type="tipo:si_no_type" nillable="true"/>
+										<xsd:element name="esito" type="lista:esito_servizio" nillable="true"/>
+										<xsd:element name="data" type="tipo:date_type"/>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							
+							<xsd:element name="politica_attiva__data_ritiro" type="tipo:date_type" nillable="true"/>
+							<xsd:element name="data_decadenza" type="tipo:date_type" nillable="true"/>
+							<xsd:element name="data_rientro_lavoro" type="tipo:date_type" nillable="true"/>
+							
+							<xsd:element name="accordo_crisi__codice" type="tipo:varchar_type"/>
+							<xsd:element name="accordo_crisi__codice_precedente" type="tipo:varchar_type" nillable="true"/>
+							<xsd:element name="accordo_crisi__codice_temporaneo" type="tipo:si_no_type" nillable="true"/>
+							<xsd:element name="accordo_crisi__data_cessazione" type="tipo:date_type" nillable="true"/>
+							<xsd:element name="accordo_crisi__motivo_cessazione" type="lista:motivo_cessazione" nillable="true"/>
+							<xsd:element name="accordo_crisi__data_autorizzazione" type="tipo:date_type" nillable="true"/>
+							<xsd:element name="accordo_crisi__autorizzato" type="tipo:si_no_type" nillable="true"/>
+							
+							<xsd:element name="linea_azione" type="lista:linea_azione" nillable="true"/>
+
+							<xsd:element name="operazione" minOccurs="0" maxOccurs="unbounded">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="rif_pa_operazione" type="tipo:rif_pa_type"/>
+										<xsd:element name="ente_sede__id" type="xsd:positiveInteger"/>
+										<xsd:element name="annullamento_operazione" type="tipo:si_no_type" nillable="true"/>
+										<xsd:element name="data_ritiro_dichiarata" minOccurs="0" type="tipo:date_type" nillable="true"/>
+										<xsd:element name="data_termine_dichiarata" minOccurs="0" type="tipo:date_type" nillable="true"/>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							
+							<xsd:element name="proposta_catalogo" minOccurs="0" maxOccurs="unbounded">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="id_proposta_catalogo" type="xsd:positiveInteger"/>
+										<xsd:element name="ente_sede__id" type="xsd:positiveInteger"/>
+										<xsd:element name="italiano_per_stranieri" type="tipo:si_no_type" nillable="true"/>
+										<xsd:element name="annullamento_proposta_catalogo" type="tipo:si_no_type" nillable="true"/>
+										<xsd:element name="data_ritiro_dichiarata" minOccurs="0" type="tipo:date_type" nillable="true"/>
+										<xsd:element name="data_termine_dichiarata" minOccurs="0" type="tipo:date_type" nillable="true"/>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+														
+							<xsd:element name="annullamento_accordo" type="tipo:si_no_type" nillable="true"/>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+</xsd:schema>

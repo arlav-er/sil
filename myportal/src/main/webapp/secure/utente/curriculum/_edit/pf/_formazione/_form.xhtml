@@ -1,0 +1,156 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:eng="http://java.sun.com/jsf/composite/components">
+
+	<div class="form-group">
+		<p:outputLabel for="titoloFormazione" value="Titolo" styleClass="col-sm-3 control-label" />
+		<div class="col-md-9 col-lg-9">
+			<p:inputText id="titoloFormazione" required="true"
+				value="#{curriculumVitaePfBean.cvFormazioneProfPfSection.cvFormazione.titoloCorso}"
+				requiredMessage="Il titolo e' obbligatorio" styleClass="form-control" label="#{ui['sap.tematichePrincipali']}"
+				maxlength="255">
+			</p:inputText>
+			<p:message id="titoloFormazioneMessage" for="titoloFormazione"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel for="areaFormazione" value="Area" styleClass="col-sm-3 control-label">
+		</p:outputLabel>
+		<div class="col-md-9 col-lg-9">
+			<p:selectOneMenu id="areaFormazione"
+				value="#{curriculumVitaePfBean.cvFormazioneProfPfSection.cvFormazione.deAreaFormazione}"
+				converter="deAreaFormazioneConverter" required="true" filter="true" filterMatchMode="contains" style="width: 100%;"
+				emptyMessage="Nessuna area selezionata" requiredMessage="L'area e' obbligatoria" styleClass="form-control"
+				cache="true">
+				<f:selectItem itemLabel="" itemValue="" />
+				<f:selectItems value="#{curriculumVitaePfBean.getAreeValide()}" var="deAreaFormazione"
+					itemLabel="#{deAreaFormazione.descrizione}" itemValue="#{deAreaFormazione}" />
+			</p:selectOneMenu>
+			<p:message for="areaFormazione" />
+		</div>
+	</div>
+
+
+	<div class="form-group">
+		<p:outputLabel for="tematichePrincipali" value="Principali tematiche trattate" styleClass="col-sm-3 control-label" />
+		<div class="col-md-9 col-lg-9">
+			<p:inputTextarea id="tematichePrincipali" required="true"
+				value="#{curriculumVitaePfBean.cvFormazioneProfPfSection.cvFormazione.principaliTematiche}"
+				requiredMessage="E` necessario indicare la tematica principale del corso" styleClass="form-control compact-textarea"
+				autoResize="false" counter="tematichePrincipaliCount" counterTemplate="{0} caratteri rimanenti"
+				label="#{ui['sap.tematichePrincipali']}" widgetVar="tematichePrincipaliWV" maxlength="250">
+			</p:inputTextarea>
+			<p:message id="tematichePrincipaliMessage" for="tematichePrincipali"></p:message>
+			<h:outputText id="tematichePrincipaliCount" />
+		</div>
+	</div>
+
+
+	<div class="form-group">
+		<p:outputLabel for="formaIstituto" value="Istituto" styleClass="col-sm-3 control-label" />
+		<div class="col-md-9 col-lg-9">
+			<p:inputText id="formaIstituto" value="#{curriculumVitaePfBean.cvFormazioneProfPfSection.cvFormazione.nomeIstituto}"
+				styleClass="form-control" label="#{ui['sap.istituto']}" widgetVar="formaIstitutoWV" maxlength="100">
+			</p:inputText>
+			<p:message id="formaIstitutoMessage" for="formaIstituto"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel for="durata" value="Durata" styleClass="col-sm-3 control-label" />
+		<div class="col-md-9 col-lg-9">
+			<p:inputText id="durata" value="#{curriculumVitaePfBean.cvFormazioneProfPfSection.cvFormazione.durata}"
+				styleClass="form-control" label="#{ui['sap.istituto']}" maxlength="100">
+			</p:inputText>
+			<p:message id="durataMessage" for="durata"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel for="inCorso" value="In corso" styleClass="col-sm-3 control-label">
+		</p:outputLabel>
+		<div class="col-md-9 col-lg-9">
+			<p:selectBooleanCheckbox id="inCorso" styleClass="form-control"
+								value="#{curriculumVitaePfBean.cvFormazioneProfPfSection.cvFormazione.flgInCorso}">
+				<p:ajax update="anno" process="@this" listener="#{curriculumVitaePfBean.cvFormazioneProfPfSection.cleanValueAnno}"/>
+			</p:selectBooleanCheckbox>
+			<p:message id="incorsoMessage" for="inCorso"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel for="anno" value="Anno conseguimento"
+					   styleClass="col-sm-3 control-label" />
+		<div class="col-md-9 col-lg-9">
+			<p:inputText id="anno"
+						 value="#{curriculumVitaePfBean.cvFormazioneProfPfSection.cvFormazione.numAnno}"
+						 disabled="#{curriculumVitaePfBean.cvFormazioneProfPfSection.cvFormazione.flgInCorso}"
+						 required="#{!curriculumVitaePfBean.cvFormazioneProfPfSection.cvFormazione.flgInCorso}"
+						 maxlength="4" size="4" converterMessage="Anno non valido"
+						 requiredMessage="Anno Conseguimento Obbligatorio se non In corso"
+						 styleClass="form-control" label="Anno conseguimento">
+
+				<f:validator validatorId="annoPassatoValidator" for="function" />
+				<f:validateLength for="function" maximum="4" />
+			</p:inputText>
+			<p:message id="annoMessage" for="anno"></p:message>
+		</div>
+	</div>
+	<ui:remove>
+		<div class="form-group">
+			<p:outputLabel for="incorso" value="In corso"
+						   styleClass="col-sm-3 control-label" />
+			<div class="col-md-9 col-lg-9">
+				<p:selectOneMenu id="incorso"
+								 value="#{curriculumVitaePfBean.cvFormazioneProfPfSection.cvFormazione.flgInCorso}"
+								 label="In corso" styleClass="form-control" style="width: 100px"
+								 panelStyle="width: 100px;">
+					<f:selectItem itemLabel="" itemValue="" />
+					<f:selectItem itemLabel="Sì" itemValue="true" />
+					<f:selectItem itemLabel="No" itemValue="false" />
+				</p:selectOneMenu>
+				<p:message id="incorsoMessage1" for="incorso"></p:message>
+			</div>
+		</div>
+	</ui:remove>
+
+	<div class="form-group">
+		<p:outputLabel for="attestazione" value="Attestazione conseguita" styleClass="col-sm-3 control-label" />
+		<div class="col-md-9 col-lg-9">
+			<p:inputTextarea id="attestazione"
+				value="#{curriculumVitaePfBean.cvFormazioneProfPfSection.cvFormazione.attestazioneConseguita}"
+				requiredMessage="E` necessario indicare la tematica principale del corso" styleClass="form-control compact-textarea"
+				autoResize="false" counter="attestazioneCount" counterTemplate="{0} caratteri rimanenti" label="Attestazione"
+				widgetVar="attestazioneWV" maxlength="3000">
+			</p:inputTextarea>
+			<p:message id="attestazioneMessage" for="attestazione"></p:message>
+			<h:outputText id="attestazioneCount" />
+		</div>
+	</div>
+
+
+
+
+	<div class="text-center">
+		<p:defaultCommand target="syncOneFormazioneProf"></p:defaultCommand>
+		<p:commandLink id="syncOneFormazioneProf" actionListener="#{curriculumVitaePfBean.cvFormazioneProfPfSection.sync()}"
+			styleClass="btn btn-primary ui-button baby-btn uk-margin-top"
+			onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+			oncomplete="MyPortal.Curriculum.syncArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+			update="@(.ui-message)" process="@this, syncForm">                        
+            #{ui['shared.save']}
+        </p:commandLink>
+
+		<p:commandLink id="annulla" styleClass="btn btn-primary ui-button baby-btn uk-margin-top uk-margin-left "
+			onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+			oncomplete="MyPortal.Curriculum.cancelArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+			process="@this">                        
+            Annulla
+            <p:ajax update="syncForm, :formazioneForm:articles"
+				listener="#{curriculumVitaePfBean.cvFormazioneProfPfSection.cancelEditFormazione()}" resetValues="true" />
+		</p:commandLink>
+
+		<p:remoteCommand name="updateArticles" update=":formazioneForm:articles" process="@this"></p:remoteCommand>
+	</div>
+</ui:composition>

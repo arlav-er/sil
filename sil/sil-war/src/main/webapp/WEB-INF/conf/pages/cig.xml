@@ -1,0 +1,665 @@
+<!-- ricerca cig -->
+<PAGE distributed="false" name="CigRicercaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="CI_STATO_ALTRA_ISCR"/>
+		<MODULE keep="false" name="CI_MOTIVO_CHIUSURA"/>
+		<MODULE keep="false" name="CI_TIPO_ISCR"/>
+		<MODULE name="M_ELENCOCPI" />
+		<MODULE keep="false" name="M_GetIDOProvince" />				
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CigRicercaPage" target="CI_STATO_ALTRA_ISCR"/>
+		<DEPENDENCE source="CigRicercaPage" target="CI_MOTIVO_CHIUSURA" />
+		<DEPENDENCE source="CigRicercaPage" target="CI_TIPO_ISCR"/>	
+		<DEPENDENCE source="CigRicercaPage" target="M_ELENCOCPI"/>
+		<DEPENDENCE source="CigRicercaPage" target="M_GetIDOProvince"/>	
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- lista cig -->
+<PAGE distributed="false" name="CigListaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetConfigAltreIscr" />
+		<MODULE keep="false" name="M_ListaDomandeCig" />
+		<MODULE keep="false" name="M_ListaAltreIscrizioni" />
+		<MODULE keep="false" name="CI_TIPO_ISCR" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CigListaPage" target="M_GetConfigAltreIscr" />
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_ListaDomandeCig">
+			<CONDITIONS>
+					<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_ListaAltreIscrizioni"> 
+			<CONDITIONS>
+					<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_ListaAltreIscrizioni">
+			<CONDITIONS>
+					<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="2"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="CigListaPage" target="CI_TIPO_ISCR"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CigLavListaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetConfigAltreIscr" />
+		<MODULE keep="false" name="CI_TIPO_ISCR" />
+		<MODULE keep="false" name="CI_MOTIVO_CHIUSURA" />
+		<MODULE keep="false" name="CI_COMUNI_COMPETENZA" />
+		<MODULE keep="false" name="CI_STATO_ALTRA_ISCR_NO_FLAG" />
+		<MODULE keep="false" name="CI_STATO_ALTRA_ISCR_FLAG" />
+		<MODULE keep="false" name="M_GetGiorniTolleranza" />
+		<MODULE keep="false" name="M_InsertDomandaCig" />
+		<MODULE keep="false" name="M_InsertAltraIscrizione" />
+		<MODULE keep="false" name="M_ListaLavDomandeCig" />
+		<MODULE keep="false" name="M_ListaAltreIscrizioni" />
+		<MODULE keep="false" name="M_IscrizioniCIG" />
+		<MODULE keep="false" name="M_GetAltraIscrizione" />
+		<MODULE keep="false" name="M_UpdateIscrCIG" />
+		<MODULE keep="false" name="M_UpdateAltraIscrizione" />
+		<MODULE keep="false" name="M_DeleteIscrCig" />
+		<MODULE keep="false" name="M_DataInizioCig" />
+		<MODULE keep="false" name="M_DataFineCig" />
+		<MODULE keep="false" name="M_CodComDomLav" />
+		<MODULE keep="false" name="M_PdfAccordoSindacale"/>
+		<MODULE keep="false" name="CI_MOTIVO_NOT_DO" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CigLavListaPage" target="M_GetConfigAltreIscr"/>
+		
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="CI_TIPO_ISCR"/>	
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="CI_MOTIVO_CHIUSURA"/>
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="CI_COMUNI_COMPETENZA"/>
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="CI_STATO_ALTRA_ISCR_NO_FLAG"/>
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="CI_STATO_ALTRA_ISCR_FLAG"/>
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_CodComDomLav"/>
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="CI_MOTIVO_NOT_DO">
+			<CONDITIONS>
+				<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="CI_MOTIVO_NOT_DO">
+			<CONDITIONS>
+				<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="2"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_GetGiorniTolleranza">
+			<CONDITIONS>
+	        	<PARAMETER name="inserisci" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	        	<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_GetGiorniTolleranza">
+			<CONDITIONS>
+	        	<PARAMETER name="inserisci" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	        	<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="2"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetGiorniTolleranza" target="M_InsertDomandaCig">
+			<CONDITIONS>
+	        	<PARAMETER name="inserisci" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="GG_TOLLERANZA" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_GetGiorniTolleranza.ROWS.ROW.GG_TOLLERANZA"/>
+	    	</CONSEQUENCES> 
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_InsertDomandaCig" target="M_DataInizioCig">
+			<CONDITIONS>
+	        	<PARAMETER name="M_InsertDomandaCig.conferma" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="PRGACCORDO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_InsertDomandaCig.ROWS.ROW.PRGACCORDOCIG"/>
+	    	</CONSEQUENCES> 
+	    </DEPENDENCE>
+		
+		<DEPENDENCE source="M_InsertDomandaCig" target="M_DataFineCig">
+			<CONDITIONS>
+	        	<PARAMETER name="M_InsertDomandaCig.conferma" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="PRGACCORDO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_InsertDomandaCig.ROWS.ROW.PRGACCORDOCIG"/>
+	    	</CONSEQUENCES>  
+	    </DEPENDENCE>
+	    
+	    <DEPENDENCE source="M_GetConfigAltreIscr" target="M_GetGiorniTolleranza">
+			<CONDITIONS>
+	        	<PARAMETER name="aggiorna" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	        	<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_GetGiorniTolleranza">
+			<CONDITIONS>
+	        	<PARAMETER name="aggiorna" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	        	<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="2"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetGiorniTolleranza" target="M_UpdateIscrCIG">
+			<CONDITIONS>
+	        	<PARAMETER name="aggiorna" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="GG_TOLLERANZA" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_GetGiorniTolleranza.ROWS.ROW.GG_TOLLERANZA"/>
+	    	</CONSEQUENCES> 
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_UpdateIscrCIG" target="M_DataInizioCig">
+			<CONDITIONS>
+	        	<PARAMETER name="M_UpdateIscrCIG.conferma" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="PRGACCORDO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_UpdateIscrCIG.ROWS.ROW.PRGACCORDOCIG"/>
+	    	</CONSEQUENCES> 
+	    </DEPENDENCE>
+		
+		<DEPENDENCE source="M_UpdateIscrCIG" target="M_DataFineCig">
+			<CONDITIONS>
+	        	<PARAMETER name="M_UpdateIscrCIG.conferma" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="PRGACCORDO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_UpdateIscrCIG.ROWS.ROW.PRGACCORDOCIG"/>
+	    	</CONSEQUENCES>  
+	    </DEPENDENCE>
+	    
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_DeleteIscrCig">
+			<CONDITIONS>
+	        	<PARAMETER name="cancella" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	        	<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_DeleteIscrCig">
+			<CONDITIONS>
+	        	<PARAMETER name="cancella" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	        	<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="2"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_InsertAltraIscrizione">
+			<CONDITIONS>
+				<PARAMETER name="inserisci" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	        	<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_UpdateAltraIscrizione">
+			<CONDITIONS>
+				<PARAMETER name="aggiorna" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	        	<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_ListaLavDomandeCig">
+			<CONDITIONS>
+					<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_ListaLavDomandeCig">
+			<CONDITIONS>
+					<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="2"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_ListaAltreIscrizioni">
+			<CONDITIONS>
+					<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_IscrizioniCIG">
+			<CONDITIONS>
+	        	<PARAMETER name="dettaglio" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	        	<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_IscrizioniCIG">
+			<CONDITIONS>
+	        	<PARAMETER name="dettaglio" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	        	<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="2"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_IscrizioniCIG" target="M_PdfAccordoSindacale">
+			<CONDITIONS>
+	        	<PARAMETER name="M_IscrizioniCIG.ROWS.ROW.PRGACCORDO" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetConfigAltreIscr" target="M_GetAltraIscrizione">
+			<CONDITIONS>
+	        	<PARAMETER name="dettaglio" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	        	<PARAMETER name="M_GetConfigAltreIscr.CONFIGURAZIONE" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetAltraIscrizione" target="M_PdfAccordoSindacale">
+			<CONDITIONS>
+	        	<PARAMETER name="M_GetAltraIscrizione.ROWS.ROW.PRGACCORDO" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>		
+		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CigLavListaPage_OLD" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="CI_TIPO_ISCR" />
+		<MODULE keep="false" name="CI_MOTIVO_CHIUSURA" />
+		<MODULE keep="false" name="CI_COMUNI_COMPETENZA" />
+		<MODULE keep="false" name="CI_STATO_ALTRA_ISCR_NO_FLAG" />
+		<MODULE keep="false" name="CI_STATO_ALTRA_ISCR_FLAG" />
+		<MODULE keep="false" name="M_GetGiorniTolleranza" />
+		<MODULE keep="false" name="M_InsertDomandaCig" />
+		<MODULE keep="false" name="M_ListaLavDomandeCig" />
+		<MODULE keep="false" name="M_IscrizioniCIG" />
+		<MODULE keep="false" name="M_UpdateIscrCIG" />
+		<MODULE keep="false" name="M_DeleteIscrCig" />
+		<MODULE keep="false" name="M_DataInizioCig" />
+		<MODULE keep="false" name="M_DataFineCig" />
+		<MODULE keep="false" name="M_CodComDomLav" />
+		
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CigLavListaPage_OLD" target="CI_TIPO_ISCR"/>	
+		<DEPENDENCE source="CigLavListaPage_OLD" target="CI_MOTIVO_CHIUSURA"/>
+		<DEPENDENCE source="CigLavListaPage_OLD" target="CI_COMUNI_COMPETENZA"/>
+		<DEPENDENCE source="CigLavListaPage_OLD" target="CI_STATO_ALTRA_ISCR_NO_FLAG"/>
+		<DEPENDENCE source="CigLavListaPage_OLD" target="CI_STATO_ALTRA_ISCR_FLAG"/>
+		<DEPENDENCE source="CigLavListaPage_OLD" target="M_CodComDomLav"/>
+		
+		<DEPENDENCE source="CigLavListaPage_OLD" target="M_GetGiorniTolleranza">
+			<CONDITIONS>
+	        	<PARAMETER name="inserisci" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetGiorniTolleranza" target="M_InsertDomandaCig">
+			<CONDITIONS>
+	        	<PARAMETER name="inserisci" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="GG_TOLLERANZA" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_GetGiorniTolleranza.ROWS.ROW.GG_TOLLERANZA"/>
+	    	</CONSEQUENCES> 
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_InsertDomandaCig" target="M_DataInizioCig">
+			<CONDITIONS>
+	        	<PARAMETER name="M_InsertDomandaCig.conferma" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="PRGACCORDO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_InsertDomandaCig.ROWS.ROW.PRGACCORDOCIG"/>
+	    	</CONSEQUENCES> 
+	    </DEPENDENCE>
+		
+		<DEPENDENCE source="M_InsertDomandaCig" target="M_DataFineCig">
+			<CONDITIONS>
+	        	<PARAMETER name="M_InsertDomandaCig.conferma" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="PRGACCORDO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_InsertDomandaCig.ROWS.ROW.PRGACCORDOCIG"/>
+	    	</CONSEQUENCES>  
+	    </DEPENDENCE>
+	    
+	    <DEPENDENCE source="CigLavListaPage_OLD" target="M_GetGiorniTolleranza">
+			<CONDITIONS>
+	        	<PARAMETER name="aggiorna" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetGiorniTolleranza" target="M_UpdateIscrCIG">
+			<CONDITIONS>
+	        	<PARAMETER name="aggiorna" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="GG_TOLLERANZA" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_GetGiorniTolleranza.ROWS.ROW.GG_TOLLERANZA"/>
+	    	</CONSEQUENCES> 
+		</DEPENDENCE>
+		
+		
+		<DEPENDENCE source="M_UpdateIscrCIG" target="M_DataInizioCig">
+			<CONDITIONS>
+	        	<PARAMETER name="M_UpdateIscrCIG.conferma" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="PRGACCORDO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_UpdateIscrCIG.ROWS.ROW.PRGACCORDOCIG"/>
+	    	</CONSEQUENCES> 
+	    </DEPENDENCE>
+		
+		<DEPENDENCE source="M_UpdateIscrCIG" target="M_DataFineCig">
+			<CONDITIONS>
+	        	<PARAMETER name="M_UpdateIscrCIG.conferma" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="PRGACCORDO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_UpdateIscrCIG.ROWS.ROW.PRGACCORDOCIG"/>
+	    	</CONSEQUENCES>  
+	    </DEPENDENCE>
+	    
+		
+		<DEPENDENCE source="CigLavListaPage_OLD" target="M_DeleteIscrCig">
+			<CONDITIONS>
+	        	<PARAMETER name="cancella" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="CigLavListaPage_OLD" target="M_ListaLavDomandeCig"/>
+		<DEPENDENCE source="CigLavListaPage_OLD" target="M_IscrizioniCIG">
+			<CONDITIONS>
+	        	<PARAMETER name="dettaglio" scope="SERVICE_REQUEST"  value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ScadenzeCigPage" scope="REQUEST">
+</PAGE>
+
+<PAGE distributed="false" name="CercaScadenzeCigPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetEsitoCig" />
+		<MODULE keep="false" name="M_GetAzioniCig" />
+		<MODULE keep="false" name="M_ElencoCPI" />
+	</MODULES>
+	
+	<DEPENDENCIES>
+	<DEPENDENCE source="CercaScadenzeCigPage" target="M_ElencoCPI">
+		<CONDITIONS/>
+	</DEPENDENCE>
+		<DEPENDENCE source="CercaScadenzeCigPage" target="M_GetEsitoCig">
+			<CONDITIONS>
+	        	<PARAMETER name="SCADENZIARIO" scope="SERVICE_REQUEST"  value="CIG2"/>
+	    	</CONDITIONS>
+	    </DEPENDENCE>
+	    <DEPENDENCE source="CercaScadenzeCigPage" target="M_GetEsitoCig">
+			<CONDITIONS>
+	        	<PARAMETER name="SCADENZIARIO" scope="SERVICE_REQUEST"  value="CIG4"/>
+	    	</CONDITIONS>
+	    </DEPENDENCE>
+	    <DEPENDENCE source="CercaScadenzeCigPage" target="M_GetAzioniCig">
+			<CONDITIONS>
+	        	<PARAMETER name="SCADENZIARIO" scope="SERVICE_REQUEST"  value="CIG3"/>
+	    	</CONDITIONS>
+	    </DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ScadListaCigPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ListScadenzeCig" />
+		<MODULE keep="false" name="M_EsitoCig" />
+		<MODULE keep="false" name="M_AzioniCig" />
+		<MODULE keep="false" name="M_DescCPI" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ScadListaCigPage" target="M_ListScadenzeCig"/>
+		<DEPENDENCE source="ScadListaCigPage" target="M_DescCPI">
+			<CONDITIONS>
+	        	<PARAMETER name="CODCPI" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    </DEPENDENCE>
+		
+		
+		<DEPENDENCE source="ScadListaCigPage" target="M_EsitoCig">
+			<CONDITIONS>
+	        	<PARAMETER name="SCADENZIARIO" scope="SERVICE_REQUEST"  value="CIG2"/>
+	    	</CONDITIONS>
+	    </DEPENDENCE>
+	    <DEPENDENCE source="ScadListaCigPage" target="M_AzioniCig">
+			<CONDITIONS>
+	        	<PARAMETER name="SCADENZIARIO" scope="SERVICE_REQUEST"  value="CIG3"/>
+	    	</CONDITIONS>
+	    </DEPENDENCE>
+	    <DEPENDENCE source="ScadListaCigPage" target="M_EsitoCig">
+			<CONDITIONS>
+	        	<PARAMETER name="SCADENZIARIO" scope="SERVICE_REQUEST"  value="CIG4"/>
+	    	</CONDITIONS>
+	    </DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Lista corsi cig -->
+
+<PAGE distributed="false" name="CigLavCorsiPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ListaLavCorsiCig" />
+		<MODULE keep="false" name="M_ContaIscrAperte" />
+		<MODULE keep="false" name="M_ListaIscrAperteCorsiCig" />	
+		<MODULE keep="false" name="M_RecuperaInfoPerOrienter" />
+		<MODULE keep="false" name="M_DettaglioCorsoOrienter" />
+		<MODULE keep="false" name="M_ContaOrPercorsi" />
+		<MODULE keep="false" name="M_ContaPresaIncarico" />
+		<MODULE keep="false" name="M_ListaOrPercConcordato" />
+		<MODULE keep="false" name="M_InsertCorsoOrienter" />
+		<MODULE keep="false" name="M_DeleteCorso"/>
+		<MODULE keep="false" name="M_InsertCorso"/>
+		<MODULE keep="false" name="M_InsertCatalogo" />
+		<MODULE keep="false" name="M_GetContattoEmailBody" />
+		<MODULE keep="false" name="M_InsertContatto" />
+		<MODULE keep="false" name="M_GetCatalogo" />
+		<MODULE keep="false" name="M_UPDATENOTECORSO" />
+		<MODULE keep="false" name="M_ControlCorsiCig" />		
+		<MODULE keep="false" name="MSPI_UTENTE" />
+		<MODULE keep="false" name="M_BloccaPulsanti" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CigLavCorsiPage" target="MSPI_UTENTE"/>
+		
+		<DEPENDENCE source="CigLavCorsiPage" target="M_BloccaPulsanti"/>
+	
+		<DEPENDENCE source="CigLavCorsiPage" target="M_UPDATENOTECORSO">
+			<CONDITIONS>
+	        	<PARAMETER name="updateNoteCorso" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="CigLavCorsiPage" target="M_InsertCorsoOrienter">
+			<CONDITIONS>
+	        	<PARAMETER name="INSERTCORSOORIENTER" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="CigLavCorsiPage" target="M_DeleteCorso">
+			<CONDITIONS>
+	        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_DeleteCorso"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="CigLavCorsiPage" target="M_ContaIscrAperte"/>
+		<DEPENDENCE source="CigLavCorsiPage" target="M_ListaIscrAperteCorsiCig"/>
+		
+		<DEPENDENCE source="CigLavCorsiPage" target="M_ContaOrPercorsi">
+			<CONDITIONS>
+	        	<PARAMETER name="APRIDIVLISTAISCR" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="CigLavCorsiPage" target="M_ListaOrPercConcordato">
+			<CONDITIONS>
+	        	<PARAMETER name="APRIDIVLISTAISCR" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="CigLavCorsiPage" target="M_ContaPresaIncarico">
+			<CONDITIONS>
+	        	<PARAMETER name="APRIDIVPERCCONCORDATO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_ContaPresaIncarico" target="M_ContaOrPercorsi">
+			<CONDITIONS>
+	        	<PARAMETER name="APRIDIVPERCCONCORDATO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="CigLavCorsiPage" target="M_ListaOrPercConcordato">
+			<CONDITIONS>
+	        	<PARAMETER name="APRIDIVPERCCONCORDATO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="CigLavCorsiPage" target="M_RecuperaInfoPerOrienter">
+			<CONDITIONS>
+	        	<PARAMETER name="APRIDIVORIENTER" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="CigLavCorsiPage" target="M_RecuperaInfoPerOrienter">
+			<CONDITIONS>
+	        	<PARAMETER name="APRIDIVPERCCONCORDATO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="CigLavCorsiPage" target="M_DettaglioCorsoOrienter">
+			<CONDITIONS>
+	        	<PARAMETER name="APRIDIVDETTORIENTER" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+	    
+	    <DEPENDENCE source="CigLavCorsiPage" target="M_InsertCorso">
+			<CONDITIONS>
+	        	<PARAMETER name="inserisciCorsoCatalogo" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_InsertCorso" target="M_InsertCatalogo">
+			<CONDITIONS>
+	        	<PARAMETER name="inserisciCorsoCatalogo" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="PRGCORSOCI" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_InsertCorso.ROWS.ROW.PRGCORSOCI"/>
+	    	</CONSEQUENCES>
+	    </DEPENDENCE>
+	    
+	    <DEPENDENCE source="M_InsertCatalogo" target="M_GetContattoEmailBody">
+		    <CONDITIONS>
+	        	<PARAMETER name="NUMIDPROPOSTA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	        	<PARAMETER name="NUMRECID" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>	   
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="PRGCORSOCI" type="RELATIVE" scope="SESSION" value="PRGCORSOCI"/>
+	    	</CONSEQUENCES> 	
+	    </DEPENDENCE>
+	    
+	    <DEPENDENCE source="M_GetContattoEmailBody" target="M_InsertContatto">
+		    <CONDITIONS>
+	        	<PARAMETER name="NUMIDPROPOSTA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	        	<PARAMETER name="NUMRECID" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="REFERENTESEDE" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_GetContattoEmailBody.ROWS.ROW.REFERENTESEDE"/>
+	    		<PARAMETER name="STRSEDE" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_GetContattoEmailBody.ROWS.ROW.STRSEDE"/>
+	    		<PARAMETER name="LAVORATORE" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_GetContattoEmailBody.ROWS.ROW.LAVORATORE"/>
+	    		<PARAMETER name="DENOMINAZIONE" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_GetContattoEmailBody.ROWS.ROW.DENOMINAZIONE"/>
+	    		<PARAMETER name="CODTIPOISCR" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_GetContattoEmailBody.ROWS.ROW.CODTIPOISCR"/>
+	    	</CONSEQUENCES>
+	    </DEPENDENCE>
+	    
+	    <DEPENDENCE source="CigLavCorsiPage" target="M_ListaLavCorsiCig" />
+	    
+	    <DEPENDENCE source="CigLavCorsiPage" target="M_GetCatalogo">
+			<CONDITIONS>
+	        	<PARAMETER name="apriDivCorsi" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    </DEPENDENCE>
+	    
+	     <DEPENDENCE source="CigLavCorsiPage" target="M_ControlCorsiCig"/>
+	 
+	 </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ApriListaCatalogoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ListaCatalogoCig" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ApriListaCatalogoPage" target="M_ListaCatalogoCig"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CigInvioSiferPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CigInvioSifer" />					
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CigInvioSiferPage" target="M_CigInvioSifer" >
+			<CONDITIONS>
+	        	<PARAMETER name="INIZIO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	        	<PARAMETER name="FINE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    	</CONDITIONS>
+	    </DEPENDENCE>		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ListaContattiEntiPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="ListaContattiEntiModule" />					
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaContattiEntiPage" target="ListaContattiEntiModule" >
+		</DEPENDENCE>		
+	</DEPENDENCIES>
+</PAGE>
+
+ <PAGE name="AccorpaAltreIscrPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetInfoAltraIscr" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AccorpaAltreIscrPage" target="M_GetInfoAltraIscr">
+			<CONDITIONS>
+	    		<PARAMETER name="prgaltraiscr1" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    		<PARAMETER name="prgaltraiscr2" scope="SERVICE_REQUEST" value="AF_DEFINED"/>	    		
+	    		<PARAMETER name="ISCRIZIONI" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+		</DEPENDENCE>	
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ListaAccorpaIscrPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_AccorpaIscrizione" />	
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaAccorpaIscrPage" target="M_AccorpaIscrizione"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="RefreshAccorpaIscrPage" scope="REQUEST">
+</PAGE>
+
+ <PAGE name="AccorpaIscrDettaglioPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetInfoAltraIscr" />
+		<MODULE keep="false" name="M_LIST_PIC_ISCR1" />
+		<MODULE keep="false" name="M_LIST_PIC_ISCR2" />
+		<MODULE keep="false" name="M_LIST_CORSI_ISCR1" />
+		<MODULE keep="false" name="M_LIST_CORSI_ISCR2" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AccorpaIscrDettaglioPage" target="M_GetInfoAltraIscr"/>
+		<DEPENDENCE source="AccorpaIscrDettaglioPage" target="M_LIST_PIC_ISCR1"/>
+		<DEPENDENCE source="AccorpaIscrDettaglioPage" target="M_LIST_PIC_ISCR2"/>
+		<DEPENDENCE source="AccorpaIscrDettaglioPage" target="M_LIST_CORSI_ISCR1"/>
+		<DEPENDENCE source="AccorpaIscrDettaglioPage" target="M_LIST_CORSI_ISCR2"/>
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="AccorpaIscrizioniPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="ACCORPA_ISCRIZIONE" />      
+   	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AccorpaIscrizioniPage" target="ACCORPA_ISCRIZIONE"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+

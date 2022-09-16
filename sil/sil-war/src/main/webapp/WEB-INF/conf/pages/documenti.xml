@@ -1,0 +1,608 @@
+<!-- ***************************************************************************
+                         RICERCA DOCUMENTI
+     *************************************************************************** -->
+
+<PAGE name="DocumentiRicercaPage">
+	<MODULES>
+		<MODULE name="ComboAmbito"/>
+		<MODULE name="ComboTipoDocumento"/>
+		<MODULE name="M_GetCpiPoloProvinciale"/>
+		<MODULE name="COMBO_STATO_ATTO_DOC"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DocumentiRicercaPage" target="COMBO_STATO_ATTO_DOC" />
+		<DEPENDENCE source="DocumentiRicercaPage" target="ComboAmbito"/>
+		<DEPENDENCE source="DocumentiRicercaPage" target="ComboTipoDocumento"/>
+		<DEPENDENCE source="DocumentiRicercaPage" target="M_GetCpiPoloProvinciale"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="ListaDocumentiPage">
+	<MODULES>
+		<MODULE name="M_GetListDocumenti" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaDocumentiPage" target="M_GetListDocumenti"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- ***************************************************************************
+                         LOOKUP del LAVORATORE e dell'AZIENDA
+     *************************************************************************** -->
+
+<PAGE name="DocumentiSelezionaLavoratorePage">
+	<MODULES/>
+</PAGE>
+
+<PAGE name="DocumentiListaLavoratoriPage">
+	<MODULES>
+		<MODULE name="M_DocumentiGetListaLavoratori"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DocumentiListaLavoratoriPage" target="M_DocumentiGetListaLavoratori"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE name="DocumentiSelezionaAziendaPage">
+	<MODULES>
+		<MODULE name="M_GetIDOProvince"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DocumentiSelezionaAziendaPage" target="M_GetIDOProvince"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="DocumentiListaAziendePage">
+	<MODULES>
+		<MODULE name="M_DocumentiGetListaAziende"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DocumentiListaAziendePage" target="M_DocumentiGetListaAziende"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Per riportare i dati resi dalle LOOKUP di AZI e LAV precedenti nella finestra chiamante -->
+<PAGE name="DocumentiRicercaRefreshPage">
+	<MODULES/>
+</PAGE>
+
+
+<!-- ***************************************************************************
+                                Documenti Associati
+     *************************************************************************** -->
+
+<PAGE name="RicercaDocAssociatiPage">
+	<MODULES>
+		<MODULE name="ComboAmbito"/>
+		<MODULE name="ComboTipoDocumento"/>
+		<MODULE name="M_GetCpiPoloProvinciale"/>
+		<MODULE name="COMBO_STATO_ATTO_DOC"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaDocAssociatiPage" target="ComboAmbito"/>
+		<DEPENDENCE source="RicercaDocAssociatiPage" target="ComboTipoDocumento"/>
+		<DEPENDENCE source="RicercaDocAssociatiPage" target="M_GetCpiPoloProvinciale"/>
+		<DEPENDENCE source="RicercaDocAssociatiPage" target="COMBO_STATO_ATTO_DOC" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="DocumentiAssociatiPage">
+	<MODULES>
+		<MODULE name="M_GetDocAssociati" />  
+		<MODULE name="M_GetDatiLav" />
+		<MODULE name="M_GetTestataAzienda" />
+		<MODULE name="M_GetUnitaAzienda" />
+	    <!-- controllo esistenza storico -->
+		<MODULE name="M_Doc_HasInfoStoriche" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DocumentiAssociatiPage"  target="M_GetDocAssociati"/>
+		<DEPENDENCE source="M_GetDocAssociati"  target="M_GetDatiLav">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetDocAssociati"  target="M_GetTestataAzienda">
+			<CONDITIONS>
+				<PARAMETER name="prgAzienda" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetTestataAzienda"  target="M_GetUnitaAzienda">
+			<CONDITIONS>
+				<PARAMETER name="prgAzienda" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+				<PARAMETER name="prgUnita"   scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="DocumentiAssociatiPage" target="M_Doc_HasInfoStoriche"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE name="ListaDocAssociatiL68Page">
+	<MODULES>
+		<MODULE name="M_GetDocAssociatiL68" />  
+		<MODULE name="M_GetDatiLav" />
+		<MODULE name="M_GetTestataAzienda" />
+		<MODULE name="M_GetUnitaAzienda" />
+	    <!-- controllo esistenza storico -->
+		<MODULE name="M_Doc_HasInfoStoriche" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaDocAssociatiL68Page"  target="M_GetDocAssociatiL68"/>
+		<DEPENDENCE source="M_GetDocAssociatiL68"  target="M_GetDatiLav">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetDocAssociatiL68"  target="M_GetTestataAzienda">
+			<CONDITIONS>
+				<PARAMETER name="prgAzienda" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetTestataAzienda"  target="M_GetUnitaAzienda">
+			<CONDITIONS>
+				<PARAMETER name="prgAzienda" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+				<PARAMETER name="prgUnita"   scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="ListaDocAssociatiL68Page" target="M_Doc_HasInfoStoriche"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- ***************************************************************************
+                                Documenti Associati
+     *************************************************************************** -->
+
+<PAGE name="RicercaDocAssociatiL68Page">
+	<MODULES>
+		<MODULE name="ComboAmbito"/>
+		<MODULE name="ComboTipoDocumento"/>
+		<MODULE name="M_GetCpiPoloProvinciale"/>
+		<MODULE name="COMBO_STATO_ATTO_DOC"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaDocAssociatiL68Page" target="ComboAmbito"/>
+		<DEPENDENCE source="RicercaDocAssociatiL68Page" target="ComboTipoDocumento"/>
+		<DEPENDENCE source="RicercaDocAssociatiL68Page" target="M_GetCpiPoloProvinciale"/>
+		<DEPENDENCE source="RicercaDocAssociatiL68Page" target="COMBO_STATO_ATTO_DOC" />
+	</DEPENDENCIES>
+</PAGE>
+
+
+
+<!-- ***************************************************************************
+                                Dettagli Documento
+     *************************************************************************** -->
+<PAGE name="DettagliDocumentoPage">
+	<MODULES>
+		<MODULE name="DettagliDocumento"/>
+		<MODULE name="NuovoDocumento"/>
+		<MODULE name="SalvaDocumento"/>
+		<MODULE name="ComboTipoDocumento"/>
+		<MODULE name="ComboTipoFile"/>
+		<MODULE name="ComboAmbito"/>
+		<MODULE name="ComboTipoDocumentoPatronato"/>
+		<MODULE name="ComboAmbitoPatronato"/>
+		<MODULE name="COMBO_STATO_ATTO_DOC"/>
+		<MODULE name="M_GetProtocollazione" />			<!-- num possibile protocollo -->
+		<MODULE name="M_GetCartaIdentitaValida" />		<!-- viene utilizzato per il refresh della pagina -->
+		<MODULE name="M_RefreshDocumento" />			<!-- Modulo per stabilire se la data fine validita' e' modificabile -->
+		<MODULE name="M_GetCodMonoGestDoc" />
+		<MODULE name="M_GetCpiDocumento" />
+		<MODULE name="M_getMotivoAnnullamentoDoc" />
+		<MODULE name="M_getMotivoAnnullamentoDocFiltrata" />
+		<MODULE name="M_getTuttiMotiviAnnullamentoDoc" />
+		<MODULE name="M_GetStatoProspetto" />
+		
+		<!-- M_GET_PRG_CONFIG_PROT modulo che controlla esistenza di un record su st_template_stampa con codtipodocumento uguale al doc analizzato -->
+		<MODULE name="M_GET_PRG_CONFIG_PROT" />
+		<!-- M_CONFIG_PI3PROT modulo che controlla se la configurazione PI3PROT attiva -->
+		<MODULE name="M_CONFIG_PI3PROT" />
+		
+		<MODULE name="M_ExistDocumentiPi3" />
+		
+		
+		<MODULE keep="false" name="M_GetInfoProtocollazioneDocPi3"/>
+    	<MODULE keep="false" name="M_GET_CODICI_FROM_TITOLARIO"/>
+    	<MODULE keep="false" name="M_GetDocAssociatiPi3"/>
+    	 
+    	<MODULE name="M_CONFIG_CONSENSOFIRMA" /> 
+		<MODULE name="M_VerificaAmConsensoFirma" />		
+		<MODULE name="M_VerificaFileFirmabile" />
+		<MODULE name="M_VerificaDocumentoGiaFirmatoGrafometricamente" />
+	</MODULES>
+	<DEPENDENCIES>
+		<!-- DETTAGLI -->
+		<DEPENDENCE source="DettagliDocumentoPage" target="DettagliDocumento">
+			<CONDITIONS>
+				<PARAMETER name="SALVA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+				<PARAMETER name="NUOVO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+				
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="DettagliDocumentoPage" target="DettagliDocumento">
+			<CONDITIONS>
+				<PARAMETER name="PROT_PI3" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="DettagliDocumento" target="M_GetCpiDocumento">
+			<CONDITIONS/>
+			<CONSEQUENCES>
+				<PARAMETER name="documento" type="RELATIVE" scope="SERVICE_RESPONSE" value="DettagliDocumento.documento"/>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="DettagliDocumento" target="M_GetCodMonoGestDoc">
+			<CONDITIONS/>
+			<CONSEQUENCES>
+				<PARAMETER name="PRGDOCUMENTO" type="relative" scope="SERVICE_RESPONSE" value="DettagliDocumento.PRGDOCUMENTO"/>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+		<!-- SALVA -->
+		<DEPENDENCE source="DettagliDocumentoPage" target="SalvaDocumento">
+			<CONDITIONS>
+				<PARAMETER name="SALVA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+				<PARAMETER name="PROT_PI3" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="SalvaDocumento" target="M_GetCpiDocumento">
+			<CONDITIONS/>
+			<CONSEQUENCES>
+				<PARAMETER name="documento" type="RELATIVE" scope="SERVICE_RESPONSE" value="SalvaDocumento.documento"/>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="SalvaDocumento" target="M_GetCodMonoGestDoc">
+			<CONDITIONS/>
+			<CONSEQUENCES>
+				<PARAMETER name="PRGDOCUMENTO" type="relative" scope="SERVICE_RESPONSE" value="SalvaDocumento.PRGDOCUMENTO"/>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+		<!-- NUOVO -->
+		<DEPENDENCE source="DettagliDocumentoPage" target="NuovoDocumento">
+			<CONDITIONS>
+				<PARAMETER name="NUOVO" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+				<PARAMETER name="PROT_PI3" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="NuovoDocumento" target="M_GetCpiDocumento">
+			<CONDITIONS/>
+			<CONSEQUENCES>
+				<PARAMETER name="documento" type="RELATIVE" scope="SERVICE_RESPONSE" value="NuovoDocumento.documento"/>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+		<!-- REFRESH -->
+		<DEPENDENCE source="DettagliDocumentoPage" target="M_RefreshDocumento">
+			<CONDITIONS>
+				<PARAMETER name="REFRESH_PR" scope="SERVICE_REQUEST" value="TRUE" />
+				<PARAMETER name="PROT_PI3" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_RefreshDocumento" target="M_GetCpiDocumento">
+			<CONDITIONS/>
+			<CONSEQUENCES>
+				<PARAMETER name="documento" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_RefreshDocumento.documento"/>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_RefreshDocumento" target="M_GetCartaIdentitaValida">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="CDNLAVORATORE" type="relative" scope="SERVICE_RESPONSE" value="M_RefreshDocumento.CDNLAVORATORE"/>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+		<!-- SEMPRE PRESENTI -->
+
+		<DEPENDENCE source="DettagliDocumentoPage" target="M_GetProtocollazione" />			
+				
+
+		<DEPENDENCE source="DettagliDocumentoPage" target="M_GetCartaIdentitaValida">
+			<CONDITIONS>
+				<PARAMETER name="REFRESH_PR"    scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="DettagliDocumentoPage" target="ComboTipoDocumento"/>
+		<DEPENDENCE source="DettagliDocumentoPage" target="ComboTipoFile"/>
+		<DEPENDENCE source="DettagliDocumentoPage" target="ComboAmbito"/>		
+		
+		<DEPENDENCE source="DettagliDocumentoPage" target="ComboTipoDocumentoPatronato"/>
+		<DEPENDENCE source="DettagliDocumentoPage" target="ComboAmbitoPatronato"/>
+		
+		<DEPENDENCE source="DettagliDocumentoPage" target="M_CONFIG_CONSENSOFIRMA" />
+		
+		<DEPENDENCE source="DettagliDocumento" target="COMBO_STATO_ATTO_DOC">
+			<CONDITIONS/>
+			<CONSEQUENCES>
+				<PARAMETER name="documento" type="RELATIVE" scope="SERVICE_RESPONSE" value="DettagliDocumento.documento"/>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="NuovoDocumento" target="COMBO_STATO_ATTO_DOC"/>
+		<DEPENDENCE source="SalvaDocumento" target="COMBO_STATO_ATTO_DOC">	
+			<CONSEQUENCES>
+				<PARAMETER name="documento" type="RELATIVE" scope="SERVICE_RESPONSE" value="SalvaDocumento.documento"/>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="DettagliDocumentoPage" target="M_getMotivoAnnullamentoDocFiltrata"/>	
+		<DEPENDENCE source="DettagliDocumentoPage" target="M_getMotivoAnnullamentoDoc"/>
+		<DEPENDENCE source="DettagliDocumentoPage" target="M_getTuttiMotiviAnnullamentoDoc"/>
+		
+		<DEPENDENCE source="DettagliDocumentoPage" target="M_GetStatoProspetto">
+			<CONDITIONS>
+				<PARAMETER name="prgdocumento" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		
+		
+		
+		<DEPENDENCE source="DettagliDocumentoPage" target="M_CONFIG_PI3PROT">
+			<CONDITIONS>
+				<PARAMETER name="CODSTATOATTO" scope="SERVICE_REQUEST" type="ABSOLUTE" value="PR" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_CONFIG_PI3PROT" target="M_GET_PRG_CONFIG_PROT">
+			<CONDITIONS>
+				<PARAMETER name="M_CONFIG_PI3PROT.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<!--
+		<DEPENDENCE source="M_GET_PRG_CONFIG_PROT" target="M_CONFIG_CONSENSOFIRMA">
+			<CONDITIONS>
+				<PARAMETER name="M_GET_PRG_CONFIG_PROT.ROWS.ROW.PRGCONFIGPROT" scope="SERVICE_RESPONSE" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		-->
+		
+		
+		<DEPENDENCE source="M_GET_PRG_CONFIG_PROT" target="M_GetDocAssociatiPi3">
+			<CONDITIONS>
+				<PARAMETER name="M_GET_PRG_CONFIG_PROT.ROWS.ROW.PRGCONFIGPROT" scope="SERVICE_RESPONSE" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<!--
+		
+		<DEPENDENCE source="M_GET_PRG_CONFIG_PROT" target="M_GetInfoProtocollazioneDocPi3">
+			<CONDITIONS>
+				<PARAMETER name="M_GET_PRG_CONFIG_PROT.ROWS.ROW.PRGCONFIGPROT" scope="SERVICE_RESPONSE" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		-->
+		
+		<DEPENDENCE source="M_GET_PRG_CONFIG_PROT" target="M_GET_CODICI_FROM_TITOLARIO">
+			<CONDITIONS>
+				<PARAMETER name="M_GET_PRG_CONFIG_PROT.ROWS.ROW.PRGCONFIGPROT" scope="SERVICE_RESPONSE" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+<!-- 		<DEPENDENCE source="M_GetInfoProtocollazioneDocPi3" target="M_GetDocAssociatiPi3" /> -->
+		<DEPENDENCE source="M_GetDocAssociatiPi3" target="M_GetInfoProtocollazioneDocPi3" />
+		<DEPENDENCE source="M_GetInfoProtocollazioneDocPi3" target="M_ExistDocumentiPi3" />
+		
+		<DEPENDENCE source="M_CONFIG_CONSENSOFIRMA" target="M_VerificaFileFirmabile">
+		    <CONDITIONS>
+		        <PARAMETER name="M_CONFIG_CONSENSOFIRMA.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1" />
+		    </CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_VerificaFileFirmabile" target="M_VerificaAmConsensoFirma">
+		    <CONDITIONS>
+		        <PARAMETER name="M_VerificaFileFirmabile.FLGFIRMAGRAFO" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="S" />
+		    </CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_VerificaAmConsensoFirma" target="M_VerificaDocumentoGiaFirmatoGrafometricamente">
+		    <CONDITIONS>
+		        <PARAMETER name="M_VerificaAmConsensoFirma.codStatoConsenso" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="AT" />
+		    </CONDITIONS>
+		</DEPENDENCE>
+		
+		
+		
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE name="RedoFirmaGrafometricaPage">
+	<MODULES>
+		<MODULE name="RedoFirmaDocumenti"/>
+	</MODULES>
+	
+	<DEPENDENCIES>
+		<DEPENDENCE source="RedoFirmaGrafometricaPage" target="RedoFirmaDocumenti" />
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- Per tentativo di salto da menu, si veda global/jump2... (by Luigi) -->
+<PAGE name="Jump2RicercaDocAssociatiPage">
+	<MODULES>
+		<MODULE name="Jump2Module" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="Jump2RicercaDocAssociatiPage" target="Jump2Module">
+			<CONSEQUENCES>
+				<PARAMETER name="jump2page" type="absolute" value="RicercaDocAssociatiPage" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- ***************************************************************************
+                         Gestione Stato Documenti
+      - vuoi Protocollare, Salvare, solo Lettura?
+     *************************************************************************** -->
+<PAGE name="GestioneStatoDocPage">
+	<MODULES>
+		<MODULE name="M_GetTipoDoc"/>
+		<MODULE name="M_GetProtocollazione"/>
+		<MODULE name="M_GetEstFileProt"/>
+		<MODULE name="M_ExistDocument"/>
+		<MODULE name="M_ExistDocumentPerChiave"/>
+		<!-- Utilizzato per controllare se si tratta di un doc di I. o O. -->
+		<MODULE name="M_GetValoreDoc"/>
+		<MODULE name="M_GetConfigAltreIscr"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="GestioneStatoDocPage" target="M_GetTipoDoc"/>
+		<DEPENDENCE source="GestioneStatoDocPage" target="M_GetProtocollazione"/>
+		<DEPENDENCE source="GestioneStatoDocPage" target="M_GetEstFileProt"/>
+		<DEPENDENCE source="GestioneStatoDocPage" target="M_ExistDocument"/>
+		<DEPENDENCE source="GestioneStatoDocPage" target="M_GetValoreDoc"/>
+		<DEPENDENCE source="GestioneStatoDocPage" target="M_GetConfigAltreIscr">
+			<CONDITIONS>
+				<PARAMETER name="tipoDoc" scope="SERVICE_REQUEST" value="CIGDOM" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="GestioneStatoDocPage" target="M_ExistDocumentPerChiave">
+			<CONDITIONS>
+				<PARAMETER name="tipoDoc" scope="SERVICE_REQUEST" value="STVCHATT" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="GestioneStatoDocPage" target="M_ExistDocumentPerChiave">
+			<CONDITIONS>
+				<PARAMETER name="tipoDoc" scope="SERVICE_REQUEST" value="STVCHPAR" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- ***************************************************************************
+                         Gestione Rosa dei candidati DOC
+        - vuoi Salvare, solo Lettura, etc.
+     *************************************************************************** -->
+<PAGE name="GestioneRosaIDOPage">
+	<MODULES>
+	    <MODULE name="M_GetTipoDoc"/>
+	    <MODULE name="M_GetProtocollazione"/>
+	    <MODULE name="M_GetEstFileProt"/>
+	    <MODULE name="M_ExistDocumentPerAzienda"/>
+	    <MODULE name="M_GetDataInvioRosae"/>
+	    <MODULE name="M_IdoGetStatoRichOrig"/>
+	    <MODULE name="M_IdoGetSpi"/>   
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="GestioneRosaIDOPage" target="M_GetTipoDoc"/>
+		<DEPENDENCE source="GestioneRosaIDOPage" target="M_GetProtocollazione"/>
+		<DEPENDENCE source="GestioneRosaIDOPage" target="M_GetEstFileProt"/>
+		<DEPENDENCE source="GestioneRosaIDOPage" target="M_ExistDocumentPerAzienda"/>
+		<DEPENDENCE source="GestioneRosaIDOPage" target="M_GetDataInvioRosae"/>
+		<DEPENDENCE source="GestioneRosaIDOPage" target="M_IdoGetSpi"/>
+		
+		<DEPENDENCE source="GestioneRosaIDOPage" target="M_IdoGetStatoRichOrig">
+			<CONDITIONS/>
+			<CONSEQUENCES>
+				<PARAMETER name="prgRichiestaAZ" scope="SERVICE_REQUEST" type="RELATIVE" value="prgRichAzienda"/>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+	</DEPENDENCIES>
+</PAGE>
+
+
+
+<!-- **************************************************************************************
+     Gestione Pubblicazione Richiesta Azienda Specifica (quando conosciamo il prgAzienda)
+        - vuoi Salvare, solo Lettura, etc.
+     ************************************************************************************** -->
+<PAGE name="GestionePubblSpecificaPage">
+	<MODULES>
+		<MODULE name="M_GetTipoDoc"/>
+		<!--<MODULE name="M_GetProtocollazione"/>-->
+		<MODULE name="M_GetEstFileProt"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="GestionePubblSpecificaPage" target="M_GetTipoDoc"/>
+		<!--<DEPENDENCE source="GestioneRosaIDOPage" target="M_GetProtocollazione"/>-->
+		<DEPENDENCE source="GestionePubblSpecificaPage" target="M_GetEstFileProt"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- ***************************************************************************
+                         Stampe relative il lavoratore
+     *************************************************************************** -->
+<PAGE name="StampePreselPage">
+	<MODULES>
+		<MODULE keep="false" name="M_ConfigStampaSituazioneLavorativa"/>
+		<MODULE keep="false" name="StampePresel"/>
+		<MODULE keep="false" name="M_StampeGetCPItit"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="StampePreselPage" target="M_ConfigStampaSituazioneLavorativa" />
+		<DEPENDENCE source="StampePreselPage" target="StampePresel" />
+		<DEPENDENCE source="StampePreselPage" target="M_StampeGetCPItit"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="ReportFrameMainReloadPage" />
+
+<!-- Chiamata tramite syncXMLHTTPGETRequest: info per protocollare un documento -->
+<PAGE name="NuovoProtocolloPage">
+	<MODULES>
+		<MODULE keep="false" name="M_GetProtocollazione"/>		
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="NuovoProtocolloPage" target="M_GetProtocollazione" />
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- *************************************************************************** 
+                          Stampa lista dei lavoratori
+     *************************************************************************** -->
+     
+<PAGE distributed="false" name="CMStampaLavPensPage" scope="REQUEST"/>
+
+<PAGE distributed="false" name="CMStampaLavMovPage" scope="REQUEST"/>
+
+<PAGE name="GestioneGenericStatoDocPage">
+	<MODULES>
+		<MODULE name="M_GetTipoDoc"/>
+		<MODULE name="M_GetProtocollazione"/>
+		<MODULE name="M_GetEstFileProt"/>
+		<MODULE name="M_ExistGenericDocument"/>		
+		<MODULE name="M_GetValoreDoc"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="GestioneGenericStatoDocPage" target="M_GetTipoDoc"/>
+		<DEPENDENCE source="GestioneGenericStatoDocPage" target="M_GetProtocollazione"/>
+		<DEPENDENCE source="GestioneGenericStatoDocPage" target="M_GetEstFileProt"/>
+		<DEPENDENCE source="GestioneGenericStatoDocPage" target="M_ExistGenericDocument"/>
+		<DEPENDENCE source="GestioneGenericStatoDocPage" target="M_GetValoreDoc"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="DOCALLEGATOMBOPAGE">
+	<MODULES>
+		<MODULE name="M_GetDocAllegatoMBO"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DOCALLEGATOMBOPAGE" target="M_GetDocAllegatoMBO"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DownloadPageWithWarning" scope="REQUEST"/>
+
+<PAGE distributed="false" name="ReportStampeParamTop" scope="REQUEST"/>

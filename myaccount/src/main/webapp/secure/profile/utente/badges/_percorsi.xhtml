@@ -1,0 +1,51 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:pretty="http://ocpsoft.com/prettyfaces">
+	<div class="col-md-12" style="margin-top: 50px;">
+		<h:panelGroup id="percorsiGroup">
+			<ui:repeat var="percorso" value="#{badgesBean.percorsiList}" varStatus="status">
+				<div class="col-xs-4 animated fadeIn">
+					<div class="steps">
+						<ul id="sortable">
+							<li class="#{badgesBean.isPercorsoCompleted(percorso.codPercorso)?'checked':'unchecked'}">
+								<label>
+									<h2>
+										<span class="title" data-toggle="tooltip" data-placement="bottom" title="#{percorso.descrizione}">#{percorso.descrizione}</span>
+										<ui:fragment rendered="#{badgesBean.isPercorsoCompleted(percorso.codPercorso)}">
+											<span class="subtitle">
+												<h:outputFormat value="#{badgesBean.completionPercorsoDate(percorso.codPercorso)}">
+													<f:convertDateTime pattern="#{ui['shared.dateFormat']}"></f:convertDateTime>
+												</h:outputFormat>
+											</span>
+										</ui:fragment>
+									</h2>
+								</label>
+							</li>
+
+							<ui:repeat var="badgePercorso" value="#{badgesBean.percorsi.get(percorso)}">
+								<li class=" #{badgesBean.isBadgeAchieved(badgePercorso)?'checked':'unchecked'}">
+									<div class="badge-thumb fa #{badgePercorso.imageClass}">
+										<img src="#{resource['commons:images/gamification/'.concat(badgePercorso.imageSource)]}" width="30" height="30"
+											alt="" />
+									</div>
+									<label>
+										<h2>
+											<span class="title" data-toggle="tooltip" data-placement="bottom" title="#{badgePercorso.descrizione}">#{badgePercorso.descrizione}</span>
+											<ui:fragment rendered="#{badgesBean.isBadgeAchieved(badgePercorso)}">
+												<span class="subtitle">
+													<h:outputFormat value="#{badgesBean.getGpBadge(badgePercorso).dtmMod}">
+														<f:convertDateTime pattern="#{ui['shared.dateFormat']}"></f:convertDateTime>
+													</h:outputFormat>
+												</span>
+											</ui:fragment>
+										</h2>
+									</label>
+								</li>
+							</ui:repeat>
+						</ul>
+					</div>
+				</div>
+			</ui:repeat>
+		</h:panelGroup>
+	</div>
+</ui:composition>

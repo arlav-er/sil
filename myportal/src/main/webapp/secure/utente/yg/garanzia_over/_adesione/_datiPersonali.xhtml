@@ -1,0 +1,131 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui">
+	<fieldset id="datiPersonaliFieldset">
+		<legend>Dati personali</legend>
+		<table style="border-spacing: 1.5em;">
+			<tr>
+				<td>
+					<p:outputLabel for="nomeInput" value="Nome" />
+					<br />
+					<p:inputText id="nomeInput" required="true" maxLength="50"
+						value="#{ygOverAdesioneBean.utente.utenteDTO.pfPrincipalDTO.nome}"
+						requiredMessage="Il nome è obbligatorio" binding="#{nomeComponent}"/>
+					<br />
+					<p:message for="nomeInput" />
+				</td>
+				<td>
+					<p:outputLabel for="cognomeInput" value="Cognome" />
+					<br />
+					<p:inputText id="cognomeInput" required="true" maxlength="50"
+						value="#{ygOverAdesioneBean.utente.utenteDTO.pfPrincipalDTO.cognome}"
+						requiredMessage="Il cognome è obbligatorio" binding="#{cognomeComponent}" />
+					<br />
+					<p:message for="cognomeInput" />
+				</td>
+				<td>
+					<ui:fragment rendered="#{not empty ygOverAdesioneBean.utente.utenteInfo.codiceFiscale}">
+						<p:outputLabel value="Codice fiscale" />
+						<br />
+						<h:outputText value="#{ygOverAdesioneBean.utente.utenteInfo.codiceFiscale}" />
+					</ui:fragment>
+					<ui:fragment rendered="#{empty ygOverAdesioneBean.utente.utenteInfo.codiceFiscale}">
+						<p:outputLabel for="cfInput" value="Codice Fiscale" />
+						<br />
+						<p:inputText id="cfInput" required="true" maxlength="16"
+							value="#{ygOverAdesioneBean.utente.utenteInfo.codiceFiscale}"
+							requiredMessage="Il codice fiscale è obbligatorio">
+							<f:validator validatorId="codiceFiscaleCorrispondenzaValidator" />
+							<f:attribute name="nome" value="#{nomeComponent}" />
+							<f:attribute name="cognome" value="#{cognomeComponent}" />
+						</p:inputText>
+						<br />
+						<p:message for="cfInput" />
+					</ui:fragment>
+				</td>
+				<td>
+					<p:outputLabel for="sessoInput" value="Sesso" />
+					<br />
+					<p:selectOneMenu id="sessoInput" required="true"
+						value="#{ygOverAdesioneBean.utente.utenteInfo.genere}"
+						requiredMessage="Il sesso è obbligatorio" converter="deGenereDTOConverter">
+						<f:selectItems value="#{utilsBean.genere}" var="sesso"
+							itemValue="#{sesso}" itemLabel="#{sesso.descrizione}" />
+					</p:selectOneMenu>
+					<p:message for="sessoInput" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p:outputLabel for="dataNascitaInput" value="Data di nascita" />
+					<br />
+					<p:calendar id="dataNascitaInput" showOn="button" navigator="true" required="true"
+						value="#{ygOverAdesioneBean.utente.utenteInfo.dataNascita}"
+						pattern="dd/MM/yyyy" yearRange="-70:-18" 
+						requiredMessage="La data di nascita è obbligatoria" >
+						<f:validator validatorId="dataNascitaGaranziaOverValidator" />
+					</p:calendar>
+					<p:message for="dataNascitaInput" />
+				</td>
+				<td>
+					<p:outputLabel for="comuneNascitaInput"
+						value="Comune o stato di nascita" />
+					<br />
+					<p:autoComplete id="comuneNascitaInput" required="true" forceSelection="true"
+						value="#{ygOverAdesioneBean.utente.utenteInfo.comuneNascita}"
+						completeMethod="#{ygOverAdesioneBean.completeComuneNascita}" var="comNascita"
+						itemLabel="#{comNascita.descrizione}" itemValue="#{comNascita}"
+						converter="deComuneDTOConverter" requiredMessage="Il luogo di nascita è obbligatorio"
+						minQueryLength="2" maxResults="10" emptyMessage="Nessun comune trovato">
+					</p:autoComplete>
+					<p:message for="comuneNascitaInput" />
+				</td>
+				<td>
+					<p:outputLabel for="cittadinanzaInput" value="Cittadinanza" />
+					<br />
+					<p:autoComplete id="cittadinanzaInput" required="true" forceSelection="true"
+						value="#{ygOverAdesioneBean.utente.utenteInfo.cittadinanza}"
+						completeMethod="#{ygOverAdesioneBean.completeCittadinanza}" var="cittadinanza"
+						itemLabel="#{cittadinanza.descrizione}" itemValue="#{cittadinanza}"
+						converter="deCittadinanzaDTOConverter" requiredMessage="La cittadinanza è obbligatoria" 
+						minQueryLength="2" maxResults="10" emptyMessage="Nessuna cittadinanza trovata">
+						<p:ajax event="itemSelect" process="@this" update="@this datiDocumentoPanel" />
+					</p:autoComplete>
+					<br />
+					<p:message for="cittadinanzaInput" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p:outputLabel value="E-mail" />
+					<br />
+					<span>#{ygOverAdesioneBean.utente.utenteDTO.pfPrincipalDTO.email}</span>
+				</td>
+				<td>
+					<p:outputLabel for="telefonoInput" value="Telefono" />
+					<br />
+					<p:inputText id="telefonoInput" maxlength="14" 
+						value="#{ygOverAdesioneBean.utente.utenteInfo.telCasa}"/>
+					<br />
+					<p:message for="telefonoInput" />
+				</td>
+				<td>
+					<p:outputLabel for="cellulareInput" value="Cellulare" />
+					<br />
+					<p:inputText id="cellulareInput" maxlength="14" 
+						required="#{ygOverAdesioneBean.utente.utenteInfo.flgConsensoSms}"
+						value="#{ygOverAdesioneBean.utente.utenteInfo.cellulare}"
+						requiredMessage="Se dai il consenso per ricevere SMS, il cellulare è obbligatorio.">
+						<p:ajax process="@this" update="@this" />
+					</p:inputText>
+					<br />
+					<p:message for="cellulareInput" />
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+</ui:composition>

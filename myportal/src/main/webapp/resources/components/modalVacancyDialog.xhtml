@@ -1,0 +1,110 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:composite="http://java.sun.com/jsf/composite">
+
+<!--  Attributi da definire nell'interfaccia -->
+<composite:interface shortDescription="Attenzione: questo componente FUNZIONA solo SE UTILIZZATO all'ESTERNO di una FORM">
+	<composite:attribute name="bean" required="true" shortDescription="BackingBean della pagina. Il Bean deve essere provvisto di un metodo 'inviaCandidatura'" />	
+	<composite:attribute name="curricula" shortDescription="Elemento contenente i curricula dell'utente. Di default viene utilizzato cc.attrs.bean.myCurricula ma impostando questa proprietà si sovrascrive il comportamento di default" />
+	<composite:attribute name="lettere"  shortDescription="Elemento contenente le lettere di presentazione dell'utente. Di default viene utilizzato cc.attrs.bean.myLettere ma impostando questa proprietà si sovrascrive il comportamento di default" />
+	<composite:attribute name="datiVacancy" required="true" shortDescription="Elemento contenente i dati della Vacancy di tipo VaDatiAziendaVacancy" />
+	<composite:attribute name="candidatura"  shortDescription="Elemento contenente i dati della candidatura. Di default viene utilizzato cc.attrs.bean.candidatura ma impostando questa proprietà si sovrascrive il comportamento di default" />
+	<composite:attribute name="showInfo"  default="true" type="java.lang.Boolean" shortDescription="Se impostato a 'true' permette di nascondere le informazioni riassuntive sulla vacancy per la quale ci si sta candidando." />
+	<composite:attribute name="renderAjax" default="" shortDescription="Inserire gli identificativi degli elementi che devono essere aggiornati sulla pagina in seguito alla conferma della candidatura." />
+</composite:interface>
+
+<!--  Interfaccia implementata -->
+<composite:implementation>
+	<ui:param name="bean" value="#{cc.attrs.bean}"></ui:param>
+	<ui:param name="dto" value="#{cc.attrs.datiVacancy}"></ui:param>
+	<ui:param name="candidatura" value="#{cc.attrs.candidatura != null ? cc.attrs.candidatura : cc.attrs.bean.candidatura}"></ui:param>
+	<ui:param name="renderAjax" value="#{cc.attrs.renderAjax}"></ui:param>
+	<ui:param name="curricula" value="#{cc.attrs.curricula != null ? cc.attrs.curricula : cc.attrs.bean.myCurricula}"></ui:param>
+	<ui:param name="lettere" value="#{cc.attrs.lettere != null ? cc.attrs.lettere : cc.attrs.bean.myLettere}"></ui:param>	
+
+	<div id="#{cc.clientId}" title="Conferma Candidatura" class="modal_dialog">
+		<h:panelGroup id="panel_vacancy" layout="block" rendered="#{cc.attrs.showInfo}">
+			<h:panelGrid id="dati_vacancy" columns="2"
+				columnClasses="visualizza_left,visualizza_right">
+				<h:outputLabel for="descrizione_vacancy" value="Descrizione"></h:outputLabel>
+				<h:outputText id="descrizione_vacancy" value="#{dto.datiVacancy.descrizione}" escape="false"></h:outputText>
+				
+
+				<h:outputLabel for="comune_lavoro" value="Comune"></h:outputLabel>
+				<h:outputText id="comune_lavoro" value="#{dto.datiAziendaInfo.strComLavoro}">
+				</h:outputText>
+
+				<h:outputLabel for="indirizzo_lavoro" value="Indirizzo"></h:outputLabel>
+				<h:outputText id="indirizzo_lavoro" value="#{dto.datiAziendaInfo.indirizzoLavoro}"></h:outputText>
+
+				<h:outputLabel for="mansione" value="Gruppo professionale"></h:outputLabel>
+				<h:outputText id="mansione" value="#{dto.datiVacancy.strMansione}"></h:outputText>
+
+				<h:outputLabel for="attivita" value="Attività"></h:outputLabel>
+				<h:outputText id="attivita" value="#{dto.datiVacancy.strAteco}"></h:outputText>
+
+				<h:outputLabel for="attivitaPrincipale" value="Profilo richiesto"></h:outputLabel>
+				<h:outputText id="attivitaPrincipale"
+					value="#{dto.datiVacancy.attivitaPrincipale}"></h:outputText>
+			</h:panelGrid>
+		</h:panelGroup>
+		<hr />
+		<h:form id="#{cc.clientId}_seleziona" >
+			<input id="stateModale" type="hidden" name="javax.faces.ViewState" value="" />
+			<h:panelGroup layout="block">
+				<h:panelGrid id="dati_cv_panel" columns="1" columnClasses="cv_col1">
+									
+					<cc:selectOneMenu id="cv_vacancy" styleClass="width400" label="Seleziona un Curriculum" value="#{candidatura.idCvDatiPersonali}" disableInput="true">
+						<f:selectItems value="#{curricula}" />
+					</cc:selectOneMenu>
+					
+					<cc:selectOneMenu id="lettere_vacancy" label="Seleziona una lettera di presentazione" value="#{candidatura.idCvLetteraAcc}"  disableInput="true">
+						<f:selectItems value="#{lettere}"/>
+					</cc:selectOneMenu>	
+									
+				</h:panelGrid>
+			</h:panelGroup>
+			<h:commandLink value="Invia Candidatura" id="invia_candidatura" tabindex="0"
+				action="#{bean.inviaCandidatura}" styleClass="buttonStyle"> 
+				<f:ajax execute="@form" render="#{renderAjax}" onevent="modalVacancyCallback"></f:ajax>		
+				<f:param name="id" value="#{dto.datiVacancy.id}"></f:param>		
+			</h:commandLink>				
+		</h:form>
+	</div>
+
+	<script type="text/javascript">
+		
+		var finestra = $(jq("#{cc.clientId}"));
+		
+		//var finestra = $("##{cc.attrs.id}\\:candida_vacancy_dialog");
+		function modalVacancyCallback(data) {
+			if (data.status == 'success') {				
+				$(jq("#{cc.clientId}")).dialog('close');
+				$.jnotify('Candidatura inviata correttamente.','info',false);				
+				disegnaBottoni();
+				pollNotifications(#{sessionBean.principalId});
+			}
+		}
+		function openVacancy(data) {
+			if (!data || data.status == 'success') {
+				var state = window.document.getElementsByName("javax.faces.ViewState");
+				valueViewState = state[0].value;
+				//alert(valueViewState);				
+
+				var stateModale = window.document.getElementById("stateModale");
+				stateModale.value = valueViewState;
+				var item = "#{cc.clientId}";
+				$(jq(item))[0].open($(jq('candidatiButton')));				
+				
+			}
+		}
+		disegnaBottoni();
+		myportal.modalVacancyDialog.init({
+			ccid:"#{cc.clientId}"
+		});
+	</script>
+</composite:implementation>
+</html>

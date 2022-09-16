@@ -1,0 +1,490 @@
+
+<PAGE distributed="false" name="AzioniConcordateRicercaPage" scope="REQUEST">
+	<MODULES>
+	<!-- da patto.xml -->
+		<MODULE name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE name="M_De_List_Servizi"/>  
+		<MODULE name="M_DeAzioniRagg"/>  	
+		<MODULE name="M_DeAzioni"/>  
+		<MODULE name="M_DeEsito"/>
+		<MODULE name="M_DeEsitoRendicont"/>  
+		<MODULE name="M_ElencoCPI"/>
+		<MODULE name="M_DeEsito_Sifer"/>
+		<MODULE name="M_CONFIG_VOUCHER" />
+		<MODULE name="M_EntiVoucher"/> 
+		<MODULE name="M_SediEntiVoucher"/>		 							
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AzioniConcordateRicercaPage" target="M_CONFIG_UMB_NGE_AZ"/>	
+		<DEPENDENCE source="AzioniConcordateRicercaPage" target="M_De_List_Servizi"/>				
+		<DEPENDENCE source="AzioniConcordateRicercaPage" target="M_DeAzioniRagg"/>		
+		<DEPENDENCE source="AzioniConcordateRicercaPage" target="M_DeAzioni"/>				
+		<DEPENDENCE source="AzioniConcordateRicercaPage" target="M_DeEsito"/>
+		<DEPENDENCE source="AzioniConcordateRicercaPage" target="M_DeEsitoRendicont"/>		
+		<DEPENDENCE source="AzioniConcordateRicercaPage" target="M_ElencoCPI"/>
+		<DEPENDENCE source="AzioniConcordateRicercaPage" target="M_DeEsito_Sifer"/>
+		<DEPENDENCE source="AzioniConcordateRicercaPage" target="M_CONFIG_VOUCHER"/>
+		
+		<DEPENDENCE source="M_CONFIG_VOUCHER" target="M_EntiVoucher">
+			<CONDITIONS>
+				<PARAMETER name="M_CONFIG_VOUCHER.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CONFIG_VOUCHER" target="M_SediEntiVoucher">
+			<CONDITIONS>
+				<PARAMETER name="M_CONFIG_VOUCHER.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+	</DEPENDENCIES>
+</PAGE> 
+
+<PAGE distributed="false" name="AzioniConcordateListaPage" scope="REQUEST">
+	<MODULES>			
+		<MODULE name="M_CONFIG_UMB_NGE_AZ"/>
+		<MODULE name="M_Configurazione_CIG"/> 							
+		<MODULE name="M_ListaAzioniConcordate"/>
+	    <MODULE name="M_DeEsito"/>
+	    <MODULE name="M_DeEsitoRendicont"/>
+	    <MODULE name="M_GetNumConfigurazioneChiusuraDidMultipla"/>
+	    <MODULE name="M_MotFineAtto"/>
+	    <MODULE name="M_ChiusuraDidMultipla"/>
+	    <MODULE name="M_AnnullaMultiploEsitiAttivita"/>
+	    <MODULE name="M_DeEsito_Sifer"/>
+	    <MODULE name="M_CONFIG_VOUCHER" />
+	    <MODULE name="M_DeEsito_Filtro"/>
+	    <MODULE name="M_GetCodRegione" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AzioniConcordateListaPage" target="M_CONFIG_UMB_NGE_AZ"/>
+		<DEPENDENCE source="AzioniConcordateListaPage" target="M_ChiusuraDidMultipla">			 
+			<CONDITIONS>
+	    		<PARAMETER name="CHIUDI_DID" scope="SERVICE_REQUEST" value="CHIUDI_DID" />
+	    	</CONDITIONS>	        
+		</DEPENDENCE>
+		<DEPENDENCE source="AzioniConcordateListaPage" target="M_AnnullaMultiploEsitiAttivita">			 
+			<CONDITIONS>
+	    		<PARAMETER name="AGGIORNA_ESITI" scope="SERVICE_REQUEST" value="AGGIORNA_ESITI" />
+	    	</CONDITIONS>	        
+		</DEPENDENCE>		
+		<DEPENDENCE source="AzioniConcordateListaPage" target="M_CONFIG_VOUCHER"/>
+		<DEPENDENCE source="AzioniConcordateListaPage" target="M_MotFineAtto"/>
+		<DEPENDENCE source="AzioniConcordateListaPage" target="M_GetNumConfigurazioneChiusuraDidMultipla"/>
+		<DEPENDENCE source="AzioniConcordateListaPage" target="M_Configurazione_CIG"/>
+		<DEPENDENCE source="M_Configurazione_CIG" target="M_ListaAzioniConcordate">
+			<CONDITIONS/>
+	    	<CONSEQUENCES>	    		    			    			    
+	    		<PARAMETER name="canCIG" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_Configurazione_CIG.ROWS.ROW.canCIG"/>
+	    	</CONSEQUENCES>	    
+		</DEPENDENCE>
+	 	<DEPENDENCE source="AzioniConcordateListaPage" target="M_DeEsito"/>
+	 	<DEPENDENCE source="AzioniConcordateListaPage" target="M_DeEsitoRendicont"/>  
+	 	<DEPENDENCE source="AzioniConcordateListaPage" target="M_DeEsito_Sifer"/>
+	 	<DEPENDENCE source="AzioniConcordateListaPage" target="M_DeEsito_Filtro"/>
+	 	<DEPENDENCE source="AzioniConcordateListaPage" target="M_GetCodRegione" />
+	</DEPENDENCIES>
+</PAGE> 
+
+<PAGE distributed="false" name="ConfermaAnnualeDidPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetProtocollazione"/>
+		<MODULE name="M_Lista_Dich_Annuali"/>
+		<MODULE name="M_Get_Dich_Annuale"/>
+		<MODULE name="M_Annulla_Dich_Annuale"/>	 
+		<MODULE name="M_CONFIG_CONSENSOFIRMA" /> 
+		<MODULE name="M_VerificaAmConsensoFirma" />		
+		<MODULE name="M_VerificaFileFirmabile" />				
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ConfermaAnnualeDidPage" target="M_GetProtocollazione"/>
+		<DEPENDENCE source="ConfermaAnnualeDidPage" target="M_Get_Dich_Annuale">
+			<CONDITIONS>
+		    	<PARAMETER name="PRGDIDANNUALE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    	<PARAMETER name="ANNULLADICH" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+		   	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ConfermaAnnualeDidPage" target="M_Annulla_Dich_Annuale">
+			<CONDITIONS>
+				<PARAMETER name="ANNULLADICH" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ConfermaAnnualeDidPage" target="M_Lista_Dich_Annuali"/>
+		
+				<!-- firma -->
+		<DEPENDENCE source="ConfermaAnnualeDidPage" target="M_CONFIG_CONSENSOFIRMA" />
+		<DEPENDENCE source="M_CONFIG_CONSENSOFIRMA" target="M_VerificaFileFirmabile">
+		    <CONDITIONS>
+		        <PARAMETER name="M_CONFIG_CONSENSOFIRMA.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1" />
+		    </CONDITIONS>
+		    <CONSEQUENCES>
+				<PARAMETER name="DOCUMENTTYPE" type="ABSOLUTE" scope="" value="IMDICANN" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_VerificaFileFirmabile" target="M_VerificaAmConsensoFirma">
+		    <CONDITIONS>
+		        <PARAMETER name="M_VerificaFileFirmabile.FLGFIRMAGRAFO" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="S" />
+		    </CONDITIONS>
+		</DEPENDENCE>
+		 
+	</DEPENDENCIES>
+	
+
+</PAGE>
+
+<PAGE distributed="false" name="RicercaDichAnnualePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ELENCOCPI"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaDichAnnualePage" target="M_ELENCOCPI"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ListaLavDichAnnualePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_DescCPI"/>
+		<MODULE name="M_ListaLavDichAnnuale"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaLavDichAnnualePage" target="M_DescCPI"/>
+		<DEPENDENCE source="ListaLavDichAnnualePage" target="M_ListaLavDichAnnuale"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MovimentiEntePromotorePage" scope="REQUEST">
+  <MODULES>
+      <MODULE keep="false" name="M_MovimentiEntePromotore"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovimentiEntePromotorePage" target="M_MovimentiEntePromotore"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CheckDataAdesioneYGPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetDatiLav" />
+		<MODULE keep="false" name="M_YG_CheckDataAdesione" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CheckDataAdesioneYGPage" target="M_GetDatiLav">
+			<CONDITIONS />
+			<CONSEQUENCES>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetDatiLav" target="M_YG_CheckDataAdesione">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="STRCODICEFISCALE" scope="SERVICE_RESPONSE"
+					type="RELATIVE" value="M_GetDatiLav.ROWS.ROW.STRCODICEFISCALE" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="RiepilogoPattoAzioniPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_RiepilogoPacchettoAdulti" />
+		<MODULE keep="false" name="M_RiepilogoPattoAzioni" />
+		<MODULE keep="false" name="M_GetAdesionePA" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RiepilogoPattoAzioniPage" target="M_RiepilogoPacchettoAdulti">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="RiepilogoPattoAzioniPage" target="M_GetAdesionePA">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONE" scope="SERVICE_REQUEST" value="GET_ADESIONE" />
+        	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetAdesionePA" target="M_RiepilogoPacchettoAdulti">
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_RiepilogoPacchettoAdulti" target="M_RiepilogoPattoAzioni">
+		</DEPENDENCE>
+		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="AzioniConcordateSapPage" scope="REQUEST">
+	<MODULES>
+<!-- 		<MODULE keep="false" name="M_CheckSap2"/> -->
+		<MODULE keep="false" name="M_GetAzioniConcordateSAP" />
+	</MODULES>
+	<DEPENDENCIES>
+<!-- 		<DEPENDENCE source="AzioniConcordateSapPage" target="M_CheckSap2" /> -->
+		<DEPENDENCE source="AzioniConcordateSapPage" target="M_GetAzioniConcordateSAP" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="SchedaPartecipantePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_Combo_Contratto" />
+		<MODULE name="M_Combo_Durata" />
+		<MODULE name="M_Combo_Occupazione" />
+		<MODULE name="M_Combo_Studio" />
+		<MODULE name="M_Combo_Svantaggio" />
+		<MODULE name="M_SaveSchedaPartecipante" />
+		<MODULE name="M_UltimoPattoAperto" />
+		<MODULE name="M_SchedaPartecipantePatto" />
+		<MODULE name="M_SchedaSvantaggiPattoAperto" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="SchedaPartecipantePage" target="M_Combo_Contratto" />
+		<DEPENDENCE source="SchedaPartecipantePage" target="M_Combo_Durata" />
+		<DEPENDENCE source="SchedaPartecipantePage" target="M_Combo_Occupazione" />
+		<DEPENDENCE source="SchedaPartecipantePage" target="M_Combo_Studio" />
+		<DEPENDENCE source="SchedaPartecipantePage" target="M_Combo_Svantaggio" />
+		<DEPENDENCE source="SchedaPartecipantePage" target="M_UltimoPattoAperto" />
+		<DEPENDENCE source="M_UltimoPattoAperto" target="M_SchedaPartecipantePatto">
+			<CONDITIONS/>
+			<CONSEQUENCES>
+				<PARAMETER name="PRGPATTOLAVORATORE" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_UltimoPattoAperto.ROWS.ROW.PRGPATTOLAVORATORE" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+		<DEPENDENCE source="SchedaPartecipantePage" target="M_SaveSchedaPartecipante">
+			<CONDITIONS>
+				<PARAMETER name="inserisciAggiornaScheda" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_SaveSchedaPartecipante" target="M_SchedaPartecipantePatto"/>
+		
+		<DEPENDENCE source="M_SchedaPartecipantePatto" target="M_SchedaSvantaggiPattoAperto">
+			<CONDITIONS/>
+			<CONSEQUENCES>
+				<PARAMETER name="PRGPATTOLAVORATORE" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_SchedaPartecipantePatto.ROWS.ROW.PRGPATTOLAVORATORE" />
+			</CONSEQUENCES>
+		</DEPENDENCE>				
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="SchedaPartecipanteStoricoPage" scope="REQUEST">
+	<MODULES>
+	    <MODULE name="M_PattoDettaglioStorico" />
+		<MODULE name="M_Combo_Contratto" />
+		<MODULE name="M_Combo_Durata" />
+		<MODULE name="M_Combo_Occupazione" />
+		<MODULE name="M_Combo_Studio" />
+		<MODULE name="M_Combo_Svantaggio" />
+ 		<MODULE name="M_SchedaPartecipantePatto" />
+ 		<MODULE name="M_SchedaSvantaggiPattoAperto" />
+ 	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="SchedaPartecipanteStoricoPage" target="M_PattoDettaglioStorico" />
+		<DEPENDENCE source="SchedaPartecipanteStoricoPage" target="M_Combo_Contratto" />
+		<DEPENDENCE source="SchedaPartecipanteStoricoPage" target="M_Combo_Durata" />
+		<DEPENDENCE source="SchedaPartecipanteStoricoPage" target="M_Combo_Occupazione" />
+		<DEPENDENCE source="SchedaPartecipanteStoricoPage" target="M_Combo_Studio" />
+		<DEPENDENCE source="SchedaPartecipanteStoricoPage" target="M_Combo_Svantaggio" />
+		<DEPENDENCE source="SchedaPartecipanteStoricoPage" target="M_SchedaPartecipantePatto">
+			<CONDITIONS>
+				<PARAMETER name="prgpattolavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_SchedaPartecipantePatto" target="M_SchedaSvantaggiPattoAperto">
+			<CONDITIONS/>
+			<CONSEQUENCES>
+				<PARAMETER name="PRGPATTOLAVORATORE" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_SchedaPartecipantePatto.ROWS.ROW.PRGPATTOLAVORATORE" />
+			</CONSEQUENCES>
+		</DEPENDENCE>		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="RiepilogoProgrammiPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_RiepilogoProgrammiPatto"/>
+		<MODULE keep="false" name="NotePattoStoricizzato" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RiepilogoProgrammiPage" target="M_RiepilogoProgrammiPatto"/>
+		<DEPENDENCE source="RiepilogoProgrammiPage" target="NotePattoStoricizzato">
+			<CONDITIONS>
+				<PARAMETER name="prgpattolavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ProgrammaDettaglioPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_RiepilogoAzioniProgrammaPatto"/>
+		<MODULE keep="false" name="NotePattoStoricizzato" />
+		<MODULE keep="false" name="M_GetCodRegione" />
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ProgrammaDettaglioPage" target="M_GetCodRegione"/>
+		<DEPENDENCE source="ProgrammaDettaglioPage" target="M_CONFIG_UMB_NGE_AZ"/>
+		<DEPENDENCE source="ProgrammaDettaglioPage" target="M_RiepilogoAzioniProgrammaPatto"/>
+		<DEPENDENCE source="ProgrammaDettaglioPage" target="NotePattoStoricizzato">
+			<CONDITIONS>
+				<PARAMETER name="prgpattolavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="SoggettoAccProgrammiPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetCodRegione" />
+		<MODULE keep="false" name="M_UltimoPattoAperto" />
+		<MODULE keep="false" name="M_ListaSoggettoAccProgrammi"/>
+		<MODULE keep="false" name="M_ProgrammiPattoLavNoSoggetto" />
+		<MODULE keep="false" name="M_InserisciSoggettoProgrammaPattoLav" />
+		<MODULE keep="false" name="M_CancellaSoggettoProgrammaPattoLav" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="SoggettoAccProgrammiPage" target="M_GetCodRegione" />
+	
+		<DEPENDENCE source="M_GetCodRegione" target="M_ListaSoggettoAccProgrammi">
+			<CONDITIONS>
+				<PARAMETER name="ASSOCIASOGGETTOPROGRAMMA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+				<PARAMETER name="CANCELLASOGGETTOPROGRAMMA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetCodRegione" target="M_UltimoPattoAperto">
+			<CONDITIONS>
+				<PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetCodRegione" target="M_ProgrammiPattoLavNoSoggetto">
+			<CONDITIONS>
+				<PARAMETER name="ASSOCIASOGGETTOPROGRAMMA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+				<PARAMETER name="CANCELLASOGGETTOPROGRAMMA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+				<PARAMETER name="cdnlavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetCodRegione" target="M_InserisciSoggettoProgrammaPattoLav">
+			<CONDITIONS>
+				<PARAMETER name="ASSOCIASOGGETTOPROGRAMMA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetCodRegione" target="M_CancellaSoggettoProgrammaPattoLav">
+			<CONDITIONS>
+				<PARAMETER name="CANCELLASOGGETTOPROGRAMMA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_InserisciSoggettoProgrammaPattoLav" target="M_ProgrammiPattoLavNoSoggetto">
+			<CONDITIONS>
+				<PARAMETER name="cdnlavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_CancellaSoggettoProgrammaPattoLav" target="M_ProgrammiPattoLavNoSoggetto">
+			<CONDITIONS>
+				<PARAMETER name="cdnlavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_InserisciSoggettoProgrammaPattoLav" target="M_ListaSoggettoAccProgrammi" />
+		<DEPENDENCE source="M_CancellaSoggettoProgrammaPattoLav" target="M_ListaSoggettoAccProgrammi" />
+		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="SoggettoAccProgrammiStoricoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ListaSoggettoAccProgrammi"/>
+		<MODULE keep="false" name="NotePattoStoricizzato" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="SoggettoAccProgrammiStoricoPage" target="M_ListaSoggettoAccProgrammi" />
+		<DEPENDENCE source="SoggettoAccProgrammiStoricoPage" target="NotePattoStoricizzato" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="AllProfilingGGPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_StoricoProfilingGG"></MODULE>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AllProfilingGGPage" target="M_StoricoProfilingGG"/>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="DettaglioProfilingGGPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_COMBO_PROVINCIA_CodiceMinDescr"/>
+		<MODULE keep="false" name="M_CCD_COMBO_MN_PF_PRESENZAIT"/>
+		<MODULE keep="false" name="M_CCD_COMBO_PF_OCCUP"/>
+		<MODULE keep="false" name="M_DettaglioProfiloGG"/>
+		<MODULE keep="false" name="M_GestioneProfilingGG"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DettaglioProfilingGGPage" target="M_COMBO_PROVINCIA_CodiceMinDescr"/>
+		<DEPENDENCE source="DettaglioProfilingGGPage" target="M_CCD_COMBO_MN_PF_PRESENZAIT"/>
+		<DEPENDENCE source="DettaglioProfilingGGPage" target="M_CCD_COMBO_PF_OCCUP"/>
+		<DEPENDENCE source="DettaglioProfilingGGPage" target="M_DettaglioProfiloGG">
+			<CONDITIONS>
+				<PARAMETER name="PRGYGPROFILING" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+				<PARAMETER name="OPERAZIONE_GG" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="DettaglioProfilingGGPage" target="M_GestioneProfilingGG">
+			<CONDITIONS>
+				<PARAMETER name="PRGYGPROFILING" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+				<PARAMETER name="OPERAZIONE_GG" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="CalcolaProfilingGGPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetInfoLavProfilingGG"/>
+		<MODULE keep="false" name="M_COMBO_PROVINCIA_CodiceMinDescr"/>
+		<MODULE keep="false" name="M_CCD_COMBO_MN_PF_PRESENZAIT"/>
+		<MODULE keep="false" name="M_CCD_COMBO_PF_OCCUP"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CalcolaProfilingGGPage" target="M_GetInfoLavProfilingGG"/>
+		<DEPENDENCE source="CalcolaProfilingGGPage" target="M_COMBO_PROVINCIA_CodiceMinDescr"/>
+		<DEPENDENCE source="CalcolaProfilingGGPage" target="M_CCD_COMBO_MN_PF_PRESENZAIT"/>
+		<DEPENDENCE source="CalcolaProfilingGGPage" target="M_CCD_COMBO_PF_OCCUP"/>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="AllNeetGGPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_StoricoNeetGG"></MODULE>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AllNeetGGPage" target="M_StoricoNeetGG"/>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="DettaglioNeetGGPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_DettaglioNeetGG"/>
+		<MODULE name="M_GestioneNeetGG"/>
+		<MODULE name="M_ComboVerificaNeet" />
+		<MODULE name="M_ComboMinEsitoNeet"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DettaglioNeetGGPage" target="M_ComboVerificaNeet"/>
+		<DEPENDENCE source="DettaglioNeetGGPage" target="M_ComboMinEsitoNeet"/>
+		<DEPENDENCE source="DettaglioNeetGGPage" target="M_DettaglioNeetGG">
+			<CONDITIONS>
+				<PARAMETER name="PRGVERIFICANEET" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="DettaglioNeetGGPage" target="M_GestioneNeetGG">
+			<CONDITIONS>
+				<PARAMETER name="PRGVERIFICANEET" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<!-- Storico invii patto/accordo on line -->
+<PAGE distributed="false" name="PTOnLineStoricoPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="PTOnLineStoricoModule"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="PTOnLineStoricoPage" target="PTOnLineStoricoModule"/>
+  </DEPENDENCIES>
+</PAGE>

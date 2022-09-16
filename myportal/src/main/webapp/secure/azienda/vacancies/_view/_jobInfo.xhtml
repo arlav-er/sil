@@ -1,0 +1,203 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+				xmlns:o="http://omnifaces.org/ui">
+
+	<div class="job-info m-t-50 m-b-50">
+
+		<ui:fragment rendered="#{not empty vacancyViewBean.vaContrattoList}">
+			<div class="row">
+				<div class="col-md-4">
+					<span>Contratto</span>
+				</div>
+				<div class="col-md-8">
+					<ui:repeat value="#{vacancyViewBean.vaContrattoList}" var="vaContratto" varStatus="contrattoLoop">
+						<div>#{vaContratto.deContrattoSil.descrizione}</div>
+					</ui:repeat>
+				</div>
+			</div>
+		</ui:fragment>
+
+		<ui:fragment rendered="#{not empty vacancyViewBean.vaOrarioList}">
+			<div class="row">
+				<div class="col-md-4">
+					<span>Orario</span>
+				</div>
+				<div class="col-md-8">
+					<ui:repeat value="#{vacancyViewBean.vaOrarioList}" var="vaOrario">
+						<div>#{vaOrario.deOrarioSil.descrizioneIdo}</div>
+					</ui:repeat>
+				</div>
+			</div>
+		</ui:fragment>
+
+		<ui:fragment rendered="#{vacancyViewBean.vaAltreInfo.flagOrarioContinuato}">
+			<div class="row">
+				<div class="col-md-4">
+					<span>Orario continuato</span>
+				</div>
+				<div class="col-md-8">
+					<span> <h:outputFormat escape="false"/>
+						<i class="fa #{vacancyViewBean.vaAltreInfo.flagOrarioContinuato?'fa-check-circle':''} "
+						   aria-hidden="true"></i>
+					</span>
+				</div>
+			</div>
+		</ui:fragment>
+
+		<ui:fragment rendered="#{not empty vacancyViewBean.vacancy.deComune.denominazione}">
+			<div class="row">
+				<div class="col-md-4">
+					<span>Luogo di lavoro</span>
+				</div>
+				<div class="col-md-8">
+					<span>#{vacancyViewBean.vacancy.deComune.denominazione}
+						(#{vacancyViewBean.vacancy.deComune.deProvincia.targa}) </span> <span> #{vacancyViewBean.vacancy.indirizzoLavoro}
+					</span>
+				</div>
+			</div>
+		</ui:fragment>
+
+		<ui:fragment rendered="#{not empty vacancyViewBean.vaEsperienze.opzEsperienza and vacancyViewBean.vaEsperienze.opzEsperienza =='Y' }">
+			<div class="row">
+				<div class="col-md-4">
+					<span>Esperienza richiesta</span>
+				</div>
+				<div class="col-md-8">
+					<p style="margin-top:10px">
+						<span style="display: contents;"><i class="fa fa-check-circle" aria-hidden="true"></i></span>
+						<ui:fragment rendered="#{not empty vacancyViewBean.vaEsperienze.descEsperienzaLav}">
+							<span style="display: contents; white-space:pre"> #{vacancyViewBean.vaEsperienze.descEsperienzaLav}</span>
+						</ui:fragment>
+					</p>
+				</div>
+			</div>
+		</ui:fragment>
+
+		<ui:fragment rendered="#{not empty vacancyViewBean.vaLinguaList}">
+			<div class="row">
+				<div class="col-md-4">
+					<span>Conoscenze linguistiche</span>
+				</div>
+
+				<div class="col-md-8">
+					<ui:repeat value="#{vacancyViewBean.vaLinguaList}" var="vaLingua" varStatus="linguaLoop">
+						<span> <strong>#{vaLingua.deLingua.denominazione}</strong>
+							<ul>
+								<ui:fragment rendered="#{not vaLingua.flagMadrelingua and not empty vaLingua.deGradoSilLetto}">
+								<li>
+									<strong>Letto: </strong>
+									<h:outputText title="#{vaLingua.deGradoSilLetto.descrizioneIdoLetto}" value="#{vaLingua.deGradoSilLetto.codIdo}" style="display:inline;"/>
+								</li>
+								</ui:fragment>
+							<ui:fragment rendered="#{not vaLingua.flagMadrelingua and not empty vaLingua.deGradoSilParlato}">
+								<li>
+									<strong>Parlato: </strong>
+									<h:outputText title="#{vaLingua.deGradoSilParlato.descrizioneIdoParlato}" value="#{vaLingua.deGradoSilParlato.codIdo}" style="display:inline;"/>
+								</li>
+								</ui:fragment>
+								<ui:fragment rendered="#{not vaLingua.flagMadrelingua and not empty vaLingua.deGradoSilScritto}">
+								<li>
+									<strong>Scritto: </strong>
+									<h:outputText title="#{vaLingua.deGradoSilScritto.descrizioneIdoScritto}" value="#{vaLingua.deGradoSilScritto.codIdo}" style="display:inline;"/>
+								</li>
+								</ui:fragment>
+
+								<ui:fragment rendered="#{vaLingua.flagMadrelingua}">
+								<li>
+										#{ui['lingue.madrelingua']}
+								</li>
+								</ui:fragment>
+							</ul>
+						</span>
+					</ui:repeat>
+				</div>
+			</div>
+		</ui:fragment>
+		<ui:fragment rendered="#{not empty vacancyViewBean.vaInformatica}">
+			<div class="row">
+				<div class="col-md-4">
+					<span>Conoscenze informatiche</span>
+				</div>
+
+				<div class="col-md-8">
+					<span> <h:outputFormat escape="false" value="#{vacancyViewBean.vaInformatica.conoscenzaInfo}" />
+					</span>
+				</div>
+			</div>
+		</ui:fragment>
+
+		<ui:fragment rendered="#{not empty vacancyViewBean.vaIstruzioneList}">
+			<div class="row">
+				<div class="col-md-4">
+					<span>Titolo di studio</span>
+				</div>
+				<div class="col-md-8">
+					<ui:repeat value="#{vacancyViewBean.vaIstruzioneList}" var="vaIstruzione">
+						<span> <strong>#{vaIstruzione.deTitolo.descrizione}</strong><br />							  
+							<ul>
+								<h:outputFormat escape="false" rendered="#{not empty vaIstruzione.tipoSceltaTitolo and vaIstruzione.tipoSceltaTitolo == 'P'}">
+									<li><strong>Preferibile</strong></li>
+								</h:outputFormat>
+								<h:outputFormat escape="false" rendered="#{not empty vaIstruzione.tipoSceltaTitolo and vaIstruzione.tipoSceltaTitolo == 'I'}">
+  								    <li><strong>Indispensabile</strong></li>
+								</h:outputFormat>								
+								<h:outputFormat escape="false" rendered="#{not empty vaIstruzione.specifica}">
+									<li><strong>Specifica: </strong> #{vaIstruzione.specifica}</li>
+								</h:outputFormat>
+								<h:outputFormat escape="false" rendered="#{not empty vaIstruzione.votazione}">
+									<li><strong>Votazione: </strong> #{vaIstruzione.votazione}</li>
+								</h:outputFormat>
+							</ul>
+						</span>
+					</ui:repeat>
+				</div>
+			</div>
+		</ui:fragment>
+
+		<ui:fragment rendered="#{not empty vacancyViewBean.vaPatenteList}">
+			<div class="row">
+				<div class="col-md-4">
+					<span>Patenti</span>
+				</div>
+				<div class="col-md-8">
+					<ul>
+						<ui:repeat value="#{vacancyViewBean.vaPatenteList}" var="vaPatente">
+							<li>#{vaPatente.dePatenteSil.descrizione}</li>
+						</ui:repeat>
+					</ul>
+				</div>
+			</div>
+		</ui:fragment>
+
+		<ui:fragment rendered="#{not empty vacancyViewBean.vaPatentinoList}">
+			<div class="row">
+				<div class="col-md-4">
+					<span>Patentini</span>
+				</div>
+				<div class="col-md-8">
+					<ul>
+						<ui:repeat value="#{vacancyViewBean.vaPatentinoList}" var="vaPatentino">
+							<li>#{vaPatentino.dePatentinoSil.descrizione}</li>
+						</ui:repeat>
+					</ul>
+				</div>
+			</div>
+		</ui:fragment>
+
+		<ui:fragment rendered="#{not empty vacancyViewBean.vaAlboList}">
+			<div class="row">
+				<div class="col-md-4">
+					<span>Albo</span>
+				</div>
+				<div class="col-md-8">
+					<ul>
+						<ui:repeat value="#{vacancyViewBean.vaAlboList}" var="vaAlbo">
+							<li>#{vaAlbo.deAlboSil.descrizione}</li>
+						</ui:repeat>
+					</ul>
+				</div>
+			</div>
+		</ui:fragment>
+	</div>
+</ui:composition>
+

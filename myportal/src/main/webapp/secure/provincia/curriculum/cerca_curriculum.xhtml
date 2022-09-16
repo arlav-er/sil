@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/main.xhtml">
+
+	<ui:define name="title">
+		<h:outputText value="#{msg['provincia.cerca_curriculum.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+		<ui:param name="bean" value="#{provinciaCercaCurriculumBean}" />
+		<h:outputStylesheet library="css" name="pagination_datatable.css" />
+		
+		<style type="text/css">
+			a.page-link{ text-decoration: none; }
+		</style>
+
+		<br />
+		<h:outputText value="#{txt['provincia.cerca_curriculum.descrizione']}"
+			escape="false" />
+		<br />
+		
+		<h:form id="ricercaForm" class="widget_container ui-tabs ui-widget-content ui-corner-all">
+			<h:panelGrid columns="2">
+				<cc:inputText label="Nome" value="#{bean.parametriRicerca.nome}"/>
+
+				<cc:inputText label="Cognome" value="#{bean.parametriRicerca.cognome}" />
+
+				<cc:inputSuggestion size="80" id="titolo" label="Titolo di studio"
+					showButton="true" suggestionPath="titoliStudio" title="Titoli di studio"
+					valueCod="#{bean.parametriRicerca.titoli}" 
+					value="#{bean.parametriRicerca.descrizioneTitolo}">
+					<f:converter converterId="titoloSuggestionListConverter"
+						for="hidden" />
+				</cc:inputSuggestion>
+
+				<cc:inputText label="Codice fiscale" value="#{bean.parametriRicerca.cf}" />
+
+				<cc:inputSuggestion id="mansione" size="114"
+					label="Gruppo professionale"
+					valueCod="#{bean.parametriRicerca.gruppoProf.id}"
+					value="#{bean.parametriRicerca.gruppoProf.descrizione}" showButton="true"
+					suggestionPath="mansioni">
+					<f:validator validatorId="mansioneSuggestionValidator"
+						for="function" />
+				</cc:inputSuggestion>
+
+				<cc:inputSuggestion label="Comune di domicilio"
+					title="Comune di domicilio" suggestionPath="comuni" size="50"
+					valueCod="#{bean.parametriRicerca.comune.id}"
+					value="#{bean.parametriRicerca.comune.descrizione}">
+					<f:validator validatorId="comuneSuggestionValidator"
+						for="function" />
+				</cc:inputSuggestion>
+
+				<cc:inputToken label="Lingue" value="#{bean.parametriRicerca.lingue}">
+					<f:selectItems value="#{bean.lingue}" />
+				</cc:inputToken>
+
+				<h:outputText value="" />
+
+				<cc:selectFlagCheckbox label="Disponibilità a trasferte"
+					value="#{bean.parametriRicerca.trasferte}" inline="true" />
+
+				<h:panelGroup>
+					<span class="boldText"> 
+						<h:outputText value="Munito di mezzo " /> <br />
+						<div style="float: left; padding-right: 5px;">
+						<cc:selectFlagCheckbox label="Auto" id="automunito"
+							value="#{bean.parametriRicerca.automunito}" inline="true" />
+						</div> 
+						<h:outputText value="   oppure " /> 
+						<cc:selectFlagCheckbox id="motomunito" inline="true" 
+							label="Moto" value="#{bean.parametriRicerca.motomunito}" />
+					</span>
+				</h:panelGroup>
+					
+				<h:commandLink id="searchButton" value="Cerca" styleClass="searchButton" 
+					action="#{bean.search}">
+					<f:ajax execute=":ricercaForm" render="@this :listaLavoratoriForm"
+						onevent="onSearch" />
+				</h:commandLink>
+			</h:panelGrid>
+		</h:form>
+		<br />
+		
+		<cc:waiting id ="searchLoader" hidden="true" waitMessage="Ricerca in corso..." />
+		
+		<h:form id="listaLavoratoriForm">
+			<cc:messages id="messages" />
+			
+			<div style="display:none;">
+				<h:inputHidden id="pageValue" value="#{bean.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{bean.changePage}" value="DUMMY FOR PAGINATION">
+					<f:ajax execute=":listaLavoratoriForm:pageValue" render=":listaLavoratoriForm:results" />
+				</h:commandButton>
+			</div>
+			
+			<ui:fragment rendered="#{(bean.ricercaEseguita) and (empty bean.risultato)}">
+				<h2 class="nessun_elemento_trovato">Nessun lavoratore trovato</h2>
+			</ui:fragment>
+			
+			<ui:fragment rendered="#{(bean.ricercaEseguita) and (not empty bean.risultato)}">	
+				<script type="text/javascript">
+					$(function() {							
+					    $("#paginationBar").pagination({							    
+					    	pages: #{bean.paginationHandler.pages()},						       
+					        cssStyle: 'light-theme',
+					        prevText: 'Prec.',
+					        nextText: 'Succ.',
+					        onPageClick: function (pageNumber, event) {							        
+					        	document.getElementById('listaLavoratoriForm:pageValue').value = pageNumber;
+					            document.getElementById('listaLavoratoriForm:pageCommand').click();  
+					            $(jq("listaLavoratoriForm:results")).hide();					            
+					            $(jq("listaLavoratoriForm:resultsLoader")).show();
+						    }
+					    });
+					});
+				</script>
+					
+				<div id="paginationBar" class="widget_container ui-tabs ui-widget-content ui-corner-all" />
+				<br />
+					
+				<cc:waiting id="resultsLoader" hidden="true" waitMessage="Caricamento..." />
+
+				<h:panelGroup id="results" class="dataTables_wrapper">
+					<table class="dataTable">
+						<tr>
+							<th class="ui-state-default">Cognome - Nome</th>
+							<th class="ui-state-default">Codice fiscale</th>
+							<th class="ui-state-default">Curriculum</th>
+							<th class="ui-state-default">Comune domicilio</th>
+							<th class="ui-state-default">Provenienza</th>
+							<th class="ui-state-default">Data inserimento</th>
+						</tr>
+						
+						<ui:repeat value="#{bean.risultato}" var="curriculum" varStatus="status">
+							<tr>
+								<td class="clickable-td">
+									<h:link outcome="visualizza_curriculum"
+										title="Visualizza il curriculum: #{curriculum.descrizioneCV}"
+										value="#{bean.getVeroCognomeNome(curriculum)}">
+											<f:param name="id" value="#{curriculum.idCvDatiPersonali}" />
+											<span class="ui-icon ui-icon-document fix_icon" />
+									</h:link>
+								</td>
+							
+								<td class="clickable-td">
+									<h:link outcome="visualizza_curriculum"
+										title="Visualizza il curriculum: #{curriculum.descrizioneCV}"
+										value="#{bean.getVeroCodiceFiscale(curriculum)} &nbsp;">
+										<f:param name="id" value="#{curriculum.idCvDatiPersonali}" />
+										<span class="ui-icon ui-icon-document fix_icon" />
+									</h:link>
+								</td>
+							
+								<td class="clickable-td">
+									<h:link outcome="visualizza_curriculum"
+										title="Visualizza il curriculum: #{curriculum.descrizioneCV}"
+										value="#{curriculum.descrizioneCV} &nbsp;">
+										<f:param name="id" value="#{curriculum.idCvDatiPersonali}" />
+										<span class="ui-icon ui-icon-document fix_icon" />
+									</h:link>
+								</td>
+							
+								<td> <h:outputText value="#{curriculum.comuneDomicilio}" /> </td>
+							
+								<td> <h:outputText value="#{curriculum.provenienza}" /> </td>
+							
+								<td>
+									<h:outputText value="#{curriculum.dataInserimentoCV}">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+								</td>
+							</tr>
+						</ui:repeat>
+					</table>
+						
+					<script type="text/javascript">
+						disegnaBottoni();
+						$(jq("listaLavoratoriForm:resultsLoader")).hide();
+					</script>
+				</h:panelGroup>
+			</ui:fragment>
+				
+			<script type="text/javascript">	
+				disegnaBottoni();
+				$(jq("searchLoader")).hide();
+			</script>
+		</h:form>
+		
+		<script type="text/javascript">
+			function onSearch(data) {
+				if (data.status == 'begin') {
+					$(jq("searchLoader")).show();
+					$(jq("listaLavoratoriForm")).hide();
+				}
+			}
+		</script>
+	</ui:define>
+</ui:composition>

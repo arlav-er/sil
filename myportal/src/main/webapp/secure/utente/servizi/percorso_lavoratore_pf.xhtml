@@ -1,0 +1,138 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components" template="../../template/main_primefaces.xhtml">
+
+	<ui:define name="title">
+		<h:outputText value="#{msg['cittadino.servizi.percorso_lavoratore.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+			<h:form id="percorso">
+				<h:panelGrid columns="1">
+					<p:outputLabel for="dataInizio" value="Data inizio"></p:outputLabel>
+					<p:calendar id="dataInizio" label="Data inizio" 
+						required="true" requiredMessage="Campo obbligatorio"
+						showOn="button" pattern="dd/MM/yyyy" navigator="true" yearRange="c-50:c50"
+						value="#{percorsoLavoratoreBean.dataInizio}">
+						<f:validator validatorId="dateNotFutureValidator" for="function" />
+					</p:calendar>
+					<p:message id="dataInizioMsg" for="dataInizio"></p:message>
+
+					<p:commandButton id="chiamaServizioButton"
+						onclick="$('#content .wait').fadeIn();" oncomplete="$('#content .wait').hide();"
+						action="#{percorsoLavoratoreBean.chiamaServizio}" value="Invia" styleClass="buttonStyle"
+						update=":result dataInizioMsg"/>
+				</h:panelGrid>
+			</h:form>
+
+			<h:panelGroup id="result" layout="block" style="text-align:center;">
+				<ui:fragment rendered="#{percorsoLavoratoreBean.reqTried and not empty percorsoLavoratoreBean.listaElementi and (percorsoLavoratoreBean.risultatoProtocollo == null or percorsoLavoratoreBean.risultatoProtocollo =='')}">
+					<h:panelGroup class="ok" layout="block">
+						<h:graphicImage value="/resources/images/check.gif" alt="ok" />
+						<b>Dati recuperati con successo</b>
+					</h:panelGroup>
+				</ui:fragment>
+				<cc:waiting hidden="true" waitMessage="Stiamo richiedendo i dati al CPI di tua competenza..." />
+				<ui:fragment rendered="#{percorsoLavoratoreBean.reqTried and percorsoLavoratoreBean.risultato != 'OK'}">
+					<h:panelGroup class="error" layout="block">
+						<h:graphicImage value="/resources/images/error.png" alt="error" />
+						<br />
+						<b>Impossibile elaborare la richiesta.</b>
+						<br />
+						<h:outputText value="#{percorsoLavoratoreBean.risultato}" />
+					</h:panelGroup>
+				</ui:fragment>
+				<ui:fragment
+					rendered="#{percorsoLavoratoreBean.reqTried and percorsoLavoratoreBean.risultato == 'OK' and empty percorsoLavoratoreBean.listaElementi}">
+					<h:panelGroup class="warning" layout="block">
+						<h:graphicImage value="/resources/images/icons/warning.gif" alt="warning" />
+						<br />
+						<b>Non sono presenti movimenti nel periodo indicato</b>
+					</h:panelGroup>
+				</ui:fragment>
+				<ui:fragment
+					rendered="#{const['regione.cod'] != 16 and percorsoLavoratoreBean.reqTried and percorsoLavoratoreBean.risultato == 'OK'}">
+					<br />
+					<form>
+						<h:outputLink styleClass="linkAsButton" value="#{percorsoLavoratoreBean.downloadPercorso()}" style="float:left; display:flex;" icon="ui-icon-print">
+							Stampa
+						</h:outputLink>
+					</form>
+				</ui:fragment>
+
+				<h:form>
+					<ui:fragment
+						rendered="#{const['regione.cod'] == 16 and percorsoLavoratoreBean.reqTried and percorsoLavoratoreBean.risultato == 'OK' and not empty percorsoLavoratoreBean.listaElementi}">
+						<p:commandButton ajax="false" id="download" styleClass="buttonStyle" value="Stampa" style="float:left; display:flex;" icon="ui-icon-print">
+							<p:fileDownload value="#{percorsoLavoratoreBean.downloadPercorsoPuglia()}" />
+						</p:commandButton>
+						<ui:fragment rendered="#{percorsoLavoratoreBean.reqProtocollo and percorsoLavoratoreBean.risultatoProtocollo != 'OK'}">
+							<h:panelGroup class="error" layout="block">
+								<h:graphicImage value="/resources/images/error.png" alt="error" />
+								<br />
+								<b>impossibile elaborare la richiesta di stampa</b>
+								<br />
+								<h:outputText value="#{percorsoLavoratoreBean.risultatoProtocollo}" />
+							</h:panelGroup>
+						</ui:fragment>
+					</ui:fragment>
+				</h:form>
+
+				<ui:fragment rendered="#{percorsoLavoratoreBean.reqTried and not empty percorsoLavoratoreBean.listaElementi}">
+					<h:form>
+					<p:dataTable id="elementi_list" summary="Percorso lavoratore" columnClasses=",,,"
+						paginator="true" rows="10"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+		                currentPageReportTemplate="{startRecord}-{endRecord} di {totalRecords} risultati"
+		                rowsPerPageTemplate="10,25,50,100"
+						value="#{percorsoLavoratoreBean.listaElementi}" var="element" widgetVar="elementListWv"
+						filteredValue="#{percorsoLavoratoreBean.filteredValues}"
+						emptyMessage="Nessun risultato trovato">
+						
+						<f:facet name="header">
+				            <p:outputPanel>
+				                <label>Filtro veloce: </label>
+				                <p:inputText id="globalFilter" onkeyup="PF('elementListWv').filter()" style="width:200px"/>
+				            </p:outputPanel>
+				        </f:facet>
+						
+						<p:column filterBy="#{element.dataDaStr}" filterMatchMode="contains" sortBy="#{element.dataDa}" filterStyle="display:none; visibility:hidden;">
+							<f:facet name="header">Data Da</f:facet>
+							<h:outputText value="#{element.dataDa}">
+								<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+							</h:outputText>
+						</p:column>
+
+						<p:column filterBy="#{element.dataAStr}" filterMatchMode="contains" sortBy="#{element.dataA}" filterStyle="display:none; visibility:hidden;">
+							<f:facet name="header">Data A</f:facet>
+							<h:outputText value="#{element.dataA}">
+								<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+							</h:outputText>
+						</p:column>
+
+						<p:column filterBy="#{element.tipo}" filterMatchMode="contains" sortBy="#{element.tipo}" filterStyle="display:none; visibility:hidden;">
+							<f:facet name="header">Tipo</f:facet>
+							<h:outputText value="#{element.tipo}" />
+						</p:column>
+
+						<p:column filterBy="#{element.descrizione}" filterMatchMode="contains" colspan="5" sortBy="#{element.descrizione}" style="text-align:left;" filterStyle="display:none; visibility:hidden;">
+							<f:facet name="header">Descrizione</f:facet>
+							<h:outputText value="#{element.descrizione}" />
+						</p:column>
+
+					</p:dataTable>
+					</h:form>
+
+					<script type="text/javascript">
+						$(function() {
+							$('#percorso').hide();
+						});
+					</script>
+				</ui:fragment>
+			</h:panelGroup>
+
+		<p:button value="Torna indietro" title="Torna alla pagina dei servizi"
+			outcome="/secure/utente/servizi/index.xhtml" style="float:right;"/>
+
+	</ui:define>
+</ui:composition>

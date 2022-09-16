@@ -1,0 +1,44 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/main_primefaces.xhtml">
+<ui:param name="pagetitle" value="Schede Fabbisogno" />
+<ui:define name="content">
+	<div class="widget_container">
+		<h1>Schede Fabbisogno</h1>
+		<h:form id="cercaSchedaFbForm">			
+		<p:dataTable id="fbSchedaTable" value="#{fbSchedaSearchRegioneBean.fbSchedafabbisognList}" pagination="true" rows="10"
+				 emptyMessage="Nessuna scheda fabbisogno trovata" var="fbScheda"
+				 paginator="true" paginatorAlwaysVisible="false"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
+				
+				<p:column headerText="Soggetto ospitante" sortBy="#{fbScheda.aziendaOspitante}">
+					#{fbScheda.aziendaOspitante}
+				</p:column>
+				<p:column headerText="Data pubblicazione" sortBy="#{fbScheda.dtPubblicazione}">
+					<h:outputText value="#{fbScheda.dtPubblicazione}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Stato" sortBy="#{fbScheda.deStatoScheda.descrizione}">
+					#{fbScheda.deStatoScheda.descrizione}
+				</p:column>
+				<p:column headerText="Azioni">
+					<p:button  title="Dettaglio" outcome="scheda_fb_form" icon="ui-icon-search">
+						<f:param name="idFbSchedaFabbisogno" value="#{fbScheda.id}" />
+					</p:button>
+				</p:column>
+				</p:dataTable>	
+			
+			<p:button outcome="home" styleClass="margin-1em" title="Torna alla scrivania"
+		value="Torna alla scrivania" />
+		<p:button value="Torna alle checklist" outcome="../checklist/checklist_list.xhtml"
+				styleClass="margin-1em">
+			</p:button>
+		</h:form>
+	</div>
+</ui:define>
+</ui:composition>

@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<ui:fragment>
+		<script type="text/javascript">				
+
+			$(function(){
+				$(".contentCollapse").hide();
+
+				//toggle the componenet with class msg_body
+		  		$(".headingCollapse").click(function() {				
+					$(this).next(".contentCollapse").slideToggle(500);		
+				});
+		  		$('#mansione_titolo').click(function() {	
+		  			changeAttrCollapseDiv("#mansione_titolo");	    		
+					return changeCssCollapseDiv("#mansione_titolo", "#mansione_brake_titolo");
+				});
+		  		$('#mansione_titolo_a').click(function() {	
+		  			changeAttrCollapseDiv("#mansione_titolo_a");	    		
+					return changeCssCollapseDiv("#mansione_titolo_a", "#mansione_brake_titolo_a");
+				});
+		  		$("#contratto_titolo").click(function() {		    		
+		  			changeAttrCollapseDiv("#contratto_titolo");	    		
+					return changeCssCollapseDiv("#contratto_titolo", "#contratto_brake_titolo");
+				});
+		  		$("#orario_titolo").click(function() {		    		
+		  			changeAttrCollapseDiv("#orario_titolo");	    		
+					return changeCssCollapseDiv("#orario_titolo", "#orario_brake_titolo");
+				});
+		  		$("#esperienza_titolo").click(function() {	
+		  			changeAttrCollapseDiv("#esperienza_titolo");	    		
+					return changeCssCollapseDiv("#esperienza_titolo", "#esperienza_brake_titolo");
+				});
+		  		$("#settore_titolo").click(function() {		    		
+		  			changeAttrCollapseDiv("#settore_titolo");	    		
+					return changeCssCollapseDiv("#settore_titolo", "#settore_brake_titolo");
+				});
+		  		$("#lingua_titolo").click(function() {		    		
+		  			changeAttrCollapseDiv("#lingua_titolo");	    		
+					return changeCssCollapseDiv("#lingua_titolo", "#lingua_brake_titolo");
+				});
+		  		$("#titStudio_titolo").click(function() {		    		
+		  			changeAttrCollapseDiv("#titStudio_titolo");	    		
+					return changeCssCollapseDiv("#titStudio_titolo", "#titStudio_brake_titolo");
+				});
+		  		$("#dispTrasferte_titolo").click(function() {		    		
+		  			changeAttrCollapseDiv("#dispTrasferte_titolo");	    		
+					return changeCssCollapseDiv("#dispTrasferte_titolo", "#dispTrasferte_brake_titolo");
+				});
+		  		$("#patente_titolo").click(function() {		    		
+		  			changeAttrCollapseDiv("#patente_titolo");	    		
+					return changeCssCollapseDiv("#patente_titolo", "#patente_brake_titolo");
+				});
+
+		    });
+		</script>
+		<h:panelGroup id="panelInsertButton" layout="block">
+			<h:commandLink id="insertButton" value="Salva ricerca" 
+			 rendered="#{((not empty bean.data.cosa or not empty bean.data.dove) or 
+			 bean.searchCheckTrue(bean.rvGroupDTO.checkMansione) or bean.searchCheckTrue(bean.rvGroupDTO.checkContratto) or 
+			 bean.searchCheckTrue(bean.rvGroupDTO.checkOrario) or bean.searchCheckTrue(bean.rvGroupDTO.checkEsperienza) or 
+			 bean.searchCheckTrue(bean.rvGroupDTO.checkSettore) or bean.searchCheckTrue(bean.rvGroupDTO.checkLingua) or 
+			 bean.searchCheckTrue(bean.rvGroupDTO.checkTitoloStudio) or bean.searchCheckTrue(bean.rvGroupDTO.checkDispTrasferte) or 
+			 bean.searchCheckTrue(bean.rvGroupDTO.checkPatente))}"
+				styleClass="buttonStyle saveButton bottomMargin" onclick="setHiddenInputs();showSaveDialog();return false;"  
+				onkeypress="if (event.keyCode==13) {setHiddenInputs();showSaveDialog();return false;} return true;">
+			</h:commandLink>
+		</h:panelGroup>
+		<f:ajax execute=":form_lista_offerte:filtriCheck"
+			render=":form_lista_offerte:tabella_vacancy :form_lista_offerte:panelInsertButton :form_lista_offerte:panelInsertButton_Bottom" onevent="reloadMappa">
+			<h:panelGroup id="filtriCheck" layout="block"
+				styleClass="riquardoGroup">
+				<h:panelGroup layout="block"
+					rendered="#{not empty bean.rvGroupDTO.listMansione}">	
+				Utilizza i filtri sottostanti per affinare la ricerca
+					
+					<h3 id="mansione_titolo" 
+						class="headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+						<span id="mansione_brake_titolo"
+							class="ui-icon ui-icon-triangle-1-e"></span> <a href="#">Gruppo professionale</a>
+					</h3>					
+					<div id="mansione_content"
+						class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+						<ui:repeat var="gruppo" value="#{bean.rvGroupDTO.listMansione}">
+							<h:selectBooleanCheckbox id="mansioneCheckBox" rendered="#{gruppo != null}"
+								value="#{bean.rvGroupDTO.checkMansione.get(bean.rvGroupDTO.mapMansione.get(gruppo))}"
+								valueChangeListener="#{bean.searchCheck(bean.gruppi.get(0),gruppo, bean.rvGroupDTO.mapMansione)}" />
+							<h:outputLabel value="#{gruppo}" />
+							<br />
+						</ui:repeat>
+					</div>
+				</h:panelGroup>
+				<h:panelGroup layout="block"
+					rendered="#{not empty bean.rvGroupDTO.listContratto}">
+					<h3 id="contratto_titolo"
+						class="headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+						<span id="contratto_brake_titolo"
+							class="ui-icon ui-icon-triangle-1-e"></span> <a href="#">Contratto</a>
+					</h3>
+					<div id="contratto_content"
+						class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+						<ui:repeat var="gruppo" value="#{bean.rvGroupDTO.listContratto}">
+							<h:selectBooleanCheckbox id="contrattoCheckBox" rendered="#{gruppo != null}" onclick="spostaMappa()" onkeypress="spostaMappa()"
+								value="#{bean.rvGroupDTO.checkContratto.get(bean.rvGroupDTO.mapContratto.get(gruppo))}"
+								valueChangeListener="#{bean.searchCheck(bean.gruppi.get(1),gruppo, bean.rvGroupDTO.mapContratto)}" />
+							<h:outputLabel value="#{gruppo}" />
+							<br />
+						</ui:repeat>
+					</div>
+				</h:panelGroup>
+				<h:panelGroup layout="block"
+					rendered="#{not empty bean.rvGroupDTO.listOrario}">
+					<h3 id="orario_titolo"
+						class="headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+						<span id="orario_brake_titolo"
+							class="ui-icon ui-icon-triangle-1-e"></span> <a href="#">Orario
+							(Full/part time)</a>
+					</h3>
+					<div id="orario_content"
+						class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+						<ui:repeat var="gruppo" value="#{bean.rvGroupDTO.listOrario}">
+							<h:selectBooleanCheckbox id="orarioCheckBox" rendered="#{gruppo != null}" onclick="spostaMappa()" onkeypress="spostaMappa()"
+								value="#{bean.rvGroupDTO.checkOrario.get(bean.rvGroupDTO.mapOrario.get(gruppo))}"
+								valueChangeListener="#{bean.searchCheck(bean.gruppi.get(2),gruppo, bean.rvGroupDTO.mapOrario)}" />
+							<h:outputLabel value="#{gruppo}" />
+							<br />
+						</ui:repeat>
+					</div>
+				</h:panelGroup>
+				<h:panelGroup layout="block"
+					rendered="#{not empty bean.rvGroupDTO.listEsperienza}">
+					<h3 id="esperienza_titolo"
+						class="headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+						<span id="esperienza_brake_titolo"
+							class="ui-icon ui-icon-triangle-1-e"></span> <a href="#">Con
+							esperienza</a>
+					</h3>
+					<div id="esperienza_content"
+						class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+						<ui:repeat var="gruppo" value="#{bean.rvGroupDTO.listEsperienza}">
+							<h:selectBooleanCheckbox id="esperienzaCheckBox" rendered="#{gruppo != null}" onclick="spostaMappa()" onkeypress="spostaMappa()"
+								value="#{bean.rvGroupDTO.checkEsperienza.get(bean.rvGroupDTO.mapEsperienza.get(gruppo))}"
+								valueChangeListener="#{bean.searchCheck(bean.gruppi.get(3),gruppo, bean.rvGroupDTO.mapEsperienza)}" />
+							<h:outputLabel value="#{gruppo}" />
+							<br />
+						</ui:repeat>
+					</div>
+				</h:panelGroup>
+				<h:panelGroup layout="block"
+					rendered="#{not empty bean.rvGroupDTO.listSettore}">
+					<h3 id="settore_titolo"
+						class="headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+						<span id="settore_brake_titolo"
+							class="ui-icon ui-icon-triangle-1-e"></span> <a href="#">Settore</a>
+					</h3>
+					<div id="settore_content"
+						class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+						<ui:repeat var="gruppo" value="#{bean.rvGroupDTO.listSettore}">
+							<h:selectBooleanCheckbox id="settoreCheckBox" rendered="#{gruppo != null}" onclick="spostaMappa()" onkeypress="spostaMappa()"
+								value="#{bean.rvGroupDTO.checkSettore.get(bean.rvGroupDTO.mapSettore.get(gruppo))}"
+								valueChangeListener="#{bean.searchCheck(bean.gruppi.get(4),gruppo, bean.rvGroupDTO.mapSettore)}" />
+							<h:outputLabel value="#{gruppo}" />
+							<br />
+						</ui:repeat>
+					</div>
+				</h:panelGroup>
+				<h:panelGroup layout="block"
+					rendered="#{not empty bean.rvGroupDTO.listLingua}">
+					<h3 id="lingua_titolo"
+						class="headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+						<span id="lingua_brake_titolo"
+							class="ui-icon ui-icon-triangle-1-e"></span> <a href="#">Lingua</a>
+					</h3>
+					<div id="lingua_content"
+						class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+						<ui:repeat var="gruppo" value="#{bean.rvGroupDTO.listLingua}">
+							<h:selectBooleanCheckbox id="linguaCheckBox" rendered="#{gruppo != null}" onclick="spostaMappa()" onkeypress="spostaMappa()"
+								value="#{bean.rvGroupDTO.checkLingua.get(bean.rvGroupDTO.mapLingua.get(gruppo))}"
+								valueChangeListener="#{bean.searchCheck(bean.gruppi.get(5),gruppo, bean.rvGroupDTO.mapLingua)}" />
+							<h:outputLabel value="#{gruppo}" />
+							<br />
+						</ui:repeat>
+					</div>
+				</h:panelGroup>
+				<h:panelGroup layout="block"
+					rendered="#{not empty bean.rvGroupDTO.listTitoloStudio}">
+					<h3 id="titStudio_titolo"
+						class="headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+						<span id="titStudio_brake_titolo"
+							class="ui-icon ui-icon-triangle-1-e"></span> <a href="#">Titolo
+							di studio</a>
+					</h3>
+					<div id="titStudio_content"
+						class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+						<ui:repeat var="gruppo"
+							value="#{bean.rvGroupDTO.listTitoloStudio}">
+							<h:selectBooleanCheckbox id="titStudioCheckBox" rendered="#{gruppo != null}" onclick="spostaMappa()" onkeypress="spostaMappa()"
+								value="#{bean.rvGroupDTO.checkTitoloStudio.get(bean.rvGroupDTO.mapTitoloStudio.get(gruppo))}"
+								valueChangeListener="#{bean.searchCheck(bean.gruppi.get(6),gruppo, bean.rvGroupDTO.mapTitoloStudio)}" />
+							<h:outputLabel value="#{gruppo}" />
+							<br />
+						</ui:repeat>
+					</div>
+				</h:panelGroup>
+				<h:panelGroup layout="block"
+					rendered="#{not empty bean.rvGroupDTO.listDispTrasferte}">
+					<h3 id="dispTrasferte_titolo"
+						class="headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+						<span id="dispTrasferte_brake_titolo"
+							class="ui-icon ui-icon-triangle-1-e"></span> <a href="#">Disponibile
+							a trasferte</a>
+					</h3>
+					<div id="dispTrasferte_content"
+						class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+						<ui:repeat var="gruppo"
+							value="#{bean.rvGroupDTO.listDispTrasferte}">
+							<h:selectBooleanCheckbox id="dispTrasferteCheckBox" rendered="#{gruppo != null}" onclick="spostaMappa()" onkeypress="spostaMappa()"
+								value="#{bean.rvGroupDTO.checkDispTrasferte.get(bean.rvGroupDTO.mapDispTrasferte.get(gruppo))}"
+								valueChangeListener="#{bean.searchCheck(bean.gruppi.get(7),gruppo, bean.rvGroupDTO.mapDispTrasferte)}" />
+							<h:outputLabel value="#{gruppo}" />
+							<br />
+						</ui:repeat>
+					</div>
+				</h:panelGroup>
+				<h:panelGroup layout="block"
+					rendered="#{not empty bean.rvGroupDTO.listPatente}">
+					<h3 id="patente_titolo"
+						class="headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+						<span id="patente_brake_titolo"
+							class="ui-icon ui-icon-triangle-1-e"></span> <a href="#">Patente</a>
+					</h3>
+					<div  id="patente_content"
+						class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+						<ui:repeat var="gruppo" value="#{bean.rvGroupDTO.listPatente}">
+							<h:selectBooleanCheckbox id="patenteCheckBox" rendered="#{gruppo != null}" onclick="spostaMappa()" onkeypress="spostaMappa()"
+								value="#{bean.rvGroupDTO.checkPatente.get(bean.rvGroupDTO.mapPatente.get(gruppo))}"
+								valueChangeListener="#{bean.searchCheck(bean.gruppi.get(8),gruppo, bean.rvGroupDTO.mapPatente)}" />
+							<h:outputLabel value="#{gruppo}" />
+							<br />
+						</ui:repeat>
+					</div>
+				</h:panelGroup>
+			</h:panelGroup>
+		</f:ajax>
+		<h:panelGroup id="panelInsertButton_Bottom" layout="block">
+			<h:commandLink id="insertButton_Bottom" value="Salva ricerca" 
+			 rendered="#{(
+			 bean.searchCheckTrue(bean.rvGroupDTO.checkMansione) or bean.searchCheckTrue(bean.rvGroupDTO.checkContratto) or 
+			 bean.searchCheckTrue(bean.rvGroupDTO.checkOrario) or bean.searchCheckTrue(bean.rvGroupDTO.checkEsperienza) or 
+			 bean.searchCheckTrue(bean.rvGroupDTO.checkSettore) or bean.searchCheckTrue(bean.rvGroupDTO.checkLingua) or 
+			 bean.searchCheckTrue(bean.rvGroupDTO.checkTitoloStudio) or bean.searchCheckTrue(bean.rvGroupDTO.checkDispTrasferte) or 
+			 bean.searchCheckTrue(bean.rvGroupDTO.checkPatente))}"
+				styleClass="buttonStyle saveButton topMargin " onclick="setHiddenInputs();showSaveDialog();return false;" onkeypress="if (event.keyCode==13) {setHiddenInputs();showSaveDialog();return false;}return true;">
+			</h:commandLink>
+		</h:panelGroup>
+
+		<script type="text/javascript">
+			$(function(){
+				//Per ogni accordion verifico la presenza di check a true  
+				$('[id$=_content]').each(function(i) {
+					var accordion = $(this);
+					var elemCheckBox = accordion.attr('id');
+					elemCheckBox = "[id$="+elemCheckBox.substring(0,elemCheckBox.indexOf('_'))+"CheckBox]";
+
+					$(accordion).each(function(y) {
+						var found;
+						$(elemCheckBox).each(function(x) {
+							var checkBox = $(this);
+							//nel caso in cui almeno un check == true, mostro l'accordion aperto
+							if(checkBox.is(':checked') == true){
+							    found = true;
+							    return;
+							}
+						});
+						if(found){
+						    var id = accordion.attr('id');
+							id = id.substring(0,id.indexOf('_'))+'_titolo';
+						    $('#'+id).click();
+						 return;
+						}						
+					});
+										
+				});
+		    });
+			function showSaveDialog() {
+				$("#ricerca_vacancy_dialog-save").dialog('open');
+			};
+			
+			function closeSaveDialog() {
+				$( "[id$=dialog-save]" ).dialog('close');
+			};
+
+		</script>
+
+	</ui:fragment>
+</ui:composition>

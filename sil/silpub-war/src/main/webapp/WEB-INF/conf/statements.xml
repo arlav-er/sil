@@ -1,0 +1,722 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generato il Fri Mar 12 12:15:44 CET 2004-->
+<STATEMENTS>
+
+<STATEMENT
+        name="GET_IDO_TIPI_QUALIFICAPUB"
+        query=" SELECT codqualifica as codice, DECODE( GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, 
+                               STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...' ) 
+                      || DECODE (SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)',  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)', '') AS DESCRIZIONE
+                FROM DE_QUALIFICA_PUB
+                order by codQualifica " />
+
+<STATEMENT name="GET_GRIGLIA_PROV_QUERY"
+           query="{ call ? := PG_IDO.WEBGRIGLIAPROVQUERY() }"
+/>
+
+                
+<STATEMENT name="SELECT_CONTRATTI_RICHIESTA" query="
+    SELECT
+      CODCONTRATTO AS CODICE,
+      DECODE( 
+        GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...'
+      ) || 
+      DECODE (
+        SYSDATE, 
+        GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+        ' (scaduto)',
+        LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+        ' (scaduto)', 
+        ''
+       ) AS DESCRIZIONE
+    FROM DE_CONTRATTO
+    WHERE FLGRIUCHIESTA = 'S'
+    ORDER BY STRDESCRIZIONE
+    "/>
+    
+
+
+ <STATEMENT name="GET_FILE_DOWNLOAD" 
+	query=" select de_doc_sezione.strDescrizione as strDescrizione,
+				   ts_doc_pubb.strNomeFile as Nomefile, 
+				   ts_doc_pubb.strdescrizione as Descrizione,
+				   de_doc_tipo_file_est.strdescrizione as Tipofile,
+				   to_char(ts_doc_pubb.datInizioVal,'DD/MM/YYYY') as DataPubbl,
+				   ts_doc_pubb.strCodRif as codiceCpi
+			from ts_doc_pubb, de_doc_sezione,ts_generale,de_doc_tipo_file_est
+			where ts_doc_pubb.coddocSezione=de_doc_sezione.coddocSezione 
+				  and ts_doc_pubb.codtipofileest=de_doc_tipo_file_est.codtipofileest
+				  and sysdate between TRUNC(ts_doc_pubb.datInizioval) and TRUNC(ts_doc_pubb.datFineval) 
+				  and de_doc_sezione.coddocsezione = ?
+	  			  and ts_doc_pubb.strCodRif= (select codprovinciasil from ts_generale)
+				  order by ts_doc_pubb.numposizione"/>  
+
+<STATEMENT
+        name="IDOGET_PROVINCE"
+        query="select codprovincia as codice, STRDENOMINAZIONE 
+                      || DECODE (SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)',  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)', '') AS DESCRIZIONE
+                from de_provincia
+                where codregione &lt;&gt; '99'
+                order by decode(codice,'NT', 3,1) || decode(codregione,(select de_provincia.CODREGIONE 
+							 					  from   de_provincia 
+												  inner join ts_generale on (de_provincia.codprovincia = ts_generale.CODPROVINCIASIL)),1,2),strdenominazione"/>
+				  
+<STATEMENT name="SELECT_TIPI_MANSIONE" query="
+    SELECT
+      CODMANSIONE AS CODICE,
+        DECODE( 
+          GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...'
+        ) 
+        || DECODE (
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+        ) AS DESCRIZIONE
+    FROM DE_MANSIONE    
+    WHERE CDNLIVELLO=0
+    ORDER BY CODICE
+  "/>
+
+
+
+<STATEMENT
+        name="GET_DE_MANSIONE_PADRE"
+        query="select man.codMansione, man.codMansione ||' - '||  man.strdescrizione strdescrizione,man_p.strDescrizione as desTipologia,
+                      man.codPadre, man.cdnLivello 
+               from de_mansione man
+               inner join de_mansione man_p on man_p.codmansione=substr(man.codMansione, 0, 5) || '00'
+               WHERE man.codMansione = ?
+               ORDER BY man.codMansione"/>
+
+<STATEMENT
+        name="GET_DE_MANSIONE_PADRE_FREQUENTE"
+        query="select man.codMansione, man.codMansione ||' - '||  man.strdescrizione strdescrizione,man_p.strDescrizione as desTipologia,
+                      man.codPadre, man.cdnLivello 
+               from VW_de_mansione_flgFrequente man
+               inner join de_mansione man_p on man_p.codmansione=substr(man.codMansione, 0, 5) || '00'
+               WHERE man.codMansione = ?
+               ORDER BY man.codMansione"/>
+
+<!--<STATEMENT  
+            name="CERCA_MANSIONE_CODMANSIONE"
+            query="select man.codMansione, 
+              DECODE( GREATEST(LENGTH(man.strdescrizione),45) , 45, 
+                          man.STRDESCRIZIONE, SUBSTR(man.strdescrizione, 1, 45) || '...' ) 
+                          as desMansione, 
+              DECODE( GREATEST(LENGTH(man_p.strdescrizione),45) , 45, 
+                          man_p.STRDESCRIZIONE, SUBSTR(man_p.strdescrizione, 1, 45) || '...' ) 
+                          as desTipoMansione, man.flgFrequente
+              from de_mansione man
+              inner join de_mansione man_p on man_p.codMansione=substr(man.codMansione, 0, 2) || '0000'
+              where man.codMansione like ? || '%'
+                  and man.codMansione 
+                  in (
+                  select codMansione
+                  from do_mansione, do_richiesta_az, do_evasione
+                  where (do_mansione.PRGRICHIESTAAZ=do_richiesta_az.PRGRICHIESTAAZ)
+                  and (do_evasione.codevasione &lt;&gt; 'AS')
+                  and (do_evasione.codevasione not in ('MIR','MPP','MPA'))
+                  and (do_richiesta_az.FLGPUBBLICATA='S' and do_richiesta_az.NUMSTORICO=0)
+                  and (do_richiesta_az.DATPUBBLICAZIONE &lt;= SYSDATE AND SYSDATE &lt;=do_richiesta_az.DATSCADENZAPUBBLICAZIONE)
+                  )
+              order by codMansione" />-->
+              
+<!--<STATEMENT  
+            name="CERCA_MANSIONE_CODMANSIONE_CM"
+            query="select man.codMansione, 
+              DECODE( GREATEST(LENGTH(man.strdescrizione),45) , 45, 
+                          man.STRDESCRIZIONE, SUBSTR(man.strdescrizione, 1, 45) || '...' ) 
+                          as desMansione, 
+              DECODE( GREATEST(LENGTH(man_p.strdescrizione),45) , 45, 
+                          man_p.STRDESCRIZIONE, SUBSTR(man_p.strdescrizione, 1, 45) || '...' ) 
+                          as desTipoMansione, man.flgFrequente
+              from de_mansione man
+              inner join de_mansione man_p on man_p.codMansione=substr(man.codMansione, 0, 2) || '0000'
+              where man.codMansione like ? || '%'
+                  and man.codMansione 
+                  in (
+                  select codMansione
+                  from do_mansione, do_richiesta_az, do_evasione
+                  where (do_mansione.PRGRICHIESTAAZ=do_richiesta_az.PRGRICHIESTAAZ)
+                  and (do_evasione.codevasione &lt;&gt; 'AS')
+                  and (do_evasione.codevasione in ('MPP','MPA'))
+                  and (do_richiesta_az.FLGPUBBLICATA='S' and do_richiesta_az.NUMSTORICO=0)
+                  and (do_richiesta_az.DATPUBBLICAZIONE &lt;= SYSDATE AND SYSDATE &lt;=do_richiesta_az.DATSCADENZAPUBBLICAZIONE)
+                  )
+              order by codMansione" />-->
+
+<STATEMENT  
+            name="CERCA_MANSIONE_DESMANSIONE"
+            query="select man.codMansione, 
+                          DECODE( GREATEST(LENGTH(man.strdescrizione),45) , 45, 
+                                  man.STRDESCRIZIONE, SUBSTR(man.strdescrizione, 1, 45) || '...' ) 
+                                  as desMansione, 
+                          DECODE( GREATEST(LENGTH(man_p.strdescrizione),45) , 45, 
+                                  man_p.STRDESCRIZIONE, SUBSTR(man_p.strdescrizione, 1, 45) || '...' ) 
+                                  as desTipoMansione, man.flgFrequente
+                    from de_mansione man
+                    inner join de_mansione man_p on man_p.codMansione=substr(man.codMansione, 0, 5) || '00'
+                    where man.codMansione 
+                        in (
+                        select codMansione
+                        from do_mansione, do_richiesta_az inner join DO_EVASIONE ev on (do_richiesta_az.PRGRICHIESTAAZ=ev.PRGRICHIESTAAZ)
+                        where (do_mansione.PRGRICHIESTAAZ=do_richiesta_az.PRGRICHIESTAAZ)
+                            and (ev.codevasione in ('DFA','DFD','DPR','DRA') )
+                            and (do_richiesta_az.FLGPUBBLICATA='S' and do_richiesta_az.NUMSTORICO=0)
+                            and (ev.cdnStatoRich &lt;&gt; 5)
+                          and (do_richiesta_az.DATPUBBLICAZIONE &lt;= SYSDATE AND SYSDATE &lt;=do_richiesta_az.DATSCADENZAPUBBLICAZIONE)
+                        )
+                    order by codMansione" />
+                    
+<STATEMENT  
+            name="CERCA_MANSIONE_DESMANSIONE_CM"
+            query="select man.codMansione, 
+                          DECODE( GREATEST(LENGTH(man.strdescrizione),45) , 45, 
+                                  man.STRDESCRIZIONE, SUBSTR(man.strdescrizione, 1, 45) || '...' ) 
+                                  as desMansione, 
+                          DECODE( GREATEST(LENGTH(man_p.strdescrizione),45) , 45, 
+                                  man_p.STRDESCRIZIONE, SUBSTR(man_p.strdescrizione, 1, 45) || '...' ) 
+                                  as desTipoMansione, man.flgFrequente
+                    from de_mansione man
+                    inner join de_mansione man_p on man_p.codMansione=substr(man.codMansione, 0, 5) || '00'
+                    where man.codMansione 
+                        in (
+                        select codMansione
+                        from do_mansione, do_richiesta_az inner join DO_EVASIONE ev on (do_richiesta_az.PRGRICHIESTAAZ=ev.PRGRICHIESTAAZ)
+                        where (do_mansione.PRGRICHIESTAAZ=do_richiesta_az.PRGRICHIESTAAZ)
+                            and (ev.codevasione in ('MPP','MPA') )
+                            and (do_richiesta_az.FLGPUBBLICATA='S' and do_richiesta_az.NUMSTORICO=0)
+                            and (ev.cdnStatoRich &lt;&gt; 5)
+                          and (do_richiesta_az.DATPUBBLICAZIONE &lt;= SYSDATE AND SYSDATE &lt;=do_richiesta_az.DATSCADENZAPUBBLICAZIONE)
+                        )
+                    order by codMansione" />
+
+<!--STATEMENT  
+            name="CERCA_MANSIONE_DESMANSIONE_FREQUENTE"
+            query="select man.codMansione, 
+                          DECODE( GREATEST(LENGTH(man.strdescrizione),45) , 45, 
+                                  man.STRDESCRIZIONE, SUBSTR(man.strdescrizione, 1, 45) || '...' ) 
+                                  as desMansione, 
+                          DECODE( GREATEST(LENGTH(man_p.strdescrizione),45) , 45, 
+                                  man_p.STRDESCRIZIONE, SUBSTR(man_p.strdescrizione, 1, 45) || '...' ) 
+                                  as desTipoMansione, man.flgFrequente
+                    from vw_de_mansione_flgFrequente man
+                    inner join de_mansione man_p on man_p.codMansione=substr(man.codMansione, 0, 2) || '0000'
+                    where lower(man.strdescrizione) like '%' || lower(?) || '%'
+                    AND UPPER(man.flgfrequente) = 'S'
+                    order by desMansione" /-->
+   
+
+
+<!-- Cerco solo fra le mansioni contemplate nelle pubblicazioni attive -->
+<STATEMENT
+    name="GET_DE_MANSIONE"
+    query="select man.codMansione, man.codMansione || ' - '|| man.strdescrizione strdescrizione, man_p.strDescrizione as desTipologia, 
+                  man.codPadre, man.cdnLivello 
+           from VW_WEB_DE_MANSIONE man
+           inner join de_mansione man_p on man_p.codmansione=substr(man.codMansione, 0, 5) || '00'
+           WHERE man.codPadre = ?
+           ORDER BY man.codMansione"/>           
+           
+           
+<!--STATEMENT
+    name="GET_DE_MANSIONE"
+    query="select man.codMansione, man.codMansione || ' - '|| man.strdescrizione strdescrizione, man_p.strDescrizione as desTipologia, 
+                  man.codPadre, man.cdnLivello 
+           from de_mansione man
+           inner join de_mansione man_p on man_p.codmansione=substr(man.codMansione, 0, 2) || '0000'
+           WHERE man.codPadre = ?
+           ORDER BY man.codMansione"/>
+    -->     
+<!--STATEMENT
+    name="GET_DE_MANSIONE_FREQUENTE"
+    query="select man.codMansione, man.codMansione || ' - '|| man.strdescrizione strdescrizione, man_p.strDescrizione as desTipologia, 
+                  man.codPadre, man.cdnLivello 
+           from VW_de_mansione_flgFrequente man
+           inner join de_mansione man_p on man_p.codmansione=substr(man.codMansione, 0, 2) || '0000'
+           WHERE man.codPadre = ?
+           ORDER BY man.codMansione"/-->
+           
+           
+ <!-- PUBBLICAZIONI WEB: DETTAGLIO SINTETICO -->
+ <STATEMENT
+        name="GET_TESTATA_RICHIESTA"
+        query="SELECT
+				  /* CAMPI AGGIUNTI per la parte di PUBBLICAZIONE: */
+					RIC.CODQUALIFICA,
+					RIC.STRCOGNOMERIFPUBB,
+					RIC.STRNOMERIFPUBB,
+					RIC.STRTELRIFPUBB,
+					RIC.STRFAXRIFPUBB,
+					RIC.STREMAILRIFPUBB,
+					RIC.STRDATIAZIENDAPUBB,
+					RIC.STRLUOGOLAVORO,
+					RIC.STRFORMAZIONEPUBB,
+					RIC.STRCONOSCENZEPUBB,
+					RIC.STRNOTEORARIOPUBB,
+					RIC.STRRIFCANDIDATURAPUBB,
+				  /* ---- */
+                  to_char(RIC.PRGRICHIESTAAZ) as PRGRICHIESTAAZ,
+                  to_char(RIC.NUMANNO) as NUMANNO,
+                  to_char(RIC.NUMRICHIESTA) as NUMRICHIESTA,
+                  to_char(nvl(RIC.NUMRICHIESTAORIG, RIC.NUMRICHIESTA)) as NUMRICHIESTAORIG,
+                  RIC.NUMSTORICO,
+                  to_char(RIC.PRGAZIENDA) as PRGAZIENDA,
+                  to_char(RIC.PRGUNITA) as PRGUNITA,
+                  RIC.codCpi, (DE_CPI.STRDESCRIZIONE) as descCpi,
+                  de_cpi.STRINDIRIZZO as indCpi, de_cpi.STRTEL as telCpi, de_cpi.STRFAX as faxCpi,  de_cpi.STREMAIL as emailCpi,
+                  TO_CHAR(DATRICHIESTA,'DD/MM/YYYY') DATRICHIESTA,
+                  RIC.FLGART16,
+                  RIC.FLGPUBBLICATA,
+                  TO_CHAR(DATPUBBLICAZIONE,'DD/MM/YYYY') DATPUBBLICAZIONE,
+                  TO_CHAR(DATSCADENZAPUBBLICAZIONE,'DD/MM/YYYY') DATSCADENZAPUBBLICAZIONE,
+                  TO_CHAR(DATSCADENZA,'DD/MM/YYYY') DATSCADENZA,
+                  RIC.STRMANSIONEPUBB,
+                  to_char(RIC.NUMPROFRICHIESTI) as NUMPROFRICHIESTI,
+                  RIC.STRLOCALITA,
+                  to_char(RIC.PRGSPI) as PRGSPI,
+                  RIC.STRCOGNOMERIFERIMENTO,
+                  RIC.STRNOMERIFERIMENTO,
+                  RIC.STRTELRIFERIMENTO,
+                  RIC.STRFAXRIFERIMENTO,
+                  RIC.STREMAILRIFERIMENTO,
+                  RIC.FLGAUTOMUNITO,
+                  RIC.FLGMOTOMUNITO,
+                  RIC.FLGMILITE,
+                  RIC.CODTRASFERTA, de_trasferta.STRDESCRIZIONE as descTrasferta,
+                  RIC.FLGFUORISEDE,
+                  RIC.FLGVITTOALLOGGIO,
+                  RIC.STRSESSO,
+                  RIC.STRMOTIVSESSO,
+                  RIC.CODAREA, (DE_AREA.STRDESCRIZIONE) as descArea,
+                  RIC.TXTFIGURAPROFESSIONALE,
+                  RIC.TXTCARATTERISTFIGPROF,
+                  RIC.TXTCONDCONTRATTUALE,
+                  RIC.TXTNOTEOPERATORE,
+                  RIC.cdnUtins,
+                  TO_CHAR(RIC.DTMINS,'DD/MM/YYYY') DTMINS,
+                  RIC.cdnUtmod,
+                  TO_CHAR(RIC.DTMMOD,'DD/MM/YYYY') DTMMOD,                  
+                  RIC.NUMKLORICHIESTAAZ,
+                  DE_EVASIONE_RICH.FLGINCROCIO, de_evasione_rich.STRDESCRIZIONE as modEvasione,
+                  DO_EVASIONE.CDNSTATORICH, 
+                  do_evasione.CODEVASIONE  ,
+                  de_qualifica_pub.STRDESCRIZIONE as descMacroQualifica
+              FROM
+                  DO_RICHIESTA_AZ RIC
+                  LEFT OUTER JOIN DO_EVASIONE ON (RIC.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+                  LEFT OUTER JOIN DE_EVASIONE_RICH ON (DO_EVASIONE.CODEVASIONE=DE_EVASIONE_RICH.CODEVASIONE)
+                  left outer join DE_CPI ON (RIC.CODCPI=DE_CPI.CODCPI)
+                  left outer join DE_AREA ON (RIC.CODAREA=DE_AREA.CODAREA)
+                  left outer join de_qualifica_pub on (RIC.CODQUALIFICA=de_qualifica_pub.CODQUALIFICA) 
+                  left outer join de_trasferta on (RIC.CODTRASFERTA=de_trasferta.CODTRASFERTA) 
+              WHERE 
+                  RIC.PRGRICHIESTAAZ = ?"
+ />
+ 
+ <STATEMENT name="GET_InfUnitaAzienda"
+            query="SELECT
+                      AZ.STRRAGIONESOCIALE AS RAGIONESOCIALE,
+                      AZ.STRCODICEFISCALE AS CODICEFISCALE,
+                      AZ.STRPARTITAIVA AS PIVA,
+                      U.STRINDIRIZZO || ', ' || U.STRLOCALITA AS INDIRIZZO,
+                      C.STRDENOMINAZIONE AS DENOMINAZIONE,
+                      AZ.CODCCNL AS CCNLAZ,
+                      NATGIUR.STRDESCRIZIONE DESCRNATGIURAZ, 
+                      U.STRTEL STRTELAZ,
+                      U.STRFAX STRFAXAZ,
+                      C.STRCAP STRCAPAZ,
+                      DECCNL.STRDESCRIZIONE AS DESCRCCNL,
+                      AZ.CODTIPOAZIENDA AS CODTIPOAZ,
+                      TIPOAZ.STRDESCRIZIONE AS DESCRTIPOAZ,
+                      AZ.STRNUMALBOINTERINALI AS STRNUMALBOINT,
+                      U.STRNUMREGISTROCOMMITT AS STRNUMREGCOMM,
+                      U.CODATECO CODATECO,
+                      ATT.STRDESCRIZIONE DESCRATECO,
+                      AZ.CODNATGIURIDICA CODNATGIURIDICA,
+                      AZ.FLGDATIOK FLGDATIOK
+                  FROM
+                    AN_AZIENDA AZ,
+                    AN_UNITA_AZIENDA U,
+                    DE_COMUNE C,
+                    DE_CONTRATTO_COLLETTIVO DECCNL,
+                    DE_TIPO_AZIENDA TIPOAZ,
+                    DE_ATTIVITA ATT,
+                    DE_NAT_GIURIDICA NATGIUR
+                  WHERE	 
+                     U.PRGAZIENDA = ? AND
+                     U.PRGUNITA = ? AND
+                     AZ.PRGAZIENDA = U.PRGAZIENDA AND
+                     AZ.CODCCNL = DECCNL.CODCCNL AND
+                     AZ.CODTIPOAZIENDA = TIPOAZ.CODTIPOAZIENDA AND
+                     C.CODCOM = U.CODCOM AND
+                     U.CODATECO = ATT.CODATECO AND
+                     AZ.CODNATGIURIDICA = NATGIUR.CODNATGIURIDICA (+)" 
+ />
+ 
+ <STATEMENT name="GET_InfPrgRichiesta"
+            query="select  nvl(numrichiestaorig, numrichiesta) || '/' || numanno annoRichiesta, numStorico
+					from do_richiesta_az
+					where prgrichiestaaz=?" 
+ />
+ 
+ <STATEMENT
+        name="LIST_IDO_MANSIONI_DETTAGLIO"
+        query=" select m.prgMansione, 
+        			   m.prgRichiestaAz, 
+        			   TO_CHAR(m.prgAlternativa) AS PRGALTERNATIVA, 
+        			   raz.prgAzienda,
+                       man.strDescrizione as desMansione, 
+                       man_p.strDescrizione as desTipoMansione
+                from do_mansione m
+                inner join de_mansione man on man.codMansione=m.codMansione
+                inner join de_mansione man_p on man_p.codMansione=substr(m.codMansione, 0, 5) || '00'
+                inner join do_richiesta_az raz on m.prgRichiestaAz=raz.PRGRICHIESTAAZ
+                where m.prgRichiestaAz=?"
+ />
+ 
+ <STATEMENT name="LOAD_ABIL_RICH" 
+ 			query="SELECT A.CODABILITAZIONEGEN, A.PRGRICHIESTAAZ,B.STRDESCRIZIONE, A.FLGINDISPENSABILE,
+           C.STRDESCRIZIONE DESCRIZIONETIPOABILITAZIONE 
+    FROM DO_ABILITAZIONE_GEN A, DE_ABILITAZIONE_GEN B, DE_TIPO_ABILITAZIONE_GEN C
+    WHERE A.CODABILITAZIONEGEN=B.CODABILITAZIONEGEN AND
+          C.CODTIPOABILITAZIONEGEN = B.CODTIPOABILITAZIONEGEN AND
+          A.PRGRICHIESTAAZ = ?
+  "/>
+  
+<STATEMENT name="ListaOrariRichiesta"
+            query="SELECT DO_ORARIO.PRGORARIO,
+                          DO_ORARIO.CODORARIO,
+                          DO_ORARIO.PRGRICHIESTAAZ,
+                          DE_ORARIO.STRDESCRIZIONE
+                          FROM DO_ORARIO,DE_ORARIO
+                          WHERE DO_ORARIO.CODORARIO=DE_ORARIO.CODORARIO AND
+                                DO_ORARIO.PRGRICHIESTAAZ=?"/>
+                                
+<STATEMENT
+        name="GET_TURNI_RICHIESTA"
+        query="SELECT 
+                  do.prgTurno,
+                  do.codTurno,
+                  de.strDescrizione,
+                  do.prgRichiestaAz,
+                  do.cdnUtIns,
+                  TO_CHAR(do.dtmIns,'DD/MM/YYYY') DTMINS,
+                  do.cdnUtMod,
+                  TO_CHAR(do.dtmMod,'DD/MM/YYYY') DTMMOD
+                FROM
+                  do_turno do,
+                  de_turno de
+                WHERE
+                   do.prgRichiestaAz = ? AND
+                   do.codTurno = de.codTurno	
+                  "/>
+                  
+<STATEMENT name="ListaTerritoriRichiestaDettaglio"
+            query="SELECT DO_COMUNE.PRGCOMUNE AS PROGRESSIVO,
+                          DO_COMUNE.CODCOM AS CODICE,
+                          DO_COMUNE.PRGRICHIESTAAZ,
+                          'C' AS TIPOTERR,
+                          DE_COMUNE.STRDENOMINAZIONE || ' (' || DE_PROVINCIA.STRTARGA || ')' AS DESCRIZIONETERRITORIO
+                          FROM DO_COMUNE,DE_COMUNE, DE_PROVINCIA
+                          WHERE DO_COMUNE.CODCOM=DE_COMUNE.CODCOM AND
+                                DE_PROVINCIA.CODPROVINCIA=DE_COMUNE.CODPROVINCIA AND
+                                DO_COMUNE.PRGRICHIESTAAZ = ?
+                    UNION
+                    SELECT DO_PROVINCIA.PRGPROVINCIA AS PROGRESSIVO,
+                           DO_PROVINCIA.CODPROVINCIA AS CODICE,
+                           DO_PROVINCIA.PRGRICHIESTAAZ,
+                           'P' AS TIPOTERR,
+                           DE_PROVINCIA.STRDENOMINAZIONE AS DESCRIZIONETERRITORIO
+                           FROM DO_PROVINCIA, DE_PROVINCIA
+                           WHERE DO_PROVINCIA.CODPROVINCIA=DE_PROVINCIA.CODPROVINCIA AND
+                                 DO_PROVINCIA.PRGRICHIESTAAZ = ?"/>
+
+
+<STATEMENT
+        name="ListaCittadinanzaRichiesta"
+        query="SELECT     PRGCITTADINANZA,
+                          PRGRICHIESTAAZ,
+                          STRDESCRIZIONE,
+                          STRMOTIVAZIONE
+                          FROM DO_CITTADINANZA,DE_CITTADINANZA
+                          WHERE DO_CITTADINANZA.CODCITTADINANZA=DE_CITTADINANZA.CODCITTADINANZA
+                          AND DO_CITTADINANZA.PRGRICHIESTAAZ=?"/>
+
+
+<STATEMENT
+        name="GET_IDO_ETAESPERIENZA_DETTAGLIO_SINTETICO"
+        query="select r.prgAzienda, r.prgUnita, a.prgRichiestaAz, a.prgAlternativa, a.strNote, 
+                      a.flgEsperienza, 
+                      to_char(a.numAnniEsperienza) as NUMANNIESPERIENZA, 
+                      a.flgFormazioneprof, 
+                      TO_CHAR(a.numda) AS NUMDA, 
+                      TO_CHAR(a.numa) AS NUMA, 
+                      a.strMotiveta,
+                      a.cdnUtins, TO_CHAR(a.dtmIns, 'DD/MM/YYYY') as dtmIns, 
+                      a.cdnutMod, TO_CHAR(a.dtmMod, 'DD/MM/YYYY') as dtmMod 
+               from do_alternativa a
+               inner join do_richiesta_az r on r.prgRichiestaAz=a.prgRichiestaAz 
+               where a.prgRichiestaAz=? order by prgAlternativa"/>
+
+<STATEMENT name="ListaStudiRichiestaDettaglio"
+            query="SELECT
+                          DO.PRGSTUDIO AS PRGSTUDIO,
+                          TO_CHAR(DO.PRGALTERNATIVA) AS PRGALTERNATIVA,
+                          DE.STRDESCRIZIONE AS DESCTITOLO,
+                          DO.STRSPECIFICA AS SPECIFICA,
+                          DO.FLGCONSEGUITO AS CONSEGUITO,
+                          DO.FLGINDISPENSABILE AS INDISPENSABILE
+                   FROM
+                          DO_STUDIO DO,
+                          DE_TITOLO DE
+                  WHERE
+                          DO.CODTITOLO = DE.CODTITOLO AND
+                          DO.PRGRICHIESTAAZ = ? order by prgAlternativa"/>
+
+<STATEMENT name="ListaInfoRichiestaDettaglio"
+            query="SELECT DO_INFO.PRGINFO,
+                          TO_CHAR(DO_INFO.PRGALTERNATIVA) AS PRGALTERNATIVA,
+                          DE_TIPO_INFO.STRDESCRIZIONE AS DESCRIZIONETIPO,
+                          DE_DETT_INFO.STRDESCRIZIONE AS DESCRIZIONEDETT,
+                          DE_GRADO_INFO.STRDESCRIZIONE AS DESCRIZIONEGRADO,
+                          DO_INFO.FLGINDISPENSABILE
+                          FROM DO_INFO
+                              INNER JOIN DE_TIPO_INFO ON (DO_INFO.CODTIPOINFO = DE_TIPO_INFO.CODTIPOINFO)
+                              LEFT JOIN DE_DETT_INFO ON (DO_INFO.CODDETTINFO = DE_DETT_INFO.CODDETTINFO)
+                              INNER JOIN DE_GRADO_INFO ON (DO_INFO.CDNGRADO = DE_GRADO_INFO.CDNGRADO)
+                          WHERE DO_INFO.PRGRICHIESTAAZ = ? order by PRGALTERNATIVA, DESCRIZIONETIPO, DESCRIZIONEDETT"/>
+
+<STATEMENT name="ListaLingueRichiestaDettaglio"
+            query="SELECT PRGLINGUA,
+                          PRGRICHIESTAAZ,
+                          TO_CHAR(PRGALTERNATIVA) AS PRGALTERNATIVA,
+                          STRDENOMINAZIONE,
+                          DGL.STRDESCRIZIONE AS DescrizioneLetto,
+                          DGS.STRDESCRIZIONE AS DescrizioneScritto,
+                          DGP.STRDESCRIZIONE AS DescrizioneParlato,
+                          DO_LINGUA.FLGINDISPENSABILE
+                          FROM DO_LINGUA,DE_LINGUA,DE_GRADO_LIN DGL, DE_GRADO_LIN DGS, DE_GRADO_LIN DGP
+                          WHERE DO_LINGUA.CODLINGUA=DE_LINGUA.CODLINGUA AND
+                                DO_LINGUA.CDNGRADOLETTO=DGL.CDNGRADO(+) AND
+                                DO_LINGUA.CDNGRADOSCRITTO=DGS.CDNGRADO(+) AND
+                                DO_LINGUA.CDNGRADOPARLATO=DGP.CDNGRADO (+) AND
+                                DO_LINGUA.PRGRICHIESTAAZ=?"/>
+
+<STATEMENT name="ListaCompetenzeRichiestaDettaglio"
+            query="SELECT DO_COMPETENZA.PRGCOMPETENZA,
+                      TO_CHAR(DO_COMPETENZA.PRGALTERNATIVA) AS PRGALTERNATIVA,
+                      DE_COMPETENZA.STRDESCRIZIONE AS DESCRIZIONECOMPETENZA,
+                      DE_COMPETENZA.CODTIPOCOMPETENZA,
+                      DO_COMPETENZA.CODCOMPETENZA,
+                      DO_COMPETENZA.PRGRICHIESTAAZ,
+                      DO_COMPETENZA.FLGINDISPENSABILE,
+                      DO_COMPETENZA.CDNUTINS,
+                      TO_CHAR(DO_COMPETENZA.DTMINS, 'DD/MM/YYYY') as DTMINS,
+                      DO_COMPETENZA.CDNUTMOD,
+                      TO_CHAR(DO_COMPETENZA.DTMMOD, 'DD/MM/YYYY') AS DTMMOD
+                    FROM DO_COMPETENZA
+                      INNER JOIN DE_COMPETENZA ON (DO_COMPETENZA.CODCOMPETENZA=DE_COMPETENZA.CODCOMPETENZA)
+                    WHERE DO_COMPETENZA.PRGRICHIESTAAZ = ? order by PRGALTERNATIVA"/>
+
+<STATEMENT name="ListaContrattiRichiestaDettaglio"
+            query="SELECT DO_CONTRATTO.PRGCONTRATTO,
+                          TO_CHAR(DO_CONTRATTO.PRGALTERNATIVA) AS PRGALTERNATIVA,
+                          DO_CONTRATTO.CODCONTRATTO,
+                          DE_CONTRATTO.STRDESCRIZIONE
+                          FROM DO_CONTRATTO,DE_CONTRATTO
+                          WHERE DO_CONTRATTO.CODCONTRATTO=DE_CONTRATTO.CODCONTRATTO AND
+                                DO_CONTRATTO.PRGRICHIESTAAZ=? order by PRGALTERNATIVA"/>
+
+<STATEMENT name="ListaAgevolazioniRichiestaDettaglio"
+            query="SELECT DO_AGEVOLAZIONE.PRGAGEVOLAZIONE,
+                          TO_CHAR(DO_AGEVOLAZIONE.PRGALTERNATIVA) AS PRGALTERNATIVA,
+                          DO_AGEVOLAZIONE.CODAGEVOLAZIONE,
+                          DO_AGEVOLAZIONE.FLGINDISPENSABILE,
+                          DE_AGEVOLAZIONE.STRDESCRIZIONE
+                          FROM DO_AGEVOLAZIONE,DE_AGEVOLAZIONE
+                          WHERE DO_AGEVOLAZIONE.CODAGEVOLAZIONE=DE_AGEVOLAZIONE.CODAGEVOLAZIONE AND
+                                DO_AGEVOLAZIONE.PRGRICHIESTAAZ=? order by PRGALTERNATIVA"/>
+                                
+<STATEMENT 	name="EmailAzienda"
+			query="select stremailpubbl,
+					G.cdngruppo,
+					G.strdenominazione,
+					R.numanno,
+					R.numrichiesta, nvl(R.numrichiestaorig, R.numrichiesta) as numrichiestaorig
+					from ts_gruppo G,
+					do_richiesta_az R,
+					ts_utente U,				
+					do_evasione E
+					where R.cdnutins = U.cdnut
+					and G.strcodrif = R.codcpi
+					and E.prgrichiestaaz = R.prgrichiestaaz
+					and E.CODEVASIONE in ('DFA','DRA')
+					and r.prgrichiestaaz = ?"/>
+                           
+<STATEMENT 
+          name="GET_MANSIONI_RIC"
+          query=" SELECT DO_MANSIONE.CODMANSIONE, DE_MANSIONE.STRDESCRIZIONE, 
+          				 DO_MANSIONE.PRGRICHIESTAAZ 
+          		  FROM   DE_MANSIONE DE_MANSIONE, 
+          				 DO_MANSIONE DO_MANSIONE
+				  WHERE  DE_MANSIONE.CODMANSIONE=DO_MANSIONE.CODMANSIONE
+				  AND 	 DO_MANSIONE.PRGALTERNATIVA=1 AND DO_MANSIONE.PRGRICHIESTAAZ=?" />   
+				  
+
+
+	<STATEMENT name="GET_RICHIESTA_PUBB"
+		   query="SELECT TO_CHAR(NVL(RIC.NUMRICHIESTAORIG, RIC.NUMRICHIESTA)) || '/' || TO_CHAR(RIC.NUMANNO) as NUMRICH, 
+				  TO_CHAR(DATSCADENZAPUBBLICAZIONE,'DD/MM/YYYY') DATSCADENZAPUBBLICAZIONE,
+				  TO_CHAR(RIC.DATSCADENZA,'DD/MM/YYYY') DATSCADENZA,
+				  RIC.STRDATIAZIENDAPUBB,
+				  RIC.STRMANSIONEPUBB,
+				  RIC.TXTFIGURAPROFESSIONALE,
+				  RIC.STRLUOGOLAVORO,
+				  RIC.TXTCONDCONTRATTUALE,
+				  RIC.TXTCARATTERISTFIGPROF,
+				  RIC.STRRIFCANDIDATURAPUBB, 
+				  DO_EVASIONE.CODEVASIONE,
+				  RIC.STRFORMAZIONEPUBB, 
+				  RIC.STRCONOSCENZEPUBB,
+				  RIC.STRNOTEORARIOPUBB,
+				  RIC.CODCPI,
+				  DE_CPI.STRDESCRIZIONE as DESCRIZIONE,
+				  DE_CPI.STRFAX as FAX, 
+				  DE_CPI.STREMAIL as mail, 
+				  DE_CPI.CODPROVINCIA as CODPROVINCIA,
+				  DE_PROVINCIA.STRDENOMINAZIONE as STRDESCPROVINCIA
+			FROM  DO_RICHIESTA_AZ RIC
+				  inner join DE_CPI ON (RIC.CODCPI=DE_CPI.CODCPI)
+				  inner join DO_EVASIONE ON (DO_EVASIONE.PRGRICHIESTAAZ = RIC.PRGRICHIESTAAZ)
+				  left outer join DE_PROVINCIA ON (DE_CPI.CODPROVINCIA=DE_PROVINCIA.CODPROVINCIA) 
+			WHERE RIC.FLGPUBBLICATA = 'S' AND DO_EVASIONE.CDNSTATORICH != 5 AND RIC.DATPUBBLICAZIONE &lt;= SYSDATE 
+				  AND SYSDATE &lt;= RIC.DATSCADENZAPUBBLICAZIONE AND RIC.NUMSTORICO = 0 
+				  AND (DO_EVASIONE.CODEVASIONE != 'AS' AND DO_EVASIONE.CODEVASIONE != 'CMA' ) and do_evasione.FLGPUBBWEB = 'S' 
+				  AND ( (de_cpi.codprovincia = (SELECT codprovinciasil
+                                        		FROM ts_generale
+                                       			WHERE ROWNUM = 1))
+          		  AND (de_cpi.datfineval >= SYSDATE)
+          		  AND LENGTH (TRIM (TRANSLATE (de_cpi.codcpi, ' +-.0123456789', ' '))) IS NULL) "/> 
+			
+
+<STATEMENT name="GET_MAX_RIGHE" 
+query =" select count (*) as numMax
+	     from DO_RICHIESTA_AZ RIC 
+	     	  inner join DO_EVASIONE ON (DO_EVASIONE.PRGRICHIESTAAZ = RIC.PRGRICHIESTAAZ)
+	     	  inner join DE_CPI ON (RIC.CODCPI=DE_CPI.CODCPI)
+		 WHERE RIC.FLGPUBBLICATA = 'S' AND DO_EVASIONE.CDNSTATORICH != 5 AND RIC.DATPUBBLICAZIONE &lt;= SYSDATE 
+				  AND SYSDATE &lt;= RIC.DATSCADENZAPUBBLICAZIONE AND RIC.NUMSTORICO = 0 
+				  AND DO_EVASIONE.CODEVASIONE != 'AS' and do_evasione.FLGPUBBWEB = 'S' 
+				  AND ( (de_cpi.codprovincia = (SELECT codprovinciasil
+                                        		FROM ts_generale
+                                       			WHERE ROWNUM = 1))
+          		  AND (de_cpi.datfineval >= SYSDATE)
+          		  AND LENGTH (TRIM (TRANSLATE (de_cpi.codcpi, ' +-.0123456789', ' '))) IS NULL) "/> 
+
+
+<STATEMENT 
+          name="GET_NUMSECONDI"
+          query="select num 
+          	     from ts_config_loc 
+          	     where codtipoconfig = 'SLIDER' and strcodrif = (select codprovinciasil from ts_generale)"/> 
+          	     
+<STATEMENT 
+          name="GET_IND_INTERNET"
+          query="select strvalore as indirizzo
+				from ts_config_loc
+				where codtipoconfig = 'SILPUB' and strcodrif = (select codprovinciasil from ts_generale)"/> 
+          	     
+<STATEMENT 
+          name="GET_FLAG_CM_PUB"
+          query="select nvl(strvalore,'N') as FLAGCMPUB
+				from ts_config_loc
+				where codtipoconfig = 'CM_PUB' and strcodrif = (select codprovinciasil from ts_generale)"/>          	     
+
+<!-- GRIGLIA PER LE STAMPE DELLE ASTE - AS -->
+
+
+<STATEMENT 
+          name="GET_PUB_CPI"
+          query="select 	de_cpi.CODCPI, replace(de_cpi.STRDESCRIZIONE,' ','_') as STRDESCRIZIONE 
+					from	de_cpi
+					where	(de_cpi.CODPROVINCIA=(select codProvinciaSil from ts_generale where rownum=1)) 
+					and		(de_cpi.DATFINEVAL &gt;= sysdate) 
+					and		length(trim(translate(de_cpi.CODCPI, ' +-.0123456789', ' '))) is null 
+				order by 	de_cpi.CODCPI"/>
+
+
+<STATEMENT name="GET_PUB_GRIGLIA_DATACHIMATA"
+           query="{ call ? := PG_IDO.WEBGRIGLIAASQUERY() }"
+/>
+
+<STATEMENT 
+          name="GET_NOTA_FISSA"
+          query="select strnotaavvpubblico,
+          				codprovinciasil 
+          		   from ts_generale" />
+
+
+<STATEMENT name="GET_PUB_GRIGLIA_CM"   
+           query="{ call ? := PG_IDO.WEBGRIGLIACMQUERY() }"
+/>
+
+<STATEMENT 
+          name="GET_CONFIG_LOGHI_STAMPA"
+          query="select num, strcodrif, strvalore 
+          	     from ts_config_loc 
+          	     where codtipoconfig = 'PUBLOGHI' and strcodrif = (select codprovinciasil from ts_generale)"/>
+          	     
+<STATEMENT  name="CARICA_INFO_PROV"
+			query="SELECT (SELECT codprovinciasil
+				          FROM ts_generale) AS codice,
+				       (SELECT strver
+				          FROM ts_generale) AS versione,				          
+				       (SELECT p.strdenominazione
+				          FROM ts_generale g, de_provincia p
+				         WHERE p.codprovincia = g.codprovinciasil) AS nome,
+				       (SELECT c.strvalore
+				          FROM ts_config_loc c, ts_generale g
+				         WHERE g.codprovinciasil = c.strcodrif
+				           AND c.codtipoconfig = 'URLCPI') AS urlsitocpi,
+				       (SELECT c.strvalore
+				          FROM ts_config_loc c, ts_generale g
+				         WHERE g.codprovinciasil = c.strcodrif
+				           AND c.codtipoconfig = 'URLPROV') AS urlsitoprov,
+				       (SELECT nvl(flgpoloreg, 'N') flgpoloreg
+				       		FROM ts_generale) AS flgpoloreg,
+				        (SELECT codregionesil
+				          FROM ts_generale) AS codicereg
+				  FROM DUAL" />
+				
+<STATEMENT  name="CARICA_INFO_REG"
+			query="SELECT (SELECT r.codregione
+                          FROM ts_generale g, de_provincia p, de_regione r
+                         WHERE p.codprovincia = g.codprovinciasil and r.CODREGIONE = p.CODREGIONE) AS codice,                        
+                       (SELECT r.strdenominazione
+                          FROM ts_generale g, de_provincia p, de_regione r
+                         WHERE p.codprovincia = g.codprovinciasil and r.CODREGIONE = p.CODREGIONE) AS nome,
+                       (SELECT c.strvalore
+                          FROM ts_config_loc c, ts_generale g, de_provincia p
+                         WHERE g.codprovinciasil = p.codprovincia
+                           AND c.strcodrif = p.codregione
+                           AND c.codtipoconfig = 'NOMESIL') AS nomesil,                       
+                       (SELECT c.strvalore
+                          FROM ts_config_loc c, ts_generale g, de_provincia p
+                         WHERE g.codprovinciasil = p.codprovincia
+                           AND c.strcodrif = p.codregione
+                           AND c.codtipoconfig = 'URLREG') AS urlsitoreg,
+                       (SELECT c.strvalore
+                          FROM ts_config_loc c, ts_generale g
+                         WHERE c.strcodrif = g.codprovinciasil
+                           AND c.codtipoconfig = 'ACCESSO') AS strAccesso   
+                  FROM DUAL" />
+
+</STATEMENTS>

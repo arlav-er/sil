@@ -1,0 +1,872 @@
+<!-- Gestione Template -->
+<STATEMENT name="SELECT_COMBO_PRG_TIPO_DOMINI"
+	query="select codtipodominio as CODICE,
+		       strdescrizione as DESCRIZIONE from DE_TIPO_DOMINIO_DATI_STAMPA" />
+		       
+<STATEMENT name="SELECT_COMBO_TIPO_PROTOCOLLAZIONE_TEMPLATE"
+	query="select codtipoprotocollazione as CODICE, 
+				  strdescrizione ||
+                  DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                  LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                  '') as DESCRIZIONE
+			from DE_TIPO_PROTOCOLLAZIONE  where DATFINEVAL > SYSDATE" />
+
+<STATEMENT name="SELECT_COMBO_TIPO_TRATTAMENTO_TEMPLATE"
+	query="select codtipotrattamento as CODICE, 
+				  strdescrizione ||
+                  DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                  LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                  '') as DESCRIZIONE
+			from DE_TIPO_TRATTAMENTO  where DATFINEVAL >= SYSDATE" />
+
+
+<STATEMENT name="SELECT_COMBO_TITOLARIO_TEMPLATE"
+	query="select prgtitolario as CODICE, 
+				  (strcodiceclassificazione ||
+                  DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                  LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                  '') || ' - ' || STRDESCRIZIONE) as DESCRIZIONE 
+			from DE_TITOLARIO  where DATFINEVAL >= SYSDATE" />
+
+<STATEMENT name="DettaglioTemplate"
+	query="select  
+		   st_template_stampa.flg_patronato AS FLGOPPAT,
+		   st_template_stampa.flg_cm AS FLGCM,
+		   st_template_stampa.strnome as STRNOME, 
+		   st_template_stampa.strnote as STRNOTE ,    
+           de_doc_tipo.STRDESCRIZIONE as STRDESCRIZIONE,        
+           st_template_stampa.CODTIPODOCUMENTO as CODAMBITOTEM,        
+           st_template_stampa.CODTIPODOMINIO as CODTIPODOMINIO,
+           am_config_protocollo.CODTIPOPROTOCOLLAZIONE as CODTIPOPROTOCOLLAZIONE,
+           de_tipo_protocollazione.STRDESCRIZIONE as DESCRIZIONEPROTOCOLLAZIONE,
+           de_tipo_trattamento.STRDESCRIZIONE as DESCRIZIONETRATTAMENTO,
+           am_config_protocollo.CODTIPOTRATTAMENTO as CODTIPOTRATTAMENTO,
+           nvl(am_config_protocollo.FLGPREDISPOSTO, '0') as FLGPREDISPOSTO,
+           nvl(am_config_protocollo.FLGFIRMAGRAFO, '0') as FLGFIRMAGRAFO,
+           nvl(am_config_protocollo.FLGTRASMISSIONEINTERNA, '0') as FLGTRASMISSIONEINTERNA,
+           am_config_protocollo.PRGTITOLARIO AS PRGTITOLARIO,
+           st_template_stampa.NUMKLOTEMP as NUMKLOTEMP,
+   		   to_char(st_template_stampa.datinizioval, 'dd/MM/yyyy') as datinizioval,         
+   		   to_char(st_template_stampa.datfineval, 'dd/MM/yyyy')   as datfineval,
+   		   de_doc_tipo.STRDESCRIZIONE as DESCCODAMBITOTEM, de_doc_tipo.strio,
+   		   st_template_stampa.cdnutins, to_char(st_template_stampa.dtmins, 'dd/mm/yyyy hh24:mi') dtmins, 
+   		   st_template_stampa.cdnutmod, to_char(st_template_stampa.dtmmod, 'dd/mm/yyyy hh24:mi') dtmmod,     
+		   de_tipo_dominio_dati_stampa.STRDESCRIZIONE as DESCDOMINIO,
+		   st_template_stampa.PRGTEMPLATESTAMPA as PRGTEMPLATESTAMPA, st_template_stampa.PRGCONFIGPROT as PRGCONFIGPROT,
+		   am_config_protocollo.NUMKLOCONFPROT as NUMKLOCONFPROT, st_template_stampa.filetemplate as FILETEMPLATE,
+		   st_template_stampa.PRGCLASSIF
+		   from  st_template_stampa     
+		   JOIN  de_doc_tipo    ON st_template_stampa.CODTIPODOCUMENTO = de_doc_tipo.CODTIPODOCUMENTO 
+		   JOIN  de_tipo_dominio_dati_stampa ON st_template_stampa.CODTIPODOMINIO = de_tipo_dominio_dati_stampa.CODTIPODOMINIO
+		   LEFT JOIN  am_config_protocollo ON st_template_stampa.prgconfigprot = am_config_protocollo.prgconfigprot
+		   JOIN  de_tipo_protocollazione on am_config_protocollo.CODTIPOPROTOCOLLAZIONE = de_tipo_protocollazione.CODTIPOPROTOCOLLAZIONE
+		   LEFT JOIN  de_tipo_trattamento on am_config_protocollo.CODTIPOTRATTAMENTO = de_tipo_trattamento.CODTIPOTRATTAMENTO		   
+		   where st_template_stampa.prgtemplatestampa = ?" />
+
+<STATEMENT name="DettaglioAllegatoTemplate"
+	query="select am_config_prot_doc_tipo.prgConfigProtDocTipo, am_config_prot_doc_tipo.prgConfigProt, am_config_prot_doc_tipo.prgTemplateStampa,
+			am_config_prot_doc_tipo.codTipoDocumento, am_config_prot_doc_tipo.strDescrizione, 
+			nvl(am_config_prot_doc_tipo.flgObbl, '0') as flgObbl, am_config_prot_doc_tipo.numKloConfProtDoc
+		   from am_config_prot_doc_tipo
+		   where am_config_prot_doc_tipo.prgConfigProtDocTipo = ?" />
+		   
+<STATEMENT name="Get_Template_As_Allegato"
+	query="select st_template_stampa.PRGTEMPLATESTAMPA as codice, st_template_stampa.strnome as DESCRIZIONE
+		   from st_template_stampa
+		   where nvl(st_template_stampa.flgvisibile, '0') = '1' 
+		   and st_template_stampa.datcanc is null
+		   and st_template_stampa.prgtemplatestampa != ?
+		   and st_template_stampa.CODTIPODOMINIO = ?" />
+
+<STATEMENT name="UpdateConfigurazioneTemplate"
+	query="update am_config_protocollo
+			       set CODTIPOPROTOCOLLAZIONE = ?,
+			           PRGTITOLARIO = ?,
+			           FLGPREDISPOSTO = ?,
+			           FLGFIRMAGRAFO =  ?,
+			           FLGTRASMISSIONEINTERNA = ?,
+			           CODTIPOTRATTAMENTO = ?,
+			           CDNUTMOD = ?,
+			           DTMMOD = sysdate, NUMKLOCONFPROT = ? + 1
+			           where PRGCONFIGPROT = ?" />
+
+<STATEMENT name="UpdateTemplate"
+	query="update st_template_stampa
+			       set strnome = upper(?),
+			           CODTIPODOCUMENTO = ?,
+			           strnote = ?,
+			           datinizioval =  to_date(?,'DD/MM/YYYY'),
+			           datfineval = to_date(?,'DD/MM/YYYY'),
+			           codtipodominio = ?,
+			           FLG_PATRONATO = ?,
+			           FLG_CM = ?,
+			           NUMKLOTEMP = ? + 1,
+			           cdnutmod = ?,
+			           dtmmod = sysdate,
+			           PRGCONFIGPROT = ?,
+			           PRGCLASSIF = ?
+			           where prgtemplatestampa = ?" />
+
+<STATEMENT name="SelectNumLockTemplate"
+	query="select NUMKLOTEMP as NUMKLOTEMP 
+		   from st_template_stampa where 
+		   prgtemplatestampa = ?" />
+
+<STATEMENT name="InsertTemplate"
+            query="INSERT INTO ST_TEMPLATE_STAMPA (
+                     PRGTEMPLATESTAMPA, 
+                     STRNOME, 
+                     CODTIPODOCUMENTO, 
+                     STRNOTE,
+                     DATINIZIOVAL, 
+                     DATFINEVAL, 
+                     FILETEMPLATE, 
+                     CODTIPODOMINIO,
+                     FLG_PATRONATO,
+                     FLG_CM, 
+                     NUMKLOTEMP, 
+                     CDNUTINS, 
+                     DTMINS, 
+                     CDNUTMOD, 
+                     DTMMOD, FLGVISIBILE, PRGCONFIGPROT, PRGCLASSIF)
+                VALUES (?, 
+                        upper(?), 
+                        ?,
+                        ?,
+                        TO_DATE(?,'DD/MM/YYYY'), 
+                        TO_DATE(?,'DD/MM/YYYY'),
+                        ?, 
+                        ?, 
+                        ?,
+                        ?,
+                        0, 
+                        ?,
+                        sysdate, 
+                        ?, 
+                        sysdate, '1', ?, ?)"/>
+                        
+<STATEMENT name="InsertConfigurazioneTemplate"
+            query="INSERT INTO AM_CONFIG_PROTOCOLLO (
+                     PRGCONFIGPROT, 
+                     CODTIPOPROTOCOLLAZIONE, 
+                     PRGTITOLARIO, 
+                     FLGPREDISPOSTO,
+                     FLGFIRMAGRAFO, 
+                     FLGTRASMISSIONEINTERNA,
+                     CODTIPOTRATTAMENTO,
+                     CDNUTINS, 
+                     DTMINS, 
+                     CDNUTMOD, 
+                     DTMMOD)
+                VALUES (?,
+                        ?, 
+                        ?,
+                        ?,
+                        ?, 
+                        ?,
+                        ?, 
+                        ?,
+                        sysdate, 
+                        ?, 
+                        sysdate)"/>
+                        
+<STATEMENT name="InsertAllegatoConfigurazioneTemplate"
+            query="INSERT INTO AM_CONFIG_PROT_DOC_TIPO (
+            		 PRGCONFIGPROTDOCTIPO,
+                     PRGCONFIGPROT, 
+                     CODTIPODOCUMENTO, 
+                     STRDESCRIZIONE, PRGTEMPLATESTAMPA,
+                     FLGOBBL,
+                     CDNUTINS, 
+                     DTMINS, 
+                     CDNUTMOD, 
+                     DTMMOD)
+                VALUES (?,
+                        ?, 
+                        ?,
+                        ?, ?,
+                        ?, 
+                        ?, 
+                        sysdate, 
+                        ?, 
+                        sysdate)"/>
+                        
+<STATEMENT name="UpdateAllegatoConfigurazioneTemplate"
+	query="update AM_CONFIG_PROT_DOC_TIPO
+			       set CODTIPODOCUMENTO = ?,
+			           STRDESCRIZIONE = ?, PRGTEMPLATESTAMPA = ?,
+			           FLGOBBL = ?, NUMKLOCONFPROTDOC = ? + 1,
+			           CDNUTMOD = ?,
+			           DTMMOD = sysdate
+			           where PRGCONFIGPROTDOCTIPO = ?" />
+
+<STATEMENT name="DettaglioEditor"
+	query="select  
+		   st_template_stampa.filetemplate as filetemplate   
+		   from  st_template_stampa     
+		   JOIN de_doc_tipo ON st_template_stampa.CODTIPODOCUMENTO = de_doc_tipo.CODTIPODOCUMENTO   
+		   JOIN de_tipo_dominio_dati_stampa ON st_template_stampa.CODTIPODOMINIO = de_tipo_dominio_dati_stampa.CODTIPODOMINIO
+		   where st_template_stampa.prgtemplatestampa = ?" />
+		   
+<STATEMENT name="AggiornaEditor"
+	query="update st_template_stampa
+			       set filetemplate = ?,
+			       CDNUTMOD = ?,
+			       DTMMOD = sysdate,
+			       NUMKLOTEMP = ? + 1
+			where prgtemplatestampa = ?" />
+			
+<STATEMENT name="UpdateCancellaTemplate"
+	query="update st_template_stampa
+			       set CDNUTMOD = ?,
+			       DTMMOD = sysdate,
+			       DATCANC = sysdate,
+			       NUMKLOTEMP = ? + 1
+			where prgtemplatestampa = ?" />
+			
+<STATEMENT name="UpdateCancellaAllegatoConfig"
+	query="update AM_CONFIG_PROT_DOC_TIPO
+			       set CDNUTMOD = ?,
+			       DTMMOD = sysdate,
+			       DATCANC = sysdate,
+			       NUMKLOCONFPROTDOC = ? + 1
+			where PRGCONFIGPROTDOCTIPO = ?" />
+
+<STATEMENT name="SELECT_COMBO_PRG_TEMPLATE_STAMPE"
+	query="select prgtemplatestampa as CODICE,
+		       strnome||' | '||CODTIPODOCUMENTO||' | ' ||NUMKLOTEMP as DESCRIZIONE 
+		       from ST_TEMPLATE_STAMPA" />
+
+<STATEMENT name="CARICA_DATI_CPI"
+	query="select   G.STRCODRIF COD_CPI,
+                    CP.STRINDIRIZZOSTAMPA INDIRIZZO_STAMPA,
+                    INITCAP(CP.STRDESCRIZIONE) DESC_CPI,
+                    CP.STRINDIRIZZO INDIRIZZO,
+                    CP.STRLOCALITA	LOCALITA,
+                    CP.STRCAP	 CAP,
+                    CP.CODCOM	CODCOM,
+                    CP.CODPROVINCIA CODPROVINCIA,
+                    CO.STRDENOMINAZIONE COMUNE,
+                    PR.STRDENOMINAZIONE PROVINCIA,
+                    CP.STRTEL TELEFONO,
+                    CP.STRFAX FAX,
+                    CP.STREMAIL EMAIL,
+                    CP.STRORARIO ORARIO,
+                    CP.STRRESPONSABILE RESPONSABILE,
+                    CP.STREMAILPEC EMAILPEC,
+                    'servizimpiego.adl@pec.provincia.tn.it' EMAILADL
+                  from ts_profilatura_utente PU,
+                       ts_profilo P,
+                       ts_profilo_gruppo PG,
+                       ts_gruppo G,
+                       ts_utente U,
+                       ts_tipo_gruppo TG,
+                       de_cpi CP,
+                       de_comune co,
+                       de_provincia PR
+                 where PU.cdnprofilo = P.cdnprofilo
+                   and PU.cdngruppo = PG.cdngruppo
+                   and PU.cdngruppo = G.cdngruppo
+                   and P.cdnprofilo = PG.cdnprofilo
+                   and U.cdnut = PU.cdnut
+                   and G.cdntipogruppo = TG.cdntipogruppo
+                   AND G.STRCODRIF = CP.CODCPI
+                   and cp.codcom=co.codcom and co.codprovincia=pr.codprovincia
+                   and PU.PRGPROFILOUTENTE = ?
+                   and U.STRLOGIN = ? " />
+                   
+<STATEMENT name="DO_TEMPLATE_STAMPA_NEXTVAL"
+           query="
+    select S_ST_TEMPLATE_STAMPA.nextval from dual
+"/>
+
+<STATEMENT name="DO_CONFIG_TEMPLATE_STAMPA_NEXTVAL"
+           query="
+    select S_AM_CONFIG_PROTOCOLLO.nextval from dual
+"/>
+
+<STATEMENT name="DO_ALLEGATO_CONFIG_STAMPA_NEXTVAL"
+           query="
+    select S_AM_CONFIG_PROT_DOC_TIPO.nextval from dual
+"/>
+
+<STATEMENT name="SELECT_DUPLICATI_TEMPLATE_STAMPA"
+          query="SELECT STRNOME, 
+                     CODTIPODOCUMENTO, 
+                     CODTIPODOMINIO 
+          		FROM ST_TEMPLATE_STAMPA
+                 WHERE upper(STRNOME) = upper(?)
+                 and CODTIPODOCUMENTO = ? 
+                 and CODTIPODOMINIO = ? and DATCANC is null"/>
+                 
+<STATEMENT name="SELECT_DUPLICATI_ALLEGATI_TEMPLATE_STAMPA"
+          query="SELECT PRGCONFIGPROTDOCTIPO 
+          		FROM AM_CONFIG_PROT_DOC_TIPO
+                 WHERE PRGCONFIGPROT = ?
+                 and CODTIPODOCUMENTO = ? and upper(STRDESCRIZIONE) = upper(?)
+                 and PRGTEMPLATESTAMPA = ? and DATCANC is null"/>
+                 
+<STATEMENT name="SELECT_COMBO_PRG_TEMPLATE_STAMPE_DOMINIO"
+	query="select st.prgtemplatestampa as CODICE,
+			   st.strnome as DESCRIZIONE, doc_tipo.STRIO as strio, nvl(prot.FLGFIRMAGRAFO,0) as FLGFIRMAGRAFO
+		       from ST_TEMPLATE_STAMPA st
+		       inner join am_config_protocollo prot on (st.PRGCONFIGPROT = prot.PRGCONFIGPROT)
+		       inner join de_doc_tipo doc_tipo on (st.codtipodocumento = doc_tipo.codtipodocumento)
+		       where st.codTipoDominio = ? and nvl(st.flgvisibile, '0') = '1' 
+		       and st.DATFINEVAL > SYSDATE and st.DATINIZIOVAL &lt;= SYSDATE and st.datcanc is null order by ordinamento,strnome asc" />
+		      
+<STATEMENT name="SELECT_COMBO_PRG_TEMPLATE_STAMPE_DOMINIO_PAT"
+	query="select st.prgtemplatestampa as CODICE,
+			   st.strnome as DESCRIZIONE, doc_tipo.STRIO as strio, nvl(prot.FLGFIRMAGRAFO,0) as FLGFIRMAGRAFO
+		       from ST_TEMPLATE_STAMPA st
+		       inner join am_config_protocollo prot on (st.PRGCONFIGPROT = prot.PRGCONFIGPROT)
+		       inner join de_doc_tipo doc_tipo on (st.codtipodocumento = doc_tipo.codtipodocumento)
+		       where st.codTipoDominio = ? and nvl(st.flgvisibile, '0') = '1' and nvl(st.FLG_PATRONATO, '0') = '1' 
+		       and st.DATFINEVAL > SYSDATE and st.DATINIZIOVAL &lt;= SYSDATE and st.datcanc is null order by ordinamento,strnome asc" />
+		      
+<STATEMENT name="SELECT_COMBO_PRG_TEMPLATE_STAMPE_DOMINIO_NO_CM"
+	query="select st.prgtemplatestampa as CODICE,
+			   st.strnome as DESCRIZIONE, doc_tipo.STRIO as strio, nvl(prot.FLGFIRMAGRAFO,0) as FLGFIRMAGRAFO
+		       from ST_TEMPLATE_STAMPA st
+		       inner join am_config_protocollo prot on (st.PRGCONFIGPROT = prot.PRGCONFIGPROT)
+		       inner join de_doc_tipo doc_tipo on (st.codtipodocumento = doc_tipo.codtipodocumento)
+		       where st.codTipoDominio = ? and nvl(st.flgvisibile, '0') = '1' and nvl(st.FLG_CM, '0') = '0' 
+		       and st.DATFINEVAL > SYSDATE and st.DATINIZIOVAL &lt;= SYSDATE and st.datcanc is null order by ordinamento,strnome asc" />
+
+
+		      
+<STATEMENT name="INSERT_STAMPA_PARAM_LAV"
+				query="insert into am_documento
+							(prgdocumento, codcpi, cdnlavoratore,prgazienda,prgunita, codtipodocumento, strdescrizione, codStatoAtto, codmonoio, datacqril, 
+							 datinizio, datfine, prgTemplateStampa, strNote, cdnutins, dtmins, cdnutmod, dtmmod)
+							values
+							(?, ?, ?,?,?, ?, ?, ?, ?, TO_DATE( ?,'DD/MM/YYYY'),
+							 TO_DATE( ?,'DD/MM/YYYY'), TO_DATE( ?,'DD/MM/YYYY'), ?, ?, ?, sysdate, ?, sysdate) " />
+						 
+<STATEMENT name="DETTAGLIO_STAMPA_PARAM_LAV"
+	query="select doc.prgdocumento, doc.codtipodocumento tipodocumento, de_doc_tipo.strdescrizione desctipodoc, doc.cdnlavoratore, doc.strdescrizione, doc.codStatoAtto, 
+			doc.codmonoio, to_char(doc.datacqril, 'dd/mm/yyyy') datacqril, to_char(doc.datinizio, 'dd/mm/yyyy') datinizio, to_char(doc.datfine, 'dd/mm/yyyy') datfine,
+			doc.strNote, doc.cdnutins, doc.prgtemplatestampa, to_char(doc.dtmins, 'dd/mm/yyyy hh24:mi') dtmins, doc.cdnutmod, to_char(doc.dtmmod, 'dd/mm/yyyy hh24:mi') dtmmod
+		   from am_documento doc
+		   inner join de_doc_tipo on (doc.codtipodocumento = de_doc_tipo.codtipodocumento)
+		   where doc.prgdocumento = ?" />
+		   
+<STATEMENT name="ALLEGATI_TEMPLATE_STAMPA_PARAM_LAV"
+	query="select am_config_prot_doc_tipo.prgconfigprotdoctipo as codice,
+		   (case
+				when am_config_prot_doc_tipo.strdescrizione is not null then am_config_prot_doc_tipo.strdescrizione
+				when templAllegato.prgtemplatestampa is not null then 'Template: ' || templAllegato.strNome
+				else de_doc_tipo.strdescrizione
+		   end) as descrizione,
+       	   (case
+				when am_config_prot_doc_tipo.prgtemplatestampa is not null then 0 
+				else 1
+		   end) as is_template,
+	       am_config_prot_doc_tipo.codtipodocumento
+		   from am_documento doc
+		   inner join st_template_stampa on (doc.prgtemplatestampa = st_template_stampa.prgtemplatestampa)
+		   inner join am_config_prot_doc_tipo on (st_template_stampa.prgconfigprot = am_config_prot_doc_tipo.prgconfigprot)
+		   left join de_doc_tipo on (am_config_prot_doc_tipo.codtipodocumento = de_doc_tipo.codtipodocumento)
+		   left join st_template_stampa templAllegato on (am_config_prot_doc_tipo.prgtemplatestampa = templAllegato.prgtemplatestampa)
+		   where doc.prgdocumento = ? and am_config_prot_doc_tipo.datcanc is null
+		   union
+		   select 0 as codice, 'Altro' as descrizione , 1 as is_template, null from dual" />
+		   
+<STATEMENT name="SELECT_TIPO_E_DESC_DOC_ALLEGATO"
+	query="select am_config_prot_doc_tipo.prgconfigprotdoctipo, am_config_prot_doc_tipo.prgtemplatestampa,
+				(case
+					when am_config_prot_doc_tipo.prgtemplatestampa is null then am_config_prot_doc_tipo.codtipodocumento
+					else st_template_stampa.codtipodocumento
+				end) as codtipodocumento, 
+				(case
+					when am_config_prot_doc_tipo.strdescrizione is not null then am_config_prot_doc_tipo.strdescrizione
+					when st_template_stampa.prgtemplatestampa is not null then 'Template: ' || st_template_stampa.strNome
+					else de_doc_tipo.strdescrizione
+			    end) as descrdocumento
+		   from am_config_prot_doc_tipo
+		   left join de_doc_tipo on (am_config_prot_doc_tipo.codtipodocumento = de_doc_tipo.codtipodocumento)
+		   left join st_template_stampa on (am_config_prot_doc_tipo.prgtemplatestampa = st_template_stampa.prgtemplatestampa)
+		   where am_config_prot_doc_tipo.prgconfigprotdoctipo = ? " />
+		   
+<STATEMENT name="INSERT_DOC_ALLEGATO_STAMPA_PARAM"
+	query="	insert into am_documento_allegato
+					(PRGDOCUMENTOALLEGATO, PRGDOCUMENTOPADRE, PRGDOCUMENTOFIGLIO, FLGPRESAVISIONE, FLGCARICSUCCESSIVO,
+					 CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)
+				values
+					(s_am_documento_allegato.nextval, ?, ?, ?, ?,
+					 ?, sysdate, ?, sysdate) " />
+					 
+<STATEMENT name="UPDATE_DOC_ALLEGATO_STAMPA_PARAM"
+	query=" update am_documento_allegato
+					set FLGCARICSUCCESSIVO = ?,
+					NUMKLODOCALLEGATO = NUMKLODOCALLEGATO + 1
+				where PRGDOCUMENTOALLEGATO = ? " />
+					 
+<STATEMENT name="GET_INFO_DOCUMENTO_ALLEGATO"
+	query="select docAllegato.flgpresavisione, docAllegato.flgcaricsuccessivo
+		   from am_documento_allegato docAllegato
+		   where docAllegato.prgdocumentoallegato = ? " />
+		   
+<STATEMENT name="GET_INFO_DOCUMENTO_PADRE"
+	query="select doc.strdescrizione || (case when trunc(sysdate) &gt; trunc(st.datfineval) then ' (scaduto)'  end) AS strdescrizione , de_doc_tipo.strdescrizione desctipodoc, doc.codstatoatto
+		   from am_documento doc, st_template_stampa st, de_doc_tipo
+		   where doc.prgdocumento = ? 
+		   and doc.codtipodocumento = de_doc_tipo.codtipodocumento
+           and st.prgtemplatestampa (+) = doc.prgtemplatestampa" />
+		   
+<STATEMENT name="AM_DOCUMENTO_SELECT_STAMPA_PARAM"
+				query="SELECT doc.prgdocumento,
+						       doc.codcpi, de_cpi.strdescrizione desccpi,
+						       doc.cdnlavoratore,
+						       doc.prgazienda,
+						       doc.prgunita,
+						       doc.codtipodocumento,
+						       doc.flgautocertificazione,
+						       doc.strdescrizione || (case when trunc(sysdate) &gt; trunc(st.datfineval) then ' (scaduto)'  end) as strdescrizione,
+						       doc.flgdocamm,
+						       doc.flgdocidentifp,
+						       to_char(doc.datinizio, 'dd/mm/yyyy') as datinizio,
+						       doc.strnumdoc,
+						       doc.strenterilascio,
+						       doc.codmonoio,
+						       to_char(doc.datacqril, 'dd/mm/yyyy') as datacqril, 
+						       doc.codmodalitaacqril,
+						       doc.codtipofile,
+						       doc.strnomedoc,
+						       to_char(doc.datfine, 'dd/mm/yyyy') as datfine,
+						       doc.numannoprot,
+						       doc.numprotocollo,
+						       doc.strnote,
+						       doc.cdnutins,
+						       to_char(doc.dtmins, 'dd/mm/yyyy hh24:mi') as dtmins,
+						       doc.cdnutmod,
+						       to_char(doc.dtmmod, 'dd/mm/yyyy hh24:mi') as dtmmod,
+						       doc.numklodocumento,
+						       TO_CHAR(DOC.DATPROTOCOLLO,'DD/MM/YYYY HH24:MI:SS') as DATPROTOCOLLO,
+						       nvl(dbms_lob.getlength(doc_blob.BLBFILE),0) as existBlob,
+						       td.strdescrizione || (case when trunc(sysdate) &gt; trunc(td.datfineval) then ' (scaduto)'  end) as STRTIPODOC,
+						       doc.CODSTATOATTO CODSTATOATTO,
+						       doc.codMotAnnullamentoAtto,
+						       doc_coll.strChiaveTabella,
+						       doc.prgtemplatestampa,
+						       td.flgAnnullDaDocumento
+						FROM   am_documento doc,
+						       am_documento_blob doc_blob,
+							   am_documento_coll doc_coll,
+							   de_doc_tipo td, de_cpi,
+							   st_template_stampa st	
+						 WHERE doc_blob.prgdocumento = doc.prgdocumento 
+						 and   doc_coll.PRGDOCUMENTO(+) = doc.prgdocumento
+						 and   td.CODTIPODOCUMENTO = doc.CODTIPODOCUMENTO
+						 and   de_cpi.codcpi(+) = doc.codcpi
+						 and   st.prgtemplatestampa (+) = doc.prgtemplatestampa				 
+						 AND   doc.prgdocumento = ? " />
+						 
+<STATEMENT name="CARICA_DATI_LAVORATORE"
+	query="SELECT AN.CDNLAVORATORE CDNLAVORATORE, 
+                      AN.STRCODICEFISCALE STRCODICEFISCALE, 
+                      INITCAP(AN.STRCOGNOME) STRCOGNOME, 
+                      INITCAP(AN.STRNOME) STRNOME, 
+                      AN.STRSESSO STRSESSO, 
+                      TO_CHAR(AN.DATNASC, 'DD/MM/YYYY') DATNASC,
+                      INITCAP(COMNASC.STRDENOMINAZIONE) || ' (' || rtrim(provnasc.strIstat) || ') ' as STRCOMNAS,
+                      AN.STRCELL STRCELL,
+                      AN.STREMAIL STREMAIL,
+                      provnasc.strIstat STRPROVNAS,
+                      CIT1.STRDESCRIZIONE STRCITTADINANZA, 
+                      CIT1.STRNAZIONE STRNAZIONE,
+                      CIT2.STRDESCRIZIONE STRCITTADINANZA2, 
+                      CIT2.STRNAZIONE STRNAZIONE2,
+                      INITCAP(COMRES.strdenominazione) as STRCOMRES,
+                      provres.strdenominazione as PROVRES,
+                      INITCAP(an.strindirizzores) STRINDIRIZZORES,
+                      an.strlocalitares STRLOCALITARES,
+                      an.strcapres STRCAPRES,
+					  COMDOM.strdenominazione as STRCOMDOM,
+                      provdom.strdenominazione as PROVDOM,
+                      INITCAP(an.strindirizzodom) as STRINDIRIZZODOM,
+                      an.strlocalitadom as STRLOCALITADOM,
+                      an.strcapdom as STRCAPDOM,
+                      an.strtelres as STRTELRES,
+                      an.strteldom as STRTELDOM
+               FROM AN_LAVORATORE AN , 
+                    DE_COMUNE COMNASC,
+                    de_provincia provnasc, 
+                    DE_CITTADINANZA CIT1, 
+                    DE_CITTADINANZA CIT2, 
+                    de_provincia provres,
+                    DE_COMUNE COMRES,
+                    de_provincia provdom,
+                    DE_COMUNE COMDOM
+               WHERE AN.CODCOMNAS=COMNASC.CODCOM
+               AND COMNASC.codprovincia=provnasc.codprovincia 
+               AND AN.CODCITTADINANZA=CIT1.CODCITTADINANZA
+               AND AN.CODCITTADINANZA2=CIT2.CODCITTADINANZA (+)
+               AND an.codcomres = COMRES.codcom
+               and COMRES.codprovincia = provres.codprovincia
+               and an.codcomdom = COMDOM.codcom 
+               and COMDOM.codprovincia = provdom.codprovincia
+               AND AN.cdnLavoratore = ? " />
+               
+<STATEMENT name="CARICA_DATI_DID_LAVORATORE"
+	query="select did.prgdichdisponibilita, to_char(did.datdichiarazione, 'dd/mm/yyyy') datdichiarazione
+			from am_dich_disponibilita did
+			inner join am_elenco_anagrafico el on (did.prgelencoanagrafico = el.prgelencoanagrafico)
+			where el.cdnlavoratore = ? and did.codstatoatto = 'PR' and did.datfine is null 
+			and did.datdichiarazione = (SELECT max(did1.datdichiarazione) from am_dich_disponibilita did1
+      inner join am_elenco_anagrafico el1 on (did1.prgelencoanagrafico = el1.prgelencoanagrafico)
+			where el1.cdnlavoratore = el.cdnlavoratore and did1.codstatoatto = 'PR' and did1.datfine is null)"/>
+			
+            
+<STATEMENT name="CHECK_ALLEGATI_DOCUMENTO_PADRE"
+	query="select docFiglio.strdescrizione descDoc, docFiglio.codtipodocumento, de_doc_tipo.strdescrizione descTipoDoc,
+		   docFiglio.codstatoatto, blobFiglio.prgdocumentoblob, docFiglio.strnomedoc, am_documento_allegato.flgpresavisione,
+		   am_documento_allegato.flgcaricsuccessivo
+		   from am_documento docPadre
+		   inner join am_documento_allegato on (docPadre.prgdocumento = am_documento_allegato.prgdocumentopadre)
+		   inner join am_documento docFiglio on (docFiglio.prgdocumento = am_documento_allegato.prgdocumentofiglio)
+		   inner join de_doc_tipo on (docFiglio.codtipodocumento = de_doc_tipo.codtipodocumento)
+		   left join am_documento_blob blobFiglio on (docFiglio.prgdocumento = blobFiglio.prgdocumento)
+		   where docPadre.prgdocumento = ?" />
+		   
+<STATEMENT name="CHECK_ALLEGATI_TEMPLATE"
+	query="select am_config_prot_doc_tipo.prgconfigprotdoctipo as codice, am_config_prot_doc_tipo.strdescrizione as descrizione,
+				  (case
+				  	when am_config_prot_doc_tipo.codtipodocumento is not null then am_config_prot_doc_tipo.codtipodocumento
+				  	else templAllegato.codtipodocumento
+				  end) as codTipoDocAllegato, 
+				  am_config_prot_doc_tipo.flgobbl,
+				  (case 
+				    when am_config_prot_doc_tipo.codtipodocumento IS NULL then templAllegato.STRNOME
+				    else de_doc_tipo.strdescrizione end)
+				    AS NOMETIPOSTAMPA
+		   from st_template_stampa
+		   inner join am_config_protocollo on (st_template_stampa.prgconfigprot = am_config_protocollo.prgconfigprot)
+		   inner join am_config_prot_doc_tipo on (st_template_stampa.prgconfigprot = am_config_prot_doc_tipo.prgconfigprot)
+		   left join de_doc_tipo on (am_config_prot_doc_tipo.codtipodocumento = de_doc_tipo.codtipodocumento)
+		   left join st_template_stampa templAllegato on (am_config_prot_doc_tipo.prgtemplatestampa = templAllegato.prgtemplatestampa)
+		   where st_template_stampa.prgtemplatestampa = ? and am_config_prot_doc_tipo.datcanc is null" />
+		   
+<STATEMENT name="CHECK_CONFIGURAZIONE_PROTOCOLLO"
+	query="select am_config_protocollo.flgfirmagrafo
+		   from st_template_stampa
+		   inner join am_config_protocollo on (st_template_stampa.prgconfigprot = am_config_protocollo.prgconfigprot)
+		   where st_template_stampa.prgtemplatestampa = ?" />
+		   
+<STATEMENT name="GetInfoTemplatePresenti"
+	query="select upper(st_template_stampa.strnome) nome
+		   from st_template_stampa
+		   where nvl(flgvisibile, '0') = '1' and datcanc is null" />
+		
+<STATEMENT name="GetUpdateInfoTemplatePresenti"
+	query="select upper(st_template_stampa.strnome) nome
+		   from st_template_stampa
+		   where prgtemplatestampa != ? and nvl(flgvisibile, '0') = '1' and datcanc is null" />
+			
+<STATEMENT name="CARICA_DATI_DATA_APP_LAVORATORE"
+			query="select to_char(ag1.dtmdataora,'dd/mm/yyyy') dataappuntamento, to_char(ag1.dtmdataora,'hh24:mi') ora
+from ag_agenda ag1
+inner join ag_lavoratore on ag_lavoratore.prgappuntamento = ag1.prgappuntamento
+inner join an_lavoratore an on an.cdnlavoratore = ag_lavoratore.cdnlavoratore
+where ag1.codservizio ='48' and ag1.codstatoappuntamento = 2
+and trunc(ag1.dtmdataora) >= trunc(sysdate)
+and an.cdnlavoratore = ?
+and
+ag1.dtmdataora = (select min(ag2.dtmdataora) 
+from ag_agenda ag2
+inner join ag_lavoratore on ag_lavoratore.prgappuntamento = ag2.prgappuntamento
+inner join an_lavoratore on an_lavoratore.cdnlavoratore = ag_lavoratore.cdnlavoratore
+where ag2.codservizio ='48' and ag2.codstatoappuntamento = 2
+and trunc(ag2.dtmdataora) >= trunc(sysdate)
+and an_lavoratore.cdnlavoratore = an.cdnlavoratore)"/>
+
+<STATEMENT name="CARICA_DATI_DATA_PATRONATO"
+			query="select to_char(ag1.dtmdataora,'dd/mm/yyyy') dataappuntamento, to_char(ag1.dtmdataora,'hh24:mi') ora
+from ag_agenda ag1
+inner join ag_lavoratore on ag_lavoratore.prgappuntamento = ag1.prgappuntamento
+inner join an_lavoratore an on an.cdnlavoratore = ag_lavoratore.cdnlavoratore
+where ag1.codservizio ='PATRONAT' and ag1.codstatoappuntamento = 2
+and trunc(ag1.dtmdataora) >= trunc(sysdate)
+and an.cdnlavoratore = ?
+and
+ag1.dtmdataora = (select min(ag2.dtmdataora) 
+from ag_agenda ag2
+inner join ag_lavoratore on ag_lavoratore.prgappuntamento = ag2.prgappuntamento
+inner join an_lavoratore on an_lavoratore.cdnlavoratore = ag_lavoratore.cdnlavoratore
+where ag2.codservizio ='PATRONAT' and ag2.codstatoappuntamento = 2
+and trunc(ag2.dtmdataora) >= trunc(sysdate)
+and an_lavoratore.cdnlavoratore = an.cdnlavoratore)"/>
+
+
+
+<STATEMENT name="CARICA_DATI_DATA_CM_ISCRIZIONE" 
+	query="	select DATULTIMAISCR, descrizione, dataanzianital68, numiscrizione
+		    from (SELECT to_char(iscr.DATULTIMAISCR,'dd/mm/yyyy') DATULTIMAISCR,
+			tipoiscr.strdescrizione descrizione,
+			to_char(iscr.datanzianita68, 'dd/mm/yyyy') dataanzianital68, iscr.numiscrizione
+			from am_cm_iscr iscr 
+			inner join de_cm_tipo_iscr tipoiscr on tipoiscr.codcmtipoiscr = iscr.codcmtipoiscr
+			inner JOIN AM_DOCUMENTO_COLL COLL ON (iscr.PRGCMISCR = to_number(COLL.STRCHIAVETABELLA))
+			inner JOIN AM_DOCUMENTO DOC ON (COLL.PRGDOCUMENTO = DOC.PRGDOCUMENTO AND DOC.CODTIPODOCUMENTO = 'L68') 
+			where DOC.cdnlavoratore = ? and DOC.CODSTATOATTO = 'PR' and iscr.DATDATAFINE is null
+			order by iscr.DATULTIMAISCR desc, iscr.DTMINS DESC
+			) where  ROWNUM = 1"/>
+
+<!-- <STATEMENT name="CARICA_DATI_DATA_PAI_LAVORATORE" -->
+<!-- 			query="select to_char(ag1.dtmdataora,'dd/mm/yyyy') dataappuntamento, to_char(ag1.dtmdataora,'hh24:mi') ora -->
+<!-- from ag_agenda ag1 -->
+<!-- inner join ag_lavoratore on ag_lavoratore.PRGAPPUNTAMENTO = ag1.prgappuntamento -->
+<!-- inner join an_lavoratore an on an.cdnlavoratore = ag_lavoratore.cdnlavoratore -->
+<!-- where ag1.codservizio ='SPAI' and ag1.codstatoappuntamento = 2 -->
+<!-- and trunc(ag1.dtmdataora) >= trunc(sysdate) -->
+<!-- and an.cdnlavoratore = ? -->
+<!-- and -->
+<!-- ag1.dtmdataora = (select min(ag2.dtmdataora)  -->
+<!-- from ag_agenda ag2 -->
+<!-- inner join ag_lavoratore on ag_lavoratore.prgappuntamento = ag2.prgappuntamento -->
+<!-- inner join an_lavoratore on an_lavoratore.cdnlavoratore = ag_lavoratore.cdnlavoratore -->
+<!-- where ag2.codservizio ='SPAI' and ag2.codstatoappuntamento = 2 -->
+<!-- and trunc(ag2.dtmdataora) >= trunc(sysdate) -->
+<!-- and an_lavoratore.cdnlavoratore = an.cdnlavoratore)"/> -->
+
+<STATEMENT name="CARICA_DATI_AZIENDA"
+			query="select 
+an.STRRAGIONESOCIALE as RagSociale,
+an.STRPARTITAIVA as PartitaIva,
+an.STRCODICEFISCALE as CodiceFiscale,
+NAT_GIU.strdescrizione as NaturaGiuridica,
+TIPO_AZ.strdescrizione as TipoAzienda,
+an.STRSITOINTERNET as SitoInternet,
+ATT.strdescrizione as AttivAteco,
+an.NUMSOCI as NumSoci,
+an.NUMDIPENDENTI as NumDipendenti,
+an.NUMCOLLABORATORI as NumCollaboratori,
+an.NUMALTRAPOSIZIONE as NumAltraPosizione,
+to_char(an.DATINIZIO, 'dd/mm/yyyy') as DataInizioAttivita,
+to_char(an.DATFINE, 'dd/mm/yyyy') as DataFineAttivita,
+an.STRPATINAIL as PatInail,
+an.FLGOBBLIGOL68 as FlgObbl68, 
+an.STRNUMALBOINTERINALI as NumAlboInterinali,
+an.STRNUMAGSOMMINISTRAZIONE as NumAgSomministrazione,
+an.DATCAMBIORAGSOC as DataCambioRagsociale
+FROM AN_AZIENDA AN , 
+                    de_nat_giuridica NAT_GIU,
+                    de_tipo_azienda TIPO_AZ, 
+                    de_attivita ATT
+               WHERE AN.CODNATGIURIDICA=NAT_GIU.CODNATGIURIDICA (+)
+               AND AN.CODTIPOAZIENDA=TIPO_AZ.CODTIPOAZIENDA
+               AND AN.STRDESCATTIVITA=ATT.STRDESCRIZIONE  (+)
+              AND AN.PRGAZIENDA = ?" /> 
+
+              
+<STATEMENT name="CARICA_DATI_LEGALI_AZIENDA"
+			query="select
+	AN.STRDENOMINAZIONE as DenominazioneSedeLegale, 
+	an.strindirizzo as IndirizzoSedeLegale,
+	COM.STRDENOMINAZIONE as ComuneSedeLegale,
+	an.strcap as CapSedeLegale,
+	an.strtel as TelSedeLegale,
+	an.strfax as FaxSedeLegale,
+	AN.STREMAIL as EmailSedeLegale
+	FROM AN_UNITA_AZIENDA AN , 
+	                    DE_COMUNE COM
+	               WHERE AN.CODCOM=COM.CODCOM
+	               and AN.FLGSEDE = 'S'
+	               AND AN.PRGAZIENDA = ?" />
+	               
+<STATEMENT name="GET_ST_TEMPLATE_STAMPA"
+			query="select st_template_stampa.ordinamento ordinamento,st_template_stampa.strnome         as  STRNOME, 
+st_template_stampa.strnote          as  STRNOTE ,
+de_doc_tipo.STRDESCRIZIONE   as  STRDESCRIZIONE, 
+st_template_stampa.CODTIPODOCUMENTO     as  CODAMBITOTEM, 
+st_template_stampa.CODTIPODOMINIO   as  CODTIPODOMINIO, 
+st_template_stampa.NUMKLOTEMP       as  NUMKLOTEMP, 
+to_char(st_template_stampa.datinizioval, 'dd/MM/yyyy')    as  datinizioval, 
+to_char(st_template_stampa.datfineval, 'dd/MM/yyyy')      as  datfineval, 
+de_doc_tipo.STRDESCRIZIONE  as  DESCCODAMBITOTEM, 
+de_tipo_dominio_dati_stampa.STRDESCRIZIONE  as  DESCDOMINIO, 
+st_template_stampa.PRGTEMPLATESTAMPA as PRGTEMPLATESTAMPA, st_template_stampa.PRGCONFIGPROT as PRGCONFIGPROT 
+from st_template_stampa 
+JOIN de_doc_tipo ON st_template_stampa.CODTIPODOCUMENTO = de_doc_tipo.CODTIPODOCUMENTO 
+JOIN de_tipo_dominio_dati_stampa ON st_template_stampa.CODTIPODOMINIO = de_tipo_dominio_dati_stampa.CODTIPODOMINIO 
+LEFT JOIN  am_config_protocollo ON st_template_stampa.prgconfigprot = am_config_protocollo.prgconfigprot
+where nvl(st_template_stampa.flgvisibile, '0') = '1' and st_template_stampa.datcanc is null order by ordinamento" />
+
+<STATEMENT name="QUERY_UPDATE_ORDINAMENTO_TEMPLATE" 
+		query="update ST_TEMPLATE_STAMPA
+					set ORDINAMENTO = ?,
+					NUMKLOTEMP = NUMKLOTEMP +1
+				where PRGTEMPLATESTAMPA = ? " />
+				
+				
+				
+<!-- GESTIONE STATEMENT DELLE CLASSIFICAZIONI -->
+<STATEMENT name="InsertClassificazione"
+          query="INSERT INTO ST_TEMPLATE_CLASSIF (PRGCLASSIF, STRNOME, DESCRIZIONE, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD, CODTIPODOMINIO)
+                VALUES (S_ST_TEMPLATE_CLASSIF.nextval, ?, ?, ?, sysdate, ?, sysdate, ?)"/>
+				
+<STATEMENT name="GET_PRG_CLASSIFICAZIONE_NEXTVAL"
+           query="SELECT S_ST_TEMPLATE_CLASSIF.nextval FROM DUAL"/>
+
+<STATEMENT name="UpdateClassificazione"
+          query="UPDATE ST_TEMPLATE_CLASSIF
+                 SET STRNOME = ?,
+                     DESCRIZIONE = ?,
+					 CDNUTMOD = ?,
+                     DTMMOD = sysdate,
+                     CODTIPODOMINIO = ?,
+                     NUMKLOCLASSIF = ? +1
+               WHERE PRGCLASSIF = ?"/>
+               
+<STATEMENT name="UpdateClassificazioneAndTemplateAssociati"
+		  query="UPDATE ST_TEMPLATE_STAMPA
+				 SET CODTIPODOMINIO = ?, 
+				 NUMKLOTEMP = NUMKLOTEMP + 1
+				 WHERE PRGCLASSIF = ?" />
+			   
+<STATEMENT name="UpdateOrdinamentoClassificazione" 
+	      query="update ST_TEMPLATE_CLASSIF
+					set ORDINAMENTO = ?,
+					NUMKLOCLASSIF = NUMKLOCLASSIF +1
+				where STRNOME = ? " />
+			   
+<STATEMENT name="VerificaClassificazioneInTemplate"
+		  query="SELECT COUNT(*) as NUM_TEMPLATE
+				 FROM   ST_TEMPLATE_STAMPA
+						inner join ST_TEMPLATE_CLASSIF on ST_TEMPLATE_CLASSIF.PRGCLASSIF = ST_TEMPLATE_STAMPA.PRGCLASSIF
+				 WHERE  ST_TEMPLATE_STAMPA.PRGCLASSIF = ?"/>
+			   
+<STATEMENT name="DeleteLogicClassificazione"
+          query="UPDATE ST_TEMPLATE_CLASSIF
+                 SET DATCANC = sysdate,
+					 CDNUTMOD = ?,
+                     DTMMOD = sysdate,
+                     NUMKLOCLASSIF = ? +1
+               WHERE PRGCLASSIF = ?"/>
+			   
+
+<STATEMENT name="DettaglioClassificazione"
+          query="SELECT ST_TEMPLATE_CLASSIF.PRGCLASSIF,
+						ST_TEMPLATE_CLASSIF.STRNOME,
+						ST_TEMPLATE_CLASSIF.DESCRIZIONE,
+						ST_TEMPLATE_CLASSIF.CDNUTINS,
+						TO_CHAR(ST_TEMPLATE_CLASSIF.DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS,
+                        ST_TEMPLATE_CLASSIF.CDNUTMOD,
+                        TO_CHAR(ST_TEMPLATE_CLASSIF.DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD,
+						ST_TEMPLATE_CLASSIF.NUMKLOCLASSIF,
+						DE_TIPO_DOMINIO_DATI_STAMPA.CODTIPODOMINIO,
+						ST_TEMPLATE_CLASSIF.DATCANC
+				 FROM   ST_TEMPLATE_CLASSIF 
+						inner join DE_TIPO_DOMINIO_DATI_STAMPA on DE_TIPO_DOMINIO_DATI_STAMPA.CODTIPODOMINIO = ST_TEMPLATE_CLASSIF.CODTIPODOMINIO
+				 WHERE  ST_TEMPLATE_CLASSIF.PRGCLASSIF = ?"/>
+				 
+<STATEMENT name="UpdateTemplateWithClassificazione"
+	      query="UPDATE ST_TEMPLATE_STAMPA
+			     SET CDNUTMOD = ?,
+			         DTMMOD = sysdate,
+					 NUMKLOTEMP = ?,
+			         PRGCLASSIF = ?
+			     WHERE PRGTEMPLATESTAMPA = ?" />
+			     
+<STATEMENT name="ESISTE_CLASSIFICAZIONE" 
+          query="SELECT 1
+                 FROM ST_TEMPLATE_CLASSIF
+                 WHERE upper(STRNOME) = upper(?)
+                 AND DATCANC IS NULL"/>
+                 
+<STATEMENT name="ESISTE_CLASSIFICAZIONE_AGGIORNAMENTO" 
+          query="SELECT 1
+                 FROM ST_TEMPLATE_CLASSIF
+                 WHERE upper(STRNOME) = upper(?)
+                 AND DATCANC IS NULL
+                 AND PRGCLASSIF != ?"/>
+                 
+<STATEMENT name="GET_LISTA_ORDINATA_TEMPLATE_CLASSIF" 
+          query="SELECT ST_TEMPLATE_CLASSIF.PRGCLASSIF as CODICE,
+          				ST_TEMPLATE_CLASSIF.STRNOME as DESCRIZIONE,
+          				ST_TEMPLATE_CLASSIF.ORDINAMENTO,
+            			ST_TEMPLATE_CLASSIF.PRGCLASSIF,
+						ST_TEMPLATE_CLASSIF.STRNOME,
+						ST_TEMPLATE_CLASSIF.DESCRIZIONE as STRDESCRIZIONE,
+						ST_TEMPLATE_CLASSIF.CDNUTINS,
+						TO_CHAR(ST_TEMPLATE_CLASSIF.DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS,
+            			ST_TEMPLATE_CLASSIF.CDNUTMOD,
+            			TO_CHAR(ST_TEMPLATE_CLASSIF.DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD,
+						ST_TEMPLATE_CLASSIF.NUMKLOCLASSIF,
+						DE_TIPO_DOMINIO_DATI_STAMPA.CODTIPODOMINIO,
+            			DE_TIPO_DOMINIO_DATI_STAMPA.STRDESCRIZIONE AS DESCDOMINIO
+				 FROM   ST_TEMPLATE_CLASSIF 
+						JOIN DE_TIPO_DOMINIO_DATI_STAMPA ON DE_TIPO_DOMINIO_DATI_STAMPA.CODTIPODOMINIO = ST_TEMPLATE_CLASSIF.CODTIPODOMINIO
+				 WHERE  ST_TEMPLATE_CLASSIF.DATCANC IS NULL
+				 ORDER BY ST_TEMPLATE_CLASSIF.ORDINAMENTO"/>
+				 
+<STATEMENT name="GET_LISTA_ORDINATA_TEMPLATE_CLASSIF_ORD" 
+          query="select st_template_stampa.ordinamento ordinamento,st_template_stampa.strnome         as  STRNOME, 
+st_template_stampa.strnote          as  STRNOTE ,
+de_doc_tipo.STRDESCRIZIONE   as  STRDESCRIZIONE, 
+st_template_stampa.CODTIPODOCUMENTO     as  CODAMBITOTEM, 
+st_template_stampa.CODTIPODOMINIO   as  CODTIPODOMINIO, 
+st_template_stampa.NUMKLOTEMP       as  NUMKLOTEMP, 
+to_char(st_template_stampa.datinizioval, 'dd/MM/yyyy')    as  datinizioval, 
+to_char(st_template_stampa.datfineval, 'dd/MM/yyyy')      as  datfineval, 
+de_doc_tipo.STRDESCRIZIONE  as  DESCCODAMBITOTEM, 
+de_tipo_dominio_dati_stampa.STRDESCRIZIONE  as  DESCDOMINIO, 
+st_template_stampa.PRGTEMPLATESTAMPA as PRGTEMPLATESTAMPA, st_template_stampa.PRGCONFIGPROT as PRGCONFIGPROT ,
+to_char(ST_TEMPLATE_CLASSIF.PRGCLASSIF) as codice_GRUPPO,
+ST_TEMPLATE_CLASSIF.STRNOME as gruppo,
+ST_TEMPLATE_CLASSIF.CODTIPODOMINIO as ordine_gruppo, ST_TEMPLATE_CLASSIF.ORDINAMENTO
+from st_template_stampa 
+JOIN de_doc_tipo ON st_template_stampa.CODTIPODOCUMENTO = de_doc_tipo.CODTIPODOCUMENTO 
+JOIN de_tipo_dominio_dati_stampa ON st_template_stampa.CODTIPODOMINIO = de_tipo_dominio_dati_stampa.CODTIPODOMINIO 
+JOIN ST_TEMPLATE_CLASSIF ON ST_TEMPLATE_CLASSIF.PRGCLASSIF = st_template_stampa.PRGCLASSIF
+LEFT JOIN  am_config_protocollo ON st_template_stampa.prgconfigprot = am_config_protocollo.prgconfigprot
+where nvl(st_template_stampa.flgvisibile, '0') = '1' and st_template_stampa.datcanc is null 
+order by ordine_gruppo DESC, ST_TEMPLATE_CLASSIF.ORDINAMENTO, st_template_stampa.ordinamento"/>
+				 
+<STATEMENT name="GET_LISTA_ORDINATA_CLASSIFICAZIONI_E_TEMPLATE"
+		  query="SELECT classif.PRGCLASSIF, classif.STRNOME as nomeClassif, stampa.PRGTEMPLATESTAMPA, stampa.PRGCONFIGPROT, stampa.STRNOME as nomeStampa,
+                        classif.CODTIPODOMINIO
+				 FROM   ST_TEMPLATE_CLASSIF classif, ST_TEMPLATE_STAMPA stampa
+				 WHERE  stampa.PRGCLASSIF = classif.PRGCLASSIF
+				 AND classif.DATCANC IS NULL
+				ORDER BY classif.CODTIPODOMINIO DESC, classif.ORDINAMENTO, classif.DTMINS"/>
+				
+<STATEMENT name="GET_LISTA_CLASSIFICAZIONI_PER_DOMINIO_DATI"
+          query="SELECT PRGCLASSIF as CODICE, STRNOME as DESCRIZIONE
+				 FROM ST_TEMPLATE_CLASSIF
+				 WHERE DATCANC IS NULL
+				 AND   CODTIPODOMINIO = ?
+				 ORDER BY ORDINAMENTO"/>
+				 
+<STATEMENT name="GET_LISTA_ORDINATA_CLASSIFICAZIONI_E_TEMPLATE_DOMINIO"
+		  query="SELECT classif.PRGCLASSIF, classif.STRNOME as nomeClassif, stampa.PRGTEMPLATESTAMPA, stampa.PRGCONFIGPROT, stampa.STRNOME as nomeStampa,
+                        classif.CODTIPODOMINIO, stampa.PRGTEMPLATESTAMPA as codice, stampa.STRNOME as descrizione, doc_tipo.STRIO as strio, nvl(prot.FLGFIRMAGRAFO,0) as FLGFIRMAGRAFO
+				 FROM   ST_TEMPLATE_CLASSIF classif, ST_TEMPLATE_STAMPA stampa,  de_doc_tipo doc_tipo, am_config_protocollo prot
+				 WHERE  stampa.PRGCLASSIF = classif.PRGCLASSIF
+				 AND stampa.codtipodocumento = doc_tipo.codtipodocumento
+				 and stampa.PRGCONFIGPROT = prot.PRGCONFIGPROT
+				 AND stampa.codTipoDominio = ? and nvl(stampa.flgvisibile, '0') = '1' 
+		         AND stampa.DATFINEVAL &gt;= TRUNC(SYSDATE) and stampa.DATINIZIOVAL &lt;= SYSDATE and stampa.datcanc is null
+				ORDER BY classif.CODTIPODOMINIO DESC, classif.PRGCLASSIF, stampa.ORDINAMENTO, classif.DTMINS"/>
+	
+<STATEMENT name="GET_LISTA_ORDINATA_CLASSIFICAZIONI_E_TEMPLATE_DOMINIO_PAT"
+		  query="SELECT classif.PRGCLASSIF, classif.STRNOME as nomeClassif, stampa.PRGTEMPLATESTAMPA, stampa.PRGCONFIGPROT, stampa.STRNOME as nomeStampa,
+                        classif.CODTIPODOMINIO, stampa.PRGTEMPLATESTAMPA as codice, stampa.STRNOME as descrizione, doc_tipo.STRIO as strio, nvl(prot.FLGFIRMAGRAFO,0) as FLGFIRMAGRAFO
+				 FROM   ST_TEMPLATE_CLASSIF classif, ST_TEMPLATE_STAMPA stampa,  de_doc_tipo doc_tipo, am_config_protocollo prot
+				 WHERE  stampa.PRGCLASSIF = classif.PRGCLASSIF
+				 AND stampa.codtipodocumento = doc_tipo.codtipodocumento
+				 and stampa.PRGCONFIGPROT = prot.PRGCONFIGPROT
+				 AND stampa.codTipoDominio = ? and nvl(stampa.flgvisibile, '0') = '1' and nvl(stampa.FLG_PATRONATO, '0') = '1' 
+				 AND stampa.DATFINEVAL &gt;= TRUNC(SYSDATE) and stampa.DATINIZIOVAL &lt;= SYSDATE and stampa.datcanc is null
+				ORDER BY classif.CODTIPODOMINIO DESC, classif.PRGCLASSIF, stampa.ORDINAMENTO, classif.DTMINS"/>
+				
+<STATEMENT name="GET_LISTA_ORDINATA_CLASSIFICAZIONI_E_TEMPLATE_DOMINIO_NO_CM"
+		  query="SELECT classif.PRGCLASSIF, classif.STRNOME as nomeClassif, stampa.PRGTEMPLATESTAMPA, stampa.PRGCONFIGPROT, stampa.STRNOME as nomeStampa,
+                        classif.CODTIPODOMINIO, stampa.PRGTEMPLATESTAMPA as codice, stampa.STRNOME as descrizione, doc_tipo.STRIO as strio, nvl(prot.FLGFIRMAGRAFO,0) as FLGFIRMAGRAFO
+				 FROM   ST_TEMPLATE_CLASSIF classif, ST_TEMPLATE_STAMPA stampa,  de_doc_tipo doc_tipo, am_config_protocollo prot
+				 WHERE  stampa.PRGCLASSIF = classif.PRGCLASSIF
+				 AND stampa.codtipodocumento = doc_tipo.codtipodocumento
+				 and stampa.PRGCONFIGPROT = prot.PRGCONFIGPROT
+				 AND stampa.codTipoDominio = ? and nvl(stampa.flgvisibile, '0') = '1' and nvl(stampa.FLG_CM, '0') = '0' 
+		              AND stampa.DATFINEVAL &gt;= TRUNC(SYSDATE) and stampa.DATINIZIOVAL &lt;= SYSDATE and stampa.datcanc is null
+				ORDER BY classif.CODTIPODOMINIO DESC, classif.PRGCLASSIF, stampa.ORDINAMENTO, classif.DTMINS"/>		

@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components" template="../../../template/main_primefaces.xhtml">
+	<ui:define name="content">
+		<div class="widget_container">
+			<h1>Compila una checklist</h1>
+			<div class="ui-widget-content ui-widget ui-corner-all">
+				<h:form id="checklistForm">
+					<ui:include src="../../../_common/convenzioni_quadro/_checklist.xhtml" />
+
+					<div>
+						<p:commandButton value="Valida" rendered="#{fbChecklistFormBean.isValidaAvailable()}" update="@form"
+							oncomplete="PF('checklistValidataDialogWV').show();" />
+						<p:commandButton value="Revoca" update="@form" oncomplete="PF('checklistRevocaWV').show();" rendered="#{fbChecklistFormBean.isRevocable()}" styleClass="margin-1em"/>
+						<p:button outcome="checklist_list" styleClass="margin-1em" title="Torna alle checklist"
+							value="Torna alle checklist" />
+					</div>
+				</h:form>
+			</div>
+
+			<script>
+		
+              function onValidation(args){
+                 if(args.success){
+                    PF('checklistValidataDialogWV').hide();
+                    PF('successDialogWV').show();
+                  }
+               if(!args.success)   
+                 {
+                   PF('checklistValidataDialogWV').hide();
+                   PF('failDialogWV').show();
+                }
+              }
+               function onRevocaComplet(args){
+       			if (args.success) {
+       				PF('checklistRevocaWV').hide();
+       				PF('revocaSuccessDialogWV').show();
+       			}
+       		}  
+  
+	</script>
+		</div>
+		<p:button outcome="home" styleClass="margin-1em" title="Torna alla scrivania" value="Torna alla scrivania" />
+		<p:dialog id="checklistValidataDialog" widgetVar="checklistValidataDialogWV" modal="true" header="Valida Checklist"
+			width="400"><br/>
+			<p>Dopo la validazione l'Azienda Ospitante potrà pubblicare le proprie Schede Fabbisogno. <br/>Confermare la
+					validazione?</p>
+			<div class="text-center" style="padding: 10px;">				
+				<p:commandButton value="Conferma" title="Conferma" oncomplete="onValidation(args)"
+					actionListener="#{fbChecklistFormBean.valida}" update=":checklistForm"/>
+			    <p:commandButton value="Annulla" title="Annulla" onclick="PF('checklistValidataDialogWV').hide();"/>		
+			</div>
+		</p:dialog>
+
+		<p:dialog id="successDialog" widgetVar="successDialogWV" modal="true" width="400" header="Checklist Valida"><br/>
+			<p>Checklist validata correttamente </p>
+			
+			<div class="text-center" style="padding: 10px;">
+				<p:commandButton value="Ok" onclick="PF('successDialogWV').hide();" />
+			</div>
+		</p:dialog>
+		<p:dialog id="failDialog" widgetVar="failDialogWV" modal="true" width="400" header="Checklist non valida">
+			<p>Errore durante la validazione della Checklist. Contattare l'amministratore di sistema </p>
+			<p:commandButton value="Ok" onclick="PF('failDialogWV').hide();" />
+		</p:dialog>
+
+		<p:dialog id="checklistRevoca" widgetVar="checklistRevocaWV" modal="true" header="Revoca Checklist" width="400">
+			<h:form id="motivoRevoca">
+				<p>Confermi la revoca della checklist? </p>
+				<p:inputTextarea id="revocaInput" required="true" requiredMessage="Il motivo della revoca è obbligatorio" rows="4"
+					maxlength="1000" value="#{fbChecklistFormBean.checklist.motivoRevoca}">
+					<p:ajax event="blur" update="revocaMessage" />
+				</p:inputTextarea>
+				<p:message for="revocaInput" id="revocaMessage" />
+				<div class="text-center" style="padding: 10px;">
+					<p:commandButton value="Conferma revoca" id="confirmRevocaButton" title="Conferma revoca" styleClass="margin-1em"
+						process="@form :checklistForm" update="@form :checklistForm" oncomplete="onRevocaComplet(args)" actionListener="#{fbChecklistFormBean.revoca}"/>
+				  <p:commandButton value="Annulla" title="Annulla" onclick="PF('checklistRevocaWV').hide();"/>
+				</div>
+			</h:form>
+		</p:dialog>
+		<p:dialog id="revocaSuccessDialog" widgetVar="revocaSuccessDialogWV" modal="true" width="400" header="Revoca eseguita"><br/>
+		 <p>Checklist revocata corretamente</p>
+		 <div class="text-center" style="padding: 10px;">
+		  <p:commandButton value="Ok" onclick="PF('revocaSuccessDialogWV').hide();"/>
+		 </div>
+		</p:dialog>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,93 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:pretty="http://ocpsoft.com/prettyfaces"
+	template="/templates/#{godfatherBean.theme}/main.xhtml">
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{sessionLogger.grantAccessFor(sessionLogger.getProvinciaAccess())}" />
+	</f:metadata>
+	<ui:param name="pagetitle" value="Profile" />
+	<ui:define name="content">
+		<div class="container-fluid">
+
+			<h:form id="profileEditForm" enctype="multipart/form-data" styleClass="form-horizontal">
+				<div class="well text-center" data-uk-sticky="{top:0}">
+
+					<p:commandLink id="modificaBtn" actionListener="#{provEditAz.sync}" styleClass="btn btn-primary action-link" update="@form"
+						global="false" onstart="onActionStart()" oncomplete="onActionComplete()">
+						<i class="fa fa-pencil uk-margin-small-right"></i> #{ui['shared.modifica']}
+					</p:commandLink>					
+					<ui:fragment rendered="#{provEditAz.canRifiutaRettifica}">
+						<p:commandLink id="copiaNuoviDatiBtn" actionListener="#{provEditAz.copyData}" styleClass="btn btn-primary uk-margin-left action-link"
+							update="masterGroup" global="false" onstart="onActionStart()" oncomplete="onActionComplete()" rendered="#{provEditAz.isRettifica}">
+							<i class="fa fa-files-o uk-margin-small-right"></i> #{ui['prof.copiaNuoviDati']}
+						</p:commandLink>
+						<p:commandLink id="rifiutaRettificaBtn" actionListener="#{provEditAz.cancelUpdate}"
+							styleClass="btn btn-primary uk-margin-left action-link" update="@form" global="false" onstart="onActionStart()"
+							oncomplete="onActionComplete()" rendered="#{provEditAz.isRettifica}">
+							<i class="fa fa-times uk-margin-small-right"></i> #{ui['prof.rifiutaRettifica']}
+						</p:commandLink>
+					</ui:fragment>
+
+					<h:graphicImage styleClass="action-loader" library="#{godfatherBean.theme}" name="images/loader.gif" alt="loader" style="display: none" />
+				</div>
+				<h:panelGroup id="masterGroup">
+					<div class="panel-body profile-information">
+						<div class="col-md-2">
+							<div class="profile-pic text-center">
+								<h:panelGroup id="userProfilePic">
+									<h:panelGroup rendered="#{empty provEditAz.aziendaInfo.logo}">
+										<h:graphicImage library="commons" name="images/profilePic.jpg"></h:graphicImage>
+									</h:panelGroup>
+									<h:panelGroup rendered="#{not empty provEditAz.aziendaInfo.logo}">
+										<pretty:urlbuffer var="imgURL" mappingId="profilePicture">
+											<f:param id="type" value="azienda" />
+											<f:param id="id" value="#{provEditAz.aziendaInfo.pfPrincipal.idPfPrincipal}" />
+											<f:param id="username" value="#{provEditAz.aziendaInfo.pfPrincipal.username}" />
+										</pretty:urlbuffer>
+										<img src="#{imgURL}?#{utils.currentTimeMillis()}" />
+									</h:panelGroup>
+								</h:panelGroup>
+
+							</div>
+						</div>
+
+
+
+						<div class="col-md-5">
+							<div class="panel panel-warning">
+								<div class="panel-heading">#{ui['prof.datiAzienda']}</div>
+								<div class="panel-body">
+									<ui:include src="editAzienda/_datiAzienda.xhtml" />
+								</div>
+							</div>
+						</div>
+						<div class="col-md-5">
+							<div class="panel panel-warning">
+								<div class="panel-heading">#{ui['prof.datiAccount']}</div>
+								<div class="panel-body">
+									<ui:include src="editAzienda/_datiAccount.xhtml" />
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="panel-body ricSare">
+						<h:panelGroup>
+							<ui:include src="editAzienda/_ricSARE.xhtml" />
+						</h:panelGroup>
+					</div>
+				</h:panelGroup>
+			</h:form>
+			<script>
+				function onActionStart() {
+					$('.action-link').hide();
+					$('.action-loader').show();
+				}
+
+				function onActionComplete() {
+					$('.action-link').show();
+					$('.action-loader').hide();
+				}
+			</script>
+		</div>
+	</ui:define>
+</ui:composition>
+

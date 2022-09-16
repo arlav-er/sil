@@ -1,0 +1,112 @@
+<STATEMENT name ="GET_CPI_CODICI_DESCRIZIONE"
+		   query="select distinct de_cpi.codcpi as codice,
+                      de_cpi.strDescrizione || ' - ' || de_cpi.codcpi as descrizione
+                 from de_cpi, de_comune, de_provincia
+                 where de_cpi.codcpi = de_comune.codcpi
+                   and de_comune.codprovincia = de_provincia.codprovincia
+                   and de_provincia.codregione = (select de_provincia.CODREGIONE 
+                              from de_provincia 
+                           inner join ts_generale on (de_provincia.codprovincia = ts_generale.CODPROVINCIASIL))
+                 order by descrizione"  />     
+                 
+  <STATEMENT name ="GET_SUB_TOTALI_BUDGET_ORIG"
+		   query=" select 
+		   
+		   				 sum(DECTOTBUDGET)  Totbudget ,                                                                 
+				         sum(DECTOTIMPEGNATO) impegnato,                           
+				         sum( DECTOTSPESO)    speso ,   
+				         sum( DECTOTRESIDUO)  residuo   
+				 from VCH_BUDGET_CPI CPI_BDG
+				 inner join de_cpi cpi
+				   on CPI_BDG.CODCPI=cpi.codcpi
+				 WHERE 1=1"  />    
+				 
+  <STATEMENT name ="GET_SUB_TOTALI_BUDGET"
+		   query="select 
+		   			'' codcpi,
+		   			'' STRDESCRIZIONE,
+		   			'TOTALI' NUMANNOBUDGET,
+		   			case 
+					when  sum(DECTOTBUDGET) = 0 then '0.00' 
+				    else trim(to_char( sum(DECTOTBUDGET), '9999999.99')) 
+				 end Totbudget,
+		   case 
+					when  sum(DECTOTIMPEGNATO) = 0 then '0.00' 
+				    else trim(to_char( sum(DECTOTIMPEGNATO), '9999999.99')) 
+				 end impegnato,
+          case 
+					when  sum(DECTOTSPESO) = 0 then '0.00' 
+				    else trim(to_char( sum(DECTOTSPESO), '9999999.99')) 
+				 end speso,
+         case 
+					when  sum(DECTOTRESIDUO) = 0 then '0.00' 
+				    else trim(to_char( sum(DECTOTRESIDUO), '9999999.99')) 
+				 end residuo
+				 from VCH_BUDGET_CPI CPI_BDG
+				 inner join de_cpi cpi
+				   on CPI_BDG.CODCPI=cpi.codcpi
+				 WHERE 1=1"  />  
+				 
+  <STATEMENT name ="GET_SUB_TOTALI_BUDGET_CPI"
+		   query="select    
+					case       when  sum(DECTOTBUDGET) = 0 then '0.00'    
+					else trim(to_char( sum(DECTOTBUDGET), '9999999.99'))  end totBudgetCpi,     
+					case       when  sum(DECTOTIMPEGNATO) = 0 then '0.00'   
+					else trim(to_char( sum(DECTOTIMPEGNATO), '9999999.99'))   end impegnatoCpi,      
+					case       when  sum(DECTOTSPESO) = 0 then '0.00'        
+					else trim(to_char( sum(DECTOTSPESO), '9999999.99'))   end spesoCpi,     
+					case       when  sum(DECTOTRESIDUO) = 0 then '0.00'        
+					else trim(to_char( sum(DECTOTRESIDUO), '9999999.99'))     
+					end residuoCpi   
+					from VCH_BUDGET_CPI CPI_BDG     
+					inner join de_cpi cpi     
+					on CPI_BDG.CODCPI=cpi.codcpi 
+					WHERE  cpi.codcpi=? and CPI_BDG.NUMANNOBUDGET = ?"  
+	/>
+
+  <STATEMENT name ="STORED_ATTIVA_BUDGET"
+		   query="{ call  PG_GESTIONE_VOUCHER.attivaBudgetCPI(?,?,?,?,?,?) }"  />
+		   
+ <STATEMENT name="STORED_OPERAZIONE_BUDGET_CPI"  
+ 			query="{ call PG_GESTIONE_VOUCHER.operazioneBudgetCPI(?,?,?,?,?,?,?,?,?) }" />
+		   
+<STATEMENT name ="GET_TIPO_OPERAZIONE"
+		   query="select codoperazione as codice , strdescrizione as descrizione  from de_vch_operazione"  />    
+		   
+	
+		   
+<STATEMENT name ="TEST_GET_CPI_CODICI_DESCRIZIONE"
+		   query="select distinct de_cpi.codcpi as codice,
+                      de_cpi.strDescrizione || ' - ' || de_cpi.codcpi as descrizione
+                 from de_cpi, de_comune, de_provincia
+                 where de_cpi.codcpi = de_comune.codcpi
+                   and de_comune.codprovincia = de_provincia.codprovincia
+                   and de_provincia.codregione = (select de_provincia.CODREGIONE 
+                              from de_provincia 
+                           inner join ts_generale on (de_provincia.codprovincia = ts_generale.CODPROVINCIASIL))
+                 order by descrizione"  />   
+                 
+ <STATEMENT name="GET_COMUNI_CODICE_DESCRIZIONE_PER_VOUCHER"
+			query="SELECT distinct c.codcom  codice , c.strdenominazione  descrizione  
+						FROM de_comune c
+              		 	INNER JOIN de_provincia p ON c.codprovincia=p.codprovincia
+              	 		where SYSDATE &gt;= c.datinizioval
+              			 and SYSDATE &lt;= c.datfineval 
+              			 order by descrizione"   />     
+   
+  <STATEMENT name="GET_MISURE_AZIONE"
+		   query="select prgazioni as codice, strdescrizione  descrizione  from de_azione "  
+		   />                 
+ 
+  <STATEMENT name="STORED_OPERAZIONE_INSERT_ACCREDITAMENTO"  
+ 			query="{ call PG_GESTIONE_VOUCHER.insertAccreditamento(?,?,?,?,?,?,?,?) }" />
+ 			
+ <STATEMENT name="STORED_OPERAZIONE_UPDATE_ENTE_ACCREDITAMENTO"  
+ 			query="{ call PG_GESTIONE_VOUCHER.UpdateEnte(?,?,?,?,?,?,?,?,?) }" />
+ 			
+  <STATEMENT name="STORED_OPERAZIONE_DELETE_ENTE_ACCREDITAMENTO"  
+ 			query="{ call PG_GESTIONE_VOUCHER.deleteAccreditamento(?,?,?) }" />
+ 
+  <STATEMENT name="STORED_OPERAZIONE_INSERT_ENTE_ACCREDITAMENTO"  
+ 			query="{ call PG_GESTIONE_VOUCHER.InsertEnte(?,?,?,?,?,?,?,?,?) }" />
+ 

@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui"
+	xmlns:pretty="http://ocpsoft.com/prettyfaces">
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{sessionLogger.grantAccessFor(sessionLogger.getUtenteAccess())}" />
+	</f:metadata>
+	<h:outputStylesheet library="commons" name="css/gamification/flickity.min.css" />
+	<h:outputStylesheet library="commons" name="css/gamification/style.css" />
+	<h:outputScript library="commons" name="js/gamification/flickity.pkgd.min.js" />
+	<h:outputScript library="commons" name="js/gamification/jquery.easy-pie-chart.js" />
+	<h:outputScript library="commons" name="js/gamification/jquery.waypoints.min.js" />
+	<h:outputScript library="commons" name="js/gamification/jquery.counterup.min.js" />
+	<h:outputScript library="commons" name="js/gamification/bootstrap-progressbar.min.js" />
+	<h:outputScript library="commons" name="js/gamification/mixitup.min.js" />
+	<h:outputScript library="commons" name="js/gamification/gamification.js" />
+
+	<h:form>
+		<p:remoteCommand name="prepareBadgesRC" actionListener="#{badgesBean.prepareBadges}" process="@this"
+			oncomplete="Gamification.prepareBadgesComplete(args)"
+			update=":availableBadgesGroup :badgeCountersGroup :badgeCarouselGroup :percentageGroup" async="true"></p:remoteCommand>
+		<p:remoteCommand name="preparePercorsiRC" actionListener="#{badgesBean.preparePercorsi}" process="@this"
+			oncomplete="Gamification.preparePercorsiComplete(args)" update=":percorsiGroup" async="true"
+			onstart="Gamification.prepareBadgesStart()"></p:remoteCommand>
+	</h:form>
+
+	<div class="container-fluid">
+		<div class="panel-body profile-information animated fadeIn">
+			<div class="row">
+				<div class="col-xs-2">
+					<ui:include src="badges/_leftBar.xhtml" />
+				</div>
+				<div class="col-md-10">
+					<ul class="nav nav-tabs text-center">
+						<li class="active">
+							<a data-toggle="tab" href="#badge">Riconoscimenti</a>
+						</li>
+						<li>
+							<a data-toggle="tab" href="#percorsi">Percorsi</a>
+						</li>
+					</ul>
+
+					<div class="tab-content">
+						<div id="badge" class="tab-pane fade in active">
+							<ui:include src="badges/_carousel.xhtml" />
+
+							<ui:include src="badges/_counters.xhtml" />
+
+							<ui:include src="badges/_availableBadges.xhtml" />
+						</div>
+
+						<div id="percorsi" class="tab-pane fade">
+							<ui:include src="badges/_percorsi.xhtml" />
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<ui:include src="badges/_viewBadge.xhtml" />
+
+</ui:composition>

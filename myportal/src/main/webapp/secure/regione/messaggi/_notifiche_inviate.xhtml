@@ -1,0 +1,179 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+		
+	<h:form id="form_notifiche_inviate">
+		<h:outputText value="Non è stata inviata alcuna notifica"
+			rendered="#{empty notificheInviateBean.list}" />
+		<h:dataTable id="elenco_notifiche_inviate"
+			rendered="#{not empty notificheInviateBean.list}"
+			columnClasses="notSortable,customcenter,customcenter, customcenter"
+			value="#{notificheInviateBean.list}" var="element">
+			
+			<h:column >
+				<h:commandLink id="view" immediate="true" class="myClass"
+					action="#{notificheInviateBean.view}">
+					<span class="ui-icon #{element.letto ? 'ui-icon-mail-open' : 'ui-icon-mail-closed'} fix_icon"></span>
+					<f:param name="id" value="#{element.id}"></f:param>
+					<f:ajax execute="@this" render=":form_notifiche_inviate:notifichePanel" onevent="viewCallback"></f:ajax>
+				</h:commandLink>
+			</h:column>
+			
+			<h:column>
+				<f:facet name="header">
+					Destinatario
+				</f:facet>
+				<h:outputText value="#{element.destinatario}" styleClass="#{element.letto ? '' : 'boldText'}"></h:outputText>
+			</h:column>
+			
+			<h:column>
+				<f:facet name="header">
+							Oggetto
+						</f:facet>
+				<h:outputText value="#{element.oggetto}" styleClass="#{element.letto ? '' : 'boldText'}"></h:outputText>
+			</h:column>
+			
+			<h:column>
+				<f:facet name="header">
+							Data
+						</f:facet>
+				<h:outputText value="#{element.dtmIns}" styleClass="#{element.letto ? '' : 'boldText'}">
+					<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+				</h:outputText>
+			</h:column>
+		</h:dataTable>
+		<br />
+		
+		<h:commandLink styleClass="newAlertButton"
+			value="Invia una nuova notifica"
+			rendered="#{not notificheInviateBean.showPanel}"
+			action="#{notificheInviateBean.showInsertPanel}">
+			<f:ajax execute="@this" render="@form" onevent="viewCallback"></f:ajax>
+		</h:commandLink>
+		<br />
+		
+		<h:panelGroup id="notifichePanel" styleClass="insertPanel" layout="block" >							
+				<h:panelGroup id="notificheInnerPanel" style="display:none" layout="block" rendered="#{notificheInviateBean.showPanel}">
+					<h:panelGrid id="view_form" columns="2" cellspacing="10" >
+					<p class="hiddenStructure">
+						<a id="contenutoMessaggio" href="#contenutoMessaggio"></a>
+					</p>					
+						<cc:inputText value="#{notificheInviateBean.data.oggetto}" label="Oggetto" editingMode="#{notificheInviateBean.editing}" maxlength="250"/>
+						<cc:inputText type="date" value="#{notificheInviateBean.data.dtmIns}" label="Data invio" editingMode="false"/>
+						<cc:selectOneMenu						
+							id="destinatari"
+							editingMode="#{notificheInviateBean.editing}"
+							label="Destinatari"						
+							value="#{notificheInviateBean.data.provinciaTo.id}" 
+							valueDescription="#{notificheInviateBean.data.provinciaTo.descrizione}">
+							<f:selectItems value="#{notificheInviateBean.destinatari}"/>
+						</cc:selectOneMenu>
+						<h:panelGroup/>
+						<cc:inputTextarea style="width:81%" maxlength="1000"
+							label="Testo della notifica" richTextMode="false"
+							value="#{notificheInviateBean.data.corpo}" 
+							editingMode="#{notificheInviateBean.editing}"/>
+					</h:panelGrid>
+					
+					<h:panelGroup id="buttons">
+						<h:commandLink styleClass="marginButton commentButton"
+							action="#{notificheInviateBean.save}" value="Invia notifica"
+							rendered="#{notificheInviateBean.editing}">
+							<f:ajax execute="@form" render="@form" onevent="saveMessageCallback"></f:ajax>
+						</h:commandLink>
+						<h:commandLink styleClass="marginButton closeButton #{notificheInviateBean.editing ? 'secondButton' : ''}"
+							action="#{notificheInviateBean.dontedit}" value="Chiudi" immediate="true"
+							id="closeButton" onclick="return hidePanel();">
+							<f:ajax render="@form" onevent="disegnaBottoni"></f:ajax>
+						</h:commandLink>
+					</h:panelGroup>
+				</h:panelGroup>
+			</h:panelGroup>
+		
+		<script type="text/javascript">
+		/* <![CDATA[ */
+			myFocusIn = function() {
+				$(this).parent().parent().addClass("ui-state-hover");
+			}
+
+			myFocusOut = function() {
+				$(this).parent().parent().removeClass("ui-state-hover");
+			}
+
+			$('.myClass').focusin(myFocusIn);
+			$('.myClass').focusout(myFocusOut);
+			
+			function saveMessageCallback(data) {
+				if (data.status == 'success') {
+					disegnaBottoni();
+					$('[id$=ticketInnerPanel]').show();
+				}
+			}
+		
+			function hidePanel() {				
+				return true;
+			}
+
+			function viewCallback(data) {
+				if (data.status == 'success') {
+					disegnaBottoni();
+					showPanel('notificheInnerPanel');
+					$('#contenutoMessaggio').focus();
+				}
+			}
+
+			var justClicked = false;
+			var drawornot = {};	//devo disegnare?
+			function drawCallback(options) {
+				if (drawornot[options["_iDisplayStart"]]) return;	//se ho già disegnato non farlo più
+				drawornot[options["_iDisplayStart"]] = true				
+				var righe = $(jq('form_notifiche_inviate:elenco_notifiche_inviate' + " tr"));
+				righe.css('cursor','pointer');
+				righe.click(function(e) {	
+					if (justClicked) {
+						justClicked = false;
+						e.preventDefault();
+						return false;
+					}
+					justClicked = true;					
+					$('[id$=view]',this).click();
+										
+				});
+				
+				righe.mouseover(function() {					
+					$(this).addClass('ui-state-hover');
+				});
+
+				righe.mouseout(function() {
+					$(this).removeClass('ui-state-hover');
+				});
+			}
+
+			$(function() {			
+				generateDataTable(jq('form_notifiche_inviate:elenco_notifiche_inviate'),{'bPaginate' : true, 
+																		'bFilter' : true,
+																		'bStateSave': false, 
+																        'iDisplayStart': 0,
+																		'bInfo' : true, 
+																		'oLanguage': {
+																				'sInfo': 'Messaggi da _START_ a _END_ di _TOTAL_'
+																		 },
+																		 'aoColumns': [   null,
+																			              null,
+																			              null,
+																			              { 'sType': 'uk_date' }
+																			          ],
+																		 'fnDrawCallback': drawCallback
+			    });		
+				
+				disegnaBottoni();		
+			});	
+		/*]]>*/ 
+		</script>
+		
+		<cc:messages />
+	</h:form>
+</ui:composition>

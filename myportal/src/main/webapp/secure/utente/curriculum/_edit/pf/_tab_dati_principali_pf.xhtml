@@ -1,0 +1,292 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui">
+
+	<h:form id="datiPrincipaliForm" styleClass="form-horizontal" enctype="multipart/form-data">
+		<h4>Dati Principali</h4>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<p:outputLabel for="descrizione" value="Nome CV" styleClass="col-sm-4 control-label" />
+					<div class="col-md-8">
+						<p:inputText id="descrizione" maxlength="100" required="true" requiredMessage="Il nome del cv e' obbligatorio"
+							value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.descrizione}" styleClass="form-control">
+							<f:validateLength for="function" maximum="100" />
+						</p:inputText>
+						<p:message for="descrizione" />
+					</div>
+				</div>
+			</div>
+			<ui:remove>
+				<ui:fragment rendered="#{curriculumVitaePfBean.usaDecodificheSil()}">
+					<div class="col-md-12">
+						<div class="form-group">
+							<p:outputLabel for="titolo" value="Titolo" styleClass="col-sm-4 control-label" />
+							<div class="col-md-8">
+								<p:inputText id="titolo" maxlength="100" required="true" requiredMessage="Campo obbligatorio."
+									value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.titolo}" styleClass="form-control">
+									<f:validateLength for="function" maximum="100" />
+								</p:inputText>
+								<div class="helpPanelToggleButton" style="display: inline-block"
+									title="Il titolo inserito sarà visualizzato dalle aziende, si consiglia di non usare dati personali" />
+								<p:message for="titolo" />
+							</div>
+						</div>
+					</div>
+				</ui:fragment>
+			</ui:remove>
+			<div class="col-md-12">
+				<hr />
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<p:outputLabel value="Data di nascita" for="dataNascita" styleClass="col-sm-4 control-label" />
+					<div class="col-md-8">
+						<p:calendar id="dataNascita" pattern="dd/MM/yyyy" required="true"
+							requiredMessage="La data di nascita e' obbligatoria."
+							value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.dtNascita}" styleClass="form-control">
+							<f:validator validatorId="dateNotFutureValidator" for="function" />
+						</p:calendar>
+						<p:message for="dataNascita" />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<p:outputLabel for="codiceFiscale" value="Codice fiscale" styleClass="col-sm-4 control-label" />
+					<div class="col-md-8">
+						<p:inputText id="codiceFiscale" maxlength="16" required="true" requiredMessage="Il codice fiscale e' obbligatorio"
+							value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.codiceFiscale}"
+							styleClass="form-control">
+							<f:validator validatorId="codiceFiscaleValidator" />
+						</p:inputText>
+						<p:message for="codiceFiscale" />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<p:outputLabel for="comuneDiNascita" value="Comune o stato di nascita" styleClass="col-sm-4 control-label" />
+					<div class="col-md-8">
+						<p:autoComplete id="comuneDiNascita" converter="deComuneConverter" forceSelection="true"
+							completeMethod="#{curriculumVitaePfBean.autoCompleteBean.completeComune}" itemLabel="#{comuneVar.denominazione}"
+							itemValue="#{comuneVar}" filter="true" filterMatchMode="contains" required="true"
+							requiredMessage="Il comune di nascita e' obbligatorio"
+							value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.comuneNascita}" var="comuneVar"
+							styleClass="form-control">
+						</p:autoComplete>
+						<p:message for="comuneDiNascita" />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<p:outputLabel for="comuneDomicilio" value="Comune di domicilio" styleClass="col-sm-4 control-label" />
+					<div class="col-md-8">
+						<p:autoComplete id="comuneDomicilio" converter="deComuneConverter" forceSelection="true"
+							completeMethod="#{curriculumVitaePfBean.autoCompleteBean.completeComune}" itemLabel="#{comuneVar.denominazione}"
+							itemValue="#{comuneVar}" filter="true" filterMatchMode="contains" required="true"
+							requiredMessage="Il comune di domicilio e' obbligatorio"
+							value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.comuneDomicilio}" var="comuneVar"
+							styleClass="form-control">
+						</p:autoComplete>
+						<p:message for="comuneDomicilio" />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<p:outputLabel for="indirizzoDomicilio" value="Indirizzo di domicilio" styleClass="col-sm-4 control-label" />
+					<div class="col-md-8">
+						<p:inputText id="indirizzoDomicilio" maxlength="512" required="true"
+							requiredMessage="L'indirizzo di domicilio e' obbligatorio"
+							value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.indirizzoDomicilio}"
+							styleClass="form-control">
+							<f:validateLength for="function" maximum="512" />
+						</p:inputText>
+						<p:message for="indirizzoDomicilio" />
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<legend>Contatti e social</legend>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<p:outputLabel for="email" value="E-mail" styleClass="col-sm-4 control-label" />
+					<div class="col-md-8">
+						<p:inputText id="email" maxlength="255" required="true" requiredMessage="L'indirizzo Email e' obbligatorio"
+							value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.email}" styleClass="form-control">
+							<f:validator validatorId="emailEnhancedValidator" for="email" />
+						</p:inputText>
+						<p:message for="email" />
+					</div>
+				</div>
+			</div>
+			<ui:remove>
+				<div class="col-md-12">
+					<div class="form-group">
+						<p:outputLabel for="telefono" value="Telefono" styleClass="col-sm-4 control-label" />
+						<div class="col-md-8">
+							<p:inputText id="telefono" maxlength="15" required="true"
+								requiredMessage="Il Telefono principale e' obbligatorio"
+								value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.tel1}" styleClass="form-control">
+								<f:validator validatorId="numeroTelefonicoValidator" for="telefono" />
+								<f:validateLength for="function" maximum="15" />
+							</p:inputText>
+							<p:message for="telefono" />
+						</div>
+					</div>
+				</div>
+			</ui:remove>
+			<div class="col-md-12">
+				<div class="form-group">
+					<p:outputLabel for="cellulare" value="Cellulare" styleClass="col-sm-4 control-label" />
+					<div class="col-md-8">
+						<p:inputText id="cellulare" maxlength="15" required="true" requiredMessage="Il cellulare e' obbligatorio"
+							value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.tel2}" styleClass="form-control">
+							<f:validator validatorId="numeroTelefonicoValidator" for="cellulare" />
+							<f:validateLength for="function" maximum="15" />
+						</p:inputText>
+						<p:message for="cellulare" />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<p:outputLabel for="skype" value="Skype/Messaggistica Istantanea" styleClass="col-sm-4 control-label" />
+					<div class="col-md-8">
+						<p:inputText id="skype" maxlength="150"
+							value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.riferimentiMessaggistica}"
+							styleClass="form-control">
+						</p:inputText>
+						<p:message for="skype" />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<p:outputLabel for="LinkedIn" value="LinkedIn/Sito Web" styleClass="col-sm-4 control-label" />
+					<div class="col-md-8">
+						<p:inputText id="LinkedIn" maxlength="150"
+							value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.indirizzoProfilo}"
+							styleClass="form-control">
+						</p:inputText>
+						<p:message for="LinkedIn" />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<legend>Allegati e visibilita</legend>
+			</div>
+			<ui:remove>
+				<ui:fragment rendered="#{curriculumVitaePfBean.usaDecodificheSil()}">
+					<div class="col-md-12">
+						<div class="form-group">
+							<p:outputLabel for="descrizioneCv" value="Descrizione" styleClass="col-sm-4 control-label" />
+							<div class="col-md-8">
+								<p:inputTextarea id="descrizioneCv" maxlength="4000"
+									value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.descrizioneCv}"
+									styleClass="form-control">
+									<f:validateLength for="function" maximum="4000" />
+								</p:inputTextarea>
+								<p:message for="descrizioneCv" />
+							</div>
+						</div>
+					</div>
+				</ui:fragment>
+			</ui:remove>
+
+			<div class="col-md-12">
+				<div class="form-group">
+					<p:outputLabel for="allegato" value="Allegato" styleClass="col-sm-4 control-label" />
+					<h:panelGroup id="uploadedFileGroup">
+						<ui:fragment rendered="#{empty curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvAllegato}">
+							<p:fileUpload id="allegato" value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.file}" auto="true"
+								fileUploadListener="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.handleFileUpload}" fileLimit="1"
+								multiple="false" update="uploadedFileGroup" sizeLimit="#{ui['file.sizeUpload']}" process="@this"
+								invalidSizeMessage="Allegare un file con dimenzione massima di 5Mb."
+								allowTypes="/(\.|\/)(pdf|doc|docx|jpe?g|png)$/" widgetVar="allegoFileUploadWV"
+								fileLimitMessage="E' possibile allegare un solo file"
+								invalidFileMessage="Formati accettati: pfd, jpg, doc, docx" label="Inserisci un allegato"
+								styleClass="datiPrinAllegato" />
+						</ui:fragment>
+						<p:message for="allegato" id="allegaFileUploadMessages" />
+						<h:panelGrid id="uploadedFile">
+							<h:panelGrid rendered="#{not empty curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvAllegato}" columns="3">
+								<h:outputText value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvAllegato.filename}" />
+								<p:commandLink process="@this" actionListener="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.deleteFile()}"
+									update="uploadedFileGroup">
+									<i class="fa fa-times remove-allegato"></i>
+								</p:commandLink>
+								<ui:fragment rendered="#{not empty curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.dtmIns}">
+									<p:commandLink ajax="false">
+										<i class="fa fa-download download-allegato" aria-hidden="true"></i>
+										<p:fileDownload value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.downloadAllegatoFile()}" />
+									</p:commandLink>
+								</ui:fragment>
+							</h:panelGrid>
+						</h:panelGrid>
+					</h:panelGroup>
+				</div>
+			</div>
+
+			<ui:fragment>
+				<div class="form-group">
+
+					<div class="col-md-12">
+						<p:outputLabel for="visibileAziende" value="Rendi visibile CV alle aziende" styleClass="col-sm-4 control-label">
+							<i class="m-l-10 fa fa-info-circle info-circile"
+								title="Selezionando questo campo renderai pubblico il tuo CV e le aziende potranno ricercarlo e visionarlo liberamente. Se decidi invece di non selezionarlo potrai utilizzare il CV solo per candidarti a specifiche offerte di lavoro."
+								data-toggle="tooltip" data-placement="top" data-container="body"></i>
+						</p:outputLabel>
+
+						<div class="col-md-8">
+							<p:selectBooleanCheckbox value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.ricercabile}"
+								rendered="true" id="visibileAziende">
+							</p:selectBooleanCheckbox>
+
+						</div>
+					</div>
+				</div>
+			</ui:fragment>
+
+			<div class="col-md-12">
+				<legend>Trattamento dati personali</legend>
+			</div>
+			<div class="col-md-12">
+				<div class="form-group">
+					<p:outputLabel for="trattamentoDati" value="Trattamento dati personali" styleClass="col-sm-4 control-label" />
+					<div class="col-md-8">
+						<p:selectBooleanCheckbox id="trattamentoDati" required="true" styleClass="form-control"
+							value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.flagTrattamentoDati}">
+							<f:validator validatorId="checkBoxRequiredValidator" for="function" />
+						</p:selectBooleanCheckbox>
+
+						<p:message id="trattamentoDatiMessage" for="trattamentoDati" />
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<h:panelGroup layout="block" styleClass="well text-right">
+
+			<p:commandLink title="#{ui['shared.saveAndContinue']}"
+				actionListener="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.sync}"
+				styleClass="btn btn-primary ui-button continue" onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+				update="@(.ui-message) :navMenu"
+				oncomplete="MyPortal.Curriculum.navigateDatiPrincipaliComplete(args); MyPortal.disableLoadingButton(this);">
+				#{ui['shared.saveAndContinue']}
+				<i class="fa fa-arrow-right" aria-hidden="true"></i>
+			</p:commandLink>
+		</h:panelGroup>
+	</h:form>
+</ui:composition>

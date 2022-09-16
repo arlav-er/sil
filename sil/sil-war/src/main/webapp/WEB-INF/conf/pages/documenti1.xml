@@ -1,0 +1,68 @@
+<!-- ***************************************************************************
+                         Gestione Stato Documenti per Pubblicazione
+     *************************************************************************** -->
+<PAGE name="GestioneReportPubbPage" scope="REQUEST">
+	<MODULES>
+    <MODULE name="M_GetTipoDoc"/>
+    <MODULE name="M_GetProtocollazione"/>
+    <MODULE name="M_GetEstFileProt"/>
+    <MODULE name="M_ExistDocument"/>
+  </MODULES>
+  <DEPENDENCIES>
+	    <DEPENDENCE source="GestioneReportPubbPage" target="M_GetTipoDoc"/>
+	    <DEPENDENCE source="GestioneReportPubbPage" target="M_GetProtocollazione"/>
+	    <DEPENDENCE source="GestioneReportPubbPage" target="M_GetEstFileProt"/>
+	    <DEPENDENCE source="GestioneReportPubbPage" target="M_ExistDocument"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="ReportTopPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_InfoTsGenerale"/>
+    	<MODULE name="M_CCD_GetSituazioneSap"/>
+    	<MODULE name="COMBO_ENTETIT"/>
+    	<MODULE name="M_CheckPrendiTitolarieta"/>
+    	<MODULE name="M_InviaSapPrendiTitolarieta"/>
+    	<MODULE name="M_InviaSapSoloTitolarieta"/>
+    	<MODULE name="COMBO_ATTIVITA_POLATT"/>
+    	<MODULE name="COMBO_TITOLOPROGETTO"/>
+  	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ReportTopPage" target="M_InfoTsGenerale">
+			<CONDITIONS>
+				<PARAMETER name="TRASFVERIFICASAP" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ReportTopPage" target="M_InfoTsGenerale">
+			<CONDITIONS>
+				<PARAMETER name="INVIASAPTITOLARIETA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ReportTopPage" target="M_InfoTsGenerale">
+			<CONDITIONS>
+				<PARAMETER name="INVIASAPSOLOTITOLARIETA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_InfoTsGenerale" target="M_CCD_GetSituazioneSap">
+			<CONDITIONS>
+				<PARAMETER name="INVIASAPTITOLARIETA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+				<PARAMETER name="INVIASAPSOLOTITOLARIETA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_InfoTsGenerale" target="COMBO_ENTETIT"/>
+		<DEPENDENCE source="M_InfoTsGenerale" target="COMBO_ATTIVITA_POLATT"/>
+		<DEPENDENCE source="M_InfoTsGenerale" target="COMBO_TITOLOPROGETTO"/>
+		<DEPENDENCE source="M_InfoTsGenerale" target="M_InviaSapPrendiTitolarieta">
+			<CONDITIONS>
+				<PARAMETER name="INVIASAPTITOLARIETA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_InfoTsGenerale" target="M_InviaSapSoloTitolarieta">
+			<CONDITIONS>
+				<PARAMETER name="INVIASAPSOLOTITOLARIETA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CCD_GetSituazioneSap" target="M_CheckPrendiTitolarieta"/>
+		
+	</DEPENDENCIES>
+</PAGE>

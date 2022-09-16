@@ -1,0 +1,3806 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="8" minor_version="0" major_xml_version="6" minor_xml_version="5" count="3" id="0">
+    <Datasource dll="pdsora7.dll" host="srvhmd:1521:orahmb" schema="" catalog="" user="modenadev" password="00A426F8DF8EFB092CB39AF83B8EC59EF4A7259CDE9DE358B6F877FF3B53352B85" url="">
+      <Tablesource alias="CM_DIAGNOSI_FUNZIONALE" databaseIdentifier="CM_DIAGNOSI_FUNZIONALE">
+        <Column name="PRGDIAGNOSIFUNZIONALE" type="6" />
+        <Column name="CDNLAVORATORE" type="11" />
+        <Column name="CODAZIENDAASL" type="11" />
+        <Column name="FLGREVACCERTAMENTO" type="11" />
+        <Column name="DATREVISIONEACCERT" type="15" />
+        <Column name="DATDIAGNOSI" type="15" />
+        <Column name="FLGINVALIDFISICA" type="11" />
+        <Column name="FLGINVALIDPSICHICA" type="11" />
+        <Column name="FLGINVALIDSENSORIALE" type="11" />
+        <Column name="FLGINVALIDINTELLETTIVA" type="11" />
+        <Column name="STRGIUDIZIODIAGNOSTICO" type="11" />
+        <Column name="CODGIUDIZIO" type="11" />
+        <Column name="NUMPERCINVAL" type="6" />
+        <Column name="DATRICONOSCIMENTO" type="15" />
+        <Column name="FLGPERMANENZASTATO" type="11" />
+        <Column name="DATRICHREVDIAGNOSI" type="15" />
+        <Column name="FLGREVDIAGNOSIPERVENUTA" type="11" />
+        <Column name="DATARRIVOREVDIAGNOSI" type="15" />
+        <Column name="FLGINTERDETTO" type="11" />
+        <Column name="STRCOGNOMENOMETUTORE" type="11" />
+        <Column name="STRINDIRIZZOTUTORE" type="11" />
+        <Column name="STRCAPTUTORE" type="11" />
+        <Column name="CODCOMTUTORE" type="11" />
+        <Column name="STRAUTONOMIA" type="11" />
+        <Column name="STRNOTEPROGETTOSOCIOASS" type="11" />
+        <Column name="STRCONDIZLAVINCOMPAT" type="11" />
+        <Column name="STRCAPACITAMIGLIORI" type="11" />
+        <Column name="CODLIVELLOLIM" type="11" />
+        <Column name="STRNOTELIVELLOLIM" type="11" />
+        <Column name="CODSUGGERIMENTO" type="11" />
+        <Column name="STRNOTESUGGERIMENTO" type="11" />
+        <Column name="CDNUTINS" type="6" />
+        <Column name="DTMINS" type="15" />
+        <Column name="CDNUTMOD" type="6" />
+        <Column name="DTMMOD" type="15" />
+        <Column name="NUMKLODIAGNOSIFUNZIONALE" type="6" />
+        <Column name="DATFINE" type="15" />
+        <Column name="FLGSTATOGRAVITA104" type="11" />
+        <Column name="FLGINVALIDNONDETERMINATA" type="11" />
+      </Tablesource>
+      <Tablesource alias="DE_AZIENDA_ASL" databaseIdentifier="DE_AZIENDA_ASL">
+        <Column name="CODAZIENDAASL" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODCOM" type="11" />
+        <Column name="STRINDIRIZZO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+      <Tablesource alias="CM_COMITATO_TEC" databaseIdentifier="CM_COMITATO_TEC">
+        <Column name="PRGDIAGNOSIFUNZIONALE" type="6" />
+        <Column name="STRNOTACOMITATOTEC" type="11" />
+        <Column name="STRPROFILOSOCIOLAV" type="11" />
+        <Column name="STRIPOTESIINSLAV" type="11" />
+        <Column name="CDNUTINS" type="6" />
+        <Column name="DTMINS" type="15" />
+        <Column name="CDNUTMOD" type="6" />
+        <Column name="DTMMOD" type="15" />
+        <Column name="FLGDISPLIM" type="11" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="CM_DIAGNOSI_FUNZIONALE" to="DE_AZIENDA_ASL" type="loj">
+      <Link from="CODAZIENDAASL" to="CODAZIENDAASL" type="eq"/>
+    </Join>
+
+    <Join from="CM_COMITATO_TEC" to="CM_DIAGNOSI_FUNZIONALE" type="roj">
+      <Link from="PRGDIAGNOSIFUNZIONALE" to="PRGDIAGNOSIFUNZIONALE" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="5">
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="datRichRevDiagnosi"/>
+      <Attribute name="shortName" value="datRichRevDiagnosi"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[Local DateVar dat := Date(DateTime(( {CM_DIAGNOSI_FUNZIONALE.DATRICHREVDIAGNOSI}  ),Time (00,00,00)));
+Local StringVar dataEff := "";
+
+if (not IsNull(  {CM_DIAGNOSI_FUNZIONALE.DATRICHREVDIAGNOSI}  )) then
+(
+   Local StringVar str := "";
+
+   str := ToText(Day(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := str;
+
+   str := ToText(Month(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := dataEff + "/" + str;
+   
+   str := ToText(Year(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := dataEff + "/" + str;
+);
+
+dataEff;]]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="datDiagnosi"/>
+      <Attribute name="shortName" value="datDiagnosi"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[Local DateVar dat := Date(DateTime(( {CM_DIAGNOSI_FUNZIONALE.DATDIAGNOSI}  ),Time (00,00,00)));
+Local StringVar dataEff := "";
+
+if (not IsNull(  {CM_DIAGNOSI_FUNZIONALE.DATDIAGNOSI}  )) then
+(
+   Local StringVar str := "";
+
+   str := ToText(Day(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := str;
+
+   str := ToText(Month(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := dataEff + "/" + str;
+   
+   str := ToText(Year(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := dataEff + "/" + str;
+);
+
+dataEff;]]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="dataRrivorevDiagnosi"/>
+      <Attribute name="shortName" value="dataRrivorevDiagnosi"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[Local DateVar dat := Date(DateTime(( {CM_DIAGNOSI_FUNZIONALE.DATARRIVOREVDIAGNOSI}  ),Time (00,00,00)));
+Local StringVar dataEff := "";
+
+if (not IsNull(  {CM_DIAGNOSI_FUNZIONALE.DATARRIVOREVDIAGNOSI}  )) then
+(
+   Local StringVar str := "";
+
+   str := ToText(Day(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := str;
+
+   str := ToText(Month(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := dataEff + "/" + str;
+   
+   str := ToText(Year(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := dataEff + "/" + str;
+);
+
+dataEff;]]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="datRevisioneAccert"/>
+      <Attribute name="shortName" value="datRevisioneAccert"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[Local DateVar dat := Date(DateTime(( {CM_DIAGNOSI_FUNZIONALE.DATREVISIONEACCERT}  ),Time (00,00,00)));
+Local StringVar dataEff := "";
+
+if (not IsNull(  {CM_DIAGNOSI_FUNZIONALE.DATREVISIONEACCERT}  )) then
+(
+   Local StringVar str := "";
+
+   str := ToText(Day(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := str;
+
+   str := ToText(Month(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := dataEff + "/" + str;
+   
+   str := ToText(Year(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := dataEff + "/" + str;
+);
+
+dataEff;]]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="datRiconoscimento"/>
+      <Attribute name="shortName" value="datRiconoscimento"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[Local DateVar dat := Date(DateTime(( {CM_DIAGNOSI_FUNZIONALE.DATRICONOSCIMENTO}  ),Time (00,00,00)));
+Local StringVar dataEff := "";
+
+if (not IsNull(  {CM_DIAGNOSI_FUNZIONALE.DATRICONOSCIMENTO}  )) then
+(
+   Local StringVar str := "";
+
+   str := ToText(Day(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := str;
+
+   str := ToText(Month(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := dataEff + "/" + str;
+   
+   str := ToText(Year(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := dataEff + "/" + str;
+);
+
+dataEff;]]>
+    </Field>
+  </FormulaFields>
+
+  <PromptFields count="7">
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="parPrgDiagnosiFunzionale"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="dataProt"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="numAnnoProt"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="numProt"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="docInOut"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="parConfigDiagnosiFunzionale"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="cdnlav"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{?parPrgDiagnosiFunzionale} = {CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE}]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="12240"/>
+    <Attribute name="page height" value="15840"/>
+    <Attribute name="page orientation" value="1"/>
+    <Attribute name="page margin left" value="360"/>
+    <Attribute name="page margin right" value="360"/>
+    <Attribute name="page margin top" value="360"/>
+    <Attribute name="page margin bottom" value="360"/>
+    <Attribute name="report title" value="Report1"/>
+    <Attribute name="report last saved" value="9 Nov 2011 12:43:33 GMT"/>
+    <Attribute name="report created" value="18 Sep 2006 08:00:02 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="0"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="PageAreaPair" id="0">
+    <Area type="PageHeader" count="1">
+      <Section type="PageHeader" count="0" width="11520" height="345" id="0">
+      </Section>
+    </Area>
+    <Area type="PageFooter" count="1">
+      <Section type="PageFooter" count="0" width="11520" height="525" id="1">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="2">
+      <Section type="ReportHeader" count="1" width="11520" height="900" id="2">
+        <Element type="Text" count="1" x_position="150" y_position="150" width="11115" height="465">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="2"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="240"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[DIAGNOSI FUNZIONALE DELLA PERSONA DISABILE]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+      <Section type="ReportHeader" count="6" width="11520" height="375" id="3">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA[isnull({?numProt})]]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="Text" count="1" x_position="2700" y_position="0" width="450" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font name" value="Times New Roman"/>
+                <Attribute name="font size" value="210"/>
+              </FontProperties>
+            <![CDATA[Num ]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="3300" y_position="0" width="2115" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="PromptVarField" refname="?numProt"/>
+        </Element>
+        <Element type="Text" count="1" x_position="150" y_position="0" width="570" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font name" value="Times New Roman"/>
+                <Attribute name="font size" value="210"/>
+              </FontProperties>
+            <![CDATA[Anno]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="7350" y_position="0" width="4065" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="PromptVarField" refname="?dataProt"/>
+        </Element>
+        <Element type="Text" count="1" x_position="5700" y_position="0" width="1575" height="285">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font name" value="Times New Roman"/>
+                <Attribute name="font size" value="210"/>
+              </FontProperties>
+            <![CDATA[Data di prot.]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="900" y_position="0" width="1665" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="PromptVarField" refname="?numAnnoProt"/>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <Section type="ReportFooter" count="0" width="11520" height="0" id="4">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="13">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+      </AreaProperties>
+      <Section type="Detail" count="1" width="11520" height="315" id="5">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Subreport" x_position="135" y_position="0" width="11115" height="315">
+          <BorderProperties>
+            <Attribute name="left border" value="0"/>
+            <Attribute name="right border" value="0"/>
+            <Attribute name="bottom border" value="0"/>
+            <Attribute name="top border" value="0"/>
+          </BorderProperties>
+          <SubreportProperties>
+            <Attribute name="report id" value="14"/>
+          </SubreportProperties>
+          <SubreportLinks count="1">
+            <SubreportLink>
+              <Reference name="id" type="PromptVarField" refname="?cdnlav"/>
+              <Attribute name="id" value="1"/>
+            </SubreportLink>
+          </SubreportLinks>
+          <FontProperties>
+            <Attribute name="font size" value="240"/>
+          </FontProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="42" width="11520" height="6810" id="6">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Text" count="0" x_position="555" y_position="5940" width="1710" height="315">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{?parConfigDiagnosiFunzionale} = '0']]>
+            </PropertyFormula>
+          </CommonProperties>
+        </Element>
+        <Element type="Text" count="1" x_position="150" y_position="1350" width="3075" height="315">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="1"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{?parConfigDiagnosiFunzionale} = '1']]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Data redazione diagnosi funzionale:]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="2265" y_position="3570" width="315" height="315">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{CM_DIAGNOSI_FUNZIONALE.FLGREVACCERTAMENTO}  <> "S" or IsNull (  {CM_DIAGNOSI_FUNZIONALE.FLGREVACCERTAMENTO} )]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="225"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[X]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="150" y_position="2100" width="11175" height="345">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="2"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="220"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[DIAGNOSI DELLA MINORAZIONE]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="3600" y_position="3600" width="315" height="315">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[No]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="2700" y_position="3600" width="315" height="315">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Sì]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="150" y_position="3300" width="6315" height="330">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Eventuale revisione prevista dal verbale e relativo periodo:]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="150" y_position="2700" width="2430" height="330">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Azienda U.S.L. competente:]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="150" y_position="4650" width="1890" height="330">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Giudizio diagnostico:]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="2700" y_position="2700" width="8655" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_AZIENDA_ASL.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="Text" count="1" x_position="3180" y_position="3570" width="315" height="315">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{CM_DIAGNOSI_FUNZIONALE.FLGREVACCERTAMENTO}  <> "N" or IsNull (  {CM_DIAGNOSI_FUNZIONALE.FLGREVACCERTAMENTO} )]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="225"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[X]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="2250" y_position="4050" width="675" height="315">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Entro il]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="150" y_position="3600" width="1665" height="315">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Revisione prevista]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="3150" y_position="4050" width="1200" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="FormulaField" refname="@datRevisioneAccert"/>
+        </Element>
+        <Element type="Text" count="1" x_position="5850" y_position="1350" width="2415" height="315">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Data revisione diagnosi:]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="8550" y_position="1350" width="1365" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="FormulaField" refname="@dataRrivorevDiagnosi"/>
+        </Element>
+        <Element type="FieldElement" x_position="4200" y_position="1350" width="1200" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="FormulaField" refname="@datDiagnosi"/>
+        </Element>
+        <Element type="Text" count="1" x_position="4500" y_position="600" width="315" height="315">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Sì]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="4200" y_position="600" width="315" height="315">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{CM_DIAGNOSI_FUNZIONALE.FLGREVDIAGNOSIPERVENUTA} <> "S" or IsNull ( {CM_DIAGNOSI_FUNZIONALE.FLGREVDIAGNOSIPERVENUTA} )]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="225"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[X]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="150" y_position="150" width="3615" height="315">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="3"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="3"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Data richiesta diagnosi da parte dell'Ufficio]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="5400" y_position="600" width="315" height="315">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[No]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="150" y_position="600" width="3615" height="315">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="3"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="3"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Diagnosi funzionale pervenuta]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="5115" y_position="600" width="315" height="315">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{CM_DIAGNOSI_FUNZIONALE.FLGREVDIAGNOSIPERVENUTA}  <> "N" or IsNull ( {CM_DIAGNOSI_FUNZIONALE.FLGREVDIAGNOSIPERVENUTA} )]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="225"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[X]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="4200" y_position="150" width="1200" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="FormulaField" refname="@datRichRevDiagnosi"/>
+        </Element>
+        <Element type="Text" count="1" x_position="555" y_position="5190" width="1710" height="315">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Fisica]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="555" y_position="5565" width="1710" height="315">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Mentale]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Box" x2_position="375" y2_position="5775" x_position="210" y_position="5610" width="0" height="0">
+          <BoxProperties>
+            <Attribute name="close border on page break" value="true"/>
+          </BoxProperties>
+        </Element>
+        <Element type="Box" x2_position="375" y2_position="5400" x_position="210" y_position="5235" width="0" height="0">
+          <BoxProperties>
+            <Attribute name="close border on page break" value="true"/>
+          </BoxProperties>
+        </Element>
+        <Element type="Text" count="1" x_position="555" y_position="5940" width="1710" height="315">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{?parConfigDiagnosiFunzionale} = '1']]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Intellettiva]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Box" x2_position="375" y2_position="6150" x_position="210" y_position="5985" width="0" height="0">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{?parConfigDiagnosiFunzionale} = '1']]>
+            </PropertyFormula>
+          </CommonProperties>
+          <BoxProperties>
+            <Attribute name="close border on page break" value="true"/>
+              <LineProperties>
+                <Attribute name="suppress" value="true"/>
+              </LineProperties>
+          </BoxProperties>
+        </Element>
+        <Element type="Box" x2_position="375" y2_position="6525" x_position="210" y_position="6360" width="0" height="0">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{?parConfigDiagnosiFunzionale} = '1']]>
+            </PropertyFormula>
+          </CommonProperties>
+          <BoxProperties>
+            <Attribute name="close border on page break" value="true"/>
+              <LineProperties>
+                <Attribute name="suppress" value="true"/>
+              </LineProperties>
+          </BoxProperties>
+        </Element>
+        <Element type="Text" count="1" x_position="555" y_position="6315" width="1695" height="315">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{?parConfigDiagnosiFunzionale} = '1']]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Sensoriale]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="225" y_position="5550" width="315" height="315">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{CM_DIAGNOSI_FUNZIONALE.FLGINVALIDPSICHICA}   <> "S" or IsNull (   {CM_DIAGNOSI_FUNZIONALE.FLGINVALIDPSICHICA}  )]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="225"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[X]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="225" y_position="5160" width="315" height="315">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{CM_DIAGNOSI_FUNZIONALE.FLGINVALIDFISICA}   <> "S" or IsNull (   {CM_DIAGNOSI_FUNZIONALE.FLGINVALIDFISICA}  )]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="225"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[X]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="225" y_position="5910" width="315" height="315">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{CM_DIAGNOSI_FUNZIONALE.FLGINVALIDINTELLETTIVA}   <> "S" or IsNull (   {CM_DIAGNOSI_FUNZIONALE.FLGINVALIDINTELLETTIVA}  )]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="225"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[X]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="225" y_position="6300" width="315" height="315">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{CM_DIAGNOSI_FUNZIONALE.FLGINVALIDSENSORIALE}   <> "S" or IsNull (  {CM_DIAGNOSI_FUNZIONALE.FLGINVALIDSENSORIALE}  )]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="225"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[X]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Box" x2_position="4350" y2_position="825" x_position="4185" y_position="660" width="0" height="0">
+          <BoxProperties>
+            <Attribute name="close border on page break" value="true"/>
+          </BoxProperties>
+        </Element>
+        <Element type="Box" x2_position="5265" y2_position="825" x_position="5100" y_position="660" width="0" height="0">
+          <BoxProperties>
+            <Attribute name="close border on page break" value="true"/>
+          </BoxProperties>
+        </Element>
+        <Element type="Box" x2_position="2415" y2_position="3810" x_position="2250" y_position="3645" width="0" height="0">
+          <BoxProperties>
+            <Attribute name="close border on page break" value="true"/>
+          </BoxProperties>
+        </Element>
+        <Element type="Box" x2_position="3330" y2_position="3810" x_position="3165" y_position="3645" width="0" height="0">
+          <BoxProperties>
+            <Attribute name="close border on page break" value="true"/>
+          </BoxProperties>
+        </Element>
+        <Element type="Box" x2_position="375" y2_position="6165" x_position="210" y_position="6000" width="0" height="0">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{?parConfigDiagnosiFunzionale} = '0']]>
+            </PropertyFormula>
+          </CommonProperties>
+          <BoxProperties>
+            <Attribute name="close border on page break" value="true"/>
+              <LineProperties>
+                <Attribute name="suppress" value="true"/>
+              </LineProperties>
+          </BoxProperties>
+        </Element>
+        <Element type="Text" count="1" x_position="225" y_position="5920" width="315" height="315">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{CM_DIAGNOSI_FUNZIONALE.FLGINVALIDNONDETERMINATA}  <> "S" or IsNull (  {CM_DIAGNOSI_FUNZIONALE.FLGINVALIDNONDETERMINATA} )]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="225"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[X]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+      <Section type="Detail" count="2" width="11520" height="720" id="7">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Text" count="1" x_position="150" y_position="0" width="1140" height="330">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="220"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Diagnosi:]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="150" y_position="405" width="11190" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="CM_DIAGNOSI_FUNZIONALE.STRGIUDIZIODIAGNOSTICO"/>
+        </Element>
+      </Section>
+      <Section type="Detail" count="1" width="11520" height="405" id="8">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Subreport" x_position="30" y_position="75" width="11265" height="315">
+          <BorderProperties>
+            <Attribute name="left border" value="0"/>
+            <Attribute name="right border" value="0"/>
+            <Attribute name="bottom border" value="0"/>
+            <Attribute name="top border" value="0"/>
+          </BorderProperties>
+          <SubreportProperties>
+            <Attribute name="report id" value="15"/>
+          </SubreportProperties>
+          <SubreportLinks count="1">
+            <SubreportLink>
+              <Reference name="id" type="DatabaseField" refname="CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+              <Attribute name="id" value="2"/>
+            </SubreportLink>
+          </SubreportLinks>
+          <FontProperties>
+            <Attribute name="font size" value="240"/>
+          </FontProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="1" width="11520" height="480" id="9">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Subreport" x_position="30" y_position="105" width="11265" height="315">
+          <BorderProperties>
+            <Attribute name="left border" value="0"/>
+            <Attribute name="right border" value="0"/>
+            <Attribute name="bottom border" value="0"/>
+            <Attribute name="top border" value="0"/>
+          </BorderProperties>
+          <SubreportProperties>
+            <Attribute name="report id" value="16"/>
+          </SubreportProperties>
+          <SubreportLinks count="1">
+            <SubreportLink>
+              <Reference name="id" type="DatabaseField" refname="CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+              <Attribute name="id" value="3"/>
+            </SubreportLink>
+          </SubreportLinks>
+          <FontProperties>
+            <Attribute name="font size" value="240"/>
+          </FontProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="1" width="11520" height="375" id="10">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Subreport" x_position="30" y_position="30" width="11265" height="315">
+          <BorderProperties>
+            <Attribute name="left border" value="0"/>
+            <Attribute name="right border" value="0"/>
+            <Attribute name="bottom border" value="0"/>
+            <Attribute name="top border" value="0"/>
+          </BorderProperties>
+          <SubreportProperties>
+            <Attribute name="report id" value="17"/>
+          </SubreportProperties>
+          <SubreportLinks count="1">
+            <SubreportLink>
+              <Reference name="id" type="DatabaseField" refname="CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+              <Attribute name="id" value="4"/>
+            </SubreportLink>
+          </SubreportLinks>
+          <FontProperties>
+            <Attribute name="font size" value="240"/>
+          </FontProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="1" width="11520" height="390" id="11">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Subreport" x_position="30" y_position="75" width="11265" height="315">
+          <BorderProperties>
+            <Attribute name="left border" value="0"/>
+            <Attribute name="right border" value="0"/>
+            <Attribute name="bottom border" value="0"/>
+            <Attribute name="top border" value="0"/>
+          </BorderProperties>
+          <SubreportProperties>
+            <Attribute name="report id" value="18"/>
+          </SubreportProperties>
+          <SubreportLinks count="1">
+            <SubreportLink>
+              <Reference name="id" type="DatabaseField" refname="CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+              <Attribute name="id" value="5"/>
+            </SubreportLink>
+          </SubreportLinks>
+          <FontProperties>
+            <Attribute name="font size" value="240"/>
+          </FontProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="1" width="11520" height="375" id="12">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Subreport" x_position="30" y_position="60" width="11265" height="315">
+          <BorderProperties>
+            <Attribute name="left border" value="0"/>
+            <Attribute name="right border" value="0"/>
+            <Attribute name="bottom border" value="0"/>
+            <Attribute name="top border" value="0"/>
+          </BorderProperties>
+          <SubreportProperties>
+            <Attribute name="report id" value="19"/>
+          </SubreportProperties>
+          <SubreportLinks count="1">
+            <SubreportLink>
+              <Reference name="id" type="DatabaseField" refname="CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+              <Attribute name="id" value="6"/>
+            </SubreportLink>
+          </SubreportLinks>
+          <FontProperties>
+            <Attribute name="font size" value="240"/>
+          </FontProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="1" width="11520" height="390" id="13">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Subreport" x_position="30" y_position="75" width="11265" height="315">
+          <BorderProperties>
+            <Attribute name="left border" value="0"/>
+            <Attribute name="right border" value="0"/>
+            <Attribute name="bottom border" value="0"/>
+            <Attribute name="top border" value="0"/>
+          </BorderProperties>
+          <SubreportProperties>
+            <Attribute name="report id" value="20"/>
+          </SubreportProperties>
+          <SubreportLinks count="1">
+            <SubreportLink>
+              <Reference name="id" type="DatabaseField" refname="CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+              <Attribute name="id" value="7"/>
+            </SubreportLink>
+          </SubreportLinks>
+          <FontProperties>
+            <Attribute name="font size" value="240"/>
+          </FontProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="1" width="11520" height="390" id="14">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Subreport" x_position="30" y_position="75" width="11265" height="315">
+          <BorderProperties>
+            <Attribute name="left border" value="0"/>
+            <Attribute name="right border" value="0"/>
+            <Attribute name="bottom border" value="0"/>
+            <Attribute name="top border" value="0"/>
+          </BorderProperties>
+          <SubreportProperties>
+            <Attribute name="report id" value="21"/>
+          </SubreportProperties>
+          <SubreportLinks count="1">
+            <SubreportLink>
+              <Reference name="id" type="DatabaseField" refname="CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+              <Attribute name="id" value="8"/>
+            </SubreportLink>
+          </SubreportLinks>
+          <FontProperties>
+            <Attribute name="font size" value="240"/>
+          </FontProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="1" width="11520" height="375" id="15">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Subreport" x_position="30" y_position="135" width="11295" height="195">
+          <BorderProperties>
+            <Attribute name="left border" value="0"/>
+            <Attribute name="right border" value="0"/>
+            <Attribute name="bottom border" value="0"/>
+            <Attribute name="top border" value="0"/>
+          </BorderProperties>
+          <SubreportProperties>
+            <Attribute name="report id" value="22"/>
+          </SubreportProperties>
+          <SubreportLinks count="1">
+            <SubreportLink>
+              <Reference name="id" type="DatabaseField" refname="CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+              <Attribute name="id" value="9"/>
+            </SubreportLink>
+          </SubreportLinks>
+          <FontProperties>
+            <Attribute name="font size" value="240"/>
+          </FontProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="1" width="11520" height="375" id="16">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Subreport" x_position="30" y_position="120" width="11265" height="195">
+          <BorderProperties>
+            <Attribute name="left border" value="0"/>
+            <Attribute name="right border" value="0"/>
+            <Attribute name="bottom border" value="0"/>
+            <Attribute name="top border" value="0"/>
+          </BorderProperties>
+          <SubreportProperties>
+            <Attribute name="report id" value="23"/>
+          </SubreportProperties>
+          <SubreportLinks count="1">
+            <SubreportLink>
+              <Reference name="id" type="DatabaseField" refname="CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+              <Attribute name="id" value="10"/>
+            </SubreportLink>
+          </SubreportLinks>
+          <FontProperties>
+            <Attribute name="font size" value="240"/>
+          </FontProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="2" width="11520" height="990" id="17">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Text" count="1" x_position="4410" y_position="135" width="2985" height="330">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="2"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="220"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[RELAZIONE CONCLUSIVA:]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="150" y_position="555" width="11130" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="CM_DIAGNOSI_FUNZIONALE.STRCAPACITAMIGLIORI"/>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="8" minor_version="0" major_xml_version="6" minor_xml_version="5" count="2" id="14">
+    <Datasource dll="pdsora7.dll" host="srvhmd:1521:orahmb" schema="" catalog="" user="modenadev" password="002742174A040D33E794F6E5A3AC32FD152441734B17D6BA97D322E32FA291A617" url="">
+      <Tablesource alias="AN_LAVORATORE" databaseIdentifier="AN_LAVORATORE">
+        <Column name="CDNLAVORATORE" type="6" />
+        <Column name="STRCODICEFISCALE" type="11" />
+        <Column name="STRCOGNOME" type="11" />
+        <Column name="STRNOME" type="11" />
+        <Column name="STRSESSO" type="11" />
+        <Column name="DATNASC" type="9" />
+        <Column name="CODCOMNAS" type="11" />
+        <Column name="CODCITTADINANZA" type="11" />
+        <Column name="CODCITTADINANZA2" type="11" />
+        <Column name="CODSTATOCIVILE" type="11" />
+        <Column name="FLGMILITE" type="11" />
+        <Column name="CODCOMRES" type="11" />
+        <Column name="NUMFIGLI" type="6" />
+        <Column name="STRINDIRIZZORES" type="11" />
+        <Column name="STRLOCALITARES" type="11" />
+        <Column name="STRCAPRES" type="11" />
+        <Column name="CODCOMDOM" type="11" />
+        <Column name="STRINDIRIZZODOM" type="11" />
+        <Column name="STRLOCALITADOM" type="11" />
+        <Column name="STRCAPDOM" type="11" />
+        <Column name="CODCOMREC" type="11" />
+        <Column name="STRINDIRIZZOREC" type="11" />
+        <Column name="STRLOCALITAREC" type="11" />
+        <Column name="STRCAPREC" type="11" />
+        <Column name="STRTELRES" type="11" />
+        <Column name="STRTELDOM" type="11" />
+        <Column name="STRTELALTRO" type="11" />
+        <Column name="STRCELL" type="11" />
+        <Column name="STREMAIL" type="11" />
+        <Column name="STRFAX" type="11" />
+        <Column name="STRNOTE" type="11" />
+        <Column name="FLGCFOK" type="11" />
+        <Column name="CDNUTINS" type="6" />
+        <Column name="DTMINS" type="9" />
+        <Column name="CDNUTMOD" type="6" />
+        <Column name="DTMMOD" type="9" />
+        <Column name="NUMKLOLAVORATORE" type="6" />
+        <Column name="FLGINVIOSMS" type="11" />
+        <Column name="DATINVIOSMS" type="9" />
+      </Tablesource>
+      <Tablesource alias="DE_COMUNE" databaseIdentifier="DE_COMUNE">
+        <Column name="CODCOM" type="11" />
+        <Column name="STRDENOMINAZIONE" type="11" />
+        <Column name="STRCAP" type="11" />
+        <Column name="CODCPI" type="11" />
+        <Column name="CODPROVINCIA" type="11" />
+        <Column name="NUMMESIMOBEXCASSAMEZZ" type="6" />
+        <Column name="DATINIZIOVAL" type="9" />
+        <Column name="DATFINEVAL" type="9" />
+        <Column name="NUMKLOCOMUNE" type="6" />
+        <Column name="CODISTAT" type="11" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="AN_LAVORATORE" to="DE_COMUNE" type="inn">
+      <Link from="CODCOMNAS" to="CODCOM" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="1">
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="datNascita"/>
+      <Attribute name="shortName" value="datNascita"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[Local DateVar dat := Date(DateTime(( {AN_LAVORATORE.DATNASC} ),Time (00,00,00)));
+Local StringVar dataEff := "";
+
+if (not IsNull(  {AN_LAVORATORE.DATNASC}  )) then
+(
+   Local StringVar str := "";
+
+   str := ToText(Day(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := str;
+
+   str := ToText(Month(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := dataEff + "/" + str;
+   
+   str := ToText(Year(dat),0,'','');
+   if (length(str)=1) then
+      str := "0"+str;
+   dataEff := dataEff + "/" + str;
+);
+
+dataEff;]]>
+    </Field>
+  </FormulaFields>
+
+  <PromptFields count="1">
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-cdnlav"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-cdnlav"/>
+      <Attribute name="use_range" value="false"/>
+      <Attribute name="id" value="1"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{AN_LAVORATORE.CDNLAVORATORE} =  {?Pm-cdnlav}]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="0"/>
+    <Attribute name="page margin left" value="360"/>
+    <Attribute name="page margin right" value="360"/>
+    <Attribute name="page margin top" value="360"/>
+    <Attribute name="page margin bottom" value="360"/>
+    <Attribute name="report title" value="DatiLavoratore"/>
+    <Attribute name="report last saved" value="9 Nov 2011 12:43:33 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="0"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <Section type="ReportHeader" count="8" width="11115" height="915" id="0">
+        <Element type="FieldElement" x_position="5250" y_position="150" width="3915" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="DatabaseField" refname="AN_LAVORATORE.STRCOGNOME"/>
+        </Element>
+        <Element type="Text" count="1" x_position="0" y_position="150" width="1515" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="3"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="3"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Nome: ]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="3900" y_position="150" width="1215" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="3"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="3"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Cognome: ]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="1650" y_position="150" width="2115" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="DatabaseField" refname="AN_LAVORATORE.STRNOME"/>
+        </Element>
+        <Element type="Text" count="1" x_position="3300" y_position="600" width="1815" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="3"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="3"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Comune di nascita: ]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="0" y_position="600" width="1515" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="3"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="3"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Data di nascita: ]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="5250" y_position="600" width="3915" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_COMUNE.STRDENOMINAZIONE"/>
+        </Element>
+        <Element type="FieldElement" x_position="1650" y_position="600" width="1590" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <DateProperties>
+            <Attribute name="use system default format" value="false"/>
+            <Attribute name="date windows default type" value="2"/>
+            <Attribute name="date order" value="1"/>
+            <Attribute name="year type" value="1"/>
+            <Attribute name="date first seperator" value="/"/>
+            <Attribute name="date second seperator" value="/"/>
+          </DateProperties>
+          <Reference name="field" type="DatabaseField" refname="AN_LAVORATORE.DATNASC"/>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <Section type="ReportFooter" count="0" width="11115" height="390" id="1">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="1">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+      </AreaProperties>
+      <Section type="Detail" count="0" width="11115" height="450" id="2">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="8" minor_version="0" major_xml_version="6" minor_xml_version="5" count="2" id="15">
+    <Datasource dll="pdsora7.dll" host="concordia:1521:ORAC10" schema="" catalog="" user="AOSTATEST" password="" url="">
+      <Tablesource alias="CM_CAPACITA" databaseIdentifier="CM_CAPACITA">
+        <Column name="PRGCAPACITALAV" type="6" />
+        <Column name="PRGDIAGNOSIFUNZIONALE" type="6" />
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCGRADO" type="11" />
+      </Tablesource>
+      <Tablesource alias="DE_CAPACITA" databaseIdentifier="DE_CAPACITA">
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODCAPRAGGR" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+      <Tablesource alias="DE_GRADO_CAPACITA" databaseIdentifier="DE_GRADO_CAPACITA">
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="CM_CAPACITA" to="DE_CAPACITA" type="inn">
+      <Link from="CODCAPACITA" to="CODCAPACITA" type="eq"/>
+    </Join>
+
+    <Join from="CM_CAPACITA" to="DE_GRADO_CAPACITA" type="inn">
+      <Link from="CODGRADOCAPACITA" to="CODGRADOCAPACITA" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="0">
+  </FormulaFields>
+
+  <PromptFields count="2">
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="use_range" value="false"/>
+      <Attribute name="id" value="2"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="1">
+    <Field type="SummaryField" valueType="6">
+      <Attribute name="name" value="Count of CM_CAPACITA.PRGCAPACITALAV"/>
+      <Reference name="id" type="DatabaseField" refname="CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="operation" value="6"/>
+      <Attribute name="summary_nth" value="0"/>
+      <Attribute name="summary_type" value="1"/>
+      <Attribute name="chartFieldSelect" value="2"/>
+      <Attribute name="group number type" value="0"/>
+      <Attribute name="show as percent value" value="false"/>
+      <Attribute name="execute on db" value="false"/>
+    </Field>
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{DE_CAPACITA.CODCAPRAGGR} = "MR"   AND  {CM_CAPACITA.PRGDIAGNOSIFUNZIONALE} =  {?Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE} AND CurrentDate >=  {DE_CAPACITA.DATINIZIOVAL}   AND CurrentDate <=  {DE_CAPACITA.DATFINEVAL}]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="0"/>
+    <Attribute name="page margin left" value="720"/>
+    <Attribute name="page margin right" value="720"/>
+    <Attribute name="page margin top" value="720"/>
+    <Attribute name="page margin bottom" value="720"/>
+    <Attribute name="report title" value="Capacità lavorative"/>
+    <Attribute name="report last saved" value="9 Nov 2011 12:43:33 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="0"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <Section type="ReportHeader" count="1" width="11265" height="555" id="0">
+        <Element type="Text" count="1" x_position="165" y_position="165" width="10950" height="270">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="2"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="220"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[CAPACITA' LAVORATIVE]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <Section type="ReportFooter" count="0" width="11265" height="0" id="1">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="2">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+      </AreaProperties>
+      <Section type="Detail" count="2" width="11265" height="330" id="2">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="9210" y_position="60" width="1965" height="240">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_GRADO_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="FieldElement" x_position="90" y_position="60" width="8970" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+      </Section>
+      <Section type="Detail" count="2" width="11265" height="300" id="3">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Text" count="1" x_position="555" y_position="45" width="705" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[isNull({DE_CAPACITA.CODMONOTIPOGRADO}) OR ({DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S")]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Nota:]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="1365" y_position="45" width="7695" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="CM_CAPACITA.STRDESCGRADO"/>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="8" minor_version="0" major_xml_version="6" minor_xml_version="5" count="2" id="16">
+    <Datasource dll="pdsora7.dll" host="concordia:1521:ORAC10" schema="" catalog="" user="AOSTATEST" password="" url="">
+      <Tablesource alias="CM_CAPACITA" databaseIdentifier="CM_CAPACITA">
+        <Column name="PRGCAPACITALAV" type="6" />
+        <Column name="PRGDIAGNOSIFUNZIONALE" type="6" />
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCGRADO" type="11" />
+      </Tablesource>
+      <Tablesource alias="DE_CAPACITA" databaseIdentifier="DE_CAPACITA">
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODCAPRAGGR" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+      <Tablesource alias="DE_GRADO_CAPACITA" databaseIdentifier="DE_GRADO_CAPACITA">
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="CM_CAPACITA" to="DE_CAPACITA" type="inn">
+      <Link from="CODCAPACITA" to="CODCAPACITA" type="eq"/>
+    </Join>
+
+    <Join from="CM_CAPACITA" to="DE_GRADO_CAPACITA" type="inn">
+      <Link from="CODGRADOCAPACITA" to="CODGRADOCAPACITA" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="0">
+  </FormulaFields>
+
+  <PromptFields count="2">
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="use_range" value="false"/>
+      <Attribute name="id" value="3"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{DE_CAPACITA.CODCAPRAGGR} = "IN"   AND  {CM_CAPACITA.PRGDIAGNOSIFUNZIONALE} =  {?Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE} AND CurrentDate >=  {DE_CAPACITA.DATINIZIOVAL}   AND CurrentDate <=  {DE_CAPACITA.DATFINEVAL}]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="0"/>
+    <Attribute name="page margin left" value="720"/>
+    <Attribute name="page margin right" value="720"/>
+    <Attribute name="page margin top" value="720"/>
+    <Attribute name="page margin bottom" value="720"/>
+    <Attribute name="report title" value="RAGGIUNGIMENTO DEL POSTO DI LAVORO"/>
+    <Attribute name="report last saved" value="9 Nov 2011 12:43:33 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="0"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <Section type="ReportHeader" count="1" width="11265" height="495" id="0">
+        <Element type="Text" count="1" x_position="165" y_position="165" width="10950" height="270">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="2"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="220"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[RAGGIUNGIMENTO DEL POSTO DI LAVORO]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <Section type="ReportFooter" count="0" width="11265" height="0" id="1">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="2">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+      </AreaProperties>
+      <Section type="Detail" count="3" width="11265" height="480" id="2">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="9210" y_position="60" width="1965" height="240">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N" OR {DE_CAPACITA.CODMONOTIPOGRADO} = NULL]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_GRADO_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="FieldElement" x_position="90" y_position="60" width="4695" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="Line" x2_position="9030" y2_position="285" x_position="4935" y_position="285" width="2130" height="0">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N" OR isNull({DE_CAPACITA.CODMONOTIPOGRADO})]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <LineProperties>
+            <Attribute name="style" value="4"/>
+            <Attribute name="suppress" value="true"/>
+          </LineProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="2" width="11265" height="360" id="3">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="1425" y_position="45" width="7635" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="CM_CAPACITA.STRDESCGRADO"/>
+        </Element>
+        <Element type="Text" count="1" x_position="555" y_position="45" width="705" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[isNull({DE_CAPACITA.CODMONOTIPOGRADO}) OR ({DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S")]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Nota:]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="8" minor_version="0" major_xml_version="6" minor_xml_version="5" count="2" id="17">
+    <Datasource dll="pdsora7.dll" host="concordia:1521:ORAC10" schema="" catalog="" user="AOSTATEST" password="" url="">
+      <Tablesource alias="CM_CAPACITA" databaseIdentifier="CM_CAPACITA">
+        <Column name="PRGCAPACITALAV" type="6" />
+        <Column name="PRGDIAGNOSIFUNZIONALE" type="6" />
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCGRADO" type="11" />
+      </Tablesource>
+      <Tablesource alias="DE_CAPACITA" databaseIdentifier="DE_CAPACITA">
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODCAPRAGGR" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+      <Tablesource alias="DE_GRADO_CAPACITA" databaseIdentifier="DE_GRADO_CAPACITA">
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="CM_CAPACITA" to="DE_CAPACITA" type="inn">
+      <Link from="CODCAPACITA" to="CODCAPACITA" type="eq"/>
+    </Join>
+
+    <Join from="CM_CAPACITA" to="DE_GRADO_CAPACITA" type="inn">
+      <Link from="CODGRADOCAPACITA" to="CODGRADOCAPACITA" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="0">
+  </FormulaFields>
+
+  <PromptFields count="2">
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="use_range" value="false"/>
+      <Attribute name="id" value="4"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{DE_CAPACITA.CODCAPRAGGR} = "PO"   AND  {CM_CAPACITA.PRGDIAGNOSIFUNZIONALE} =  {?Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE} AND CurrentDate >=  {DE_CAPACITA.DATINIZIOVAL}   AND CurrentDate <=  {DE_CAPACITA.DATFINEVAL}]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="0"/>
+    <Attribute name="page margin left" value="720"/>
+    <Attribute name="page margin right" value="720"/>
+    <Attribute name="page margin top" value="720"/>
+    <Attribute name="page margin bottom" value="720"/>
+    <Attribute name="report title" value="IN QUALE AMBIENTE PUO&#39; LAVORARE"/>
+    <Attribute name="report last saved" value="9 Nov 2011 12:43:33 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="0"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <Section type="ReportHeader" count="1" width="11265" height="495" id="0">
+        <Element type="Text" count="1" x_position="165" y_position="165" width="10950" height="270">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="2"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="220"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[IN QUALE AMBIENTE PUO' LAVORARE]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <Section type="ReportFooter" count="0" width="11265" height="0" id="1">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="2">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+      </AreaProperties>
+      <Section type="Detail" count="3" width="11265" height="480" id="2">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="9210" y_position="60" width="1965" height="240">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_GRADO_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="FieldElement" x_position="90" y_position="60" width="3675" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="Line" x2_position="9030" y2_position="285" x_position="3840" y_position="285" width="2130" height="0">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N" OR isNull({DE_CAPACITA.CODMONOTIPOGRADO})]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <LineProperties>
+            <Attribute name="style" value="4"/>
+            <Attribute name="suppress" value="true"/>
+          </LineProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="2" width="11265" height="390" id="3">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="1425" y_position="45" width="7635" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="CM_CAPACITA.STRDESCGRADO"/>
+        </Element>
+        <Element type="Text" count="1" x_position="555" y_position="45" width="705" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[isNull({DE_CAPACITA.CODMONOTIPOGRADO}) OR ({DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S")]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Nota:]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="8" minor_version="0" major_xml_version="6" minor_xml_version="5" count="2" id="18">
+    <Datasource dll="pdsora7.dll" host="concordia:1521:ORAC10" schema="" catalog="" user="AOSTATEST" password="" url="">
+      <Tablesource alias="CM_CAPACITA" databaseIdentifier="CM_CAPACITA">
+        <Column name="PRGCAPACITALAV" type="6" />
+        <Column name="PRGDIAGNOSIFUNZIONALE" type="6" />
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCGRADO" type="11" />
+      </Tablesource>
+      <Tablesource alias="DE_CAPACITA" databaseIdentifier="DE_CAPACITA">
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODCAPRAGGR" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+      <Tablesource alias="DE_GRADO_CAPACITA" databaseIdentifier="DE_GRADO_CAPACITA">
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="CM_CAPACITA" to="DE_CAPACITA" type="inn">
+      <Link from="CODCAPACITA" to="CODCAPACITA" type="eq"/>
+    </Join>
+
+    <Join from="CM_CAPACITA" to="DE_GRADO_CAPACITA" type="inn">
+      <Link from="CODGRADOCAPACITA" to="CODGRADOCAPACITA" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="0">
+  </FormulaFields>
+
+  <PromptFields count="2">
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="use_range" value="false"/>
+      <Attribute name="id" value="5"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{DE_CAPACITA.CODCAPRAGGR} = "LO"   AND  {CM_CAPACITA.PRGDIAGNOSIFUNZIONALE} =  {?Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE} AND CurrentDate >=  {DE_CAPACITA.DATINIZIOVAL}   AND CurrentDate <=  {DE_CAPACITA.DATFINEVAL}]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="0"/>
+    <Attribute name="page margin left" value="720"/>
+    <Attribute name="page margin right" value="720"/>
+    <Attribute name="page margin top" value="720"/>
+    <Attribute name="page margin bottom" value="720"/>
+    <Attribute name="report title" value="TEMPI DI LAVORO"/>
+    <Attribute name="report last saved" value="9 Nov 2011 12:43:33 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="0"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <Section type="ReportHeader" count="1" width="11265" height="495" id="0">
+        <Element type="Text" count="1" x_position="165" y_position="165" width="10950" height="270">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="2"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="220"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[TEMPI DI LAVORO]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <Section type="ReportFooter" count="0" width="11265" height="0" id="1">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="3">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+      </AreaProperties>
+      <Section type="Detail" count="3" width="11265" height="480" id="2">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="multiple column section" value="false"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N"]]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="9210" y_position="60" width="1965" height="240">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_GRADO_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="FieldElement" x_position="90" y_position="60" width="4275" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="Line" x2_position="9030" y2_position="285" x_position="4515" y_position="285" width="2130" height="0">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N" OR isNull({DE_CAPACITA.CODMONOTIPOGRADO})]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <LineProperties>
+            <Attribute name="style" value="4"/>
+            <Attribute name="suppress" value="true"/>
+          </LineProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="2" width="11265" height="510" id="3">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="multiple column section" value="false"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N"]]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="1425" y_position="45" width="7635" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="CM_CAPACITA.STRDESCGRADO"/>
+        </Element>
+        <Element type="Text" count="1" x_position="555" y_position="45" width="705" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[isNull({CM_CAPACITA.CODGRADOCAPACITA}) OR ({DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S")]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Nota:]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+      <Section type="Detail" count="2" width="11265" height="375" id="4">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="multiple column section" value="false"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} <> "N"]]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="Text" count="1" x_position="90" y_position="45" width="705" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[isNull({DE_CAPACITA.CODMONOTIPOGRADO}) OR ({DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S")]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Altro:]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="960" y_position="45" width="8115" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="CM_CAPACITA.STRDESCGRADO"/>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="8" minor_version="0" major_xml_version="6" minor_xml_version="5" count="2" id="19">
+    <Datasource dll="pdsora7.dll" host="concordia:1521:ORAC10" schema="" catalog="" user="AOSTATEST" password="" url="">
+      <Tablesource alias="CM_CAPACITA" databaseIdentifier="CM_CAPACITA">
+        <Column name="PRGCAPACITALAV" type="6" />
+        <Column name="PRGDIAGNOSIFUNZIONALE" type="6" />
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCGRADO" type="11" />
+      </Tablesource>
+      <Tablesource alias="DE_CAPACITA" databaseIdentifier="DE_CAPACITA">
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODCAPRAGGR" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+      <Tablesource alias="DE_GRADO_CAPACITA" databaseIdentifier="DE_GRADO_CAPACITA">
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="CM_CAPACITA" to="DE_CAPACITA" type="inn">
+      <Link from="CODCAPACITA" to="CODCAPACITA" type="eq"/>
+    </Join>
+
+    <Join from="CM_CAPACITA" to="DE_GRADO_CAPACITA" type="inn">
+      <Link from="CODGRADOCAPACITA" to="CODGRADOCAPACITA" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="0">
+  </FormulaFields>
+
+  <PromptFields count="2">
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="use_range" value="false"/>
+      <Attribute name="id" value="6"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{DE_CAPACITA.CODCAPRAGGR} = "MV"   AND  {CM_CAPACITA.PRGDIAGNOSIFUNZIONALE} =  {?Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE} AND CurrentDate >=  {DE_CAPACITA.DATINIZIOVAL}   AND CurrentDate <=  {DE_CAPACITA.DATFINEVAL}]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="0"/>
+    <Attribute name="page margin left" value="720"/>
+    <Attribute name="page margin right" value="720"/>
+    <Attribute name="page margin top" value="720"/>
+    <Attribute name="page margin bottom" value="720"/>
+    <Attribute name="report title" value="IMPEGNO FISICO (FATICA)"/>
+    <Attribute name="report last saved" value="9 Nov 2011 12:43:33 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="0"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <Section type="ReportHeader" count="1" width="11265" height="495" id="0">
+        <Element type="Text" count="1" x_position="165" y_position="165" width="10950" height="270">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="2"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="220"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[IMPEGNO FISICO (FATICA)]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <Section type="ReportFooter" count="0" width="11265" height="0" id="1">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="2">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+      </AreaProperties>
+      <Section type="Detail" count="3" width="11265" height="480" id="2">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="9210" y_position="60" width="1965" height="240">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_GRADO_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="FieldElement" x_position="90" y_position="60" width="5835" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="Line" x2_position="9030" y2_position="285" x_position="6090" y_position="285" width="2130" height="0">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N" OR isNull({DE_CAPACITA.CODMONOTIPOGRADO})]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <LineProperties>
+            <Attribute name="style" value="4"/>
+            <Attribute name="suppress" value="true"/>
+          </LineProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="2" width="11265" height="480" id="3">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="1425" y_position="45" width="7635" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="CM_CAPACITA.STRDESCGRADO"/>
+        </Element>
+        <Element type="Text" count="1" x_position="555" y_position="45" width="705" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[isNull({DE_CAPACITA.CODMONOTIPOGRADO}) OR ({DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S")]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Nota:]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="8" minor_version="0" major_xml_version="6" minor_xml_version="5" count="2" id="20">
+    <Datasource dll="pdsora7.dll" host="concordia:1521:ORAC10" schema="" catalog="" user="AOSTATEST" password="" url="">
+      <Tablesource alias="CM_CAPACITA" databaseIdentifier="CM_CAPACITA">
+        <Column name="PRGCAPACITALAV" type="6" />
+        <Column name="PRGDIAGNOSIFUNZIONALE" type="6" />
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCGRADO" type="11" />
+      </Tablesource>
+      <Tablesource alias="DE_CAPACITA" databaseIdentifier="DE_CAPACITA">
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODCAPRAGGR" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+      <Tablesource alias="DE_GRADO_CAPACITA" databaseIdentifier="DE_GRADO_CAPACITA">
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="CM_CAPACITA" to="DE_CAPACITA" type="inn">
+      <Link from="CODCAPACITA" to="CODCAPACITA" type="eq"/>
+    </Join>
+
+    <Join from="CM_CAPACITA" to="DE_GRADO_CAPACITA" type="inn">
+      <Link from="CODGRADOCAPACITA" to="CODGRADOCAPACITA" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="0">
+  </FormulaFields>
+
+  <PromptFields count="2">
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="use_range" value="false"/>
+      <Attribute name="id" value="7"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{DE_CAPACITA.CODCAPRAGGR} = "AC"   AND  {CM_CAPACITA.PRGDIAGNOSIFUNZIONALE} =  {?Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE} AND CurrentDate >=  {DE_CAPACITA.DATINIZIOVAL}   AND CurrentDate <=  {DE_CAPACITA.DATFINEVAL}]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="0"/>
+    <Attribute name="page margin left" value="720"/>
+    <Attribute name="page margin right" value="720"/>
+    <Attribute name="page margin top" value="720"/>
+    <Attribute name="page margin bottom" value="720"/>
+    <Attribute name="report title" value="POSTURE"/>
+    <Attribute name="report last saved" value="9 Nov 2011 12:43:33 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="0"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <Section type="ReportHeader" count="1" width="11265" height="495" id="0">
+        <Element type="Text" count="1" x_position="165" y_position="165" width="10950" height="270">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="2"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="220"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[POSTURE]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <Section type="ReportFooter" count="0" width="11265" height="0" id="1">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="2">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+      </AreaProperties>
+      <Section type="Detail" count="3" width="11265" height="480" id="2">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="multiple column section" value="false"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N"]]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="9210" y_position="60" width="1965" height="240">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_GRADO_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="FieldElement" x_position="90" y_position="60" width="4785" height="240">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="Line" x2_position="9030" y2_position="285" x_position="5010" y_position="285" width="2130" height="0">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N" OR isNull({DE_CAPACITA.CODMONOTIPOGRADO})]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <LineProperties>
+            <Attribute name="style" value="4"/>
+            <Attribute name="suppress" value="true"/>
+          </LineProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="2" width="11265" height="495" id="3">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="multiple column section" value="false"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} <> "N"]]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="885" y_position="120" width="7635" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="CM_CAPACITA.STRDESCGRADO"/>
+        </Element>
+        <Element type="Text" count="1" x_position="90" y_position="120" width="615" height="300">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[isNull({DE_CAPACITA.CODMONOTIPOGRADO})]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Note:]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="8" minor_version="0" major_xml_version="6" minor_xml_version="5" count="2" id="21">
+    <Datasource dll="pdsora7.dll" host="concordia:1521:ORAC10" schema="" catalog="" user="AOSTATEST" password="" url="">
+      <Tablesource alias="CM_CAPACITA" databaseIdentifier="CM_CAPACITA">
+        <Column name="PRGCAPACITALAV" type="6" />
+        <Column name="PRGDIAGNOSIFUNZIONALE" type="6" />
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCGRADO" type="11" />
+      </Tablesource>
+      <Tablesource alias="DE_CAPACITA" databaseIdentifier="DE_CAPACITA">
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODCAPRAGGR" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+      <Tablesource alias="DE_GRADO_CAPACITA" databaseIdentifier="DE_GRADO_CAPACITA">
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="CM_CAPACITA" to="DE_CAPACITA" type="inn">
+      <Link from="CODCAPACITA" to="CODCAPACITA" type="eq"/>
+    </Join>
+
+    <Join from="CM_CAPACITA" to="DE_GRADO_CAPACITA" type="inn">
+      <Link from="CODGRADOCAPACITA" to="CODGRADOCAPACITA" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="0">
+  </FormulaFields>
+
+  <PromptFields count="2">
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="use_range" value="false"/>
+      <Attribute name="id" value="8"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{DE_CAPACITA.CODCAPRAGGR} = "FA"   AND  {CM_CAPACITA.PRGDIAGNOSIFUNZIONALE} =  {?Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE} AND CurrentDate >=  {DE_CAPACITA.DATINIZIOVAL}   AND CurrentDate <=  {DE_CAPACITA.DATFINEVAL}]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="0"/>
+    <Attribute name="page margin left" value="720"/>
+    <Attribute name="page margin right" value="720"/>
+    <Attribute name="page margin top" value="720"/>
+    <Attribute name="page margin bottom" value="720"/>
+    <Attribute name="report title" value="MOVIMENTI E COORDINAZIONE DEGLI ARTI"/>
+    <Attribute name="report last saved" value="9 Nov 2011 12:43:33 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="0"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <Section type="ReportHeader" count="1" width="11265" height="495" id="0">
+        <Element type="Text" count="1" x_position="165" y_position="165" width="10950" height="270">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="2"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="220"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[MOVIMENTI E COORDINAZIONE DEGLI ARTI]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <Section type="ReportFooter" count="0" width="11265" height="0" id="1">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="2">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+      </AreaProperties>
+      <Section type="Detail" count="3" width="11265" height="480" id="2">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="9210" y_position="60" width="1965" height="240">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_GRADO_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="FieldElement" x_position="90" y_position="60" width="5835" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="Line" x2_position="9030" y2_position="285" x_position="6090" y_position="285" width="2130" height="0">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N" OR isNull({DE_CAPACITA.CODMONOTIPOGRADO})]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <LineProperties>
+            <Attribute name="style" value="4"/>
+            <Attribute name="suppress" value="true"/>
+          </LineProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="2" width="11265" height="345" id="3">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="1425" y_position="45" width="7635" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="CM_CAPACITA.STRDESCGRADO"/>
+        </Element>
+        <Element type="Text" count="1" x_position="555" y_position="45" width="705" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[isNull({DE_CAPACITA.CODMONOTIPOGRADO}) OR ({DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S")]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Nota:]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="8" minor_version="0" major_xml_version="6" minor_xml_version="5" count="2" id="22">
+    <Datasource dll="pdsora7.dll" host="concordia:1521:ORAC10" schema="" catalog="" user="AOSTATEST" password="" url="">
+      <Tablesource alias="CM_CAPACITA" databaseIdentifier="CM_CAPACITA">
+        <Column name="PRGCAPACITALAV" type="6" />
+        <Column name="PRGDIAGNOSIFUNZIONALE" type="6" />
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCGRADO" type="11" />
+      </Tablesource>
+      <Tablesource alias="DE_CAPACITA" databaseIdentifier="DE_CAPACITA">
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODCAPRAGGR" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+      <Tablesource alias="DE_GRADO_CAPACITA" databaseIdentifier="DE_GRADO_CAPACITA">
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="CM_CAPACITA" to="DE_CAPACITA" type="inn">
+      <Link from="CODCAPACITA" to="CODCAPACITA" type="eq"/>
+    </Join>
+
+    <Join from="CM_CAPACITA" to="DE_GRADO_CAPACITA" type="inn">
+      <Link from="CODGRADOCAPACITA" to="CODGRADOCAPACITA" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="0">
+  </FormulaFields>
+
+  <PromptFields count="2">
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="use_range" value="false"/>
+      <Attribute name="id" value="9"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{DE_CAPACITA.CODCAPRAGGR} = "SL"   AND  {CM_CAPACITA.PRGDIAGNOSIFUNZIONALE} =  {?Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE} AND CurrentDate >=  {DE_CAPACITA.DATINIZIOVAL}   AND CurrentDate <=  {DE_CAPACITA.DATFINEVAL}]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="0"/>
+    <Attribute name="page margin left" value="720"/>
+    <Attribute name="page margin right" value="720"/>
+    <Attribute name="page margin top" value="720"/>
+    <Attribute name="page margin bottom" value="720"/>
+    <Attribute name="report title" value="SITUAZIONI DI PERICOLO"/>
+    <Attribute name="report last saved" value="9 Nov 2011 12:43:33 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="0"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <Section type="ReportHeader" count="1" width="11295" height="495" id="0">
+        <Element type="Text" count="1" x_position="165" y_position="165" width="10950" height="270">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="2"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="220"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[SITUAZIONI DI PERICOLO]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <Section type="ReportFooter" count="0" width="11295" height="0" id="1">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="2">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+      </AreaProperties>
+      <Section type="Detail" count="3" width="11295" height="480" id="2">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="9210" y_position="60" width="1965" height="240">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_GRADO_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="FieldElement" x_position="90" y_position="60" width="5835" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="Line" x2_position="9030" y2_position="285" x_position="6090" y_position="285" width="2130" height="0">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N" OR isNull({DE_CAPACITA.CODMONOTIPOGRADO})]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <LineProperties>
+            <Attribute name="style" value="4"/>
+            <Attribute name="suppress" value="true"/>
+          </LineProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="2" width="11295" height="405" id="3">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="1425" y_position="45" width="7635" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S"]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="CM_CAPACITA.STRDESCGRADO"/>
+        </Element>
+        <Element type="Text" count="1" x_position="555" y_position="45" width="705" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[isNull({DE_CAPACITA.CODMONOTIPOGRADO}) OR ({DE_CAPACITA.CODMONOTIPOGRADO} <> "P" AND {DE_CAPACITA.CODMONOTIPOGRADO} <>"N" AND {DE_CAPACITA.CODMONOTIPOGRADO} <> "S")]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Nota:]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="8" minor_version="0" major_xml_version="6" minor_xml_version="5" count="2" id="23">
+    <Datasource dll="pdsora7.dll" host="concordia:1521:ORAC10" schema="" catalog="" user="AOSTATEST" password="" url="">
+      <Tablesource alias="CM_CAPACITA" databaseIdentifier="CM_CAPACITA">
+        <Column name="PRGCAPACITALAV" type="6" />
+        <Column name="PRGDIAGNOSIFUNZIONALE" type="6" />
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCGRADO" type="11" />
+      </Tablesource>
+      <Tablesource alias="DE_CAPACITA" databaseIdentifier="DE_CAPACITA">
+        <Column name="CODCAPACITA" type="11" />
+        <Column name="CODCAPRAGGR" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+      <Tablesource alias="DE_GRADO_CAPACITA" databaseIdentifier="DE_GRADO_CAPACITA">
+        <Column name="CODGRADOCAPACITA" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODMONOTIPOGRADO" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="CM_CAPACITA" to="DE_CAPACITA" type="inn">
+      <Link from="CODCAPACITA" to="CODCAPACITA" type="eq"/>
+    </Join>
+
+    <Join from="CM_CAPACITA" to="DE_GRADO_CAPACITA" type="inn">
+      <Link from="CODGRADOCAPACITA" to="CODGRADOCAPACITA" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="0">
+  </FormulaFields>
+
+  <PromptFields count="2">
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE"/>
+      <Attribute name="use_range" value="false"/>
+      <Attribute name="id" value="10"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-CM_CAPACITA.PRGCAPACITALAV"/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{DE_CAPACITA.CODCAPRAGGR} = "CA"   AND  {CM_CAPACITA.PRGDIAGNOSIFUNZIONALE} =  {?Pm-CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE} AND CurrentDate >=  {DE_CAPACITA.DATINIZIOVAL}   AND CurrentDate <=  {DE_CAPACITA.DATFINEVAL}]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="0"/>
+    <Attribute name="page margin left" value="720"/>
+    <Attribute name="page margin right" value="720"/>
+    <Attribute name="page margin top" value="720"/>
+    <Attribute name="page margin bottom" value="720"/>
+    <Attribute name="report title" value="AUTONOMIA, ADATTAMENTO E COMUNICAZIONE"/>
+    <Attribute name="report last saved" value="9 Nov 2011 12:43:33 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="0"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <Section type="ReportHeader" count="1" width="11265" height="495" id="0">
+        <Element type="Text" count="1" x_position="165" y_position="165" width="10950" height="270">
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="2"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="220"/>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[AUTONOMIA, ADATTAMENTO E COMUNICAZIONE]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <Section type="ReportFooter" count="0" width="11265" height="0" id="1">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="2">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+      </AreaProperties>
+      <Section type="Detail" count="3" width="11265" height="480" id="2">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="multiple column section" value="false"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N"]]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="9210" y_position="60" width="1965" height="240">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N" OR {DE_CAPACITA.CODMONOTIPOGRADO} = NULL]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_GRADO_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="FieldElement" x_position="90" y_position="60" width="5835" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_CAPACITA.STRDESCRIZIONE"/>
+        </Element>
+        <Element type="Line" x2_position="9030" y2_position="285" x_position="6090" y_position="285" width="2130" height="0">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} = "N" OR isNull({DE_CAPACITA.CODMONOTIPOGRADO})]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <LineProperties>
+            <Attribute name="style" value="4"/>
+            <Attribute name="suppress" value="true"/>
+          </LineProperties>
+        </Element>
+      </Section>
+      <Section type="Detail" count="2" width="11265" height="450" id="3">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="multiple column section" value="false"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA[{DE_CAPACITA.CODMONOTIPOGRADO} <> "N"]]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="930" y_position="45" width="8130" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="4"/>
+            <Attribute name="can grow" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Reference name="field" type="DatabaseField" refname="CM_CAPACITA.STRDESCGRADO"/>
+        </Element>
+        <Element type="Text" count="1" x_position="90" y_position="45" width="705" height="225">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[isNull({DE_CAPACITA.CODMONOTIPOGRADO})]]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font style" value="1"/>
+              </FontProperties>
+            <![CDATA[Nota:]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>
+</inet:Report>

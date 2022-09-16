@@ -1,0 +1,349 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="/secure/template/tab.xhtml">
+
+	<ui:define name="tabcontent">
+		<ui:param name="bean" value="#{atipiciCoordinatoreBean}" />
+		
+		<style type="text/css">
+			a.page-link { text-decoration: none; }
+		</style>
+		
+		<h:outputText escape="false"
+			value="#{msg['coordinatore.pratiche_atipici.consulenza_tematica.descrizione']}" />
+			
+		<cc:waiting id="tematicaAssegnazioneLoader" hidden="true" waitMessage="Assegnazione in corso..." />	
+		<cc:waiting id="tematicaRispostaLoader" hidden="true" waitMessage="Risposta in corso..." />
+		<cc:messages id="tematicaMessages" />
+			
+		<h:form id="tematicaListForm">
+			<div style="display: none;">
+				<h:inputHidden id="pageValue" value="#{bean.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{bean.changePage}" value="DUMMY FOR PAGINATION">
+					<f:ajax execute=":tematicaListForm:pageValue" 
+						render=":tematicaListForm:tabella :tematicaDetailForm" />
+				</h:commandButton>
+			</div>
+			
+			<ui:fragment rendered="#{empty bean.pratiche}">
+				<h2 class="nessun_elemento_trovato">Nessun elemento trovato.</h2>
+			</ui:fragment>
+
+			<ui:fragment rendered="#{not empty bean.pratiche}">
+				<script type="text/javascript">
+					$(function() {							
+						$(jq("tematicaPaginationBar")).pagination({							    
+						pages: #{bean.paginationHandler.pages()},						       
+						cssStyle: 'light-theme',
+						prevText: 'Prec.',
+						nextText: 'Succ.',
+						onPageClick: function (pageNumber, event) {							        
+							document.getElementById('tematicaListForm:pageValue').value = pageNumber;
+							document.getElementById('tematicaListForm:pageCommand').click();
+							$(jq("tematicaDetailForm")).hide();
+							$(jq("tematicaListForm:tabella")).hide();	            
+							$(jq("tematicaListForm:paginationLoader")).show();
+							}
+						});
+					});
+				</script>
+
+				<div id="tematicaPaginationBar" class="widget_container ui-tabs ui-widget-content ui-corner-all" />
+				<br />
+
+				<cc:waiting id="paginationLoader" hidden="true" waitMessage="Caricamento..." />	
+					
+				<h:panelGroup layout="block" id="tabella" class="dataTables_wrapper">		
+					<table class="dataTable">
+						<tr>
+							<th class="ui-state-default"></th>
+							<th class="ui-state-default">ID</th>
+							<th class="ui-state-default">Oggetto</th>
+							<th class="ui-state-default">Tipo Lavoro</th>
+							<th class="ui-state-default">Data della richiesta</th>
+							<th class="ui-state-default">Inoltrata al CPI il:</th>
+							<th class="ui-state-default">Risposta all'utente il:</th>
+							<th class="ui-state-default">Stato</th>
+							<th class="ui-state-default">CPI incaricato</th>
+						</tr>
+
+						<ui:repeat value="#{bean.pratiche}" var="pratica" varStatus="status">
+							<tr>
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<span class="ui-icon #{pratica.daLeggere ? 'ui-icon-mail-closed' : 'ui-icon-mail-open'}" />
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{pratica.id} &nbsp;"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{pratica.tipoPratica} &nbsp;"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{pratica.tipoLavoro} &nbsp;"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{empty pratica.dtInvio ? '&nbsp;' : pratica.dtInvio}"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}">
+											<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+										</h:outputText>
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{empty pratica.dtInoltroCoord ? '&nbsp;' : pratica.dtInoltroCoord}"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}">
+											<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+										</h:outputText>
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{empty pratica.dtRisposta ? '&nbsp;' : pratica.dtRisposta}"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}">
+											<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+										</h:outputText>
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{pratica.statoPratica} &nbsp;"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+											<f:ajax execute="@this" onevent="onShowDetail"
+												render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+									<h:outputText value="#{pratica.targaCPIincaricato} &nbsp;"
+										styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+							</tr>
+						</ui:repeat>
+					</table>
+					<script>
+			       		$(jq("tematicaListForm:paginationLoader")).hide();
+					</script>
+				</h:panelGroup>
+			</ui:fragment>
+		</h:form>
+		<br/>
+			
+		<cc:waiting id="tematicaDetailLoader" hidden="true" waitMessage="Caricamento..." />	
+						
+		<h:form id="tematicaDetailForm">	
+			<h:panelGroup layout="block" rendered="#{bean.state == 'view'}" styleClass="insertPanel">
+				
+				<ui:include src="/secure/atipici/corpo_pratica_atipici.xhtml">
+					<ui:param name="pratica" value="#{bean.pratica}" />
+					<ui:param name="readonly" value="#{true}" />
+				</ui:include>
+
+				<ui:include src="/secure/atipici/lista_messaggi_atipici.xhtml">
+					<ui:param name="pratica" value="#{bean.pratica}" />
+					<ui:param name="type" value="coordinatore" />
+				</ui:include>
+			
+				<h:panelGroup layout="block" styleClass="multiMessageDiv messageDiv"
+					rendered="#{bean.pratica.rispostoCittadino}">
+					
+					<h:outputText value="Risposta/Integrazione del CPI" styleClass="mittente" />
+					
+					<div class="corpo">
+						#{bean.pratica.risposte.get(0).corpo}
+					</div>
+					
+					<cc:upload readonly="#{true}" label="Allegato"
+						rendered="#{not empty bean.pratica.risposte.get(0).allegati}"
+						idAllegato="#{bean.pratica.risposte.get(0).allegati[0].id}"
+						value="#{bean.pratica.risposte.get(0).allegati[0].filename}" />
+				</h:panelGroup>
+				<br />
+
+				<h:panelGroup layout="block" styleClass="messageDiv" style="margin-left:10px;"
+					rendered="#{not empty bean.pratica.motivoRifiuto}" >
+						
+					<h:outputText value="Non approvata il " styleClass="boldText" />
+					<h:outputText value="#{bean.pratica.dtmMod}" styleClass="boldText">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+					</h:outputText>
+					<br />
+					<br />
+							
+					<h:panelGroup layout="block" styleClass="corpo" rendered="#{empty bean.pratica.risposta}">
+						<h:outputText value="Motivazione del rifiuto: #{bean.pratica.motivoRifiuto}" />
+					</h:panelGroup>
+
+					<ui:fragment rendered="#{not empty bean.pratica.risposta}">
+						<h:outputText value="Risposta a #{bean.pratica.mittente} - inviata il "
+							styleClass="mittente" />
+						<h:outputText value="#{bean.pratica.risposta.dtmIns}" styleClass="mittente">
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+						</h:outputText>		
+						<br />
+
+						<h:panelGroup layout="block" styleClass="corpo" 
+							rendered="#{not empty bean.pratica.motivoRifiuto}">
+							<h:outputText value="Motivazione del rifiuto: #{bean.pratica.motivoRifiuto}" />
+						</h:panelGroup>
+						<br />
+							
+						<div class="corpo">
+							<h:outputText value="#{bean.pratica.risposta.corpo}" />
+						</div>
+					</ui:fragment>
+
+					<cc:upload readonly="#{true}" label="Allegato"
+						rendered="#{not empty bean.pratica.risposta.allegati}"
+						idAllegato="#{bean.pratica.risposta.allegati[0].id}"
+						value="#{bean.pratica.risposta.allegati[0].filename}" />
+				</h:panelGroup>
+				<br />
+
+				<h:panelGroup layout="block" id="editResponse" rendered="#{bean.edit}"
+					styleClass="quesito_corpo_pratica_atipici accordion ui-accordion 
+					ui-widget ui-helper-reset ui-accordion-icons">
+				
+					<h3 class="header_quesito_corpo_pratica_atipici">Sezione per il COORDINATORE</h3>
+					<br />
+							
+					<h:panelGrid columns="2" style="width: 400px" rendered="#{!bean.rejected}">
+						<cc:selectOneMenu label="Assegnato al CPI di" id="cpi" required="true"
+							value="#{bean.risposta.deProvincia.id}">
+							<f:selectItems value="#{utilsBean.province}" />
+						</cc:selectOneMenu>
+
+						<h:commandLink id="assegnaButton" styleClass="forwardButton" 
+							value="Assegna" action="#{bean.assignCPI}">
+							<f:ajax execute="@form" onevent="onEventAssegnazione"
+								render=":tematicaListForm :tematicaDetailForm :tematicaMessages" />
+						</h:commandLink>
+						<br />	
+					</h:panelGrid>
+
+					<div>
+						<b>Non approvo</b>
+						<h:selectBooleanCheckbox value="#{bean.rejected}" id="rejected">
+							<f:ajax event="click" execute="@this" onevent="disegnaBottoni"
+								render=":tematicaDetailForm:editResponse :tematicaDetailForm:buttons" />
+						</h:selectBooleanCheckbox>
+						<br />
+
+						<h:panelGroup layout="block" styleClass="motivo" rendered="#{bean.rejected}">
+							<br />
+							<cc:inputTextarea label="Motivo" rows="4"
+								richTextMode="false" maxlength="3000" required="true"
+								value="#{bean.risposta.motivoRifiuto}" />
+										
+							<br />
+							<cc:inputTextarea value="#{bean.risposta.corpo}"
+								label="Risposta (compilare solo in caso si voglia comunque rispondere al richiedente)"
+								richTextMode="false" id="risposta" rows="4" maxlength="3000" />
+						</h:panelGroup>
+					</div>
+				</h:panelGroup>
+				
+				<h:panelGroup layout="block" id="buttons">
+					<h:commandLink styleClass="marginButton archiveButton motivo"
+						rendered="#{bean.edit and bean.rejected}"
+						action="#{bean.archive}" value="Rispondi e archivia">
+						<f:ajax execute="@form" onevent="onEventRisposta"
+							render=":tematicaListForm :tematicaDetailForm :tematicaMessages" />
+					</h:commandLink>
+									
+					<h:commandLink styleClass="marginButton closeButton" immediate="true"
+						action="#{bean.setState('list')}" value="Chiudi" >
+						<f:ajax execute="@this" render=":tematicaDetailForm"
+							onevent="onHideDetail" />
+					</h:commandLink>
+				</h:panelGroup>
+				<script>
+					$(jq("tematicaDetailLoader")).hide();
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+		</h:form>
+		
+		<script>
+			function onEventAssegnazione(data) {
+				if (data.status == 'begin') {
+					$(jq("tematicaListForm")).hide();
+					$(jq("tematicaDetailForm")).hide();
+	    	  		$(jq("tematicaAssegnazioneLoader")).show();
+					return;
+				}
+				if (data.status == 'success') {
+	    	   		$(jq("tematicaAssegnazioneLoader")).hide();
+				}
+			}
+			
+			function onEventRisposta(data) {
+				if (data.status == 'begin') {
+					$(jq("tematicaListForm")).hide();
+					$(jq("tematicaDetailForm")).hide();
+	       			$(jq("tematicaRispostaLoader")).show();
+					return;
+				}
+				if (data.status == 'success') {
+	      			$(jq("tematicaRispostaLoader")).hide();
+				}
+			}
+			
+			function onShowDetail(data) {
+				if (data.status == 'begin') {
+					$(jq("tematicaDetailForm")).hide();
+					$(jq("tematicaDetailLoader")).show();
+				} else if (data.status == 'success') {
+					PrimeFaces.scrollTo("tematicaDetailForm");
+				}
+			}
+			
+			function onHideDetail(data) {
+				if (data.status == 'begin') {
+					$(jq("tematicaDetailForm")).slideUp("slow");
+				}
+			}
+		</script>
+	</ui:define>
+</ui:composition>

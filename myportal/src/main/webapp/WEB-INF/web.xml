@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+	<display-name>MyPortal</display-name>
+
+	<context-param>
+		<param-name>casServerUrlPrefix</param-name>
+		<param-value>http://localhost:20000/MyCas</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>javax.faces.PROJECT_STAGE</param-name>
+		<param-value>Production</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>javax.faces.DEFAULT_SUFFIX</param-name>
+		<param-value>.xhtml</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>javax.faces.FACELETS_LIBRARIES</param-name>
+		<param-value>/META-INF/myportal.taglib.xml</param-value>
+	</context-param>
+
+	<!-- BUGFIX per Data -1 by pegoraro -->
+	<context-param>
+		<param-name>javax.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- Impostazioni per nascondere campi hidden nelle form e autocomplete -->
+	<context-param>
+		<param-name>com.sun.faces.enableViewStateIdRendering</param-name>
+		<param-value>false</param-value>
+	</context-param>
+	<context-param>
+		<param-name>com.sun.faces.autoCompleteOffOnViewState</param-name>
+		<param-value>false</param-value>
+	</context-param>
+	<!-- IMPEDISCE A JSF DI SOSTITUIRE GLI INPUT NULLI CON STRINGHE VUOTE O 0 -->
+	<context-param>
+		<param-name>javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</param-name>
+		<param-value>true</param-value>
+	</context-param>
+	<context-param>
+		<param-name>javax.faces.PARTIAL_STATE_SAVING</param-name>
+		<param-value>false</param-value>
+	</context-param>
+	<context-param>
+		<param-name>com.sun.faces.defaultResourceMaxAge</param-name>
+		<param-value>3628800000</param-value> <!-- 6 weeks -->
+	</context-param>
+
+	<!-- Filtro per ovviare al problema dei caratteri accentati quando si usa il CAS -->
+	<filter>
+		<filter-name>CharacterEncodingFilter</filter-name>
+		<filter-class>it.eng.myauthservice.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>requestCharsetName</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>responseCharsetName</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>CharacterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<!-- logout -->
+
+	<filter>
+		<filter-name>CAS Single Sign Out Filter</filter-name>
+		<filter-class>org.jasig.cas.client.session.SingleSignOutFilter</filter-class>
+		<init-param>
+			<param-name>artifactParameterName</param-name>
+			<param-value>SAMLart</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CAS Single Sign Out Filter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<listener>
+		<listener-class>org.jasig.cas.client.session.SingleSignOutHttpSessionListener</listener-class>
+	</listener>
+
+	<!-- fine logout -->
+
+
+
+	<filter>
+		<filter-name>CAS Authentication Filter</filter-name>
+		<filter-class>org.jasig.cas.client.authentication.Saml11AuthenticationFilter</filter-class>
+		<init-param>
+			<param-name>tolerance</param-name>
+			<param-value>100000</param-value>
+		</init-param>
+		<init-param>
+			<param-name>casServerLoginUrl</param-name>
+			<param-value>http://localhost:20000/MyCas/login</param-value>
+		</init-param>
+		<init-param>
+			<param-name>serverName</param-name>
+			<param-value>http://localhost:20000</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>CAS Validation Filter</filter-name>
+		<filter-class>org.jasig.cas.client.validation.Saml11TicketValidationFilter</filter-class>
+		<init-param>
+			<param-name>casServerUrlPrefix</param-name>
+			<param-value>http://localhost:20000/MyCas</param-value>
+		</init-param>
+		<init-param>
+			<param-name>serverName</param-name>
+			<param-value>http://localhost:20000</param-value>
+		</init-param>
+		<init-param>
+			<param-name>redirectAfterValidation</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>useSession</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>acceptAnyProxy</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyReceptorUrl</param-name>
+			<param-value>/MyCas/proxyUrl</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyCallbackUrl</param-name>
+			<param-value>http://localhost:20000/MyCas/proxyUrl</param-value>
+		</init-param>
+		<init-param>
+			<param-name>tolerance</param-name>
+			<param-value>100000</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
+		<filter-class>org.jasig.cas.client.util.HttpServletRequestWrapperFilter</filter-class>
+	</filter>
+
+
+	<filter>
+		<filter-name>VerificaAccessoSocialFilter</filter-name>
+		<filter-class>it.eng.myportal.filter.VerificaAccessoSocialFilter</filter-class>
+	</filter>
+
+
+
+	<filter>
+		<filter-name>VerificaAccessoFilter</filter-name>
+		<filter-class>it.eng.myportal.filter.VerificaAccessoFilter</filter-class>
+	</filter>
+
+
+
+
+	<filter-mapping>
+		<filter-name>CAS Validation Filter</filter-name>
+		<url-pattern>/faces/secure/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>CAS Authentication Filter</filter-name>
+		<url-pattern>/faces/secure/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
+		<url-pattern>/faces/secure/*</url-pattern>
+	</filter-mapping>
+
+
+	<!-- Filtro di sicurezza per i servizi REST che devono essere invocati SENZA passare per i filtro jsf (in pratica non devono 
+		contenere 'faces' nell'URI di invocazione) -->
+
+	<filter-mapping>
+		<filter-name>CAS Validation Filter</filter-name>
+		<url-pattern>/secure/rest/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>CAS Authentication Filter</filter-name>
+		<url-pattern>/secure/rest/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>CAS HttpServletRequest Wrapper Filter</filter-name>
+		<url-pattern>/secure/rest/*</url-pattern>
+	</filter-mapping>
+
+
+
+
+
+	<filter-mapping>
+		<filter-name>VerificaAccessoSocialFilter</filter-name>
+		<url-pattern>/faces/secure/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>VerificaAccessoFilter</filter-name>
+		<url-pattern>/faces/secure/*</url-pattern>
+	</filter-mapping>
+
+
+
+
+
+
+	<servlet>
+		<servlet-name>Faces Servlet</servlet-name>
+		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<filter>
+		<filter-name>PrimeFaces FileUpload Filter</filter-name>
+		<filter-class>it.eng.myportal.filter.PortalFileUploadFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>PrimeFaces FileUpload Filter</filter-name>
+		<servlet-name>Faces Servlet</servlet-name>
+	</filter-mapping>
+
+
+	<servlet>
+		<display-name>DataAdesioneYG</display-name>
+		<servlet-name>DataAdesioneYG</servlet-name>
+		<servlet-class>it.eng.myportal.ws.DataAdesioneYG</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DataAdesioneYG</servlet-name>
+		<url-pattern>/service/DataAdesioneYG</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<display-name>DataAdesioneGO</display-name>
+		<servlet-name>DataAdesioneGO</servlet-name>
+		<servlet-class>it.eng.myportal.ws.DataAdesioneGO</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DataAdesioneGO</servlet-name>
+		<url-pattern>/service/DataAdesioneGO</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<display-name>RicezioneVacancy</display-name>
+		<servlet-name>RicezioneVacancy</servlet-name>
+		<servlet-class>it.eng.myportal.ws.RicezioneVacancy</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RicezioneVacancy</servlet-name>
+		<url-pattern>/service/RicezioneVacancy</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet>
+		<display-name>RicezioneClicLavoroSIL</display-name>
+		<servlet-name>RicezioneClicLavoroSIL</servlet-name>
+		<servlet-class>it.eng.myportal.ws.RicezioneClicLavoroSIL</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RicezioneClicLavoroSIL</servlet-name>
+		<url-pattern>/service/RicezioneClicLavoroSIL</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<display-name>CorsiOrienter</display-name>
+		<servlet-name>CorsiOrienter</servlet-name>
+		<servlet-class>it.eng.myportal.ws.CorsiOrienter</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CorsiOrienter</servlet-name>
+		<url-pattern>/service/CorsiOrienter</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<display-name>RssVacancy</display-name>
+		<servlet-name>RssVacancy</servlet-name>
+		<servlet-class>it.eng.myportal.servlet.RssVacancyServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RssVacancy</servlet-name>
+		<url-pattern>/RssVacancy</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<display-name>NotificheClicLavoro</display-name>
+		<servlet-name>NotificheClicLavoro</servlet-name>
+		<servlet-class>it.eng.myportal.ws.NotificheClicLavoro</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>NotificheClicLavoro</servlet-name>
+		<url-pattern>/service/NotificheClicLavoro</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<display-name>ServiziUtentiYG</display-name>
+		<servlet-name>ServiziUtentiYG</servlet-name>
+		<servlet-class>it.eng.myportal.ws.ServiziUtentiYG</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ServiziUtentiYG</servlet-name>
+		<url-pattern>/service/ServiziUtentiYG</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<display-name>GetStatoAdesioneYG</display-name>
+		<servlet-name>GetStatoAdesioneYG</servlet-name>
+		<servlet-class>it.eng.myportal.ws.GetStatoAdesioneYG</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GetStatoAdesioneYG</servlet-name>
+		<url-pattern>/service/statoadesione/get/ServizicoapWS</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<display-name>SetStatoAdesioneYG</display-name>
+		<servlet-name>SetStatoAdesioneYG</servlet-name>
+		<servlet-class>it.eng.myportal.ws.SetStatoAdesioneYG</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SetStatoAdesioneYG</servlet-name>
+		<url-pattern>/service/statoadesione/set/ServizicoapWS</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<display-name>NotificaCambioStatoAdesioneYG</display-name>
+		<servlet-name>NotificaCambioStatoAdesioneYG</servlet-name>
+		<servlet-class>it.eng.myportal.ws.NotificaCambioStatoAdesioneYG</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>NotificaCambioStatoAdesioneYG</servlet-name>
+		<url-pattern>/service/NotificaCambioStatoAdesioneYG</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet-mapping>
+		<servlet-name>Faces Servlet</servlet-name>
+		<url-pattern>/faces/*</url-pattern>
+	</servlet-mapping>
+
+	<welcome-file-list>
+		<welcome-file>faces/secure/auth/home.xhtml</welcome-file>
+	</welcome-file-list>
+
+	<error-page>
+		<error-code>404</error-code>
+		<location>/faces/public/errors.xhtml</location>
+	</error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/faces/public/errors.xhtml</location>
+	</error-page>
+
+	<!-- web fonts -->
+	<mime-mapping>
+		<extension>eot</extension>
+		<mime-type>application/vnd.ms-fontobject</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>otf</extension>
+		<mime-type>font/opentype</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>ttf</extension>
+		<mime-type>application/x-font-ttf</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>woff</extension>
+		<mime-type>application/x-font-woff</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>woff2</extension>
+		<mime-type>application/x-font-woff2</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>svg</extension>
+		<mime-type>image/svg+xml</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>ico</extension>
+		<mime-type>image/x-icon</mime-type>
+	</mime-mapping>
+
+
+	<session-config>
+		<!-- <session-timeout>60</session-timeout> -->
+		<!-- <cookie-config> <secure>true</secure> <http-only>true</http-only> </cookie-config> -->
+	</session-config>
+
+</web-app>

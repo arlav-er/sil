@@ -1,0 +1,144 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:pretty="http://ocpsoft.com/prettyfaces"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{sessionLogger.grantAccessFor(sessionLogger.getUtenteAccess())}" />
+	</f:metadata>
+	<h:outputScript library="commons" name="js/user/user.edit.js" />
+	<div class="container-fluid animated fadeIn">
+		<h:form id="profileEditForm" enctype="multipart/form-data" styleClass="form-horizontal">
+			<div class="row uk-margin-top">
+				<div class="profile-information">
+					<div class="col-md-2">
+						<div class="profile-pic text-center">
+							<h:panelGroup id="userProfilePic" styleClass="userProfilePic animated bounceIn" layout="block">
+								<h:panelGroup rendered="#{empty utenteEditBean.utenteInfo.foto}">
+									<h:graphicImage library="commons" name="images/profilePic.jpg"></h:graphicImage>
+								</h:panelGroup>
+								<h:panelGroup rendered="#{not empty utenteEditBean.utenteInfo.foto}">
+									<pretty:urlbuffer var="imgURL" mappingId="profilePicture">
+										<f:param id="type" value="utente" />
+										<f:param id="id" value="#{utenteEditBean.utenteInfo.pfPrincipal.idPfPrincipal}" />
+										<f:param id="username" value="#{utenteEditBean.utenteInfo.pfPrincipal.username}" />
+									</pretty:urlbuffer>
+									<div class="uk-overlay">
+										<img src="#{imgURL}?#{utils.currentTimeMillis()}" />
+										<div class="uk-overlay-area delete">
+											<div class="uk-overlay-area-content">
+												<p:commandLink process="@this" actionListener="#{utenteEditBean.removeProfilePic}" update="userProfilePic">
+													<i class="fa fa-times fa-4"></i>
+												</p:commandLink>
+											</div>
+										</div>
+									</div>
+								</h:panelGroup>
+							</h:panelGroup>
+
+							<div class="user-image-btn">
+								<span class="btn ui-button btn-primary btn-file">
+									<i class="fa fa-pencil"></i>
+								</span>
+								<p:fileUpload styleClass="advancedHiddenFileUpload" widgetVar="uploadFile" auto="true" multiple="false"
+									process="@this" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" fileUploadListener="#{utenteEditBean.handleFileUpload}"
+									update="userProfilePic" sizeLimit="#{validation['file.size']}"
+									invalidSizeMessage="#{validation['file.invalidSizeMessage']}"
+									invalidFileMessage="#{validation['file.invalidFileMessage']}" messageTemplate="."
+									onstart="$('.userProfilePic').removeClass('animated').addClass('animated bounceOut'); PF('ajaxStatusVar').trigger('start')"
+									oncomplete="PF('ajaxStatusVar').trigger('complete')">
+								</p:fileUpload>
+							</div>
+							<div id="editUserUploadMessages"></div>
+
+						</div>
+					</div>
+				</div>
+				<h:panelGroup id="masterGroup">
+					<div class="col-md-5">
+						<div class="panel panel-warning">
+							<div class="panel-heading">#{ui['prof.datiAccount']}</div>
+							<div class="panel-body">
+								<ui:include src="edit/_datiAccount.xhtml" />
+							</div>
+						</div>
+						<ui:remove>
+							<!-- Specific for RER-->
+						</ui:remove>
+						<ui:fragment rendered="#{utenteEditBean.checkSezioneServiziAmministrativiAbilitato()}">
+							<div class="panel panel-warning">
+								<div class="panel-heading">#{ui['prof.serviziAmministrativi']}</div>
+								<div class="panel-body">
+									<h:panelGroup id="servAminiGroup">
+										<ui:include src="edit/_servAmini.xhtml" />
+									</h:panelGroup>
+								</div>
+							</div>
+						</ui:fragment>
+					</div>
+
+					<div class="col-md-5">
+						<div class="panel panel-warning">
+							<div class="panel-heading">#{ui['prof.datiPersonali']}</div>
+							<div class="panel-body">
+								<ui:include src="edit/_datiPers.xhtml"></ui:include>
+							</div>
+						</div>
+					</div>
+				</h:panelGroup>
+			</div>
+			<div class="well text-center">
+				<p:commandLink id="modificaBtn" action="#{utenteEditBean.sync}" styleClass="ui-button btn btn-primary action-link"
+					update="@(.ui-message) infoPerRichiestaAbilitazioneGroup abilitaPecRadio" onstart="onActionStart()"
+					oncomplete="onActionComplete();" global="false">
+					<i class="fa fa-edit"></i> #{ui['shared.modifica']}
+				</p:commandLink>
+				<pretty:urlbuffer var="profileURL" mappingId="profile">
+				</pretty:urlbuffer>
+				<a href="#{profileURL}" class="ui-button btn btn-primary action-link">
+					<i class="fa fa-arrow-left"></i>
+					#{ui['shared.back']}
+				</a>
+				<h:graphicImage styleClass="action-loader" library="#{godfatherBean.theme}" name="images/loader.gif" alt="loader"
+					style="display: none" />
+			</div>
+			<script>
+				function onActionStart() {
+					$('.action-link').hide();
+					$('.action-loader').show();
+				}
+
+				function onActionComplete() {
+					$('.action-link').show();
+					$('.action-loader').hide();
+				}
+			</script>
+		</h:form>
+	</div>
+
+	<ui:include src="edit/_changePasswordDialog.xhtml"></ui:include>
+	<ui:fragment
+		rendered="#{utenteEditBean.utenteInfo.pfPrincipal.flagAbilitatoServizi
+                                    and not empty utenteEditBean.utenteInfo.codServiziAmministrativi}">
+
+		<ui:include src="edit/_cellulareFirmaOTPDialog.xhtml"></ui:include>
+	</ui:fragment>
+	<p:dialog widgetVar="cantAbilitatoServiziWV" header="#{ui['shared.attention']}" modal="true">
+		<div class="alert alert-danger" role="alert">
+			<h:outputFormat value="#{ui['regCit.cantAbilitatoServizi']}">
+				<f:param value="#{utils.nomeRegione}"></f:param>
+			</h:outputFormat>
+		</div>
+
+
+	</p:dialog>
+	<script>
+		$(document).ready(function(){
+			$('.ui-fileupload-buttonbar span input[type=file]').addClass('uploadBtn');
+			$('.btn-file').append($('.uploadBtn'))
+			$('.uploadBtn').change(function() {
+				var a = $('.ui-fileupload-content').html(); var b = $('#editUserUploadMessages').html(a);
+			}) 
+		});			
+	</script>
+</ui:composition>
+

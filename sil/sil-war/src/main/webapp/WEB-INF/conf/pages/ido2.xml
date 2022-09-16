@@ -1,0 +1,1312 @@
+﻿<!-- RICHIESTE -->
+
+<!--IdoTestataRichiestaPage-->
+<PAGE name="IdoTestataRichiestaPage" scope="REQUEST">
+	<MODULES>      
+    <MODULE name="M_GetTestataRichiesta" />
+    <MODULE name="M_ElencoCPI" />
+    <MODULE name="M_SaveTestataRichiesta" />
+    <MODULE name="MListTrasferte" />
+    <MODULE name="COMBO_SPI" />
+    <MODULE name="COMBO_SPI_ONLY_VALID" />
+    <MODULE name="M_GetPrgSpiUt" />
+    <!-- <MODULE name="M_GetLastRichiesta" /> -->
+    <MODULE name="M_InsertRichiesta" />
+    <MODULE name="M_ReiteraRichAz" />
+    <!-- modulo da presel -->
+    <MODULE name="M_GetArea" />
+    <!-- get numgg per data pubblicata -->
+    <MODULE name="M_GetNumGgPubb" />
+    <!-- get numgg per data richiesta -->
+    <MODULE name="M_GetNumGgRich" />
+    <MODULE name="M_GetTipiAzienda" />
+    <!-- preleva i referenti di una azienda-->
+	<MODULE name="M_GetReferentiAzienda"/>
+	<MODULE name="COMBO_MOTIVO_SESSO"/>
+	<MODULE name="COMBO_TIPO_LSU"/>
+	<MODULE name="COMBO_LISTE_SPECIALI_CM"/>
+	<MODULE name="M_GetConfigSV"/>
+	<MODULE name="M_CONFIG_CRESCO"/>
+	<MODULE name="M_Config_AsOnline"/>	
+	<MODULE name="M_GenericComboSiNo"/>	
+	</MODULES>
+	<DEPENDENCIES>
+  
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_GetTestataRichiesta">
+        <CONDITIONS>
+           <PARAMETER name="prgRichiestaAZ" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+           <PARAMETER name="salvaReiter" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    <!-- get numgg per data pubblicata -->
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_GetNumGgPubb">
+        <CONDITIONS>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    <!-- get numgg per data richiesta -->
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_GetNumGgRich">
+        <CONDITIONS>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    <!-- OPERAZIONI DI SALVATAGGIO-->
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_SaveTestataRichiesta">
+        <CONDITIONS>
+           <PARAMETER name="salva" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE> 
+
+    <DEPENDENCE source="M_SaveTestataRichiesta" target="M_GetTestataRichiesta">
+        <CONDITIONS>
+           <PARAMETER name="prgRichiestaAZ" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <!-- OPERAZIONI DI INSERIMENTO -->
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_InsertRichiesta">
+      <CONDITIONS>
+        <PARAMETER name="inserisciRichiesta" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="M_InsertRichiesta" target="M_GetTestataRichiesta">
+        <CONDITIONS>
+          <PARAMETER name="inserisciRichiesta" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES>
+          <PARAMETER name="prgRichiestaAz" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_InsertRichiesta.ROWS.ROW.PRGRICHIESTAAZ"/>
+        </CONSEQUENCES>          
+    </DEPENDENCE>
+
+    <!-- REITERAZIONE DELLA RICHIESTA AZIENDA -->
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_ReiteraRichAz">
+      <CONDITIONS>
+        <PARAMETER name="salvaReiter" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="M_ReiteraRichAz" target="M_GetTestataRichiesta">
+      <CONDITIONS>
+        <PARAMETER name="salvaReiter" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES>
+         <PARAMETER name="prgRichiestaAZ" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_REITERARICHAZ.ROW.prgRichiestaAZ"/>
+      </CONSEQUENCES>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+
+    <!-- OPERAZIONI GENERICHE -->    
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_ElencoCPI"/>
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="MListTrasferte"/>
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="COMBO_SPI">
+    	<CONDITIONS>
+			<PARAMETER name="reiteraRichAz" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+			<PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+		</CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="COMBO_SPI_ONLY_VALID">
+		<CONDITIONS>
+			<PARAMETER name="reiteraRichAz" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		</CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="COMBO_SPI_ONLY_VALID">
+		<CONDITIONS>
+			<PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		</CONDITIONS>
+    </DEPENDENCE>    
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_GetArea"/>
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_GetTipiAzienda"/>
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="COMBO_MOTIVO_SESSO"/>
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="COMBO_TIPO_LSU"/>  
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="COMBO_LISTE_SPECIALI_CM"/>  
+        
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_GetReferentiAzienda"> 
+      <CONDITIONS>
+         <PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" type="RELATIVE" value="AF_DEFINED"/>
+         <PARAMETER name="PRGUNITA" scope="SERVICE_REQUEST" type="RELATIVE" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+
+    <!--<DEPENDENCE source="M_InsertRichiesta" target="M_GetLastRichiesta">
+      <CONDITIONS> 
+      </CONDITIONS>
+      <CONSEQUENCES>         
+       </CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_GetLastRichiesta" target="M_GetTestataRichiesta">
+        <CONDITIONS>           
+        </CONDITIONS>
+        <CONSEQUENCES>
+          <PARAMETER name="prgRichiestaAz" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_GETLASTRICHIESTA.ROWS.ROW.PRGRICHIESTAAZ"/>
+        </CONSEQUENCES>          
+    </DEPENDENCE>-->
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_GetPrgSpiUt"/>
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_GetConfigSV"/>
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_CONFIG_CRESCO"/>    
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_Config_AsOnline"/>       
+    <DEPENDENCE source="IdoTestataRichiestaPage" target="M_GenericComboSiNo"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<!--IdoDeleteRichiestaPage-->
+<PAGE name="IdoDeleteRichiestaPage" scope="REQUEST">
+	<MODULES>      
+    <MODULE name="M_DeleteRichiesta" />    
+	</MODULES>
+	<DEPENDENCIES>
+    <DEPENDENCE source="IdoDeleteRichiestaPage" target="M_DeleteRichiesta">
+        <CONDITIONS>
+           <PARAMETER name="prgRichiestaAZ" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_DeleteRichiesta" target="M_DynRicercaRichieste">
+        <CONDITIONS/>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+  </DEPENDENCIES>
+</PAGE>    
+
+<!--IdoTurniRichiestaPage-->
+<PAGE name="IdoTurniRichiestaPage" scope="REQUEST">
+	<MODULES>
+    <MODULE name="M_GetTestataRichiesta" />
+    <MODULE name="M_GetTurniRichiesta" />
+    <MODULE name="M_ListTurni" />    
+    <MODULE name="M_DeleteTurnoRichiesta" />
+    <MODULE name="M_SaveTurniRichiesta" />   
+	</MODULES>
+	<DEPENDENCIES>
+    <DEPENDENCE source="IdoTurniRichiestaPage" target="M_GetTestataRichiesta"/>
+    <DEPENDENCE source="IdoTurniRichiestaPage" target="M_GetTurniRichiesta">
+        <CONDITIONS>
+           <PARAMETER name="prgRichiestaAZ" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="IdoTurniRichiestaPage" target="M_ListTurni">
+        <CONDITIONS/>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="IdoTurniRichiestaPage" target="M_SaveTurniRichiesta">
+        <CONDITIONS>
+          <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_SaveTurniRichiesta"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="IdoTurniRichiestaPage" target="M_DeleteTurnoRichiesta">
+          <CONDITIONS>
+            <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_DeleteTurnoRichiesta"/> 
+          </CONDITIONS>
+          <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_DeleteTurnoRichiesta" target="M_GetTurniRichiesta">
+      <CONDITIONS/>
+    </DEPENDENCE>    
+    <DEPENDENCE source="M_DeleteTurnoRichiesta" target="M_ListTurni">
+      <CONDITIONS/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_SaveTurniRichiesta" target="M_GetTurniRichiesta">
+      <CONDITIONS/>
+    </DEPENDENCE>    
+    <DEPENDENCE source="M_SaveTurniRichiesta" target="M_ListTurni">
+      <CONDITIONS/>
+    </DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+<!--IdoListaRichiesteUnitaPage-->
+<PAGE name="IdoListaRichiesteUnitaPage" scope="REQUEST">
+	<MODULES>
+    <MODULE name="M_GetListaRichiesteUnita" />    
+	</MODULES>
+	<DEPENDENCIES>
+    <DEPENDENCE source="IdoListaRichiesteUnitaPage" target="M_GetListaRichiesteUnita">
+        <CONDITIONS>
+           <PARAMETER name="prgAzienda" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+           <PARAMETER name="prgUnita" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+<!--RicercaAziendaPage-->
+<PAGE distributed="false" name="RicercaAziendaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE  name="M_DynRicercaAziendeUnita"/>
+
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaAziendaPage" target="M_DynRicercaAziendeUnita">
+  </DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Gestione Studi nell'alternativa della Richiesta-->
+<PAGE distributed="false" name="IdoStudiPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="M_GetTestataRichiesta"/>
+    <MODULE keep="false" name="M_GetStudiRichiesta"/>
+    <MODULE keep="false" name="M_InsertStudioRichiesta"/>
+    <MODULE keep="false" name="M_DeleteStudioRichiesta"/>
+    <MODULE keep="false" name="M_SaveStudioRichiesta"/>
+    <MODULE keep="false" name="M_GetDettaglioStudioRichiesta"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="IdoStudiPage" target="M_GetTestataRichiesta"/>
+
+
+    <DEPENDENCE source="IdoStudiPage" target="M_GetDettaglioStudioRichiesta">
+      <CONDITIONS>
+        <PARAMETER name="SELDETTAGLIO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>    
+
+    
+    <DEPENDENCE source="IdoStudiPage" target="M_InsertStudioRichiesta">
+      <CONDITIONS>
+        <PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>    
+
+    <DEPENDENCE source="M_InsertStudioRichiesta" target="M_GetTestataRichiesta">
+    </DEPENDENCE>
+
+    <DEPENDENCE source="IdoStudiPage" target="M_SaveStudioRichiesta">
+      <CONDITIONS>
+        <PARAMETER name="salva" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="M_SaveStudioRichiesta" target="M_GetTestataRichiesta">
+      <CONDITIONS>
+      </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="IdoStudiPage" target="M_DeleteStudioRichiesta">
+      <CONDITIONS>
+        <PARAMETER name="CANCELLA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="IdoStudiPage" target="M_GetStudiRichiesta"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- Gestione Dettaglio Studi Della Richiesta-->
+<PAGE distributed="false" name="IdoDettaglioStudioRichiestaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="M_GetDettaglioStudioRichiesta"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="IdoDettaglioStudioRichiestaPage" target="M_GetDettaglioStudioRichiesta"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+
+<!-- Gestione dello stato di una richiesta-->
+<PAGE name="IdoGestStatoRichiestaPage" scope="REQUEST">
+  <MODULES>
+    <!--  riapertura della richiesta - modulo AS-->
+    <MODULE name="M_SaveRiaperturaRichiesta"/>
+    
+    <!--Esposito 04/02/2008 - Serve ancora questo modulo? -->
+    <MODULE name="M_InserisciStatoRich"/>
+    
+    <MODULE name="M_SalvaStatoRich"/>
+    <MODULE name="M_UpdateCategoriaCM"/>
+    <MODULE name="M_IdoGetStatoRich"/>
+    <MODULE name="M_StatoEvRichAz"/>
+    <MODULE name="M_GetAziendaUnita"/>
+    <MODULE name="M_EvasioneRichAz"/>
+    <MODULE name="M_StatoRichAz"/>
+    <MODULE name="M_IdoGetMotivoChiusuraRich"/>
+    <!-- moduli usati in gestione esito richiesta -->
+    <MODULE name="M_IdoGetRelEvasMotivo"/>  
+    <MODULE name="M_IdoGetEsitoRichiesta"/>
+    <!-- combo per la riapertura della richiesta - modulo AS-->
+	<MODULE name="COMBO_MOTIVO_RIAPERTURA"/>	
+	<MODULE name="M_GetMotivoAperturaRich"/> 
+	<MODULE name="M_CONFIG_FLUSSO_VACANCY" />     
+	<MODULE name="M_CONFIG_CRESCO" />     
+  </MODULES>
+
+  <DEPENDENCIES>
+  	<DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_SaveRiaperturaRichiesta">
+    	<CONDITIONS>
+        	<PARAMETER name="riapri" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      	</CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_InserisciStatoRich">
+      <CONDITIONS>
+        <PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_SalvaStatoRich" target="M_UpdateCategoriaCM">
+      <CONDITIONS>
+      	<PARAMETER name="CODEVASIONE" scope="SERVICE_REQUEST" type="ABSOLUTE" value="MIR"/>
+        <PARAMETER name="CODMONOCMCATEGORIAOLD" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_SalvaStatoRich" target="M_UpdateCategoriaCM">
+      <CONDITIONS>
+      	<PARAMETER name="CODEVASIONE" scope="SERVICE_REQUEST" type="ABSOLUTE" value="MPP"/>
+        <PARAMETER name="CODMONOCMCATEGORIAOLD" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_SalvaStatoRich" target="M_UpdateCategoriaCM">
+      <CONDITIONS>
+      	<PARAMETER name="CODEVASIONE" scope="SERVICE_REQUEST" type="ABSOLUTE" value="MPA"/>
+        <PARAMETER name="CODMONOCMCATEGORIAOLD" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_InserisciStatoRich" target="M_UpdateCategoriaCM">
+      <CONDITIONS>
+      	<PARAMETER name="CODEVASIONE" scope="SERVICE_REQUEST" type="ABSOLUTE" value="MIR"/>
+        <PARAMETER name="CODMONOCMCATEGORIAOLD" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_InserisciStatoRich" target="M_UpdateCategoriaCM">
+      <CONDITIONS>
+      	<PARAMETER name="CODEVASIONE" scope="SERVICE_REQUEST" type="ABSOLUTE" value="MPP"/>
+        <PARAMETER name="CODMONOCMCATEGORIAOLD" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_InserisciStatoRich" target="M_UpdateCategoriaCM">
+      <CONDITIONS>
+      	<PARAMETER name="CODEVASIONE" scope="SERVICE_REQUEST" type="ABSOLUTE" value="MPA"/>
+        <PARAMETER name="CODMONOCMCATEGORIAOLD" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_SalvaStatoRich">
+      <CONDITIONS>
+        <PARAMETER name="salva" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_IdoGetStatoRich">
+      <CONDITIONS>
+        <PARAMETER name="prgRichiestaAZ" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_GetAziendaUnita"/>
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_StatoEvRichAz"/>
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_EvasioneRichAz"/>
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_StatoRichAz"/>
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_IdoGetMotivoChiusuraRich"/>
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_IdoGetRelEvasMotivo"/>
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_IdoGetEsitoRichiesta"/>
+    <!-- combo per la riapertura della richiesta - modulo AS-->
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="COMBO_MOTIVO_RIAPERTURA"/>
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_GetMotivoAperturaRich"/>
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_CONFIG_FLUSSO_VACANCY"/>
+    <DEPENDENCE source="IdoGestStatoRichiestaPage" target="M_CONFIG_CRESCO"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="StampeRosaCandidatiIDOPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_IdoGetAnnoNumRichiesta"/>    
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="StampeRosaCandidatiIDOPage" target="M_IdoGetAnnoNumRichiesta"/>     
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!-- Gestisce i filtri da applicare ad una specifica rosa di candidati dell'Incrocio Domanda/Offerta-->
+<PAGE name="FiltriPerRosaIDOPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_Ido2GetRichiestaAz"/>
+    <MODULE name="M_Ido2GetGiaFiltrata"/>
+    <MODULE name="M_FiltroPerSesso"/>
+    <MODULE name="M_FiltroPerEta"/>
+    <MODULE name="M_FiltroPerNazione"/>
+    <MODULE name="M_ApplicaFiltro"/>
+    <!--MODULE name="M_FiltraSesso"/-->
+    <!--MODULE name="M_FiltraEta"/-->
+    <!--MODULE name="M_FiltraNazione"/-->    
+    <MODULE name="COMBO_MOTIVO_SESSO"/>
+	<MODULE name="COMBO_MOTIVO_ETA" />
+	<MODULE name="COMBO_MOTIVO_NAZIONALITA" />
+	<MODULE name="M_FiltroPerSvantaggiati" />
+	<MODULE name="M_GetConfigSV" />
+	<MODULE name="M_FiltroPerDisNonIscritti" />
+	<MODULE name="CI_TIPO_ISCR"/>
+	<MODULE name="M_LoadFiltroPerAltreIscr"/>
+  </MODULES>
+  
+  <DEPENDENCIES>
+  
+	<DEPENDENCE source="FiltriPerRosaIDOPage" target="COMBO_MOTIVO_SESSO"/>
+	<DEPENDENCE source="FiltriPerRosaIDOPage" target="COMBO_MOTIVO_ETA"/>
+	<DEPENDENCE source="FiltriPerRosaIDOPage" target="COMBO_MOTIVO_NAZIONALITA"/>
+	<DEPENDENCE source="FiltriPerRosaIDOPage" target="CI_TIPO_ISCR"/>
+  
+    <DEPENDENCE source="FiltriPerRosaIDOPage" target="M_ApplicaFiltro">
+        <CONDITIONS>
+          <PARAMETER name="filtro" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+<!-- Savino 30/08/2005: le operazioni dei 3 filtri sono state spostate in applica_filtro
+
+    <DEPENDENCE source="M_ApplicaFiltro" target="M_FiltraSesso">
+        <CONDITIONS>
+          <PARAMETER name="filtro" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+          <PARAMETER name="sesso" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+
+   <DEPENDENCE source="M_ApplicaFiltro" target="M_FiltraEta">
+        <CONDITIONS>
+          <PARAMETER name="filtro" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+          <PARAMETER name="eta" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="M_ApplicaFiltro" target="M_FiltraNazione">
+        <CONDITIONS>
+          <PARAMETER name="filtro" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+          <PARAMETER name="codCittadinanza_1" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+-->
+
+    <DEPENDENCE source="FiltriPerRosaIDOPage" target="M_Ido2GetRichiestaAz"/>
+    <DEPENDENCE source="FiltriPerRosaIDOPage" target="M_Ido2GetGiaFiltrata"/>
+    <DEPENDENCE source="FiltriPerRosaIDOPage" target="M_LoadFiltroPerAltreIscr"/>
+
+    <DEPENDENCE source="M_Ido2GetRichiestaAz" target="M_FiltroPerSesso">
+        <CONSEQUENCES>
+          <PARAMETER name="prgRichiestaAz" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_IDO2GETRICHIESTAAZ.ROWS.ROW.PRGRICHIESTAAZ"/>
+        </CONSEQUENCES>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="M_Ido2GetRichiestaAz" target="M_FiltroPerEta">
+        <CONSEQUENCES>
+          <PARAMETER name="prgRichiestaAz" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_IDO2GETRICHIESTAAZ.ROWS.ROW.PRGRICHIESTAAZ"/>
+          <PARAMETER name="prgAlternativa" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_IDO2GETRICHIESTAAZ.ROWS.ROW.PRGALTERNATIVA"/>
+        </CONSEQUENCES>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="M_Ido2GetRichiestaAz" target="M_FiltroPerNazione">
+        <CONSEQUENCES>
+          <PARAMETER name="prgRichiestaAz" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_IDO2GETRICHIESTAAZ.ROWS.ROW.PRGRICHIESTAAZ"/>
+        </CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_Ido2GetRichiestaAz" target="M_FiltroPerSvantaggiati">
+        <CONSEQUENCES>
+          <PARAMETER name="prgRichiestaAz" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_IDO2GETRICHIESTAAZ.ROWS.ROW.PRGRICHIESTAAZ"/>
+        </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_Ido2GetRichiestaAz" target="M_FiltroPerDisNonIscritti">
+        <CONSEQUENCES>
+          <PARAMETER name="prgRichiestaAz" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_IDO2GETRICHIESTAAZ.ROWS.ROW.PRGRICHIESTAAZ"/>
+        </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="FiltriPerRosaIDOPage" target="M_GetConfigSV"/>
+       
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- Gestisce i filtri CM da applicare ad una specifica rosa di candidati dell'Incrocio Domanda/Offerta-->
+<PAGE name="FiltriCMPerRosaIDOPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_Ido2GetRichiestaAz"/>
+    <MODULE name="M_Ido2GetGiaFiltrata"/>
+    <MODULE name="M_ApplicaFiltroCM"/>    
+    <MODULE name="M_RosaParFiltroCM"/> 
+    <MODULE name="COMBO_GRADO_FILTRI_CM"/>
+    <MODULE name="COMBO_FILTRI_CAPACITA_CM"/>
+    <MODULE name="M_GetConfigDiagnosiFunz" />
+    <MODULE name="COMBO_CAPACITA_CM_VDA" />
+    <MODULE name="COMBO_GRADO_FILTRI_CM_SINO" />
+    <MODULE name="COMBO_GRADO_FILTRI_CM_ARTI" />
+    <MODULE name="M_RosaParFiltroCMVDA" />
+  </MODULES>
+  
+  <DEPENDENCIES>
+    <DEPENDENCE source="FiltriCMPerRosaIDOPage" target="M_GetConfigDiagnosiFunz"/>
+  
+    <DEPENDENCE source="M_GetConfigDiagnosiFunz" target="COMBO_GRADO_FILTRI_CM"/>
+    <DEPENDENCE source="M_GetConfigDiagnosiFunz" target="COMBO_FILTRI_CAPACITA_CM"/>
+    <DEPENDENCE source="M_GetConfigDiagnosiFunz" target="M_ApplicaFiltroCM">
+        <CONDITIONS>
+          <PARAMETER name="filtro" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_GetConfigDiagnosiFunz" target="M_Ido2GetRichiestaAz"/>
+    <DEPENDENCE source="M_GetConfigDiagnosiFunz" target="M_Ido2GetGiaFiltrata"/>
+    <DEPENDENCE source="M_Ido2GetRichiestaAz" target="M_RosaParFiltroCM"/>
+    <DEPENDENCE source="M_Ido2GetRichiestaAz" target="COMBO_CAPACITA_CM_VDA"/>
+    <DEPENDENCE source="M_Ido2GetRichiestaAz" target="COMBO_GRADO_FILTRI_CM_SINO"/>
+    <DEPENDENCE source="M_Ido2GetRichiestaAz" target="COMBO_GRADO_FILTRI_CM_ARTI"/>
+    <DEPENDENCE source="M_Ido2GetRichiestaAz" target="M_RosaParFiltroCMVDA"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!--Esito del match domanda/offerta-->
+<PAGE name="MatchEsitoPage" scope="REQUEST">
+	<MODULES>
+    <MODULE name="M_GET_PRGORIGINALE"/>
+		<MODULE name="M_GetEsitoPrgRichAz"/>
+		<MODULE name="M_GetEsitoMatchIDO"/>
+		<MODULE name="M_DesEsitoXAzienda"/>
+		<MODULE name="M_DesEsitoXCandidato"/>
+    <MODULE name="MDettaglioRosa"/>
+		<MODULE  name="M_InsertEsitoMatchIDO"/>
+		<MODULE  name="M_SaveEsitoMatchIDO"/>
+	</MODULES>
+	
+  <DEPENDENCIES>
+    <DEPENDENCE source="MatchEsitoPage" target="M_InsertEsitoMatchIDO"> 
+      <CONDITIONS>
+         <PARAMETER name="inserisci" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="MatchEsitoPage" target="M_SaveEsitoMatchIDO"> 
+      <CONDITIONS>
+         <PARAMETER name="salva" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="MatchEsitoPage"      target="M_GET_PRGORIGINALE"/>
+    <DEPENDENCE source="MatchEsitoPage"      target="MDettaglioRosa"/>
+    <DEPENDENCE source="MatchEsitoPage"      target="M_DesEsitoXAzienda"/>
+    <DEPENDENCE source="MatchEsitoPage"      target="M_DesEsitoXCandidato"/>
+    <DEPENDENCE source="MatchEsitoPage"      target="M_GetEsitoPrgRichAz"/>
+    <DEPENDENCE source="M_GetEsitoPrgRichAz" target="M_GetEsitoMatchIDO"/>
+    
+	</DEPENDENCIES>
+		
+</PAGE>
+
+
+
+<PAGE name="MatchViewParEsattoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetParOpzionaliIncrocio"/>
+  </MODULES>
+    <DEPENDENCIES>
+        <DEPENDENCE source="MatchViewParEsattoPage" target="M_GetParOpzionaliIncrocio"/> 
+    </DEPENDENCIES>
+</PAGE>
+
+
+<PAGE name="RiferimentiAziendaPage" scope="REQUEST">
+
+	<MODULES>
+		<MODULE name="M_GetReferentiAzienda"/>
+  </MODULES>
+
+    <DEPENDENCIES>
+        <DEPENDENCE source="RiferimentiAziendaPage" target="M_GetReferentiAzienda"/> 
+    </DEPENDENCIES>
+
+</PAGE>
+
+
+<!-- gestione dell'accorpamento delle unità aziendali -->
+
+<PAGE name="AccorpamentoUnitaPage" scope="REQUEST">
+	<MODULES>
+	    <MODULE name="M_GetUnitaAziendaAccorpamento" />	
+        <MODULE name="M_GetStatiAzienda" />
+        <MODULE name="M_GetTestataAzienda" />
+        <MODULE name="M_DoAccorpamento" />        
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="AccorpamentoUnitaPage" target="M_DoAccorpamento">    	
+        	<CONDITIONS>
+        		<PARAMETER name="DOACCORPAMENTO" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        	</CONDITIONS>
+        </DEPENDENCE>
+        <DEPENDENCE source="AccorpamentoUnitaPage" target="M_GetTestataAzienda">    	
+        	<CONDITIONS>
+        		<PARAMETER name="DOACCORPAMENTO" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+        </DEPENDENCE>
+	    <DEPENDENCE source="AccorpamentoUnitaPage" target="M_GetUnitaAziendaAccorpamento">    	
+        	<CONDITIONS>
+        		<PARAMETER name="DOACCORPAMENTO" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+        </DEPENDENCE>
+
+  	    <DEPENDENCE source="AccorpamentoUnitaPage" target="M_GetStatiAzienda">
+          	<CONDITIONS>
+        		<PARAMETER name="DOACCORPAMENTO" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+        </DEPENDENCE>
+  	        	
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Gestione dell'accorpamento delle testate aziendali -->
+
+<PAGE name="AccorpamentoTestataPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetTestateAziendaAccorpamento" />
+		<MODULE name="M_DoAccorpamentoTestata" />
+
+		<!-- ex:combo: -->
+		<MODULE name="M_GetTipiAzienda"/>
+		<MODULE name="M_GetTipiNatGiuridica"/>
+		<MODULE name="M_GetTipiCCNL"/>
+		<MODULE name="M_GetCCNL"/>
+		<MODULE name="M_GestisciStatoProspetto"/>
+	</MODULES>
+  
+	<DEPENDENCIES>
+		<DEPENDENCE source="AccorpamentoTestataPage" target="M_GetTestateAziendaAccorpamento">
+			<CONDITIONS>
+				<PARAMETER name="DOACCORPAMENTO" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="M_GetTestateAziendaAccorpamento" target="M_GetTipiAzienda"/>
+		<DEPENDENCE source="M_GetTestateAziendaAccorpamento" target="M_GetTipiNatGiuridica"/>
+		<DEPENDENCE source="M_GetTestateAziendaAccorpamento" target="M_GetTipiCCNL"/>
+		<DEPENDENCE source="M_GetTestateAziendaAccorpamento" target="M_GetCCNL"/>
+
+		<DEPENDENCE source="AccorpamentoTestataPage" target="M_DoAccorpamentoTestata">
+			<CONDITIONS>
+				<PARAMETER name="DOACCORPAMENTO" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetTestateAziendaAccorpamento" target="M_GestisciStatoProspetto"/>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- Pubblicazione richieste - Lato operatore  -->
+<PAGE distributed="false" name="PubbRichiestePage" scope="REQUEST">
+     <MODULES>
+     	 <MODULE name="M_CONFIG_CRESCO"/>   
+         <MODULE name="M_GetTestataRichiesta"/>    
+         <MODULE name="M_GetUnitaAzienda"/>    
+         <MODULE name="M_GetTestataAzienda"/>    
+         <MODULE name="M_GetStudiRichiestaPubb"/>             
+         <MODULE name="M_GetContrattiRichiestaPubb"/>    
+         <MODULE name="MListaLingueRichiestaPubb"/>           
+         <MODULE name="M_GetInformaticaRichiestaPubb"/>         
+         <MODULE name="M_GetIdoEtaEsperienzaPubb"/>    
+         <MODULE name="M_ListAbilRich"/>    
+         <MODULE name="MListaOrariRichiesta"/>    
+         <MODULE name="M_GetTurniRichiesta"/>    
+         <MODULE name="M_GetInfoCPI"/>    
+         <MODULE name="M_ListIdoMansioniPubb" />                  
+         <MODULE name="MListaTerritoriComuniRichiesta" />                  
+         <MODULE name="MListaTerritoriProvinceRichiesta" />                  
+         <MODULE name="M_SaveTestataRichiestaPubb" />    
+         <MODULE name="M_IdoGetStatoRich" />                  
+         <MODULE name="M_GetNumGgPubb" />
+         <MODULE name="M_GetIdoTipiQualificaPub" />         
+         <MODULE name="M_GetReferentiAziendaRichiestaPubb" />                           
+         <MODULE name="M_GetTestataRichiestaPubb" />
+         <!-- AS -->
+         <MODULE name="M_ListIdoMansioniPubbAS" />
+         <MODULE name="M_GetDataChiamataPubb" />
+		 <!-- CM -->
+         <MODULE name="M_GetDataChiamataCMPubb" />
+         <MODULE name="M_CountIdoMansioni" />
+         <MODULE name="M_CountIdoComuni" />
+         <MODULE name="M_GetCodRegione" /> 
+         <MODULE name="M_ComboRapportoLav"/>     
+         <!-- gestione flusso sil-portale -->
+         <MODULE name="M_CONFIG_FLUSSO_VACANCY" />   
+         <MODULE name="M_CHECK_INVIO_VACANCY_SIL" />
+         <MODULE name="M_CONFIG_CANDID_PALE_VAC"/> 
+         <MODULE name="InviaVacancySil" />
+         <MODULE name="M_CONFIG_DTPUBB_VACANCY" />
+     </MODULES>
+     <DEPENDENCIES>
+     	 <DEPENDENCE source="PubbRichiestePage" target="M_CONFIG_DTPUBB_VACANCY" />	
+     	 <DEPENDENCE source="PubbRichiestePage" target="M_CONFIG_CRESCO" />	
+     	 <DEPENDENCE source="M_CONFIG_CRESCO" target="M_CONFIG_CANDID_PALE_VAC" />
+      	 <DEPENDENCE source="M_CONFIG_CANDID_PALE_VAC" target="M_CONFIG_FLUSSO_VACANCY" />
+      	 <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_CHECK_INVIO_VACANCY_SIL">
+			<CONDITIONS>
+				<PARAMETER name="M_CONFIG_FLUSSO_VACANCY.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1" />
+				<PARAMETER name="invioFlussoVacancy" scope="SERVICE_REQUEST" value="invioFlussoVacancy" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CHECK_INVIO_VACANCY_SIL" target="InviaVacancySil" >
+			<CONDITIONS>
+				<PARAMETER name="M_CHECK_INVIO_VACANCY_SIL.CHECKINVIO" scope="SERVICE_RESPONSE" value="AF_DEFINED" />
+				<PARAMETER name="invioFlussoVacancy" scope="SERVICE_REQUEST" value="invioFlussoVacancy" />
+			</CONDITIONS>
+		</DEPENDENCE>
+     	 <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_ComboRapportoLav" />
+		 <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetNumGgPubb" />     
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetTestataRichiesta" >    
+           <CONDITIONS>
+             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+           </CONDITIONS>
+           <CONSEQUENCES/>
+         </DEPENDENCE>         
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetUnitaAzienda">    
+           <CONDITIONS>
+             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+           </CONDITIONS>
+           <CONSEQUENCES/>
+         </DEPENDENCE>         
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetTestataAzienda">    
+           <CONDITIONS>
+             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+           </CONDITIONS>
+           <CONSEQUENCES/>
+         </DEPENDENCE>
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetStudiRichiestaPubb">    
+           <CONDITIONS>
+           	 <PARAMETER name="M_CONFIG_FLUSSO_VACANCY.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0" />
+             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+           </CONDITIONS>
+           <CONSEQUENCES/>
+         </DEPENDENCE>         
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetContrattiRichiestaPubb">    
+           <CONDITIONS>
+           	 <PARAMETER name="M_CONFIG_FLUSSO_VACANCY.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0" />
+             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+           </CONDITIONS>
+           <CONSEQUENCES/>
+         </DEPENDENCE>         
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="MListaLingueRichiestaPubb">    
+           <CONDITIONS>
+           	 <PARAMETER name="M_CONFIG_FLUSSO_VACANCY.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0" />
+             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+           </CONDITIONS>
+           <CONSEQUENCES/>
+         </DEPENDENCE>         
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetInformaticaRichiestaPubb">    
+           <CONDITIONS>
+           	 <PARAMETER name="M_CONFIG_FLUSSO_VACANCY.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0" />
+             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+           </CONDITIONS>
+           <CONSEQUENCES/>
+         </DEPENDENCE>         
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetIdoEtaEsperienzaPubb">    
+           <CONDITIONS>
+             <PARAMETER name="M_CONFIG_FLUSSO_VACANCY.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0" />
+             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+           </CONDITIONS>
+           <CONSEQUENCES/>
+         </DEPENDENCE>         
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_ListAbilRich">    
+           <CONDITIONS>
+           	 <PARAMETER name="M_CONFIG_FLUSSO_VACANCY.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0" />
+             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+           </CONDITIONS>
+           <CONSEQUENCES/>
+         </DEPENDENCE>         
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="MListaOrariRichiesta">    
+           <CONDITIONS>
+           	 <PARAMETER name="M_CONFIG_FLUSSO_VACANCY.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0" />
+             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+           </CONDITIONS>
+           <CONSEQUENCES/>
+         </DEPENDENCE>         
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetTurniRichiesta">    
+           <CONDITIONS>
+             <PARAMETER name="M_CONFIG_FLUSSO_VACANCY.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="0" />
+             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+           </CONDITIONS>
+           <CONSEQUENCES/>
+         </DEPENDENCE>         
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetInfoCPI">    
+           <CONDITIONS>
+             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+           </CONDITIONS>
+           <CONSEQUENCES/>
+         </DEPENDENCE>         
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_ListIdoMansioniPubb" />                  
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="MListaTerritoriComuniRichiesta" />                  
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="MListaTerritoriProvinceRichiesta" />                  
+          <!-- AS -->
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_ListIdoMansioniPubbAS" >
+	         <CONDITIONS>
+	             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+	         </CONDITIONS>
+	         <CONSEQUENCES/>
+	     </DEPENDENCE>
+	     <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetDataChiamataPubb" >
+         	<CONDITIONS>
+         		<PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+         	</CONDITIONS>
+         	<CONSEQUENCES/>  
+	     </DEPENDENCE>
+	     <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetDataChiamataCMPubb" >
+         	<CONDITIONS>
+         		<PARAMETER name="salva" scope="SERVICE_REQUEST" value="Prevalorizza"/>
+         	</CONDITIONS>
+         	<CONSEQUENCES/>  
+	     </DEPENDENCE>
+	     <!-- /AS -->
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_SaveTestataRichiestaPubb" >    
+           <CONDITIONS>
+             <PARAMETER name="salva" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+             <PARAMETER name="invioFlussoVacancy" scope="SERVICE_REQUEST" value="NO" />
+           </CONDITIONS>
+           <CONSEQUENCES/>
+         </DEPENDENCE> 
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_IdoGetStatoRich" />                  
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetIdoTipiQualificaPub" />         
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetReferentiAziendaRichiestaPubb" />                           
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetTestataRichiestaPubb" />
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_CountIdoMansioni" />
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_CountIdoComuni" />
+         <DEPENDENCE source="M_CONFIG_FLUSSO_VACANCY" target="M_GetCodRegione" />    
+     </DEPENDENCIES>
+</PAGE>
+
+
+<!--ASListaAdesionipage-->
+<PAGE name="ASListaAdesioniPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_GetLavoratoreAnag" />
+    	<MODULE name="M_GetASListaAdesioniLavoratore" />    	
+    	<MODULE name="M_ASAssociaRichiesteAdesione" />        	
+    	<MODULE name="M_ASDeleteRichiestaAdesione" /> 
+    	<MODULE name="M_ASUpdatePunteggiRichiestaAdesione" /> 
+	</MODULES>
+	<DEPENDENCIES>	    
+	    <DEPENDENCE source="ASListaAdesioniPage" target="M_ASAssociaRichiesteAdesione">
+        	<CONDITIONS>
+          		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_ASAssociaRichiesteAdesione"/>
+        	</CONDITIONS>
+        	<CONSEQUENCES/>
+    	</DEPENDENCE>
+    	<DEPENDENCE source="ASListaAdesioniPage" target="M_ASDeleteRichiestaAdesione">
+        	<CONDITIONS>
+          		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_ASDeleteRichiestaAdesione"/>
+        	</CONDITIONS>
+        	<CONSEQUENCES/>
+    	</DEPENDENCE>
+		<DEPENDENCE source="ASListaAdesioniPage" target="M_ASUpdatePunteggiRichiestaAdesione">
+        	<CONDITIONS>
+          		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_ASUpdatePunteggiRichiestaAdesione"/>
+        	</CONDITIONS>
+        	<CONSEQUENCES/>
+    	</DEPENDENCE>
+    	<DEPENDENCE source="ASListaAdesioniPage" target="M_GetLavoratoreAnag"/>	  
+	    <DEPENDENCE source="ASListaAdesioniPage" target="M_GetASListaAdesioniLavoratore" />
+  </DEPENDENCIES>
+</PAGE>
+
+<!--ASCercaAdesionePage-->
+<PAGE name="ASCercaRichiesteAdesionePage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_GetLavoratoreAnag" />
+    	<MODULE name="M_GetASCercaRichiesteAdesioni" />    	       	
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="ASCercaRichiesteAdesionePage" target="M_GetLavoratoreAnag"/>	  
+	    <DEPENDENCE source="ASCercaRichiesteAdesionePage" target="M_GetASCercaRichiesteAdesioni" />
+  </DEPENDENCIES>
+</PAGE>
+
+<!--ASInserisciRichiestaAdesionePage-->
+<PAGE name="ASListaAstePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="COMBO_SPI_SCAD" />
+	    <MODULE name="M_GetPrgSpiUt" />
+    	<MODULE name="M_GetLavoratoreAnag" />
+    	<MODULE name="M_GetASListaAste" />    
+    	<MODULE name="M_Config_PunteggiDidIsee" />	        	
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ASListaAstePage" target="COMBO_SPI_SCAD"/> 
+		<DEPENDENCE source="ASListaAstePage" target="M_GetPrgSpiUt"/>
+	    <DEPENDENCE source="ASListaAstePage" target="M_GetLavoratoreAnag"/>	  
+	    <DEPENDENCE source="ASListaAstePage" target="M_GetASListaAste" />	     	
+	    <DEPENDENCE source="ASListaAstePage" target="M_Config_PunteggiDidIsee" />	     	
+  </DEPENDENCIES>
+</PAGE>
+
+<!--ASNotePubbPage-->
+<PAGE name="ASNotePubbPage" scope="REQUEST">
+	<MODULES>		
+		<MODULE name="M_AS_UpdPubbNote"/>
+		<MODULE name="M_AS_GetPubbNote"/>
+		<MODULE name="M_IdoGetStatoRich"/>	       	        	
+	</MODULES>
+	<DEPENDENCIES>		
+		<DEPENDENCE source="ASNotePubbPage" target="M_AS_UpdPubbNote">
+			<CONDITIONS>
+  				<PARAMETER name="btnAggiorna" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+  			</CONDITIONS>
+  		</DEPENDENCE>
+  		<DEPENDENCE source="ASNotePubbPage" target="M_AS_GetPubbNote"/> 
+  		<DEPENDENCE source="ASNotePubbPage" target="M_IdoGetStatoRich"/> 	     	
+  	</DEPENDENCIES>
+</PAGE>
+
+<!--Pagina INFO STORICHE per la RIAPERTURA della RICHIESTA per AS-->
+
+<PAGE name="ASStoricoAperturaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetMotivoAperturaRichList"/>			
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ASStoricoAperturaPage" target="M_GetMotivoAperturaRichList"/>		
+	</DEPENDENCIES>
+</PAGE>
+
+<!--InvioSMS da ROSA GREZZA-->
+
+<PAGE name="InvioSMSDaRosaGrezzaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_IDO_SMS_INVIO"/>			
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="InvioSMSDaRosaGrezzaPage" target="M_IDO_SMS_INVIO"/>		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="TestoSMSPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_TESTO_SMS"/>
+		<MODULE name="M_CPI_SMS"/>			
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="TestoSMSPage" target="M_TESTO_SMS"/>
+		<DEPENDENCE source="TestoSMSPage" target="M_CPI_SMS"/>		
+	</DEPENDENCIES>
+</PAGE>
+
+<!--Pagina per il calcolo dell'organico aziendale per CM-->
+<PAGE name="CalcoloOrganicoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_Calcolo_Organico"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CalcoloOrganicoPage" target="M_Calcolo_Organico"/>		
+	</DEPENDENCIES>
+</PAGE>
+
+<!--Pagina per la ricerca delle richieste di gradualità per CM-->
+<PAGE name="CMRichGradRicercaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_COMBO_STATO_RICH_GRAD"/>
+		<MODULE keep="false" name="COMBO_STATO_ATTO_RICH_GRAD"/>		
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="CMRichGradRicercaPage" target="M_COMBO_STATO_RICH_GRAD"/>
+	    <DEPENDENCE source="CMRichGradRicercaPage" target="COMBO_STATO_ATTO_RICH_GRAD"/>
+    </DEPENDENCIES>
+</PAGE>
+
+<!--Pagina per la lista delle richieste di gradualità per CM-->
+<PAGE name="CMRichGradListaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_LISTA_RICH_GRAD_CM"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMRichGradListaPage" target="M_LISTA_RICH_GRAD_CM"/>		
+	</DEPENDENCIES>
+</PAGE>
+
+<!--Pagina per l'inserimento o la visualizzazione di una richiesta di gradualità per CM-->
+<PAGE name="CMRichGradPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_Insert_RichGrad"/>	
+		<MODULE name="M_Load_RichGrad"/>
+		<MODULE name="M_Save_RichGrad"/>	
+		<MODULE name="M_GetProtocollazione"/>
+		<MODULE name="SalvaRichGradDoc"/>
+		<MODULE name="M_COMBO_STATO_RICH_GRAD"/>
+		<MODULE name="COMBO_STATO_ATTO_RICH_GRAD"/>
+		<MODULE name="M_Info_Azienda"/>
+		<MODULE name="M_Load_Doc_Grad"/>
+		<MODULE name="M_Annullamento_RichGrad_E_Doc"/>
+		<MODULE name="M_GetPrgUnita"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMRichGradPage" target="M_COMBO_STATO_RICH_GRAD" />
+		<DEPENDENCE source="CMRichGradPage" target="COMBO_STATO_ATTO_RICH_GRAD" />	
+		<DEPENDENCE source="CMRichGradPage" target="M_Load_Doc_Grad"/>
+		<DEPENDENCE source="CMRichGradPage" target="M_Load_RichGrad"/>
+		<DEPENDENCE source="CMRichGradPage" target="M_GetProtocollazione"/>
+		
+		<DEPENDENCE source="CMRichGradPage" target="M_GetPrgUnita">
+			<CONDITIONS>
+				<PARAMETER name="prgAzienda" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="CMRichGradPage" target="M_Insert_RichGrad">
+			<CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_Insert_RichGrad" target="M_Load_Doc_Grad">
+			<CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST" value="AF_DEFINED"/>	
+		    </CONDITIONS>	
+		     <CONSEQUENCES>
+		    	<PARAMETER name="PRGRICHGRADUALITA" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_Insert_RichGrad.ROWS.ROW.DO_NEXTVAL"/>
+		    </CONSEQUENCES>    
+		</DEPENDENCE>				
+		<DEPENDENCE source="M_Insert_RichGrad" target="M_Load_RichGrad">
+			<CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST" value="AF_DEFINED"/>	
+		    </CONDITIONS>	
+		     <CONSEQUENCES>
+		    	<PARAMETER name="PRGRICHGRADUALITA" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_Insert_RichGrad.ROWS.ROW.DO_NEXTVAL"/>
+		    </CONSEQUENCES>    
+		</DEPENDENCE>
+
+		<DEPENDENCE source="CMRichGradPage" target="M_Info_Azienda">
+			<CONDITIONS>
+				<PARAMETER name="prgAzienda" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>		
+
+	    <DEPENDENCE source="CMRichGradPage" target="M_Save_RichGrad">
+			<CONDITIONS>
+		    	<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    	<PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="0"/>
+		    </CONDITIONS>
+	    </DEPENDENCE> 
+	    <DEPENDENCE source="M_Save_RichGrad" target="M_Load_RichGrad">
+			<CONDITIONS>
+		    	<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    	<PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="0"/>
+		    </CONDITIONS>
+	    </DEPENDENCE>
+		
+	
+    	<!-- update Doc -->
+		<DEPENDENCE source="CMRichGradPage" target="SalvaRichGradDoc">
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDoc" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="0"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="SalvaRichGradDoc" target="M_Load_Doc_Grad">
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDoc" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="0"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+	    <DEPENDENCE source="SalvaRichGradDoc" target="M_Load_RichGrad">
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDoc" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="0"/>
+			</CONDITIONS>
+    	</DEPENDENCE>		
+
+		<!-- annulla rich e doc -->
+		<DEPENDENCE source="CMRichGradPage" target="M_Annullamento_RichGrad_E_Doc">
+			<CONDITIONS>
+				<PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="1"/>
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="M_Annullamento_RichGrad_E_Doc" target="M_Load_Doc_Grad">
+			<CONDITIONS>
+				<PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="1"/>
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	    <DEPENDENCE source="M_Annullamento_RichGrad_E_Doc" target="M_Load_RichGrad">
+			<CONDITIONS>
+				<PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="1"/>
+			</CONDITIONS>
+    	</DEPENDENCE>
+    		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="IdoSelezionaAziendaPage">
+	<MODULES/>
+</PAGE>
+
+<PAGE name="IdoListAziendePage">
+	<MODULES>
+		<MODULE name="M_IdoGetListaAziende"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="IdoListAziendePage" target="M_IdoGetListaAziende"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="IdoDatiAziendaRefreshPage">
+	<MODULES/>
+</PAGE>
+
+<PAGE distributed="false" name="CMStampaEsonPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="CM_GET_PROVINCIA_ISCR" />    	       	
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="CMStampaEsonPage" target="CM_GET_PROVINCIA_ISCR"/>
+  	</DEPENDENCIES>
+</PAGE>
+
+<!--CMListaAdesionipage-->
+<PAGE name="CMListaAdesioniPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_GetLavoratoreAnag" />
+    	<MODULE name="M_GetCMListaAdesioniLavoratore" />    	
+    	<MODULE name="M_CMAssociaRichiesteAdesione" />        	
+    	<MODULE name="M_CMDeleteRichiestaAdesione" /> 
+	</MODULES>
+	<DEPENDENCIES>	    
+	    <DEPENDENCE source="CMListaAdesioniPage" target="M_CMAssociaRichiesteAdesione">
+        	<CONDITIONS>
+          		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_CMAssociaRichiesteAdesione"/>
+        	</CONDITIONS>
+        	<CONSEQUENCES/>
+    	</DEPENDENCE>
+    	<DEPENDENCE source="CMListaAdesioniPage" target="M_CMDeleteRichiestaAdesione">
+        	<CONDITIONS>
+          		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_CMDeleteRichiestaAdesione"/>
+        	</CONDITIONS>
+        	<CONSEQUENCES/>
+    	</DEPENDENCE>
+    	<DEPENDENCE source="CMListaAdesioniPage" target="M_GetLavoratoreAnag"/>	  
+	    <DEPENDENCE source="CMListaAdesioniPage" target="M_GetCMListaAdesioniLavoratore" />
+  </DEPENDENCIES>
+</PAGE>
+
+<!--CMCercaAdesionePage-->
+<PAGE name="CMCercaRichiesteAdesionePage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_GetLavoratoreAnag" />
+    	<MODULE name="M_GetCMCercaRichiesteAdesioni" />    	       	
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="CMCercaRichiesteAdesionePage" target="M_GetLavoratoreAnag"/>	  
+	    <DEPENDENCE source="CMCercaRichiesteAdesionePage" target="M_GetCMCercaRichiesteAdesioni" />
+  </DEPENDENCIES>
+</PAGE>
+
+<!--CMListaAstePage-->
+<PAGE name="CMListaAstePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="COMBO_SPI_SCAD" />
+	    <MODULE name="M_GetPrgSpiUt" />
+    	<MODULE name="M_GetLavoratoreAnag" />
+    	<MODULE name="M_GetCMListaAste" />
+    	<MODULE name="CM_GET_DE_QUALIFICATO" />
+    	<MODULE name="M_GetConfigGraduatoria_cm"/>>     	        	
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMListaAstePage" target="M_GetConfigGraduatoria_cm" />
+		<DEPENDENCE source="CMListaAstePage" target="COMBO_SPI_SCAD"/> 
+		<DEPENDENCE source="CMListaAstePage" target="M_GetPrgSpiUt"/>
+	    <DEPENDENCE source="CMListaAstePage" target="M_GetLavoratoreAnag"/>
+	    <DEPENDENCE source="CMListaAstePage" target="CM_GET_DE_QUALIFICATO" />	  
+	    <DEPENDENCE source="CMListaAstePage" target="M_GetCMListaAste" />	    	     
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CMStampaAdesionePage" scope="REQUEST">
+</PAGE> 
+
+<!--CMPrioritaPage-->
+<PAGE name="CMPrioritaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_UpdatePriorita"/>
+		<MODULE name="M_GetPriorita"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMPrioritaPage" target="M_UpdatePriorita">
+			<CONDITIONS>
+          		<PARAMETER name="UPDATE_PRIORITA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        	</CONDITIONS>
+        	<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="CMPrioritaPage" target="M_GetPriorita" />
+	</DEPENDENCIES>
+</PAGE>
+
+<!--CMNotePubbPage-->
+<PAGE name="CMNotePubbPage" scope="REQUEST">
+	<MODULES>		
+		<MODULE name="M_AS_UpdPubbNote"/>
+		<MODULE name="M_AS_GetPubbNote"/>
+		<MODULE name="M_IdoGetStatoRich"/>	       	        	
+	</MODULES>
+	<DEPENDENCIES>		
+		<DEPENDENCE source="CMNotePubbPage" target="M_AS_UpdPubbNote">
+			<CONDITIONS>
+  				<PARAMETER name="btnAggiorna" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+  			</CONDITIONS>
+  		</DEPENDENCE>
+  		<DEPENDENCE source="CMNotePubbPage" target="M_AS_GetPubbNote"/> 
+  		<DEPENDENCE source="CMNotePubbPage" target="M_IdoGetStatoRich"/> 	     	
+  	</DEPENDENCIES>
+</PAGE>
+
+
+<!--Anteprima invio flusso Vacancy da sil a portale-->
+<PAGE name="IdoInvioVacancyAnteprimaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ANTEPRIMA_INVIO_VACANCY_SIL" />
+<!-- 		<MODULE name="M_GetDatiTitoliStudioAnteprimaVacancy" /> -->
+<!-- 		<MODULE name="M_GetDatiSpecificaTitoliStudioAnteprimaVacancy" /> -->
+		<MODULE name="M_GetSettoreAnteprimaVacancy" />
+		<MODULE name="M_GetDatiLingueAnteprimaVacancy" />
+		<MODULE name="M_GetDatiLivelloLingueAnteprimaVacancy" />
+		<MODULE name="M_GetDatiOrarioAnteprimaVacancy" />
+		<MODULE name="M_GetDatiTurniAnteprimaVacancy" />
+		<MODULE name="M_GetDatiAgevolazioneAnteprimaVacancy" />
+		<MODULE name="M_GetDatiContrattoAnteprimaVacancy" />
+		<MODULE name="M_GetDatiAlboAnteprimaVacancy" />
+		<MODULE name="M_GetDatiPatentiAnteprimaVacancy" />
+		<MODULE name="M_GetDatiPatentiniAnteprimaVacancy" />
+		<MODULE name="M_GetListaComuniAnteprimaVacancy" />
+		<MODULE name="M_GetListaCPIAnteprimaVacancy" />
+		<MODULE name="M_GetAreaAnteprimaVacancy" />
+		<MODULE name="M_GetTrasfertaAnteprimaVacancy" />
+		<MODULE name="M_GetMotEtaAnteprimaVacancy" />
+    </MODULES>   
+    <DEPENDENCIES>
+    	<DEPENDENCE source="IdoInvioVacancyAnteprimaPage" target="M_ANTEPRIMA_INVIO_VACANCY_SIL"/>
+    	<!-- <DEPENDENCE source="IdoInvioVacancyAnteprimaPage" target="M_GetDatiTitoliStudioAnteprimaVacancy"/>
+    	<DEPENDENCE source="IdoInvioVacancyAnteprimaPage" target="M_GetDatiSpecificaTitoliStudioAnteprimaVacancy"/> -->
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetSettoreAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetDatiLingueAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetDatiLivelloLingueAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetDatiOrarioAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetDatiTurniAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetDatiAgevolazioneAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetDatiContrattoAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetDatiAlboAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetDatiPatentiAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetDatiPatentiniAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetListaComuniAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetListaCPIAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetAreaAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetTrasfertaAnteprimaVacancy"/>
+    	<DEPENDENCE source="M_ANTEPRIMA_INVIO_VACANCY_SIL" target="M_GetMotEtaAnteprimaVacancy"/>
+    </DEPENDENCIES> 
+</PAGE>

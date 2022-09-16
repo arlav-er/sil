@@ -1,0 +1,371 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html" template="../../template/main.xhtml"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<ui:define name="title">
+		Offerte di lavoro
+	</ui:define>
+
+	<ui:param name="form_id" value="testata" />
+
+	<ui:define name="content">
+		<div class="widget_container">
+			<ui:fragment rendered="#{!utilsBean.isRER()}">
+				<p>Compila questo modulo per inserire una nuova offerta di lavoro. Puoi scegliere se rendere visibile l'offerta
+					solo sul portale regionale o anche a livello nazionale tramite il portale ClicLavoro.</p>
+	
+				<p>
+					Attenzione: tutte le offerte di lavoro pubblicate in questo portale sono da intendersi rivolte a uomini e donne
+					senza discriminazione di età, di convinzioni personali, affiliazione sindacale o politica, credo religioso,
+					orientamento sessuale, stato matrimoniale o di famiglia o di gravidanza, handicap, o razza, a meno che non siano
+					previsti limiti dal contratto proposto dall'azienda (es. contratto di apprendistato),o che non si tratti di
+					caratteristiche che incidono sulle modalità di svolgimento della attività lavorativa o che costituiscono un
+					requisito essenziale e determinante ai fini dell'attività lavorativa, come previsto dall'
+	
+					<h:outputLink target="_blank"
+						value="http://portale.provincia.ra.it/binary/centri_impiego/normativa/D.lgs%2010%20settembre%202003%20n.%20276%20-%20Art._10.1241086595.pdf">
+						<h:outputText value="art. 10 del D.lgs 276/03" />
+					</h:outputLink>
+					.
+				</p>
+			</ui:fragment>
+			<ui:fragment rendered="#{utilsBean.isRER()}">
+				<p>
+					Compila il modulo che segue per <b style="color:black;">inserire una nuova offerta di lavoro</b>. Potrai poi scegliere se renderla visibile 
+					solo su questo portale o anche sul portale nazionale ANPAL.
+				</p>
+				<p>
+					Attenzione: tutte le offerte di lavoro pubblicate in questo portale sono rivolte a uomini e donne senza discriminazione 
+					di età, convinzioni personali, affiliazione sindacale o politica, credo religioso, orientamento sessuale, stato matrimoniale/di 
+					famiglia/di gravidanza, handicap, razza, a meno che le eventuali limitazioni non siano esplicitamente previste dal contratto 
+					proposto (es. contratto di apprendistato) o non facciano riferimento a caratteristiche che incidono sulle modalità di 
+					svolgimento dell’attività lavorativa o che costituiscono un requisito essenziale e determinante ai fini dell'attività 
+					lavorativa, come previsto dall'
+					
+					<h:outputLink target="_blank"
+						value="http://portale.provincia.ra.it/binary/centri_impiego/normativa/D.lgs%2010%20settembre%202003%20n.%20276%20-%20Art._10.1241086595.pdf">
+						<h:outputText value="art. 10 del D.lgs 276/03" />
+					</h:outputLink>
+					. 
+				</p>
+			</ui:fragment>
+			<div class="ui-widget-content ui-widget ui-corner-all">
+				<h:form id="#{form_id}">
+					<h:panelGrid columns="1" cellspacing="10">
+
+						<cc:inputText id="attivitaPrincipale" required="true" label="Profilo richiesto"
+							value="#{testataVacancyBean.data.attivitaPrincipale}">
+							<f:validateLength maximum="100" for="function" />
+						</cc:inputText>
+
+						<cc:inputTextarea id="descrizione" required="true" richTextMode="false" label="Descrizione attività"
+							maxlength="18000" style="width:80%" value="#{testataVacancyBean.data.descrizione}">
+						</cc:inputTextarea>
+
+						<cc:inputText id="numeroLavoratoriRicercati" required="true" label="Numero lavoratori ricercati"
+							value="#{testataVacancyBean.data.numeroLavoratoriRicercati}" maxlength="8">
+							<f:convertNumber validatorId="integerConverter" for="function" />
+						</cc:inputText>
+
+						<h:panelGroup rendered="#{utilsBean.isUmbria() or utilsBean.isRER() or utilsBean.isCalabria() or utilsBean.isVDA() or utilsBean.isPuglia()}">
+							<p style="margin:0;font-style:italic;font-family: Arial;">
+								Per favorire una migliore ricerca di figure professionali nel settore <b style="font-weight: 900;">Agricolo</b>, si consiglia di selezionare dalla lista
+							</p>
+							<p style="margin:0;font-style:italic;font-family: Arial;">
+								almeno uno dei sei elementi appartenenti al gruppo "AGRICOLTURA, VERDE, TERRITORIO E AMBIENTE"
+							</p>
+						</h:panelGroup>
+							
+						<h:panelGrid columns="2">
+							<cc:inputSuggestion id="mansione" label="Gruppo professionale" required="true" showButton="true"
+								valueCod="#{testataVacancyBean.data.codMansione}" value="#{testataVacancyBean.data.strMansione}"
+								requiredMessage="Il Gruppo professionale è obbligatorio"
+								requiredMessageCod="E' necessario scegliere un Gruppo professionale dalla lista a tendina"
+								suggestionPath="mansioni" valueChangeListener="#{testataVacancyBean.setQualificaFilter}">
+								<f:ajax event="change" execute="@this" render=":testata:panel_qualifica_richiesta" />
+								<f:validator validatorId="mansioneSuggestionValidator" for="function" />
+							</cc:inputSuggestion>
+							
+							<h:panelGroup id="panel_qualifica_richiesta">
+								<cc:inputSuggestion id="qualifica_richiesta" label="Qualifica richiesta"
+									required="#{testataVacancyBean.isQualificaObbligatoria()}"
+									requiredMessage="La Qualifica Richiesta è obbligatoria"
+									requiredMessageCod="E' necessario scegliere una Qualifica Richiesta dalla lista a tendina"
+									helpMessage="#{msg['azienda.info.qualifica_richiesta']}" valueCod="#{testataVacancyBean.data.mansioneMin.id}"
+									value="#{testataVacancyBean.data.mansioneMin.descrizione}" showButton="true" suggestionPath="mansioneMin"
+									filter="#{testataVacancyBean.filtroQualifica}" extraParamF="getQualificaRichiestaExtraParams">
+									<f:attribute name="codMansione" value=":testata:mansione:inputHidden" />
+									<f:validator validatorId="mansioneMinSuggestionValidator" for="function" />
+								</cc:inputSuggestion>
+								<script type="text/javascript">
+									function getQualificaRichiestaExtraParams() {
+										var extraParams = [ [ 'filter',
+												'#{testataVacancyBean.filtroQualifica}' ] ];
+										return extraParams;
+									}
+
+									disegnaBottoni();
+								</script>
+							</h:panelGroup>
+
+							<cc:inputSuggestion id="attivita" label="Settore" showButton="true" required="true"
+								value="#{testataVacancyBean.data.strAteco}" valueCod="#{testataVacancyBean.data.codAteco}"
+								suggestionPath="attivita" valueChangeListener="#{testataVacancyBean.setAttivitaFilter}">
+								<f:ajax event="change" execute="@this" render=":testata:panel_attivita_ateco" />
+								<f:validator validatorId="attivitaSuggestionValidator" for="function" />
+							</cc:inputSuggestion>
+
+							<h:panelGroup id="panel_attivita_ateco">
+								<cc:inputSuggestion id="attivita_ateco" label="Attività ATECO"
+									helpMessage="#{msg['azienda.info.attivita_ateco']}" valueCod="#{testataVacancyBean.data.attivitaMin.id}"
+									value="#{testataVacancyBean.data.attivitaMin.descrizione}" showButton="true" suggestionPath="attivitaMin"
+									filter="#{testataVacancyBean.filtroAttivita}" extraParamF="getAttivitaAtecoExtraParams">
+									<f:attribute name="codAteco" value=":testata:attivita:inputHidden" />
+									<f:validator validatorId="attivitaMinSuggestionValidator" for="function" />
+								</cc:inputSuggestion>
+								<script type="text/javascript">
+									function getAttivitaAtecoExtraParams() {
+										var extraParams = [ [ 'filter',
+												'#{testataVacancyBean.filtroAttivita}' ] ];
+										return extraParams;
+									}
+
+									disegnaBottoni();
+								</script>
+							</h:panelGroup>
+						</h:panelGrid>
+
+						<cc:inputSuggestion id="comune_lavoro" required="true" label="Comune della sede"
+							value="#{testataVacancyBean.data.strComLavoro}" valueCod="#{testataVacancyBean.data.codComLavoro}"
+							suggestionPath="comuni">
+							<f:validator validatorId="comuneSuggestionValidator" for="function" />
+						</cc:inputSuggestion>
+
+						<cc:inputText id="indirizzo_lavoro" required="true" label="Indirizzo della sede"
+							value="#{testataVacancyBean.data.indirizzoLavoro}">
+							<f:validateLength maximum="512" for="function" />
+						</cc:inputText>
+
+						<ui:fragment rendered="#{utilsBean.isPAT()}">
+							<h:outputLabel for="dataPubblicazionePAT" value="Data pubblicazione *" />
+							<br />
+							<h:inputText id="dataPubblicazionePAT" styleClass="datepicker" required="true"
+								requiredMessage="Campo obbligatorio" converterMessage="Formato errato"
+								value="#{testataVacancyBean.data.dataPubblicazione}" onchange="checkDateIsAfter()" size="30">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+								<f:ajax event="blur" render="dataPubblicazionePATMessage" />
+								<f:validator validatorId="dateNotPastValidator" for="function" />
+							</h:inputText>
+							<br />
+							<h:outputLabel>Attenzione!! La data di pubblicazione non potrà essere alterata una volta pubblicata la vacancy</h:outputLabel>
+							<br />
+							<h:message id="dataPubblicazionePATMessage" for="dataPubblicazionePAT" styleClass="ui-state-error ui-corner-all" />
+							<br />
+							<cc:inputText id="scadenzaPubblicazionePAT" required="true" type="date" label="Data scadenza"
+								value="#{testataVacancyBean.data.scadenzaPubblicazione}" minDateFree="false">
+								<f:attribute name="range_unit" value="giorno" />
+								<f:attribute name="range_value" value="#{testataVacancyBean.getVacanciesPatMaxScadenza()}" />
+								<f:attribute name="data_da_id" value="#{form_id}:dataPubblicazionePAT" />
+								<f:validator validatorId="datesRangeValidator" for="function" />
+							</cc:inputText>
+						</ui:fragment>
+						<ui:fragment rendered="#{not utilsBean.isPAT()}">
+							<cc:inputText id="dataPubblicazione" required="true" type="date" label="Data pubblicazione"
+								value="#{testataVacancyBean.data.dataPubblicazione}" minDateFree="false">
+							</cc:inputText>
+							<h:outputLabel>Attenzione!! La data di pubblicazione non potrà essere alterata una volta pubblicata la vacancy</h:outputLabel>
+							<br />
+							<cc:inputText id="scadenzaPubblicazione" required="true" type="date" label="Data scadenza"
+								value="#{testataVacancyBean.data.scadenzaPubblicazione}" minDateFree="false">
+								<f:attribute name="range_unit" value="giorno" />
+								<f:attribute name="range_value" value="#{testataVacancyBean.getVacanciesMaxScadenza()}" />
+								<f:attribute name="data_da_id" value="#{testataVacancyBean.data.dataPubblicazione}" />
+								<f:validator validatorId="datesRangeValidatorVacancy" for="function" />
+							</cc:inputText>
+						</ui:fragment>
+
+						<h:panelGroup layout="block" rendered="false">
+							<h:link title="Georeferenzia" styleClass="buttonStyle modalAutocomplete"
+								onclick="$('#dialog').dialog('open');return false;">
+								<span class="ui-icon ui-icon-pin-s fix_icon"></span>
+							</h:link>
+						</h:panelGroup>
+						<br />
+						<h:panelGroup layout="block">
+							<h:commandLink id="save" styleClass="buttonStyle " value="Salva" action="#{testataVacancyBean.save}">
+							</h:commandLink>
+						</h:panelGroup>
+						<cc:messages />
+					</h:panelGrid>
+				</h:form>
+
+				<cc:modalpDialog id="pubblicazioneD" submitLabel="OK" title="Attenzione">
+					<p>Stai programmando la pubblicazione dell'offerta in una data futura, diversa da quella odierna. Verrà
+						visualizzata sulla bacheca di Trentino Lavoro il giorno della data di pubblicazione.</p>
+				</cc:modalpDialog>
+
+				<script type="text/javascript">
+					function openModal() {
+						document.getElementById("pubblicazioneD").open();
+					}
+
+					function checkDateIsAfter() {
+						let dateValue = $(jq('#{form_id}:dataPubblicazionePAT'))
+								.val();
+						let arrayUnitTime = dateValue.split('/');
+						let day = arrayUnitTime[0];
+						let month = arrayUnitTime[1];
+						let year = arrayUnitTime[2];
+						let formattedDate = new Date(year + '-' + month + '-'
+								+ day).getTime()
+						let today = new Date().getTime();
+						if (formattedDate > today) {
+							openModal();
+						}
+					}
+
+					$('.datepicker')
+							.datepicker(
+									{
+										minDate : 0,
+										showOn : "both",
+										buttonImage : "/" + contextName
+												+ "/resources/images/calendar_"
+												+ regione + ".gif",
+										buttonImageOnly : true,
+										buttonText : "Selezionare una data",
+										editingMode : true,
+										dateFormat : 'dd/mm/yy',
+										changeYear : true,
+										changeMonth : true,
+										showAnim : 'slideDown',
+										yearRange : '-50:+50',
+										showAnim : 'slideDown',
+										onSelect : function(date) {
+											$(this).focus();
+											let todaysDate = new Date();
+											let month = todaysDate.getMonth() + 1;
+											let nows = todaysDate.getDate()
+													+ "/" + month + "/"
+													+ todaysDate.getFullYear();
+											let inputDate = date.split("/");
+											let inputMonth = inputDate[1] - 1;
+											let formatedDate = new Date(
+													inputDate[2], inputMonth,
+													inputDate[0]);
+											if (formatedDate > todaysDate) {
+												$(jq('pubblicazioneD:modal_form:_cancelButton')).value = "Torna indietro";
+												openModal();
+											}
+										},
+									});
+
+					function infoResolver(params) {
+						jqBtnResolver = jq('#{form_id}:' + params.id + ':cerca');
+						if (jQuery.isEmptyObject($(jqBtnResolver))) {
+							return;
+						}
+								base_url = "#{request.contextPath}/secure/rest/resolve/",
+								json_url = base_url + params.id + "Info";
+
+						resolvInfoBtn = $(document.createElement('div')).attr(
+								'tabindex', 0).append('?').addClass(
+								'buttonStyle').button();
+
+						$(jqBtnResolver).after(resolvInfoBtn);
+						defaultsBtn = {
+							my : "left top",
+							at : "right top",
+							of : jqBtnResolver,
+							offset : "5 0",
+							collision : "none none"
+						};
+
+						$(resolvInfoBtn).position(defaultsBtn);
+
+						//resolvInfoDiv=$(document.createElement('div')).attr('id',params.id+"InfoDiv").css('display','none');
+						resolvInfoDivCloser = $(document.createElement('div'))
+								.css('text-align', 'left').append(
+										$(document.createElement('div')).attr(
+												'tabindex', 0).append('X')
+												.addClass('buttonStyle')
+												.button().click(
+														closeResolverInfoDiv)
+												.keypress(function(event) {
+													//con invio si chiude le info mansioni
+													if (event.keyCode == 13)
+														closeResolverInfoDiv()
+												}));
+						resolvInfoDiv = $(document.createElement('div')).css(
+								'display', 'none');
+						resolvInfoDivContent = $(document.createElement('div'));
+						resolvInfoDiv.append(resolvInfoDivContent).append(
+								resolvInfoDivCloser);
+
+						jqCod2resolve = jq('#{form_id}:' + params.id
+								+ ':inputHidden');
+						jqMasterDiv = jq("#{form_id}:" + params.id + "");
+						jqInput = jq("#{form_id}:" + params.id + ":inputText");
+						$(jqMasterDiv).after(resolvInfoDiv);
+
+						//onclick recupero la info in base al codice
+						$(resolvInfoBtn).click(resolveCod).keypress(
+								function(event) {
+									//con invio si recupera le info mansioni
+									if (event.keyCode == 13)
+										resolveCod()
+								});
+					}
+
+					function closeResolverInfoDiv() {
+						$(resolvInfoDiv).hide();
+					}
+
+					function resolveCod() {
+						codSel = $(jqCod2resolve).val();
+						if (codSel) {
+							$('#mansioneInfoDialog').dialog('close');
+							$.getJSON(json_url, {
+								term : codSel,
+							}, function(data, textStatus, jqXHR) {
+								$('#mansioneInfoDialog').dialog({
+									title : data.titolo,
+									close : function(event, ui) {
+										//console.log('event CLOSE');
+										//console.log('$(elem):'+JSON.stringify($(elem).html()));
+										$(resolvInfoBtn).focus();
+										//console.log('event:'+JSON.stringify(event));
+									}
+								});
+								$('#mansioneInfoContent')
+										.text(data.descrizione);
+								$('#mansioneInfoDialog').dialog('open');
+							});
+						} else {
+							console.log('codSel empty');
+						}
+					}
+					$(function() {
+						disegnaBottoni();
+						try {
+							infoResolver({
+								id : 'mansione'
+							});
+						} catch (e) {
+							//console.log('inforesolver not started');
+						}
+						$("#mansioneInfoDialog").dialog({
+							autoOpen : false,
+							modal : true
+						});
+					});
+				</script>
+			</div>
+		</div>
+		<cc:btnBack backTo="#{testataVacancyBean.backTo}" />
+		<div id="mansioneInfoDialog" style="display: none;">
+			<div id="mansioneInfoContent" />
+		</div>
+	</ui:define>
+
+</ui:composition>

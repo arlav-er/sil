@@ -1,0 +1,98 @@
+<!-- Esposito 10/12/2008 Query utilizzate dal WS per il recupero delle info dal sil per lo sportello dei servizi sociali -->
+
+<STATEMENT Name="GET_DATI_GENERALI_LAVORATORE" 
+		   Query="SELECT LAV.STRNOME AS NOME, 
+					      LAV.STRCOGNOME AS COGNOME, 
+					      to_char(LAV.DATNASC,'dd/mm/yyyy') AS DATANASCITA,
+						  DEOCC.STRDESCRIZIONE AS STATOOCC,
+						  to_char(OCC.DATINIZIO,'dd/mm/yyyy') AS DATAINIZIOSTATOOCC,
+						  LAV.CDNLAVORATORE
+				     FROM AN_LAVORATORE LAV
+				LEFT JOIN AM_STATO_OCCUPAZ OCC ON LAV.CDNLAVORATORE = OCC.CDNLAVORATORE AND OCC.DATFINE IS NULL
+				LEFT JOIN DE_STATO_OCCUPAZ DEOCC ON OCC.CODSTATOOCCUPAZ = DEOCC.CODSTATOOCCUPAZ
+					WHERE LAV.STRCODICEFISCALE = ?"/>
+					
+<STATEMENT Name="GET_DATI_DID"
+		   Query="select decode(nvl(tab.datFine, ''),'',to_char(tab.datDichiarazione, 'dd/mm/yyyy'),tab.datFine, '') AS DATADID,
+					       decode(nvl(tab.datFine, ''),'', 'Did valida',tab.datFine, demfa.STRDESCRIZIONE) AS STATODID, 
+						   decode(nvl(tab.datFine, ''),'',deDid.STRDESCRIZIONE,tab.datFine,'') AS TIPODID,
+					  	   tab.PRGDICHDISPONIBILITA
+					  from am_dich_disponibilita tab,
+					       am_elenco_anagrafico tab1,
+					       de_motivo_fine_atto demfa,
+						   DE_TIPO_DICH_DISP deDid 
+					 WHERE tab1.CDNLAVORATORE = ?
+					   AND tab.prgElencoAnagrafico = tab1.prgElencoAnagrafico
+					   AND tab.CODMOTIVOFINEATTO   = demfa.CODMOTIVOFINEATTO (+)
+					   AND tab.CODTIPODICHDISP = deDid.CODTIPODICHDISP (+)
+					   AND tab.codStatoAtto = 'PR'
+					   AND tab.datDichiarazione    = (select max(tab2.datDichiarazione)
+					                                    from am_dich_disponibilita tab2, am_elenco_anagrafico tab3
+					            					   where tab1.CDNLAVORATORE = tab3.cdnLavoratore
+					                                     AND tab2.prgElencoAnagrafico = tab3.prgElencoAnagrafico
+					              						 AND tab2.codStatoAtto = 'PR')
+					   AND ((trunc(nvl(tab.datfine,to_date('31/12/9999','dd/mm/yyyy'))) =
+					            (select max (trunc(nvl(tab4.datfine,to_date('31/12/9999','dd/mm/yyyy'))))
+					                  from am_dich_disponibilita tab4, am_elenco_anagrafico tab5
+					            where tab1.CDNLAVORATORE      = tab5.cdnLavoratore
+					              and tab4.prgElencoAnagrafico = tab5.prgElencoAnagrafico
+					              and tab4.codStatoAtto = 'PR')
+					     ))
+					   AND rownum = 1
+					   order by prgDichDisponibilita desc"/>					
+					
+<STATEMENT Name="GET_AZIONI_CONCORDATE"
+		   Query="select to_char(col.datColloquio, 'DD/MM/YYYY') as datColloquio,
+						deaz.strDescrizione as azione,
+						to_char(perc.datStimata, 'DD/MM/YYYY') as datStimata,
+						deesito.strDescrizione || ' ' || to_char(perc.datEffettiva, 'DD/MM/YYYY') as esitoDataSvolgimento,
+						lav.strIndirizzoDom || ' ' || lav.strCapDom || ' ' || com.strDenominazione || ' (' || trim(prov.strIstat) || ')' as indirizzoDom,
+						decode(lav.strTelDom, null, '', 'dom '|| lav.strTelDom || ' ') ||
+						decode(lav.strCell, null, '', 'cell ' || lav.strCell || ' ' ) ||
+						decode(lav.strTelAltro, null, '', 'altro ' || lav.strtelAltro) as telefono,
+						cpi.strDescrizione as cpiTitComp
+				from or_colloquio col
+				inner join an_lavoratore lav on (col.cdnLavoratore=lav.cdnLavoratore)
+				inner join de_comune com on (lav.codcomdom=com.codCom)
+				inner join de_provincia prov on (com.codProvincia=prov.codProvincia)
+				inner join an_lav_storia_inf lavinf on (lav.cdnLavoratore=lavinf.cdnLavoratore and DECODE(lavinf.DATFINE, NULL, 'S','N') = 'S')
+				inner join de_cpi cpi on (cpi.codCpi=lavinf.codCpiTit)
+				inner join or_percorso_concordato perc on (perc.prgColloquio=col.prgColloquio)
+				inner join de_azione deaz on (deaz.prgAzioni=perc.prgAzioni)
+				inner join de_azione_ragg ob on (deaz.prgAzioneRagg=ob.prgAzioniRagg)
+				left join de_esito deesito on (deesito.codEsito = perc.codEsito )
+				where col.CDNLAVORATORE = ?"/>
+				
+<STATEMENT Name="GET_COLLOQUI"
+		   Query="SELECT distinct to_char(coll.datcolloquio,'dd/mm/yyyy') as datcolloquio, ser.strdescrizione,
+						   coll.datcolloquio as datcolloquio_ord
+					  FROM or_colloquio coll, de_servizio ser
+					 WHERE coll.codservizio = ser.codservizio(+)
+					   and coll.CDNLAVORATORE = ?
+				  order by datcolloquio_ord desc"/>
+				  
+<STATEMENT Name="GET_SEGNALAZIONI_IN_ROSE"
+		   Query="select to_char(pLav.DATDATAINIZIO, 'dd/mm/yyyy') || DECODE(pLav.DATDATAFINE,NULL, '','-&gt;'|| to_char(pLav.DATDATAFINE, 'dd/mm/yyyy')) as datSegnalazione, 
+				 	     pLav.DESCRIZIONEPERCORSO as SEGNALAZIONE
+				    from vw_percorso_lav pLav
+				   where pLav.CODMONOTIPOINF IN ('L','N')
+				     and pLav.CDNLAVORATORE = ?
+				order by DATDATAINIZIO desc, dataSort2 desc"/>
+				
+<STATEMENT Name="GET_APPUNTAMENTI_COLLOQUI" 
+		   Query="select to_char(pLav.DATDATAINIZIO, 'dd/mm/yyyy') as datAppuntamento, 
+				 	     pLav.DESCRIZIONEPERCORSO as DETTAGLIO
+				    from vw_percorso_lav pLav
+				   where pLav.CODMONOTIPOINF = 'G'
+				     and pLav.CDNLAVORATORE = ?
+				order by DATDATAINIZIO desc, dataSort2 desc"/>
+				
+<STATEMENT Name="GET_INFO_INVOCAZIONE_SERVIZI" 
+		   Query="select ep.STRURL,
+					 	   ep.FLGPOLOATTIVO,
+						   ut.STRNOME,
+						   ut.STRCOGNOME
+					  from ts_endpoint ep, ts_utente ut 
+					 where ep.CODCOM = ?
+					   and ep.STRNAME = ?
+					   and ut.CDNUT = ?"/>

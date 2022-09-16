@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:pretty="http://ocpsoft.com/prettyfaces">
+<f:metadata>
+	<f:event type="preRenderView" listener="#{sessionLogger.grantAccessFor(sessionLogger.getAziendaAccess())}" />
+</f:metadata>
+<div class="container-fluid">
+	<div class="panel-body profile-information animated fadeIn">
+		<div class="row">
+			<div class="col-md-2">
+				<div class="profile-pic text-center">
+					<h:panelGroup id="userProfilePic">
+						<h:panelGroup rendered="#{empty aziendaViewBean.aziendaInfo.logo}">
+							<h:graphicImage library="commons" name="images/profilePic.jpg"></h:graphicImage>
+						</h:panelGroup>
+						<h:panelGroup rendered="#{not empty aziendaViewBean.aziendaInfo.logo}">
+							<pretty:urlbuffer var="imgURL" mappingId="profilePicture">
+								<f:param id="type" value="azienda" />
+								<f:param id="id" value="#{aziendaViewBean.aziendaInfo.pfPrincipal.idPfPrincipal}" />
+								<f:param id="username" value="#{aziendaViewBean.aziendaInfo.pfPrincipal.username}" />
+							</pretty:urlbuffer>
+							<img src="#{imgURL}?#{utils.currentTimeMillis()}" />
+						</h:panelGroup>
+						<h3>#{aziendaViewBean.aziendaInfo.ragioneSociale}</h3>
+						
+						<pretty:urlbuffer var="viewProfileURL" mappingId="profile" />		
+						<a href="#{viewProfileURL}" class="ui-button btn btn-primary"><i class="fa fa-undo"></i> #{ui['shared.back']}</a>
+					</h:panelGroup>
+				</div>
+			</div>
+			<div class="col-md-10">
+				<div class="panel panel-warning">
+					<div class="panel-heading">#{ui['shared.token']}</div>
+					<div class="panel-body">
+						<p:dataTable id="profilatureDataTable" var="prof" paginator="true"
+							value="#{aziendaViewBean.aziendaInfo.pfPrincipal.gpProfilaturaList}">
+							<p:column headerText="Descrizione" style="width: 66%;">
+								<b>#{prof.gpRuoloGruppo.gpRuolo.descrizione}</b> per 
+								<b>#{prof.gpRuoloGruppo.gpGruppo.descrizione}</b>
+							</p:column>
+							<p:column headerText="Token">
+								#{aziendaViewBean.getTokenProfilatura(prof.gpRuoloGruppo)}
+							</p:column>
+						</p:dataTable>
+						<p>
+							<h:outputText value="#{ui['prof.tokenInfo1']} " escape="false" />
+							<a href="#{aziendaViewBean.getPortaleURL()}" >
+								#{ui['prof.tokenInfo2']} #{aziendaViewBean.getRegionePortale()}</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</ui:composition>

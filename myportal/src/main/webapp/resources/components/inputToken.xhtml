@@ -1,0 +1,105 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:composite="http://java.sun.com/jsf/composite">
+
+	<composite:interface >
+		<composite:attribute name="label" shortDescription="Etichetta da applicare al campo di input." />
+		<composite:attribute name="value" required="true" shortDescription="Collection del BB relativa ai codici dell'input" />
+		<composite:attribute name="disabled" default="false" />
+		<composite:attribute name="decodeObjects" default="true" type="java.lang.Boolean"/>
+
+		<composite:attribute name="disableLabel" default="false" />
+		<composite:attribute name="readonly" type="java.lang.Boolean" />
+		<composite:attribute name="showButton" type="java.lang.Boolean" default="true"
+			shortDescription="Mostra un bottone per mostrare tutte le opzioni" />
+		<composite:attribute name="editingMode" default="true" type="java.lang.Boolean"
+			shortDescription="visualizzato come input oppure come testo" />
+		<composite:attribute name="required" default="false" type="java.lang.Boolean"
+			shortDescription="Indica che l'utente deve selezionare almeno un elemento" />
+		<composite:attribute name="preventDuplicates" default="true" type="java.lang.Boolean"
+			shortDescription="Abilita la selezione senza duplicati" />
+			
+		<composite:attribute name="requiredMessage" default="Seleziona almeno un elemento" />
+		<composite:attribute name="converterMessage" default="Formato errato"
+			shortDescription="Messaggio di errore del Converter" />
+		<composite:attribute name="tokenLimit" default="1000" shortDescription="imposta il massimo numero di Token inseribili" />
+		<composite:attribute name="hintText" default="Digita due caratteri per effettuare la ricerca" />
+		<composite:attribute name="noResultsText" default="Nessun Risultato" />
+		<composite:attribute name="searchingText" default="Ricerca in Corso" />
+		<composite:attribute name="extraParamJson" default="" shortDescription="Parametri extra in formato JSON" />
+
+		<!-- style che si applica al panelGroup -->
+		<composite:attribute name="style" shortDescription="Stile applicato all'intero componente" />
+		<composite:attribute name="styleClass" default="inner-shadow" />
+		<composite:attribute name="suggestionPath"
+			shortDescription="NON IN USO Indica a quale indirizzo risponde il servizio REST che fornisce i dati. Il servizio deve essere in ascolto su 'rest/#{suggestionPath}/suggestion'. Nel caso si fornisse il pulsante per il suggerimento tramite modale il servizio REST deve rispondere anche su 'rest/#{suggestionPath}/albero'" />
+
+		<composite:editableValueHolder name="function" targets="inputText" />
+	</composite:interface>
+
+	<composite:implementation>
+		<f:loadBundle basename="conf.const" var="const" />
+		
+
+		<div id="#{cc.clientId}">
+
+			<h:outputLabel id="label" for="inputText" rendered="#{not cc.attrs.disableLabel}">
+				<h:outputText value="#{cc.attrs.label}" />
+				<h:outputText value=" *" rendered="#{cc.attrs.required}" />
+			</h:outputLabel>
+
+			<h:panelGroup id="group" layout="block" style="#{cc.attrs.style} width:100%">
+				<h:inputText id="inputText" title="#{cc.attrs.title}" required="#{cc.attrs.required}" value="#{cc.attrs.value}"
+					requiredMessage="#{cc.attrs.requiredMessage}" converterMessage="#{cc.attrs.converterMessage}"
+					disabled="#{cc.attrs.disabled}">
+					<f:converter converterId="#{cc.attrs.decodeObjects ? 'tokenConverter' : 'idleConverter'}" />
+				</h:inputText>
+				<ui:fragment rendered="#{not (cc.attrs.disabled or cc.attrs.readonly or not cc.attrs.editingMode) }">
+					<h:commandLink id="openFullList" rendered="#{cc.attrs.showButton}" styleClass="buttonStyle modalAutocomplete yellowButton"
+						onclick="$(jq('#{cc.clientId}:inputText')).tokenInput('openFullList','#{cc.clientId}');return false;"
+						onkeypress="if (event.keyCode==13) $(jq('#{cc.clientId}:inputText')).tokenInput('openFullList','#{cc.clientId}'); if (event.shiftKey &amp;&amp; event.keyCode==9) $(this).prev().focus(); else blur();return false;">
+						<span class="ui-icon ui-icon-triangle-1-s fix_icon"></span>
+					</h:commandLink>
+				</ui:fragment>
+				<h:selectManyMenu style="display:none" id="inputSelect" readonly="true"  disabled="true">
+					<composite:insertChildren />
+				</h:selectManyMenu>
+
+				<h:panelGroup id="effect" class="toggler" style="display:none;">
+					<h:message id="message" for="inputText" errorClass="ui-state-error ui-corner-all"></h:message>
+					<script type="text/javascript">
+						$(function() {
+							if ($(jq('#{cc.clientId}:message')).html() != '') {
+								runEffectError(jq('#{cc.clientId}:effect'));
+							}
+						}); 
+					</script>
+				</h:panelGroup>
+			</h:panelGroup>
+
+			<h:panelGroup id="dialog" layout="block" rendered="#{cc.attrs.showButton}">
+				<h:panelGroup id="tree" layout="block" />
+			</h:panelGroup>
+
+			<h:panelGroup id="help" layout="block" class="field-help" rendered="#{cc.attrs.helpMessage != null}"
+				style="display: none">
+				<p>#{cc.attrs.helpMessage}</p>
+			</h:panelGroup>
+			<script type="text/javascript">myportal.inputToken.init({
+				ccid:'#{cc.clientId}',
+				disabled:'#{cc.attrs.disabled}',
+				editingMode:'#{cc.attrs.editingMode}',
+				readonly:'#{cc.attrs.readonly}',
+				tokenLimit:'#{cc.attrs.tokenLimit}',
+				hintText:'#{StringEscapeUtils.escapeEcmaScript(cc.attrs.hintText)}',
+				noResultsText:'#{StringEscapeUtils.escapeEcmaScript(cc.attrs.noResultsText)}',
+				searchingText:'#{StringEscapeUtils.escapeEcmaScript(cc.attrs.searchingText)}',
+				tokenInputExtra:{
+					preventDuplicates:#{cc.attrs.preventDuplicates},
+					#{cc.attrs.extraParamJson}
+					}
+				});
+			</script>
+		</div>
+	</composite:implementation>
+</ui:composition>

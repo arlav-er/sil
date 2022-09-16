@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"
+	xmlns:composite="http://java.sun.com/jsf/composite">
+<composite:interface>
+	<composite:attribute name="id" />
+	<composite:attribute name="value" />
+	<composite:attribute name="converter" />
+	<composite:attribute name="forceSelection" default="true" shortDescription="Boolean value" />
+	<composite:attribute name="var" />
+	<composite:attribute name="itemLabel" />
+	<composite:attribute name="label" />
+	<composite:attribute name="itemValue" />
+	<composite:attribute name="emptyMessage" default="#{ui['shared.emptyAutoComplete']}" />
+	<composite:attribute name="completeMethod" method-signature="java.util.List complete(java.lang.String)" required="true" />
+	<composite:attribute name="size" default="55" />
+	<composite:attribute name="minQueryLength" default="2" />
+	<composite:attribute name="styleClass" />
+	<composite:attribute name="cache" default="true" />
+	<composite:attribute name="readonly" default="false" />
+	<composite:attribute name="required" />
+	<composite:attribute name="ajaxEvent" />
+	<composite:attribute name="ajaxUpdate" />
+	<composite:attribute name="treeValue" />
+	<composite:attribute name="bean" required="true" type="java.lang.Object" />
+	<composite:attribute name="treeSelectListener" required="true" type="java.lang.String" />
+	<composite:attribute name="treeCompleteSelectListener" required="false" type="java.lang.String" />
+</composite:interface>
+
+<composite:implementation>
+	<h:panelGroup id="treeAutoComplete" layout="block">
+		<div class="input-group">
+			<p:autoComplete id="autocomplete" value="#{cc.attrs.value}" forceSelection="#{cc.attrs.forceSelection}"
+				var="#{cc.attrs.var}" itemLabel="#{cc.attrs.itemLabel}" label="#{cc.attrs.label}" itemValue="#{cc.attrs.itemValue}"
+				emptyMessage="#{cc.attrs.emptyMessage}" completeMethod="#{cc.attrs.completeMethod}" size="#{cc.attrs.size}"
+				minQueryLength="#{cc.attrs.minQueryLength}" styleClass="#{cc.attrs.styleClass} input-button-field"
+				cache="#{cc.attrs.cache}" required="#{cc.attrs.required}" requiredMessage="#{cc.attrs.requiredMessage}"
+				widgetVar="#{cc.attrs.id}ACWV" readonly="#{cc.attrs.readonly}">
+				<c:if test="#{not empty cc.attrs.converter}">
+					<f:converter converterId="#{cc.attrs.converter}" />
+				</c:if>
+				<c:if test="#{not empty cc.attrs.ajaxEvent}">
+					<c:if test="#{cc.attrs.treeCompleteSelectListener != null or not empty cc.attrs.treeCompleteSelectListener}">
+						<p:ajax event="#{cc.attrs.ajaxEvent}" process="@this"
+							listener="#{cc.attrs.bean[cc.attrs.treeCompleteSelectListener]}" update="#{cc.attrs.ajaxUpdate}">
+						</p:ajax>
+					</c:if>
+					<c:if test="#{cc.attrs.treeCompleteSelectListener == null or empty cc.attrs.treeCompleteSelectListener}">
+						<p:ajax event="#{cc.attrs.ajaxEvent}" process="@this" update="#{cc.attrs.ajaxUpdate}">
+						</p:ajax>
+					</c:if>
+				</c:if>
+			</p:autoComplete>
+			<span class="input-group-btn input-button">
+				<button id="#{cc.clientId}_search_btn" class="btn btn-default " type="button"
+					aria-label="#{ui['shared.view']} #{cc.attrs.label}">
+					<i class="fa fa-search"></i>
+				</button>
+			</span>
+		</div>
+
+		<span id="#{cc.clientId}_tree_container">
+			<p:tree id="tree" value="#{cc.attrs.treeValue}" var="node" widgetVar="#{cc.attrs.id}TreeWV"
+				style="border: none; width: 100%;" dynamic="true" cache="true" selectionMode="single">
+				<p:ajax event="select" listener="#{cc.attrs.bean[cc.attrs.treeSelectListener]}"
+					update=":#{cc.clientId}:autocomplete" process="@this" resetValues="true">
+				</p:ajax>
+				<p:treeNode styleClass="#{node.isNodeSelectable()?'':''}">
+					<span>
+						<h:outputText value="#{node.descrizione}" />
+					</span>
+				</p:treeNode>
+			</p:tree>
+		</span>
+
+		<script>
+		$( document ).ready(function() {
+			Eng.cw("TreeAutoComplete", "#{cc.attrs.id}WV", {widgetVar: "#{cc.attrs.id}WV", id: '#{cc.clientId}', autoCompleteWV: '#{cc.attrs.id}ACWV', treeWV: '#{cc.attrs.id}TreeWV'});
+		});
+		
+	</script>
+	</h:panelGroup>
+</composite:implementation>
+</html>

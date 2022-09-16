@@ -1,0 +1,134 @@
+ <STATEMENT name="CARICA_DESCR_VOUCHER"
+            query="select STRDESCRIZIONE,DATINIZIOVAL,DATFINEVAL,FLGFORMAZIONE from DE_AZIONE where 1=1 " />
+ 
+<STATEMENT name="GET_STATO_PAGAMENTO"
+			query="select codvchstatopagamento as codice, strdescrizione as descrizione from DE_VCH_STATO_PAGAMENTO order by descrizione" />
+			
+<STATEMENT name="GET_COMBO_STATO_VOUCHER"
+		   query="select codstatovoucher as codice,strdescrizione as descrizione from DE_VCH_STATO order by descrizione" />
+		   
+<STATEMENT name="GET_COMBO_AZIONE_VOUCHER"
+		  query="select prgazioni as codice,strdescrizione as descrizione from DE_AZIONE order by descrizione" />	
+		  
+		  
+<STATEMENT name="GET_LISTA_CRUSCOTTO_VOUCHER"
+		   query="SELECT AN_LAVORATORE.STRCOGNOME  COGNOME ,AN_LAVORATORE.Strnome  NOME,AN_LAVORATORE.STRCODICEFISCALE  CODICEFISCALE,
+						 DE_Azione.Strdescrizione  azione_descrizione ,
+						or_vch_voucher.datmaxerogazione  datamaxerogazione,
+						 or_vch_voucher.datattivazione  datattivazione ,
+						DE_vch_STATO.Strdescrizione statodescrizione ,
+						or_vch_voucher.codattivazione codattivazione_voucher
+				FROM
+				AN_LAVORATORE   
+				inner join
+				OR_COLLOQUIO   
+				ON OR_COLLOQUIO.CDNLAVORATORE=AN_LAVORATORE.cdnlavoratore
+				inner join 
+				OR_PERCORSO_CONCORDATO
+				on OR_COLLOQUIO.PRGCOLLOQUIO =OR_PERCORSO_CONCORDATO.PRGCOLLOQUIO
+				inner join
+				OR_VCH_VOUCHER
+				on OR_COLLOQUIO.PRGCOLLOQUIO=OR_VCH_VOUCHER.PRGCOLLOQUIO
+				inner join
+				an_vch_ente
+				on an_vch_ente.strcodicefiscale=OR_VCH_VOUCHER.STRCFENTEACCREDITATO
+				inner join 
+				DE_Azione
+				on de_azione.prgazioni=OR_PERCORSO_CONCORDATO.PRGAZIONI
+				inner join
+				DE_vch_STATO
+				on DE_vch_STATO.Codstatovoucher=OR_VCH_VOUCHER.CODSTATOVOUCHER
+				where
+				1=1"	  
+				
+/> 
+
+<STATEMENT name="GET_LISTA_CRUSCOTTO_VOUCHER_TEST"
+			query="SELECT AN_LAVORATORE.STRCOGNOME  cognome ,AN_LAVORATORE.Strnome  nome,AN_LAVORATORE.STRCODICEFISCALE  codicefiscale,
+             	    DE_Azione.Strdescrizione  azione_descrizione ,
+            	    or_vch_voucher.datmaxerogazione  datamaxerogazione,
+             	    or_vch_voucher.datattivazione  datattivazione ,
+                   DE_vch_STATO.Strdescrizione statodescrizione ,
+                  or_vch_voucher.codattivazione codattivazione_voucher
+                FROM
+               AN_LAVORATORE ,DE_Azione,or_vch_voucher,DE_vch_STATO" />
+               
+               
+<STATEMENT name="GET_LISTA_TOTALI_VOUCHER"
+			query="select EXTRACT(year FROM datAttivazione) ANNO,
+			       az.strdescrizione AZIONE,
+			       st.strdescrizione STATO,  
+			       count(*) CONTEGGIO,
+			       SUM(CASE WHEN  vou.codstatovoucher= 'CHI' 
+			              and vou.codvchstatopagamento ='INA' 
+			           then decspesaeffettiva
+			           else 0
+			           end
+			          ) tot_euro_attesa,          
+			       SUM(CASE WHEN  vou.codstatovoucher= 'CHI' 
+			              and vou.codvchstatopagamento in ('PAG','NPAG')  
+			           then decpagato
+			           else 0
+			           end
+			          )  Tot_euro_Pagati
+			  	from OR_VCH_VOUCHER Vou
+			    left outer join or_percorso_concordato per 
+			        on vou.prgcolloquio= per.prgcolloquio
+			          and vou.prgpercorso =per.prgpercorso
+			    left outer join or_colloquio cl
+			        on per.prgcolloquio = cl.prgcolloquio
+			    left outer join an_lavoratore lav
+			        on cl.cdnlavoratore=lav.cdnlavoratore        
+			    left outer join de_azione az 
+			         on per.prgazioni=az.prgazioni
+			    left outer join de_vch_stato st
+			         on vou.codstatovoucher=st.codstatovoucher
+				WHERE 1=1" />
+			
+<STATEMENT name="GET_LISTA_SUB_TOTALI_VOUCHER"
+			query="select COUNT(*) CONTEGGIO,
+			       SUM(CASE WHEN  vou.codstatovoucher= 'CHI' 
+			              and vou.codvchstatopagamento ='INA' 
+			           then decspesaeffettiva
+			           else 0
+			           end
+			          ) tot_euro_attesa,          
+			       SUM(CASE WHEN  vou.codstatovoucher= 'CHI' 
+			              and vou.codvchstatopagamento in ('PAG','NPAG')  
+			           then decpagato
+			           else 0
+			           end
+			          )  Tot_euro_Pagati
+			  	 from OR_VCH_VOUCHER Vou
+			    left outer join or_percorso_concordato per 
+			        on vou.prgcolloquio= per.prgcolloquio
+			          and vou.prgpercorso =per.prgpercorso
+			    left outer join or_colloquio cl
+			        on per.prgcolloquio = cl.prgcolloquio
+			    left outer join an_lavoratore lav
+			        on cl.cdnlavoratore=lav.cdnlavoratore        
+			    left outer join de_azione az 
+			         on per.prgazioni=az.prgazioni
+			    left outer join de_vch_stato st
+			         on vou.codstatovoucher=st.codstatovoucher
+				WHERE 1=1" />
+               
+             
+<STATEMENT name ="GET_LISTA_TOTALI_VOUCHER_TEST"
+		   query="select vou.numannobudget ANNO,az.strdescrizione AZIONE, st.strdescrizione STATO, vou.decpagato CONTEGGIO,
+			        vou.decspesaeffettiva tot_euro_attesa,vou.decvaltot Tot_euro_Pagati
+			        from OR_VCH_VOUCHER Vou
+			          left outer join or_percorso_concordato per 
+			              on vou.prgcolloquio= per.prgcolloquio
+			                and vou.prgpercorso =per.prgpercorso
+			          left outer join or_colloquio cl
+			              on per.prgcolloquio = cl.prgcolloquio
+			          left outer join an_lavoratore lav
+			              on cl.cdnlavoratore=lav.cdnlavoratore        
+			          left outer join de_azione az 
+			               on per.prgazioni=az.prgazioni
+			          left outer join de_vch_stato st
+			               on vou.codstatovoucher=st.codstatovoucher"  />     
+			               
+
+               

@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<div id="profili">
+		<ui:repeat var="listImg"
+			value="#{bean.getImg(const['vetrina.sezione.profiliRichiesti'])}">
+			<p:lightBox id="previewImage">  
+			    <h:outputLink title="Anteprima immagine" value="#{request.contextPath}/secure/rest/getSvImmagine?imgId=#{listImg}">  
+			        <h:graphicImage id="graphicImage"
+			        	alt="Anteprima immagine"
+			        	height="100"
+			        	width="100"
+			        	value="/secure/rest/getSvImmagine?imgId=#{listImg}"/>  
+			    </h:outputLink>
+     		</p:lightBox>
+		</ui:repeat>
+		<h:outputText value="#{bean.data.profiliRichiesti}" escape="false" />
+		<br /> <br />
+		
+		<!-- Vacancies dirette -->
+		<ui:fragment  rendered="#{vetrinaAziendaBean.countVacanciesDirette > 0}">
+			<p:outputLabel value="Elenco offerte di lavoro pubblicate" />
+			<p:dataTable id="elenco_vacancies_dirette"
+				lazy="true"
+				paginator="true"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rows="20"
+				rowsPerPageTemplate="20,30,50"
+				value="#{vetrinaAziendaBean.getAllVacanciesDiretteLazy()}"
+				var="element"
+				>
+				
+				<p:column headerText="Professione" rendered="#{vetrinaAziendaBean.chekRER()}">
+				   #{element.flgIdo eq  true ? element.descrCodMansioneIstat : element.strMansione}
+				</p:column>
+				
+				<p:column headerText="Professione" rendered="#{!vetrinaAziendaBean.chekRER()}">
+				    #{element.strMansione}
+				</p:column>
+				
+				<p:column headerText="Ultima modifica">
+					<h:outputText value="#{element.dtmMod}">
+						<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+					</h:outputText>
+				</p:column>
+
+				<p:column headerText="Visualizza offerta di lavoro" rendered="#{vetrinaAziendaBean.chekRER()}">
+					<p:button
+						outcome="#{element.flgIdo eq  true ? 'visualizza_vacancy_pf':'visualizza_vacancy'}"
+						icon="ui-icon ui-icon-contact fix_icon icon-xs"
+						title="Visualizza">
+						<f:param name="id" value="#{element.id}" />
+					</p:button>
+				</p:column>
+			
+				<p:column headerText="Visualizza offerta di lavoro"  rendered="#{!vetrinaAziendaBean.chekRER()}" >
+					<p:button 
+						icon="ui-icon ui-icon-contact fix_icon icon-xs"
+						outcome="visualizza_vacancy"
+						title="Visualizza">
+						<f:param name="id" value="#{element.id}" />
+					</p:button>
+				</p:column>
+				
+				<p:column headerText="Riferimento dell'annuncio" rendered="#{utilsBean.isRER()}">
+					#{element.anno} - #{element.numeroRichiesta}
+				</p:column>
+				
+			</p:dataTable>
+		</ui:fragment>
+		<br />
+		
+		<!-- Vacancies palesi -->
+		<ui:fragment  rendered="#{vetrinaAziendaBean.countVacanciesPalesi > 0}">
+			<p:outputLabel value="Elenco offerte di lavoro pubblicate da un Centro per l'impiego per conto dell'azienda"/>
+			<p:dataTable id="elenco_vacancies_palesi"
+				lazy="true"
+				paginator="true"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				rows="20"
+				rowsPerPageTemplate="20,30,50"
+				value="#{vetrinaAziendaBean.getAllVacanciesPalesiLazy()}"
+				var="element"
+				>
+
+				<p:column headerText="Professione"
+					rendered="#{vetrinaAziendaBean.chekRER()}">
+				   #{element.flgIdo eq  true ? element.descrCodMansioneIstat : element.strMansione}
+				</p:column>
+
+				<p:column headerText="Professione"
+					rendered="#{!vetrinaAziendaBean.chekRER()}">
+				    #{element.strMansione}
+				</p:column>
+
+				<p:column headerText="Ultima modifica">
+					<h:outputText value="#{element.dtmMod}">
+						<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+					</h:outputText>
+				</p:column>
+				
+				<p:column headerText="Visualizza offerta di lavoro" rendered="#{vetrinaAziendaBean.chekRER()}">
+					<p:button
+						outcome="#{element.flgIdo eq  true ? 'visualizza_vacancy_pf':'visualizza_vacancy'}"
+						icon="ui-icon ui-icon-contact fix_icon icon-xs" title="Visualizza">
+						<f:param name="id" value="#{element.id}" />
+					</p:button>
+				</p:column>
+				<p:column  headerText="Visualizza offerta di lavoro" rendered="#{!vetrinaAziendaBean.chekRER()}">
+					<p:button title="Visualizza"
+						icon="ui-icon ui-icon-contact fix_icon icon-xs"
+						outcome="visualizza_vacancy">
+						<f:param name="id" value="#{element.id}" />
+					</p:button>
+				</p:column>
+				
+				<p:column headerText="Riferimento dell'annuncio" rendered="#{utilsBean.isRER()}">
+					#{element.anno} - #{element.numeroRichiesta}
+				</p:column>
+
+			</p:dataTable>
+		</ui:fragment>
+	</div>
+</ui:composition>

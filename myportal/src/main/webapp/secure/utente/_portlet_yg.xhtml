@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/template_portlet.xhtml">
+
+	<ui:param name="portletCssClass" value="portletYG" />
+
+	<ui:define name="portlet_title">
+		<h:outputText value="#{txt['cittadino.portlet.yg.titolo']}"
+			escape="false" />
+	</ui:define>
+
+	<ui:define name="portlet_content">
+
+		<div style="text-align: justify;">
+			<h:outputText
+				value="#{txt['cittadino.portlet.yg.descrizione_abilitato_servizi']}"
+				escape="false" />
+		</div>
+
+		<br />
+		<h:form id="adesione_form">
+			<h:panelGroup rendered="#{not ygAdesioneBean.esisteAdesione}">
+				<h:link
+					rendered="#{utenteHomeBean.checkAbilitazioneVisibile('yg_btn') and utilsBean.isUmbria()}"
+					styleClass="buttonStyle"
+					outcome="/secure/utente/yg/informativa.xhtml"
+					title="Aderisci a UMBRIATTIVA GIOVANI e GARANZIA GIOVANI NAZIONALE">Aderisci a UMBRIATTIVA GIOVANI e GARANZIA GIOVANI NAZIONALE</h:link>
+
+				<h:link
+					rendered="#{utenteHomeBean.checkAbilitazioneVisibile('yg_btn') and !utilsBean.isUmbria()}"
+					styleClass="buttonStyle"
+					outcome="/secure/utente/yg/informativa.xhtml"
+					title="Garanzia Giovani">Aderisci alla Garanzia Giovani</h:link>
+
+				<br />
+			</h:panelGroup>
+
+			<h:panelGroup rendered="#{ygAdesioneBean.esisteAdesione}">
+				<div class="ui-widget-content ui-corner-all yg_padding">
+					<h:outputText
+						value="Hai gi&agrave; aderito al progetto Garanzia Giovani" />
+					<br />
+					<h:outputText
+						rendered="#{ygAdesioneBean.currentAdesioneInviataDaMyPortal}"
+						value="Adesione inviata in data: " />
+
+					<b> <h:outputText id="data_adesione"
+							rendered="#{ygAdesioneBean.currentAdesioneInviataDaMyPortal}"
+							value="#{ygAdesioneBean.ygAdesioneDTO.dtAdesione}">
+							<f:convertDateTime for="data_adesione" pattern="dd/MM/yyyy"
+								type="date" />
+						</h:outputText></b>
+
+					<h:outputText escape="false"
+						value=" Stato adesione: &lt;b&gt;#{ygAdesioneBean.ygAdesioneDTO.deStatoAdesioneMin.descrizione}&lt;/b&gt;" />
+
+					<h:panelGroup
+						rendered="#{ygAdesioneBean.adesioneAttiva and empty ygAppuntamentoPortletBean.agAppuntamentoDTO and not ygAdesioneBean.currentAdesionePresaInCarico 
+							and empty ygAdesioneBean.ygAdesioneDTO.dtPresaInCarico and utenteHomeBean.checkAbilitazioneVisibile('yg_btn_prenota_app')}">
+						<br />
+						<br />
+						<h:link styleClass="buttonStyle"
+							outcome="/secure/utente/yg/prenota_appuntamento.xhtml"
+							title="Prenota Appuntamento">Prenota Appuntamento</h:link>
+					</h:panelGroup>
+
+					<h:panelGroup
+						rendered="#{ygAdesioneBean.adesioneAttiva and empty ygAppuntamentoPortletBean.agAppuntamentoDTO and not ygAdesioneBean.currentAdesionePresaInCarico 
+							and empty ygAdesioneBean.ygAdesioneDTO.dtPresaInCarico and utenteHomeBean.checkAbilitazioneVisibile('yg_btn_prenota_app_nuova_agenda')}">
+						<br />
+						<br />
+						<a class="buttonStyle" href="#{sessionBean.urlMyAgenda}" title="Prenota Appuntamento"
+							target="_blank">Prenota Appuntamento</a>
+					</h:panelGroup>
+					
+					<h:panelGroup
+						rendered="#{ygAdesioneBean.adesioneAttiva and ((not empty ygAppuntamentoPortletBean.agAppuntamentoDTO) or (not empty ygAdesioneBean.ygAdesioneDTO.dtPresaInCarico))}">
+						<div class="">
+							<div style="float: left; width: 315px;">
+								<br />
+								<h:outputText value="Hai un appuntamento fissato il " />
+								<b><h:outputText id="data_appuntamento"
+										value="#{ygAdesioneBean.ygAdesioneDTO.dtPresaInCarico}">
+										<f:convertDateTime for="data_adesione" pattern="dd/MM/yyyy"
+											type="date" />
+									</h:outputText></b>
+							</div>
+							<div style="float: right; margin: 13px 5px;">
+								<h:link styleClass="buttonStyle yellowButton"
+									title="Dettaglio dell'appuntamento"
+									outcome="/secure/utente/yg/dettaglio_appuntamento.xhtml"
+									rendered="#{not empty ygAppuntamentoPortletBean.agAppuntamentoDTO}">
+									<f:param name="idAgAppuntamento"
+										value="#{ygAppuntamentoPortletBean.agAppuntamentoDTO.id}" />
+									<span class="ui-icon ui-icon-document fix_icon" />
+								</h:link>
+							</div>
+							<div style="clear: both;"></div>
+						</div>
+					</h:panelGroup>
+					<div style="clear: both;"></div>
+					<br />
+
+					<h:panelGroup
+						rendered="#{ygAdesioneBean.readCodMonoStatoAdesione() eq 'A' and ygAdesioneBean.ygAdesioneDTO.deStatoAdesioneMin.id eq 'A'}">
+						<h:outputText
+							value="In caso di ripensamento è possibile effettuare l'annullamento dell'adesione"
+							escape="false" />
+						<br />
+						<h:link tabindex="0" href="#" styleClass="buttonStyle"
+							outcome="/secure/utente/yg/annullamento.xhtml">
+							Annullamento Adesione
+					</h:link>
+
+					</h:panelGroup>
+
+					<h:panelGroup
+						rendered="#{not ygAdesioneBean.adesioneAttiva and ygAdesioneBean.readCodMonoStatoAdesione() ne 'R'}">
+						<h:outputText value="E' possibile effettuare una nuova adesione"
+							escape="false" />
+						<br />
+						<h:link
+							rendered="#{utenteHomeBean.checkAbilitazioneVisibile('yg_btn') and utilsBean.isUmbria()}"
+							styleClass="buttonStyle"
+							outcome="/secure/utente/yg/informativa.xhtml"
+							title="Aderisci a UMBRIATTIVA GIOVANI e GARANZIA GIOVANI NAZIONALE">Aderisci ad Umbriattiva Giovani e a Garanzia Giovani nazionale
+						</h:link>
+
+						<h:link
+							rendered="#{utenteHomeBean.checkAbilitazioneVisibile('yg_btn') and !utilsBean.isUmbria()}"
+							styleClass="buttonStyle"
+							outcome="/secure/utente/yg/informativa.xhtml"
+							title="Aderisce">Aderisce
+						</h:link>
+						<br />
+					</h:panelGroup>
+				</div>
+			</h:panelGroup>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

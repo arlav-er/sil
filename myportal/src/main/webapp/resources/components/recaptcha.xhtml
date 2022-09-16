@@ -1,0 +1,59 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:rc="http://lavoroperte.emilia-romgna.it/rc">
+
+
+	<!--  Attributi da definire nell'interfaccia -->
+	<composite:interface>
+		<composite:attribute name="label" />
+		<composite:attribute name="required" default="false" />
+		<composite:attribute name="requiredLabel" default=" *" />
+		<composite:attribute name="requiredMessage"
+			default="#{cc.resourceBundleMap.requiredMessage}" />
+		<composite:attribute name="converterMessage"
+			default="#{cc.resourceBundleMap.converterMessage}" />
+		<composite:attribute name="errorPosition" default="right"
+			shortDescription="I valori ammessi sono: top, bottom, left, right" />
+		<composite:attribute name="publicKey" required="true" />
+		<composite:attribute name="privateKey" required="true" />
+	</composite:interface>
+
+	<!--  Interfaccia implementata -->
+	<composite:implementation>
+		<f:loadBundle basename="conf.const" var="const" />
+
+		<div id="#{cc.clientId}">
+			<!--  Label -->
+			<h:outputLabel id="label" for="inputRecaptcha"
+				rendered="#{not cc.attrs.disableLabel}">
+				<h:outputText value="#{cc.attrs.label}" />
+				<h:outputText value="#{cc.attrs.requiredLabel}"
+					rendered="#{cc.attrs.required and cc.attrs.editingMode}" />
+			</h:outputLabel>
+			<!--  Campo Input -->
+			<rc:recaptcha id="inputRecaptcha" value="xxx"
+				publicKey="#{cc.attrs.publicKey}"
+				privateKey="#{cc.attrs.privateKey}">
+			</rc:recaptcha>
+			<h:outputText value="&lt;br /&gt;" escape="false"
+				rendered="#{cc.attrs.errorPosition == 'bottom'}" />
+			<!--  Gestione messaggio -->
+			<h:panelGroup id="effect" class="toggler" style="display:none;">
+				<h:message id="message" for="inputRecaptcha"
+					errorClass="ui-state-error ui-corner-all"
+					infoClass="ui-state-highlight ui-corner-all">
+				</h:message>
+				<script type="text/javascript">
+						$(function() {					 							
+							runEffectError(jq('#{cc.clientId}:effect'));
+						});
+					</script>
+			</h:panelGroup>
+		</div>
+	</composite:implementation>
+
+</ui:composition>

@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/partial_tab.xhtml">
+
+	<ui:param name="form_id" value="contatto_alternativo"></ui:param>
+	<ui:param name="tabBean" value="#{vaContattoAltBean}"></ui:param>
+	<ui:param name="deleteId" value="#{tabBean.data.id}"></ui:param>
+
+	<ui:define name="form_data">
+		<h:panelGrid id="insert_form" columns="1" cellspacing="10">
+			<cc:inputText value="#{tabBean.data.cognomeRiferimento}"
+				maxlength="100" label="Cognome" editingMode="#{tabBean.editing}"></cc:inputText>
+			<cc:inputText value="#{tabBean.data.nomeRiferimento}" label="Nome"
+				maxlength="100" editingMode="#{tabBean.editing}"></cc:inputText>
+			<cc:inputText id="tel" value="#{tabBean.data.telRiferimento}"
+				label="Telefono" maxlength="20"
+				editingMode="#{tabBean.editing}">
+				<f:validator validatorId="numeroTelefonicoValidator" for="function"></f:validator>
+			</cc:inputText>
+			<cc:inputText id="fax" value="#{tabBean.data.faxRiferimento}"
+				label="Fax" maxlength="20"
+				editingMode="#{tabBean.editing}">
+				<f:validator validatorId="numeroTelefonicoValidator" for="function"></f:validator>
+			</cc:inputText>
+			<cc:inputText id="mail" value="#{tabBean.data.mail}" label="E-mail"
+				maxlength="255" editingMode="#{tabBean.editing}"
+				execute=":#{form_id}:tel:inputText :#{form_id}:fax:inputText">
+				<f:validator validatorId="emailValidator" for="function" />
+				<f:attribute name="tel_val" value="#{form_id}:tel" />
+				<f:attribute name="fax_val" value="#{form_id}:fax" />
+				<f:attribute name="email_val" value="#{form_id}:mail" />
+				<f:validator validatorId="contattoValidator" for="function" />
+			</cc:inputText>
+		</h:panelGrid>
+
+		<f:event listener="#{tabBean.checkDatiCliclavoroListener}"
+			type="postValidate" />
+	</ui:define>
+
+	<ui:define name="javascript_data">
+		<script type="text/javascript">
+			$(function() {
+				disegnaBottoni();
+
+				attachListener();
+
+				$('#Contatto_Alternativo a:visible:enabled:first').focus();			
+			});
+		</script>
+	</ui:define>
+</ui:composition>

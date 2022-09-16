@@ -1,0 +1,222 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:eng="http://java.sun.com/jsf/composite/components">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="descrizione" value="Titolo annuncio" styleClass="col-sm-3 control-label" />
+				<div class="col-md-9 col-lg-9">
+					<p:inputText id="descrizione" maxlength="100" required="true" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+						requiredMessage="Il titolo annuncio e' obbligatorio" value="#{vacancyFormPfBean.vaDatiVacancy.attivitaPrincipale}"
+						styleClass="form-control">
+						<f:validateLength for="function" maximum="100" />
+					</p:inputText>
+					<p:message for="descrizione" />
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="descrizioneEstesa" value="Descrizione attivita" styleClass="col-sm-3 control-label" />
+				<div class="col-md-9 col-lg-9">
+					<p:inputTextarea id="descrizioneEstesa" required="true" requiredMessage="La descrizione attivita' e' obbligatoria"
+						disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+						value="#{vacancyFormPfBean.vaDatiVacancy.attivitaDescrizioneEstesa}" maxlength="18000"
+						styleClass="form-control compact-textarea" autoResize="false" counter="descrizioneEstesaCount"
+						counterTemplate="{0} caratteri rimanenti">
+						<f:validateLength for="function" maximum="18000" />
+					</p:inputTextarea>
+					<br />
+					<p:message for="descrizioneEstesa" />
+					<h:outputText id="descrizioneEstesaCount" />
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="numLavoratori" value="Num. lavoratori ricercati" styleClass="col-sm-3 control-label" />
+				<div class="col-md-9 col-lg-9">
+					<p:inputText id="numLavoratori" maxlength="100" required="true" type="number"
+						disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+						requiredMessage="Il Num. lavoratori ricercati e' obbligatorio"
+						value="#{vacancyFormPfBean.vaDatiVacancy.numLavRicercati}" styleClass="form-control">
+						<f:validateLength for="function" maximum="100" />
+					</p:inputText>
+					<p:message for="numLavoratori" />
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel id="settAgricolo_label" for="settAgricolo" styleClass="col-sm-3 control-label">
+					<h:outputText value="Filtro Settore Agricolo" />
+				</p:outputLabel>
+
+				<div class="col-md-9 col-lg-9">
+					<p:selectBooleanCheckbox value="#{vacancyFormPfBean.checkAgricolo}" widgetVar="settAgricoloWV" rendered="true" 
+					    disabled="#{vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+						id="settAgricolo" styleClass="form-control">
+						<p:ajax listener="#{vacancyFormPfBean.handleChangeProfessioni}"
+							update=":datiGeneraliForm:gruppoProfessionaleGroup" process="@this" />
+					</p:selectBooleanCheckbox>
+				</div>
+
+			</div>
+		</div>
+
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="gruppoProfessionale:autocomplete" value="Professione" styleClass="col-sm-3 control-label">
+					<span class="ui-outputlabel-rfi">*</span>
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<h:panelGroup id="gruppoProfessionaleGroup">
+						<ui:fragment rendered="#{!vacancyFormPfBean.isArchivedNoModify() and !vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}">
+							<eng:treeAutoComplete id="gruppoProfessionale" value="#{vacancyFormPfBean.vaDatiVacancy.deBpMansione}" 
+								converter="deBpMansioneConverter" forceSelection="true" var="deMansione" itemLabel="#{deMansione.descrizione}"
+								label="#{ui['sap.gruppoProfessionale']}" itemValue="#{deMansione}"
+								emptyMessage="#{ui['shared.emptyAutoComplete']}"
+								completeMethod="#{vacancyFormPfBean.decodificheBean.completeDeBpMansioneLevel4Only}" size="55"
+								minQueryLength="2" styleClass="form-control not-clickable" cache="true" required="true" ajaxEvent="itemSelect"
+								treeValue="#{vacancyFormPfBean.deMansioneTreeNode}" bean="#{vacancyFormPfBean.datiGeneraliVacancySection}"
+								treeSelectListener="gruppoProfessionaleNodeSelected" requiredMessage="La professione è obbligatoria"></eng:treeAutoComplete>
+							<p:message id="gruppoProfessionaleMessage" for="gruppoProfessionale:autocomplete"></p:message>
+						</ui:fragment>
+					</h:panelGroup>
+					<ui:fragment rendered="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}">
+						<p:inputText maxlength="250" disabled="true" value="#{vacancyFormPfBean.vaDatiVacancy.deBpMansione.descrizione}"
+							styleClass="form-control" >
+						</p:inputText>
+					</ui:fragment>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="descrizioneEstesa" value="Mansione" styleClass="col-sm-3 control-label" />
+				<div class="col-md-9 col-lg-9">
+					<p:inputText id="mansione" maxlength="250" required="true" requiredMessage="La mansione e' obbligatoria"
+						disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}" value="#{vacancyFormPfBean.vaDatiVacancy.professione}"
+						styleClass="form-control">
+						<f:validateLength for="function" maximum="250" />
+					</p:inputText>
+					<p:message for="mansione" />
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="luogoLavoro" value="Luogo di lavoro" styleClass="col-sm-3 control-label" />
+				<div class="col-md-9 col-lg-9">
+					<p:autoComplete id="luogoLavoro" converter="deComuneConverter" forceSelection="true"
+						disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+						completeMethod="#{vacancyFormPfBean.autoCompleteBean.completeComune}" itemLabel="#{comuneVar.denominazione}"
+						itemValue="#{comuneVar}" filter="true" filterMatchMode="contains" required="true"
+						requiredMessage="Il luogo di lavoro e' obbligatorio" value="#{vacancyFormPfBean.vaDatiVacancy.deComune}"
+						var="comuneVar" styleClass="form-control">
+					</p:autoComplete>
+					<p:message for="luogoLavoro" />
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="indirizzoLavoro" value="Indirizzo luogo di lavoro" styleClass="col-sm-3 control-label" />
+				<div class="col-md-9 col-lg-9">
+					<p:inputText id="indirizzoLavoro" maxlength="250" required="true"
+						disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}" requiredMessage="L'indirizzo di lavoro e' obbligatorio"
+						value="#{vacancyFormPfBean.vaDatiVacancy.indirizzoLavoro}" styleClass="form-control">
+						<f:validateLength for="function" maximum="500" />
+					</p:inputText>
+					<p:message for="indirizzoLavoro" />
+				</div>
+			</div>
+		</div>		
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel value="Data Pubblicazione" for="dtPubblicazione" styleClass="col-sm-3 control-label">
+					<i class="m-l-10 fa fa-info-circle info-circile"
+						title="Data dalla quale l’offerta di lavoro sarà visibile sul portale Lavoro per Te" data-toggle="tooltip"
+						data-placement="top" data-container="body"></i>
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:calendar id="dtPubblicazione" label="Data Pubblicazione"
+						disabled="#{vacancyFormPfBean.isNotScadenzaModify() or vacancyFormPfBean.isArchivedNoModify()}" navigator="true"
+						pattern="dd/MM/yyyy" readonlyInput="true" requiredMessage="Data pubblicazione obbligatoria"
+						value="#{vacancyFormPfBean.vaDatiVacancy.dtPubblicazione}" converterMessage="Data non valida!"
+						mindate="#{vacancyFormPfBean.decodificheBean.getCurrentDate()}"
+						maxdate="#{vacancyFormPfBean.decodificheBean.addDaysToDate(vacancyFormPfBean.decodificheBean.getCurrentDate(),15)}"
+						required="true" styleClass="form-control" locale="it" widgetVar="dtInizioWV" mask="true">
+
+						<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+						<f:attribute name="limitDate" value="#{vacancyFormPfBean.vaDatiVacancy.dtScadenzaPubblicazione}" />
+						<f:validator validatorId="dateLimitScadPubbValidator" for="function" />
+						<p:ajax event="dateSelect" update="dtScadenzaPubblicazione @(.ui-message)"
+							listener="#{vacancyFormPfBean.datiGeneraliVacancySection.warnFutureDtPubb()}" process="@this" />
+					</p:calendar>
+					Inserisci la data con il formato gg/mm/aaaa
+					<p:message id="dtPubblicazioneMessage" for="dtPubblicazione"></p:message>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel value="Data Scadenza" for="dtScadenzaPubblicazione" styleClass="col-sm-3 control-label">
+					<i class="m-l-10 fa fa-info-circle info-circile"
+						title="Data dopo la quale l’offerta di lavoro non sarà più visibile sul portale Lavoro per Te"
+						data-toggle="tooltip" data-placement="top" data-container="body"></i>
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:calendar id="dtScadenzaPubblicazione"
+						disabled="#{vacancyFormPfBean.isNotScadenzaModify() or vacancyFormPfBean.isArchivedNoModify()}"
+						label="Data Inizio" navigator="true" pattern="dd/MM/yyyy" readonlyInput="true"
+						value="#{vacancyFormPfBean.vaDatiVacancy.dtScadenzaPubblicazione}" converterMessage="Data non valida!"
+						mindate="#{vacancyFormPfBean.decodificheBean.getCurrentDate()}" required="true" styleClass="form-control"
+						locale="it" widgetVar="dtScadenzaPubblicazioneWV" mask="true"
+						requiredMessage="Data scadenza pubblicazione obbligatoria">
+						<p:ajax event="dateSelect" update="dtPubblicazione @(.ui-message) dtScadenzaMessage" process="@this" />
+						<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+						<f:attribute name="range_unit" value="giorno" />
+						<f:attribute name="range_value" value="#{vacancyFormPfBean.getVacanciesMaxScadenza()}" />
+						<f:attribute name="data_da_id" value="#{vacancyFormPfBean.vaDatiVacancy.dtPubblicazione}" />
+						<f:validator validatorId="datesRangeValidatorPF" for="function" />
+					</p:calendar>
+					Inserisci la data con il formato gg/mm/aaaa
+					<p:message id="dtScadenzaMessage" for="dtScadenzaPubblicazione"></p:message>
+				</div>
+			</div>
+		</div>	
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="noDiscriminazione"
+					value="Accettazione condizioni di servizio"
+					styleClass="col-sm-4 control-label">
+					<i class="m-l-10 fa fa-info-circle info-circile"
+						title="L’Azienda si impegna a:
+                               · assicurare la coerenza tra le caratteristiche della richiesta di personale definite e dichiarate e quanto richiesto e proposto al candidato selezionato;
+							   · non comunicare ad aziende terze o ad altri soggetti intermediari i nominativi dei candidati raccolti tramite il portale nel rispetto del Regolamento Europeo n. 679/2016;
+                               · rispettare i principi costituzionali di non discriminazione e quelli previsti dall’art. 10 del D. Lgs. n. 276/2003 sia nel testo della pubblicazione, sia nel contatto coi candidati."
+						data-toggle="tooltip" data-placement="top" data-container="body"></i>
+				</p:outputLabel>
+
+
+				<div class="col-md-8">
+					<p:selectBooleanCheckbox id="noDiscriminazione" required="true"
+						styleClass="form-control"
+						value="#{vacancyFormPfBean.vaDatiVacancy.flagNoDiscriminazione}" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}">
+						<f:validator validatorId="checkBoxRequiredNoDiscriminazioneValidator"
+							for="function" />
+					</p:selectBooleanCheckbox>
+
+					<p:message id="noDiscriminazioneMessage" for="noDiscriminazione" />
+				</div>
+			</div>
+		</div>
+	</div>
+</ui:composition>

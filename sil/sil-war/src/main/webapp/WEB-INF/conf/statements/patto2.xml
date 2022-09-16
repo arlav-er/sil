@@ -1,0 +1,888 @@
+<!-- Recupera i patti associati allo stato occupaz -->
+<STATEMENT name="GET_TUTTI_PATTI_LAV" 
+query="SELECT am_.prgpattolavoratore,
+            am_.cdnlavoratore,
+            am_.prgdichdisponibilita,
+            to_char(am_.datstipula , 'dd/mm/yyyy') as datstipula,
+            am_.codstatoatto,
+            am_.prgstatooccupaz,
+            am_.codmotivofineatto,
+            to_char(am_.datscadconferma ,'dd/mm/yyyy') as datscadconferma,
+            to_char(am_.datfine ,'dd/mm/yyyy') as datfine,
+            am_.strnote,
+            am_.cdnutins,
+            to_char(am_.dtmins ,'dd/mm/yyyy') as dtmins,
+            am_.cdnutmod,
+            to_char(am_.dtmmod ,'dd/mm/yyyy') as dtmmod,
+            am_.numklopattolavoratore,
+            am_.flgpatto297,
+            to_char(am_.DATULTIMOPROTOCOLLO,'dd/mm/yyyy') DATULTIMOPROTOCOLLO,
+  			am_.codTipoPatto, am_.codServizio
+         FROM am_patto_lavoratore am_
+  WHERE am_.cdnlavoratore = ?
+"/>
+
+<STATEMENT name="GET_DICH_ANNUALI" 
+query="select ann.prgdidannuale PRGDIDANNUALE, 
+	to_char(did.datdichiarazione, 'dd/mm/yyyy') DATDICHIARAZIONE,
+	to_char(did.datfine, 'dd/mm/yyyy') DATCHIUSURA,
+	to_char(ann.datdichiarazione, 'dd/mm/yyyy') DATDICHANNUALE, 
+	ann.strnote STRNOTE, mv.strdescrizione descMotFineAtto
+	from am_did_annuale ann 
+	inner join am_dich_disponibilita did 
+		on (ann.prgdichdisponibilita = did.prgdichdisponibilita)
+	left join de_motivo_fine_atto mv 
+		on (did.codmotivofineatto = mv.codmotivofineatto)
+	where ann.codstatoatto = 'PR'
+	and ann.cdnlavoratore = ?
+	order by ann.datdichiarazione desc
+"/>
+
+<STATEMENT name="INSERT_DICH_ANNUALE" 
+query="insert into am_did_annuale(prgdidannuale, cdnlavoratore, prgdichdisponibilita,
+	datdichiarazione, numannodichiarazione, strnote, 
+	codstatoatto, cdnutins, cdnutmod, dtmins, dtmmod)
+	values(?, to_number(?), to_number(?), 
+	to_date(?, 'dd/mm/yyyy'), to_number(to_char(to_date(?, 'dd/mm/yyyy'), 'yyyy')), ?, 
+	'PR', to_number(?), to_number(?), sysdate, sysdate) "/>
+	
+	
+<STATEMENT name="GET_DICHIARAZIONE_ANNUALE" 
+query="select to_char(ann.datdichiarazione, 'dd/mm/yyyy') DATDICHANNUALE
+	from am_did_annuale ann
+	where ann.prgdichdisponibilita = ? and
+	ann.codstatoatto = 'PR' and
+	ann.numannodichiarazione = to_number(to_char(to_date(?, 'dd/mm/yyyy'), 'yyyy'))
+"/>
+
+<STATEMENT name="GET_DICH_DETTAGLIO_DID" 
+query="select to_char(did.datdichiarazione, 'dd/mm/yyyy') datdichiarazione
+	from am_dich_disponibilita did
+	where did.prgdichdisponibilita = ?
+"/>
+
+<STATEMENT name="GET_AM_DID_ANNUALE_NEXTVAL" query="
+	select s_AM_DID_ANNUALE.nextval as do_nextval from dual"/>
+
+
+<STATEMENT name="GET_DETT_AM_DID_ANNUALE" 
+query="select prgdidannuale, codstatoatto, 
+	to_char(datdichiarazione, 'dd/mm/yyyy') datdichiarazione, strnote,
+	cdnutins, cdnutmod, to_char(dtmins, 'dd/mm/yyyy') dtmins,
+	to_char(dtmmod, 'dd/mm/yyyy') dtmmod, numklodidann
+	from am_did_annuale 
+	where prgdidannuale = ?
+"/>
+
+<STATEMENT name="UPDATE_ANNULLA_DICH_ANN"
+query="update am_did_annuale set codstatoatto = 'AN',
+	numklodidann = to_number(?),
+	cdnutmod = to_number(?), dtmmod = sysdate
+	where prgdidannuale = ? "/>
+
+<STATEMENT name="GET_DOCUMENTO_DICH_ANN" 
+query="select doc.prgdocumento, doc.numklodocumento
+	from am_documento doc, am_documento_coll coll
+	where doc.prgdocumento = coll.prgdocumento and 
+	doc.codtipodocumento = 'IMDICANN' and coll.strchiavetabella = ?
+"/>
+
+<STATEMENT name="UPDATE_ANNULLA_DOC_DICH_ANN"
+query="update am_documento set codstatoatto = 'AN',
+	codmotannullamentoatto = 'ERR',
+	numklodocumento = to_number(?),
+	cdnutmod = to_number(?), dtmmod = sysdate
+	where prgdocumento = ? "/>
+	
+<STATEMENT name="GET_FORMAZIONE_PROFESSIONALE_PATTO_CDNLAV"
+query="SELECT count(*) as numAttivitaFormazionePatto
+	   FROM pr_corso p
+	   WHERE p.cdnlavoratore = ?
+	   AND EXISTS (SELECT aps.prgpattolavoratore
+		           FROM am_lav_patto_scelta aps, am_patto_lavoratore apl
+		           WHERE aps.prgpattolavoratore = apl.prgpattolavoratore
+		                 AND apl.cdnlavoratore = p.cdnlavoratore and apl.datfine is null
+		                 AND aps.codlsttab = 'PR_COR'
+                		 AND aps.strchiavetabella = p.prgcorso)"/>
+                		
+<STATEMENT name="GET_FORMAZIONE_PROFESSIONALE_ASSOCIATI_PATTO"
+query="SELECT count(*) as numAttivitaFormazionePatto
+	   FROM pr_corso p
+	   WHERE p.cdnlavoratore = ?
+	   AND EXISTS (SELECT aps.prgpattolavoratore
+		           FROM am_lav_patto_scelta aps, am_patto_lavoratore apl
+		           WHERE aps.prgpattolavoratore = apl.prgpattolavoratore
+		                 AND apl.prgpattolavoratore = ?
+		                 AND aps.codlsttab = 'PR_COR'
+                		 AND aps.strchiavetabella = p.prgcorso)"/>
+
+<STATEMENT name="GET_NUM_CONFIGURAZIONE_CHIUSURA_DID_MULTIPLA" query="
+
+	select 
+	  NVL(
+	    (SELECT TL.NUM
+	     FROM TS_CONFIG_LOC TL
+	     WHERE TL.STRCODRIF = (SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE)
+	         AND TL.CODTIPOCONFIG = 'CLOSEDID'),0) num
+	from dual
+
+"/>
+
+<STATEMENT name="GET_DID_LAVORATORE_CLOSEDID" query="
+
+	select  amdd.prgdichdisponibilita, 
+        TO_CHAR(amdd.datdichiarazione,'DD/MM/YYYY') datdichiarazione, 
+        amea.cdnlavoratore, 
+        amdd.codtipodichdisp,
+        amdd.codultimocontratto,
+        TO_CHAR(amdd.datscadconferma,'DD/MM/YYYY') datscadconferma,
+        TO_CHAR(amdd.datscaderogazservizi,'DD/MM/YYYY') datscaderogazservizi,
+        amdd.codstatoatto,
+        amdd.strnote,
+        (amdd.numklodichdisp + 1) numklodichdisp    
+	from am_dich_disponibilita amdd
+	inner join am_elenco_anagrafico amea on amdd.prgelencoanagrafico = amea.prgelencoanagrafico
+	where amdd.datfine is null
+	  and amdd.codstatoatto = 'PR'
+	  and amea.datcan is null
+	  and amea.cdnlavoratore = ?
+
+"/>
+
+<STATEMENT name="GET_CF_LAVORATORE_CLOSEDID" query="
+
+	select strcodicefiscale
+	from an_lavoratore
+	where cdnlavoratore = ?
+
+"/>
+
+<STATEMENT name="GET_CODIFICA_TIPO_PATTO" query="
+               SELECT codcodificapatto as codice,
+                      strdescrizione || DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL), '(scaduto)',
+                      LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),'(scaduto)', '') as descrizione,
+                      flgpatto297, strdescrizione as descrizioneDB
+               FROM de_codifica_patto
+               order by strdescrizione
+"/>
+
+<STATEMENT name="GET_ACCORDI_GENERICI_NON_297" 
+query="SELECT patto.prgpattolavoratore, patto.codStatoAtto, patto.codtipopatto,
+			to_char(patto.datStipula,'dd/mm/yyyy') as datStipula,
+            to_char(patto.datfine,'dd/mm/yyyy') as datfine,
+            patto.codmotivofineatto,
+            patto.numklopattolavoratore
+         FROM am_patto_lavoratore patto
+         left join de_codifica_patto on (patto.codcodificapatto = de_codifica_patto.codcodificapatto)
+  WHERE patto.cdnlavoratore = ? and nvl(patto.flgpatto297, nvl(de_codifica_patto.flgpatto297, 'S')) = 'N'
+  order by patto.datStipula desc, patto.prgpattolavoratore desc
+"/>
+
+<STATEMENT name="CHIUSURA_ACCORDO_NO_297"  query="
+	update am_patto_lavoratore set datfine = to_date(?,'dd/mm/yyyy'),
+	codMotivoFineAtto =	?,
+	cdnutmod = ?, dtmMod = sysdate, numklopattolavoratore = ?
+	where prgPattoLavoratore = ?	
+"/>
+
+<STATEMENT name="APRI_ACCORDO_NO_297"  query="
+	update am_patto_lavoratore set datfine = null,
+	codMotivoFineAtto =	null,
+	cdnutmod = ?, dtmMod = sysdate, numklopattolavoratore = ?
+	where prgPattoLavoratore = ?	
+"/>
+
+<STATEMENT name="GET_INFO_PATTO_ACCORDO_SPECIFICO" 
+query="SELECT patto.codStatoAtto,
+			to_char(patto.datStipula,'dd/mm/yyyy') as datStipula,
+            patto.numklopattolavoratore
+         FROM am_patto_lavoratore patto
+  WHERE patto.prgpattolavoratore = ?
+"/>
+
+<STATEMENT name="UPDATE_ACCORDO_STATO_OCC" query="
+	update am_patto_lavoratore set numKloPattoLavoratore = ?,
+		PRGSTATOOCCUPAZ = null 
+	where prgpattolavoratore = ?
+"/>
+
+<STATEMENT name="GET_CODMIN_REGIONE_TS_GENERALE" query="
+    select reg.CODMIN
+    from ts_generale gen
+    inner join de_provincia pro on PRO.CODPROVINCIA = GEN.CODPROVINCIASIL
+    inner join de_regione reg on REG.CODREGIONE = PRO.CODREGIONE
+"/>
+
+<STATEMENT name="GET_DENOMINAZIONE_REGIONE" query="
+	select STRDENOMINAZIONE AS descRegioneAdesione
+	from DE_REGIONE
+	where CODMIN = ?
+"/>
+
+<STATEMENT name="GET_DESCRIZIONE_STATO_ADESIONE_MIN" query="
+	select strDescrizione AS descStatoAdesioneMin
+	from DE_STATO_ADESIONE_MIN
+	where codStatoAdesioneMin = ?
+"/>
+
+<STATEMENT name="GET_DE_ESITO_SIFER"
+	query="
+	select codEsito as codice, strDescrizione || DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL), '(scaduto)',
+               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),'(scaduto)', 
+               '') as descrizione, datinizioval, datfineval, nvl(numValore,0) as numValore, codEsitoRendicont
+               from de_esito where flgformazione = 'S'
+" />
+
+<STATEMENT name="GET_DE_ESITO_FILTRO"
+	query="
+	select codEsito as codice, strDescrizione || DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL), '(scaduto)',
+               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),'(scaduto)', 
+               '') as descrizione from de_esito where flg_filtra_esito = 'S'
+" />
+
+<STATEMENT name="GET_PROM_TIR"
+    query="select prgconfigloc,strcodrif,strvalore from ts_config_loc
+    WHERE codTIPOCONFIG = 'PROM_TIR' AND strcodrif = (SELECT CODPROVINCIASIL FROM TS_GENERALE)
+" />
+
+<STATEMENT name="GET_CERT_TIR"
+    query="select prgconfigloc,strcodrif,strvalore from ts_config_loc
+    WHERE codTIPOCONFIG = 'CERT_TIR' AND strcodrif = (SELECT CODPROVINCIASIL FROM TS_GENERALE)
+" />
+
+<STATEMENT name="UPDATE_PATTO_DATAADESIONE_PA"  query="
+	update am_patto_lavoratore set datAdesionePA = to_date(?,'dd/mm/yyyy'),
+	cdnutmod = ?, dtmMod = sysdate, numklopattolavoratore = numklopattolavoratore + 1
+	where cdnlavoratore = ? and codstatoatto = 'PR' and to_date(?,'dd/mm/yyyy') between trunc(datstipula) and trunc(nvl(datfine, sysdate))
+"/>
+
+<STATEMENT name="UPDATE_PATTO_DATAADESIONE_PA_VUOTA"  query="
+	update am_patto_lavoratore set datAdesionePA = null,
+	cdnutmod = ?, dtmMod = sysdate, numklopattolavoratore = numklopattolavoratore + 1
+	where cdnlavoratore = ? and codstatoatto = 'PR'
+"/>
+
+<STATEMENT name="COMBO_DE_SCHEDA_CONTRATTO"
+	query="
+	select codcontratto as codice, STRDESCRIZIONE 
+		|| DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL), '(scaduto)',
+               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),'(scaduto)', '') as descrizione
+               from DE_SCHEDA_CONTRATTO
+" />
+<STATEMENT name="COMBO_DE_SCHEDA_DURATA"
+	query="
+	select coddurata as codice, strdescrizione as descrizione
+               from DE_SCHEDA_DURATA
+" />
+<STATEMENT name="COMBO_DE_SCHEDA_OCCUPAZIONALE"
+	query="
+	select codoccupazione as codice, STRDESCRIZIONE  
+		|| DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL), '(scaduto)',
+               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),'(scaduto)', '') as descrizione
+               from DE_SCHEDA_OCCUPAZIONALE
+" />
+<STATEMENT name="COMBO_DE_SCHEDA_STUDIO"
+	query="
+	select codstudio as codice, STRDESCRIZIONE  
+			|| DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL), '(scaduto)',
+               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),'(scaduto)', '') as descrizione
+               from DE_SCHEDA_STUDIO
+" />
+<STATEMENT name="COMBO_DE_SCHEDA_SVANTAGGIO"
+	query="
+	select codsvantaggio as codice, STRDESCRIZIONE  
+			|| DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL), '(scaduto)',
+               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),'(scaduto)', '') as descrizione
+               from DE_SCHEDA_SVANTAGGIO
+" />
+<STATEMENT name="INSERT_SCHEDA_PARTECIPANTE"
+	query="insert into or_scheda_partecipante 
+			(PRGPATTOLAVORATORE, CODCONTRATTO, CODSTUDIO, CODDURATA, CODOCCUPAZIONE,
+			STRNOTESCHEDA,FLGCONFERMA, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD )
+			values (?,?,?,?,?,?,?,?,sysdate, ?, sysdate)"
+/>
+<STATEMENT name="UPDATE_SCHEDA_PARTECIPANTE"
+	query="update or_scheda_partecipante set
+			CODCONTRATTO =?, CODSTUDIO = ?, CODDURATA =?, CODOCCUPAZIONE = ?, STRNOTESCHEDA =?, 
+			FLGCONFERMA=?, NUMKLOPARTECIPANTE = ? + 1, CDNUTMOD=?,  DTMMOD = sysdate
+			where PRGPATTOLAVORATORE = ?"
+/>
+<STATEMENT name="GET_SCHEDA_PARTECIPANTE_PATTO"
+	query="SELECT SCHEDA.CODCONTRATTO, SCHEDA.CODSTUDIO, SCHEDA.CODDURATA,SCHEDA.CODOCCUPAZIONE, SCHEDA.STRNOTESCHEDA,  
+				nvl(SCHEDA.FLGCONFERMA, 'N') FLGCONFERMA, SCHEDA.NUMKLOPARTECIPANTE, SCHEDA.PRGPATTOLAVORATORE
+			FROM OR_SCHEDA_PARTECIPANTE SCHEDA 
+			where SCHEDA.PRGPATTOLAVORATORE = ? "
+/>
+<STATEMENT name="GET_ULTIMO_PATTO_APERTO"
+	query="select Prgpattolavoratore, codTipoPatto 
+				from Am_Patto_Lavoratore
+				where cdnlavoratore = ? and Datfine is null"
+/>
+<STATEMENT name="GET_SCHEDA_SVANTAGGI_PROT_APERTO"
+	query="SELECT rtrim (xmlagg (xmlelement (e, CODSVANTAGGIO || ',')).extract ('//text()'), ',') CODICISVANTAGGIO
+				FROM OR_SCHEDA_SVANTAGGIO 
+				WHERE PRGPATTOLAVORATORE = ?"
+/>
+<STATEMENT name="GET_SCHEDA_PARTECIPANTE_ULTIMO_PATTO_PROT_APERTO"
+	query="SELECT CODCONTRATTO, CODSTUDIO, CODDURATA, CODOCCUPAZIONE, STRNOTESCHEDA, NUMKLOPARTECIPANTE
+			FROM OR_SCHEDA_PARTECIPANTE 
+			where PRGPATTOLAVORATORE in (select Prgpattolavoratore from Am_Patto_Lavoratore
+											where cdnlavoratore = ? and Codstatoatto = 'PR'	and Datfine is null)"
+/>
+<STATEMENT name="GET_SCHEDA_SVANTAGGI_ULTIMO_PATTO_PROT_APERTO"
+	query="SELECT CODSVANTAGGIO 
+			FROM OR_SCHEDA_SVANTAGGIO 
+			where PRGPATTOLAVORATORE in (select Prgpattolavoratore from Am_Patto_Lavoratore
+											where cdnlavoratore = ? and Codstatoatto = 'PR'	and Datfine is null)"
+/>
+<STATEMENT name="GET_SCHEDA_PARTECIPANTE_E_SVANTAGGI_PATTO_WS"
+	query="SELECT PAR.CODCONTRATTO, PAR.CODSTUDIO, PAR.CODDURATA, PAR.CODOCCUPAZIONE, rtrim (xmlagg (xmlelement (e, SCH.CODSVANTAGGIO || ',')).extract ('//text()'), ',') CODICISVANTAGGIO
+			FROM OR_SCHEDA_SVANTAGGIO SCH
+        	RIGHT JOIN OR_SCHEDA_PARTECIPANTE PAR ON PAR.PRGPATTOLAVORATORE = SCH.PRGPATTOLAVORATORE
+        	WHERE PAR.PRGPATTOLAVORATORE = ?
+            GROUP BY PAR.CODCONTRATTO, PAR.CODSTUDIO, PAR.CODDURATA, PAR.CODOCCUPAZIONE"
+/>
+<STATEMENT name="GET_CONTRATTO_WS"
+	query="select codContratto from (
+					select (case when TIPO_CON.CODTIPOCONTRATTO  IN ('B.01.00', 'B.02.00') then 8 
+											when TIPO_CON.CODTIPOCONTRATTO = 'A.03.10' then 6
+											when TIPO_CON.CODTIPOCONTRATTO = 'A.03.09' then 5
+					            when TIPO_CON.CODTIPOCONTRATTO = 'A.03.08' then 4
+											when TIPO_CON.CODCONTRATTO = 'LT' then 2 
+											when TIPO_CON.CODCONTRATTO = 'LP' then 1
+					            else NULL 
+										end) codContratto
+					FROM PR_ESP_LAVORO PR_ 
+					INNER JOIN PR_MANSIONE PR_M ON (PR_.PRGMANSIONE = PR_M.PRGMANSIONE)
+					INNER JOIN DE_TIPO_CONTRATTO TIPO_CON ON (TIPO_CON.CODCONTRATTO = PR_.CODCONTRATTO)
+					WHERE PR_M.CDNLAVORATORE = ? 
+					ORDER BY PR_.DTMMOD DESC) where rownum = 1"
+/>				
+<STATEMENT name="GET_TITOLO_STUDIO_WS"
+	query="select decode(nvl(max(studio.codtitolo),''),'','0',SUBSTR(max(studio.codtitolo),1,1)) codStudio 
+			from pr_studio studio where studio.cdnlavoratore = ? AND studio.codtitolo != 'NT'"															
+/>															
+<STATEMENT name="GET_CONDIZIONE_OCCUPAZIONALE_WS"
+	query="select (case when occ.codstatooccupaz IN ('A223', 'A22') then '1' 
+						when occ.codstatooccupaz IN ('B', 'A212','B3','A1','B2','B1') then '2'
+						when occ.codstatooccupaz IN ('A21', 'A213') then '3' 
+						when occ.codstatooccupaz IN ('C','C0','C1','C11','C12','C14','C13') then '5' 
+						else NULL 
+					end) codOccupazione 
+			from am_stato_occupaz occ 
+			where occ.cdnlavoratore = ? 
+			and to_date(?,'dd/mm/yyyy') between trunc(occ.datinizio) and trunc(nvl(occ.datfine, sysdate))"
+/>
+<STATEMENT name="GET_DURATA_RICERCA_OCCUPAZIONE_WS"
+	query="select (case WHEN anz.mesi_anz &lt; 6 THEN '1'
+			  			WHEN anz.mesi_anz &gt;= 6 and anz.mesi_anz &lt; 12 THEN '2'
+			  			ELSE '3'
+					end) codDurata
+			from (
+			select to_number(substr(PG_MOVIMENTI.CalcolaAnzianita(?, ?), 1, instr(PG_MOVIMENTI.CalcolaAnzianita(?, ?), '-', 1)-1)) mesi_anz 
+			from dual) anz"
+/>
+<STATEMENT name="GET_CDNLAVORATORE_DA_PERCORSO"
+	query="select col.CDNLAVORATORE from OR_PERCORSO_CONCORDATO per
+			inner join OR_COLLOQUIO col on (col.PRGCOLLOQUIO = per.PRGCOLLOQUIO)
+			where per.PRGCOLLOQUIO = ? and per.PRGPERCORSO = ?"
+/>
+<STATEMENT name="ANNULLA_DI_UFFICIO_PERCORSO"
+	query="update or_percorso_concordato set 
+				codEsito = 'NA',
+				codEsitoRendicont = 'A',
+				prgSpiProposta = NULL,
+				prgSpiAvvio = NULL,
+				prgSpiConclusione = NULL,
+				datEffettiva = NULL,
+				cdnUtMod = ?,  
+				dtmMod = sysdate
+			where prgColloquio = ? and prgPercorso = ?
+"/>
+
+<STATEMENT
+    name="CONFIG_PRIVACY"
+    query="
+	    select ts_config_loc.CODTIPOCONFIG, ts_config_loc.NUM,to_char(ts_config_loc.NUM) VALORENUM, ts_config_loc.STRCODRIF, ts_config_loc.STRVALORE
+		from ts_config_loc , ts_generale
+		where ts_config_loc.CODTIPOCONFIG = 'PRIVACY'
+		and ts_config_loc.DATFINEVAL &gt; sysdate and ts_config_loc.DATINIZIOVAL &lt; sysdate
+		and ts_config_loc.STRCODRIF = ts_generale.CODPROVINCIASIL
+		and ts_generale.DATFINEVAL &gt; sysdate		
+"/>
+
+<STATEMENT name="GET_PROGRAMMI_PATTO_NO_SOGGETTO_ACC"
+	query="SELECT coll.prgcolloquio as codice, to_char(coll.datcolloquio, 'dd/mm/yyyy') || ' ' || de_servizio.strdescrizione as descrizione,
+       to_char(coll.datcolloquio, 'dd/mm/yyyy') dataProgramma, patto.cdnlavoratore, patto.prgpattolavoratore, coll.codservizio
+			 from am_patto_lavoratore patto 
+			 inner join or_colloquio coll on (patto.cdnlavoratore = coll.cdnlavoratore) 
+			 inner join de_servizio on (coll.codservizio = de_servizio.codservizio) 
+			 where patto.prgpattolavoratore = ? and coll.datfineprogramma is null
+			 and de_servizio.codmonoprogramma is not null
+			 and coll.prgcolloquio in (select per.prgcolloquio 
+	                                  from am_patto_lavoratore patto1
+	                                  inner join or_colloquio on (patto1.cdnlavoratore = or_colloquio.cdnlavoratore)
+	                                  inner join or_percorso_concordato per on (or_colloquio.prgcolloquio = per.prgcolloquio)
+	                                  inner join am_lav_patto_scelta scelta on (scelta.prgpattolavoratore = patto1.prgpattolavoratore and 
+	                                  to_number(scelta.strchiavetabella) = per.prgpercorso and scelta.codlsttab = 'OR_PER')
+	                                  where patto1.prgpattolavoratore = patto.prgpattolavoratore)
+	        and coll.prgcolloquio not in (select ente.prgcolloquio from am_programma_ente ente)
+"/>
+
+<STATEMENT name="GET_PROGRAMMI_PATTO_LAV_NO_SOGGETTO_ACC"
+	query="SELECT coll.prgcolloquio as codice, to_char(coll.datcolloquio, 'dd/mm/yyyy') || ' ' || de_servizio.strdescrizione as descrizione,
+       to_char(coll.datcolloquio, 'dd/mm/yyyy') dataProgramma, patto.cdnlavoratore, patto.prgpattolavoratore, coll.codservizio
+			 from am_patto_lavoratore patto 
+			 inner join or_colloquio coll on (patto.cdnlavoratore = coll.cdnlavoratore) 
+			 inner join de_servizio on (coll.codservizio = de_servizio.codservizio) 
+			 where patto.cdnlavoratore = ? and patto.datfine is null and coll.datfineprogramma is null 
+			 and de_servizio.codmonoprogramma is not null
+			 and coll.prgcolloquio in (select per.prgcolloquio 
+	                                  from am_patto_lavoratore patto1
+	                                  inner join or_colloquio on (patto1.cdnlavoratore = or_colloquio.cdnlavoratore)
+	                                  inner join or_percorso_concordato per on (or_colloquio.prgcolloquio = per.prgcolloquio)
+	                                  inner join am_lav_patto_scelta scelta on (scelta.prgpattolavoratore = patto1.prgpattolavoratore and 
+	                                  to_number(scelta.strchiavetabella) = per.prgpercorso and scelta.codlsttab = 'OR_PER')
+	                                  where patto1.prgpattolavoratore = patto.prgpattolavoratore)
+	        and coll.prgcolloquio not in (select ente.prgcolloquio from am_programma_ente ente)
+"/>
+
+<STATEMENT name="INSERT_SOGGETTO_PROGRAMMA_PATTO_LAV"
+	query="INSERT INTO AM_PROGRAMMA_ENTE
+			(PRGPATTOLAVORATORE, PRGCOLLOQUIO, STRENTECODICEFISCALE, CODSEDE, STRNOTAENTE, CDNUTINS, CDNUTMOD, DTMINS, DTMMOD)
+			values (?, ?, ?, ?, ?, ?, ?, SYSDATE, SYSDATE)"
+/>
+
+<STATEMENT name="DEL_SOGGETTO_PROGRAMMA_PATTO_LAV"
+	query="DELETE FROM AM_PROGRAMMA_ENTE WHERE PRGPATTOLAVORATORE = ? AND PRGCOLLOQUIO = ? AND STRENTECODICEFISCALE = ? AND CODSEDE = ?"/>
+
+<STATEMENT name="GET_SOGGACCREDITATO_REPORT"
+	query="SELECT am_programma_ente.strentecodicefiscale as cfEnteAccr, 
+  ente.strindirizzo as indEnte,
+  ente.strtel as telEnte,
+  ente.strdenominazione as ragSocEnte,
+  de_comune.strdenominazione || ' (' || de_provincia.STRTARGA || ')' as com_ente,
+  am_programma_ente.strNotaEnte AS notaEnte,
+  am_programma_ente.prgcolloquio
+FROM am_programma_ente
+INNER JOIN am_patto_lavoratore patto
+ON (am_programma_ente.prgpattolavoratore = patto.prgpattolavoratore)
+INNER JOIN an_vch_ente ente
+ON (am_programma_ente.strentecodicefiscale = ente.strcodicefiscale
+AND am_programma_ente.codsede  = ente.codsede)
+INNER JOIN de_comune
+ON (ente.codcom = de_comune.codcom)
+INNER JOIN de_provincia
+ON (de_provincia.codprovincia = de_comune.codprovincia)
+INNER JOIN or_colloquio coll
+ON (am_programma_ente.prgcolloquio = coll.prgcolloquio)
+INNER JOIN de_servizio
+ON (coll.codservizio      = de_servizio.codservizio)
+WHERE patto.cdnlavoratore = ?
+AND patto.datfine        IS NULL
+ORDER BY am_programma_ente.prgcolloquio DESC "
+/>
+
+<STATEMENT name="ListaAzioniProgramma"
+	query="SELECT coll.prgcolloquio, to_char(coll.datcolloquio, 'dd/mm/yyyy') dataProgramma, to_char(coll.DATFINEPROGRAMMA,'dd/mm/yyyy') as DATAFINEPROGRAMMA,
+				de_servizio.strdescrizione descProgramma, az.strdescrizione descAzione, de_esito.strdescrizione esito, de_azione_ragg.prgazioniragg,
+				to_char(or_percorso_concordato.datstimata, 'dd/mm/yyyy') dataStimata, to_char(or_percorso_concordato.datavvioazione, 'dd/mm/yyyy') dataAvvio, 
+				to_char(or_percorso_concordato.dateffettiva, 'dd/mm/yyyy') dataConclusione, de_esito.codesito,
+				de_azione_ragg.strdescrizione prestazione, nvl(de_servizio.flgprogramma, 'N') flgprogramma, 
+				nvl(de_servizio.codmonoprogramma, 'N') codmonoprogramma
+				from or_colloquio coll
+				inner join de_servizio on (coll.codservizio = de_servizio.codservizio) 
+				inner join or_percorso_concordato on (coll.prgcolloquio = or_percorso_concordato.prgcolloquio) 
+				inner join de_azione az on (or_percorso_concordato.prgazioni = az.prgazioni)
+				inner join de_azione_ragg on (az.prgazioneragg = de_azione_ragg.prgazioniragg)
+				inner join de_esito on (or_percorso_concordato.codesito = de_esito.codesito)
+				where coll.prgcolloquio = ?
+				order by de_azione_ragg.prgazioniragg"/>
+	
+<STATEMENT name="GET_PROFILING_GG"
+	query="select PRGYGPROFILING, 
+			CODMONOTIPO, 
+			DECODE(CODMONOTIPO, 'I', 'Calcolato',
+                    'S', 'Scaricato',
+                    '') strTipoProfiling,
+ 			to_char(DTMCALCOLO, 'dd/mm/yyyy hh:mi') as dataCalcolo,
+			NUMINDICE2
+			from am_yg_profiling where CDNLAVORATORE = ? 
+ 			order by DTMCALCOLO desc"/>
+ 			
+<STATEMENT name="COMBO_PROVINCE_CODICE_MIN_DESCR"
+	query="select CODPROVINCIA as codice, 
+			CODMIN || ' - ' ||  STRDENOMINAZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                    '') AS DESCRIZIONE
+			from DE_PROVINCIA"/> 
+ 			
+<STATEMENT name="DettaglioProfilingGG"
+	query=" select  PRGYGPROFILING, 
+			 DECODE(CODMONOTIPO, 'I', 'Calcolato',
+			                    'S', 'Scaricato',
+			                    '') strTipoProfiling,
+			 yg.STRCODICEFISCALE,
+			 yg.CODPROVINCIA,
+			 to_char(DTMCALCOLO, 'dd/mm/yyyy hh24:mi') as dataCalcolo, 
+			 yg.CODPFPRESENZAIT,
+			 yg.CODPFCONDOCCUP,
+			 yg.CODTITOLO ,
+			 tit.STRDESCRIZIONEPARLANTE || DECODE(SYSDATE,    
+             	GREATEST(SYSDATE, tit.DATINIZIOVAL, tit.DATFINEVAL),' (scaduto)',
+                LEAST(SYSDATE, tit.DATINIZIOVAL, tit.DATFINEVAL),' (scaduto)', 
+               '') as descrTitolo,
+			 yg.STRSESSO, to_char(yg.NUMETA) as strNumEta, 
+			 to_char(yg.NUMINDICE2) as strIndice2, yg.STRDESCINDICE2,
+			 utIns.STRCOGNOME || ' ' || utIns.STRNOME || ' - ' || to_char( yg.DTMMOD, 'dd/mm/yyyy hh24:mi') as utenteIns, 
+			 utMod.STRCOGNOME || ' ' || utMod.STRNOME || ' - ' || to_char( yg.DTMINS, 'dd/mm/yyyy hh24:mi') as utenteMod  
+			 from am_yg_profiling yg
+			 inner join ts_utente utIns on (utIns.cdnut =  yg.CDNUTINS)
+      		 inner join ts_utente utMod on (utMod.cdnut =  yg.CDNUTMOD)
+			 left join DE_TITOLO tit on (yg.CODTITOLO = tit.codtitolo)
+			WHERE PRGYGPROFILING =?"/> 
+			
+<STATEMENT name="GetInfoLavProfilingGG"
+	query=" SELECT AN.CDNLAVORATORE ,
+		 	  AN.STRCODICEFISCALE STRCODICEFISCALE,
+			  AN.CODCITTADINANZA CODCITTADINANZA,
+			  pr.codregione AS codiceEstero,
+			  pr2.CODMIN codProvCpiInvio,
+			  pr2.CODPROVINCIA codProvCpi,
+			  prs.CODTITOLO,
+			  tit.STRDESCRIZIONE strTitoloStudio,
+			  tit.FLGPFGG, prs.FLGPRINCIPALE
+			FROM AN_LAVORATORE AN 
+				inner join  de_comune com on com.CODCOM = AN.CODCOMNAS
+				inner join  de_provincia pr on pr.CODPROVINCIA = com.CODPROVINCIA   
+				inner join AN_LAV_STORIA_INF inf on (inf.CDNLAVORATORE = AN.CDNLAVORATORE and inf.datfine is null)
+				inner join de_cpi cpi on cpi.CODCPI = inf.CODCPITIT
+				inner join  de_comune com2 on com2.CODCOM = cpi.CODCOM
+				inner join  de_provincia pr2 on pr2.CODPROVINCIA = com2.CODPROVINCIA
+				left join pr_studio prs on (prs.CDNLAVORATORE = AN.CDNLAVORATORE and prs.FLGPRINCIPALE = 'S')
+				left join de_titolo tit on (prs.CODTITOLO = tit.CODTITOLO)
+			WHERE AN.CDNLAVORATORE  = ?"/> 
+
+<STATEMENT name="INSERT_AM_YG_PROFILING"
+	query="   INSERT INTO AM_YG_PROFILING
+   (	PRGYGPROFILING , 
+	CDNLAVORATORE  ,
+	STRCODICEFISCALE , 
+	CODPROVINCIA , 
+	DTMCALCOLO , 
+	CODPFPRESENZAIT , 
+	CODPFCONDOCCUP , 
+	CODTITOLO , 
+	STRSESSO , 
+	NUMETA , 
+	NUMINDICE1 , 
+	STRDESCINDICE1 , 
+	NUMINDICE2 , 
+	STRDESCINDICE2 , 
+	CODMONOTIPO , 
+	CDNUTINS , 
+	DTMINS , 
+	CDNUTMOD , 
+	DTMMOD
+   )  VALUES(
+		?,		?,		?,		?,		?,		?,		?,		?,
+		?,		?,		?,		?,		?,		?,		?,		?,
+		SYSDATE,		?,		SYSDATE
+   )
+"/> 
+<STATEMENT name="CheckEsistenzaProfiling"
+	query=" 
+		select PRGYGPROFILING 
+		from am_yg_profiling
+		where DTMCALCOLO >= ?
+		and upper(STRCODICEFISCALE) = upper(?)
+		and upper(CODPROVINCIA) = upper(?)
+	"/>
+<STATEMENT name="GetCodMonoAttiva_StatoAdesione"
+	query=" 
+		select CODMONOATTIVA from de_stato_adesione_min 
+		where lower(codstatoadesionemin)=lower(?)"/>
+		
+<STATEMENT name="GET_CODPROVINCIA_FROM_CODMIN" query="select codprovincia from de_provincia where lower(codmin) = lower(?)"/>			
+
+<STATEMENT name="SELECT_DESC_PARLANTE_SCAD" 
+	query="
+	select  STRDESCRIZIONEPARLANTE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                   '') AS descrTitolo
+    from DE_TITOLO 
+	where codTitolo = ?"
+	/>			
+
+
+<STATEMENT name="GET_FLGOBBLIGOENTE"
+query="SELECT DISTINCT
+		    coll.prgcolloquio, 
+		    de_servizio.strdescrizione,
+		    to_char(coll.datcolloquio, 'dd/mm/yyyy') as datcolloquio,
+		    to_char(coll.datfineprogramma, 'dd/mm/yyyy') as datfineprogramma,
+		    to_char(am_patto_lavoratore.datstipula, 'dd/mm/yyyy') as datstipula
+		FROM
+		    am_patto_lavoratore
+		    INNER JOIN am_lav_patto_scelta ON ( am_patto_lavoratore.prgpattolavoratore = am_lav_patto_scelta.prgpattolavoratore )
+		    INNER JOIN or_percorso_concordato ON ( to_number(am_lav_patto_scelta.strchiavetabella) = or_percorso_concordato.prgpercorso )
+		    INNER JOIN or_colloquio coll ON ( or_percorso_concordato.prgcolloquio = coll.prgcolloquio )
+		    INNER JOIN de_servizio ON ( coll.codservizio = de_servizio.codservizio )
+		    LEFT OUTER JOIN am_programma_ente ON ( am_programma_ente.prgpattolavoratore = am_patto_lavoratore.prgpattolavoratore
+		                                           AND am_programma_ente.prgcolloquio = coll.prgcolloquio )
+		WHERE am_patto_lavoratore.PRGPATTOLAVORATORE = ? 
+		    and am_lav_patto_scelta.codlsttab = 'OR_PER'
+		    AND coll.datfineprogramma IS NULL
+		    AND nvl(de_servizio.flgobbligoente, 'N') = 'S'
+		    AND am_programma_ente.strentecodicefiscale IS NULL
+"/>
+<!-- PATTO ON LINE -->
+<STATEMENT name="PATTO_ONLINE_CONFIG"
+ query="SELECT 
+    nvl((
+        SELECT
+            ts_config_loc.strvalore
+        FROM
+            ts_config_loc
+            INNER JOIN de_tipo_config ON(ts_config_loc.codtipoconfig = de_tipo_config.codtipoconfig)
+        WHERE
+            ts_config_loc.strcodrif =(
+                SELECT
+                    ts_generale.codprovinciasil
+                FROM
+                    ts_generale
+                WHERE
+                    prggenerale = 1
+            )
+            AND de_tipo_config.codtipoconfig = 'PTONLINE'
+            AND trunc(ts_config_loc.datinizioval) &lt;= trunc(sysdate)
+            AND trunc(ts_config_loc.datfineval) &gt; trunc(sysdate)
+    		), '0') AS strvaloreconfig,
+	    (
+	        SELECT
+	            ts_generale.codprovinciasil
+	        FROM
+	            ts_generale
+	        WHERE
+	            prggenerale = 1
+	    ) AS codprovinciasil 
+ FROM dual"
+ />
+<STATEMENT name="COMBO_STATO_PT_ONLINE"
+ query=" 
+	 SELECT
+	    'A' AS codice,
+	    'A - accettato' AS descrizione
+	FROM dual
+	UNION
+	SELECT
+	    'D' AS codice,
+	    'D - da accettare' AS descrizione
+	FROM dual
+	UNION
+	SELECT
+	    'S' AS codice,
+	    'S - scadenza termini accettazione' AS descrizione
+	FROM  dual
+	ORDER BY codice ASC"
+/>
+<STATEMENT name="GET_PT_ONLINE_PER_INVIO"
+ query="  SELECT lav.strcodicefiscale   codiceFiscale,                  
+	               to_char(patto.datStipula, 'yyyy-mm-dd hh24:mi:ss')  dataPatto,                    
+			       patto.strcodabiportale codServiziAmministrativi,      
+			       to_char(am_doc.numprotocollo)   numProtocollo,                 
+			       to_char(am_doc.numannoprot)     annoProtocollo,                
+			       com.codprovincia codProvinciaProv,             
+			       patto.numklopattolavoratore ,
+			       am_doc.prgdocumento,
+			       to_char(patto.DTMINVIOPORTALE, 'yyyy-mm-dd hh24:mi:ss') dataInvioPortale,  
+			       patto.codmonoaccettazione,   
+			       to_char(patto.DTMACCETTAZIONE, 'yyyy-mm-dd hh24:mi:ss') dataAccettazione,
+			       patto.STRTIPOACCETTAZIONE			            
+			  FROM am_patto_lavoratore patto                             
+			 INNER JOIN an_lavoratore lav                                
+			    ON patto.cdnlavoratore = lav.cdnlavoratore               
+			 INNER JOIN am_documento_coll doc_coll                       
+			    ON (to_number(doc_coll.strchiavetabella) = patto.prgpattolavoratore)   
+			 INNER JOIN am_documento am_doc                              
+			    ON (am_doc.prgdocumento = doc_coll.prgdocumento AND      
+			       am_doc.cdnlavoratore = patto.cdnlavoratore)           
+			  INNER JOIN de_cpi ON (patto.codcpi = de_cpi.codcpi)        
+			  INNER JOIN de_comune com on (com.codcom = de_cpi.codcom)   
+			 WHERE  patto.prgpattolavoratore = ? 
+			   AND patto.codmonoaccettazione is null
+              AND patto.strcodabiportale is not null 
+              AND am_doc.codtipodocumento IN ('PT297', 'ACLA')         
+			  AND am_doc.codstatoatto = 'PR'  "
+/>
+<STATEMENT name="UPDATE_PTONLINE_DA_ACCETTARE"
+ query="UPDATE am_patto_lavoratore 
+	SET  codmonoaccettazione = 'D',
+    dtminvioportale = sysdate, numklopattolavoratore = ? + 1, CDNUTMOD = ?, 
+    DTMMOD = sysdate WHERE prgpattolavoratore = ?"
+/>
+<STATEMENT name="GET_PT_ONLINE_PER_RICHIESTA"
+ query="  SELECT patto.numklopattolavoratore ,
+		    lav.strcodicefiscale     codiceFiscale,
+		    to_char(patto.datstipula, 'yyyy-mm-dd hh24:mi:ss') dataPatto,
+		    to_char(patto.dtminvioportale, 'yyyy-mm-dd hh24:mi:ss') dataInvioPortale,
+		    patto.strcodabiportale  codServiziAmministrativi,
+		    to_char(am_doc.numprotocollo) numProtocollo,
+		    to_char(am_doc.numannoprot) annoProtocollo,
+		    com.codprovincia         codProvinciaProv
+		FROM
+		    am_patto_lavoratore   patto
+		    INNER JOIN an_lavoratore  lav ON patto.cdnlavoratore = lav.cdnlavoratore
+		    INNER JOIN am_documento_coll     doc_coll ON ( to_number(doc_coll.strchiavetabella) = patto.prgpattolavoratore )
+		    INNER JOIN am_documento  am_doc ON ( am_doc.prgdocumento = doc_coll.prgdocumento AND am_doc.cdnlavoratore = patto.cdnlavoratore )
+		    INNER JOIN de_cpi ON ( patto.codcpi = de_cpi.codcpi )
+		    INNER JOIN de_comune  com ON ( com.codcom = de_cpi.codcom )
+		WHERE
+		    patto.prgpattolavoratore = ? 
+		    AND am_doc.codtipodocumento IN ('PT297', 'ACLA')         
+			AND am_doc.codstatoatto = 'PR' "
+		/>
+<STATEMENT name="PT_ONLINE_COMBO_CODMONOACCETTAZIONE"
+	query="SELECT
+	    'A' AS codice,
+	    'Accettato' AS descrizione
+	FROM
+	    dual
+	UNION
+	SELECT
+	    'D' AS codice,
+	    'Da accettare' AS descrizione
+	FROM
+	    dual
+	UNION
+	SELECT
+	    'S' AS codice,
+	    'Scadenza termini accettazione' AS descrizione
+	FROM
+	    dual
+	ORDER BY
+	    codice asc"/>
+<STATEMENT name="UPDATE_PTONLINE_REINVIATO"
+ query="UPDATE am_patto_lavoratore 
+	SET  codmonoaccettazione = 'D', STRTIPOACCETTAZIONE = null, 
+	DTMACCETTAZIONE = null,  FLGREINVIOPTONLINE = null,
+    dtminvioportale = sysdate, numklopattolavoratore = ? + 1, CDNUTMOD = ?, 
+    DTMMOD = sysdate WHERE prgpattolavoratore = ?"
+/>
+<STATEMENT name="INSERT_PTONLINE_STORICO"
+ query="
+ INSERT INTO am_pt_online_storico (
+        dtmaccettazione,
+        strcodabiportale,
+        prgptonlstorico,
+        codmonoaccettazione,
+        cdnutsto,
+        dtminvioportale,
+        dtmsto,
+        prgpattolavoratore,
+        strtipoaccettazione
+    ) VALUES (
+        to_date(?,'yyyy-mm-dd hh24:mi:ss'),
+        ?,
+        S_AM_PT_ONLINE_STORICO.nextval,
+        ?,
+        ?,
+        to_date(?,'yyyy-mm-dd hh24:mi:ss'),
+        sysdate,
+        ?,
+        ?
+    )
+ "
+/>
+<STATEMENT name="GET_PATTO_RISTAMPA"
+ query="SELECT  numklopattolavoratore, nvl(FLGPATTOONLINE, 'N') as FLGPATTOONLINE, CODMONOACCETTAZIONE
+ 		from am_patto_lavoratore 
+		WHERE prgpattolavoratore = ?"
+/>
+<STATEMENT name="UPDATE_PATTO_RISTAMPA"
+ query="UPDATE am_patto_lavoratore 
+	SET  DTMULTIMASTAMPA = sysdate, numklopattolavoratore = ?  , CDNUTMOD = ?, 
+    DTMMOD = sysdate WHERE prgpattolavoratore = ?"
+/>
+<STATEMENT name="UPDATE_PATTO_ONLINE_RISTAMPA"
+ query="UPDATE am_patto_lavoratore 
+	SET  DTMULTIMASTAMPA = sysdate, FLGREINVIOPTONLINE = 'S', 
+	numklopattolavoratore = ?  , CDNUTMOD = ?, 
+    DTMMOD = sysdate WHERE prgpattolavoratore = ?"
+/>
+<STATEMENT name="PTOnLineStorico"
+	query="
+		SELECT
+		    prgptonlstorico,
+		    strcodabiportale,
+		    to_char(dtminvioportale, 'dd/mm/yyyy hh24:mi') AS datainvioaccettazione,
+		    to_char(dtmaccettazione, 'dd/mm/yyyy hh24:mi') AS dataaccettazione,
+		    decode(codmonoaccettazione,'A','Accettato','D','Da accettare', 'S', 'Scadenza termini accettazione') as statopatto,
+		    dtminvioportale
+		FROM
+		    am_pt_online_storico
+		WHERE
+		    prgpattolavoratore = ?
+		ORDER BY
+		    dtminvioportale DESC
+	"
+/>
+<STATEMENT name="GET_PATTI_ONLINE_STORICIZZATI"
+	query="
+	select patto.prgpattolavoratore, patto.dtminvioportale
+	from am_pt_online_storico sto, am_patto_lavoratore patto
+	where sto.prgpattolavoratore= patto.prgpattolavoratore
+	and patto.cdnlavoratore = ? and patto.codstatoatto = 'PR' and patto.datfine is null
+	order by patto.dtminvioportale desc
+" />
+<STATEMENT name="MAKE_PATTOACCORDO_ONLINE"
+	query="UPDATE am_patto_lavoratore
+		SET
+		    flgpttrasfonline = 'S',
+		    flgpattoonline = 'S',
+		    dtmmod = sysdate,
+		    numklopattolavoratore = ?,
+		    cdnutmod = ?
+		WHERE
+		    prgpattolavoratore = ?
+" />
+<STATEMENT name="GET_PT_ONLINE_PER_REINVIO"
+ query="  SELECT lav.strcodicefiscale   codiceFiscale,                  
+	               to_char(patto.datStipula, 'yyyy-mm-dd hh24:mi:ss')  dataPatto,                    
+			       patto.strcodabiportale codServiziAmministrativi,      
+			       to_char(am_doc.numprotocollo)   numProtocollo,                 
+			       to_char(am_doc.numannoprot)     annoProtocollo,                
+			       com.codprovincia codProvinciaProv,             
+			       patto.numklopattolavoratore ,
+			       am_doc.prgdocumento,
+			       to_char(patto.DTMINVIOPORTALE, 'yyyy-mm-dd hh24:mi:ss') dataInvioPortale,  
+			       patto.codmonoaccettazione,   
+			       to_char(patto.DTMACCETTAZIONE, 'yyyy-mm-dd hh24:mi:ss') dataAccettazione,
+			       patto.STRTIPOACCETTAZIONE			            
+			  FROM am_patto_lavoratore patto                             
+			 INNER JOIN an_lavoratore lav                                
+			    ON patto.cdnlavoratore = lav.cdnlavoratore               
+			 INNER JOIN am_documento_coll doc_coll                       
+			    ON (to_number(doc_coll.strchiavetabella) = patto.prgpattolavoratore)   
+			 INNER JOIN am_documento am_doc                              
+			    ON (am_doc.prgdocumento = doc_coll.prgdocumento AND      
+			       am_doc.cdnlavoratore = patto.cdnlavoratore)           
+			  INNER JOIN de_cpi ON (patto.codcpi = de_cpi.codcpi)        
+			  INNER JOIN de_comune com on (com.codcom = de_cpi.codcom)   
+			 WHERE  patto.prgpattolavoratore = ? 
+			   AND patto.codmonoaccettazione ='A'
+              AND patto.strcodabiportale is not null 
+              AND am_doc.codtipodocumento IN ('PT297', 'ACLA')         
+			  AND am_doc.codstatoatto = 'PR'  "
+/>
+
+<STATEMENT name="GET_PATTI_CHIUSI_ONLINE_STORICIZZATI"
+	query="
+	select patto.prgpattolavoratore, patto.dtminvioportale
+	from am_pt_online_storico sto, am_patto_lavoratore patto
+	where sto.prgpattolavoratore= patto.prgpattolavoratore
+	and patto.prgpattolavoratore = ?
+	order by patto.dtminvioportale desc
+" />

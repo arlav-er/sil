@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui">
+	<h:form id="slotDisponibiliForm">
+		<fieldset>
+			<legend>Prenota l'appuntamento</legend>
+			<ui:fragment rendered="#{not empty ygOverAppuntamentoBean.slotDisponibili}">
+				<p:dataTable value="#{ygOverAppuntamentoBean.slotDisponibili}" var="slot" 
+					tableStyleClass="dataTable" emptyMessage="Nessuno slot trovato"
+					rowIndexVar="row">
+					<p:column styleClass="notSortable">
+						<p:selectBooleanCheckbox styleClass="slot-checkbox"
+							value="#{ygOverAppuntamentoBean.slotCheckbox[row]}">
+							<p:ajax process="@this" 
+								update="@this @(.slot-checkbox) :slotDisponibiliForm:prenotaBtn"
+								listener="#{ygOverAppuntamentoBean.onSlotSelected(row)}" />
+						</p:selectBooleanCheckbox>
+					</p:column>
+					<p:column headerText="Data" styleClass="notSortable">
+						<h:outputText 
+							value="#{ygOverAppuntamentoBean.convertXMLCalendarToDate(slot.dataAppuntamento)}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Orario" styleClass="notSortable">
+						<h:outputText value="#{slot.oraAppuntamento}" />
+					</p:column>
+					<p:column headerText="Presso" styleClass="notSortable sixty">
+						<h:outputText value="#{slot.ambiente}" rendered="#{not empty slot.ambiente}" />
+						<h:outputText value="Centro per l'Impiego" rendered="#{empty slot.ambiente}" />
+					</p:column>
+					<p:column headerText="Sigla Op." styleClass="notSortable fifteen">
+						<h:outputText value="#{slot.siglaOperatore}" />
+					</p:column>
+				</p:dataTable>
+				
+				<div>
+					<p:commandButton value="Cerca disponibilità nei giorni successivi" 
+						actionListener="#{ygOverAppuntamentoBean.cercaGiorniSeguenti}" 
+						styleClass="commandButtonMargin" update="@form" widgetVar="giorniSeguentiBtnWV"
+						onstart="PF('giorniSeguentiBtnWV').disable()" 
+						oncomplete="PF('giorniSeguentiBtnWV').enable()" />
+						
+					<p:commandButton id="prenotaBtn" value="Prenota" styleClass="commandButtonMargin" 
+						actionListener="#{ygOverAppuntamentoBean.prenotaAppuntamento}"
+						disabled="#{empty ygOverAppuntamentoBean.idSlotSelezionato}"
+						update=":everythingPanel" widgetVar="prenotaAppuntamentoBtnWV"
+						onstart="PF('prenotaAppuntamentoBtnWV').disable()" 
+						oncomplete="PF('prenotaAppuntamentoBtnWV').enable()"/>
+				</div>
+			</ui:fragment>
+			
+			<ui:fragment rendered="#{empty ygOverAppuntamentoBean.slotDisponibili}">
+				<h4>Nessuno slot trovato</h4>
+			</ui:fragment>
+		</fieldset>
+	</h:form>
+</ui:composition>

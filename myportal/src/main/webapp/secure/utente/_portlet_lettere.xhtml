@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/template_portlet.xhtml">
+
+
+	<ui:param name="portletCssClass" value="portletLettere" />
+
+	<ui:define name="portlet_title">
+		<h:outputText value="#{msg['cittadino.portlet.lettere.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="portlet_content">
+		<h:outputText value="#{txt['cittadino.portlet.lettere.descrizione']}" escape="false" />
+		<h:form id="lettere_form">
+			<ui:repeat var="lettera" value="#{utenteHomeBean.lettere}">
+				<div class="ui-widget-content ui-corner-all cv-element">
+					<div style="float: left; width: 315px; margin: 5px;">
+						<label>Nome lettera: </label>
+						<h:link outcome="/secure/utente/lettere/visualizza_utente.xhtml"
+							title="Visualizza la lettera">
+							#{lettera.nome}
+							<f:param name="id" value="#{lettera.id}" />
+						</h:link>
+						<br /> <label>Ultima modifica: </label>
+						<h:outputText value="#{lettera.dtmMod}">
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="date" />
+						</h:outputText>
+					</div>
+					<div style="float: right; margin: 13px 5px;">
+
+						<h:link styleClass="buttonStyle yellowButton "
+							outcome="/secure/utente/lettere/edit.xhtml" title="Modifica">
+							<f:param name="id" value="#{lettera.id}" />
+							<span class="ui-icon ui-icon-pencil fix_icon" />
+						</h:link>
+
+						<a tabindex="0" class="selectAction buttonStyle yellowButton "
+							title="Scegli un'azione"> <span
+							class="ui-icon ui-icon-triangle-1-s fix_icon" />
+						</a>
+					</div>
+
+					<ul class="option-menu">
+						<li><h:link
+								outcome="/secure/utente/lettere/visualizza_utente.xhtml"
+								onclick="save_last_action(this,'Apri')">
+								<f:param name="id" value="#{lettera.id}" />
+								<span class="ui-icon ui-icon-document fix_icon" />
+								Visualizza
+							</h:link></li>
+						<li><h:link outcome="/secure/utente/lettere/edit.xhtml"
+								title="Modifica" onclick="save_last_action(this,'Modifica')">
+								<f:param name="id" value="#{lettera.id}" />
+								<span class="ui-icon ui-icon-pencil fix_icon" />
+								Modifica
+							</h:link></li>
+						<li><a href="#"
+							onclick="return eliminaLettera({id: #{lettera.id}, referenziato: #{lettera.referenziatoInMsg}, component: this});"
+							onkeypress="if (event.keyCode==13) {return eliminaLettera({id: #{lettera.id}, referenziato: #{lettera.referenziatoInMsg}, component: this});return false;} else {return true;}">
+								<span class="ui-icon ui-icon-trash fix_icon" /> Elimina
+						</a></li>
+						<li class="copia-lettera-menu"><a href="#"
+							onclick="return copiaLettera({id: #{lettera.id}, descr: '#{utilsBean.escapeJS(lettera.nome)}', component: this});"
+							onkeypress="if (event.keyCode==13) {return copiaLettera({id: #{lettera.id}, descr: '#{utilsBean.escapeJS(lettera.nome)}', component: this});return false; } else {return true;}">
+								<span class="ui-icon ui-icon-copy fix_icon" /> Copia
+						</a></li>
+						<li><h:outputLink onclick="save_last_action(this,'Stampa')"
+								value="../rest/services/getLetteraAccompagnamento" title="Stampa">
+								<f:param name="id" value="#{lettera.id}" />
+								<span class="ui-icon ui-icon-print fix_icon" />
+							Stampa
+						</h:outputLink></li>
+					</ul>
+					<div style="clear: both;"></div>
+				</div>
+			</ui:repeat>
+
+			<script type="text/javascript">
+				//<![CDATA[
+				
+				function checkMaxLettere() {
+					// Confronta il numero di lettere inserite con il massimo permesso.
+					// Se si e' superato il limite allora nasconde i pulsanti/voci di menu per l'inserimento di nuove lettere
+					var maxLettere = #{const['lettere.max']};
+					var currLettere = #{utenteHomeBean.numeroLettere}; 
+
+					if (currLettere < maxLettere) {
+						$('#portlet-#{portlet.id}\\:nuova_lettera_button').show();
+						$('.copia-lettera-menu').show();
+					} else {
+						$('#portlet-#{portlet.id}\\:nuova_lettera_button').hide();
+						$('.copia-lettera-menu').hide();
+						//$.jnotify(("Non è possibile inserire più di "+ #{const['lettere.max']} +" lettere di presentazione"), "warn");
+					}
+				};
+
+				var copiaLettera = function(params) {
+					// Viene richiamata quando si clicca o preme invio sulla voce di menu Copia
+					document.getElementById('portlet-#{portlet.id}:lettere_copy').open(
+							{id: params.id, descr: params.descr},
+							params.component);
+				};
+
+				var openCopyLettera = function(params) {
+					// Apre la modale per la copia della lettera
+					var itemId = params.id;
+					var itemDescrizione = params.descr;
+					var copyItemDescrizione = itemDescrizione;
+					$('[id$="lettere_copy\:modal_form\:descrizione_copia"]').val(copyItemDescrizione);
+					$('[id$="lettere_copy\:modal_form\:id_copia"]').val(itemId);
+				};
+
+				var eliminaLettera = function(params) {
+					// Viene richiamata quando si clicca o preme invio sulla voce di menu Elimina
+					document.getElementById('portlet-#{portlet.id}:lettere_delete').open(
+							{id: params.id, referenziato: params.referenziato},
+							params.component);
+				};
+
+				var openDeleteLettera = function(params) {
+					// Apre la modale per l'eliminazione della lettera
+					var itemId = params.id;
+					var referenziato = params.referenziato;
+
+					$('[id$="lettere_delete\:modal_form\:id_delete"]').val(itemId);
+					
+					if (referenziato) {
+						$('[id$="lettere_delete"] .message_content').text("Questa lettera di presentazione è referenziata all'interno di una richiesta di supporto. Sei sicuro di volerla eliminare?");
+					} else {
+						$('[id$="lettere_delete"] .message_content').text("Sei sicuro di voler eliminare la lettera di presentazione?");
+					}
+				};
+
+				$(function() {	
+					disegnaBottoni();
+					
+					checkMaxLettere();
+
+					generateActionMenus("[id$=lettere_form] .selectAction");
+				});
+				//]]>
+			</script>
+		</h:form>
+
+		<cc:modalDialog id="lettere_delete" title="Elimina"
+			openF="openDeleteLettera"
+			actionSubmit="#{utenteHomeBean.deleteLettera}" submitLabel="Elimina"
+			renderAjax=":portlet-#{portlet.id}:lettere_form  :global_messages">
+			<h:inputHidden id="id_delete"></h:inputHidden>
+		</cc:modalDialog>
+
+		<cc:modalDialog id="lettere_copy" title="Copia"
+			openF="openCopyLettera" actionSubmit="#{utenteHomeBean.copyLettera}"
+			submitLabel="Copia"
+			renderAjax=":portlet-#{portlet.id}:lettere_form  :global_messages"
+			width="450" height="150">
+			<h:inputHidden id="id_copia"></h:inputHidden>
+			<h:inputHidden id="descrizione_hidden"></h:inputHidden>
+			<h:outputText value="Descrizione"></h:outputText>
+			<h:inputText id="descrizione_copia" style="box-sizing: border-box; width:100%;"></h:inputText>
+		</cc:modalDialog>
+
+		<br />
+		<h:link id="nuova_lettera_button" styleClass="buttonStyle"
+			title="Compila una nuova Lettera di presentazione"
+			outcome="/secure/utente/lettere/edit">
+			Compila una nuova lettera di presentazione 
+		</h:link>
+	</ui:define>
+</ui:composition>

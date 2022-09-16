@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="/secure/template/main.xhtml">
+
+	<ui:define name="content">
+		<ui:param name="bean" value="#{profilatoHomeBean}" />
+		<ui:param name="userBean" value="#{profilatoHomeBean}" />
+
+		<h:graphicImage rendered="#{const['regione.cod']==8}"
+			style="margin:10px;" value="/resources/images/rer/logo_lavoroxte_text_only.png"
+			alt="Logo" />
+		
+		<h:graphicImage rendered="#{const['regione.cod']==2}"
+			style="margin:10px;" value="/resources/images/vda/Logo_lavoroxte_VDA.png"
+			alt="Logo Lavoro" />
+
+		<div
+			style="float: right; margin: 10px; width: 50%; text-align: justify;">
+
+			<h:outputText value="#{msg['cittadino.home.descrizione']}"
+				rendered="#{sessionBean.utente}" escape="false" />
+
+			<h:outputText value="#{msg['azienda.home.descrizione']}"
+				rendered="#{sessionBean.azienda}" escape="false" />
+
+			<h:outputText value="#{txt['coordinatore.home.descrizione']}"
+				rendered="#{sessionBean.coordinatore}" escape="false" />
+
+			<h:outputText value="#{txt['provincia.home.descrizione']}"
+				rendered="#{sessionBean.provincia}" escape="false" />
+
+			<h:outputText value="#{msg['regione.home.descrizione']}"
+				rendered="#{sessionBean.regione}" escape="false" />
+				
+			<h:outputText value="#{txt['certificatore.home.descrizione']}"
+				rendered="#{sessionBean.certificatore}" escape="false" />
+				
+			<h:outputText value="#{msg['patronato.home.descrizione']}"
+				rendered="#{sessionBean.patronato}" escape="false" />
+					
+		</div>
+
+		<div>
+			<div id="home_body"></div>
+			<div id="left_column" class="portlet-column portlet-left-column">
+				<c:forEach items="#{bean.leftColumn}" var="portlet">
+					<ui:include src="#{bean.cartella}/#{portlet.nome}.xhtml">
+					</ui:include>
+				</c:forEach>
+			</div>
+			<div id="right_column" class="portlet-column portlet-right-column">
+				<c:forEach items="#{bean.rightColumn}" var="portlet">
+					<ui:include src="#{bean.cartella}/#{portlet.nome}.xhtml">
+					</ui:include>
+				</c:forEach>
+			</div>
+		</div>
+
+		<h:form id="portlet_positioner">
+			<h:inputHidden id="params" value="xx" />
+			<h:commandButton id="posizionaPortlet"
+				action="#{bean.posizionaPortlet}" value="posiziona"
+				style="display: none;">
+				<f:ajax execute="@form" render="@this" />
+			</h:commandButton>
+		</h:form>
+
+		<script type="text/javascript">
+			$(function() {
+				selectMasterTab('#home_link');
+
+				configurePortlet();
+				initPortlets();				
+			});					
+		</script>
+
+		<cc:messages id="global_messages" />
+	</ui:define>
+</ui:composition>

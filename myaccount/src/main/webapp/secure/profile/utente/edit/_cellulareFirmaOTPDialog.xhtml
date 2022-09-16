@@ -1,0 +1,75 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui">
+	<p:dialog id="cellulareFirmaOTP" widgetVar="cellulareFirmaOTPWV" modal="true"
+		header="#{ui['prof.cellulareFirmaElettronicaOTPSMSTitle']}" height="340" width="800" dynamic="true">
+		<h:form id="cellulareFirmaOTPForm">
+
+			<div class="col-md-12">
+				<h:panelGroup id="cellulareFirmaOTPGroup">
+					<ui:fragment rendered="#{not utenteEditBean.cellulareFirmaOTPSent}">
+						<p>#{ui['prof.cellulareFirmaElettronicaOTPSMSDesc']}</p>
+						<div class="form-group">
+							<p:outputLabel for="tempCellurareFirmaOTP" value="#{ui['prof.cellurare']}" styleClass="col-sm-4 control-label" />
+							<div class="col-md-8">
+								<p:inputText id="tempCellurareFirmaOTP" styleClass="form-control otp-mobile" required="true">
+									<f:convertNumber integerOnly="true" type="number" />
+								</p:inputText>
+								<p:message id="tempCellurareFirmaOTPMessage" for="tempCellurareFirmaOTP"></p:message>
+							</div>
+						</div>
+
+						<div class="text-center">
+							<p:commandButton value="#{ui['prof.inviaCodice']}" styleClass="btn btn-primary"
+								update="@(.ui-message) cellulareFirmaOTPGroup" onclick="UserEdit.generateOTPRequest()"
+								widgetVar="inviaCodiceBtnWV"></p:commandButton>
+							<p:remoteCommand name="generateOTPRichiestaRC" actionListener="#{utenteEditBean.generateOTPRichiesta}"
+								oncomplete="UserEdit.generateOTPRequestComplete()"></p:remoteCommand>
+						</div>
+					</ui:fragment>
+					<ui:fragment rendered="#{utenteEditBean.cellulareFirmaOTPSent}">
+						<p>#{ui['prof.cellulareFirmaElettronicaOTPSMS2Desc']}</p>
+
+						<div class="form-group">
+							<p:outputLabel for="tempCodeFirmaOTP" value="#{ui['prof.codice']}" styleClass="col-sm-4 control-label" />
+							<div class="col-md-8">
+								<p:inputText id="tempCodeFirmaOTP" value="#{utenteEditBean.tempCodeFirmaOTP}" styleClass="form-control"
+									required="true">
+								</p:inputText>
+								<p:message id="tempCodeFirmaOTPMessage" for="tempCodeFirmaOTP"></p:message>
+							</div>
+						</div>
+
+						<div class="text-center">
+							<p:commandButton actionListener="#{utenteEditBean.replyToOTP}" value="#{ui['prof.conferma']}"
+								styleClass="btn btn-primary"
+								update="@(.ui-message) cellulareFirmaOTPGroup :profileEditForm:infoPerRichiestaAbilitazioneGroup"
+								onclick="UserEdit.replyToOTP()" oncomplete="UserEdit.replyToOTPComplete(args)" widgetVar="confermaCodiceBtnWV"></p:commandButton>
+						</div>
+					</ui:fragment>
+				</h:panelGroup>
+			</div>
+
+			<p:remoteCommand name="resetOTPRC" actionListener="#{utenteEditBean.resetOTPSteps}" process="@this" global="false"></p:remoteCommand>
+		</h:form>
+
+		<script>              
+        function initIntlInput(setNumber) {              
+        	var input = document.querySelector("#cellulareFirmaOTPForm\\:tempCellurareFirmaOTP");  	
+        	UserEdit.iti = intlTelInput(input, {
+                 initialCountry: "IT",
+                 utilsScript: "#{resource['commons:/js/intlInputUtils.js']}"
+               });
+
+             if(#{not empty utenteEditBean.utenteInfo.cellulareOTP} &amp;&amp; setNumber) {
+            	 UserEdit.iti.setNumber("#{utenteEditBean.utenteInfo.cellulareOTP}")
+             }
+            }
+
+            $(function() { 
+            	initIntlInput(true);
+            });
+
+        </script>
+	</p:dialog>
+</ui:composition>

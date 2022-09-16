@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/main.xhtml">
+
+	<ui:define name="title">
+		<h:outputText value="#{msg['cittadino.servizi.conferma_registrazione.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+		<f:loadBundle basename="conf.const" var="const" />
+		<f:metadata>
+			<f:viewParam name="t"
+				value="#{confermaRegistrazioneForteBean.registrazioneForteToken}" />
+			<f:event type="preRenderView"
+				listener="#{confermaRegistrazioneForteBean.conferma}" />
+		</f:metadata>
+
+
+
+		<h:panelGrid columns="1">
+			<h:outputText value="Modulo di registrazione." />
+			<br />
+			<h:form
+				rendered="#{confermaRegistrazioneForteBean.registrazioneForteToken == null}">
+				<h:panelGroup>
+					<h:outputLabel for="codReg"
+						value="Inserisci il codice di autenticazione: " />
+				</h:panelGroup>
+				<h:panelGroup>
+					<h:inputText id="codReg"
+						value="#{confermaRegistrazioneForteBean.codiceRegistrazione}" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<h:commandButton styleClass="buttonStyle"
+						action="#{confermaRegistrazioneForteBean.confermaManuale}"
+						value="Invia" id="codRegSubmit">
+						<f:ajax execute="@form" render="@form" />
+					</h:commandButton>
+				</h:panelGroup>
+				<br />
+				<h:panelGroup rendered="#{confermaRegistrazioneForteBean.ok}">
+					<p>
+						<h:outputText value="Registrazione Utente confermata." />
+					</p>
+				</h:panelGroup>
+				<cc:messages />
+				<script type="text/javascript">
+					disegnaBottoni();
+				</script>
+			</h:form>
+			<h:panelGroup rendered="#{confermaRegistrazioneForteBean.ok}">
+				<p>
+					<h:outputText value="Registrazione Utente confermata." />
+				</p>
+				
+			</h:panelGroup>
+
+			<h:panelGroup
+				rendered="#{not confermaRegistrazioneForteBean.ok and confermaRegistrazioneForteBean.registrazioneForteToken != null }">
+				<p>
+					<h:outputText value="Errore durante la conferma." />
+				</p>
+				<p>
+					<h:outputText value="Contatta un amministratore." />
+				</p>
+				
+			</h:panelGroup>
+		</h:panelGrid>
+
+		<h:link outcome="new_home" title="Torna alla HomePage"
+			styleClass="homeButton">Torna all'HomePage</h:link>
+
+		<script type="text/javascript">
+			disegnaBottoni();
+		</script>
+	</ui:define>
+</ui:composition>

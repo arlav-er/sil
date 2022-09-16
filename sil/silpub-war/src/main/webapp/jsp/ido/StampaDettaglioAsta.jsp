@@ -1,0 +1,599 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<%@ page import="com.engiweb.framework.base.*,
+                 java.lang.*,
+                 java.text.*,
+                 java.util.*, 
+                 java.math.*,
+                 it.eng.afExt.utils.StringUtils,
+                 it.eng.sil.util.StyleUtils,
+                 it.eng.sil.security.*"%>
+            
+
+<%@ include file="../global/getCommonObjects.inc"%>
+<%@ page extends="com.engiweb.framework.dispatching.httpchannel.AbstractHttpJspPage" %>
+
+<%
+
+//dati della richiesta
+BigDecimal numAnno		= null; 
+BigDecimal numRichiesta	= null;
+BigDecimal numRichiestaOrig	= null;
+String ente				= ""; 
+String luogoDiLavoro	= "";
+BigDecimal posti		= null;  
+BigDecimal numProfili 	= null;  
+BigDecimal exLsu		= null;
+BigDecimal exMilitari	= null;
+BigDecimal mobilita	= null;
+String mansione			= "";
+String requisiti		= "";
+String contratto		= "";  
+String orario	 		= ""; 
+String notaFissa 		= ""; 
+String notaSpec 		= "";
+String datChiam 		= "";
+String riusoGrad 		= "";
+//specifiche per la provincia ed il cpi
+String prov				= "";
+String codProv			= "";
+String cpi				= "";
+String codCpi			= "";
+String indirizzo		= "";
+String tel				= "";
+String fax				= "";
+String email			= "";
+String dataPubb			= "";
+String notaFissaCpi		= "";
+String notaChiusura		= "";
+//variabili della riga precedente
+String datChiamPrec		= "";
+String dataPubbPrec		= "";
+String codCpiPrec		= "";
+String notaCpiPrec		= "";
+
+
+Vector listaPubb = serviceResponse.getAttributeAsVector("M_PUB_SPAMPA_DETTAGLIO_ASTA.ROWS.ROW");
+%>
+
+<html>
+<head>
+	<title>Pubblicazioni delle chiamate per le aste</title>
+	<STYLE type="text/css">
+	td.titolo {	font-family: Verdana, Arial, Helvetica, Sans-serif;
+				font-size: 20px; 
+				font-weight: bold;
+				text-color: #000000;
+				text-align: center;
+	}	
+	td.head   {	font-family: Verdana, Arial, Helvetica, Sans-serif;
+				font-size: 14px; 
+				font-weight: bold;
+				text-color: #000000;
+				text-align: center;
+				vertical-align: middle;
+				border-right: 2px solid black;
+				padding-left: 5px;
+				padding-right: 5px;
+				padding-top: 3px;
+				padding-bottom: 3px;
+				
+	}
+	td.head2  {	font-family: Verdana, Arial, Helvetica, Sans-serif;
+				font-size: 14px; 
+				font-weight: bold;
+				text-color: #000000;
+				text-align: center;
+				vertical-align: middle;
+				padding-left: 5px;
+				padding-right: 5px;
+				padding-top: 3px;
+				padding-bottom: 3px;
+	}
+	td.cross  {	font-family: Verdana, Arial, Helvetica, Sans-serif;
+				font-size: 14px; 
+				font-weight: normal;
+				text-color: #000000;
+				text-align: center;
+				vertical-align: middle;
+				border-right: 2px solid black;
+				border-bottom: 2px solid black;
+				border-top: 2px solid black;
+				padding-left: 5px;
+				padding-right: 5px;
+				padding-top: 3px;
+				padding-bottom: 3px;
+	}
+	td.cross2 {	font-family: Verdana, Arial, Helvetica, Sans-serif;
+				font-size: 14px; 
+				font-weight: normal;
+				text-color: #000000;
+				text-align: center;
+				vertical-align: middle;
+				border-bottom: 2px solid black;
+				border-top: 2px solid black;
+				padding-left: 5px;
+				padding-right: 5px;
+				padding-top: 3px;
+				padding-bottom: 3px;
+	}	
+	td.nota	  {	font-family: Verdana, Arial, Helvetica, Sans-serif;
+				font-size: 15px; 
+				text-color: #000000;
+				text-align: justify;
+				vertical-align: middle;
+				padding-left: 5px;
+				padding-right: 5px;
+				padding-top: 3px;
+				padding-bottom: 3px;				
+	}
+	
+	table.griglia { font-family: Verdana, Arial, Helvetica, Sans-serif;
+					border-top: 2px solid black;
+					border-left: 2px solid black;					
+					border-right: 2px solid black;
+					border-bottom: 2px solid black;								
+	}
+	table.fontpage  { font-family: Verdana, Arial, Helvetica, Sans-serif;
+				font-size: 14px;
+	}
+	
+	</STYLE>
+</head>
+<body>
+<% SourceBean pr	= (SourceBean)serviceResponse.getAttribute("M_PUB_NOTA_FISSA.ROWS.ROW");
+   codProv			= StringUtils.getAttributeStrNotNull(pr,"CODPROVINCIASIL");
+%>
+	
+	<table width="100%" class="fontpage">
+		<tr>
+			<td align="left" colspan="1" width="50%">
+				<img src="../../img/loghi/prov_<%=codProv%>.gif" height="70" >
+			</td>
+			<td align="right" colspan="1" width="50%">
+				<img src="../../img/loghi/prov_<%=codProv%>_cpi.gif" height="70" >
+			</td>
+		<tr>
+	</table>
+<% 	
+	String tabCpi		= "";
+	String tabChiam		= "";
+	String tabPubb		= "";
+	String tr			= "";
+	String riga			= "";
+	String tabTot		= "";
+	String tabNota		= "";
+	//variabili per il protocollo
+	String eticProt			= " PROTOCOLLO N. ";
+	String numProt 			= StringUtils.getAttributeStrNotNull(serviceRequest,"NUMPROT");
+	BigDecimal stampProt	= null;
+	BigDecimal numRichProt	= null;	
+	String strStampProt		= "";
+	String strNumRichProt	= "";
+	String protocollo		= "";
+	Vector listNumProt 		= null;
+	String strIntestazioneProvinciaRiga = "";
+	int numConfig = 0;
+	SourceBean rowNum = (SourceBean) serviceResponse.getAttribute("M_GetConfigLoghiStampa.ROWS.ROW");
+	if (rowNum != null) {
+		String valoreConfig = rowNum.containsAttribute("num")?rowNum.getAttribute("num").toString():"0";
+		numConfig = new Integer(valoreConfig).intValue();
+		if (numConfig == 1) {
+			strIntestazioneProvinciaRiga = rowNum.containsAttribute("strvalore")?rowNum.getAttribute("strvalore").toString():"";
+		}
+	}
+	Vector listPubbPrec	= serviceResponse.getAttributeAsVector("M_PUB_SPAMPA_DETTAGLIO_ASTA.ROWS.ROW");
+	if(!numProt.equals("")){
+		listNumProt	= serviceResponse.getAttributeAsVector("M_PUB_NUM_PROT.PROTOCOLLO.ROWS.ROW");
+	} else {
+		listNumProt	= serviceResponse.getAttributeAsVector("M_PUB_NUM_PROT.ROWS.ROW");
+	}
+		
+	for(int j=0; j<listPubbPrec.size(); j++){
+		SourceBean resPrec 	= (SourceBean) listPubbPrec.get(j);
+		//codCpi				= StringUtils.getAttributeStrNotNull(resPrec,"CODCPI");
+		datChiam 			= StringUtils.getAttributeStrNotNull(resPrec,"DATCHIAMATA");
+		dataPubb			= StringUtils.getAttributeStrNotNull(resPrec,"DATPUBBLICAZIONE");
+		codProv 			= StringUtils.getAttributeStrNotNull(resPrec,"CODPROVINCIA");
+		prov 				= StringUtils.getAttributeStrNotNull(resPrec,"STRDENOMINAZIONE");
+		codCpi				= StringUtils.getAttributeStrNotNull(resPrec,"CODCPI");
+		cpi					= StringUtils.getAttributeStrNotNull(resPrec,"STRCPI");
+		indirizzo			= StringUtils.getAttributeStrNotNull(resPrec,"STRINDIRIZZO");
+		tel					= StringUtils.getAttributeStrNotNull(resPrec,"STRTEL");
+		fax					= StringUtils.getAttributeStrNotNull(resPrec,"STRFAX");
+		email				= StringUtils.getAttributeStrNotNull(resPrec,"STREMAIL");
+		//Nota Pubblica
+		SourceBean nota	= (SourceBean)serviceResponse.getAttribute("M_PUB_NOTA_FISSA.ROWS.ROW");
+		notaFissa		= StringUtils.getAttributeStrNotNull(nota, "STRNOTAAVVPUBBLICO");
+		//corpo della griglia
+		numAnno = (BigDecimal)resPrec.getAttribute("NUMANNO");
+		//variabile stringa introdotta per evitare errori nel caso in cui la variabile BigDecimal sia nulla
+		//anno di riferimento
+		String strNumAnno = "";
+		if (numAnno == null) {
+			strNumAnno = "";
+		} else {
+			strNumAnno = numAnno.toString();
+		}
+		//numero della richiesta
+		numRichiesta	= (BigDecimal)resPrec.getAttribute("NUMRICHIESTA");
+		String strNumRichiesta = "";
+		if (numRichiesta == null) {
+			strNumRichiesta = "";
+		} else {
+			strNumRichiesta = numRichiesta.toString();
+		}
+		//numero della richiesta originale
+		String strNumRichiestaOrig = "";
+		numRichiestaOrig = (BigDecimal)resPrec.getAttribute("NUMRICHIESTAORIG");
+		if (numRichiestaOrig != null) {
+			strNumRichiestaOrig = numRichiestaOrig.toString();	
+		}
+		else {
+			strNumRichiestaOrig = strNumRichiesta;
+		}
+		
+		//numero profili
+		numProfili		= (BigDecimal)resPrec.getAttribute("NUMPROFRICHIESTI"); 
+		String strNumProfili = "";
+		if (numProfili == null) {
+			strNumProfili = "";
+		} else {
+			strNumProfili = numProfili.toString();
+		}
+		//numero exLsu
+		exLsu			= (BigDecimal)resPrec.getAttribute("NUMPOSTOLSU");
+		String strExLSU = "";
+		if (numProfili == null || exLsu == null) {
+			strExLSU = "";
+		} else if(numProfili != null && numProfili.intValue()>0){
+			strExLSU = "(" + exLsu.toString() + " ex LSU)";
+		}
+		//numero exMilitari
+		exMilitari		= (BigDecimal)resPrec.getAttribute("NUMPOSTOMILITARE");
+		String strExMilitari = "";		
+		if (numProfili == null || exMilitari == null) {
+			strExMilitari = "";
+		} else if(numProfili != null && numProfili.intValue()>0){
+			strExMilitari = "(" + exMilitari.toString() + " ex militari)";
+		}
+		
+		//numero Mobilità
+		mobilita = (BigDecimal)resPrec.getAttribute("NUMPOSTOMB");
+		String strMobilita = "";		
+		if (numProfili == null || mobilita == null) {
+			strMobilita = "";
+		} else if(numProfili != null && numProfili.intValue()>0){
+			strMobilita = "(" + mobilita.toString() + " mobilità)";
+		}
+	
+	
+		
+		ente			= StringUtils.getAttributeStrNotNull(resPrec, "STRDATIAZIENDAPUBB");		
+		luogoDiLavoro	= StringUtils.getAttributeStrNotNull(resPrec, "STRLUOGOLAVORO");			
+		mansione		= StringUtils.getAttributeStrNotNull(resPrec, "STRMANSIONEPUBB");
+		requisiti		= StringUtils.getAttributeStrNotNull(resPrec, "TXTCARATTERISTFIGPROF");
+		contratto		= StringUtils.getAttributeStrNotNull(resPrec, "TXTCONDCONTRATTUALE");
+		orario			= StringUtils.getAttributeStrNotNull(resPrec, "STRNOTEORARIOPUBB");
+		riusoGrad		= StringUtils.getAttributeStrNotNull(resPrec, "FLGRIUSOGRADUATORIA");
+		notaSpec		= StringUtils.getAttributeStrNotNull(resPrec, "STRNOTAAVVISOPUBB");
+		notaFissaCpi	= StringUtils.getAttributeStrNotNull(resPrec, "STRNOTE");
+							  
+			
+		//il codice che segue è organizzato in modo tale da ottenere una formattazione della stampa delle richieste
+		//ordinata e raggrupate per tre parametri: il CPI, la data chiamata e la data pubblicazione.
+		//richieste con stesso Cpi saranno raggruppate con un unica intestazione, stesso discorso vale per gli altri paremetri
+		//le variabili stringa definite rappresentano lo stream HTML per la rappresentazione delle tabelle.
+		
+		//variabile che rappresenta il contenuto della richiesta
+		riga="	<tr><td class=\"cross\">&nbsp;" + strNumRichiestaOrig + "/" +strNumAnno + "&nbsp;</td> " +
+			 " 	<td class=\"cross\">&nbsp;" +ente+ "&nbsp;</td> " +
+			 "	<td class=\"cross\">&nbsp;" +luogoDiLavoro+ "&nbsp;</td> " +
+			 "	<td class=\"cross\">&nbsp;" +strNumProfili+ "&nbsp;<br>" +strExLSU+ "<br>" +strExMilitari+ "<br>" +strMobilita+ "</td> " +
+			 "	<td class=\"cross\">&nbsp;" +mansione+ "&nbsp;</td> " +
+			 "	<td class=\"cross\">&nbsp;" +requisiti+ "&nbsp;</td> " +
+			 "	<td class=\"cross2\">&nbsp;" +contratto+ "<br>&nbsp;" +orario+ "&nbsp;</td> " +					 	
+			 // modifica 23/01/2007 savino: tolto il commento al controllo di riusoGrad. Se non presente la nota non va stampata
+			 "	</tr> ";
+			 if (riusoGrad.equals("S")){
+			 	riga+=
+				 "	<tr> " +
+				 "	<td colspan=\"7\" align=\"justify\" class=\"nota\"> " + notaFissa +						
+				 "	</td> " +		
+				 "	</tr> ";
+			 }
+			 if (!notaSpec.equals("")){
+				 riga+=  
+				 "	<tr> " +
+				 "	<td colspan=\"7\" align=\"justify\" class=\"nota\"> " + notaSpec +					
+				 "	</td> "	+	
+				 "	</tr>" ;
+			}
+			 	
+		
+	
+		// controllo sul Cpi
+		if (!codCpi.equals("") && codCpiPrec.equals(codCpi)){
+			datChiam = StringUtils.getAttributeStrNotNull(resPrec,"DATCHIAMATA");
+			// controllo sulla data chiamata
+			if (!datChiam.equals("") && datChiamPrec.equals(datChiam)){
+				dataPubb = StringUtils.getAttributeStrNotNull(resPrec,"DATPUBBLICAZIONE"); 
+				//controllo sulla data di pubblicazione
+				if (!dataPubb.equals("") && dataPubbPrec.equals(dataPubb)){
+					// creazione del primo record (riga) della tabella
+					tr += riga;
+				} else {
+					dataPubbPrec = dataPubb;
+					if(tabPubb.equals("")){					
+					
+					} else {
+						// chiudo il primo record e aggiungo l'intestazione e il record successivo alla tabella pubblicazioni
+						tabPubb += tr +" </table></tr><tr> " +
+								  " <table width=\"100%\" class=\"fontpage\"> " +
+								  "	<tr> " +								
+								  "	<td colspan=\"2\" align=\"left\" class=\"nota\">PUBBLICAZIONE DEL " + dataPubb + protocollo +
+								  "	</td> " +											
+								  "	</tr> " +
+								  "	</table> " + 
+								  "	<table class=\"griglia\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"><tr> " +
+								  "	<td class=\"head\" >Cod.</td> " +
+								  "	<td class=\"head\" >Ente</td> " +
+								  "	<td class=\"head\">Luogo di lavoro</td> " +
+								  "	<td class=\"head\" width=\"12%\">Num. posti</td> " +
+								  "	<td class=\"head\">Profilo professionale<br>e qualifica</td> " +
+								  "	<td class=\"head\">Requisiti richiesti</td> " +
+							      " <td class=\"head2\">Tipologia rapporto<br>di lavoro</td></tr> ";
+						tr = riga;
+						
+					} 
+				}	// chiusura blocco data pubblicazione
+
+			} else {
+			    datChiamPrec = datChiam;
+			    dataPubbPrec = dataPubb;
+				if(tabChiam.equals("")){
+					    
+				} else {
+					
+					//controllo uguaglianza fra il numRichiesta del protocollo e il numeroRich della chiamata
+					//se il risultato e true stampo il protocollo	
+					// modifica savino 23/01/2007: 	bisogna controllare l'esistenza di un solo numero di richiesta, 
+					//                              altrimenti c'e' il rischio che il n. prot. non venga stampato.
+					boolean protocolloBeccato = false;
+					for(int i=0; i<listNumProt.size() && !protocolloBeccato; i++){
+						SourceBean sb 	= (SourceBean) listNumProt.get(i);
+						//numero della richiesta
+						numRichProt = (BigDecimal)sb.getAttribute("NUMRICHIESTA");			
+						strNumRichProt = "";
+						if (numRichProt == null) {
+							strNumRichProt = "";
+						} else {
+							strNumRichProt = numRichProt.toString();
+						}
+						//numero del protocollo
+						stampProt = (BigDecimal)sb.getAttribute("NUMPROTOCOLLO");			
+						strStampProt = "";
+						if (stampProt == null) {
+							strStampProt = "";
+						} else {
+							strStampProt = stampProt.toString();
+						}			
+						//se true stampo il protocollo
+						if(strNumRichProt.equals(strNumRichiesta)){
+							protocollo = eticProt + strStampProt;
+							// modifica Savino 23/01/2007
+							protocolloBeccato = true;
+
+						} else {
+							protocollo = "";
+						}
+					}					
+					
+					// chiudo la tebella con i record, chiudo la tabella pubblicazione e aggiungo la tabella data chiamata
+					tabChiam += tabPubb + tr + " </table></tr></table></tr>" +
+							   " <tr><table width=\"100%\" class=\"fontpage\"> " +
+							   " <tr> " +					
+							   " <td class=\"titolo\" align=\"center\" colspan=\"2\"><br> " +
+							   " CHIAMATA SUI PRESENTI (ASTA) DEL " + datChiam +				
+							   " </td> " +	 				
+							   " <tr> " +
+							   " </table>";
+							   
+					tabPubb =  " <table width=\"100%\" class=\"fontpage\"> " +
+							   " <tr> " +								
+							   " <td colspan=\"2\" align=\"left\" class=\"nota\">PUBBLICAZIONE DEL " + dataPubb  + protocollo +
+							   " </td> " +											
+							   " </tr> " +
+							   " </table> " + 
+							   " <tr><table class=\"griglia\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"><tr> " +
+							   " <td class=\"head\" >Cod.</td> " +
+							   " <td class=\"head\" >Ente</td> " +
+							   " <td class=\"head\">Luogo di lavoro</td> " +
+							   " <td class=\"head\" width=\"12%\">Num. posti</td> " +
+							   " <td class=\"head\">Profilo professionale<br>e qualifica</td> " +
+							   " <td class=\"head\">Requisiti richiesti</td> " +
+						       " <td class=\"head2\">Tipologia rapporto<br>di lavoro</td></tr>";
+					tr = riga;
+					//protocollo = "";	//cancello il numero di protocollo				
+				}
+			}	// chisura blocco data chiamata
+		} else {
+			notaCpiPrec 	= notaFissaCpi;
+			codCpiPrec 		= codCpi;
+			datChiamPrec	= datChiam;
+			dataPubbPrec	= dataPubb;
+			if(tabCpi.equals("")){
+				
+				//controllo uguaglianza fra il numRichiesta del protocollo e il numeroRich della chiamata
+				//se il risultato e true stampo il protocollo	
+				// modifica savino 23/01/2007: 	bisogna controllare l'esistenza di un solo numero di richiesta
+				boolean protocolloBeccato = false;			
+				for(int i=0; i<listNumProt.size() && !protocolloBeccato; i++){
+					SourceBean sb 	= (SourceBean) listNumProt.get(i);
+					//numero della richiesta
+					numRichProt = (BigDecimal)sb.getAttribute("NUMRICHIESTA");			
+					strNumRichProt = "";
+					if (numRichProt == null) {
+						strNumRichProt = "";
+					} else {
+						strNumRichProt = numRichProt.toString();
+					}
+					//numero del protocollo
+					stampProt = (BigDecimal)sb.getAttribute("NUMPROTOCOLLO");			
+					strStampProt = "";
+					if (stampProt == null) {
+						strStampProt = "";
+					} else {
+						strStampProt = stampProt.toString();
+					}			
+					//se true stampo il protocollo
+					if(strNumRichProt.equals(strNumRichiesta)){
+						protocollo = eticProt + strStampProt;
+						protocolloBeccato = true;
+					} else {
+						protocollo = "";
+					}
+				}
+				// se non ho ancora un valore per tabCpi creo nuova tabella per cpi, data chiamata e pubblicazione				
+				tabCpi	= "	<p>&nbsp;</p> " +
+						  "	<table width=\"100%\" class=\"fontpage\"> " +
+						  "	<tr> "; 
+						  if (strIntestazioneProvinciaRiga.equals("")) {
+							  tabCpi = tabCpi + " <td colspan=\"2\" align=\"center\">Provincia di " +prov + " - Centro per l'impiego di " + cpi;
+						  }
+						  else {
+							  tabCpi = tabCpi + " <td colspan=\"2\" align=\"center\">" + strIntestazioneProvinciaRiga + "</td></tr> " +
+									  "	<tr> " +
+									  "	<td colspan=\"2\" align=\"center\">Centro per l'impiego di " + cpi;
+						  } 
+				tabCpi = tabCpi + "	<br> " + indirizzo +
+						  "	<br> " +
+						  "	tel.: " + tel + (!fax.equals("")?" fax: " + fax:"") + " e-mail: " +email +
+						  "	</td> " +		
+						  "	</tr> " +						  
+						  "	</table> ";  
+				tabChiam = " <table width=\"100%\" class=\"fontpage\"> " +
+						   " <tr> " +					
+						   " <td class=\"titolo\" align=\"center\" colspan=\"2\"><br> " +
+						   " CHIAMATA SUI PRESENTI (ASTA) DEL " + datChiam +				
+						   " </td> " +	 				
+						   " <tr> " +
+						   " </table>";
+			 	tabPubb	   = " <table width=\"100%\" class=\"fontpage\"> " +
+							 " <tr> " +								
+							 " <td colspan=\"2\" align=\"left\" class=\"nota\">PUBBLICAZIONE DEL " + dataPubb  + protocollo +
+							 " </td> " +											
+							 " </tr> " +
+							 " </table> " + 
+							 " <tr><table class=\"griglia\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"><tr> " +
+							 " <td class=\"head\" >Cod.</td> " +
+							 " <td class=\"head\" >Ente</td> " +
+							 " <td class=\"head\">Luogo di lavoro</td> " +
+							 " <td class=\"head\" width=\"12%\">Num. posti</td> " +
+							 " <td class=\"head\">Profilo professionale<br>e qualifica</td> " +
+							 " <td class=\"head\">Requisiti richiesti</td> " +
+						     " <td class=\"head2\">Tipologia rapporto<br>di lavoro</td></tr>";
+				
+				tr = riga;
+				
+				tabNota	= 	" <table width=\"100%\" class=\"fontpage\"> " +
+			  				" <tr><td colspan=\"2\" align=\"left\"> " + notaFissaCpi + 
+			  				" </td></tr></table>";			
+						  					
+			} else {
+				// aggiungo tutte le tabelle a tabCpi
+				tabCpi	+=  tabChiam + tabPubb + tr + " </table></tr></table> "+ tabNota +
+							  "	<p>&nbsp;</p> " +
+							  "	<table width=\"100%\" class=\"fontpage\"> " +
+							  " <tr> ";			  
+				if (strIntestazioneProvinciaRiga.equals("")) {
+					  tabCpi = tabCpi + " <td colspan=\"2\" align=\"center\">Provincia di " +prov + " - Centro per l'impiego di " + cpi;
+				}
+				else {
+					  tabCpi = tabCpi + " <td colspan=\"2\" align=\"center\">" + strIntestazioneProvinciaRiga + "</td></tr> " +
+							  "	<tr> " +
+							  "	<td colspan=\"2\" align=\"center\">Centro per l'impiego di " + cpi;
+				}	  
+				tabCpi = tabCpi + "	<br> " + indirizzo +
+					  "	<br> " +
+					  "	tel.: " + tel + (!fax.equals("")?" fax: " + fax:"") + " e-mail; " +email +
+					  "	</td> " +		
+					  "	</tr> " +							    
+					  "	</table> ";		  
+				//controllo uguaglianza fra il numRichiesta del protocollo e il numeroRich della chiamata
+				//se il risultato e true stampo il protocollo
+				// modifica savino 23/01/2007: 	bisogna controllare l'esistenza di un solo numero di richiesta
+				boolean protocolloBeccato = false;		
+				for(int i=0; i<listNumProt.size() && !protocolloBeccato; i++){
+					SourceBean sb 	= (SourceBean) listNumProt.get(i);
+					//numero della richiesta
+					numRichProt = (BigDecimal)sb.getAttribute("NUMRICHIESTA");			
+					strNumRichProt = "";
+					if (numRichProt == null) {
+						strNumRichProt = "";
+					} else {
+						strNumRichProt = numRichProt.toString();
+					}
+					//numero del protocollo
+					stampProt = (BigDecimal)sb.getAttribute("NUMPROTOCOLLO");			
+					strStampProt = "";
+					if (stampProt == null) {
+						strStampProt = "";
+					} else {
+						strStampProt = stampProt.toString();
+					}			
+					//se true stampo il protocollo
+					if(strNumRichProt.equals(strNumRichiesta)){
+						protocollo = eticProt + strStampProt;
+						protocolloBeccato = true;
+					} else {
+						protocollo = "";
+					}
+				}				
+				
+				tabChiam =	  "  </table></tr><tr><table width=\"100%\" class=\"fontpage\"> " +
+							  " <tr> " +					
+							  " <td class=\"titolo\" align=\"center\" colspan=\"2\"><br> " +
+							  " CHIAMATA SUI PRESENTI (ASTA) DEL " + datChiam +				
+							  " </td> " +	 				
+							  " <tr> " +
+							  " </table>";
+							   
+		         tabPubb =	  " <table width=\"100%\" class=\"fontpage\"> " +
+							  "	<tr> " +								
+							  "	<td colspan=\"2\" align=\"left\" class=\"nota\">PUBBLICAZIONE DEL " + dataPubb + protocollo +
+							  "	</td> " +											
+							  "	</tr> " +
+							  "	</table> " + 
+							  "	<tr><table class=\"griglia\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"><tr> " +
+							  "	<td class=\"head\" >Cod.</td> " +
+							  "	<td class=\"head\" >Ente</td> " +
+							  "	<td class=\"head\">Luogo di lavoro</td> " +
+							  "	<td class=\"head\" width=\"12%\">Num. posti</td> " +
+							  "	<td class=\"head\">Profilo professionale<br>e qualifica</td> " +
+							  "	<td class=\"head\">Requisiti richiesti</td> " +
+						      " <td class=\"head2\">Tipologia rapporto<br>di lavoro</td></tr> ";			
+				 tr = riga;
+				 
+				 tabNota = 	 " <table width=\"100%\" class=\"fontpage\"> " +
+			  				 " <tr><td colspan=\"2\" align=\"left\"> " + notaFissaCpi + 
+			  				 " </td></tr></table>";					   	
+			}		
+		}	// chiusura blocco cpi 
+	}	// chiusura del ciclo for	
+		
+	// chiudo tutte le tabelle e raccolgo la stringa finale in tabTot che è una stringa che rappresenta 
+	// tutto il codice html necessario per l'organizzazione  e la stampa delle tabelle 
+	 
+	if (!tabCpi.equals("")){
+		tabTot = tabCpi + tabChiam + tabPubb + tr +  "</table></tr></table></tr></table>" + tabNota ;
+	}
+%>
+<%=tabTot%>
+<%@ include file="/jsp/MIT.inc" %>
+<br/>
+<br/>
+<br/>
+
+</body>
+</html>

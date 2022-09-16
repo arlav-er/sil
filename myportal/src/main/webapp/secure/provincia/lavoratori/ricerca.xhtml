@@ -1,0 +1,421 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="../../template/main.xhtml"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:p="http://primefaces.org/ui">
+
+	<f:loadBundle basename="conf.const" var="const" />
+
+	<ui:define name="title">
+		<h:outputText value="#{msg['provincia.ricerca_lavoratori.titolo']}"
+			escape="false" />
+	</ui:define>
+	
+	<ui:define name="content">
+		<ui:param name="bean" value="#{ricercaLavoratoriBean}" />
+
+		<h:outputText
+			value="#{txt['provincia.ricerca_lavoratori.descrizione']}"
+			escape="false" />
+			
+		<div class="widget_container ui-tabs ui-widget-content ui-corner-all">
+			<h:form id="form_ricerca">
+				<h:panelGroup id="panel" layout="block">
+					<h:panelGrid columns="2">
+						<cc:inputText id="nome" label="Nome" title="Nome del lavoratore"
+							required="false" value="#{bean.parametriRicerca.nome}"
+							disableAjax="true" />
+						<cc:inputText id="cognome" label="Cognome"
+							title="Cognome del lavoratore" required="false"
+							value="#{bean.parametriRicerca.cognome}" disableAjax="true" />
+						<cc:inputText id="codice_fiscale" label="Codice fiscale"
+							title="Codice fiscale del lavoratore" required="false"
+							value="#{bean.parametriRicerca.codiceFiscale}" disableAjax="true" />
+						<cc:inputText id="username" label="Username"
+							title="Username del lavoratore" required="false"
+							value="#{bean.parametriRicerca.username}" disableAjax="true" />
+						<cc:inputText id="email" label="Indirizzo email"
+							title="Indirizzo email del lavoratore" required="false"
+							value="#{bean.parametriRicerca.email}" disableAjax="true" />
+						<cc:inputText id="email_pec" label="Indirizzo email PEC"
+							title="Indirizzo email PEC del lavoratore" required="false"
+							value="#{bean.parametriRicerca.emailPEC}" disableAjax="true" />
+						<cc:selectOneRadio id="tipo_ricerca"
+							value="#{bean.parametriRicerca.tipo}" label="Tipo di ricerca"
+							requiredMessage="Tipo di ricerca obbligatorio">
+							<f:selectItems value="#{ricercaLavoratoriBean.tipiRicerca}" />
+						</cc:selectOneRadio>
+						<cc:selectOneRadio id="stato_account"
+							value="#{bean.parametriRicerca.tipoAccount}"
+							label="Stato account">
+							<f:selectItems value="#{ricercaLavoratoriBean.tipiAccount}" />
+						</cc:selectOneRadio>
+						<cc:selectOneRadio id="tipo_registrazione"
+							value="#{bean.parametriRicerca.tipoRegistrazione}"
+							label="Tipo di registrazione">
+							<f:selectItems value="#{ricercaLavoratoriBean.tipiRegistrazione}" />
+						</cc:selectOneRadio>
+
+						<h:commandLink id="search_button" value="Cerca"
+							styleClass="searchButton" action="#{bean.search}">
+							<f:ajax execute=":form_ricerca"
+								render="@this :form_lista_lavoratori"
+								onevent="nascondiListaRisultato" />
+						</h:commandLink>
+
+					</h:panelGrid>
+				</h:panelGroup>
+			</h:form>
+		</div>
+		
+		<h:form style="display: none" id="changePageForm">
+			<h:inputHidden id="pageValue"
+				value="#{bean.paginationHandler.currentPage}" />
+			<h:commandButton id="pageCommand" action="#{bean.changePage}"
+				value="click me">
+				<f:ajax execute="@form" render=":form_lista_lavoratori:results" />
+			</h:commandButton>
+		</h:form>
+		
+		<h:form id="form_lista_lavoratori">
+			<h:panelGroup id="lista_lavoratori">
+			
+				<cc:waiting hidden="true" waitMessage="Ricerca in corso..."
+					activatorId="form_ricerca:search_button" />
+					
+				<center><h2>
+					<h:outputText value="Nessun lavoratore trovato"
+						rendered="#{empty bean.risultato and bean.ricercaEseguita}" />
+				</h2></center>
+				
+				<h:panelGroup id="lista_risultato"
+					rendered="#{not empty bean.risultato and bean.ricercaEseguita}">
+					
+					<script type="text/javascript">
+						$(function() {							
+						    $("#pagination").pagination({							    
+						    	pages: #{bean.paginationHandler.pages()},						       
+						        cssStyle: 'light-theme',
+						        prevText: 'Prec.',
+						        nextText: 'Succ.',
+						        onPageClick: function (pageNumber, event) {							        
+						        	document.getElementById('changePageForm:pageValue').value = pageNumber;
+						            document.getElementById('changePageForm:pageCommand').click();
+						            $("#form_lista_lavoratori\\:results").css("display", "none");					            
+						            $("#form_lista_lavoratori\\:resultsLoader").css("display", "block");
+						            $("#form_lista_lavoratori\\:resultsLoader").fadeIn();
+							    }
+						    });
+						});
+					</script>
+					
+					<div class="widget_container ui-tabs ui-widget-content ui-corner-all"
+						id="pagination">
+					</div>
+					
+					<cc:waiting hidden="true" waitMessage="Caricamento..."
+						id="resultsLoader" />
+						
+					<h:panelGroup id="results">
+						<ui:repeat value="#{bean.risultato}" var="lavoratore"
+							varStatus="status">
+							<h:panelGrid
+								styleClass="widget_container ui-tabs ui-widget-content ui-corner-all shadow-box">
+								<h:panelGrid id="lavoratori_panel" columns="4"
+									columnClasses="lavcolumn,lavcolumn,lavcolumn,lavcolumn">
+									<h:panelGroup id="userFoto">
+										<h:graphicImage id="foto"
+											alt="Foto utente #{lavoratore.idUtente}"
+											value="/secure/rest/getFoto?type=#{const['img.Type.Foto']}&amp;id=#{lavoratore.idUtente}&amp;size=medium" />
+									</h:panelGroup>
+
+									<h:panelGroup id="userInfo">
+										<h:outputLabel for="username" value="Username: "
+											styleClass="labelbold" />
+										<br />
+										<h:outputText id="username" styleClass="marginButton"
+											value="#{lavoratore.username}" />
+										<br />
+										<h:outputLabel for="nome" value="Nome: "
+											styleClass="labelbold" />
+										<br />
+										<h:outputText id="nome" styleClass="marginButton"
+											value="#{lavoratore.nome}" />
+										<br />
+										<h:outputLabel for="cognome" value="Cognome: "
+											styleClass="labelbold" />
+										<br />
+										<h:outputText id="cognome" styleClass="marginButton"
+											value="#{lavoratore.cognome}" />
+										<br />
+										<h:outputLabel for="data_nascita" value="Data di nascita: "
+											styleClass="labelbold" />
+										<br />
+										<h:outputText id="data_nascita" styleClass="marginButton"
+											value="#{lavoratore.dataNascita}">
+											<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+										</h:outputText>
+										<br />
+										<h:outputLabel for="codice_fiscale" value="Codice Fiscale: "
+											styleClass="labelbold" />
+										<br />
+										<h:outputText id="codice_fiscale" styleClass="marginButton"
+											value="#{lavoratore.codiceFiscale}" />
+									</h:panelGroup>
+
+									<h:panelGroup>
+										<h:outputLabel for="indirizzo" value="Indirizzo: "
+											styleClass="labelbold" />
+										<br />
+										<h:outputText id="indirizzo" styleClass="marginButton"
+											value="#{lavoratore.indirizzoDomicilioCompleto}" />
+										<br />
+										<h:outputLabel for="telefono_fisso" value="Telefono fisso: "
+											styleClass="labelbold" />
+										<br />
+										<h:outputText id="telefono_fisso" styleClass="marginButton"
+											value="#{lavoratore.telCasa}" />
+										<br />
+										<h:outputLabel for="telefono_cellulare" value="Cellulare: "
+											styleClass="labelbold" />
+										<br />
+										<h:outputText id="telefono_cellulare"
+											styleClass="marginButton" value="#{lavoratore.cellulare}" />
+										<br />
+										<h:outputLabel for="email" value="E-mail: "
+											styleClass="labelbold" />
+										<br />
+										<h:outputText id="email" styleClass="marginButton"
+											value="#{lavoratore.email}" />
+										<br />
+										<h:outputLabel for="pec" value="PEC: " styleClass="labelbold" />
+										<br />
+										<h:outputText id="pec" styleClass="marginButton"
+											value="#{lavoratore.emailPEC}" />
+									</h:panelGroup>
+
+									<h:panelGroup>
+										<h:outputLabel for="cittadinanza" value="Cittadinanza: "
+											styleClass="labelbold" />
+										<br />
+										<h:outputText id="cittadinanza" styleClass="marginButton"
+											value="#{lavoratore.cittadinanza.descrizione}" />
+										<br />
+										<ui:fragment rendered="#{lavoratore.cittadinanza != null}">
+											<ui:fragment
+												rendered="#{lavoratore.cittadinanza.flgCee == 'S'}">
+												<h:outputLabel for="documento_identita"
+													value="Documento d'identità: " styleClass="labelbold" />
+												<br />
+												<h:outputText id="documento_identita"
+													styleClass="marginButton"
+													value="#{lavoratore.documentoIdentita}" />
+											</ui:fragment>
+											<ui:fragment
+												rendered="#{lavoratore.cittadinanza.flgCee != 'S'}">
+												<h:outputLabel for="titolo_soggiorno"
+													value="Titolo di soggiorno: " styleClass="labelbold" />
+												<br />
+												<h:outputText id="titolo_soggiorno"
+													styleClass="marginButton"
+													value="#{lavoratore.documentoSoggiorno.descrizione}" />
+												<ui:fragment
+													rendered="#{lavoratore.documentoSoggiorno.rinnovo}">
+													<br />
+													<h:outputLabel for="numero_assicurata"
+														value="Numero assicurata/raccomandata: "
+														styleClass="labelbold" />
+													<br />
+													<h:outputText id="numero_assicurata"
+														value="#{lavoratore.numeroAssicurata}"
+														styleClass="marginButton" />
+													<br />
+													<h:outputLabel for="data_assicurata"
+														value="Data assicurata/raccomandata: "
+														styleClass="labelbold" />
+													<br />
+													<h:outputText id="data_assicurata"
+														value="#{lavoratore.dataAssicurata}"
+														styleClass="marginButton">
+														<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+													</h:outputText>
+												</ui:fragment>
+											</ui:fragment>
+											<br />
+											<h:outputLabel for="numero_documento"
+												value="Numero del documento: " styleClass="labelbold" />
+											<br />
+											<h:outputText id="numero_documento"
+												value="#{lavoratore.numeroDocumento}"
+												styleClass="marginButton" />
+											<br />
+											<h:outputLabel for="data_scadenza_documento"
+												value="Data di scadenza: " styleClass="labelbold" />
+											<br />
+											<h:outputText id="data_scadenza_documento"
+												value="#{lavoratore.dataScadenzaDocumento}"
+												styleClass="marginButton">
+												<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+											</h:outputText>
+										</ui:fragment>
+										<h:panelGroup
+											rendered="#{lavoratore.tokenAbilitazioneServizi != null}">
+											<br />
+											<h:outputText value="Codice da inviare all'utente:" />
+											<br />
+											<h:outputText style="font-weight:bold;"
+												value="#{lavoratore.tokenAbilitazioneServizi}" />
+										</h:panelGroup>
+									</h:panelGroup>
+								</h:panelGrid>
+
+								<h:panelGrid id="lavoratori_panel_bottom" columns="4"
+									columnClasses="lavcolumn,lavcolumn,lavcolumn,lavcolumn"
+									class="border_top">
+									<h:panelGroup rendered="#{lavoratore.abilitato}">
+										<div>
+											<h:outputText value="Operazioni:"
+												style="font-weight: bold;font-size:15px;" />
+											<a tabindex="0"
+												class="selectAction buttonStyle yellowButton "
+												title="Scegli un'azione"> <span
+												class="ui-icon ui-icon-triangle-1-s fix_icon" />
+											</a>
+										</div>
+
+										<ul class="option-menu">
+											<ui:fragment rendered="#{not empty lavoratore.curricula 
+													or not empty lavoratore.curriculaPalesi}">
+												<li><h:outputText value="Visualizza curricula:"
+														style="font-style: italic"
+														rendered="#{not empty lavoratore.curricula or not empty lavoratore.curriculaPalesi}" /></li>
+												<ui:repeat value="#{lavoratore.curricula}" var="curriculum"
+													varStatus="status">
+													<li><h:link outcome="#{curriculum.flgIdo eq  true ? 'visualizza_curriculumIdo' : 'visualizza_curriculum'}"
+															title="Visualizza il curriculum: #{curriculum.descrizione}"
+															value="#{curriculum.descrizione}"
+															onclick="save_last_action(this,'Visualizza CV')">
+															<f:param name="id" value="#{curriculum.id}" />
+															<f:param name="ricercabilita" value="true" />
+															<span class="ui-icon ui-icon-document fix_icon" />
+
+														</h:link></li>
+												</ui:repeat>
+												<ui:repeat value="#{lavoratore.curriculaPalesi}"
+													var="curriculum" varStatus="status">
+													<li><h:link outcome="#{curriculum.flgIdo eq  true ? 'visualizza_curriculumIdo' : 'visualizza_curriculum'}"
+															title="Visualizza il curriculum: #{curriculum.descrizione}"
+															value="#{curriculum.descrizione}"
+															onclick="save_last_action(this,'Visualizza CV')">
+															<f:param name="id" value="#{curriculum.id}" />
+															<span class="ui-icon ui-icon-document fix_icon" />
+
+														</h:link></li>
+												</ui:repeat>
+											</ui:fragment>
+											
+											<ui:fragment rendered="#{not empty lavoratore.lettere}">
+												<li><h:outputText
+														value="Visualizza lettere di presentazione:"
+														style="font-style: italic" /></li>
+												<ui:repeat value="#{lavoratore.lettere}" var="lettera"
+													varStatus="status">
+													<li><h:link outcome="visualizza_altra_lettera"
+															title="Visualizza la lettera di presentazione: #{lettera.nome}"
+															value="#{lettera.nome}"
+															onclick="save_last_action(this,'Visualizza Lettera')">
+															<f:param name="id" value="#{lettera.id}" />
+															<span class="ui-icon ui-icon-document fix_icon" />
+														</h:link></li>
+												</ui:repeat>
+											</ui:fragment>
+											
+											<ui:fragment rendered="#{empty lavoratore.lettere and empty lavoratore.curricula 
+													and empty lavoratore.curriculaPalesi}">
+												<li><h:outputText value="Nessuna operazione disponibile" /></li>
+											</ui:fragment>					
+										</ul>
+									</h:panelGroup>
+									
+									<h:panelGroup rendered="#{not lavoratore.abilitato}">
+										<h:outputText
+											value="L'utente non ha ancora convalidato il suo account previa conferma e-mail" />
+									</h:panelGroup>
+
+									<ui:fragment>
+										<h:outputLabel for="stato_account_vis" value="Stato account:"
+											styleClass="labelbold" />
+										<br />
+										<h:outputText id="stato_account_vis"
+											value="#{lavoratore.tipoAccount}" />
+									</ui:fragment>
+
+									<ui:fragment>
+										<h:outputLabel for="tipo_registrazione_vis"
+											value="Tipo di registrazione:" styleClass="labelbold" />
+										<br />
+										<h:outputText id="tipo_registrazione_vis"
+											value="#{lavoratore.tipoRegistrazione}" />
+										<br />
+										<h:panelGroup rendered="#{ricercaLavoratoriBean.isRegistrazioneForte(lavoratore.tipoRegistrazione)}">
+											<h:outputText id="codice_abilitazione" value="#{lavoratore.utenteInfo.codServiziAmministrativi}" />
+										</h:panelGroup>
+									</ui:fragment>
+								</h:panelGrid>
+							</h:panelGrid>
+							<br />
+						</ui:repeat>
+
+						<p:commandButton id="export_csv" ajax="false"
+							value="Esporta il risultato"
+							styleClass="some-margin-top some-margin-bottom"
+							icon="ui-icon-arrowthick-1-s">
+							<p:fileDownload value="#{bean.downloadCSV()}" />
+						</p:commandButton>
+
+						<script type="text/javascript">
+							$(function() {
+								$("#form_lista_lavoratori\\:resultsLoader").css("display", "none");
+					            $("#form_lista_lavoratori\\:resultsLoader").fadeOut();
+								generateActionMenus(".selectAction","220px");
+								disegnaBottoni();					
+								});
+						</script>
+					</h:panelGroup>
+				</h:panelGroup>
+
+				<script type="text/javascript">		
+					$(function() {
+						disegnaBottoni();					
+					});			
+					var openConferma = function(params) {
+						var itemId = params.id;
+						$('[id$="conferma_codice\:modal_form\:id_lavoratore"]').val(itemId);
+					}
+
+					function nascondiListaRisultato(data) {
+						if (data.status == 'begin') {
+							$('[id$="lista_risultato"]').hide();
+						}						
+					}
+				</script>
+			</h:panelGroup>
+			<cc:messages />	
+		</h:form>
+
+		<cc:modalDialog id="conferma_codice" title="Conferma Abilitazione"
+			openF="openConferma" actionSubmit="#{ricercaLavoratoriBean.abilita}"
+			submitLabel="Abilita"
+			renderAjax=":form_ricerca :form_lista_lavoratori">
+			<h:inputHidden id="id_lavoratore" />
+			<h:outputText value="Codice utente" />
+			<h:inputText id="codice_utente" />
+		</cc:modalDialog>
+
+		<br />
+	</ui:define>
+</ui:composition>

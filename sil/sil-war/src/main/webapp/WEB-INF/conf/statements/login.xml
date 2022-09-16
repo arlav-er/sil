@@ -1,0 +1,813 @@
+ 
+  <STATEMENT name="LOGIN"
+            query="select t.cdnut cod_utente,
+                       t.strlogin username,
+                       t.strpassword password,
+                       t.strcognome cognome,
+                       t.strnome nome,
+                       t.flgabilitato flgabilitato,
+                       t.flgutconvenzione flgutconvenzione,
+                       t.NUMTENTATIVI,
+                       t.DATULTIMOACCESSO,
+                       to_char(t.datinizioval, 'yyyymmdd') datinizioval,
+                       to_char(t.datfineval, 'yyyymmdd') datfineval,
+                       to_char(sysdate, 'yyyymmdd') oggi,
+                       sysdate 
+                       - nvl(dtmcambiopwd, to_date ( '01/01/1900', 'dd/mm/yyyy') ) 
+                       - (select numggvaliditapwd from   ts_generale)  NUMGGPWDSCADUTA
+                  from ts_utente t
+                  where upper(t.strlogin) = UPPER(?)
+                  and t.flgUtConvenzione = 'N'
+                  "/>
+                  
+     <STATEMENT name="REGISTRA_ACCESSO"
+           query="{ call PG_ACCESSO.REGISTRA_ACCESSO(?,?,?,?,?,?) }" />
+
+
+  <STATEMENT name="CAMBIO_PWD"
+            query="update ts_utente 
+					       set strpassword = ?,
+					       dtmcambiopwd = sysdate
+					       where cdnut = ?
+                    "/>
+
+  <STATEMENT name="RECUPERA_PWD"
+            query="
+					select t.cdnut cod_utente,
+                       t.strlogin username,
+                       t.strpassword password,
+                       t.strcognome cognome,
+                       t.strnome nome,
+                      
+                       sysdate 
+                       - nvl(dtmcambiopwd, to_date ( '01/01/1900', 'dd/mm/yyyy') ) 
+                       - (select numggvaliditapwd from   ts_generale)  NUMGGPWDSCADUTA
+                  from ts_utente t
+                  where cdnut = ?
+                    "/>
+
+
+
+
+  <STATEMENT name="CARICA_PROFILI_UTENTI"
+            query="select 
+                       PU.prgprofiloutente codice,
+                      
+                       G.strdenominazione descrizione,
+                       P.strdenominazione as GRUPPO
+                  from ts_gruppo G,
+                       ts_profilatura_utente PU,
+                       ts_utente U,
+                       ts_profilo P
+                 where 
+                        PU.cdnut = U.cdnut
+                       and G.cdngruppo = PU.cdngruppo
+                       and PU.cdnprofilo = P.cdnprofilo
+                       AND upper(U.strlogin) = upper(?) 
+                  order by 3, 2     "/>
+
+ <STATEMENT name="CARICA_PROFILO_UTENTE"
+            query=" select 
+                         PU.prgprofiloutente PRG_PROFILO_UTENTE,
+                         G.cdngruppo CDN_gruppo,
+                         G.strdenominazione desc_gruppo,
+                         G.STRCODRIF COD_RIF,
+                         G.STRCODRIF2 COD_RIF2,
+                         P.cdnprofilo CDN_profilo,
+                         P.strdenominazione desc_profilo,
+                         TG.cdntipogruppo CDN_tipo_gruppo,
+                         TG.strdenominazione desc_tipo_gruppo,
+                         TG.CODTIPO COD_TIPO, TG.STRCODICEFISCALE CF_TIPO_GRUPPO,
+                         U.CDNLAVORATORE CDNLAVORATORE
+                    from ts_profilatura_utente PU,
+                         ts_profilo P,
+                         ts_profilo_gruppo PG,
+                         ts_gruppo G,
+                         ts_utente U,
+                         ts_tipo_gruppo TG
+                   where PU.cdnprofilo = P.cdnprofilo
+                         and PU.cdngruppo = PG.cdngruppo
+                         and PU.cdngruppo = G.cdngruppo
+                         and P.cdnprofilo = PG.cdnprofilo
+                         and U.cdnut = PU.cdnut
+                         and G.cdntipogruppo = TG.cdntipogruppo
+                         and PU.PRGPROFILOUTENTE =?
+                         and U.STRLOGIN =? " />
+
+
+ <STATEMENT name="MENU_GENERALE"
+            query=" Select   SYS_connect_By_Path(cdnvocemenu, '/') PATH,
+                              level, t.strvocemenu strvocemenu, cdnfunzione, t.strdescrizionefunzione strdescrizionefunzione, t.cdncomponente, t.strcompdenominazione, t.strpage
+                              from 
+                                  (select * from vw_ts_menu k 
+                                          where k.prgprofiloutente=?
+                                          and (K.cdnfunzione IS NULL OR K.STRCODPRIMOCOMP like '%G%')
+                                   ) t
+                      connect by prior t.cdnvocemenu = t.cdnvocemenupadre
+                      start with t.cdnvocemenupadre is null
+                      order siblings by t.prgvocemenu  "/>
+
+
+
+
+ <STATEMENT name="CARICA_IDENT_LAV"
+            query=" 
+                    select initcap(t.strcognome) || ' ' ||  initcap(t.strnome)  nominativo from an_lavoratore t
+                    where t.cdnlavoratore = ?
+                    "/>
+
+
+ <STATEMENT name="CARICA_IDENT_AZIENDA"
+            query="select initcap(AZ.strragionesociale) ragionesociale,
+				       initcap(un.strindirizzo) indirizzo,
+				       un.strlocalita localita,
+				       initcap(CO.strdenominazione) COMUNE,
+				       PR.strtarga TARGA
+				  from an_azienda AZ,
+				       an_unita_azienda UN,
+				       de_comune CO,
+				       de_provincia PR
+				 where AZ.prgazienda = UN.prgazienda
+				       and CO.codcom (+)= UN.codcom
+				       and PR.codprovincia (+)= CO.codprovincia
+				       and un.prgazienda = ? and un.prgunita=? " />
+
+
+
+
+ <STATEMENT name="MENU_LAVORATORE"
+            query=" Select   SYS_connect_By_Path(cdnvocemenu, '/') PATH,
+            level, t.strvocemenu strvocemenu, cdnfunzione, t.strdescrizionefunzione strdescrizionefunzione, t.cdncomponente, t.strcompdenominazione, t.strpage
+                              from 
+                                  (
+                                      select * from vw_ts_menu k 
+						                  where k.prgprofiloutente=?
+                  						   and (K.cdnfunzione IS NULL OR K.STRCODPRIMOCOMP like '%L%')
+                                    ) t
+                                        connect by prior t.cdnvocemenu = t.cdnvocemenupadre
+                      start with t.cdnvocemenupadre is null
+                      order siblings by t.prgvocemenu  "/>
+
+
+
+ <STATEMENT name="MENU_AZIENDA"
+            query=" Select   SYS_connect_By_Path(cdnvocemenu, '/') PATH,
+            level, t.strvocemenu strvocemenu, cdnfunzione, t.strdescrizionefunzione strdescrizionefunzione, t.cdncomponente, t.strcompdenominazione, t.strpage
+                              from 
+                                  (
+                                      select * from vw_ts_menu k 
+						                  where k.prgprofiloutente=?
+                  						   and (K.cdnfunzione IS NULL OR K.STRCODPRIMOCOMP like '%A%')
+                                    ) t
+                                        connect by prior t.cdnvocemenu = t.cdnvocemenupadre
+                      start with t.cdnvocemenupadre is null
+                      order siblings by t.prgvocemenu "/>
+
+
+ <STATEMENT name="CARICA_LINGUETTE"
+            query="
+                      select 
+                              strdescliv, 
+                              strpage,
+                              SYS_connect_By_Path(cdnvocefunzione, '/') PATH,
+                              level livello
+                        from 
+                                 (
+                                    select 
+                                         VC.cdnvocefunzione cdnvocefunzione,
+                                         vc.cdnVoceFunzionePadre cdnVoceFunzionePadre,
+                                         vc.numordine numordine,
+                                         VC.strdescliv strdescliv,
+                                         C.strpage strpage
+                                    from ts_voce_funzione VC,
+                                         ts_componente C,
+                                         ts_abi_profilo ap
+                                    where 
+                                         vc.cdnfunzione= ?
+                                         and  VC.cdncomponente = C.cdncomponente (+)
+                                         and ap.cdncomponente (+)= c.cdncomponente
+                                         and (ap.cdnprofilo=? 
+                                              or 
+                                              (ap.cdnprofilo is null and C.strpage is null)
+                                        )
+                               ) vc
+                        connect by prior
+                                vc.cdnvocefunzione = vc.cdnVoceFunzionePadre
+                        start with vc.cdnVoceFunzionePadre is null
+                        order siblings by numordine
+                     "/>
+
+ 
+ <STATEMENT name="COMBO_TIPO_ORGANIZZAZIONI"
+            query="select t.cdntipogruppo codice, t.strdenominazione descrizione from ts_tipo_gruppo t order by 2 " />
+            
+ <STATEMENT name="COMBO_ORGANIZZAZIONI"
+            query="select t.cdngruppo codice, t.strdenominazione descrizione from ts_gruppo t order by 2 " />
+            
+ <STATEMENT name="COMBO_RUOLI"
+            query="select t.cdnprofilo codice, t.strdenominazione descrizione from ts_profilo t order by 2 " />
+            
+<STATEMENT name="PROF_LISTA_UTENTI"
+            query="           
+                      select DISTINCT 
+                             U.CDNUT CDUT,
+                             U.strlogin login,
+                             initcap(U.strcognome || ' ' ||  U.strnome) || '&amp;nbsp;' nominativo,
+                             to_char(U.Datinizioval, 'dd/mm/yyyy - ') || to_char(U.Datfineval,'dd/mm/yyyy') periodo_val,
+                             DECODE(U.Flgabilitato, 'S', 'SI', 's', 'SI', 'N', 'NO', 'NO') FlgAbilitato,
+                             DECODE(U.FlgUtConvenzione, 'S', 'SI', 's', 'SI', 'N', 'NO', 'NO') FlgUtConvenzione
+                        from ts_utente U,
+                             ts_profilatura_utente PU
+                       where PU.cdnut (+)= U.cdnut 
+                                AND U.flgutsistema='N'
+          " />
+          
+
+
+
+
+<STATEMENT name="PROF_TESTATA_UTENTE"
+            query="           
+            	SELECT STRLOGIN,
+				       nvl(STRCOGNOME,' ') STRCOGNOME,
+				       nvl(STRNOME,' ') STRNOME,
+				       DECODE(FLGABILITATO, 'S', 'ABILITATO', 'NON ABILITATO') STRABILITATO,
+				       TO_CHAR(DATINIZIOVAL, 'DD/MM/YYYY') DAT_INIT_VAL, 
+				       TO_CHAR(DATFINEVAL, 'DD/MM/YYYY') DAT_FINE_VAL
+				  FROM TS_UTENTE T
+				  WHERE T.CDNUT =  ?
+          " />
+
+
+
+<STATEMENT name="PROF_TESTATA_PROFILO"
+            query="   
+					select t.cdnprofilo cdnprofilo,
+					       t.strdenominazione strdenominazione,
+					       decode (t.flgstandard, 'S', 'SI', 'NO') STRFLGSTANDARD
+					  from ts_profilo t
+					  where t.cdnprofilo = ?
+ " />
+
+
+
+
+          
+<STATEMENT name="PROF_DETT_UTENTE"
+            query="           
+                          select  U.cdnut cdut,
+                                 U.strlogin strlogin,
+                                 U.strpassword strpassword,
+                                 U.strCodiceFiscale strcodiceFiscale,
+                                 initcap(U.strcognome) strcognome,
+                                 initcap(U.strnome) strnome,
+                                 to_char(U.datNasc, 'dd/mm/yyyy') datNasc,
+                                 U.strSesso strSesso,
+                                 U.strtelefono strtelefono,
+                                 U.strfax strfax,
+                                 U.stremail stremail,
+                                 U.strluogorif strluogorif,
+                                 upper(U.flgabilitato) flgabilitato,
+                                 upper(U.flgUtConvenzione) flgUtConvenzione,
+                                 U.strnota strnota,
+                                 U.prgSpi prgSpi,
+                                 O.strnome || ' ' || O.strCognome as nomeOp,
+                                 O.strCodiceFiscale as codFisOp,
+                                 DECODE(SYSDATE, GREATEST(SYSDATE, o.DATFINEVAL),' (scaduto)',
+                                  LEAST(SYSDATE, o.DATINIZIOVAL), ' (scaduto)','') AS SCADUTO,
+                                 to_char(O.datNasc,'dd/mm/yyyy') as datNascOp,
+                                 to_char(U.datinizioval, 'dd/mm/yyyy') datinizioval,
+                                 to_char(U.datfineval, 'dd/mm/yyyy') datfineval,
+                                 U.cdnlavoratore cdnlavoratore,
+                                 U.cdnutins cdnutins,
+                                 U.dtmins dtmins,
+                                 U.cdnutmod cdnutmod,
+                                 U.dtmmod dtmmod,
+                                 upper(u.flglogged) flglogged,
+                                 u.numtentativi numtentativi
+                            from ts_utente U
+                            left join an_spi O on O.prgSpi=U.prgSpi
+                           where U.cdnut =?          
+                           " />
+                           
+<STATEMENT name="PROF_UPDATE_UTENTE"
+            query="           
+                    update ts_utente
+                       set 
+                           strlogin = ? ,
+                           strpassword = ? ,
+                           strCodiceFiscale= ?,
+                           strcognome = ? ,
+                           strnome = ? ,
+                           datNasc= to_date(?, 'dd/mm/yyyy') ,
+                           strSesso= ?,
+                           strtelefono = ? ,
+                           strfax = ? ,
+                           stremail = ? ,
+                           strluogorif = ? ,
+                           flgabilitato = ? ,
+                           flgUtConvenzione = ? ,
+                           strnota = ? ,
+                           prgSpi= ?,
+                           datinizioval = to_date(? , 'dd/mm/yyyy'),
+                           datfineval = to_date(? , 'dd/mm/yyyy'),
+                           cdnutmod = ? ,
+                           dtmmod = sysdate,
+                           DTMCAMBIOPWD = null 
+                     where 
+                        cdnut = ? 
+                      " />
+                      
+
+<STATEMENT name="PROF_UPDATE_UTENTE2"
+            query="           
+                    update ts_utente
+                       set 
+                           strlogin = ? ,
+                           strCodiceFiscale= ?,
+                           strcognome = ? ,
+                           strnome = ? ,
+                           datNasc= to_date(?, 'dd/mm/yyyy') ,
+                           strSesso= ?,
+                           strtelefono = ? ,
+                           strfax = ? ,
+                           stremail = ? ,
+                           strluogorif = ? ,
+                           flgabilitato = ? ,
+                           flgUtConvenzione = ? ,
+                           strnota = ? ,
+                           prgSpi= ?,
+                           datinizioval = to_date(? , 'dd/mm/yyyy'),
+                           datfineval = to_date(? , 'dd/mm/yyyy'),
+                           cdnutmod = ? ,
+                           dtmmod = sysdate 
+                     where 
+                        cdnut = ? 
+                      " />
+                      
+
+
+                      
+                      
+<STATEMENT name="PROF_INSERT_UTENTE"
+            query="           
+                  insert into ts_utente (
+                                  cdnut, 
+                                  strlogin ,
+                                  strpassword ,
+                                  strCodiceFiscale,
+  
+                                  strcognome ,
+                                  strnome ,
+                                  datNasc,
+                                  strSesso, 
+                                  
+                                  strtelefono ,
+                                  strfax ,
+                                  stremail ,
+                                  strluogorif ,
+                                  flgabilitato ,
+                                  flgUtConvenzione,
+                                  strnota ,
+                                  prgSpi,
+                                  datinizioval ,
+                                  datfineval ,
+                                  cdnlavoratore ,
+                                  cdnutins,
+                                  dtmins ,
+                                  cdnutmod ,
+                                  dtmmod 
+                                ) values (?,?,?,?,
+                                		  ?,?,TO_DATE(?, 'DD/MM/YYYY'),?,
+                                		  ?,?,?,?,?,?,?,?,
+                                TO_DATE(?, 'DD/MM/YYYY'),
+                                TO_DATE(?, 'DD/MM/YYYY'),?,
+                                ?,SYSDATE,?,SYSDATE)                       
+                " />
+                
+<STATEMENT name="PROF_SEL_PROFIL_UT"
+            query="      
+                  select 
+                       PU.prgprofiloutente codice,
+                       P.strdenominazione || ': ' || 
+                       G.strdenominazione descrizione
+       
+                  from ts_gruppo G,
+                       ts_profilatura_utente PU,
+                       ts_utente U,
+                       ts_profilo P
+                 where 
+                        PU.cdnut = U.cdnut
+                       and G.cdngruppo = PU.cdngruppo
+                       and PU.cdnprofilo = P.cdnprofilo
+                       AND U.CDNUT = ? 
+                       order by 2 " />
+                       
+                       
+<STATEMENT name="PROF_SEL_PROFIL_DISPONIB"
+            query="      
+                  select 
+                         pg.cdnprofilo || '-' || pg.cdngruppo codice,
+                         g.strdenominazione descrizione,
+                         p.strdenominazione as GRUPPO 
+                  from ts_profilo_gruppo PG,
+                         ts_gruppo G,
+                         ts_profilo P
+                  where G.cdngruppo = PG.cdngruppo
+                         and P.cdnprofilo = PG.cdnprofilo
+                         and pg.cdnprofilo || '-' || pg.cdngruppo not in 
+                         (
+                          select pu.cdnprofilo || '-' || pu.cdngruppo
+                          from ts_profilatura_utente pu
+                          where pu.cdnut = ?
+                         ) 
+                  order by 3, 2 " />
+
+
+<STATEMENT name="PROF_INSERT_PROFIL_DISPONIB"
+            query="      
+                insert into ts_profilatura_utente
+                  (prgprofiloutente, cdnut, cdngruppo, cdnprofilo, cdnutins, dtmins, cdnutmod, dtmmod)
+                values
+                  (?, ?, ?, ?, ?, SYSDATE, ?, SYSDATE) "/>
+                  
+                  
+<STATEMENT name="PROF_DELETE_PROFILAT_UT"
+            query="      
+                    delete ts_profilatura_utente
+                    where prgprofiloutente = ? "/>
+
+<!-- Carica nome e cognome utente -->
+<STATEMENT name="CARICA_NOME_UTENTE" query="
+  select 
+    STRNOME as NOME,
+	  STRCOGNOME as COGNOME
+	from 
+    ts_utente
+  where 
+	  cdnut = ?
+  "/>
+
+
+
+<STATEMENT name="CARICA_ATTRIBUTI" query="
+ select A.codtipoattributo TIPO_ATTRIBUTO,
+        A.strdenominazione strdenominazione, 
+        A.strazione AZIONE,
+        CF.strpage PAGE_TARGET,
+        CF.strdenominazione strdenominazione_TARGET,
+        A.struri URI,
+        A.cdnfunzionefiglio cdnfunzione_TARGET,
+        A.cdncomponentefiglio cdncomponente_TARGET,
+        C.strpage strpage,
+        C.cdncomponente cdncomponente 
+   from ts_attributo A,
+        ts_componente C,
+        ts_componente CF,
+        ts_abi_attributo AA, 
+        ts_funz_comp FC
+  where C.cdncomponente = A.cdncomponente
+        and CF.cdncomponente (+)= A.cdncomponentefiglio
+        and fc.cdnfunzione (+)=a.cdnfunzionefiglio
+        and fc.cdncomponente  (+)=a.cdncomponente
+        and A.prgattributo = AA.prgattributo
+        and  upper(c.strpage) = ?
+        and aa.cdnprofilo = ?
+     	and a.codtipoattributo!='C'
+ order by aa.prgposizione       
+ 
+  "/>
+
+<STATEMENT name="CARICA_WHERE_SQL" query="
+			select FV.strwheresql STRSQL,
+			       C.strpage PAGE,
+			       VGC.cdngruppo cdngruppo,
+			       C.cdncomponente cdncomponente,
+			       FV.codazione codAzione
+			  from ts_filtro_visibilita FV,
+			       ts_vis_gruppo_comp VGC,
+			       ts_componente C
+			 where C.cdncomponente = VGC.cdncomponente
+			       and VGC.prgfiltrovisibilita = FV.prgfiltrovisibilita
+			       and VGC.cdngruppo=? and upper(C.strpage) = upper(?)
+			       and FV.codazione =?
+  "/>
+
+<STATEMENT name="CARICA_FILTRO_SQL" query="
+			select FV.strwheresql STRSQL,
+			       C.strpage PAGE,
+			       VGC.cdngruppo cdngruppo,
+			       C.cdncomponente cdncomponente,
+			       FV.codazione codAzione
+			  from ts_filtro_visibilita FV,
+			       ts_vis_gruppo_comp VGC,
+			       ts_componente C
+			 where C.cdncomponente = VGC.cdncomponente
+			       and VGC.prgfiltrovisibilita = FV.prgfiltrovisibilita
+			       and VGC.cdngruppo=? and upper(C.strpage) = upper(?)
+			       and FV.codazione =?
+             and FV.CODTIPOFILTRO=?
+               "/>
+  
+  
+ <STATEMENT name="CONTROLLA_ABIL_COMP" query="
+			 select C.CDNCOMPONENTE CDNCOMPONENTE
+			 from ts_componente C,
+			       ts_abi_profilo ap
+			 where 
+				 upper(C.strpage) = upper(?)
+				 and ap.cdncomponente=c.cdncomponente
+	             and ap.cdnprofilo=?
+  "/> 
+  
+  
+  
+ <STATEMENT name="LOGINCERCA_OPERATORI" 
+ 			query="select op.prgspi, 
+ 						  op.strcognome, 
+ 						  op.strnome, 
+ 						  to_char(op.datNasc, 'dd/mm/yyyy') datNasc, 
+ 						  op.strSesso,
+ 						  op.strCodiceFiscale 
+				   from an_spi op
+				   where
+						((
+							upper(nvl(op.strnome,'1')) = upper(nvl(?,'1')) and 
+							upper(op.strCognome)=upper(?)
+						)				   
+						or (
+							upper(op.strnome) = upper(?) and 
+							upper(nvl(op.strCognome,'1')) = upper(nvl(?,'1'))
+						))
+						and to_date(to_char(sysdate, 'dd/mm/yyyy'), 'dd/mm/yyyy') 
+                 		 BETWEEN  to_date(to_char(OP.DATINIZIOVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy') and
+                  			to_date(to_char(OP.DATFINEVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy')
+						"/>
+  
+<STATEMENT name="DettaglioUtenteConnessoQuery"
+ 			query="select to_char(a.dtminiziosessione, 'dd/mm/yyyy hh24:mi:ss' ) dtminiziosessione,
+ 					a.strip, a.strhostname,   
+ 					ut.strlogin, ut.strnome, ut.strcognome, a.strbrowser, ut.strtelefono, ut.strfax, ut.stremail,
+					ut.strluogorif, ut.strnota 	
+				from TS_ACCESSO_UTENTE a, TS_UTENTE ut
+				where a.dtmfinesessione is null
+		  			and a.cdnutente = ut.cdnut
+		  			and a.cdnutente = ? 
+		  			and a.strjsessionid = ?"/>
+
+<STATEMENT name="checkMessageQuery"
+ 			query="select count(*) numeromessaggi from ts_messaggi m
+					where sysdate between m.DTMINIZIOVALIDITA and m.DTMFINEVALIDITA
+					and m.PRGTSMESSAGGI not in (select ml.CDNMESSAGGIO from
+                    							ts_messaggi_letti ml where ml.CDNUTENTE = ?)"/>
+
+<STATEMENT  name="messageQuery"
+			query="select
+			      ms.STRCORPO corpo,
+			      ms.STROGGETTO oggetto,
+						ms.PRIORITA priorita,
+			      to_char(ms.DTMINSERIMENTO, 'dd/mm/yyyy hh24:mi:ss') datainserimento,
+			      to_char(ms.DTMINIZIOVALIDITA,'dd/mm/yyyy hh24:mi:ss') iniziovalidita,
+						to_char(ms.DTMFINEVALIDITA, 'dd/mm/yyyy hh24:mi:ss') finevalidita,
+			      ut.STRCOGNOME cognome,
+			      ut.STRNOME nome,
+			      ut.STRLOGIN login,
+			      ut.CDNUT codmittente,
+			      ms.PRGTSMESSAGGI codmessaggio
+						FROM TS_MESSAGGI ms, TS_UTENTE ut
+					where
+						  ut.cdnut = ms.CDNMITTENTE
+						  and sysdate between ms.DTMINIZIOVALIDITA and ms.DTMFINEVALIDITA
+						  and ms.PRGTSMESSAGGI not in (select ml.CDNMESSAGGIO
+					                                  from ts_messaggi_letti ml
+											   		  where ml.CDNUTENTE = ?)
+				ORDER BY priorita desc" />
+							
+<STATEMENT  name="messageInsert"
+			query="INSERT INTO TS_MESSAGGI (
+				    CDNMITTENTE, STRCORPO, STROGGETTO, PRIORITA,  DTMINIZIOVALIDITA,  DTMFINEVALIDITA, PRGTSMESSAGGI ) 
+					VALUES ( ?, ?, ? ,? ,to_date(?||' '||?, 'dd/mm/yyyy hh24:mi'),to_date(?||' '||?, 'dd/mm/yyyy hh24:mi'), S_TS_MESSAGGI.NEXTVAL )"/>
+					
+<STATEMENT  name="messageDelete"
+			query="delete from ts_messaggi ms 
+					where ms.PRGTSMESSAGGI = ? " />
+					
+<STATEMENT  name="messageSelect"
+			query="SELECT 
+					ms.STRCORPO corpo, ms.STROGGETTO oggetto, 
+					ms.PRIORITA priorita, to_char(ms.DTMINSERIMENTO, 'dd/mm/yyyy hh24:mi:ss') datainserimento, to_char(ms.DTMINIZIOVALIDITA,'dd/mm/yyyy hh24:mi:ss') iniziovalidita, 
+					to_char(ms.DTMFINEVALIDITA, 'dd/mm/yyyy hh24:mi:ss') finevalidita, ut.STRCOGNOME cognome, ut.STRNOME nome, ut.STRLOGIN login, ut.CDNUT codmittente
+					FROM TS_MESSAGGI ms, TS_UTENTE ut
+					WHERE ms.CDNMITTENTE = ut.CDNUT
+					AND ms.PRGTSMESSAGGI = ? " />
+					
+<STATEMENT  name="CARICA_INFO_PROV"
+			query="SELECT (SELECT codprovinciasil
+				          FROM ts_generale) AS codice,
+				       (SELECT strver
+				          FROM ts_generale) AS versione,				          
+				       (SELECT p.strdenominazione
+				          FROM ts_generale g, de_provincia p
+				         WHERE p.codprovincia = g.codprovinciasil) AS nome,
+				       (SELECT c.strvalore
+				          FROM ts_config_loc c, ts_generale g
+				         WHERE g.codprovinciasil = c.strcodrif
+				           AND c.codtipoconfig = 'URLCPI') AS urlsitocpi,
+				       (SELECT c.strvalore
+				          FROM ts_config_loc c, ts_generale g
+				         WHERE g.codprovinciasil = c.strcodrif
+				           AND c.codtipoconfig = 'URLPROV') AS urlsitoprov,
+				       (SELECT nvl(flgpoloreg, 'N') flgpoloreg
+				       		FROM ts_generale) AS flgpoloreg,
+				        (SELECT codregionesil
+				          FROM ts_generale) AS codicereg
+				  FROM DUAL" />
+				
+<STATEMENT  name="CARICA_INFO_REG"
+			query="SELECT (SELECT r.codregione
+                          FROM ts_generale g, de_provincia p, de_regione r
+                         WHERE p.codprovincia = g.codprovinciasil and r.CODREGIONE = p.CODREGIONE) AS codice,                        
+                       (SELECT r.strdenominazione
+                          FROM ts_generale g, de_provincia p, de_regione r
+                         WHERE p.codprovincia = g.codprovinciasil and r.CODREGIONE = p.CODREGIONE) AS nome,
+                       (SELECT c.strvalore
+                          FROM ts_config_loc c, ts_generale g, de_provincia p
+                         WHERE g.codprovinciasil = p.codprovincia
+                           AND c.strcodrif = p.codregione
+                           AND c.codtipoconfig = 'NOMESIL') AS nomesil,                       
+                       (SELECT c.strvalore
+                          FROM ts_config_loc c, ts_generale g, de_provincia p
+                         WHERE g.codprovinciasil = p.codprovincia
+                           AND c.strcodrif = p.codregione
+                           AND c.codtipoconfig = 'URLREG') AS urlsitoreg,
+                       (SELECT c.strvalore
+                          FROM ts_config_loc c, ts_generale g
+                         WHERE c.strcodrif = g.codprovinciasil
+                           AND c.codtipoconfig = 'ACCESSO') AS strAccesso   
+                  FROM DUAL" />
+					
+<STATEMENT  name="MONITORAGGIO_LOGIN"
+			query="select 
+						strlogin, strpassword sha1password
+					from ts_utente u
+					where u.cdnut=?" 
+			/>
+			  
+<STATEMENT  name="GET_ENCRYPT_PARAMETER"
+			query="{ call ? := ENCRYPT(?,?) }" />
+			
+<STATEMENT  name="GET_DECRYPT_PARAMETER"
+			query="{ call ? := DECRYPT(?,?) }" />		
+			
+
+ <STATEMENT name="CARICA_LINGUETTE_CODIFICA_OLD"
+            query="select 
+                              strdescliv, 
+                              strpage,
+                              SYS_connect_By_Path(cdnvocefunzione, '/') PATH,
+                              level livello
+                        from 
+                                 (
+                                    select 
+                                         VC.cdnvocefunzione cdnvocefunzione,
+                                         vc.cdnVoceFunzionePadre cdnVoceFunzionePadre,
+                                         vc.numordine numordine,
+                                         VC.strdescliv strdescliv,
+                                         C.strpage strpage
+                                    from ts_voce_funzione VC,
+                                         ts_componente C,
+                                         ts_abi_profilo ap
+                                    where 
+                                         vc.cdnfunzione= ?
+                                         and  VC.cdncomponente = C.cdncomponente (+)
+                                         and ap.cdncomponente (+)= c.cdncomponente
+                                         and (ap.cdnprofilo=? 
+                                              or 
+                                              (ap.cdnprofilo is null and C.strpage is null)
+                                         )
+                                         and   vc.cdnvocefunzione IN (
+                                                  SELECT TC.CODICE
+                                                  FROM TS_CONFIG_CODIFICA TC
+                                                  WHERE TC.NOMETABELLA='TS_VOCE_FUNZIONE' AND TC.CODTIPOCONFIG = ? 
+                                                 AND TC.CONFIGURAZIONE = NVL(
+                                                    (SELECT TL.NUM
+                                                     FROM TS_CONFIG_LOC TL
+                                                     WHERE TL.STRCODRIF = (SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE)
+                                                         AND TL.CODTIPOCONFIG = ?),0) 
+                                                         )      
+                                        
+                               ) vc
+                        connect by prior
+                                vc.cdnvocefunzione = vc.cdnVoceFunzionePadre
+                        start with vc.cdnVoceFunzionePadre is null
+                        order siblings by numordine
+                     "/>			
+			
+	
+ <STATEMENT name="CARICA_LINGUETTE_CODIFICA"
+            query="select 
+                              strdescliv, 
+                              strpage,
+                              SYS_connect_By_Path(cdnvocefunzione, '/') PATH,
+                              level livello
+                        from 
+                                 (
+                                    select 
+                                         VC.cdnvocefunzione cdnvocefunzione,
+                                         vc.cdnVoceFunzionePadre cdnVoceFunzionePadre,
+                                         vc.numordine numordine,
+                                         VC.strdescliv strdescliv,
+                                         C.strpage strpage
+                                    from ts_voce_funzione VC,
+                                         ts_componente C,
+                                         ts_abi_profilo ap, 
+                                         TS_CONFIG_CODIFICA tcc
+                                    where 
+                                         vc.cdnfunzione= ?
+                                         and  VC.cdncomponente = C.cdncomponente (+)
+                                         and ap.cdncomponente (+)= c.cdncomponente
+                                         and (ap.cdnprofilo=?
+                                              or 
+                                              (ap.cdnprofilo is null and C.strpage is null)
+                                         )
+                                         
+                                         and tcc.codice =  VC.cdnvocefunzione
+                                         and TCC.NOMETABELLA='TS_VOCE_FUNZIONE'
+                                         and TCC.CODTIPOCONFIG = ? 
+                                         AND TCC.CONFIGURAZIONE = NVL(
+                                                    (SELECT TL.NUM
+                                                     FROM TS_CONFIG_LOC TL
+                                                     WHERE TL.STRCODRIF = (SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE)
+                                                         AND TL.CODTIPOCONFIG = ?),0)                                           
+                                       
+                               ) vc
+                        connect by prior
+                                vc.cdnvocefunzione = vc.cdnVoceFunzionePadre
+                        start with vc.cdnVoceFunzionePadre is null
+                        order siblings by numordine
+                     "/>	
+                     
+                     
+<STATEMENT name="LOGIN_CONVENZIONE"
+            query="select t.cdnut cod_utente,
+                       t.strlogin username,
+                       t.strpassword password,
+                       t.strcognome cognome,
+                       t.strnome nome,
+                       t.flgabilitato flgabilitato,
+                       t.flgutconvenzione flgutconvenzione,
+                       t.flglogged flglogged,
+                       t.NUMTENTATIVI,
+                       t.DATULTIMOACCESSO,
+                       to_char(t.datinizioval, 'yyyymmdd') datinizioval,
+                       to_char(t.datfineval, 'yyyymmdd') datfineval,
+                       to_char(sysdate, 'yyyymmdd') oggi,
+                       sysdate 
+                       - nvl(dtmcambiopwd, to_date ( '01/01/1900', 'dd/mm/yyyy') ) 
+                       - (select numggvaliditapwd from   ts_generale)  NUMGGPWDSCADUTA
+                  from ts_utente t
+                  where upper(t.strlogin) = UPPER(?)
+                  and t.flgUtConvenzione = 'S'                                
+                  "/>                     	
+                  
+<STATEMENT name="REGISTRA_ACCESSO_UT_CONVENZIONATO"
+           query="{ call PG_ACCESSO.REGISTRA_ACCESSO_CONVENZIONATO(?,?) }" />
+
+<STATEMENT name="AGGIORNA_NUMTENTATIVI_UTENTE"
+           query="{ call ? := PG_ACCESSO.SET_NUMTENTATIVI_ACCESSO(?) }" />
+
+<STATEMENT name="RESET_NUMTENTATIVI"
+           query="update ts_utente 
+          			set numtentativi = 0,
+          			DATULTIMOACCESSO = sysdate
+          			where cdnut=?" />           
+
+<STATEMENT name="QUERY_PARAM_TENTATIVI"
+           query="select g.numsecondiwait, g.nummaxtentativi, g.FLGLOGINCONVENZIONE
+   				   from ts_generale g" />
+   				   
+<STATEMENT name="QUERY_STORICO_PASSWORD"
+           query="select strpassword, cdnutente,  CAST (dtmcambiopwd AS TIMESTAMP)     AS created_timestamp
+   				   from ts_utente_password
+   				   where cdnutente = ?
+   				   order by created_timestamp desc" />
+   				      				              
+<STATEMENT name="CHECK_UTENTE_CONVENZIONE"
+           query="select cdnut, strlogin, flgUtConvenzione
+           			from ts_utente
+          			where cdnut=?" />   
+          			
+          			
+
+<STATEMENT name="PROF_SBLOCCA_UTENTE"
+            query="           
+                    update ts_utente
+                       set 
+                           numtentativi = 0 ,
+                           flglogged='N',
+                           cdnutmod = ? ,
+                           dtmmod = sysdate 
+                     where 
+                        cdnut = ? 
+                      " />          			   				      				              
+				      				              

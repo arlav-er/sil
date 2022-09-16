@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	           xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui" 
+	           xmlns:cc="http://java.sun.com/jsf/composite/components" template="../../template/main_primefaces.xhtml" xmlns:o="http://omnifaces.org/ui">
+
+<h:outputStylesheet target="head"> 
+  .width80 {
+	  width: 80%;
+	  padding: 5px;
+}
+
+  .width50 {
+	 width: 50%;
+	 padding: 5px;
+}
+
+  .padding5 {
+	 padding: 5px;
+}
+</h:outputStylesheet>
+	<ui:define name="content">
+		<div class="widget_container">
+			<div class="ui-widget-content ui-widget ui-corner-all">
+				<div class="margin-2em">
+					<h1>Invio di newsletter</h1>
+
+					<h:form id="newslatter_form">
+						<fieldset>
+							<legend>Composizione MAIL</legend>
+							 <h:panelGrid columns="1" columnClasses="width80">
+							 						 	
+
+								<p:outputLabel value="FROM" for="from"/>
+								<p:inputText id="from" value="#{provinciaNewsletterBean.mailFrom}" required="true" label="FROM" maxlength="1000" size="150" 
+									requiredMessage="E' necessario indicare un indirizzo di posta elettronica" style="width:99%">
+								<o:validator validatorId="javax.faces.RegularExpression" pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+					                                              message="Indirizzo di posta elettronica non valido" />
+									<p:ajax event="blur" update="fromMessage" />
+								</p:inputText>
+								<p:message for="from" id="fromMessage" />
+
+								<p:outputLabel value="TO (indirizzi email separati da ';')" for="to" />
+								<p:inputTextarea id="to" maxlength="100000" richTextMode="false" rows="5" style="width:1230px" required="true" 
+									requiredMessage="E' necessario indicare almeno un indirizzo di posta elettronica"
+									value="#{provinciaNewsletterBean.mailToCustom}" validatorMessage="Indirizzo di posta elettronica non valido">
+									<p:ajax event="blur" update="toMessage" />
+									<f:validator validatorId="multipleEmailValidation"></f:validator>
+								</p:inputTextarea>
+								<p:message id="toMessage" for="to" />
+
+								<p:outputLabel value="CCN (indirizzi email separati da ';')" for="ccn" />
+								<p:inputTextarea id="ccn" maxlength="100000" richTextMode="false" rows="10" style="width:1230px"  
+									value="#{provinciaNewsletterBean.mailTo}" validatorMessage="Indirizzo di posta elettronica non valido" >																	
+								    <p:ajax event="blur" update="ccnMessage"/>
+					             <f:validator validatorId="multipleEmailValidation"></f:validator>
+								</p:inputTextarea>								
+                                <p:message for="ccn" id="ccnMessage"/>
+                                
+								<p:outputLabel value="Oggetto" for="oggetto" />
+								<p:inputText id="oggetto" label="Oggetto" maxlength="1024" size="80" required="true" 
+									requiredMessage="E' necessario indicare l'oggetto" style="width: 99%;"
+									value="#{provinciaNewsletterBean.mailOggetto}">
+									<p:ajax event="blur" update="oggettoMessage" />
+								</p:inputText>
+								<p:message id="oggettoMessage" for="oggetto" />
+
+								<p:outputLabel value="Corpo" for="corpo" />
+								<p:editor id="corpo" widgetVar="corpoWidget" width="1230" rendered="true"
+									value="#{provinciaNewsletterBean.mailCorpo}">
+								</p:editor>
+								<p:message id="corponMessage" for="corpo" />
+                                 
+                                       
+                                <h:panelGroup id="uploadAllegatoPanel">
+								<ui:fragment >
+									<p:fileUpload fileUploadListener="#{provinciaNewsletterBean.uploadAllegatoFile}" id="provinciaUploadElement"
+										sizeLimit="5242880" 
+										fileLimit="3" multiple="true" 
+										dragDropSupport="false"
+										fileLimitMessage="Puoi caricare al massimo 3 file" 
+										mode="advanced" 
+										label="Seleziona un documento" 
+										uploadLabel="Carica"
+										cancelLabel="Annulla"
+										invalidSizeMessage="La dimensione del file deve essere inferiore a 5 MB." 
+										auto="false"
+										invalidFileMessage="File non valido."
+										update="uploadAllegatoPanel">
+									</p:fileUpload>
+								</ui:fragment>
+								<ui:fragment >
+									<p>#{provinciaNewsletterBean.fileNames}</p>
+									<p:messages id="messagesError" globalOnly="true"></p:messages>
+								</ui:fragment>
+								</h:panelGroup>
+							</h:panelGrid>
+									<center>
+				<h:panelGroup columns="2" columnClasses="width50">
+				   <p:commandButton id="send" value="Invia mail" process="@form" update="@form" actionListener="#{provinciaNewsletterBean.sendMail}"/>
+				</h:panelGroup>
+				</center>
+						</fieldset>				
+					</h:form>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

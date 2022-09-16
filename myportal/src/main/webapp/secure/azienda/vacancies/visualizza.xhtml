@@ -1,0 +1,509 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" template="../../template/main.xhtml"
+	xmlns:cc="http://java.sun.com/jsf/composite/components" xmlns:p="http://primefaces.org/ui">
+
+	<ui:param name="visVaBean" value="#{visualizzaVacancyBean}" />
+
+	<ui:define name="title">
+		Offerta di lavoro
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputStylesheet library="css" name="leaflet.css" />
+		<h:outputScript library="js" name="leaflet.js" target="head" />
+		<h:outputScript library="js" name="portlet_utente_vacancy.js" target="head" />
+		<h:outputScript library="js" name="ricerca_vacancy.js" target="head" />
+
+		<f:loadBundle basename="messages.errors" var="err_msg" />
+
+		<div class="widget_container">
+			<div id="visualizza_accordion" role="tablist" class="ui-accordion ui-widget ui-helper-reset ui-accordion-icons">
+
+				<ui:fragment rendered="#{visVaBean.usaDecodificheSil()}">
+					<h:form id="newNamingContainer">
+						<ui:include src="_visualizza_new/_vis_dati_vacancy.xhtml"></ui:include>
+						<ui:include src="_visualizza_new/_vis_rapporto_di_lavoro.xhtml"></ui:include>
+						<ui:include src="_visualizza_new/_vis_istruzione.xhtml"></ui:include>
+						<ui:include src="_visualizza_new/_vis_lingue.xhtml"></ui:include>
+						<ui:include src="_visualizza_new/_vis_informatica.xhtml"></ui:include>
+						<ui:include src="_visualizza_new/_vis_abilitazioni.xhtml"></ui:include>
+						<ui:include src="_visualizza_new/_vis_competenze_trasversali.xhtml"></ui:include>
+						<ui:include src="_visualizza_new/_vis_altre_info.xhtml"></ui:include>
+						<ui:include src="_visualizza_new/_vis_contatto_principale.xhtml"></ui:include>
+						<ui:include src="_visualizza_new/_vis_contatto_alternativo.xhtml"></ui:include>
+						<ui:include src="_visualizza_new/_vis_candidature.xhtml"></ui:include>
+					</h:form>
+				</ui:fragment>
+
+				<ui:fragment rendered="#{not visVaBean.usaDecodificheSil()}">
+					<h:form id="oldNamingContainer">
+						<ui:include src="_visualizza/_vis_dati_vacancy.xhtml"></ui:include>
+						<ui:include src="_visualizza/_vis_rapporto_di_lavoro.xhtml"></ui:include>
+						<ui:include src="_visualizza/_vis_istruzione.xhtml"></ui:include>
+						<ui:include src="_visualizza/_vis_lingue.xhtml"></ui:include>
+						<ui:include src="_visualizza/_vis_informatica.xhtml"></ui:include>
+						<ui:include src="_visualizza/_vis_abilitazioni.xhtml"></ui:include>
+						<ui:include src="_visualizza/_vis_competenze_trasversali.xhtml"></ui:include>
+						<ui:include src="_visualizza/_vis_altre_info.xhtml"></ui:include>
+						<ui:include src="_visualizza/_vis_contatto_principale.xhtml"></ui:include>
+						<ui:include src="_visualizza/_vis_contatto_alternativo.xhtml"></ui:include>
+						<ui:include src="_visualizza/_vis_candidature.xhtml"></ui:include>
+					</h:form>
+				</ui:fragment>
+			</div>
+		</div>
+
+		<h:panelGroup id="panel_button" layout="block">
+			<ui:fragment rendered="#{visualizzaVacancyBean.showReportDownloadButton()}">
+				<h:form id="downloadReportForm">
+					<h:commandLink value="Scarica report candidature" ajax="false" styleClass="buttonStyle">
+						<p:fileDownload value="#{visualizzaVacancyBean.xmlReport}" />
+					</h:commandLink>
+				</h:form>
+			</ui:fragment>
+
+			<ui:fragment
+				rendered="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.aziendaPrincipale 
+                and !visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.fromClicLavoro}">
+				<h:link id="editButton" outcome="/secure/azienda/vacancies/edit"
+					rendered="#{!visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.isNonModificabile() and visVaBean.renderedModifica()}"
+					styleClass="buttonStyle editButton" value="Modifica" title="Modifica">
+					<f:param name="id" value="#{visVaBean.vaVisualizzaDTO.id}" />
+				</h:link>
+				<ui:fragment rendered="#{visVaBean.renderedCercaCompatibili()}">
+					<h:link id="cercaButton" outcome="/secure/azienda/curriculum/cerca_curriculum" styleClass="buttonStyle editButton"
+						value="Cerca CV compatibili" title="Cerca CV compatibili">
+						<f:param name="id" value="#{visVaBean.vaVisualizzaDTO.id}" />
+					</h:link>
+				</ui:fragment>
+			</ui:fragment>
+
+			<ui:fragment
+				rendered="#{(sessionBean.utente) and (not empty visVaBean.myCurricula) and (not visVaBean.usaDecodificheSil())}">
+				<br />
+				<button class="curricula_x_confronto buttonStyle">Confronta con CV</button>
+				<button class="curricula_x_confronto buttonStyle" style="display: none;">Chiudi lista Curricula</button>
+				<br />
+				<div class="curricula_x_confronto" style="display: none;">
+
+					<h:dataTable value="#{visVaBean.liveCurricula}" id="lista_curricula_table"
+						rendered="#{(not empty visVaBean.liveCurricula) and (sessionBean.utente) }" styleClass="confrontaCvDatatable"
+						columnClasses="cv_col1,cv_col2,cv_col3 notSortable" var="curriculum">
+						<h:column>
+							<f:facet name="header">
+								<h:outputText value="Descrizione" />
+							</f:facet>
+
+							<h:outputText value="#{curriculum.descrizione}" />
+						</h:column>
+
+						<h:column>
+							<f:facet name="header">
+								<h:outputText value="Ultima modifica" />
+							</f:facet>
+							<h:outputText value="#{curriculum.dtmMod}">
+								<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+							</h:outputText>
+						</h:column>
+
+						<h:column>
+							<f:facet name="header">
+								<h:outputText value="Confronta Curriculum con l'offerta corrente" />
+							</f:facet>
+
+							<h:link styleClass="buttonStyle" outcome="/secure/utente/offertelavoro/confronta_requisiti" title="Confronta">
+								<f:param name="idCurricula" value="#{curriculum.id}" />
+								<f:param name="idVacancy" value="#{visVaBean.vaVisualizzaDTO.id}" />
+								<span class="ui-icon ui-icon-arrowthick-2-e-w fix_icon" />
+							</h:link>
+						</h:column>
+					</h:dataTable>
+				</div>
+				<br />
+				<br />
+				<script type="text/javascript">
+				$(function() {
+					$("button.curricula_x_confronto").click(function () {
+						 $(".curricula_x_confronto").toggle();
+						 $('#lista_curricula_table a:first').focus();
+						 });
+				    generateDataTable(jq('lista_curricula_table'));
+				    });
+				</script>
+			</ui:fragment>
+
+			<h:outputText styleClass="buttonStyle" value="Sei già candidato a questa offerta di lavoro"
+				title="Sei già candidato a questa offerta di lavoro" rendered="#{visVaBean.hasCandidatura and sessionBean.utente}" />
+
+			<ui:fragment
+				rendered="#{(not visVaBean.hasCandidatura) and (sessionBean.utente) and (visVaBean.controlliCrescoSuperati) and (visVaBean.isCandidaturaEnabled())}">
+				<ui:fragment rendered="#{not visVaBean.vaVisualizzaDTO.fromClicLavoro}">
+					<h:link styleClass="buttonStyle" rendered="#{not empty visVaBean.myCurricula and visVaBean.isPubblicata()}" value="Invia Candidatura"
+						title="Invia Candidatura"
+						onclick="return document.getElementById('confermaCandidatura').open({id: #{visVaBean.vaVisualizzaDTO.id}, clicLavoro: #{visVaBean.vaVisualizzaDTO.fromClicLavoro}},this);">
+					</h:link>
+					<h:link styleClass="buttonStyle" rendered="#{empty visVaBean.myCurricula and visVaBean.isPubblicata()}" value="Invia Candidatura"
+						title="Invia Candidatura"
+						onclick="alert('Prima di poterti candidare per quest\'offerta di lavoro devi compilare un Curriculum.'); return false">
+					</h:link>
+				</ui:fragment>
+				<ui:fragment rendered="#{visVaBean.vaVisualizzaDTO.fromClicLavoro}">
+					<h:link styleClass="buttonStyle" rendered="#{not empty visVaBean.myClicLavoroCurricula and visVaBean.isPubblicata()}" value="Invia Candidatura"
+						title="Invia Candidatura"
+						onclick="return document.getElementById('confermaCandidatura').open({id: #{visVaBean.vaVisualizzaDTO.id}, clicLavoro: #{visVaBean.vaVisualizzaDTO.fromClicLavoro}},this);">
+					</h:link>
+					<h:link styleClass="buttonStyle" rendered="#{empty visVaBean.myClicLavoroCurricula and visVaBean.isPubblicata()}" value="Invia Candidatura"
+						title="Invia Candidatura" onclick="$('#noCandidatura').dialog('open');return false;">
+					</h:link>
+				</ui:fragment>
+			</ui:fragment>
+
+			<ui:fragment
+				rendered="#{(not visVaBean.hasCandidatura) and (sessionBean.utente) and (not visVaBean.controlliCrescoSuperati)}">
+				<h:form>
+					<h:commandLink styleClass="buttonStyle" value="Invia Candidatura" title="Invia Candidatura"
+						actionListener="#{visualizzaVacancyBean.addCrescoErrorMessage}">
+						<f:ajax render=":messages :panel_button" />
+					</h:commandLink>
+				</h:form>
+			</ui:fragment>
+
+			<ui:fragment rendered="#{utilsBean.isPAT()}">
+				<p:commandLink 	onclick="return document.getElementById('segnalaCandidatura').open(null, this);">
+					<h:graphicImage
+						value="/resources/images/share_to_friend.png"
+						styleClass="ui-image"
+						alt="Segnala questo annuncio"
+						title="Segnala questo annuncio"
+						onmouseout="imageNonSegnala(this)"
+						onmouseover="imageSegnala(this)"/>
+				</p:commandLink>
+			</ui:fragment>
+					
+			<h:panelGroup id="disegnaBottoniPanel">
+				<script type="text/javascript">
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+		</h:panelGroup>
+		<br />
+		<cc:messages id="messages" />
+		<br />
+
+		<ui:include src="/secure/_no_candidatura.xhtml" />
+
+		<cc:modalDialog id="segnalaCandidatura" openF="openSegnala"
+			title="Segnala annuncio" submitLabel="Invia"
+			actionSubmit="#{visualizzaVacancyBean.segnalaCandidatura}"
+			renderAjax=":messages"
+			eventAjax="modalSegnalaVacancyCallback">
+			<h:panelGrid id="panelSegnala" columns="1">
+				<h:panelGroup>
+					<cc:inputText id="nominativoAmico" label="Nominativo" required="true"
+						maxlength="255"
+						value="#{visualizzaVacancyBean.nominativoAmico}">
+					</cc:inputText>
+				</h:panelGroup>
+				<h:panelGroup>
+					<cc:inputText id="emailAmico" label="E-mail" required="true"
+						value="#{visualizzaVacancyBean.emailAmico}">
+						<f:validator validatorId="emailValidator" for="function" />
+					</cc:inputText>          
+			    </h:panelGroup>    
+			</h:panelGrid>
+		</cc:modalDialog>
+
+		<style>
+			#segnalaCandidatura input {
+				width: 250px;
+			}
+			#segnalaCandidatura td:nth-child(2){
+				text-align: right;
+			}
+		</style>
+
+		<cc:modalDialog id="confermaCandidatura" openF="openConferma"
+			title="Conferma Candidatura" submitLabel="Invia Candidatura"
+			actionSubmit="#{visualizzaVacancyBean.inviaCandidatura}"
+			renderAjax=":messages comment :panel_button"
+			eventAjax="modalVacancyCallback"
+			rendered="#{(not visVaBean.hasCandidatura) and (sessionBean.utente)}"
+			width="540" height="470">
+			<h:inputHidden id="objectId" />
+			<h:inputHidden id="clicLavoro" value="#{visVaBean.candidatura.flagClicLavoro}" />
+			<h:panelGroup id="panel_vacancy" layout="block" rendered="false">
+				<h:panelGrid id="dati_vacancy" columns="2" columnClasses="visualizza_left,visualizza_right">
+					<h:outputLabel for="descrizione_vacancy" value="Descrizione" />
+					<h:outputText id="descrizione_vacancy" value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.descrizione}"
+						escape="false"></h:outputText>
+					<h:outputLabel for="comune_lavoro" value="Comune" />
+					<h:outputText id="comune_lavoro" value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.strComLavoro}" />
+					<h:outputLabel for="indirizzo_lavoro" value="Indirizzo" />
+					<h:outputText id="indirizzo_lavoro" value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.indirizzoLavoro}" />
+					<h:outputLabel for="mansione" value="Gruppo professionale" />
+					<h:outputText id="mansione" value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.strMansione}" />
+					<h:outputLabel for="attivita" value="Attività"></h:outputLabel>
+					<h:outputText id="attivita" value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.strAteco}"></h:outputText>
+					<h:outputLabel for="attivitaPrincipale" value="Profilo richiesto"></h:outputLabel>
+					<h:outputText id="attivitaPrincipale" value="#{visVaBean.vaVisualizzaDTO.vaDatiVacancyDTO.attivitaPrincipale}"></h:outputText>
+				</h:panelGrid>
+			</h:panelGroup>
+			<hr />
+			<h:panelGrid id="dati_cv_panel" columns="1" columnClasses="cv_col1">
+				<cc:selectOneMenu id="cv_vacancy" styleClass="width400" label="Seleziona un Curriculum"
+					value="#{visVaBean.candidatura.idCvDatiPersonali}" disableInput="true">
+					<f:selectItems value="#{visVaBean.myCurricula}" />
+				</cc:selectOneMenu>
+				<cc:selectOneMenu id="cv_cl_vacancy" styleClass="width400" label="Seleziona un Curriculum"
+					value="#{visVaBean.candidatura.idCvDatiPersonaliCl}" disableInput="true">
+					<f:selectItems value="#{visVaBean.myClicLavoroCurricula}" />
+				</cc:selectOneMenu>
+				<cc:selectOneMenu id="lettere_vacancy" styleClass="width400" label="Seleziona una lettera di presentazione"
+					value="#{visVaBean.candidatura.idCvLetteraAcc}" disableInput="true">
+					<f:selectItems value="#{visVaBean.myLettere}" />
+				</cc:selectOneMenu>
+				<h:panelGroup>
+					<h:commandLink id="dialog_attach_opener" value="Inserisci un allegato" name="Inserisci un allegato"
+						title="Inserisci un allegato" class="buttonStyle" onclick="$('#dialog_allegato').dialog('open'); return false;">
+						<span class="ui-icon ui-icon-disk fix_icon" />
+					</h:commandLink>
+
+					<h:outputText id="original_file_name_dsplay" style="margin:10px" />
+					<h:commandLink id="attach_cleaner" value="Rimuovi" title="Rimuovi allegato" class="buttonStyle"
+						onclick="removeFileAttach(); return false;">
+						<span class="ui-icon ui-icon-trash fix_icon" />
+					</h:commandLink>
+					<h:inputHidden value="#{visVaBean.candidatura.allegatoFileName}" id="original_file_name" />
+					<h:inputHidden value="#{visVaBean.candidatura.allegatoFileNameTmp}" id="file_name" />
+				</h:panelGroup>
+				<h:panelGroup>
+					<b><h:outputText value="A seguito della candidatura sarà inviato un messaggio all'azienda interessata." /><br />
+						<h:outputText value="Occorre pertanto compilare la sezione sottostante. " /></b>
+				</h:panelGroup>
+				<cc:inputTextarea value="#{visVaBean.candidatura.commento}" id="comment" label="Testo del messaggio"
+					richTextMode="false" required="true" maxlength="2000">
+				</cc:inputTextarea>
+			</h:panelGrid>
+		</cc:modalDialog>
+		<!-- Modale per la scelta dell'allegato -->
+		<div id="dialog_allegato" title="Seleziona un file da allegare">
+			<form name="allegatoUpload" id="allegatoUpload" enctype="multipart/form-data"
+				action="#{request.contextPath}/secure/rest/uploadFileService/uploadAttachment" method="post">
+				<label for="fileupload" title="Attach"> Allegato </label> <input type="file" name="fileupload"
+					title="Carica un allegato" size="20" id="fileupload" /> <br />
+				<button type="submit" id="UploadBtn" title="Carica" class="buttonStyle">Carica</button>
+			</form>
+		</div>
+		<script type="text/javascript">
+		//<![CDATA[ 		
+
+		var openSegnala = function(params) {		
+			$('[id$="segnalaCandidatura\:modal_form\:nominativoAmico"]').val('');
+			$('[id$="segnalaCandidatura\:modal_form\:emailAmico"]').val('');
+		};
+		
+		function modalSegnalaVacancyCallback(data) {
+			//console.log(data);
+			if (data.status == 'success') {
+				//se ci sono errori di validazione lascia aperto
+				var fieldValidationFailed = (data.responseText.indexOf('ui-state-error') != -1);
+				if (fieldValidationFailed) {
+					//alert('fieldValidationFailed');
+					return 'leaveOpen'
+				}
+				//controlla se la segnalazione della candidatura è andata a buon fine
+				var validationFailed = (data.responseText.indexOf('correttamente') == -1);
+				console.log('valRes: ' + validationFailed);
+				//chiudi solo se la segnalazione della candidatura è andata a buon fine
+				if (validationFailed) {
+					return 'leaveOpen'
+				}
+				return 'close'
+				//disegnaBottoni();
+			}
+			return 'leaveOpen'
+		}
+		
+		var openConferma = function(params) {
+	    	var itemId = params.id;
+	    	var vacancyId = params.idVa;
+	    	var clicLavoro = params.clicLavoro;
+	    	console.log($('[id$="confermaCandidatura\:modal_form\:objectId"]'));
+			$('[id$="confermaCandidatura\:modal_form\:objectId"]').val(itemId);
+			$('[id$="confermaCandidatura\:modal_form\:vaId"]').val(vacancyId);
+			$('[id$="confermaCandidatura\:modal_form\:clicLavoro"]').val(clicLavoro);
+			if (clicLavoro) {
+				$(jq("confermaCandidatura:modal_form:cv_cl_vacancy")).show();
+				$(jq("confermaCandidatura:modal_form:cv_vacancy")).hide();
+			}
+			else {
+				$(jq("confermaCandidatura:modal_form:cv_cl_vacancy")).hide();
+				$(jq("confermaCandidatura:modal_form:cv_vacancy")).show();	
+			}
+			console.log('clicLavoro: ' + clicLavoro);
+			removeFileAttach();
+			
+		};
+		
+		function removeFileAttach() {
+		    $('#confermaCandidatura\\:modal_form\\:original_file_name_dsplay').text('');
+		    $('#confermaCandidatura\\:modal_form\\:original_file_name').val('');
+		    $('#confermaCandidatura\\:modal_form\\:file_name').val('');
+		    $('#fileupload').val('');
+		    return false;
+		}
+			
+		function showResponse(responseJson, statusText, xhr, $form)  {
+			//console.log("responseJson:"+responseJson);
+			//console.log("responseJson.statusCode:"+responseJson.statusCode);
+			if(responseJson.statusCode==200){
+				//console.log("responseJson:"+responseJson);
+			    $('#confermaCandidatura\\:modal_form\\:original_file_name_dsplay').text(responseJson.original_file_name);
+			    $('#confermaCandidatura\\:modal_form\\:original_file_name').val(responseJson.original_file_name);
+			    $('#confermaCandidatura\\:modal_form\\:file_name').val(responseJson.file_name);
+			} else {
+				$.jnotify("Errore durante il caricamento dell'allegato:"+responseJson.error_code,"error",true);
+			}			    
+		    $( "#dialog_allegato" ).dialog('close');
+		}
+		
+		function modalVacancyCallback(data) {
+			//console.log(data);
+			if (data.status == 'success') {
+				//se ci sono errori di validazione lascia aperto
+				var fieldValidationFailed = (data.responseText.indexOf('ui-state-error') != -1);
+				if (fieldValidationFailed) {
+					//alert('fieldValidationFailed');
+					return 'leaveOpen'
+				}
+				//controlla se la Candidatura è andata a buon fine
+				var validationFailed = (data.responseText.indexOf('Candidatura inviata correttamente') == -1);
+				console.log('valRes: ' + validationFailed);
+				//chiudi solo se la Candidatura è andata a buon fine
+				if (validationFailed) {
+					$.jnotify('#{err_msg["generic.error"]}', 'error',true);
+					return 'leaveOpen'
+				}
+				return 'close'
+				//disegnaBottoni();
+			}
+			return 'leaveOpen'
+		}
+		
+		$(function() {
+			$('#dialog_allegato').dialog({
+				width: 350,
+				height: 'auto',
+				autoOpen: false,
+				modal: true
+			});
+
+			var options = {
+					success:       showResponse,  // post-submit callback 
+					dataType:  'json'
+					}; 
+			$('#allegatoUpload').ajaxForm(options);
+/*
+			$("button.curricula_x_confronto").click(function () { 
+			      $(".curricula_x_confronto").toggle();
+				  $('#lista_curricula_table a:first').focus(); 
+		    });
+		    generateDataTable(jq('lista_curricula_table'));
+ */
+
+
+
+		    $('[id$=_titolo]').attr("role","tab");
+	    	$('[id$=_content]').attr("role","tabpanel");
+	    	$('[id$=_titolo]').attr("aria-selected","false");
+	    	$('[id$=_brake_titolo]').attr("aria-selected",null);
+	    	
+	    	$(".contentCollapse").hide();
+			  
+	  		//toggle the componenet with class msg_body
+	  		$(".headingCollapse").click(function() {				
+				$(this).next(".contentCollapse").slideToggle(500);		
+			});
+
+	  		$("#dati_vacancy_titolo").click(function() {
+		  		changeAttrCollapseDiv("#dati_vacancy_titolo");		    		
+				return changeCssCollapseDiv("#dati_vacancy_titolo", "#dati_vacancy_brake_titolo");
+				
+			});
+
+	  		$("#rapporto_lavoro_titolo").click(function() {
+	  			changeAttrCollapseDiv("#rapporto_lavoro_titolo");
+				changeCssCollapseDiv("#rapporto_lavoro_titolo", "#rapporto_lavoro_brake_titolo");
+				$('div.contrattoInfo:first').filter(":visible").focus();
+				return false;
+			});
+
+	  		$("#istruzione_titolo").click(function() {
+	  			changeAttrCollapseDiv("#istruzione_titolo");
+				return changeCssCollapseDiv("#istruzione_titolo", "#istruzione_brake_titolo");
+			});
+
+	  		$("#lingue_titolo").click(function() {
+	  			changeAttrCollapseDiv("#lingue_titolo");
+				return changeCssCollapseDiv("#lingue_titolo", "#lingue_brake_titolo");
+			});
+
+	  		$("#conoscenze_informatiche_titolo").click(function() {
+	  			changeAttrCollapseDiv("#conoscenze_informatiche_titolo");
+				return changeCssCollapseDiv("#conoscenze_informatiche_titolo", "#conoscenze_informatiche_brake_titolo");
+			});
+
+	  		$("#abilitazioni_titolo").click(function() {
+	  			changeAttrCollapseDiv("#abilitazioni_titolo");
+				return changeCssCollapseDiv("#abilitazioni_titolo", "#abilitazioni_brake_titolo");
+			});
+
+	  		$("#competenze_trasversali_titolo").click(function() {
+	  			changeAttrCollapseDiv("#competenze_trasversali_titolo");
+				return changeCssCollapseDiv("#competenze_trasversali_titolo", "#competenze_trasversali_brake_titolo");
+			});
+
+	  		$("#altre_informazioni_titolo").click(function() {
+	  			changeAttrCollapseDiv("#altre_informazioni_titolo");
+				return changeCssCollapseDiv("#altre_informazioni_titolo", "#altre_informazioni_brake_titolo");
+			});
+
+	  		$("#candidato_titolo").click(function() {
+	  			changeAttrCollapseDiv("#candidato_titolo");
+				return changeCssCollapseDiv("#candidato_titolo", "#candidato_brake_titolo");
+			});
+	  		
+	  		$("#contatto_principale_titolo").click(function() {
+	  			changeAttrCollapseDiv("#contatto_principale_titolo");
+				return changeCssCollapseDiv("#contatto_principale_titolo", "#contatto_principale_brake_titolo");
+			});
+
+	  		$("#contatto_alternativo_titolo").click(function() {
+	  			changeAttrCollapseDiv("#contatto_alternativo_titolo");
+				return changeCssCollapseDiv("#contatto_alternativo_titolo", "#contatto_alternativo_brake_titolo");
+			});
+
+	  		$("#lista_candidature_titolo").click(function() {
+	  			changeAttrCollapseDiv("#lista_candidature_titolo");
+				return changeCssCollapseDiv("#lista_candidature_titolo", "#lista_candidature_brake_titolo");
+			});
+	  		
+			// FIXME non va, dovrebbe servire a rendere il primo tab gia' aperto
+			$('#visualizza_accordion').accordion( "option", "active", 1 );
+			
+			// disegna i pulsanti
+			disegnaBottoni();
+
+			changeTdWithTh();
+
+			$('#dati_vacancy_titolo').click();
+		});
+		//]]> 
+	</script>
+
+		<cc:btnBack backTo="#{visVaBean.getBackTo()}" extraParam="#{param.id}" />
+	</ui:define>
+
+</ui:composition>

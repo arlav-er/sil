@@ -1,0 +1,149 @@
+<!-- GESTIONE VISIBILITA CURRICULUM -->
+<Statement name="SELECT_VISIB_CURRICULUM"
+           query="Select CDNLAVORATORE,CODMONOTIPO,CODMONOSOGGETTI,
+                  to_char(DATAUTORIZZAZIONE,'DD/MM/YYYY') DATAUTORIZZAZIONE,
+                  STRAUTORIZZAZIONE, CDNUTINS,DTMINS,CDNUTMOD,DTMMOD 
+                  From PR_VISIBILITA
+                  where cdnLavoratore=?" />
+
+<Statement name="INSERT_VISIB_CURRICULUM"
+           query="Insert into PR_VISIBILITA
+                  (CDNLAVORATORE,CODMONOTIPO,CODMONOSOGGETTI,DATAUTORIZZAZIONE,
+                  STRAUTORIZZAZIONE, CDNUTINS,DTMINS,CDNUTMOD,DTMMOD)
+                  values(?,?,?,to_date(?,'DD/MM/YYYY'),?,?,SYSDATE,?,SYSDATE)" />
+
+<Statement name="SAVE_VISIB_CURRICULUM"
+           query="Update PR_VISIBILITA Set
+                  CODMONOTIPO=?,
+                  CODMONOSOGGETTI=?,
+                  DATAUTORIZZAZIONE=to_date(?,'DD/MM/YYYY'),
+                  STRAUTORIZZAZIONE=?, 
+                  CDNUTMOD=?,
+                  DTMMOD=SYSDATE
+                  where cdnLavoratore=?" />
+
+<Statement name="DELETE_VISIB_CURRICULUM"
+           query="DELETE From PR_VISIBILITA
+                  where cdnLavoratore=?" />
+
+
+
+<!-- GESTIONE VISIBILITA RICHIESTA -->
+<Statement name="SELECT_VISIB_RICH"
+           query="Select PRGRICHIESTAAZ,CODMONOTIPO,CODMONOSOGGETTI,
+                  to_char(DATAUTORIZZAZIONE,'DD/MM/YYYY') DATAUTORIZZAZIONE,
+                  STRAUTORIZZAZIONE, CDNUTINS,DTMINS,CDNUTMOD,DTMMOD 
+                  From DO_VISIBILITA
+                  where PRGRICHIESTAAZ = ?" />
+
+<Statement name="INSERT_VISIB_RICH"
+           query="Insert into DO_VISIBILITA
+                  (PRGRICHIESTAAZ,CODMONOTIPO,CODMONOSOGGETTI,DATAUTORIZZAZIONE,
+                  STRAUTORIZZAZIONE, CDNUTINS,DTMINS,CDNUTMOD,DTMMOD)
+                  values(?,?,?,to_date(?,'DD/MM/YYYY'),?,?,SYSDATE,?,SYSDATE)" />
+
+<Statement name="SAVE_VISIB_RICH"
+           query="Update DO_VISIBILITA Set
+                  CODMONOTIPO=?,
+                  CODMONOSOGGETTI=?,
+                  DATAUTORIZZAZIONE=to_date(?,'DD/MM/YYYY'),
+                  STRAUTORIZZAZIONE=?, 
+                  CDNUTMOD=?,
+                  DTMMOD=SYSDATE
+                  where PRGRICHIESTAAZ=?" />
+
+<Statement name="DELETE_VISIB_RICH"
+           query="DELETE From DO_VISIBILITA
+                  where PRGRICHIESTAAZ=?" />
+
+
+
+<!-- Parametri di preselezione. Ass. Titoli di studi ed Ass. Mansioni -->
+<STATEMENT
+        name="SELECT_DE_REL_TITOLO"
+        query="SELECT DISTINCT rel_tit.codtitolo,tit.strdescrizione AS destitolo
+               FROM de_rel_titolo rel_tit, de_titolo tit
+               WHERE rel_tit.codtitolo = tit.codtitolo
+			   order by codtitolo
+"/>
+
+
+<STATEMENT
+        name="SELECT_DE_REL_TITOLO_SIMILI"
+        query="select rel_tit.codtitolosimile, tit.strdescrizione as destitolosimile, decode(rel_tit.flgtipo,'1','Primario','2','Secondario') as flgtipo
+          	   from de_rel_titolo rel_tit, de_titolo tit
+            		where rel_tit.codtitolo = ? and rel_tit.codtitolosimile = tit.codtitolo
+                order by rel_tit.flgtipo, destitolosimile
+"/>
+
+
+<STATEMENT
+        name="INSERT_DE_REL_TITOLO"
+        query="insert into de_rel_titolo values (?, ?, ?)
+"/>
+
+
+<STATEMENT
+        name="DELETE_DE_REL_TITOLO"
+        query="delete from de_rel_titolo 
+                where codtitolo = ? and codtitolosimile = ?
+"/>
+
+<STATEMENT
+        name="SELECT_DE_REL_MANSIONE"
+        query="SELECT DISTINCT rel_man.codmansione, man.strdescrizione AS desmansione
+               FROM de_rel_mansione rel_man, de_mansione man
+               WHERE rel_man.codmansione = man.codmansione
+			   order by codmansione
+"/>
+
+
+<STATEMENT
+        name="SELECT_DE_REL_MANSIONE_SIMILI"
+        query="select rel_man.codgruppo, man.strdescrizione as desgruppo, decode(rel_man.flgtipo,'1','Primario','2','Secondario') as flgtipo
+          	   from de_rel_mansione rel_man, de_mansione man
+            		where rel_man.codmansione = ?  and rel_man.codgruppo = man.codmansione 
+                order by rel_man.flgtipo, desgruppo
+"/>
+
+<STATEMENT
+        name="INSERT_DE_REL_MANSIONE"
+        query="insert into de_rel_mansione values (?, ?, ?)
+"/>
+
+
+<STATEMENT
+        name="DELETE_DE_REL_MANSIONE"
+        query="delete from de_rel_mansione
+                where codmansione = ? and codgruppo = ?
+"/>
+<!-- ****************** End Parametri di preselezione *********************************-->   
+
+<!--Gestione Annotazioni-->
+  <STATEMENT name="SELECT_ANNOTAZIONI" query="
+    SELECT FLGAUTOMUNITO, FLGMOTOMUNITO, 
+      FLGDISPFORMAZIONE, TXTNOTECURRICULUM, TXTNOTECPI, FLGEXART16,
+      TXTNOTADISPONIBILITA, TXTNOTACV,
+      CDNUTINS, to_char(DTMINS, 'dd/mm/yyyy hh24:mi') as DTMINS, 
+      CDNUTMOD, to_char(DTMMOD, 'dd/mm/yyyy hh24:mi') as DTMMOD 
+    FROM PR_NOTA_LAV
+    WHERE CDNLAVORATORE=?
+  "/>
+   
+  <STATEMENT name="INSERT_ANNOTAZIONI" query="
+    INSERT INTO PR_NOTA_LAV (
+      CDNLAVORATORE, TXTNOTADISPONIBILITA, TXTNOTACV,      
+      CDNUTINS, DTMINS, CDNUTMOD, DTMMOD ) 
+    VALUES ( ?, ?, ?, ?, SYSDATE, ?, SYSDATE)
+  "/>
+
+  <STATEMENT name="UPDATE_ANNOTAZIONI" query="
+    UPDATE PR_NOTA_LAV
+    SET TXTNOTADISPONIBILITA=?, 
+		TXTNOTACV=?,        
+        CDNUTMOD=?,
+        DTMMOD=SYSDATE
+    WHERE CDNLAVORATORE=?
+  "/>
+
+               

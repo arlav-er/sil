@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<style type="text/css">
+		.selectOneMenuLong { width: 80%; }
+	</style>
+
+	<cc:messages id="contattiInviatiMessages" />
+
+	<h:form id="contattiInviatiForm">	
+		<ui:fragment rendered="#{empty contattiInviatiBean.list}">
+			<h3 class="nessun_elemento_trovato">Nessun messaggio presente</h3>
+		</ui:fragment>
+		
+		<ui:fragment rendered="#{not empty contattiInviatiBean.list}">
+			<div style="display: none;">
+				<h:inputHidden id="pageValue" value="#{contattiInviatiBean.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{contattiInviatiBean.changePage}" value="DUMMY FOR PAGINATION">
+					<f:ajax execute=":contattiInviatiForm:pageValue" 
+						render=":contattiInviatiForm:tabella :contattiInviatiDetailForm" />
+				</h:commandButton>
+			</div>
+			
+			<script type="text/javascript">				
+				$(jq("contattiInviatiForm:paginationBar")).pagination({							    
+					pages: #{contattiInviatiBean.paginationHandler.pages()},						       
+					cssStyle: 'light-theme',
+					prevText: 'Prec.',
+					nextText: 'Succ.',
+					onPageClick: function (pageNumber, event) {
+						document.getElementById("contattiInviatiForm:pageValue").value = pageNumber;
+						document.getElementById("contattiInviatiForm:pageCommand").click();
+						$(jq("contattiInviatiDetailForm")).hide();
+						$(jq("contattiInviatiForm:tabella")).hide();					            
+						$(jq("contattiInviatiForm:paginationLoader")).show();
+					}
+				});
+			</script>
+			
+			<h:panelGroup layout="block" id="paginationBar" 
+				class="widget_container ui-tabs ui-widget-content ui-corner-all" />
+			<br />
+			
+			<cc:waiting id="paginationLoader" hidden="true" waitMessage="Caricamento..." />	
+			
+			<h:panelGroup layout="block" id="tabella" class="dataTables_wrapper">	
+				<table class="dataTable">
+					<tr>
+						<th class="ui-state-default"></th>
+						<th class="ui-state-default">Oggetto</th>
+						<th class="ui-state-default">Destinatario</th>
+						<th class="ui-state-default">Inviato il:</th>
+						<th class="ui-state-default">Risposta ricevuta il:</th>
+					</tr>
+					<ui:repeat value="#{contattiInviatiBean.list}" var="messaggio" varStatus="status">
+						<tr>
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{contattiInviatiBean.view}">
+									<h:panelGroup styleClass="ui-icon ui-icon-arrowreturnthick-1-w fix-icon"
+										rendered="#{messaggio.last != messaggio}" />
+									<span class="ui-icon #{messaggio.letto ? 'ui-icon-mail-open' 
+										: 'ui-icon-mail-closed'} fix_icon" />
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":contattiInviatiForm:tabella :contattiInviatiDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{contattiInviatiBean.view}">
+									<h:outputText value="#{messaggio.oggetto} &nbsp;"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}" />
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":contattiInviatiForm:tabella :contattiInviatiDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{contattiInviatiBean.view}">
+									<h:outputText value="#{messaggio.destinatario} &nbsp;"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}" />
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":contattiInviatiForm:tabella :contattiInviatiDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{contattiInviatiBean.view}">
+									<h:outputText value="#{empty messaggio.dtmIns ? '&nbsp;' : messaggio.dtmIns}"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":contattiInviatiForm:tabella :contattiInviatiDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{contattiInviatiBean.view}">
+									<h:outputText value="#{empty messaggio.dtmRisposta ? '&nbsp;' : messaggio.dtmRisposta}"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":contattiInviatiForm:tabella :contattiInviatiDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+						</tr>
+					</ui:repeat>
+				</table>
+				<script type="text/javascript">
+					$(jq("contattiInviatiForm:paginationLoader")).hide();
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+		</ui:fragment>
+	</h:form>
+	<br />
+	
+	<cc:waiting id="contattiInviatiDetailLoader" hidden="true" waitMessage="Caricamento..." />
+		
+	<h:form id="contattiInviatiDetailForm">
+		<h:panelGroup styleClass="insertPanel" layout="block"
+			rendered="#{contattiInviatiBean.showPanel}">
+			<h:panelGrid columns="2" cellspacing="10">
+				<h:panelGroup />
+				
+				<h:panelGroup/>
+				
+				<cc:inputText value="#{contattiInviatiBean.data.oggetto}" label="Oggetto"
+					required="true" editingMode="#{contattiInviatiBean.editing}"
+					maxlength="250" />
+				
+				<cc:inputText type="date" value="#{contattiInviatiBean.data.dtmIns}"
+					label="Data invio" editingMode="false" />
+				
+				<h:panelGroup />					
+			</h:panelGrid>
+			
+			<h:panelGrid columns="1">
+				<h:panelGroup layout="block" styleClass="messageDiv" rendered="#{not contattiInviatiBean.editing}">
+					<span class="boldText">Mittente </span>
+					<h:outputText styleClass="mittente"
+						value="#{contattiInviatiBean.data.mittente}" />
+					<br />
+					
+					<div class="corpo">
+						#{contattiInviatiBean.data.corpo}
+					</div> 
+					
+					<div class="messageDiv">
+						<h:outputLink value="#{contattiInviatiBean.linkRiferimentoMessaggio}" 
+							disabled="#{contattiInviatiBean.data.idVaDatiVacancy == null}">
+							<f:param name="id" value="#{contattiInviatiBean.data.idVaDatiVacancy}" />
+							<h:outputText value="#{contattiInviatiBean.testoLinkRiferimentoMessaggio}" 
+								rendered="#{contattiInviatiBean.data.idVaDatiVacancy != null}"/>
+							<h:outputText value="#{contattiInviatiBean.testVacancyNonPresente}" 
+								rendered="#{contattiInviatiBean.data.idVaDatiVacancy == null}"/>
+						</h:outputLink>
+					</div>
+				</h:panelGroup>
+				
+				<h:panelGroup layout="block" rendered="#{not contattiInviatiBean.editing}">
+					<ui:repeat var="risposta" value="#{contattiInviatiBean.data.risposte}">
+						<h:panelGrid columns="2" cellspacing="10">
+							<cc:selectFlagCheckbox value="#{risposta.esito}" 
+								label="Disponibilità dell'azienda ad un colloquio" editingMode="false"/>
+							<cc:inputText label="Data ricezione" 
+								editingMode="false" value="#{risposta.dtmIns}" 
+								styleClass="mittente" type="date" datePattern="dd/MM/yyyy" />
+						</h:panelGrid>
+						
+						<div class="messageDiv">
+							<h:outputText value="Risposta:" styleClass="mittente" />								
+							<br />
+							
+							<div class="corpo">
+								#{risposta.corpo}
+							</div>
+						</div>
+					</ui:repeat>
+				</h:panelGroup>
+			</h:panelGrid>
+
+			<div id="buttons">
+				<h:commandLink styleClass="marginButton closeButton" id="closeBtn"
+					action="#{contattiInviatiBean.dontedit}" value="Chiudi" immediate="true">
+					<f:ajax execute="@this" render="@form" onevent="onHideDetail" />
+				</h:commandLink>
+			</div>
+		</h:panelGroup>
+		<script type="text/javascript">
+			disegnaBottoni();
+		</script>
+	</h:form>
+
+	<script type="text/javascript">
+	//<![CDATA[
+		function onHideDetail(data) {
+			if (data.status == 'begin') {
+				$(jq("contattiInviatiDetailForm")).slideUp("slow");
+			}
+		}
+		
+		function onShowDetail(data) {
+			if (data.status == 'begin') {
+				$(jq("contattiInviatiDetailForm")).hide();
+				$(jq("contattiInviatiDetailLoader")).show();
+			} else if (data.status == 'success') {
+				$(jq("contattiInviatiDetailLoader")).hide();
+				PrimeFaces.scrollTo("contattiInviatiDetailForm");
+			}
+		}	
+	//]]> 
+	</script>
+</ui:composition>

@@ -1,0 +1,497 @@
+<!--Gestione Formazione Professionale-->
+  <STATEMENT name="LOAD_ALT_CRED" query="
+    SELECT 
+      PRGCREDITO,
+      STRSPECIFICA
+    FROM 
+      PR_CREDITO
+    WHERE CDNLAVORATORE = ?
+    ORDER BY
+      STRSPECIFICA
+  "/>
+
+  <STATEMENT name="SELECT_ALT_CRED" query="
+    SELECT PRGCREDITO, STRSPECIFICA,
+       CDNUTINS, to_char(DTMINS,'dd/mm/yyyy hh24:mi') as DTMINS, CDNUTMOD, 
+       to_char(DTMMOD,'dd/mm/yyyy hh24:mi') as DTMMOD
+    FROM PR_CREDITO
+    WHERE PRGCREDITO=?
+    AND CDNLAVORATORE=?
+  "/>
+
+  <STATEMENT name="INSERT_ALT_CRED" query="
+    INSERT INTO PR_CREDITO (
+       PRGCREDITO, CDNLAVORATORE, STRSPECIFICA, 
+       CDNUTINS, DTMINS, CDNUTMOD, 
+       DTMMOD) 
+    VALUES ( S_PR_CREDITO.nextval, ?, ?,
+        ?, SYSDATE, ?, 
+        SYSDATE)
+  "/>
+
+  <STATEMENT name="UPDATE_ALT_CRED" query="
+    UPDATE PR_CREDITO
+    SET STRSPECIFICA=?,
+        CDNUTMOD=?, 
+        DTMMOD=SYSDATE
+    WHERE PRGCREDITO=?
+    AND CDNLAVORATORE=?
+  "/>
+
+  <STATEMENT name="DELETE_ALT_CRED" query="
+    DELETE FROM PR_CREDITO 
+    WHERE PRGCREDITO=?
+    AND CDNLAVORATORE=?"/>
+
+<!--Gestione Annotazioni-->
+  <STATEMENT name="SELECT_NOTE" query="
+    SELECT FLGAUTOMUNITO, FLGMOTOMUNITO, 
+      FLGDISPFORMAZIONE, TXTNOTECURRICULUM, TXTNOTECPI, FLGEXART16,
+      CDNUTINS, to_char(DTMINS, 'dd/mm/yyyy  hh24:mi') as dtmins, CDNUTMOD, 
+      to_char(DTMMOD , 'dd/mm/yyyy hh24:mi') as dtmmod
+    FROM PR_NOTA_LAV
+    WHERE CDNLAVORATORE=?
+  "/>
+   
+  <STATEMENT name="INSERT_NOTE" query="
+    INSERT INTO PR_NOTA_LAV (
+      CDNLAVORATORE, FLGAUTOMUNITO, FLGMOTOMUNITO, 
+      FLGDISPFORMAZIONE, TXTNOTECURRICULUM, TXTNOTECPI, FLGEXART16,
+      CDNUTINS, DTMINS, CDNUTMOD, 
+      DTMMOD ) 
+    VALUES ( ?, ?, ?,
+        ?, ?, ?, ?,
+        ?, SYSDATE, ?, 
+        SYSDATE)
+  "/>
+
+  <STATEMENT name="UPDATE_NOTE" query="
+    UPDATE PR_NOTA_LAV
+    SET FLGAUTOMUNITO=?, 
+        FLGMOTOMUNITO=?, 
+        FLGDISPFORMAZIONE=?, 
+        TXTNOTECURRICULUM=?, 
+        TXTNOTECPI=?,
+        FLGEXART16=?,        
+        CDNUTMOD=?,
+        DTMMOD=SYSDATE
+    WHERE CDNLAVORATORE=?
+  "/>
+
+  <STATEMENT name="DELETE_NOTE" query="
+    DELETE FROM PR_NOTA_LAV 
+    WHERE CDNLAVORATORE=?"/>
+
+<!--Gestione Indisponibilita' -->
+
+  <STATEMENT name="INDISP_NEXTVAL" query="
+    SELECT
+      S_PR_INDISPONIBILITA.nextval AS DO_NEXTVAL
+    FROM
+      DUAL
+  "/>
+
+  <STATEMENT name="LOAD_INDISP" query="
+    SELECT 
+      STRRAGSOCIALEAZIENDA, PRGINDISPONIBILITA 
+    FROM 
+      PR_INDISPONIBILITA
+    WHERE CDNLAVORATORE = ?
+    ORDER BY
+      STRRAGSOCIALEAZIENDA
+  "/>
+
+  <STATEMENT name="SELECT_INDISP" query="
+    SELECT PRGINDISPONIBILITA, PRGAZIENDA, STRRAGSOCIALEAZIENDA, 
+        STRNOTA, CDNUTINS, to_char(DTMINS,'dd/mm/yyyy hh24:mi') as DTMINS,
+        CDNUTMOD, to_char(DTMMOD,'dd/mm/yyyy hh24:mi') as DTMMOD
+    FROM PR_INDISPONIBILITA
+    WHERE PRGINDISPONIBILITA=?
+    AND CDNLAVORATORE=?
+  "/>
+
+  <!-- NOTE: Gestione Patto 
+       E' necessari che il Progressivo sia passato come gli altri campi
+       e non inserito nella query SQL con nextVal perche' tale progressivo
+       viene memorizzato anche nel patto
+  -->
+  <STATEMENT name="INSERT_INDISP" query="
+    INSERT INTO PR_INDISPONIBILITA (
+       PRGINDISPONIBILITA, CDNLAVORATORE, PRGAZIENDA, STRRAGSOCIALEAZIENDA, 
+       STRNOTA, CDNUTINS, DTMINS, 
+       CDNUTMOD, DTMMOD) 
+    VALUES ( ?, ?, ?, ?,
+        ?, ?, SYSDATE,
+        ?, SYSDATE)
+  "/>
+
+  <STATEMENT name="UPDATE_INDISP" query="
+    UPDATE PR_INDISPONIBILITA
+    SET PRGAZIENDA=?,
+        STRRAGSOCIALEAZIENDA=?,
+        STRNOTA=?,
+        CDNUTMOD=?,
+        DTMMOD=SYSDATE
+    WHERE PRGINDISPONIBILITA=?
+    AND CDNLAVORATORE=?
+  "/>
+
+  <STATEMENT name="DELETE_INDISP" query="
+    DELETE FROM PR_INDISPONIBILITA 
+    WHERE PRGINDISPONIBILITA=?
+    AND CDNLAVORATORE=?"/>
+
+  <STATEMENT name="SELECT_INDISP_AZIENDE" query="
+    SELECT STRRAGIONESOCIALE, PRGAZIENDA
+    FROM AN_AZIENDA
+    WHERE STRRAGIONESOCIALE LIKE ?"/>
+
+<!--Gestione Valita Curriculum-->
+  <STATEMENT name="LOAD_LIST_VALID_CUR" query="
+		SELECT   a.prgvalidita, 
+				 a.codtipovalidita,
+		         c.strdescrizione AS statocurriculum, 
+		         a.datiniziocurr AS datain,
+		         a.datfinecurr AS datafine,
+		         TO_CHAR (a.datiniziocurr, 'dd/mm/yyyy') datiniziocurr,
+		         TO_CHAR (a.datfinecurr, 'dd/mm/yyyy') datfinecurr, 
+		         b.strdescvalidita,
+		         a.numklovalidita
+		    FROM pr_validita a, de_tipo_validita b, de_stato_schedalav c
+		   WHERE a.codtipovalidita = b.codtipovalidita
+		     AND a.codstatolav = c.codstatolav
+		     AND cdnlavoratore = ?
+		ORDER BY datafine DESC, datain DESC, strdescvalidita DESC  "/>
+
+  <STATEMENT name="SELECT_VALID_CUR" query="
+    SELECT A.PRGVALIDITA, A.CDNLAVORATORE, A.CODTIPOVALIDITA, to_char(A.DATINIZIOCURR,'dd/mm/yyyy') DATINIZIOCURR, 
+      to_char(A.DATFINECURR,'dd/mm/yyyy') DATFINECURR, A.CODSTATOLAV, A.CDNUTINS, 
+      to_char(A.DTMINS,'dd/mm/yyyy hh24:mi') as DTMINS, A.CDNUTMOD, to_char(A.DTMMOD,'dd/mm/yyyy hh24:mi') as DTMMOD, B.STRDESCVALIDITA, 
+      A.NUMKLOVALIDITA     
+    FROM PR_VALIDITA A, DE_TIPO_VALIDITA B
+    WHERE A.CODTIPOVALIDITA=B.CODTIPOVALIDITA
+    AND A.CDNLAVORATORE = ?
+	AND A.CODTIPOVALIDITA = ?
+	AND A.DATINIZIOCURR = TO_DATE(? ,'DD/MM/YYYY') "/>
+
+  <STATEMENT name="LOAD_VALID_CUR" query="
+    SELECT A.PRGVALIDITA, A.CDNLAVORATORE, A.CODTIPOVALIDITA, to_char(A.DATINIZIOCURR,'dd/mm/yyyy') DATINIZIOCURR, 
+      to_char(A.DATFINECURR,'dd/mm/yyyy') DATFINECURR, A.CODSTATOLAV, A.CDNUTINS, 
+      to_char(A.DTMINS,'dd/mm/yyyy hh24:mi') as DTMINS, A.CDNUTMOD, to_char(A.DTMMOD,'dd/mm/yyyy hh24:mi') as DTMMOD, B.STRDESCVALIDITA, 
+      A.NUMKLOVALIDITA     
+    FROM PR_VALIDITA A, DE_TIPO_VALIDITA B
+    WHERE A.CODTIPOVALIDITA=B.CODTIPOVALIDITA
+    AND A.PRGVALIDITA = ? "/>
+
+  <STATEMENT name="LOAD_ALL_VALID_CUR" query="
+	    SELECT A.PRGVALIDITA, A.CDNLAVORATORE, A.CODTIPOVALIDITA, to_char(A.DATINIZIOCURR,'dd/mm/yyyy') DATINIZIOCURR, 
+	      to_char(A.DATFINECURR,'dd/mm/yyyy') DATFINECURR, A.CODSTATOLAV, A.CDNUTINS, 
+	      to_char(A.DTMINS,'dd/mm/yyyy hh24:mi') as DTMINS, A.CDNUTMOD, to_char(A.DTMMOD,'dd/mm/yyyy hh24:mi') as DTMMOD, B.STRDESCVALIDITA, 
+	      A.NUMKLOVALIDITA     
+	    FROM PR_VALIDITA A, DE_TIPO_VALIDITA B
+	    WHERE A.CODTIPOVALIDITA=B.CODTIPOVALIDITA
+		  AND A.cdnlavoratore = ? "/>
+    
+  <STATEMENT
+        name="GET_PR_VALIDITA_NEXTVAL"
+        query="SELECT S_PR_VALIDITA.NEXTVAL as do_nextval FROM DUAL"/>
+
+  <STATEMENT name="INSERT_VALID_CUR" query="
+    INSERT INTO PR_VALIDITA (
+       PRGVALIDITA, CDNLAVORATORE, CODTIPOVALIDITA, DATINIZIOCURR, 
+       DATFINECURR, CODSTATOLAV, CDNUTINS, 
+       DTMINS, CDNUTMOD, DTMMOD, NUMKLOVALIDITA) 
+    VALUES (?, ?, ?, to_date(?,'dd/mm/yyyy'),
+        to_date(?,'dd/mm/yyyy'), ?, ?,
+        SYSDATE, ?, SYSDATE, ?)
+  "/>
+
+  <STATEMENT name="UPDATE_VALID_CUR" query="
+    UPDATE PR_VALIDITA
+       SET DATINIZIOCURR=to_date(?,'dd/mm/yyyy'),
+           DATFINECURR=to_date(?,'dd/mm/yyyy'),
+           CODSTATOLAV=?,
+           CDNUTMOD=?, 
+           DTMMOD=SYSDATE,
+           NUMKLOVALIDITA=TO_NUMBER(?)+1
+     WHERE PRGVALIDITA=? "/>
+
+  <STATEMENT name="DELETE_VALID_CUR" query="
+    DELETE FROM PR_VALIDITA 
+    WHERE PRGVALIDITA=?"/>
+
+  <STATEMENT name="SELECT_TIPO_VALID" query="
+    SELECT 
+      CODTIPOVALIDITA AS CODICE,
+      STRDESCVALIDITA ||
+        DECODE(
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+        ) AS DESCRIZIONE
+    FROM DE_TIPO_VALIDITA
+  "/>
+
+  <STATEMENT name="SELECT_STATO_LAV" query="
+    SELECT 
+      CODSTATOLAV AS CODICE,
+      STRDESCRIZIONE AS DESCRIZIONE
+    FROM DE_STATO_SCHEDALAV
+  "/>
+  
+
+<!-- get numgg per data fine validita curriculum -->
+<STATEMENT name="GET_NumGGCurr"
+          query="select num
+                 from ts_config_loc
+                 where codtipoconfig= 'VSLAV'
+                 and strcodrif = (select codprovinciasil from ts_generale)"/>
+
+<!-- get numero max di giorni durata curriculum -->
+<STATEMENT name="GET_MaxNumGGValCurr"
+          query="select num
+                 from ts_config_loc
+                 where codtipoconfig= 'VMXSLAV'
+                 and strcodrif = (select codprovinciasil from ts_generale)"/>
+                 
+<!-- get numero giorni da aggiornare dei curriculum scaduti -->
+<STATEMENT name="GET_NUM_GIORNI_DA_AGGIORNARE"
+          query="select NUM
+                 from ts_config_loc
+                 where strvalore=?
+                 and codtipoconfig= 'VMXSLAV'
+                 and strcodrif = (select codprovincia from de_cpi where codcpi=?)"/>
+                 
+<!-- verifica se stato lavoratore = "occupato" -->
+<STATEMENT name="GET_STATO_OCCUPATO"
+          query="select occupaz.PRGSTATOOCCUPAZ, occupaz.CODSTATOOCCUPAZ, occupaz.DATFINE, occupaz.CDNLAVORATORE, 
+          				to_char(occupaz.DATINIZIO, 'dd/mm/yyyy') DATINIZIO, occupaz.NUMKLOSTATOOCCUPAZ
+					from am_stato_occupaz occupaz
+				where occupaz.CODSTATOOCCUPAZ='B' and
+					  nvl(occupaz.DATFINE, to_date('19000101','yyyymmdd')) = to_date('19000101','yyyymmdd') and
+					  occupaz.CDNLAVORATORE=?"/>
+
+<!-- seleziona tutti i curriculum scaduti -->
+<STATEMENT name="GET_CURRICULUM_SCADUTI"
+		   query="select lav.cdnlavoratore, codtipovalidita, to_char(datiniziocurr, 'dd/mm/yyyy') datiniziocurr, 
+			    		 to_char(datfinecurr, 'dd/mm/yyyy') datfinecurr,codstatolav,
+				   		 lav.STRCOGNOME, lav.STRNOME, lav.STRCODICEFISCALE, to_char(lav.DATNASC, 'dd/mm/yyyy') DATNASC
+						   from pr_validita val
+						   inner join an_lavoratore lav on (lav.cdnlavoratore = val.cdnlavoratore)
+						   inner join am_stato_occupaz so on (so.cdnlavoratore = val.cdnlavoratore)
+						   where val.CODTIPOVALIDITA=? and
+								 to_date(?,'dd/mm/yyyy') = val.DATFINECURR and
+								 so.CODSTATOOCCUPAZ = ? and 		
+								 to_date(?,'dd/mm/yyyy') &gt;= so.DATINIZIO and 
+							     NVL(&quot;DATFINE&quot;,TO_DATE('1900-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss')) = TO_DATE('1900-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+							order by cdnlavoratore"/>
+
+<!-- seleziona tutti i curriculum scaduti pronti all'incrocio -->
+<STATEMENT name="GET_CURRICULUM_SCADUTI_DA_AGGIORNARE"
+		   query="select val.prgvalidita,
+		   				 lav.cdnlavoratore cdnlavoratore, codtipovalidita, to_char(datfinecurr, 'dd/mm/yyyy') datfinecurr,codstatolav,
+				   		 lav.STRCOGNOME strcognome, lav.STRNOME strnome, lav.STRCODICEFISCALE strcodicefiscale, to_char(lav.DATNASC, 'dd/mm/yyyy') datnasc
+						   from pr_validita val
+						   inner join an_lavoratore lav on (lav.cdnlavoratore = val.cdnlavoratore)
+						   where val.CODTIPOVALIDITA=? and
+								 to_date(?,'dd/mm/yyyy') = val.DATFINECURR and
+								 val.codstatolav=?
+						   order by cdnlavoratore"/>
+
+
+<!-- seleziona tutti i curriculum da aprire -->
+<STATEMENT name="GET_CURRICULUM_DA_VALIDARE"
+		   query="select lav.cdnlavoratore, codtipovalidita, to_char(datiniziocurr, 'dd/mm/yyyy') datiniziocurr, 
+			    	 to_char(datfinecurr, 'dd/mm/yyyy') datfinecurr,codstatolav,
+				 lav.STRCOGNOME, lav.STRNOME, lav.STRCODICEFISCALE, to_char(lav.DATNASC, 'dd/mm/yyyy') DATNASC
+
+				   from pr_validita val
+				   inner join an_lavoratore lav on (lav.cdnlavoratore = val.cdnlavoratore)
+				   inner join am_stato_occupaz so on (so.cdnlavoratore = val.cdnlavoratore)
+				   where val.CODTIPOVALIDITA=? and
+						 to_date(?,'dd/mm/yyyy') = val.DATINIZIOCURR and
+						 so.CODSTATOOCCUPAZ = ? and 		
+						 to_date(?,'dd/mm/yyyy') &gt;= so.DATINIZIO and 
+					     NVL(&quot;DATFINE&quot;,TO_DATE('1900-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss')) = TO_DATE('1900-01-01 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+					order by cdnlavoratore"/>
+
+<STATEMENT
+      name ="UPDATE_CURRICULUM_SCADUTI"
+      query="UPDATE PR_VALIDITA SET 
+                    PR_VALIDITA.DATINIZIOCURR = TO_DATE(?,'DD/MM/YYYY'),                      																																										
+                    PR_VALIDITA.DATFINECURR   = TO_DATE(?,'DD/MM/YYYY'),                      																																										
+                    PR_VALIDITA.CDNUTMOD = ?,
+                    PR_VALIDITA.DTMMOD = SYSDATE,
+                    PR_VALIDITA.NUMKLOVALIDITA=PR_VALIDITA.NUMKLOVALIDITA+1
+                    WHERE PR_VALIDITA.CODTIPOVALIDITA= ? 
+                    	AND PR_VALIDITA.PRGVALIDITA = ?"/>
+
+<STATEMENT
+      name ="UPDATE_STATO_OCCUPAZ_DA_VALIDITA_CURR"
+      query="UPDATE AM_STATO_OCCUPAZ SET 
+                    AM_STATO_OCCUPAZ.CODSTATOOCCUPAZ       = ?,                      																																										
+                    AM_STATO_OCCUPAZ.CODMONOPROVENIENZA    = ?,                      																																										
+                    AM_STATO_OCCUPAZ.CDNUTMOD              = ?,
+                    AM_STATO_OCCUPAZ.DTMMOD                = SYSDATE,
+                    AM_STATO_OCCUPAZ.NUMKLOSTATOOCCUPAZ    = ?,
+                    AM_STATO_OCCUPAZ.DATFINE 			   = ?
+                    WHERE AM_STATO_OCCUPAZ.PRGSTATOOCCUPAZ = ?"/>
+					
+<STATEMENT
+      name ="DELETE_STATO_OCCUPAZ_DA_VALIDITA_CURR"
+      query="DELETE FROM AM_STATO_OCCUPAZ WHERE AM_STATO_OCCUPAZ.PRGSTATOOCCUPAZ = ?"/>
+					
+					
+<!-- EVIDENZE -->
+<STATEMENT name="DETT_EVIDENZA"
+		   query="select 
+						   to_char(PRGEVIDENZA) as PRGEVIDENZA, 
+						   to_char(CDNLAVORATORE) as CDNLAVORATORE, 
+						   to_char(DATDATASCAD,'dd/mm/yyyy') as DATDATASCAD, 
+						   to_char(DATDATASCAD,'yyyymmdd') as DATAIN,
+						   STREVIDENZA, 
+						   PRGTIPOEVIDENZA, 
+						   to_char(NUMKLOEVIDENZA) as NUMKLOEVIDENZA, 
+						   to_char(CDNUTINS) as CDNUTINS, 
+						   to_char(DTMINS,'dd/mm/yyyy hh24:mi') as DTMINS, 
+						   to_char(CDNUTMOD) as CDNUTMOD, 
+						   to_char(DTMMOD,'dd/mm/yyyy hh24:mi') as DTMMOD
+					from
+						  AN_EVIDENZA
+					where prgEvidenza = ?"
+/>
+
+<STATEMENT name="UPD_EVIDENZA"
+		   query="UPDATE AN_EVIDENZA SET
+		   		  	DATDATASCAD = to_date(?, 'dd/mm/yyyy'),
+		   		  	STREVIDENZA = ?,
+		   		  	PRGTIPOEVIDENZA = ?,
+		   		  	NUMKLOEVIDENZA = ?,
+		   		  	CDNUTMOD = ?,
+		   		  	DTMMOD = sysdate
+		   		  WHERE PRGEVIDENZA=?"
+/>
+
+<STATEMENT name="INS_EVIDENZA"
+		   query="insert into AN_EVIDENZA 
+		   		  (PRGEVIDENZA, CDNLAVORATORE, DATDATASCAD, 
+		   		  STREVIDENZA, PRGTIPOEVIDENZA, 
+		   		  CDNUTINS, DTMINS, CDNUTMOD, DTMMOD) 
+		   		  values 
+		   		  (S_AN_EVIDENZA.nextVal, ?, to_date(?,'dd/mm/yyyy'), 
+		   		  ?, ?, 
+		   		  ?, sysdate, ?, sysdate)"
+/>
+
+<STATEMENT name="DEL_EVIDENZA"
+		   query="delete from AN_EVIDENZA where PRGEVIDENZA=?"
+/>
+
+<STATEMENT name="COMBO_TIPO_EVIDENZA"
+		   query="select E.PRGTIPOEVIDENZA as CODICE, 
+                  E.STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_TIPO_EVIDENZA E
+                  inner join TS_VIS_EVIDENZA VIS on E.PRGTIPOEVIDENZA=VIS.PRGTIPOEVIDENZA
+                  where VIS.CDNGRUPPO=?
+                  AND VIS.CDNPROFILO=?
+                  order by upper(E.STRDESCRIZIONE)"
+/>
+
+<STATEMENT name="LISTA_TIPI_EVIDENZE"
+		   query="select PRGTIPOEVIDENZA, CODTIPOEVIDENZA, STRDESCRIZIONE, 
+		   		  to_char(DATINIZIOVAL,'dd/mm/yyyy') as DATINIZIOVAL, 
+		   		  to_char(DATFINEVAL,'dd/mm/yyyy') as DATFINEVAL 
+		   		  from de_tipo_evidenza 
+		   		  order by upper(STRDESCRIZIONE)"
+/>
+
+<STATEMENT name="DETT_TIPO_EVIDENZA"
+		   query="select PRGTIPOEVIDENZA, CODTIPOEVIDENZA, STRDESCRIZIONE, 
+		   		  to_char(DATINIZIOVAL,'dd/mm/yyyy') as DATINIZIOVAL, 
+		   		  to_char(DATFINEVAL,'dd/mm/yyyy') as DATFINEVAL
+		   		  from DE_TIPO_EVIDENZA
+		   		  WHERE prgTipoEvidenza = ?"
+/>
+
+<STATEMENT name="DEL_TIPO_EVIDENZA"
+		   query="delete from de_tipo_evidenza where PRGTIPOEVIDENZA = ?"
+/>
+
+<STATEMENT name="VER_UTILIZZO_TIPO_EVIDENZA"
+		   query="select unique prgTipoEvidenza from an_evidenza where PRGTIPOEVIDENZA= ?"
+/>
+
+
+<STATEMENT name="UPD_TIPO_EVIDENZA"
+		   query="update de_tipo_evidenza set
+		   		  codTipoEvidenza = ?,
+		   		  strDescrizione = ?,
+		   		  datInizioVal = to_date(?,'dd/mm/yyyy'),
+		   		  datFineVal = to_date(?, 'dd/mm/yyyy')
+		   		  where prgTipoEvidenza = ?"
+/>
+
+
+<STATEMENT name="SELECT_UNIQUE_TIPO_EVIDENZA"
+		   query="SELECT codTipoEvidenza from de_tipo_evidenza 
+				  WHERE  UPPER(codTipoEvidenza) = UPPER(?)"/>
+
+
+<STATEMENT name="INSERT_TIPO_EVIDENZA"
+		   query="insert into DE_TIPO_EVIDENZA
+		   		 (PRGTIPOEVIDENZA,CODTIPOEVIDENZA, STRDESCRIZIONE, DATINIZIOVAL, DATFINEVAL)
+		   		 values
+		   		 (S_DE_TIPO_EVIDENZA.nextval,upper(?), ?, to_date(?, 'dd/mm/yyyy'), to_date(?, 'dd/mm/yyyy')) "
+/>
+
+
+<STATEMENT name="GET_VIS_EVIDENZA_XML"
+		   query="select xmlElement(&quot;ROOT&quot;, 
+	   							    (select XMLAGG(xmlelement(&quot;PROFILO&quot;, 
+											  			      xmlAttributes(P.cdnProfilo &quot;codice&quot;, 
+															      		    P.strDenominazione &quot;denominazione&quot;																		    
+															  ),
+													  	     (select XMLAGG(xmlElement(&quot;GRUPPO&quot;,
+																				       xmlAttributes(G.cdnGruppo &quot;codice&quot;,			
+										 							       		       				 G.strDenominazione &quot;denominazione&quot;,
+										 							       		       				 PG.cdnProfilo &quot;profilo&quot;,
+				                                                                            		 (select 'SI' 
+														  						     			      from ts_vis_evidenza ve 
+																									  where ve.cdnProfilo=P.cdnProfilo 
+																									  and ve.cdnGruppo=G.cdnGruppo
+																									  and ve.prgTipoEvidenza=?) as &quot;selezionato&quot;
+									     											  				 )
+ 						               													)
+				                    										)
+														      from TS_GRUPPO G, TS_PROFILO_GRUPPO PG
+													 	      WHERE PG.CDNPROFILO=P.CDNPROFILO
+														      AND G.CDNGRUPPO=PG.CDNGRUPPO														      
+				     										  )
+				    										)											
+			  										)
+							 	     FROM ts_profilo P
+							 	     where p.cdnProfilo in (select cdnprofilo from ts_profilo_gruppo)
+	   								)
+	  							  ).getClobVal() 
+				as DOCXML from dual"/>
+
+
+<STATEMENT name="DEL_VIS_EVIDENZA"
+		   query="DELETE FROM TS_VIS_EVIDENZA
+		   		  WHERE PRGTIPOEVIDENZA=?" />
+		   		  
+<STATEMENT name="SAVE_VIS_EVIDENZA"
+		   query="INSERT INTO TS_VIS_EVIDENZA
+		   		  (PRGVISEVIDENZA, PRGTIPOEVIDENZA,
+		   		  CDNGRUPPO, CDNPROFILO, 
+		   		  CDNUTINS, DTMINS)
+		   		  values
+		   		  (S_TS_VIS_EVIDENZA.nextVal, ?, ?, ?, ?, SYSDATE)" />
+		   		  
+<!-- /EVIDENZE -->					

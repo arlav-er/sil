@@ -1,0 +1,403 @@
+ <ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+	<fieldset>
+		<legend>Profilo</legend>
+		<table style="width: 100%;">
+			<tr>
+				<td style="width: 25%;"></td>
+				<td style="width: 25%;"></td>
+				<td style="width: 25%;"></td>
+				<td style="width: 25%;"></td>
+			</tr>
+			<tr>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="profiloRichiestoInput" value="Profilo richiesto" styleClass="block-label" />
+						<p:inputText id="profiloRichiestoInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.profilo}"
+							required="true" requiredMessage="Il profilo richiesto è obbligatorio" maxlength="100">
+							<p:ajax event="blur" update="profiloRichiestoInputMessage"/>							
+						</p:inputText>	
+						<p:message for="profiloRichiestoInput" id="profiloRichiestoInputMessage"/>
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Profilo richiesto" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.profilo}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="numeroRisorseInput" value="Numero risorse richieste" styleClass="block-label" />
+						<p:inputText id="numeroRisorseInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.numLavoratori}" required="true"
+							requiredMessage="Il numero di risorse è obbligatorio" converterMessage="Il valore deve essere un numero"/>
+						<p:message for="numeroRisorseInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Numero risorse richieste" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.numLavoratori}
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="tipoTirocinioInput" value="Tipologia tirocinio" styleClass="block-label" />
+						<p:selectOneMenu id="tipoTirocinioInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.deFbTipoTirocinio}"
+							required="true" requiredMessage="Il tipo di tirocinio è obbligatorio" converter="deFbTipoTirocinioDTOConverter"
+							style="width: 600px;">
+							<f:selectItems value="#{utilsBean.getDeFbTipoTirocinioList()}" var="tipoTir"
+								itemLabel="#{tipoTir.descrizione}" itemValue="#{tipoTir}" />
+						</p:selectOneMenu>
+						<p:message for="tipoTirocinioInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Tipologia tirocinio" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.deFbTipoTirocinio.descrizione}
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="gruppoProfInput" value="Gruppo professionale" styleClass="block-label" />
+						<p:autoComplete id="gruppoProfInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.deMansione}"
+							required="true" requiredMessage="Il gruppo professionale è obbligatorio" converter="deMansioneDTOConverter" 
+							completeMethod="#{utilsBean.completeDeMansione}" var="mansione" itemLabel="#{mansione.descrizione}" 
+							itemValue="#{mansione}" minQueryLength="2" maxResults="20" emptyMessage="Nessun gruppo professionale trovato" 
+							forceSelection="true">
+							<p:ajax event="itemSelect" process="@this" update="qualificaInput qualificaLabel" 
+								listener="#{fbSchedaFormBean.onMansioneSelected}"/>
+						</p:autoComplete>
+						<p:watermark for="gruppoProfInput" value="Scrivi le prime lettere..." />
+						<p:message for="gruppoProfInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Gruppo professionale" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.deMansione.descrizione}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel id="qualificaLabel" for="qualificaInput" value="Qualifica" styleClass="block-label" />
+						<p:autoComplete id="qualificaInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.deMansioneMin}"
+							required="true" requiredMessage="La qualifica è obbligatoria" converter="deMansioneMinDTOConverter" 
+							completeMethod="#{fbSchedaFormBean.completeDeMansioneMin}" var="mansioneMin" itemLabel="#{mansioneMin.descrizione}" 
+							itemValue="#{mansioneMin}" minQueryLength="2" maxResults="20" emptyMessage="Nessuna qualifica trovata" 
+							forceSelection="true" dropdown="true" disabled="#{empty fbSchedaFormBean.fbSchedaFabbisogno.deMansione}">
+						</p:autoComplete>
+						<p:watermark for="qualificaInput" value="Scrivi le prime lettere..." />
+						<p:message for="qualificaInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="qualificaInput" value="Qualifica" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.deMansioneMin.descrizione}
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="titoloStudioInput" value="Titolo di studio" styleClass="block-label" />
+						<p:autoComplete id="titoloStudioInput" required="true" forceSelection="true"
+							value="#{fbSchedaFormBean.fbSchedaFabbisogno.deTitolo}"
+							completeMethod="#{utilsBean.completeDeTitolo}" var="titolo"
+							itemLabel="#{titolo.descrizione}" itemValue="#{titolo}"
+							converter="deTitoloDTOConverter" requiredMessage="Il titolo di studio è obbligatorio"
+							minQueryLength="2" maxResults="10" emptyMessage="Nessun titolo di studio trovato">
+						</p:autoComplete>
+						<p:watermark for="titoloStudioInput" value="Scrivi le prime lettere..." />
+						<p:message for="titoloStudioInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Titolo di studio" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.deTitolo.descrizione}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="etaMinInput" value="Età minima" styleClass="block-label" />
+						<p:inputText id="etaMinInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.etaMin}" 
+							converterMessage="Il valore deve essere un numero" />
+						<p:message for="etaMinInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Età minima" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.etaMin}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="etaMaxInput" value="Età massima" styleClass="block-label" />
+						<p:inputText id="etaMaxInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.etaMax}" 
+							converterMessage="Il valore deve essere un numero" />
+						<p:message for="etaMaxInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Età massima" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.etaMax}
+					</ui:fragment>
+				</td>
+			</tr>
+		</table>
+		<div style="width: 80%">
+			<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+				<p:outputLabel for="attivitaDescrInput" value="Descrizione attività da svolgere" styleClass="block-label" />
+				<p:inputTextarea id="attivitaDescrInput" rows="3" maxlength="2000"  counter="descrizione" counterTemplate="{0} caratteri rimanenti."
+					value="#{fbSchedaFormBean.fbSchedaFabbisogno.attivitaDescr}" required="true"
+					requiredMessage="La descrizione dell'attività è obbligatoria" />
+					<h:outputText id="descrizione"/>
+				<p:message for="attivitaDescrInput" />
+			</ui:fragment>
+			<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+				<p:outputLabel value="Descrizione attività da svolgere" styleClass="block-label" />
+				#{fbSchedaFormBean.fbSchedaFabbisogno.attivitaDescr}
+			</ui:fragment>
+		</div>
+	</fieldset>
+	<fieldset>
+		<legend>Sede svolgimento tirocinio</legend>
+		<table style="width: 100%;">
+			<tr>
+			
+				<td style="width: 25%;">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="comuneInput" value="Comune" styleClass="block-label" />
+						<p:autoComplete id="comuneInput" required="true" forceSelection="true"
+							value="#{fbSchedaFormBean.fbSchedaFabbisogno.deComune}"
+							completeMethod="#{utilsBean.completeDeComuneValido}" var="comune"
+							itemLabel="#{comune.descrizione}" itemValue="#{comune}"
+							converter="deComuneDTOConverter" requiredMessage="Il comune è obbligatorio"
+							minQueryLength="2" maxResults="10" emptyMessage="Nessun comune trovato">
+							<p:ajax event="itemSelect" process="@this" update="@this capInput"
+								listener="#{fbSchedaFormBean.onComuneSelected}" />
+						</p:autoComplete>
+						<p:watermark for="comuneInput" value="Scrivi le prime lettere..." />
+						<p:message for="comuneInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Comune" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.deComune.descrizione}
+					</ui:fragment>
+				</td>
+				<td style="width: 25%;">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="capInput" value="CAP" styleClass="block-label" />
+						<p:inputMask id="capInput" required="true" maxlength="5" mask="9?9999"
+							value="#{fbSchedaFormBean.fbSchedaFabbisogno.cap}" 
+							requiredMessage="Il CAP è obbligatorio"/>
+						<p:message for="capInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="CAP" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.cap}
+					</ui:fragment>
+				</td>
+				<td style="width: 25%;">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="indirizzoInput" value="Indirizzo" styleClass="block-label" />
+						<p:inputText id="indirizzoInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.indirizzo}" 
+							required="true" requiredMessage="L'indirizzo è obbligatorio" maxlength="100" />
+						<p:message for="indirizzoInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Indirizzo" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.indirizzo}
+					</ui:fragment>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+	<fieldset>
+		<legend>Tutor soggetto ospitante</legend>
+		<table style="width: 80%;">
+			<tr>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="nomeTutorInput" value="Nome" styleClass="block-label" />
+						<p:inputText id="nomeTutorInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.nomeTutor}" 
+							required="true" requiredMessage="Il nome del tutor è obbligatorio" maxlength="50"  />
+						<p:message for="nomeTutorInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Nome" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.nomeTutor}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="cognomeTutorInput" value="Cognome" styleClass="block-label" />
+						<p:inputText id="cognomeTutorInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.cognomeTutor}" 
+							required="true" requiredMessage="Il cognome del tutor è obbligatorio" maxlength="50" />
+						<p:message for="cognomeTutorInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Cognome" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.cognomeTutor}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="emailTutorInput" value="Email" styleClass="block-label" />
+						<p:inputText id="emailTutorInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.emailTutor}" 
+							required="false" requiredMessage="La mail del tutor è obbligatoria" maxlength="255">
+							<p:ajax event="blur" update="emailTutorInputMessage"/>
+							<f:validator validatorId="emailValidator"></f:validator>
+						</p:inputText>	
+						<p:message for="emailTutorInput" id="emailTutorInputMessage"/>
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Email" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.emailTutor}
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode() }">
+						<p:outputLabel for="finalitaDescr" value="Motivazione/finalità del tirocinio" styleClass="block-label" />
+						<p:inputTextarea id="finalitaDescr" rows="4" maxlength="2000" style="width:98%;"
+							value="#{fbSchedaFormBean.fbSchedaFabbisogno.finalitaDescr}"  counter="motivazione" counterTemplate="{0} caratteri rimanenti."/>
+					   <h:outputText id="motivazione"/>		
+						<p:message for="finalitaDescr" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Motivazione/finalità del tirocinio" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.finalitaDescr}
+					</ui:fragment>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+	<fieldset>
+		<legend>Altre informazioni</legend>
+		<table style="width: 100%;">
+			<tr>
+				<td style="width: 50%;">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel for="competenzeRicInput" value="Competenze richieste(che il candidato deve già possedere)" styleClass="block-label" />
+						<p:inputTextarea id="competenzeRicInput" rows="4" maxlength="2000" style="width:95%;"
+							value="#{fbSchedaFormBean.fbSchedaFabbisogno.infoCompetenzeRichieste}" counter="display" counterTemplate="{0} caratteri rimanenti."/>
+							<h:outputText id="display" />
+						<p:message for="competenzeRicInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Competenze richieste" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.infoCompetenzeRichieste}
+					</ui:fragment>
+				</td>
+				<td style="width: 50%;">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel for="competenzeBaseInput" value="Competenze di base da sviluppare entro fine tirocinio" 
+							styleClass="block-label" />
+						<p:inputTextarea id="competenzeBaseInput" rows="4" maxlength="2000" style="width:95%;"
+							value="#{fbSchedaFormBean.fbSchedaFabbisogno.infoCompetenzeBase}" counter="display1" counterTemplate="{0} caratteri rimanenti."/>
+							<h:outputText id="display1" />
+						<p:message for="competenzeBaseInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Competenze di base da sviluppare entro fine tirocinio" 
+							styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.infoCompetenzeBase}
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel for="competenzeTecInput" value="Competenze tecnico-professionali da sviluppare durante il tirocinio" 
+							styleClass="block-label" />
+						<p:inputTextarea id="competenzeTecInput" rows="4" maxlength="2000" style="width:95%;"
+							value="#{fbSchedaFormBean.fbSchedaFabbisogno.infoCompetenzeTecniche}" counter="display2" counterTemplate="{0} caratteri rimanenti."/>
+						<h:outputText id="display2" />	
+						<p:message for="competenzeTecInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Competenze tecnico-professionali da sviluppare durante il tirocinio" 
+							styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.infoCompetenzeTecniche}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel for="competenzeTrasvInput" value="Competenze trasversali da sviluppare durante il tirocinio" 
+							styleClass="block-label" />
+						<p:inputTextarea id="competenzeTrasvInput" rows="4" maxlength="2000" style="width:95%;"
+							value="#{fbSchedaFormBean.fbSchedaFabbisogno.infoCompetenzeTrasversali}" counter="display3" counterTemplate="{0} caratteri rimanenti."/>
+							<h:outputText id="display3"/>
+						<p:message for="competenzeTrasvInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Competenze trasversali da sviluppare durante il tirocinio" 
+							styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.infoCompetenzeTrasversali}
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel for="percFormativoInput" value="Descrizione di un eventuale percorso formativo (durata, modalità, contenuti...)" 
+							styleClass="block-label" />
+						<p:inputTextarea id="percFormativoInput" rows="4" maxlength="2000" style="width:95%;"
+							value="#{fbSchedaFormBean.fbSchedaFabbisogno.infoPercorso}" counter="display4" counterTemplate="{0} caratteri rimanenti."/>
+							<h:outputText id="display4"/>
+						<p:message for="percFormativoInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Descrizione di un eventuale percorso formativo (durata, modalità, contenuti...)" 
+							styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.infoPercorso}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel for="indennitaInput" value="Eventuale ulteriore indennità di partecipazione" 
+							styleClass="block-label" />
+						<p:inputTextarea id="indennitaInput" rows="4" maxlength="2000" style="width:95%;"
+							value="#{fbSchedaFormBean.fbSchedaFabbisogno.infoIndennita}" counter="display5" counterTemplate="{0} caratteri rimanenti."/>
+						<h:outputText id="display5"/>	
+						<p:message for="indennitaInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Eventuale ulteriore indennità di partecipazione" 
+							styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.infoIndennita}
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel for="facilitazioniInput" value="Altre facilitazioni (mensa, trasporto...)" 
+							styleClass="block-label" />
+						<p:inputTextarea id="facilitazioniInput" rows="4" maxlength="2000" style="width:95%;"
+							value="#{fbSchedaFormBean.fbSchedaFabbisogno.infoFacilitazione}" counter="display6" counterTemplate="{0} caratteri rimanenti."/>
+							<h:outputText id="display6"/>
+						<p:message for="facilitazioniInput" />					 	
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Altre facilitazioni (mensa, trasporto...)" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.infoFacilitazione}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="orarioInput" value="Orario delle attività del tirocinio" 
+							styleClass="block-label" />
+						<p:inputTextarea id="orarioInput" rows="4" maxlength="2000" style="width:95%;" 
+							value="#{fbSchedaFormBean.fbSchedaFabbisogno.infoOrario}" counter="display7" counterTemplate="{0} caratteri rimanenti."/>
+					   <h:outputText id="display7" />		
+						<p:message for="orarioInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Orario delle attività del tirocinio" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.infoOrario}
+					</ui:fragment>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+</ui:composition>

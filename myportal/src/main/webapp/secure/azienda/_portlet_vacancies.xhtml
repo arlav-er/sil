@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" template="../../template/template_portlet.xhtml">
+
+	<ui:param name="portletCssClass" value="portletVacancies" />
+
+	<ui:define name="portlet_title">
+		<h:outputText value="#{msg['azienda.portlet.vacancies.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="portlet_content">
+		<h:panelGroup styleClass="curriculum_title" layout="block">
+			<h:outputText value="#{msg['azienda.portlet.vacancies.descrizione']}" escape="false" />
+		</h:panelGroup>
+		<ui:fragment rendered="#{not aziendaHomeBean.isVacanciesAbilitate()}">
+			<hr />
+			<a href="#{sessionBean.getUrlMyAccount()}/secure/account/edit"> Certifica il tuo account per l'accesso ai
+				servizi. </a>
+		</ui:fragment>
+
+		<ui:fragment rendered="#{aziendaHomeBean.isVacanciesAbilitate()}">
+			<h:form id="vacancies_form">
+				<ui:repeat var="vacancy" value="#{aziendaHomeBean.vacancies}">
+					<div class="ui-widget-content ui-corner-all cv-element">
+						<div style="float: left; width: 315px; margin: 5px;">
+							<h:outputLabel for="profilo_richiesto" value="Profilo richiesto:" />
+							<b> <h:link
+									rendered="#{vacancy.aziendaPrincipale and not vacancy.fromClicLavoro and not vacancy.isNonModificabile()}"
+									outcome="/secure/azienda/vacancies/edit" title="Modifica">
+									<h:outputText id="profilo_richiesto" value="#{vacancy.attivitaPrincipale}" />
+									<f:param name="id" value="#{vacancy.id}" />
+								</h:link> <h:outputText value="#{vacancy.attivitaPrincipale}"
+									rendered="#{not vacancy.aziendaPrincipale or vacancy.fromClicLavoro or vacancy.isNonModificabile()}" />
+							</b><br />
+							<h:outputLabel for="data_scadenza" value="Data scadenza:" />
+							<b><h:outputText id="data_scadenza" value="#{vacancy.scadenzaPubblicazione}">
+									<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+								</h:outputText></b> <br />
+							<h:outputLabel for="numero_candidati" value="Numero candidati:" />
+							<b><h:outputText id="numero_candidati" value="#{vacancy.numCandidati}" /> </b><br />
+							<h:outputLabel for="inviata_cliclavoro" value="Ambito diffusione offerta:"
+								rendered="#{aziendaHomeBean.checkAbilitazioneVisibile('cliclavoro')}" />
+							<ui:fragment rendered="{aziendaHomeBean.checkAbilitazioneVisibile('cliclavoro')}">
+								<b><h:outputText id="inviata_cliclavoro" value="#{vacancy.flagInvioCl ? 'Nazionale' : 'Regionale'}" /></b>
+								<br />
+								
+							</ui:fragment>
+							<ui:fragment rendered="#{utilsBean.isPAT()}">
+								<h:outputLabel value="Stato:"></h:outputLabel>
+								<b><h:outputText value="#{vacancy.getCodStatoVacancyEnum().getDescrizione()}" /></b>
+								<br />
+							</ui:fragment>
+
+						</div>
+
+						<div style="float: right; margin: 13px 5px;">
+							<ui:fragment rendered="#{vacancy.proprietary}">
+								<h:link styleClass="buttonStyle yellowButton " outcome="/secure/azienda/candidature/visualizza_lista.xhtml"
+									title="Visualizza le candidature">
+									<f:param name="id" value="#{vacancy.id}" />
+									<span class="ui-icon ui-icon-contact fix_icon" />
+								</h:link>
+							</ui:fragment>
+
+							<a tabindex="0" class="selectAction buttonStyle yellowButton " title="Scegli un'azione"> <span
+								class="ui-icon ui-icon-triangle-1-s fix_icon" />
+							</a>
+						</div>
+
+						<ul class="option-menu">
+							<li><h:link tabindex="0" outcome="/secure/azienda/vacancies/visualizza"
+									onclick="save_last_action(this,'Apri')">
+									<f:param name="id" value="#{vacancy.id}" />
+									<span class="ui-icon ui-icon-document fix_icon" />
+											Visualizza
+										</h:link></li>
+							<ui:fragment rendered="#{vacancy.aziendaPrincipale and !vacancy.fromClicLavoro and !vacancy.isNonModificabile()}">
+								<li><h:link tabindex="0" outcome="/secure/azienda/vacancies/edit" title="Modifica"
+										onclick="save_last_action(this,'Modifica')">
+										<f:param name="id" value="#{vacancy.id}" />
+										<span class="ui-icon ui-icon-pencil fix_icon" />
+											Modifica
+										</h:link></li>
+							</ui:fragment>
+							<ui:fragment rendered="#{vacancy.isInLavorazione() or (vacancy.isInPubblica() and !utilsBean.isPAT())}">
+								<li><a tabindex="0" href="#"
+									onclick="return document.getElementById('portlet-#{portlet.id}:vacancies_delete').open({vacid: #{vacancy.id}},this);">
+										<span class="ui-icon ui-icon-trash fix_icon" /> Elimina
+								</a></li>
+							</ui:fragment>
+							<li><a tabindex="0" href="#"
+								onclick="return document.getElementById('portlet-#{portlet.id}:vacancies_copy').open({vacid: #{vacancy.id},vacdescr: '#{vacancy.attivitaPrincipaleEscape}'},this);">
+									<span class="ui-icon ui-icon-copy fix_icon" /> Copia
+							</a></li>
+							<li><h:link tabindex="0" outcome="/secure/azienda/candidature/visualizza_lista.xhtml"
+									id="visualizza_candidature_button" title="Visualizza le candidature"
+									onclick="save_last_action(this,'Candidature')">
+									<f:param name="id" value="#{vacancy.id}"></f:param>
+									<span class="ui-icon ui-icon-contact fix_icon"></span>
+											Candidature										
+										</h:link></li>
+						</ul>
+						<div style="clear: both;"></div>
+					</div>
+				</ui:repeat>
+
+				<script type="text/javascript">
+					$(function() {
+	
+						var options = {};
+						if (#{fn:length(aziendaHomeBean.vacancies)} > 5) {
+							options = {'bPaginate' : true, 
+									'bFilter' : true,
+									'bStateSave': false, 
+							        'iDisplayStart': 0,
+							        'iDisplayLength': 5,
+									'bInfo' : true, 
+									'oLanguage': {
+											'sInfo': 'Offerte da _START_ a _END_ di _TOTAL_'
+									 }};
+						}
+	
+						generateActionMenus("[id$=vacancies_form] .selectAction");					
+						//generateDataTable(jq('portlet-#{portlet.id}:vacancies_form:va_list'),options);
+		
+						disegnaBottoni();
+					});
+	
+					var openCopy = function(params) {
+						var itemId = params.vacid;
+						var itemDescrizione = params.vacdescr;
+						var copyItemDescrizione = itemDescrizione;
+						$('[id$="vacancies_copy\:modal_form\:descrizione_copia"]').val(copyItemDescrizione);
+						$('[id$="vacancies_copy\:modal_form\:id_copia"]').val(itemId);
+					}
+					
+					var openDelete = function(params) {
+						var itemId = params.vacid;
+						$('[id$="vacancies_delete\:modal_form\:id_delete"]').val(itemId);
+					}
+				</script>
+			</h:form>
+
+			<br />
+			<h:link styleClass="buttonStyle" outcome="/secure/azienda/vacancies/ricerca" value="Mostra tutte le offerte" />
+
+			<h:link style="margin-left:2em" styleClass="buttonStyle" outcome="/secure/azienda/vacancies/nuovo"
+				value="Inserisci un'offerta di lavoro" />
+			<br />
+
+			<h:link style="margin-top:1em" styleClass="buttonStyle"
+				outcome="/secure/azienda/candidature/visualizza_lista_autocandidature"
+				value="Visualizza l'elenco delle autocandidature">
+				<f:param name="id" value="#{aziendaHomeBean.aziendaInfoDTO.id}" />
+			</h:link>
+
+			<cc:modalDialog id="vacancies_delete" title="Elimina" openF="openDelete"
+				message="Sei sicuro di voler eliminare l'elemento?" actionSubmit="#{aziendaHomeBean.deleteVacancy}"
+				submitLabel="Elimina" renderAjax=":portlet-#{portlet.id}:vacancies_form :home_messages">
+				<h:inputHidden id="id_delete"></h:inputHidden>
+				<h:outputText value="#{cc.attrs.message}"></h:outputText>
+			</cc:modalDialog>
+
+			<cc:modalDialog id="vacancies_copy" title="Copia" openF="openCopy" actionSubmit="#{aziendaHomeBean.copyVacancy}"
+				submitLabel="Copia" renderAjax=":portlet-#{portlet.id}:vacancies_form :home_messages">
+				<h:inputHidden id="id_copia"></h:inputHidden>
+				<h:inputHidden id="descrizione_hidden"></h:inputHidden>
+				<h:outputText value="Descrizione"></h:outputText>
+				<h:inputText id="descrizione_copia"></h:inputText>
+			</cc:modalDialog>
+		</ui:fragment>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components" xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui" template="../../template/main_primefaces.xhtml">
+
+	<ui:define name="title">
+		<h:outputText value="#{txt['cittadino.app.disp_orientamento_base.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputStylesheet library="css" name="#{sessionBean.cssStyle}/myportalPrimeFacesCittOrientamentoBase.css" />
+		<h:form id="disponibilitaAppuntamentoCittOrientamentoBaseForm">
+			<div class="container-div">
+				<div style="margin: 1.5em;">
+					<h:panelGroup layout="block" rendered="#{not empty disponibilitaCittOrientamentoBaseBean.slotDisponibili}">
+						<table style="border-spacing: 1.5em; width: 50%;">
+							<tr>
+								<td>
+									<p:outputLabel for="cellIn" value="Cellulare" />
+									<br />
+									<p:inputText id="cellIn" required="false" maxlength="16"
+										requiredMessage="Il numero di cellulare è obbligatorio."
+										value="#{disponibilitaCittOrientamentoBaseBean.utente.cellulare}" />
+									<br />
+									<p:message for="cellIn" display="text" />
+								</td>
+								<td>
+									<h:outputLabel>Inserisci il numero di cellulare per ricevere un SMS di notifica se il Centro per l'Impiego fornisce tale servizio.</h:outputLabel>
+								</td>
+							</tr>
+						</table>
+					</h:panelGroup>
+
+					<h:panelGroup layout="block" id="no_slot_div"
+						rendered="#{empty disponibilitaCittOrientamentoBaseBean.slotDisponibili}">
+						<h2>
+							<h:outputText value="Siamo spiacenti ma non risultano disponibilità." />
+						</h2>
+					</h:panelGroup>
+					<h:panelGroup layout="block" id="slot_div"
+						rendered="#{not empty disponibilitaCittOrientamentoBaseBean.slotDisponibili}">
+						<h:outputText value="Di seguito gli appuntamenti disponibili del giorno " />
+						<h:outputText value="#{disponibilitaCittOrientamentoBaseBean.dataCorrentePerSlot}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+						<h:outputText value=" per il CPI di #{disponibilitaCittOrientamentoBaseBean.deCpiDTO.descrizione}." />
+						<br />
+
+						<h:outputText
+							value="Centro per l'impiego di #{disponibilitaCittOrientamentoBaseBean.deCpiDTO.descrizione} - #{disponibilitaCittOrientamentoBaseBean.deCpiDTO.indirizzo}." />
+						<br />
+
+						<h:outputText
+							value="Per prenotare un appuntamento, selezionare quello desiderato e premere il pulsante &quot;Prenota&quot;." />
+						<br />
+
+						<h:dataTable id="slot_list" styleClass="dataTable" style="margin: 1.5em 0em;"
+							value="#{disponibilitaCittOrientamentoBaseBean.slotDisponibili}"
+							columnClasses="notSortable, notSortable, notSortable, notSortable sixty, notSortable fifteen" var="slot">
+							<h:column>
+								<h:selectOneRadio onclick="dataTableSelectOneRadio(this);">
+									<f:selectItem itemValue="#{slot.identificativoSlot}" />
+									<f:ajax listener="#{disponibilitaCittOrientamentoBaseBean.slotValuechange(slot.identificativoSlot)}" />
+								</h:selectOneRadio>
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="Data" />
+								</f:facet>
+
+								<h:outputText value="#{disponibilitaCittOrientamentoBaseBean.XMLGregorianCalendarToDate(slot.dataAppuntamento)}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</h:outputText>
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="Orario" />
+								</f:facet>
+
+								<h:outputText value="#{slot.oraAppuntamento}" />
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="Presso" />
+								</f:facet>
+
+								<h:outputText value="#{slot.ambiente}" rendered="#{not empty slot.ambiente}" />
+								<h:outputText value="Centro per l'Impiego" rendered="#{empty slot.ambiente}" />
+							</h:column>
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="Sigla Op." />
+								</f:facet>
+
+								<h:outputText value="#{slot.siglaOperatore}" />
+							</h:column>
+						</h:dataTable>
+					</h:panelGroup>
+
+					<p:commandButton rendered="#{not empty disponibilitaCittOrientamentoBaseBean.slotDisponibili}" id="prenotaButton"
+						value="Prenota" styleClass="commandButtonMargin" alt="Prenota"
+						action="#{disponibilitaCittOrientamentoBaseBean.prenotaAppuntamento}" title="Prenota" ajax="false">
+					</p:commandButton>
+					<h:panelGroup id="nextDayPanel">
+						<p:commandButton rendered="#{not empty disponibilitaCittOrientamentoBaseBean.slotDisponibili}"
+							id="giornoSuccessivoButton" styleClass="commandButtonMargin" value="Cerca disponibilità nei giorni successivi"
+							alt="Cerca disponibilità nei giorni successivi"
+							action="#{disponibilitaCittOrientamentoBaseBean.giornoSuccessivo}"
+							title="Cerca disponibilità nei giorni successivi" update="@form" process="@this">
+						</p:commandButton>
+					</h:panelGroup>
+					<br />
+					<p:button rendered="#{not empty disponibilitaCittOrientamentoBaseBean.slotDisponibili}" id="nuovoButton"
+						value="Effettua nuova ricerca" styleClass="commandButtonMargin" alt="Effettua nuova ricerca"
+						outcome="/secure/utente/orientamento_base/prenota_appuntamento.xhtml" title="Effettua nuova ricerca"></p:button>
+				</div>
+			</div>
+
+			<script>
+				//<![CDATA[
+				function dataTableSelectOneRadio(radio) {
+					var radioId = radio.name.substring(radio.name
+							.lastIndexOf(':'));
+
+					for (var i = 0; i < radio.form.elements.length; i++) {
+						var element = radio.form.elements[i];
+
+						if (element.name.substring(element.name
+								.lastIndexOf(':')) == radioId) {
+							element.checked = false;
+						}
+					}
+
+					radio.checked = true;
+				}
+				//]]>
+			</script>
+		</h:form>
+		<h:form>
+			<p:commandButton id="scrivaniaButton" ajax="false" styleClass="commandButtonMargin redButton"
+				value="Torna alla Scrivania" alt="Torna alla Scrivania" icon="ui-icon-arrowthick-1-w"
+				action="#{appuntamentoCittOrientamentoBaseBean.redirectHome}" title="Torna alla Scrivania" />
+		</h:form>
+	</ui:define>
+</ui:composition>

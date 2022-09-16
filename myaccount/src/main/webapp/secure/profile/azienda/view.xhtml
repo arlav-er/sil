@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:pretty="http://ocpsoft.com/prettyfaces">
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{sessionLogger.grantAccessFor(sessionLogger.getAziendaAccess())}" />
+	</f:metadata>
+	<ui:fragment rendered="#{not empty param['saveSucess']}">
+		<script>
+			sucessMessage("#{ui['msg.updated']}")
+		</script>
+	</ui:fragment>
+	<div class="container-fluid">
+		<div class="panel-body profile-information animated fadeIn">
+			<div class="col-md-2">
+				<div class="profile-pic text-center">
+					<h:panelGroup id="userProfilePic" styleClass="userProfilePic animated bounceIn" layout="block">
+						<h:panelGroup rendered="#{empty aziendaViewBean.aziendaInfo.logo}">
+							<h:graphicImage library="commons" name="images/profilePic.jpg"></h:graphicImage>
+						</h:panelGroup>
+						<h:panelGroup rendered="#{not empty aziendaViewBean.aziendaInfo.logo}">
+							<pretty:urlbuffer var="imgURL" mappingId="profilePicture">
+								<f:param id="type" value="azienda" />
+								<f:param id="id" value="#{aziendaViewBean.aziendaInfo.pfPrincipal.idPfPrincipal}" />
+								<f:param id="username" value="#{aziendaViewBean.aziendaInfo.pfPrincipal.username}" />
+							</pretty:urlbuffer>
+							<div class="uk-overlay">
+								<img src="#{imgURL}?#{utils.currentTimeMillis()}" />
+								<div class="uk-overlay-area delete">
+									<div class="uk-overlay-area-content">
+										<p:commandLink actionListener="#{aziendaViewBean.removeProfilePic}" update="userProfilePic">
+											<i class="fa fa-times fa-4"></i>
+										</p:commandLink>
+									</div>
+								</div>
+							</div>
+						</h:panelGroup>
+					</h:panelGroup>
+					<div class="user-image-btn">
+						<span class="btn ui-button btn-primary btn-file"> <i class="fa fa-pencil"></i>
+						</span>
+						<h:form id="uploadImageForm" enctype="multipart/form-data">
+							<p:fileUpload styleClass="advancedHiddenFileUpload" widgetVar="uploadFile" auto="true" multiple="false" process="@this"
+								allowTypes="/(\.|\/)(gif|jpe?g|png)$/" fileUploadListener="#{aziendaViewBean.handleFileUpload}" update=":userProfilePic"
+								sizeLimit="#{validation['file.size']}" invalidSizeMessage="#{validation['file.invalidSizeMessage']}"
+								invalidFileMessage="#{validation['file.invalidFileMessage']}" messageTemplate="."
+								onstart="$('.userProfilePic').removeClass('animated').addClass('animated bounceOut'); PF('ajaxStatusVar').trigger('start')"
+								oncomplete="PF('ajaxStatusVar').trigger('complete')">
+							</p:fileUpload>
+						</h:form>
+					</div>
+					<div id="editUserUploadMessages"></div>
+					<h3>
+						#{aziendaViewBean.aziendaInfo.ragioneSociale} <br />
+					</h3>
+					<pretty:urlbuffer var="editProfileURL" mappingId="editProfile" />
+
+					<h:panelGroup rendered="#{aziendaViewBean.aziendaInfo.pfPrincipal.flagAbilitatoSare}">
+						<div class="uk-button-dropdown" data-uk-dropdown="menu">
+							<button class="uk-button ui-button btn btn-primary">
+								#{ui['shared.azioni']} <i class="uk-icon-caret-down"></i>
+							</button>
+							<div class="uk-dropdown">
+								<ul class="uk-nav uk-nav-dropdown">
+									<li><a href="#{editProfileURL}">#{ui['prof.rettificaDati']} </a></li>
+									<li><a href="#{aziendaViewBean.urlStampaSare}">#{ui['prof.stampaSARE']}</a></li>
+									<li><p:commandLink value="#{ui['prof.changePassword']}" update=":changePasswordDlg"
+											oncomplete="PF('changePasswordDlgWV').show()"></p:commandLink></li>
+								</ul>
+							</div>
+						</div>
+					</h:panelGroup>
+
+					<h:panelGroup rendered="#{not aziendaViewBean.aziendaInfo.pfPrincipal.flagAbilitatoSare}">
+						<a href="#{editProfileURL}" class="ui-button btn btn-primary"><i class="fa fa-edit"></i> #{ui['shared.modifica']}</a>
+						<br /> <br />
+					</h:panelGroup>
+
+				</div>
+			</div>
+
+			<div class="col-md-5">
+				<div class="panel panel-warning">
+					<div class="panel-heading">#{ui['prof.datiAzienda']}</div>
+					<div class="panel-body">
+						<ui:include src="view/_datiAzienda.xhtml" />
+					</div>
+				</div>
+			</div>
+			<div class="col-md-5">
+				<div class="panel panel-warning">
+					<div class="panel-heading">#{ui['prof.datiAccount']}</div>
+					<div class="panel-body">
+						<ui:include src="view/_datiAccount.xhtml" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel-body ricSare">
+			<h:panelGroup>
+				<ui:include src="view/_ricSARE.xhtml" />
+			</h:panelGroup>
+		</div>
+	</div>
+
+	<ui:include src="view/_changePasswordDialog.xhtml"></ui:include>
+	<script>
+	$(document).ready(function(){
+		$('.ui-fileupload-buttonbar span input[type=file]').addClass('uploadBtn');
+		$('.btn-file').append($('.uploadBtn'))
+		$('.uploadBtn').change(function() {
+			var a = $('.ui-fileupload-content').html(); var b = $('#editUserUploadMessages').html(a);
+		}) 
+		ieMenu();
+	});	
+	function ieMenu() {
+		if($.browser.msie) {
+			$('.profile-pic .uk-button-dropdown').after($('.profile-pic .uk-dropdown').html());
+			$('.profile-pic .uk-button-dropdown').remove();			
+		}
+	}	 
+	</script>
+</ui:composition>
+

@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/tab.xhtml">
+
+	<ui:define name="tabcontent">
+		<ui:param name="bean" value="#{atipiciAziendaBean}" />
+		
+		<style type="text/css">
+			a.page-link { text-decoration: none; }
+		</style>
+		
+		<h:outputText escape="false"
+				value="#{msg['azienda.servizi_atipico.consulenza_tematica.descrizione']}" />
+		
+		<cc:waiting id="tematicaInsertLoader" hidden="true" waitMessage="Creazione pratica..." />	
+		<cc:messages id="tematicaMessages" />
+				
+		<h:form id="tematicaListForm">
+			<div style="display:none;">
+				<h:inputHidden id="pageValue" value="#{bean.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{bean.changePage}" value="DUMMY FOR PAGINATION">
+					<f:ajax execute=":tematicaListForm:pageValue" 
+						render=":tematicaListForm:tabella :tematicaDetailForm" />
+				</h:commandButton>
+			</div>
+
+			<ui:fragment rendered="#{not (bean.status == 'insert')}">
+				<script type="text/javascript">
+					$(function() {							
+						$(jq("tematicaPaginationBar")).pagination({							    
+							pages: #{bean.paginationHandler.pages()},						       
+							cssStyle: 'light-theme',
+							prevText: 'Prec.',
+							nextText: 'Succ.',
+							onPageClick: function (pageNumber, event) {							        
+								document.getElementById('tematicaListForm:pageValue').value = pageNumber;
+							  	document.getElementById('tematicaListForm:pageCommand').click();
+							    $(jq("tematicaDetailForm")).hide();
+							    $(jq("tematicaListForm:tabella")).css("display", "none");					            
+							    $(jq("tematicaListForm:paginationLoader")).css("display", "block");
+							    $(jq("tematicaListForm:paginationLoader")).fadeIn();
+							}
+						});
+					});
+				</script>
+				
+				<div id="tematicaPaginationBar" class="widget_container ui-tabs ui-widget-content ui-corner-all" />
+				<br />
+				
+				<cc:waiting id="paginationLoader" hidden="true" waitMessage="Caricamento..." />	
+				
+				<h:panelGroup layout="block" id="tabella" styleClass="dataTables_wrapper">
+					<table class="dataTable">
+						<tr>
+							<th class="ui-state-default"></th>
+							<th class="ui-state-default">ID</th>
+							<th class="ui-state-default">Titolo</th>
+							<th class="ui-state-default">Quesito</th>
+							<th class="ui-state-default">Tipo lavoro</th>
+							<th class="ui-state-default">Inviata il:</th>
+							<th class="ui-state-default">Risposta ricevuta il:</th>
+						</tr>
+						
+						<ui:repeat value="#{bean.pratiche}" var="pratica" varStatus="status">
+							<tr>
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<span
+											class="ui-icon #{pratica.daLeggere ? 'ui-icon-mail-closed' : 'ui-icon-mail-open'}" />
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{pratica.id} &nbsp;"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+									<h:outputText value="#{pratica.oggetto} &nbsp;"
+										styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+									<h:outputText value="#{pratica.corpo} &nbsp;"
+										styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+									<h:outputText value="#{pratica.tipoLavoro} &nbsp;"
+										styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{empty pratica.dtInvio ? '&nbsp;' : pratica.dtInvio}"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}">
+											<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+										</h:outputText>
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+									<h:outputText value="#{empty pratica.dtRisposta ? '&nbsp;' : pratica.dtRisposta}"
+										styleClass="#{pratica.daLeggere ? 'boldText' : ''}">
+										<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+									</h:outputText>
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":tematicaListForm:tabella :tematicaDetailForm" />
+									</h:commandLink>
+								</td>
+							</tr>
+						</ui:repeat>
+					</table>
+					<script>
+						disegnaBottoni();
+				      	$(jq("tematicaListForm:paginationLoader")).hide();
+					</script>
+				</h:panelGroup>
+				<br />
+				
+				<h:commandLink styleClass="newAlertButton" value="Nuova richiesta"
+					action="#{bean.setStatus('insert')}">
+					<f:ajax execute="@this" render=":tematicaListForm :tematicaDetailForm :tematicaInsertForm" />
+				</h:commandLink>
+			</ui:fragment>
+		</h:form>
+		<br />
+		
+		<cc:waiting id="tematicaDetailLoader" hidden="true" waitMessage="Caricamento..." />	
+		
+		<h:form id="tematicaDetailForm">
+			<h:panelGroup styleClass="insertPanel" layout="block" rendered="#{bean.detail and bean.status == 'list'}">
+
+				<ui:include src="/secure/atipici/corpo_pratica_atipici.xhtml">
+					<ui:param name="readonly" value="true" />
+					<ui:param name="abean" value="#{bean}" />
+					<ui:param name="pratica" value="#{bean.messaggio}" />
+				</ui:include>
+
+				<h:panelGroup id="rispostePanel" layout="block" rendered="#{not empty bean.messaggio.risposte}">
+					<ui:repeat var="risposta" value="#{bean.messaggio.risposte}">
+						<div class="messageDiv">
+						
+							<ui:fragment rendered="#{bean.messaggio.praticaRifiutata}">
+								<div class="boldText">La pratica è stata rifiutata</div>
+								<br />
+							</ui:fragment>
+							
+							<h:outputText styleClass="mittente"
+								value="Risposta di #{risposta.mittente} - inviata il " />
+							<h:outputText value="#{risposta.dtmIns}" styleClass="mittente">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+							</h:outputText>
+							<br />
+							
+							<div class="corpo">
+								<h:panelGroup layout="block" rendered="#{bean.messaggio.consulenza.corpo != null}">
+									<h:outputText value="#{bean.messaggio.consulenza.corpo}" />
+									<br />
+								</h:panelGroup>
+								<h:outputText value="#{risposta.corpo}" />
+							</div>
+							<br />
+							
+							<cc:upload readonly="#{true}" label="Allegato"
+								rendered="#{not empty risposta.allegati}"
+								idAllegato="#{risposta.allegati[0].id}"
+								value="#{risposta.allegati[0].filename}" />
+						</div>
+					</ui:repeat>
+				</h:panelGroup>
+				<br />
+
+				<h:commandLink styleClass="marginButton closeButton" action="#{bean.closeDetail}" value="Chiudi">
+					<f:ajax execute="@this" render=":tematicaDetailForm" onevent="onHideDetail" />
+				</h:commandLink>
+				
+				<script type="text/javascript">
+					$(jq("tematicaDetailLoader")).hide();
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+		</h:form>
+		
+		<h:form id="tematicaInsertForm">
+			<h:panelGroup layout="block" rendered="#{bean.status == 'insert'}" styleClass="insertPanel">
+
+				<div style="padding: 10px">
+					<h:outputText escape="false"
+						value="#{msg['azienda.servizi_atipico.consulenza_tematica.form']}" />
+				</div>
+
+				<ui:include src="/secure/atipici/corpo_pratica_atipici.xhtml">
+					<ui:param name="pratica" value="#{bean.richiesta}" />
+					<ui:param name="abean" value="#{bean}" />
+				</ui:include>
+				<br />
+
+				<div>
+					<h:commandLink styleClass="newRequestButton"
+						value="Invia una nuova richiesta" action="#{bean.save}">
+						<f:ajax execute="@form" onevent="onInsert" 
+							render=":tematicaListForm :tematicaDetailForm :tematicaInsertForm :tematicaMessages" />
+					</h:commandLink>
+
+					<h:commandLink styleClass="abortButton" style="margin-left:5px"
+						value="Annulla" action="#{bean.setStatus('list')}">
+						<f:ajax execute="@this" render=":tematicaListForm :tematicaDetailForm :tematicaInsertForm" />
+					</h:commandLink>
+				</div>
+				
+				<script type="text/javascript">
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+		</h:form>
+		
+		<script type="text/javascript">
+			function onShowDetail(data) {
+				if (data.status == 'begin') {
+					$(jq("tematicaDetailForm")).hide();
+					$(jq("tematicaDetailLoader")).show();
+				} else if (data.status == 'success') {
+					PrimeFaces.scrollTo("tematicaDetailForm");
+				}
+			}	
+			
+			function onHideDetail(data) {
+				if (data.status == 'begin') {
+					$(jq("tematicaDetailForm")).slideUp("slow");
+				}
+			}
+			
+			function onInsert(data) {
+				if (data.status == 'begin') {
+					$(jq("tematicaInsertForm")).hide();
+					$(jq("tematicaInsertLoader")).show();
+				}
+				else if (data.status == 'success') {
+					$(jq("tematicaInsertLoader")).hide();
+				}
+			}
+		</script>
+	</ui:define>
+</ui:composition>

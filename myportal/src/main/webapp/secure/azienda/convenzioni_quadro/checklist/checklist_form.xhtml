@@ -1,0 +1,110 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/main_primefaces.xhtml">
+<ui:param name="pagetitle" value="Inserimento/modifica checklist" />
+<ui:define name="content">
+	<div class="widget_container">
+		<h1>Compila una checklist</h1>
+		<div class="ui-widget-content ui-widget ui-corner-all">
+			<h:form id="checklistForm">
+				<ui:include src="../../../_common/convenzioni_quadro/_checklist.xhtml" />
+				
+				<div>
+					<p:commandButton value="Salva" actionListener="#{fbChecklistFormBean.save}" styleClass="margin-1em"
+						rendered="#{fbChecklistFormBean.checklist.isModificabile()}" process="@form" update="@form" 
+						oncomplete="onSalvaComplet(args)"/>
+					<p:commandButton value="Pubblica" styleClass="margin-1em" onclick="PF('confermaPubblicazioneDialogWV').show();"
+						rendered="#{fbChecklistFormBean.checklist.isModificabile()}" />
+					<p:commandButton value="Elimina" styleClass="margin-1em" onclick="PF('confermaEliminazioneDialogWV').show();"
+						rendered="#{fbChecklistFormBean.checklist.isModificabile() and not empty fbChecklistFormBean.checklist.id}" />
+					<p:button outcome="checklist_list" styleClass="margin-1em" title="Torna alle checklist" value="Torna alle checklist" />	
+				</div>
+			</h:form>
+		</div>
+		
+		<script>
+
+		function onSalvaComplet(args) {
+			if (args.success) {
+				PF('successDialogWV').show();
+			}
+		}
+		function onPubblicaComplet(args) {
+			if (args.success) {
+				PF('confermaPubblicazioneDialogWV').hide();
+				PF('pubblicaCorrettamentoWV').show();
+			}
+		}
+		
+	</script>
+	
+	</div>
+	<p:button outcome="home" styleClass="margin-1em" title="Torna alla scrivania"
+		value="Torna alla scrivania" />
+	<p:dialog id="confermaPubblicazioneDialog" widgetVar="confermaPubblicazioneDialogWV"
+		modal="true" header="Pubblicazione Checklist" width="400"><br/>
+		<p>Dopo la pubblicazione non sarà più possibile modificare la Checklist. <br/>Confermi l'operazione?</p>
+		<div class="text-center" style="padding: 10px;">
+			<p:commandButton value="Conferma" title="Conferma pubblicazione"
+				actionListener="#{fbChecklistFormBean.pubblica}" styleClass="margin-1em" 
+				update=":checklistForm" oncomplete="onPubblicaComplet(args)" />
+			<p:commandButton value="Annulla" title="Annulla" onclick="PF('confermaPubblicazioneDialogWV').hide();" />
+		</div>
+	</p:dialog>
+	
+	<p:dialog id="pubblicaCorrettamento" widgetVar="pubblicaCorrettamentoWV" modal="true" header="Checklist pubblicata" width="400"><br/>
+	  <p>Operazione eseguita con successo</p>
+	  <div class="text-center" style="padding: 10px;">
+	     <p:commandButton value="Ok" onclick="PF('pubblicaCorrettamentoWV').hide()"/>
+	  </div>
+	</p:dialog>
+	
+	<p:dialog id="confermaEliminazioneDialog" widgetVar="confermaEliminazioneDialogWV"
+		modal="true" header="Elimina checklist" width="400"><br/>
+		<p>Confermi l'eliminazione della checklist?</p>
+		<div class="text-center" style="padding: 10px;">
+			<p:commandButton value="Conferma" title="Conferma eliminazione"
+				actionListener="#{fbChecklistFormBean.elimina}" styleClass="margin-1em" 
+				update=":checklistForm" />
+			<p:commandButton value="Annulla" title="Annulla" onclick="PF('confermaEliminazioneDialogWV').hide();" />
+		</div>
+	</p:dialog>
+	
+	<p:dialog id="salvataggioDialog" widgetVar="salvataggioDialogWV" rendered="#{fbChecklistFormBean.showDialog}"
+		modal="true" header="Salvataggio Checklist" width="300"><br/>
+		<p>Checklist salvata correttamento</p>
+		<div class="text-center" style="padding: 10px;">
+			<p:commandButton value="Ok" title="Ok" onclick="PF('salvataggioDialogWV').hide();" />
+		</div>
+	</p:dialog>
+	
+	<p:dialog id="valida" widgetVar="validaWV" modal="true" width="400" header="Checklist valido"><br/>
+	   <p>Checklist Valida correttamento</p>
+	   <h:form id="dialogForm" style="padding: 10px;">
+	     <p:commandButton value="Conferma valido" title="Conferma" actionListener="#{fbChecklistFormBean.valid}"
+				styleClass="margin-1em" oncomplete="onValidation(args)"
+				process="@form :checklistForm" update="@form :checklistForm" />
+			<p:commandButton value="Annulla" title="Annulla" onclick="PF('validaWV').hide();" />
+	   </h:form>
+	</p:dialog>
+	
+	<p:dialog id="successDialog" widgetVar="successDialogWV" modal="true" width="400" header="Salvataggio Checklist"><br/>
+	    <p>Checklist salvata correttamente</p><br/><br/>
+	    <div class="text-center" style="padding: 10px;">
+	      <p:commandButton value="Ok" onclick="PF('successDialogWV').hide();"/>
+	      </div>
+	</p:dialog>	
+	<p:dialog id="failDialog" widgetVar="failDialogWV" modal="true" width="400" header="Checklist non Valida"><br/>
+	    <p>Errore durante la validazione della Checklist. Contattare l'amministratore di sistema</p>
+	    <div class="text-center" style="padding: 10px;">
+	      <p:commandButton value="Ok" onclick="PF('failDialogWV').hide();"/>
+	      </div>
+	</p:dialog>
+	
+	
+</ui:define>
+</ui:composition>

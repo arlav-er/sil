@@ -1,0 +1,52 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui">
+	<h:form id="istruzioniForm" styleClass="form-horizontal">
+		<div class="row">
+			<div class="col-md-12">
+				<h4>Istruzioni</h4>
+			</div>
+			<div class="col-sm-12 col-md-12 m-t-50">
+				<h:panelGroup id="articles" styleClass="articles">
+					<ui:include src="_articles.xhtml" />
+				</h:panelGroup>
+
+				<div
+					class="text-center add-new-btn uk-margin-top #{empty vacancyFormPfBean.vaIstruzioniSection.listaTitoliIstruzione?'hidden':''}">
+					<p:commandLink id="addNew" actionListener="#{vacancyFormPfBean.vaIstruzioniSection.addNewIstruzione}" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+						styleClass="btn btn-primary ui-button btn-addon btn-sm baby-btn"
+						onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+						oncomplete="MyPortal.Vacancy.callAddNewArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+						update="syncForm" process="@this" title="Aggiungi il titolo di studio">
+						<i class="fa fa-plus" aria-hidden="true"></i>Aggiungi titolo di studio</p:commandLink>
+				</div>
+				<h:panelGroup id="syncForm"
+					styleClass="#{empty vacancyFormPfBean.vaIstruzioniSection.listaTitoliIstruzione ?'':'hidden'} syncForm">
+					<span id="syncFormContent" class="uk-margin-top block">
+						<ui:include src="_form.xhtml" />
+					</span>
+				</h:panelGroup>
+			</div>
+		</div>
+		<h:panelGroup layout="block" styleClass="well m-t-50 text-right">
+
+			<a href="condizioniProposte" class="ui-button btn btn-primary btn-grey uk-margin-right navYuri"
+				title="#{ui['shared.shortBack']}">
+				<i class="fa fa-arrow-left" aria-hidden="true"></i>
+				Indietro
+			</a>
+			<ui:fragment rendered="#{!vacancyFormPfBean.isArchivedNoModify() and !vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}">
+				<a href="lingue" class="ui-button btn btn-primary navYuri"
+					title="#{ui['shared.continue']}"> #{ui['shared.continue']} <i
+					class="fa fa-arrow-right" aria-hidden="true"></i>
+				</a>
+			</ui:fragment>
+			<ui:fragment rendered="#{vacancyFormPfBean.isArchivedNoModify() and !vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}">
+				<a href="lingue" class="ui-button btn btn-primary navYuri disabled"
+					title="#{ui['shared.continue']}"> #{ui['shared.continue']} <i
+					class="fa fa-arrow-right" aria-hidden="true"></i>
+				</a>
+			</ui:fragment>
+		</h:panelGroup>
+	</h:form>
+</ui:composition>

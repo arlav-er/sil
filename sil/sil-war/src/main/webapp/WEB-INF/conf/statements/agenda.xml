@@ -1,0 +1,1055 @@
+<!-- STATEMENTS/AGENDA.XML -->
+
+<!-- Paolo Cavaciocchi -->
+<STATEMENT name="LISTA_AGENDA" query="SELECT CODCPI, PRGAPPUNTAMENTO, DTMDATAORA, 
+                      NUMMINUTI, CODSERVIZIO, PRGSPI, 
+                      TXTNOTE, PRGTIPOPRENOTAZIONE, STRTELRIF, 
+                      STREMAILRIF, STRTELMOBILERIF, CODEFFETTOAPPUNT, 
+                      CODESITOAPPUNT, CDNUTMOD, DTMMOD, 
+                      CDNUTINS, DTMINS, 
+                      NUMKLOAGENDA, PRGAZIENDA, PRGUNITA 
+                    FROM AG_AGENDA" />
+
+<STATEMENT name="SELECT_DETTAGLIO_AGENDA"
+	query="SELECT 
+                    PRGAPPUNTAMENTO, ag_agenda.CODCPI, 
+                    to_char(DTMDATAORA,&apos;dd/mm/yyyy&apos;) as data, 
+                    to_char(DTMDATAORA,&apos;hh24:mi&apos;) as orario,
+                    NUMORAINIZIOEFF, NUMORAFINEEFF,
+                    NUMMINUTI, CODSERVIZIO, PRGSPI, PRGSPIEFF, PRGAMBIENTE,
+                    TXTNOTE, PRGTIPOPRENOTAZIONE, STRTELRIF, 
+                    STREMAILRIF, STRTELMOBILERIF, CODEFFETTOAPPUNT, 
+                    AG_AGENDA.CODESITOAPPUNT, CODSTATOAPPUNTAMENTO, 
+                    NUMKLOAGENDA, ag_agenda.PRGAZIENDA, ag_agenda.PRGUNITA,
+                    InitCap(AN_AZIENDA.STRRAGIONESOCIALE) as strRagioneSociale, 
+                    AN_AZIENDA.STRPARTITAIVA,
+                    AN_UNITA_AZIENDA.STRTEL,
+                    AN_UNITA_AZIENDA.STRINDIRIZZO, 
+                    InitCap(DE_COMUNE.STRDENOMINAZIONE) as comune_az,
+                    ag_agenda.CDNUTINS, 
+                    to_char(ag_agenda.DTMINS, &apos;dd/mm/yyyy hh24:mi&apos;) as DTMINS, 
+                    ag_agenda.CDNUTMOD, 
+                    to_char(ag_agenda.DTMMOD, &apos;dd/mm/yyyy hh24:mi&apos;) as DTMMOD,
+                    AG_AGENDA.STRIDCOAP as idAnpal,
+                    NVL(DE_ESITO_APPUNT.FLGINVIOMIN, &apos;N&apos;) as FLGINVIOMIN_ESITOAPP,
+                    DE_ESITO_APPUNT.CODMIN AS CODMINESITOAPP,
+                    DE_CPI.CODCPIMIN
+                  FROM AG_AGENDA
+                  left JOIN AN_UNITA_AZIENDA on (ag_agenda.PRGAZIENDA=an_unita_azienda.PRGAZIENDA and ag_agenda.PRGUNITA=an_unita_azienda.PRGUNITA)
+                  left join de_comune on (an_unita_azienda.CODCOM=de_comune.CODCOM)
+                  left JOIN AN_AZIENDA on (an_unita_azienda.PRGAZIENDA=an_azienda.PRGAZIENDA)
+                  left JOIN DE_ESITO_APPUNT on (DE_ESITO_APPUNT.CODESITOAPPUNT = AG_AGENDA.CODESITOAPPUNT)
+                  inner join DE_CPI on (ag_agenda.CODCPI = DE_CPI.CODCPI)
+                  WHERE ag_agenda.CODCPI=?
+                  AND ag_agenda.PRGAPPUNTAMENTO=?" />
+
+<!--STATEMENT name="SELECT_PROGRESSIVO_AGENDA" 
+	query="SELECT S_AG_PRGAPPUNTAMENTO.nextval AS PRGAPPUNTAMENTO FROM dual" /-->
+
+<STATEMENT name="INSERT_APPUNTAMENTO_AGENDA" query="INSERT INTO AG_AGENDA (
+                     CODCPI, PRGAPPUNTAMENTO, DTMDATAORA, 
+                     NUMMINUTI, NUMORAINIZIOEFF, NUMORAFINEEFF,
+                     CODSERVIZIO, PRGSPI, PRGSPIEFF, PRGAMBIENTE,
+                     TXTNOTE, PRGTIPOPRENOTAZIONE, STRTELRIF, 
+                     STREMAILRIF, STRTELMOBILERIF, CODEFFETTOAPPUNT, 
+                     CODESITOAPPUNT, CODSTATOAPPUNTAMENTO, CDNUTMOD, DTMMOD, 
+                     CDNUTINS, DTMINS, 
+                     PRGAZIENDA, PRGUNITA) 
+                VALUES ( ?, ?, to_date(?,&apos;dd-mm-yyyy hh24:mi&apos;),
+                    ?, ?, ?,
+                    ?, ?, ?, ?,
+                    ?, ?, ?,
+                    ?, ?, ?,
+                    ?, ?, ?, sysdate,
+                    ?, sysdate,
+                    ?, ?)" />
+
+<STATEMENT name="UPDATE_DETTAGLIO_AGENDA" query="UPDATE AG_AGENDA
+                  SET 
+                    DTMDATAORA = to_date(?,&apos;dd-mm-yyyy hh24:mi&apos;),
+                    NUMMINUTI=?, 
+                    NUMORAINIZIOEFF=?,
+                    NUMORAFINEEFF=?,
+                    CODSERVIZIO=?, 
+                    PRGSPI=?, 
+                    PRGSPIEFF=?,
+                    PRGAMBIENTE=?,
+                    TXTNOTE=?, 
+                    PRGTIPOPRENOTAZIONE=?, 
+                    STRTELRIF=?, 
+                    STREMAILRIF=?, 
+                    STRTELMOBILERIF=?, 
+                    CODEFFETTOAPPUNT=?, 
+                    CODESITOAPPUNT=?, 
+                    CODSTATOAPPUNTAMENTO=?,
+                    CDNUTMOD=?, 
+                    DTMMOD=sysdate, 
+                    NUMKLOAGENDA=?+1,
+                    PRGAZIENDA=?,
+                    PRGUNITA=?
+                WHERE CODCPI=? 
+                AND PRGAPPUNTAMENTO=?" />
+                
+<STATEMENT name="UPDATE_DETT_AGENDA_FROM_LAV" query="UPDATE AG_AGENDA
+                  SET 
+                    CODEFFETTOAPPUNT=?, 
+                    CODESITOAPPUNT=?, 
+                    CODSTATOAPPUNTAMENTO=?,
+                    CDNUTMOD=?, 
+                    DTMMOD=sysdate, 
+                    NUMKLOAGENDA=?+1
+                WHERE CODCPI=? 
+                AND PRGAPPUNTAMENTO=?" />                
+
+<STATEMENT name="DELETE_APPUNTAMENTO_AGENDA" query="DELETE FROM AG_AGENDA
+                WHERE CODCPI=? 
+                AND PRGAPPUNTAMENTO=?" />
+
+<STATEMENT name="SELECT_AZIENDE_UNITA" query="SELECT A.PRGAZIENDA, A.STRRAGIONESOCIALE, U.PRGUNITA, U.STRINDIRIZZO, U.CODCOM 
+                  FROM AN_AZIENDA A, AN_UNITA_AZIENDA U
+                  WHERE A.PRGAZIENDA=U.PRGAZIENDA(+)" />
+
+<STATEMENT name="SELECT_AGENDA_LAVORATORI" query="SELECT CDNLAVORATORE, STRCODICEFISCALE, STRCOGNOME, STRNOME
+                  FROM AN_LAVORATORE" />
+
+<STATEMENT name="SELECT_COMBO_CPI" query="select CODCPI as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_CPI order by STRDESCRIZIONE" />
+
+<STATEMENT name="SELECT_COMBO_SERVIZIO_ALL"
+	query="select CODSERVIZIO as CODICE, 
+           				 DECODE( GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, 
+                               	STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...' ) ||
+                  		 DECODE(SYSDATE,    
+                                GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                &apos;&apos;) AS DESCRIZIONE,
+						DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                               &apos;&apos;) AS STRSCADUTO									
+                  from DE_SERVIZIO 
+                  WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                  order by DECODE(STRSCADUTO,&apos;&apos;,0,1),STRDESCRIZIONE" />
+                  
+<STATEMENT name="SELECT_COMBO_SERVIZIO_SOLO_ATTIVI"
+	query="select CODSERVIZIO as CODICE, 
+                  DECODE( GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, 
+                                 STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...' )  AS DESCRIZIONE
+                  from DE_SERVIZIO 
+                  WHERE to_date(nvl(?, to_char(sysdate, 'dd/mm/yyyy')), 'dd/mm/yyyy') 
+                  BETWEEN  to_date(to_char(DATINIZIOVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy') and
+                  to_date(to_char(DATFINEVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy')"/>  
+
+
+<STATEMENT name="SELECT_COMBO_SERVIZIO_SCAD"
+	query="select CODSERVIZIO as CODICE, 
+                  DECODE( GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...' )
+                  || DECODE(SYSDATE,    
+                                GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                '') AS DESCRIZIONE,                                
+                  DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                               '') AS STRSCADUTO  
+                  from DE_SERVIZIO 
+                  WHERE to_date(nvl(?, to_char(sysdate, 'dd/mm/yyyy')), 'dd/mm/yyyy') 
+                  BETWEEN  to_date(to_char(DATINIZIOVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy') and
+                  to_date(to_char(DATFINEVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy')
+                  or CODSERVIZIO = nvl(?,'') order by DECODE(STRSCADUTO,'',0,1),STRDESCRIZIONE  "/>
+                  
+<STATEMENT name="SELECT_COMBO_SERVIZIO_PATRONATO_SCAD"
+	query="select CODSERVIZIO as CODICE, 
+                  DECODE( GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...' )
+                  || DECODE(SYSDATE,    
+                                GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                '') AS DESCRIZIONE,                                
+                  DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                               '') AS STRSCADUTO  
+                  from DE_SERVIZIO 
+                  WHERE (nvl(flgpatronato, 'N') = 'S') and (to_date(nvl(?, to_char(sysdate, 'dd/mm/yyyy')), 'dd/mm/yyyy') 
+                  BETWEEN  to_date(to_char(DATINIZIOVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy') and
+                  to_date(to_char(DATFINEVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy')
+                  or CODSERVIZIO = nvl(?,'') 
+                  )
+                  order by DECODE(STRSCADUTO,'',0,1),STRDESCRIZIONE  "/>
+
+
+<STATEMENT name="SELECT_COMBO_SPI_ONLY_VALID" query="
+
+	select 
+	  PRGSPI as CODICE, 
+	  STRCOGNOME || ' ' || STRNOME AS DESCRIZIONE
+	from AN_SPI 
+	WHERE trunc(AN_SPI.DATINIZIOVAL) &lt;= SYSDATE 
+	  and trunc(AN_SPI.DATFINEVAL) &gt;= SYSDATE
+	order by DESCRIZIONE
+	
+"/>
+
+<STATEMENT name="SELECT_COMBO_SPI_ALL" query="select PRGSPI as CODICE, STRCOGNOME || ' ' || STRNOME ||
+                       DECODE(SYSDATE,    
+                                GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                '') AS DESCRIZIONE,
+            DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                               '') AS STRSCADUTO   
+                  from AN_SPI 
+                   WHERE to_date(to_char(AN_SPI.DATINIZIOVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy') &lt;=
+                        to_date(nvl(?, to_char(sysdate, 'dd/mm/yyyy')), 'dd/mm/yyyy')
+                  order by DECODE(STRSCADUTO,'',0,1),DESCRIZIONE" />
+
+<STATEMENT name="SELECT_COMBO_SPI_SCAD" query="select PRGSPI as CODICE, STRCOGNOME || ' ' || STRNOME ||
+                       DECODE(SYSDATE,    
+                                GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                '') AS DESCRIZIONE,
+            DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                               '') AS STRSCADUTO   
+                  from AN_SPI 
+                  WHERE to_date(nvl(?, to_char(sysdate, 'dd/mm/yyyy')), 'dd/mm/yyyy') 
+                  BETWEEN  to_date(to_char(DATINIZIOVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy') and
+                  to_date(to_char(DATFINEVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy')
+                  or PRGSPI = nvl(?,-1)  order by DECODE(STRSCADUTO,'',0,1),DESCRIZIONE  " />
+
+<STATEMENT name="SELECT_COMBO_TIPO_PRENOTAZIONE" query="select PRGTIPOPRENOTAZIONE as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_TIPO_PRENOTAZIONE 
+                  WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                  order by STRDESCRIZIONE" />
+
+<STATEMENT name="SELECT_COMBO_EFFETTO_APPUNTAMENTO" query="select CODEFFETTOAPPUNT as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_EFFETTO_APPUNT 
+                  WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                  order by STRDESCRIZIONE" />
+
+<STATEMENT name="SELECT_COMBO_ESITO_APPUNTAMENTO" query="select DE_ESITO_APPUNT.CODESITOAPPUNT as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE,
+                                    DE_ESITO_APPUNT.FLGINVIOMIN,
+                                     DE_AG_REL_STATO_ESITO.CODSTATOAPPUNTAMENTO
+                  from DE_ESITO_APPUNT 
+                  left  join DE_AG_REL_STATO_ESITO 
+                  		on DE_ESITO_APPUNT.CODESITOAPPUNT = DE_AG_REL_STATO_ESITO.CODESITOAPPUNT
+                  WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                  order by STRDESCRIZIONE" />
+
+<STATEMENT name="SELECT_COMBO_STATO_APPUNTAMENTO" query="select DE_STATO_APPUNTAMENTO.CODSTATOAPPUNTAMENTO as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_STATO_APPUNTAMENTO 
+                   WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                  order by STRDESCRIZIONE" />
+
+<!--STATEMENT name="SELECT_COMBO_AZIENDA" 
+	query="select PRGAZIENDA as CODICE, STRRAGIONESOCIALE as DESCRIZIONE 
+	from AN_AZIENDA order by STRRAGIONESOCIALE" /-->
+
+<!--STATEMENT name="SELECT_COMBO_UNITA_AZIENDA" 
+	query="select PRGUNITA as CODICE, STRINDIRIZZO as DESCRIZIONE 
+	from AN_UNITA_AZIENDA order by STRINDIRIZZO" /-->
+
+<STATEMENT name="INSERT_AGENDA_LAVORATORE" query="INSERT INTO AG_LAVORATORE (CDNLAVORATORE,CODCPI,PRGAPPUNTAMENTO) 
+                  VALUES(?,?,?)" />
+
+<STATEMENT name="SELECT_AGENDA_LAVORATORE" query="SELECT COUNT(*) AS NRO FROM AG_LAVORATORE WHERE 
+                 CDNLAVORATORE = ? AND
+                 CODCPI = ? AND
+                 PRGAPPUNTAMENTO=?" />
+
+<!-- Vedi collegamento con il Patto-->
+<!--STATEMENT name="SELECT_LAVORATORI_APPUNTAMENTO_AGENDA" 
+	query="SELECT A.CDNLAVORATORE, B.STRCOGNOME,B.STRNOME,B.STRCODICEFISCALE, B.DATNASC 
+	FROM AG_LAVORATORE A, AN_LAVORATORE B
+	WHERE A.CDNLAVORATORE=B.CDNLAVORATORE
+	AND A.CODCPI=?
+	AND A.PRGAPPUNTAMENTO=?" /-->
+
+<STATEMENT name="DELETE_LAVORATORI_APPUNTAMENTO_AGENDA" query="DELETE
+                    FROM AG_LAVORATORE
+                    WHERE CDNLAVORATORE=?
+                    AND CODCPI=?
+                    AND PRGAPPUNTAMENTO=?" />
+
+<STATEMENT name="SELECT_AZIENDE_ASSOCIATE_APPUNTAMENTO" query="SELECT PRGAZIENDA, PRGUNITA
+                    FROM AG_AGENDA
+                    WHERE CODCPI=?
+                    AND PRGAPPUNTAMENTO=?" />
+
+<!-- Stefania Orioli -->
+<!-- Appuntamento - Allineamento Slot -->
+<STATEMENT name="DATI_SLOT_APP" query="select 
+                       to_char(ag_slot.DTMDATAORA, &apos;hh24:mi&apos;) as oraSlot,
+                       to_char(ag_slot.NUMMINUTI) as minutiSlot,
+                       ag_slot.CODSERVIZIO as codServizioSlot,
+                       to_char(ag_spi_slot.PRGSPI) as prgSpiSlot,
+                       (NUMLAVORATORI - NUMLAVPRENOTATI) as numLavoratoriDisp
+                  from ag_slot
+                     inner join ag_spi_slot on (ag_slot.PRGSLOT=ag_spi_slot.PRGSLOT and ag_slot.CODCPI=ag_spi_slot.CODCPI)
+                  where
+                     ag_slot.PRGAPPUNTAMENTO = ?
+                     and ag_slot.CODCPIAPPUNTAMENTO = ?" />
+
+<STATEMENT name="ALLINEA_SLOT" query="{ call ? := PG_AGENDA.PDALLINEAMENTOSLOT(?,?,?,?,?,?,?) }" />
+<!-- Cancellazione Appuntamento -->
+<STATEMENT name="DEL_APPUNTAMENTO" query="{ call ? := PG_AGENDA.PDCANCELLAAPPUNTAMENTO(?,?,?,?) }" />
+
+<!-- Appuntamento - Collegamento con il Patto -->
+<STATEMENT name="SEL_AG_PATTI_LAV"
+	query="select
+                      am_patto_lavoratore.PRGPATTOLAVORATORE,
+                      to_char(am_patto_lavoratore.DATSTIPULA, &apos;dd/mm/yyyy&apos;) as data_stipula,
+                      nvl(de_codifica_patto.strdescrizione, decode(am_patto_lavoratore.FLGPATTO297, &apos;S&apos;, &apos;Patto 150&apos;, &apos;N&apos;, &apos;Accordo Generico&apos;, &apos;&apos;)) as patto297,
+                      de_stato_atto.STRDESCRIZIONE as tipo_patto,
+                      de_motivo_fine_atto.STRDESCRIZIONE as mot_fine_atto,
+                      nvl(to_char(am_patto_lavoratore.DATFINE,&apos;dd/mm/yyyy&apos;),&apos;Patto Corrente&apos;) as DATFINE,
+                      to_char(am_patto_lavoratore.DATSCADCONFERMA, &apos;dd/mm/yyyy&apos;) as data_scadenza
+                  from 
+                     am_patto_lavoratore
+                     inner join an_lavoratore on (am_patto_lavoratore.CDNLAVORATORE=an_lavoratore.CDNLAVORATORE)
+                     inner join de_stato_atto on (am_patto_lavoratore.codStatoAtto = de_stato_atto.CODSTATOATTO)                    
+                     left outer join de_motivo_fine_atto on (am_patto_lavoratore.CODMOTIVOFINEATTO=de_motivo_fine_atto.CODMOTIVOFINEATTO)
+                     left outer join de_codifica_patto on (am_patto_lavoratore.CODCODIFICAPATTO=de_codifica_patto.CODCODIFICAPATTO)
+                  where
+                     am_patto_lavoratore.CDNLAVORATORE = ?
+                     and am_patto_lavoratore.CODCPI = ?
+                  order by am_patto_lavoratore.DATFINE desc" />
+<!-- pg_utils.TRUNC_DESC(de_tipo_patto.STRDESCRIZIONE, 30, &apos;...&apos;)
+	left outer join de_tipo_patto on (am_patto_lavoratore.CODTIPOPATTO=de_tipo_patto.CODTIPOPATTO) -->
+
+<STATEMENT name="SEL_AG_DATI_LAV" query="select InitCap(an_lavoratore.STRCOGNOME) as strCognome, InitCap(an_lavoratore.STRNOME) as strNome
+                  from an_lavoratore where cdnLavoratore=?" />
+
+<STATEMENT name="INS_PATTO_APP" query="insert into AM_LAV_PATTO_SCELTA
+                 (PRGLAVPATTOSCELTA, PRGPATTOLAVORATORE, CODLSTTAB,
+                 STRCHIAVETABELLA, STRCHIAVETABELLA2, STRCHIAVETABELLA3)
+                 values
+                 (S_AM_LAV_PATTO_SCELTA.nextVal, ?, &apos;AG_LAV&apos;,
+                 ?, ?, ?)" />
+
+<STATEMENT name="UPD_PATTO_APP" query="update AM_LAV_PATTO_SCELTA
+                 set PRGPATTOLAVORATORE = ?
+                 where PRGLAVPATTOSCELTA = ?" />
+
+<STATEMENT name="DEL_PATTO_APP" query="delete from AM_LAV_PATTO_SCELTA
+                 where PRGLAVPATTOSCELTA = ?" />
+
+<STATEMENT name="SELECT_LAVORATORI_APPUNTAMENTO_AGENDA"
+	query="SELECT 
+                       ag_lavoratore.CDNLAVORATORE, 
+                       an_lavoratore.STRCOGNOME,
+                       an_lavoratore.STRNOME,
+                       an_lavoratore.STRCODICEFISCALE, 
+                       to_char(an_lavoratore.DATNASC, &apos;dd/mm/yyyy&apos;) as DATNASC,
+                       am_lps.PRGLAVPATTOSCELTA,
+                       to_char(am_patto_lavoratore.DATSTIPULA, &apos;dd/mm/yyyy&apos;) as data_stipula,
+                       nvl(de_codifica_patto.strdescrizione, decode(am_patto_lavoratore.FLGPATTO297, &apos;S&apos;, &apos;Patto 150&apos;, &apos;N&apos;, &apos;Accordo Generico&apos;, &apos;&apos;)) as patto297,
+                       de_stato_atto.STRDESCRIZIONE || ' / &lt;br&gt;' || TO_CHAR (am_lps.datProtocollo, 'dd/mm/yyyy')as tipo_patto,
+                       de_motivo_fine_atto.STRDESCRIZIONE as mot_fine_atto
+                  FROM 
+                     ag_lavoratore 
+                     left outer join an_lavoratore on (ag_lavoratore.CDNLAVORATORE=an_lavoratore.CDNLAVORATORE)
+                     left outer join am_lav_patto_scelta am_lps 
+                        on (ag_lavoratore.CDNLAVORATORE = am_lps.STRCHIAVETABELLA and
+                            ag_lavoratore.CODCPI = am_lps.STRCHIAVETABELLA2 and
+                          ag_lavoratore.PRGAPPUNTAMENTO = am_lps.STRCHIAVETABELLA3 and am_lps.CODLSTTAB=&apos;AG_LAV&apos;)
+                     left outer join am_patto_lavoratore on (am_lps.PRGPATTOLAVORATORE = am_patto_lavoratore.PRGPATTOLAVORATORE)
+                     left join de_stato_atto on (am_patto_lavoratore.codStatoAtto = de_stato_atto.CODSTATOATTO)
+                     left outer join de_motivo_fine_atto on (am_patto_lavoratore.CODMOTIVOFINEATTO=de_motivo_fine_atto.CODMOTIVOFINEATTO)
+                     left outer join de_codifica_patto on (am_patto_lavoratore.CODCODIFICAPATTO=de_codifica_patto.CODCODIFICAPATTO)
+                  WHERE 
+                      ag_lavoratore.CODCPI=?
+                      and ag_lavoratore.PRGAPPUNTAMENTO=?
+                  order by an_lavoratore.strCognome, an_lavoratore.strNome " />
+<!-- pg_utils.TRUNC_DESC(de_tipo_patto.STRDESCRIZIONE, 30, &apos;...&apos;)
+	left outer join de_tipo_patto on (am_patto_lavoratore.CODTIPOPATTO=de_tipo_patto.CODTIPOPATTO) -->
+<!-- fine collegamento con il patto -->
+
+<STATEMENT name="GET_DETT_APPUNTAMENTO"
+	query="select ag_agenda.CODCPI, de_cpi.STRDESCRIZIONE as cpi, ag_agenda.PRGAPPUNTAMENTO, 
+                  to_char(ag_agenda.DTMDATAORA, &apos;dd/mm/yyyy&apos;) as data,
+                  to_char(ag_agenda.DTMDATAORA, &apos;hh24:mi&apos;)  as orario, 
+                  ag_agenda.NUMMINUTI, 
+                  ag_agenda.CODSERVIZIO, de_servizio.STRDESCRIZIONE as servizio, 
+                  ag_agenda.PRGSPI, concat(concat(an_spi.strNome,&apos; &apos;),an_spi.strCognome) as operatore, 
+                  ag_agenda.TXTNOTE, 
+                  ag_agenda.PRGTIPOPRENOTAZIONE, de_tipo_prenotazione.STRDESCRIZIONE as tipo_prenotazione, 
+                  ag_agenda.STRTELRIF, ag_agenda.STREMAILRIF, ag_agenda.STRTELMOBILERIF, 
+                  ag_agenda.CODEFFETTOAPPUNT, de_effetto_appunt.STRDESCRIZIONE as effetto_app, 
+                  ag_agenda.CODESITOAPPUNT, de_esito_appunt.STRDESCRIZIONE as esito_app, 
+                  ag_agenda.NUMKLOAGENDA,ag_agenda.PRGAZIENDA, ag_agenda.PRGUNITA
+                  FROM ag_agenda
+                  INNER JOIN de_cpi ON (ag_agenda.CODCPI = de_cpi.CODCPI)
+                  INNER JOIN de_servizio ON (ag_agenda.CODSERVIZIO = de_servizio.CODSERVIZIO)
+                  INNER JOIN an_spi ON (ag_agenda.PRGSPI = an_spi.PRGSPI) 
+                  INNER JOIN de_tipo_prenotazione ON (ag_agenda.PRGTIPOPRENOTAZIONE = de_tipo_prenotazione.PRGTIPOPRENOTAZIONE)
+                  INNER JOIN de_effetto_appunt ON (ag_agenda.CODEFFETTOAPPUNT = de_effetto_appunt.CODEFFETTOAPPUNT)
+                  INNER JOIN de_esito_appunt ON (ag_agenda.CODESITOAPPUNT = de_esito_appunt.CODESITOAPPUNT)
+                  WHERE ag_agenda.CODCPI=? AND ag_agenda.PRGAPPUNTAMENTO=?" />
+
+<STATEMENT name="SEL_INCONGRUENZE" query="select * from VW_AGENDA_ERR where CODCPI=? and PRGAPPUNTAMENTO=?" />
+
+<!--STATEMENT name="SEL_TIPOVISTA_GIORNI" 
+	query="select PRGVISTA, STRDESCRIZIONE from de_vista_giorni where PRGVISTA <> 0" 
+	/-->
+<STATEMENT name="SEL_TIPOVISTA_GIORNI" query="select PRGVISTA as CODICE, STRDESCRIZIONE as DESCRIZIONE 
+                  from de_vista_giorni where PRGVISTA &lt;&gt; 0  and PRGVISTA &lt; 1000 
+                  order by STRDESCRIZIONE" />
+
+<STATEMENT name="SEL_TIPOVISTA_SLOT" query="select PRGVISTA as CODICE, STRDESCRIZIONE as DESCRIZIONE 
+                  from de_vista_giorni where PRGVISTA between 1000 and 1999 " />
+
+<STATEMENT name="SEL_GRUPPO_LAV" query="SELECT an_lavoratore.strCognome, an_lavoratore.strNome
+                  FROM ag_lavoratore
+                  inner join an_lavoratore ON (ag_lavoratore.cdnLavoratore=an_lavoratore.cdnLavoratore)
+                  WHERE ag_lavoratore.CODCPI=? and  ag_lavoratore.PRGAPPUNTAMENTO=?
+                  ORDER BY an_lavoratore.strCognome, an_lavoratore.strNome" />
+
+<STATEMENT name="INS_EVENTO" query="INSERT INTO AG_EVENTO
+                 (prgevento,codcpievento, datevento, strdescrizionebreve, txtevento,
+                 flgpubblico, datiniziopub, cdnutins, dtmins, cdnutmod, dtmmod)
+                 VALUES
+                 (?,?,to_date(?,&apos;dd/mm/yyyy&apos;),?,?,
+                 ?,to_date(?,&apos;dd/mm/yyyy&apos;),?,sysdate,?,sysdate)" />
+
+<STATEMENT name="SEL_EVENTO" query="SELECT prgevento, codcpievento, to_char(datevento,'dd/mm/yyyy') as datevento,
+		       strdescrizionebreve, txtEvento, 
+		       flgpubblico, to_char(datiniziopub,'dd/mm/yyyy') as datiniziopub,
+		       numkloevento,
+		       ag_evento.CDNUTINS, to_char(ag_evento.DTMINS,'dd/mm/yyyy') as DTMINS, ag_evento.CDNUTMOD, to_char(ag_evento.DTMMOD,'dd/mm/yyyy') as DTMMOD
+			   from ag_evento,  ts_utente  t1, ts_utente  t2
+			   where ag_evento.cdnutins=t1.cdnut (+)
+			   and ag_evento.cdnutmod=t2.cdnut (+)
+			   and prgevento = ?" />
+
+<STATEMENT name="UP_EVENTO" query="UPDATE AG_EVENTO SET 
+                 strdescrizionebreve = ?,
+                 txtevento = ?,
+                 flgpubblico = ?,
+                 datiniziopub = to_date(?,&apos;dd/mm/yyyy&apos;),
+                 numkloevento = ?,
+                 cdnutmod = ?,
+                 dtmmod = sysdate
+                 WHERE prgevento = ?" />
+
+
+<!--STATEMENT name="SEL_OPERATORI_SLOT_APP"
+	query="select ag_spi_slot.PRGSPI as CODICE, 
+	an_spi.strCognome || &apos; &apos; || an_spi.strNome as DESCRIZIONE
+	from ag_spi_slot
+	inner join an_spi on ag_spi_slot.prgspi=an_spi.prgSpi
+	where ag_spi_slot.prgslot=? and ag_spi_slot.codcpi=?"
+	/-->
+
+<STATEMENT name="INS_APP_DA_SLOT" query="{ call ? := PG_AGENDA.PDAPPUNTAMENTODASLOT(?,?,?,?,?,?,?,?,?,?,?) }" />
+<!-- Gestione dei Giorni Non Lavorativi -->
+<STATEMENT name="SEL_FESTIVO" query="select
+                  PRGGIORNONL, CODCPI, NUMGG, NUMMM, NUMAAAA, 
+                  NUMGSETT, to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;) as DATINIZIOVAL, 
+                  to_char(DATFINEVAL, &apos;dd/mm/yyyy&apos;) as DATFINEVAL, NUMKLOGIORNONL, FLGCHIUSURANONFESTIVA
+                  from ag_giornonl
+                  WHERE prggiornonl=? and (codcpi=? or codcpi is null)" />
+
+<STATEMENT name="INS_FESTIVO" query="INSERT INTO AG_GIORNONL
+                  (PRGGIORNONL, CODCPI, NUMGG, NUMMM, NUMAAAA, DATINIZIOVAL, DATFINEVAL, FLGCHIUSURANONFESTIVA)
+                  VALUES (?, ?, ?, ?, ?, to_date(?, &apos;dd/mm/yyyy&apos;), to_date(?, &apos;dd/mm/yyyy&apos;), ?) " />
+
+
+
+<STATEMENT name="UPD_FESTIVO" query="update AG_GIORNONL
+                  set NUMGG=?, NUMMM=?, NUMAAAA=?, DATINIZIOVAL=to_date(?, &apos;dd/mm/yyyy&apos;),
+                  DATFINEVAL=to_date(?, &apos;dd/mm/yyyy&apos;), NUMKLOGIORNONL=?+1, FLGCHIUSURANONFESTIVA=?
+                  where (CODCPI=? or codcpi is null) and PRGGIORNONL=?" />
+
+<STATEMENT name="DEL_FESTIVO" query="delete from AG_GIORNONL where PRGGIORNONL=? and (CODCPI=? or codcpi is null)" />
+
+<STATEMENT name="UPD_FESTIVO2" query="update AG_GIORNONL
+                  set DATFINEVAL=to_date(?, &apos;dd/mm/yyyy&apos;), 
+                  NUMKLOGIORNONL=?+1
+                  where (CODCPI=? or codcpi is null) and PRGGIORNONL=?" />
+
+<STATEMENT name="INS_FESTIVO2" query="INSERT INTO AG_GIORNONL
+                  (PRGGIORNONL, CODCPI, NUMGG, NUMMM, DATINIZIOVAL, DATFINEVAL)
+                  VALUES (S_AG_GIORNONL.NextVal, ?, ?, ?, to_date(?, &apos;dd/mm/yyyy&apos;), to_date(?, &apos;dd/mm/yyyy&apos;)) " />
+
+<!-- Giorni di Riposo Settimanale -->
+<STATEMENT name="INS_GSETT" query="INSERT INTO AG_GIORNONL
+                  (PRGGIORNONL, CODCPI, NUMGSETT, DATINIZIOVAL, DATFINEVAL)
+                  VALUES (?, ?, ?, to_date(?, &apos;dd/mm/yyyy&apos;), to_date(?, &apos;dd/mm/yyyy&apos;)) " />
+
+
+
+<STATEMENT name="UPD_GSETT" query="update AG_GIORNONL
+                  set DATINIZIOVAL=to_date(?, &apos;dd/mm/yyyy&apos;),
+                  DATFINEVAL=to_date(?, &apos;dd/mm/yyyy&apos;), 
+                  NUMKLOGIORNONL=?+1
+                  where (CODCPI=? or codcpi is null) and PRGGIORNONL=?" />
+
+<STATEMENT name="INS_GSETT2" query="INSERT INTO AG_GIORNONL
+                  (PRGGIORNONL, CODCPI, NUMGSETT, DATINIZIOVAL, DATFINEVAL)
+                  VALUES (S_AG_GIORNONL.NextVal, ?, ?, to_date(?, &apos;dd/mm/yyyy&apos;), to_date(?, &apos;dd/mm/yyyy&apos;)) " />
+
+
+<!--  Gestione Contatti -->
+<STATEMENT name="SEL_SPI_UTENTE" query="select prgspi from ts_utente where cdnut=?" />
+
+
+<STATEMENT name="SEL_TIPO_CONTATTO_AG" query="SELECT PRGTIPOCONTATTO AS CODICE, 
+                STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  FROM DE_TIPO_CONTATTOAG 
+                  WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                  order by strdescrizione" />
+
+<STATEMENT name="SEL_EFFETTO_CONTATTO_AG" query="SELECT PRGEFFETTOCONTATTO AS CODICE,
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  FROM DE_EFFETTO_CONTATTO 
+                  WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                  order by strdescrizione" />
+
+<STATEMENT name="SEL_MOTIVO_CONTATTO_AG" query="SELECT PRGMOTCONTATTO AS CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  FROM DE_MOTIVO_CONTATTOAG
+                  WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                  order by DATFINEVAL desc, strdescrizione asc" />
+
+<STATEMENT name="SEL_AG_LAVORATORE" query="SELECT an_lavoratore.STRCOGNOME, an_lavoratore.STRNOME,
+                      an_lavoratore.STRCODICEFISCALE, to_char(an_lavoratore.DATNASC, &apos;dd/mm/yyyy&apos;) as DATNASC,
+                      c1.strdenominazione as comune_nasc, c2.strdenominazione as comune_dom 
+                  FROM AN_LAVORATORE
+                    left outer join de_comune c1 on (an_lavoratore.CODCOMNAS = c1.codcom)
+                    left outer join de_comune c2 on (an_lavoratore.CODCOMDOM = c2.codcom)
+                  WHERE cdnLavoratore = ?" />
+
+<STATEMENT name="INS_CONTATTO" query="insert into ag_contatto
+                  (PRGCONTATTO, CODCPICONTATTO, DATCONTATTO, STRORACONTATTO, 
+                  PRGSPICONTATTO, TXTCONTATTO, FLGRICONTATTARE, STRIO, DATENTROIL, 
+                  PRGMOTCONTATTO, PRGTIPOCONTATTO, PRGEFFETTOCONTATTO, 
+                  CDNLAVORATORE, 
+                  PRGAZIENDA, PRGUNITA, 
+                  CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)
+                  values
+                  (?, ?, to_date(?, &apos;dd/mm/yyyy&apos;), ?,
+                  ?, ?, ?, ?, to_date(?, &apos;dd/mm/yyyy&apos;),
+                  ?, ?, ?,
+                  ?,
+                  ?, ?,
+                  ?, sysdate, ?, sysdate)" />
+
+<STATEMENT name="DETT_CONTATTO"
+	query="select 
+                       PRGCONTATTO, CODCPICONTATTO, 
+                       to_char(DATCONTATTO, &apos;dd/mm/yyyy&apos;) AS DATCONTATTO, 
+                       STRORACONTATTO, NUMKLOCONTATTO, 
+                       PRGSPICONTATTO, TXTCONTATTO, FLGRICONTATTARE, STRIO, 
+                       to_char(DATENTROIL, &apos;dd/mm/yyyy&apos;) as DATENTROIL, 
+                       PRGMOTCONTATTO, PRGTIPOCONTATTO, PRGEFFETTOCONTATTO, 
+                       ag_contatto.CDNLAVORATORE, 
+                            (an_lavoratore.STRCOGNOME || &apos; &apos; || an_lavoratore.STRNOME || asciistr(chr(13)) ||
+                            an_lavoratore.STRCODICEFISCALE || asciistr(chr(13)) ||
+                            c1.strdenominazione || &apos; &apos; || to_char(an_lavoratore.DATNASC,&apos;dd/mm/yyyy&apos;) || asciistr(chr(13)) ||
+                            c2.strdenominazione
+                            )as strDatiLav,
+                       ag_contatto.PRGAZIENDA, ag_contatto.PRGUNITA, 
+                            (an_azienda.STRRAGIONESOCIALE || asciistr(chr(13)) || 
+                            an_unita_azienda.STRINDIRIZZO || asciistr(chr(13)) ||
+                            de_comune.STRDENOMINAZIONE || asciistr(chr(13)) ||
+                            an_azienda.STRPARTITAIVA || asciistr(chr(13)) ||
+                            an_unita_azienda.STRTEL) AS strDatiAzienda,  
+                       ag_contatto.CDNUTINS, 
+                       to_char(ag_contatto.DTMINS, &apos;dd/mm/yyyy hh24:mi&apos;) as DTMINS,
+                       ag_contatto.CDNUTMOD, 
+                       to_char(ag_contatto.DTMMOD, &apos;dd/mm/yyyy hh24:mi&apos;) as DTMMOD,
+                       de_disponibilita_rosa.strdescrizione as STRDISPONIBILITAROSA,
+                       ag_contatto.FLGINVIATOSMS,
+                       ag_contatto.STRCELLSMSINVIO
+                  from ag_contatto 
+                  left outer join an_lavoratore on (ag_contatto.CDNLAVORATORE = an_lavoratore.CDNLAVORATORE)
+                  left outer join de_comune c1 on (an_lavoratore.CODCOMNAS = c1.codcom)
+        				  left outer join de_comune c2 on (an_lavoratore.CODCOMDOM = c2.codcom)
+                  left outer join an_unita_azienda on (ag_contatto.PRGAZIENDA = an_unita_azienda.PRGAZIENDA and ag_contatto.PRGUNITA = an_unita_azienda.PRGUNITA)
+                  left outer join an_azienda on (an_unita_azienda.PRGAZIENDA = an_azienda.PRGAZIENDA)
+                  left outer join de_comune on (an_unita_azienda.CODCOM = de_comune.CODCOM)
+                  left outer join de_disponibilita_rosa on (ag_contatto.coddisponibilitarosa=de_disponibilita_rosa.coddisponibilitarosa)
+                  where prgcontatto=? and codcpicontatto=?" />
+
+<STATEMENT name="UPD_CONTATTO" query="UPDATE AG_CONTATTO SET
+                     STRORACONTATTO = ?,
+                     PRGSPICONTATTO = ?,
+                     PRGTIPOCONTATTO = ?, STRIO = ?,
+                     TXTCONTATTO = ?,
+                     PRGMOTCONTATTO = ?,
+                     PRGEFFETTOCONTATTO = ?,
+                     CDNLAVORATORE = ?,
+                     PRGAZIENDA = ?, PRGUNITA = ?,
+                     FLGRICONTATTARE = ?,
+                     DATENTROIL = to_date(?, &apos;dd/mm/yyyy&apos;),
+                     NUMKLOCONTATTO = ? + 1,
+                     CDNUTMOD = ?, DTMMOD = sysdate
+                  WHERE PRGCONTATTO = ? AND CODCPICONTATTO = ?" />
+
+<!-- Gestione Settimana Tipo -->
+<STATEMENT name="INS_SETT_TIPO" query="insert into DE_SETTIMANA_TIPO
+                (CODCPI, PRGSETTIPO, STRDESCRIZIONESETTIMANA, DATINIZIOVAL, DATFINEVAL)
+                VALUES
+                (?, S_DE_SETTIMANA_TIPO.nextVal, ?, nvl(to_date(?, &apos;dd/mm/yyyy&apos;), sysdate), 
+                to_date(nvl(?,&apos;01/01/2100&apos;), &apos;dd/mm/yyyy&apos;))" />
+
+<STATEMENT name="DETT_SETT_TIPO" query="select CODCPI, PRGSETTIPO, STRDESCRIZIONESETTIMANA,
+                  to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;) as DATINIZIOVAL,
+                  to_char(DATFINEVAL, &apos;dd/mm/yyyy&apos;) as DATFINEVAL,
+                  NUMKLO
+                  FROM DE_SETTIMANA_TIPO
+                  WHERE PRGSETTIPO=? AND CODCPI=?" />
+
+<STATEMENT name="UPD_SETT_TIPO" query="update DE_SETTIMANA_TIPO set
+                  STRDESCRIZIONESETTIMANA = ?,
+                  DATINIZIOVAL = nvl(to_date(?, &apos;dd/mm/yyyy&apos;), DATINIZIOVAL),
+                  DATFINEVAL = nvl(to_date(?, &apos;dd/mm/yyyy&apos;), DATFINEVAL),
+                  NUMKLO = ? + 1
+                  where PRGSETTIPO=? AND CODCPI=?" />
+
+<STATEMENT name="COUNT_SLOT_TIPO" query="select count(*) as NRO_SLOT from ag_slot_tipo
+                  where PRGSETTIPO=? and CODCPI=?" />
+
+<STATEMENT name="DEL_SETT_TIPO" query="DELETE FROM DE_SETTIMANA_TIPO WHERE PRGSETTIPO=? AND CODCPI=?" />
+
+<STATEMENT name="DEL_ALL_SLOT_TIPO" query="DELETE FROM AG_SLOT_TIPO WHERE PRGSETTIPO=? AND CODCPI=?" />
+
+<STATEMENT name="SEL_GIORNO_TIPO_X_OPE" query="select 
+                       ag_slot_tipo.PRGGIORNO,
+                       to_char(ag_slot_tipo.PRGSPI) as PRGSPI, an_spi.STRCOGNOME || ' ' || an_spi.STRNOME as operatore,
+                       ag_slot_tipo.CODSERVIZIO, nvl(de_servizio.STRDESCRIZIONE, &apos;Non Specificato&apos;) as servizio,
+                       ag_slot_tipo.STRORADALLE,
+                       ag_slot_tipo.STRORAALLE,
+                       ag_slot_tipo.NUMMINUTI,
+                       ag_slot_tipo.NUMQTA
+                  from ag_slot_tipo
+                     left outer join an_spi on (ag_slot_tipo.PRGSPI=an_spi.PRGSPI)
+                     left outer join de_servizio on (ag_slot_tipo.CODSERVIZIO=de_servizio.CODSERVIZIO)
+                  where ag_slot_tipo.PRGSETTIPO=? and codcpi=? and ag_slot_tipo.NUMGIORNOSETT=?
+                  ORDER by ag_slot_tipo.PRGSPI, ag_slot_tipo.CODSERVIZIO, ag_slot_tipo.STRORADALLE" />
+
+<STATEMENT name="SEL_GIORNO_TIPO_X_SERV" query="select 
+                       ag_slot_tipo.PRGGIORNO,
+                       to_char(ag_slot_tipo.PRGSPI) as PRGSPI, an_spi.STRCOGNOME || ' ' || an_spi.STRNOME as operatore,
+                       ag_slot_tipo.CODSERVIZIO, nvl(de_servizio.STRDESCRIZIONE, &apos;Non Specificato&apos;) as servizio,
+                       ag_slot_tipo.STRORADALLE,
+                       ag_slot_tipo.STRORAALLE,
+                       ag_slot_tipo.NUMMINUTI,
+                       ag_slot_tipo.NUMQTA
+                  from ag_slot_tipo
+                     left outer join an_spi on (ag_slot_tipo.PRGSPI=an_spi.PRGSPI)
+                     left outer join de_servizio on (ag_slot_tipo.CODSERVIZIO=de_servizio.CODSERVIZIO)
+                  where ag_slot_tipo.PRGSETTIPO=? and codcpi=? and ag_slot_tipo.NUMGIORNOSETT=?
+                  ORDER by ag_slot_tipo.CODSERVIZIO, ag_slot_tipo.PRGSPI, ag_slot_tipo.STRORADALLE" />
+
+<STATEMENT name="SEL_SETT_TIPO_NRO_X_OPE" query="select ag_slot_tipo.PRGSPI as codice, 
+                       an_spi.STRCOGNOME || &apos; &apos; || an_spi.STRNOME as descr,
+                       to_char(ag_slot_tipo.NUMGIORNOSETT) as NUMGIORNOSETT,
+                       sum(nvl(ag_slot_tipo.NUMQTA, 0)) as nro
+                  from ag_slot_tipo
+                     LEFT outer join an_spi on (ag_slot_tipo.PRGSPI=an_spi.PRGSPI)
+                  where ag_slot_tipo.PRGSETTIPO=? and codcpi=?
+                  group by NUMGIORNOSETT, ag_slot_tipo.PRGSPI, an_spi.STRCOGNOME, an_spi.STRNOME" />
+
+<STATEMENT name="SEL_SETT_TIPO_NRO_X_SERV" query="select ag_slot_tipo.CODSERVIZIO as codice, 
+                       nvl(de_servizio.STRDESCRIZIONE, &apos;Non Specificato&apos;) as descr,
+                       to_char(ag_slot_tipo.NUMGIORNOSETT) as NUMGIORNOSETT,
+                       sum(nvl(ag_slot_tipo.NUMQTA, 0)) as nro
+                  from ag_slot_tipo
+                     LEFT outer join de_servizio on (ag_slot_tipo.CODSERVIZIO=de_servizio.CODSERVIZIO)
+                  where ag_slot_tipo.PRGSETTIPO=? and codcpi=?
+                  group by NUMGIORNOSETT, ag_slot_tipo.CODSERVIZIO, de_servizio.STRDESCRIZIONE" />
+
+<STATEMENT name="DESCR_SETT_TIPO" query="select strDescrizioneSettimana from de_settimana_tipo
+                    where prgsettipo=? and codcpi=?" />
+
+<STATEMENT name="DETT_SLOT_TIPO" query="select * from ag_slot_tipo 
+                  where PRGSETTIPO=? and CODCPI=? and NUMGIORNOSETT=? and PRGGIORNO=?" />
+
+<STATEMENT name="UPD_SLOT_TIPO" query="update AG_SLOT_TIPO set
+                  PRGSPI=?,
+                  CODSERVIZIO=?,
+                  PRGAMBIENTE=?,
+                  CODDESTINATARIO=?,
+                  FLGPUBBLICO=?,
+                  STRORADALLE=?,
+                  STRORAALLE=?,
+                  NUMMINUTI=?,
+                  NUMQTA=?
+                  where
+                    CODCPI=? and PRGSETTIPO=? and NUMGIORNOSETT=? and PRGGIORNO=?" />
+
+<STATEMENT name="INS_SLOT_TIPO" query="insert into AG_SLOT_TIPO
+                  (CODCPI, PRGSETTIPO, NUMGIORNOSETT, PRGGIORNO, PRGSPI, CODSERVIZIO, 
+                  PRGAMBIENTE, CODDESTINATARIO, FLGPUBBLICO,
+                  STRORADALLE, STRORAALLE, NUMMINUTI, NUMQTA)
+                  values
+                  (?, ?, ?, S_AG_SLOT_TIPO.NextVal, ?, ?,
+                  ?, ?, ?,
+                  ?, ?, ?, ?)" />
+
+<STATEMENT name="CHECK_SLOT_TIPO_I_U" query="select PRGGIORNO from AG_SLOT_TIPO
+                  where
+                      CODCPI=? and
+                      PRGSETTIPO=? and
+                      NUMGIORNOSETT=? and
+                      PRGSPI=? and
+                      CODSERVIZIO=? and
+                      PRGAMBIENTE=? and
+                      CODDESTINATARIO=? and
+                      STRORADALLE=? and
+                      STRORAALLE=?" />
+
+<STATEMENT name="DEL_SLOT_TIPO" query="delete from AG_SLOT_TIPO where PRGSETTIPO=? and CODCPI=? and NUMGIORNOSETT=? and PRGGIORNO=?" />
+
+
+<STATEMENT name="COPIA_GIORNO_TIPO" query="insert into AG_SLOT_TIPO 
+				(CODCPI, PRGSETTIPO, NUMGIORNOSETT, PRGGIORNO, 
+				PRGSPI, CODSERVIZIO, PRGAMBIENTE, FLGPUBBLICO, 
+				STRORADALLE, STRORAALLE, NUMMINUTI, NUMQTA, 
+				CODDESTINATARIO)
+				select
+				ag2.CODCPI, ag2.PRGSETTIPO, ?, S_AG_SLOT_TIPO.NEXTVAL,
+				ag2.prgspi, ag2.codServizio, ag2.prgAmbiente, ag2.FLGPUBBLICO,
+				ag2.STRORADALLE, ag2.STRORAALLE, ag2.NUMMINUTI, ag2.NUMQTA,
+				ag2.CODDESTINATARIO 
+				from AG_SLOT_TIPO ag2
+				where ag2.CODCPI=? and ag2.PRGSETTIPO=? and ag2.NUMGIORNOSETT=?" />
+
+<!-- Gestione Slot -->
+<STATEMENT name="SELECT_COMBO_STATO_SLOT" query="select CODSTATOSLOT as CODICE, 
+                STRDESCRIZIONE || DECODE(SYSDATE,    
+                                  GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                  &apos;&apos;) AS DESCRIZIONE
+                from DE_STATO_SLOT 
+                WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                      to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                order by STRDESCRIZIONE" />
+
+<STATEMENT name="SELECT_COMBO_AMBIENTE" query="select PRGAMBIENTE as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_AMBIENTE 
+                  WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;) 
+                        and CODCPI=? 
+                  order by STRDESCRIZIONE" />
+
+<STATEMENT name="SELECT_COMBO_DESTINATARIO" query="select CODDESTINATARIO as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_DESTINATARIO 
+                  WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;) 
+                  order by STRDESCRIZIONE" />
+
+<STATEMENT name="DETTAGLIO_SLOT"
+	query="SELECT 
+                  PRGSLOT, ag_slot.CODCPI, 
+                  to_char(DTMDATAORA,&apos;dd/mm/yyyy&apos;) as data, 
+                  to_char(DTMDATAORA,&apos;hh24:mi&apos;) as orario,
+                  to_char(NUMMINUTI) as NUMMINUTI, 
+                  CODSERVIZIO, 
+                  to_char(PRGAMBIENTE) as PRGAMBIENTE, 
+                  STRNOTE,
+                  FLGPUBBLICO, 
+                  to_char(NUMAZIENDE) as NUMAZIENDE, 
+                  to_chaR(NUMLAVORATORI) as NUMLAVORATORI, 
+                  to_char(NUMAZIENDEPRENOTATE) as NUMAZIENDEPRENOTATE,
+                  to_char(NUMLAVPRENOTATI) as NUMLAVPRENOTATI,
+                  CODSTATOSLOT,
+                  ag_slot.CDNUTINS, 
+                  to_char(ag_slot.DTMINS, &apos;dd/mm/yyyy&apos;) as DTMINS, 
+                  ag_slot.CDNUTMOD, 
+                  to_char(ag_slot.DTMMOD, &apos;dd/mm/yyyy&apos;) as DTMMOD,
+                  NUMKLOSLOT
+                FROM AG_SLOT
+                WHERE ag_slot.CODCPI=?
+                AND ag_slot.PRGSLOT=?" />
+
+<STATEMENT name="INS_SLOT" query="insert into AG_SLOT
+                  (PRGSLOT, CODCPI, DTMDATAORA, NUMMINUTI, 
+                  CODSERVIZIO, PRGAMBIENTE, STRNOTE, 
+                  FLGPUBBLICO, 
+                  NUMAZIENDE, NUMLAVORATORI, 
+                  CODSTATOSLOT, 
+                  CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)
+                  values
+                  (?, ?, to_date(?,&apos;dd-mm-yyyy hh24:mi&apos;), ?,
+                  ?, ?, ?,
+                  ?,
+                  ?, ?,
+                  ?,
+                  ?, sysdate, ?, sysdate)" />
+
+<STATEMENT name="UPD_SLOT" query="UPDATE AG_SLOT SET
+                    DTMDATAORA = to_date(?,&apos;dd-mm-yyyy hh24:mi&apos;),
+                    NUMMINUTI = ?,
+                    CODSERVIZIO = ?,
+                    PRGAMBIENTE = ?,
+                    STRNOTE = ?,
+                    FLGPUBBLICO = ?,
+                    NUMAZIENDE = ?,
+                    NUMLAVORATORI = ?,
+                    CODSTATOSLOT = ?,
+                    CDNUTMOD = ?,
+                    DTMMOD = sysdate,
+                    NUMKLOSLOT = ? + 1
+                  where
+                    CODCPI = ? and PRGSLOT = ?" />
+
+<STATEMENT name="DEL_SLOT" query="delete from AG_SLOT where CODCPI=? and PRGSLOT=? " />
+
+<STATEMENT name="INS_SLOT_OPERATORE" query="insert into ag_spi_slot (PRGSPI, CODCPI, PRGSLOT)
+                  values (?, ?, ?)" />
+
+<STATEMENT name="SEL_SLOT_OPERATORE" query="SELECT COUNT(*) AS NRO FROM AG_SPI_SLOT WHERE 
+                 PRGSPI = ? AND
+                 CODCPI = ? AND
+                 PRGSLOT=?" />
+<STATEMENT name="UPD_SLOT_OPERATORE" query="UPDATE AG_SPI_SLOT SET PRGSPI = ?
+           	     WHERE
+                 PRGSPI = ? AND
+                 CODCPI = ? AND
+                 PRGSLOT=?" />
+
+<STATEMENT name="SEL_OPERATORI_SLOT" query="select ag_spi_slot.*, an_spi.strCognome, an_spi.strNome, 
+				case when (an_spi.datfineval &lt;= sysdate OR an_spi.datinizioval &gt;= sysdate)  then 'false' else 'true' end as flgSpiValido
+                  from ag_spi_slot
+                  inner join an_spi on ag_spi_slot.prgspi=an_spi.prgSpi
+                  where ag_spi_slot.prgslot=? and ag_spi_slot.codcpi=?" />
+
+<STATEMENT name="DEL_OPERATORE_SLOT" query="delete from ag_spi_slot where prgspi=? and codcpi=? and prgslot=?" />
+
+<STATEMENT name="SEL_INCONGRUENZE_SLOT" query="select * from VW_SLOT_ERR where CODCPI=? and PRGSLOT=?" />
+
+<!-- Slot da Settimana Tipo -->
+<STATEMENT name="SELECT_COMBO_SETTIMANA_TIPO" query="select PRGSETTIPO as CODICE, 
+                STRDESCRIZIONESETTIMANA  AS DESCRIZIONE, to_char(datInizioVal,'dd/mm/yyyy') as datInizioVal, 
+                                  to_char(datFineVal, 'dd/mm/yyyy') as datFineVal
+                from DE_SETTIMANA_TIPO 
+                WHERE to_date(to_char(DATFINEVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &gt;=
+                      to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                      and CODCPI=?
+                order by STRDESCRIZIONESETTIMANA" />
+
+<STATEMENT name="INS_MASSIVO_SLOT" query="{ call ? := PG_AGENDA.PDINSERISCISLOTDASETTIMANA(?,?,?,?,?,?,?) }" />
+
+<STATEMENT name="CANC_MASSIVA_SLOT" query="{ call ? := PG_AGENDA.PDCANCELLASLOTMASSIVA(?,?,?,?,?,?,?) }" />
+
+<STATEMENT name="INS_MULTIPLO_SLOT" query="{ call ? := PG_AGENDA.pdInsMultiploSlot(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) }" />
+
+<!-- Debug -->
+<STATEMENT name="SEL_GIORNI_NL" query="select numgg, nummm, nvl(numaaaa,to_char(sysdate, &apos;yyyy&apos;)) as numaaaa 
+                  from ag_giornonl where codcpi=&apos;04830110&apos; and numgsett is null" />
+
+
+<STATEMENT name="SEL_FLAG_SN" query="select &apos;S&apos; as codice, &apos;Si&apos; as descrizione from dual
+                  union
+                  select &apos;N&apos; as codice, &apos;No&apos; as descrizione from dual
+                  order by 1 desc" />
+<!-- fine sezione Stefy -->
+
+<!-- Ricerca Contatti SMS - Giordano Gritti -->
+
+<STATEMENT name="SELECT_SMS_COMBO_CPI" query="SELECT CODICE, DESCRIZIONE FROM (
+				SELECT DISTINCT
+					CPI.CODCPI AS CODICE,
+					CPI.STRDESCRIZIONE || ' - ' || CPI.CODCPI AS DESCRIZIONE					
+				FROM DE_CPI CPI, TS_GENERALE GEN, DE_COMUNE COM
+				WHERE CPI.CODPROVINCIA = GEN.CODPROVINCIASIL
+				AND   CPI.CODCPI = COM.CODCPI
+				AND   TRUNC(SYSDATE) &lt;= TRUNC(CPI.DATFINEVAL)
+				UNION
+				SELECT DISTINCT
+					CPI.CODCPI AS CODICE,
+					CPI.STRDESCRIZIONE || ' - ' || CPI.CODCPI || ' (SCADUTO)' AS DESCRIZIONE					
+				FROM DE_CPI CPI, TS_GENERALE GEN
+				WHERE CPI.CODPROVINCIA = GEN.CODPROVINCIASIL
+				AND  TRUNC(CPI.DATFINEVAL) &lt;= TRUNC(SYSDATE) 
+       		    AND trunc(CPI.DATFINEVAL) &gt;= (select trunc(datscadcpi) from ts_generale)
+				)
+				ORDER BY DESCRIZIONE" />
+
+
+<STATEMENT name="SELECT_SMS_COMBO_ESITO_APPUNTAMENTO" query="select CODESITOAPPUNT as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_ESITO_APPUNT 
+                  WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                  order by STRDESCRIZIONE" />
+                  
+<STATEMENT name="SELECT_SMS_COMBO_AMBIENTE" query="select PRGAMBIENTE as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_AMBIENTE 
+                  WHERE 
+                        CODCPI=? 
+                  order by STRDESCRIZIONE" />
+                  
+<STATEMENT name="SELECT_SMS_DETTAGLIO_AGENDA"
+	query="SELECT 
+                    PRGAPPUNTAMENTO, ag_agenda.CODCPI, de_cpi.STRDESCRIZIONE as DESCRIZIONECPI, 
+                    de_cpi.STRDESCRIZIONEMIN, de_cpi.strtel as TELCPI, de_cpi.strtelrdc as TELRDCCPI,
+                    de_cpi.strindirizzo as INDIRIZZOCPI,
+                    to_char(DTMDATAORA,'dd/mm/yyyy') as data, 
+                    to_char(DTMDATAORA,'hh24:mi') as orario,
+                    NUMORAINIZIOEFF, NUMORAFINEEFF,
+                    NUMMINUTI, CODSERVIZIO, PRGSPI, PRGSPIEFF, PRGAMBIENTE,
+                    TXTNOTE, PRGTIPOPRENOTAZIONE, STRTELRIF, 
+                    STREMAILRIF, STRTELMOBILERIF, CODEFFETTOAPPUNT, 
+                    CODESITOAPPUNT, CODSTATOAPPUNTAMENTO, 
+                    NUMKLOAGENDA, ag_agenda.PRGAZIENDA, ag_agenda.PRGUNITA,
+                    InitCap(AN_AZIENDA.STRRAGIONESOCIALE) as strRagioneSociale, 
+                    AN_AZIENDA.STRPARTITAIVA,
+                    AN_UNITA_AZIENDA.STRTEL,
+                    AN_UNITA_AZIENDA.STRINDIRIZZO, 
+                    InitCap(DE_COMUNE.STRDENOMINAZIONE) as comune_az,
+                    ag_agenda.CDNUTINS, 
+                    to_char(ag_agenda.DTMINS, 'dd/mm/yyyy hh24:mi') as DTMINS, 
+                    ag_agenda.CDNUTMOD, 
+                    to_char(ag_agenda.DTMMOD, 'dd/mm/yyyy hh24:mi') as DTMMOD
+                  FROM AG_AGENDA
+                  left JOIN AN_UNITA_AZIENDA on (ag_agenda.PRGAZIENDA=an_unita_azienda.PRGAZIENDA and ag_agenda.PRGUNITA=an_unita_azienda.PRGUNITA)
+                  left join de_comune on (an_unita_azienda.CODCOM=de_comune.CODCOM)
+                  left JOIN AN_AZIENDA on (an_unita_azienda.PRGAZIENDA=an_azienda.PRGAZIENDA)
+                  inner join DE_CPI on (ag_agenda.codcpi = de_cpi.codcpi)
+                  WHERE ag_agenda.CODCPI=?
+                  AND ag_agenda.PRGAPPUNTAMENTO=?" />
+                   
+<STATEMENT name="SELECT_SMS_RECUPERADATICONTATTO"
+	query="	SELECT  to_char(ag_agenda.DTMDATAORA, 'dd/mm/yyyy') data, 
+					to_char(ag_agenda.DTMDATAORA, 'hh24:mi') ora,
+					an_lavoratore.STRCELL,
+					an_lavoratore.STRCOGNOME,
+					an_lavoratore.STRNOME,
+					an_lavoratore.STRCODICEFISCALE,					 
+					de_cpi.STRDESCRIZIONE,
+                    ag_agenda.CODSERVIZIO,
+                    de_cpi.strtel AS TELCPI,
+                    de_cpi.STRTELRDC as TELRDCCPI,
+                    DECODE (trunc(SYSDATE-1), GREATEST(TRUNC(SYSDATE-1), nvl(trunc(an_lavoratore.datinviosms),TRUNC(sysdate+1))),'N',an_lavoratore.FLGINVIOSMS) AS FLGINVIOSMS                     
+			FROM
+					ag_agenda, ag_lavoratore, an_lavoratore, de_cpi
+			WHERE
+					ag_agenda.CODCPI = ag_lavoratore.CODCPI and
+					ag_agenda.PRGAPPUNTAMENTO = ag_lavoratore.PRGAPPUNTAMENTO and
+					ag_lavoratore.CDNLAVORATORE = an_lavoratore.CDNLAVORATORE and
+					ag_agenda.CODCPI = de_cpi.CODCPI and 
+					ag_lavoratore.CODCPI = ? and 
+					ag_lavoratore.CDNLAVORATORE = ? and					
+					ag_lavoratore.PRGAPPUNTAMENTO = ?" />
+
+
+<STATEMENT name="SELECT_SMS_CREACONTATTO"
+	query="	SELECT  to_char(ag_agenda.DTMDATAORA, 'dd/mm/yyyy') data, 
+					to_char(ag_agenda.DTMDATAORA, 'hh24:mi') ora,
+					an_lavoratore.STRCELL, 
+					de_cpi.STRDESCRIZIONE
+			FROM
+					ag_agenda, ag_lavoratore, an_lavoratore, de_cpi
+			WHERE
+					ag_agenda.CODCPI = ag_lavoratore.CODCPI and
+					ag_agenda.PRGAPPUNTAMENTO = ag_lavoratore.PRGAPPUNTAMENTO and
+					ag_lavoratore.CDNLAVORATORE = an_lavoratore.CDNLAVORATORE and
+					ag_agenda.CODCPI = de_cpi.CODCPI and 
+					ag_lavoratore.CODCPI = ? and 
+					ag_lavoratore.PRGAPPUNTAMENTO = ? and
+					ag_lavoratore.CDNLAVORATORE = ?" />
+		
+		
+<STATEMENT name="S_GETCPI_CONTATTO"
+	query="	select j. codcpicontatto as codcpicontatto from ag_contatto j
+where j. prgcontatto = ? " />
+
+<!-- <STATEMENT name="SELECT_COMBO_SERVIZIO_SCAD_COLLOQUI"
+	query="select CODSERVIZIO as CODICE, 
+                  DECODE( GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...' )
+                  || DECODE(SYSDATE,    
+                                GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                '') AS DESCRIZIONE,                                
+                  DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                               LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                               '') AS STRSCADUTO  
+                  from DE_SERVIZIO 
+                  WHERE ( ((to_date(nvl(?, to_char(sysdate, 'dd/mm/yyyy')), 'dd/mm/yyyy') 
+                  BETWEEN  to_date(to_char(DATINIZIOVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy') and
+                  to_date(to_char(DATFINEVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy')) and (nvl(flgprogramma, 'N') = 'S'))
+                  or (CODSERVIZIO = nvl(?,'')) ) 
+                  order by DECODE(STRSCADUTO,'',0,1),STRDESCRIZIONE"/> -->
+                  
+<STATEMENT name="SELECT_COMBO_SERVIZIO_SCAD_COLLOQUI"
+	query="select CODSERVIZIO as CODICE, STRDESCRIZIONE AS DESCRIZIONE,                                
+                 DECODE(SYSDATE,     GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL), 'SCADUTI',
+       			 LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),'SCADUTI',   'VALIDI') as gruppo,
+        		DECODE(SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL), 2,
+           		LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL), 2, 1) as ordine_gruppo
+       from DE_SERVIZIO 
+          WHERE ( ((to_date(nvl(?, to_char(sysdate, 'dd/mm/yyyy')), 'dd/mm/yyyy') 
+                  BETWEEN  to_date(to_char(DATINIZIOVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy') and
+                  to_date(to_char(DATFINEVAL, 'dd/mm/yyyy'), 'dd/mm/yyyy')) and (nvl(flgprogramma, 'N') = 'S'))
+                  or (CODSERVIZIO = nvl(?,'')) )  
+           order by ordine_gruppo, STRDESCRIZIONE"/>
+           
+ <STATEMENT name="SELECT_COMBO_ESITO_APPUNTAMENTO_ANPAL" query="select CODESITONOTIFICA as CODICE, 
+                  CODESITONOTIFICA || '-' || STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE 
+                  from MN_ESITO_NOTIFICA_APP 
+                  WHERE to_date(to_char(DATINIZIOVAL, &apos;dd/mm/yyyy&apos;), &apos;dd/mm/yyyy&apos;) &lt;=
+                        to_date(nvl(?, to_char(sysdate, &apos;dd/mm/yyyy&apos;)), &apos;dd/mm/yyyy&apos;)
+                  order by STRDESCRIZIONE" />
+ <STATEMENT name="SELECT_DESCRIZIONE_ESITO_APPUNTAMENTO_ANPAL" query="select STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE 
+                  from MN_ESITO_NOTIFICA_APP 
+                  WHERE CODESITONOTIFICA = ?
+                  " />                  

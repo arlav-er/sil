@@ -1,0 +1,210 @@
+<!-- ============================================================================== -->
+<!-- CONTENUTO DA METTERE NEGLI OPPORTUNI FILE XML PER FAR FUNZIONARE I "TEMPLATE"  -->
+<!-- ============================================================================== -->
+
+<PAGE name="TemplateListDettPage">
+	<MODULES>
+		<MODULE name="TemplateListModule" />
+		<MODULE name="TemplateSelectModule" />
+		<MODULE name="TemplateInsertModule" />
+		<MODULE name="TemplateUpdateModule" />
+		<MODULE name="TemplateDeleteModule" />
+	</MODULES>
+	<DEPENDENCIES>
+
+		<!-- Carica un elemento selezionato per poterlo vedere e/o modificare -->
+		<DEPENDENCE source="TemplateListDettPage"
+			target="TemplateSelectModule">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST"
+					value="TemplateSelectModule" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+		<!-- Nella mainPage si vuole inserire un nuovo elemento,
+			dopo l'inserimento, ricarico l'ultimo inserimento in modo 
+			da visualizzarlo nel pannello "nuovo" e aggiono la lista -->
+		<DEPENDENCE source="TemplateListDettPage"
+			target="TemplateInsertModule">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST"
+					value="TemplateInsertModule" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+		<!-- Dalla pagina di dettaglio esegue un update dei dati e,
+			se tutto è andato bene, torna alla mainPage -->
+		<DEPENDENCE source="TemplateListDettPage"
+			target="TemplateUpdateModule">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST"
+					value="TemplateUpdateModule" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+		<!-- Cancellazione elemento -->
+		<DEPENDENCE source="TemplateListDettPage"
+			target="TemplateDeleteModule">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST"
+					value="TemplateDeleteModule" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+		<!-- Carica sempre la lista: la faccio alla fine, DOPO LE EVENTUALI MODIFICHE! -->
+		<DEPENDENCE source="TemplateListDettPage"
+			target="TemplateListModule" />
+
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- ============================================================================== -->
+
+
+<MODULE name="TemplateListModule"
+	class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="TEMPLATE_LIST">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST"
+				value="CDNLAVORATORE" />
+		</QUERY>
+		<COLUMNS>
+			<COLUMN name="STRSPECIFICA" label="Credito" />
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" label=""
+				confirm="false">
+				<PARAMETER name="PRGCREDITO" type="RELATIVE"
+					scope="LOCAL" value="PRGCREDITO" />
+			</SELECT_CAPTION>
+			<DELETE_CAPTION image="../../img/del.gif" label=""
+				confirm="false">
+				<PARAMETER name="PRGCREDITO" type="RELATIVE"
+					scope="LOCAL" value="PRGCREDITO" />
+				<PARAMETER name="STRSPECIFICA" type="RELATIVE"
+					scope="LOCAL" value="STRSPECIFICA" />
+			</DELETE_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="TemplateSelectModule"
+	class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="TEMPLATE_SELECT">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST"
+				value="PRGCREDITO" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST"
+				value="CDNLAVORATORE" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="TemplateInsertModule"
+	class="it.eng.sil.module.doInsertModule">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="TEMPLATE_INSERT">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST"
+				value="CDNLAVORATORE" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST"
+				value="STRSPECIFICA" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST"
+				value="CDNUTINS" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST"
+				value="CDNUTINS" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="TemplateUpdateModule"
+	class="it.eng.sil.module.doUpdateModule">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="TEMPLATE_UPDATE">
+			<!--SET-->
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST"
+				value="STRSPECIFICA" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST"
+				value="CDNUTMOD" />
+			<!--WHERE-->
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST"
+				value="PRGCREDITO" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST"
+				value="CDNLAVORATORE" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="TemplateDeleteModule"
+	class="it.eng.sil.module.doDeleteModule">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="TEMPLATE_DELETE">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST"
+				value="PRGCREDITO" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST"
+				value="CDNLAVORATORE" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+
+<!-- ============================================================================== -->
+
+
+<MAPPING business_name="TemplateListDettPage" business_type="PAGE"
+	publisher_name="TemplateListDettPub" />
+
+
+<!-- ============================================================================== -->
+
+
+<PUBLISHER name="TemplateListDettPub">
+	<RENDERING channel="HTTP" type="JSP" mode="FORWARD">
+		<RESOURCES>
+			<item prog="0"
+				resource="/jsp/_template/listaConPopupDett.jsp" />
+		</RESOURCES>
+	</RENDERING>
+</PUBLISHER>
+
+
+<!-- ============================================================================== -->
+
+
+<STATEMENT name="TEMPLATE_LIST"
+	query="SELECT PRGCREDITO, STRSPECIFICA
+				FROM PR_CREDITO
+				WHERE CDNLAVORATORE = ?
+				ORDER BY STRSPECIFICA" />
+
+<STATEMENT name="TEMPLATE_SELECT"
+	query="SELECT PRGCREDITO, STRSPECIFICA,
+					CDNUTINS, to_char(DTMINS,'dd/mm/yyyy') as DTMINS,
+					CDNUTMOD, to_char(DTMMOD,'dd/mm/yyyy') as DTMMOD
+				FROM PR_CREDITO
+				WHERE PRGCREDITO = ?
+				AND   CDNLAVORATORE = ? " />
+
+<STATEMENT name="TEMPLATE_INSERT"
+	query="INSERT INTO PR_CREDITO
+				(PRGCREDITO, CDNLAVORATORE, STRSPECIFICA,
+				 CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)
+				VALUES
+				(S_PR_CREDITO.nextval, ?, ?,
+				 ?, SYSDATE, ?, SYSDATE) " />
+
+<STATEMENT name="TEMPLATE_UPDATE"
+	query="UPDATE PR_CREDITO
+  				SET STRSPECIFICA = ?,
+  					CDNUTMOD = ?,
+  					DTMMOD = SYSDATE
+  				WHERE PRGCREDITO = ?
+  				AND   CDNLAVORATORE = ? " />
+
+<STATEMENT name="TEMPLATE_DELETE"
+	query="DELETE FROM PR_CREDITO
+  				WHERE PRGCREDITO = ?
+  				AND   CDNLAVORATORE = ? " />
+
+
+<!-- ============================================================================== -->

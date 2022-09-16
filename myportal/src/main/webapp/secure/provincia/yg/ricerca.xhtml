@@ -1,0 +1,653 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+
+</h:head>
+
+<f:metadata>
+	<f:event listener="#{ygRicercaAdesioneBean.checkViewPage()}"
+		type="preRenderView" />
+</f:metadata>
+
+<h:body>
+
+	<ui:composition template="../../template/main.xhtml">
+
+		<f:loadBundle basename="conf.const" var="const" />
+
+		<ui:define name="title">
+			<h:outputText value="#{txt['provincia.yg.ricerca_adesioni.titolo']}"
+				escape="false" />
+		</ui:define>
+
+		<ui:define name="content">
+			<h:outputText
+				value="#{txt['provincia.yg.ricerca_adesioni.descrizione']}"
+				escape="false" />
+
+			<div class="widget_container ui-tabs ui-widget-content ui-corner-all">
+				<h:form id="form_ricerca">
+					<h:panelGroup id="panel" layout="block">
+						<h:panelGrid columns="2">
+
+							<cc:inputText id="nome" label="Nome" title="Nome del lavoratore"
+								required="false"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.nome}" />
+
+							<cc:inputText id="cognome" label="Cognome"
+								title="Cognome del lavoratore" required="false"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.cognome}" />
+
+							<cc:inputText id="codice_fiscale" label="Codice fiscale"
+								title="Codice fiscale del lavoratore" required="false"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.codiceFiscale}" />
+
+							<cc:inputText id="email" label="Indirizzo email"
+								title="Indirizzo email del lavoratore" required="false"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.email}" />
+
+							<cc:inputText id="data_adesione_da" type="date"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.dataAdesioneDa}"
+								label="Data adesione dal" />
+
+							<cc:inputText id="data_adesione_a" type="date"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.dataAdesioneA}"
+								label="Data adesione al">
+								<f:attribute name="data_da_id"
+									value="form_ricerca:data_adesione_da:inputText" />
+								<f:validator validatorId="twoDatesEqualOrLessValidator"
+									for="function" />
+							</cc:inputText>
+
+							<cc:inputText id="data_fine_stato_adesione_da" type="date"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.dataFineStatoAdesioneDa}"
+								label="Data fine stato dal" />
+
+							<cc:inputText id="data_fine_stato_adesione_a" type="date"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.dataFineStatoAdesioneA}"
+								label="Data fine stato al">
+								<f:attribute name="data_da_id"
+									value="form_ricerca:data_fine_stato_adesione_da:inputText" />
+								<f:validator validatorId="twoDatesEqualOrLessValidator"
+									for="function" />
+							</cc:inputText>
+
+							<cc:selectOneRadio id="tipo_ricerca"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.tipoRicerca}"
+								label="Tipo di ricerca"
+								requiredMessage="Tipo di ricerca obbligatorio">
+								<f:selectItems value="#{ygRicercaAdesioneBean.tipiRicerca}" />
+							</cc:selectOneRadio>
+
+							<cc:selectOneRadio id="tipo_adesione"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.tipoAdesione}"
+								label="Tipo Adesione"
+								requiredMessage="Tipo Adesione obbligatorio">
+								<f:selectItems value="#{ygRicercaAdesioneBean.tipiAdesione}" />
+							</cc:selectOneRadio>
+
+							<cc:selectOneRadio id="stato_presa_carico"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.statoPresaCarico}"
+								label="Appuntamento"
+								requiredMessage="Stato di presa in carico obbligatorio">
+								<f:selectItems value="#{ygRicercaAdesioneBean.statiPresaCarico}" />
+							</cc:selectOneRadio>
+
+							<cc:selectOneRadio id="regione_rif_notifica"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.regioneRifNotifica}"
+								label="Regione adesione" requiredMessage="Regione adesione">
+								<f:selectItems
+									value="#{ygRicercaAdesioneBean.regioniRifNotifica}" />
+							</cc:selectOneRadio>
+
+							<cc:selectOneRadio id="assegnazione_provincia"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.assegnazioneProvincia}"
+								label="Assegnazione Provincia"
+								requiredMessage="Assegnazione Provincia obbligatorio">
+								<f:selectItems
+									value="#{ygRicercaAdesioneBean.assegnazioniProvincia}" />
+							</cc:selectOneRadio>
+
+							<cc:selectOneMenu label="CPI di riferimento" id="cpi_adesione"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.cpiAdesione.id}"
+								requiredMessage="Il CPI di riferimento e' obbligatorio">
+								<f:selectItems value="#{ygRicercaAdesioneBean.cpiSelectItems}" />
+							</cc:selectOneMenu>
+
+							<cc:selectOneMenu label="Stato Regionale (ad uso Redazione)"
+								id="stato_adesione"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.statoAdesione.id}">
+								<f:selectItem
+									itemValue="${ygRicercaAdesioneBean.parametriRicerca.codSenzaStato}"
+									itemLabel="${ygRicercaAdesioneBean.parametriRicerca.labelSenzaStato}" />
+								<f:selectItems value="#{utilsBean.statoAdesione}" var="entry"
+									itemValue="#{entry.id}" itemLabel="#{entry.descrizione}" />
+							</cc:selectOneMenu>
+
+							<cc:selectOneMenu label="Stato Ministeriale"
+								id="stato_adesione_min"
+								value="#{ygRicercaAdesioneBean.parametriRicerca.statoAdesioneMin.id}">
+								<f:selectItems value="#{utilsBean.statoAdesioneMin}" var="entry"
+									itemValue="#{entry.id}" itemLabel="#{entry.descrizione}" />
+							</cc:selectOneMenu>
+
+						</h:panelGrid>
+					</h:panelGroup>
+
+					<h:commandLink id="search_button" value="Cerca"
+						styleClass="searchButton some-margin-top some-margin-bottom"
+						action="#{ygRicercaAdesioneBean.search(true)}"
+						onevent="nascondiListaRisultato">
+					</h:commandLink>
+
+				</h:form>
+
+				<h:form style="display: none" id="changePageForm">
+					<h:inputHidden id="pageValue"
+						value="#{ygRicercaAdesioneBean.paginationHandler.currentPage}" />
+					<h:commandButton id="pageCommand"
+						action="#{ygRicercaAdesioneBean.changePage}" value="click me">
+						<f:ajax execute="@form" render=":form_lista_adesioni:results" />
+					</h:commandButton>
+				</h:form>
+
+				<h:form id="form_lista_adesioni">
+					<h:panelGroup id="lista_adesioni">
+
+						<cc:waiting hidden="true" waitMessage="Ricerca in corso..."
+							activatorId="form_ricerca:search_button" />
+
+						<center>
+							<h2>
+								<h:outputText value="Nessuna adesione trovata"
+									rendered="#{empty ygRicercaAdesioneBean.risultatoRicerca and ygRicercaAdesioneBean.ricercaEseguita}" />
+							</h2>
+						</center>
+
+						<h:panelGroup id="lista_risultato"
+							rendered="#{not empty ygRicercaAdesioneBean.risultatoRicerca and ygRicercaAdesioneBean.ricercaEseguita}">
+
+							<script type="text/javascript">					
+							$(function() {							
+						 	   $("#pagination").pagination({							    
+						    	pages: #{ygRicercaAdesioneBean.paginationHandler.pages()},						       
+						        cssStyle: 'light-theme',
+						        prevText: 'Prec.',
+						        nextText: 'Succ.',
+						        currentPage: #{ygRicercaAdesioneBean.paginationHandler.currentPage},
+						        onPageClick: function (pageNumber, event) {							        
+						        	document.getElementById('changePageForm:pageValue').value = pageNumber;
+						            document.getElementById('changePageForm:pageCommand').click();
+						            $("#form_lista_adesioni\\:results").css("display", "none");					            
+						            $("#form_lista_adesioni\\:resultsLoader").css("display", "block");
+						            $("#form_lista_adesioni\\:resultsLoader").fadeIn();
+							    }
+						    	});
+							});
+							</script>
+
+							<div
+								class="widget_container ui-tabs ui-widget-content ui-corner-all yg_pagination"
+								id="pagination"></div>
+
+							<cc:waiting hidden="true" waitMessage="Caricamento..."
+								id="resultsLoader" />
+
+							<h:panelGroup id="results">
+								<table>
+
+									<tr>
+										<td colspan="7" class="yg_td_border_bottom"></td>
+									</tr>
+
+									<ui:repeat value="#{ygRicercaAdesioneBean.risultatoRicerca}"
+										var="adesione" varStatus="status">
+
+										<!-- TITOLI PRIMA COLONNA -->
+										<tr>
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+												<h:outputLabel value="Tipo" for="tipo" />
+											</td>
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+												<h:outputLabel value="Cittadino" for="cf" />
+											</td>
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+												<h:outputLabel value="Data adesione" for="dta" />
+											</td>
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+												<h:outputLabel value="Data appuntamento" for="dtapp" />
+											</td>
+											<td class="yg_td vertical-align-top yg_td_padding_top"
+												colspan="2">
+												<h:outputLabel
+													value="Stato Regionale&lt;br/&gt;(ad uso Redazione)"
+													for="currentstatoadesione" escape="false" />
+											</td>
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+												<h:outputLabel
+													value="Data fine stato&lt;br/&gt;(ad uso Redazione)"
+													for="currentdtfinestatoadesione" escape="false" />
+											</td>
+											<!--  
+											<td class="yg_td vertical-align-top yg_td_padding_top" style="width: 60px;">
+												
+											</td>
+											-->
+										</tr>
+
+										<!-- VALORI PRIMA COLONNA -->
+										<tr class="yg_td">
+
+											<td class="yg_td vertical-align-top ">
+												<h:outputText id="tipo" styleClass="marginButton"
+													value="#{adesione.codMonoProv == 'I' ? 'da Portale' : 'da Cooperazione'}" />
+											</td>
+
+											<td class="yg_td vertical-align-top ">
+												<h:outputText id="cf" styleClass="marginButton"
+													value="#{adesione.codiceFiscale}" />
+												<ui:fragment rendered="#{adesione.cognomeUtente != null}">
+													<br />
+												</ui:fragment>
+												<h:outputText id="cogno" styleClass="marginButton"
+													value="#{adesione.cognomeUtente}" />
+												<ui:fragment rendered="#{adesione.nomeUtente != null}">
+													<br />
+												</ui:fragment>
+												<h:outputText id="nm" styleClass="marginButton"
+													value="#{adesione.nomeUtente}" />
+											</td>
+
+											<td class="yg_td vertical-align-top ">
+												<h:outputText id="dta" styleClass="marginButton"
+													value="#{adesione.dtAdesione}">
+													<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+												</h:outputText>
+											</td>
+
+											<td class="yg_td vertical-align-top ">
+												<cc:inputText label="" id="dtapp" type="date"
+													value="#{adesione.modificaDtPresoInCarico}" size="12">
+													<f:validator validatorId="dateValidator" for="function" />
+												</cc:inputText>
+											</td>
+
+											<td class="yg_td vertical-align-top " colspan="2">
+												<cc:selectOneMenu id="currentstatoadesione" label=""
+													value="#{adesione.modificaCodStatoAdesione}">
+													<f:selectItems value="#{utilsBean.statoAdesione}"
+														var="entry" itemValue="#{entry.id}"
+														itemLabel="#{entry.descrizione}" />
+												</cc:selectOneMenu>
+											</td>
+
+											<td class="yg_td vertical-align-top ">
+												<cc:inputText id="currentdtfinestatoadesione" label=""
+													type="date" value="#{adesione.modificaDtFineStatoAdesione}"
+													size="12">
+													<f:validator validatorId="dateValidator" for="function" />
+												</cc:inputText>
+											</td>
+										</tr>
+
+										<!-- TITOLI SECONDA COLONNA -->
+										<tr>
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+												<h:outputLabel value="Richiesta Dati (Min.)" for="cmdLink" />
+											</td>
+
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+												<h:outputLabel value="Username" for="usr" />
+											</td>
+
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+												<h:outputLabel value="Regione adesione" for="rades" />
+											</td>
+
+											<td class="yg_td vertical-align-top yg_td_padding_top"
+												colspan="3" rowspan="4">
+												<cc:inputTextarea styleClass="yg_note_adesione" label="Note"
+													rows="2" richTextMode="false"
+													value="#{adesione.modificaNote}" maxlength="200" />
+											</td>
+
+											<!-- 
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+												
+											</td>
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+												
+											</td>
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+											</td>
+											-->
+
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+												<h:outputLabel value="Processato da Batch" for="flgpr" />
+											</td>
+										</tr>
+
+										<!-- VALORI SECONDA COLONNA -->
+										<tr>
+											<td class="yg_td vertical-align-bottom ">
+												<h:commandLink id="cmdLink" styleClass="buttonStyle"
+													title="Richiesta Dati Anagrafici (Min.) "
+													action="#{ygRicercaAdesioneBean.viewDatiSapMin()}">
+													<f:param name="id" value="#{adesione.idYgAdesione}" />
+													<span class="ui-icon ui-icon-document fix_icon yg-sap-icon" />
+													<f:ajax onevent="viewCallback" render=":rischiestaSap" />
+												</h:commandLink>
+											</td>
+
+											<td class="yg_td vertical-align-bottom " style="">
+												<h:outputText id="usr" styleClass="marginButton"
+													value="#{adesione.username}" />
+											</td>
+
+											<td class="yg_td vertical-align-bottom " style="">
+												<h:outputText id="rades" styleClass="marginButton"
+													value="#{adesione.denominazioneRegioneAdesione}" />
+											</td>
+
+											<td class="yg_td vertical-align-bottom ">
+												<h:outputText id="flgpr" styleClass="marginButton"
+													value="#{adesione.flgProcessatoBatch}" />
+											</td>
+										</tr>
+
+										<!-- TITOLI TERZA COLONNA -->
+										<tr>
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+												<h:outputLabel value="CPI" for="cpiass" />
+											</td>
+
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+												<h:outputLabel value="Email" for="ema" />
+											</td>
+
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+											</td>
+
+											<td class="yg_td vertical-align-top yg_td_padding_top">
+											</td>
+										</tr>
+
+										<!-- VALORI TERZA COLONNA -->
+										<tr>
+											<td class="yg_td vertical-align-bottom ">
+												<h:outputText id="cpiass" styleClass="marginButton"
+													value="#{adesione.denominazioneCpiAssegnazione}" />
+												<h:outputText style="padding-bottom:10px;"
+													rendered="#{adesione.denominazioneCpiAssegnazione == null}"
+													value="&lt;br/&gt;" escape="false" />
+											</td>
+
+											<td class="yg_td vertical-align-bottom " style="">
+												<h:outputText id="ema" styleClass="marginButton"
+													value="#{adesione.emailUtente}" />
+											</td>
+
+											<td class="yg_td vertical-align-bottom " style=""></td>
+
+											<td class="yg_td vertical-align-bottom "></td>
+
+											<!-- 
+											<td class="yg_td vertical-align-bottom ">
+												
+											</td>
+											<td class="yg_td vertical-align-bottom ">
+												
+											</td>
+										
+											<td class="yg_td vertical-align-bottom ">
+												
+											</td>
+											-->
+											<td class="yg_td vertical-align-bottom "></td>
+										</tr>
+
+										<!-- VALORI TERZA COLONNA -->
+										<tr>
+											<td class="yg_td vertical-align-bottom ">
+												<h:outputLabel value="Stato Adesione (Min.)" for="statoass" />
+											</td>
+
+											<td class="yg_td vertical-align-bottom " style="">
+												<h:outputText id="statoass" styleClass="marginButton"
+													value="#{adesione.descStatoAdesioneMin}" />
+												<h:outputText style="padding-bottom:10px;"
+													value="&lt;br/&gt;" escape="false" />
+											</td>
+
+											<td class="yg_td vertical-align-bottom " colspan="4">
+												<h:commandButton style="font-size: 1em;"
+													id="cmdLinkAnnulla2" styleClass="buttonStyle"
+													rendered="#{adesione.codMonoAttivaMin eq 'A' and  adesione.codRegioneAdesione eq const['regione.cod'] and ygRicercaAdesioneBean.checkAbilitazioneVisibile('cancella_adesione')}"
+													title="Cancellazione per mancanza dei requisiti"
+													value="Cancellazione Mancanza Requisiti"
+													onclick="return document.getElementById('modalAnnulla').open({cvid: #{adesione.idYgAdesione}, stat: '#{adesione.descStatoAdesioneMin}', component:this});">
+												</h:commandButton>
+												&nbsp;
+												<h:commandButton style="font-size: 1em;"
+													id="cmdLinkMancato2" styleClass="buttonStyle"
+													rendered="#{adesione.codMonoAttivaMin eq 'A' and  adesione.codRegioneAdesione eq const['regione.cod'] and ygRicercaAdesioneBean.checkAbilitazioneVisibile('chiusura_adesione')}"
+													title="Chiusura per mancato appuntamento"
+													value="Chiusura mancato appuntamento"
+													onclick="return document.getElementById('modalMancato').open({cvid: #{adesione.idYgAdesione}, stat: '#{adesione.descStatoAdesioneMin}', component:this});">
+												</h:commandButton>
+												&nbsp;
+												<h:link style="font-size: 1em;" id="cmdLinkRipristino2"
+													styleClass="buttonStyle"
+													rendered="#{adesione.canReactivate}"
+													title="Ripristino Adesione" value="Ripristino Adesione"
+													outcome="ripristino_adesione.xhtml">
+													<f:param name="idYgAdesione" value="#{adesione.idYgAdesione}" />
+												</h:link>
+											</td>
+										</tr>
+
+										<tr>
+											<td class="yg_td vertical-align-bottom ">
+												<h:outputLabel value="Data Stato Adesione (Min.)"
+													for="dtAdeMin" />
+											</td>
+
+											<td class="yg_td vertical-align-bottom ">
+												<h:outputText id="dtAdeMin" styleClass="marginButton"
+													value="#{adesione.dtStatoAdesioneMin}">
+													<f:convertDateTime type="datetime"
+														pattern="dd/MM/yyyy HH:mm:ss" />
+												</h:outputText>
+											</td>
+											<td colspan="3"></td>
+										</tr>
+										
+										<ui:fragment rendered="#{ygRicercaAdesioneBean.isStoricoAdesioneEnabled()}">
+											<tr>
+												<td colspan="7">
+													<h:link style="font-size: 1em;" styleClass="buttonStyle"
+														target="_blank"
+														title="Dettaglio Storico" value="Dettaglio Storico"
+														outcome="dettaglio_storico.xhtml">
+														<f:param name="idYgAdesione" value="#{adesione.idYgAdesione}" />
+													</h:link>
+												</td>
+											</tr>
+										</ui:fragment>
+
+										<tr>
+											<td colspan="7" class="yg_td_border_bottom"></td>
+										</tr>
+									</ui:repeat>
+								</table>
+
+								<script type="text/javascript">
+									$(function() {
+										$("#form_lista_adesioni\\:resultsLoader").css("display", "none");
+					            		$("#form_lista_adesioni\\:resultsLoader").fadeOut();								
+										disegnaBottoni();		
+									});
+								</script>
+							</h:panelGroup>
+
+							<h:commandLink tabindex="0" id="update_abilitazioni"
+								styleClass="buttonStyle some-margin-top some-margin-bottom"
+								value="Salva" action="#{ygRicercaAdesioneBean.save}">
+							</h:commandLink>
+
+							<p:commandButton id="export_csv" ajax="false"
+								value="Esporta il risultato"
+								styleClass="some-margin-top some-margin-bottom some-margin-left"
+								icon="ui-icon-arrowthick-1-s">
+								<p:fileDownload value="#{ygRicercaAdesioneBean.downloadCSV()}" />
+							</p:commandButton>
+
+						</h:panelGroup>
+
+						<script type="text/javascript">		
+							$(function() {
+								disegnaBottoni();					
+							});
+
+							function nascondiListaRisultato() {
+								if (data.status == 'begin') {
+									$('[id$="lista_risultato"]').hide();
+								}						
+							}
+						</script>
+
+					</h:panelGroup>
+				</h:form>
+			</div>
+
+			<cc:messages id="abilitazione_messages" />
+
+			<cc:modalDialog id="modalAnnulla" title="Cancella adesione YG"
+				openF="openModalAnnulla" submitLabel="Cancella Adesione"
+				renderAjax=":abilitazione_messages :form_lista_adesioni"
+				actionSubmit="#{ygRicercaAdesioneBean.annullaAdesione()}">
+				<h:inputHidden id="id_delete"></h:inputHidden>
+			</cc:modalDialog>
+
+			<cc:modalDialog id="modalMancato" title="Chiusura adesione YG"
+				openF="openModalMancato" submitLabel="Chiusura Adesione"
+				renderAjax=":abilitazione_messages :form_lista_adesioni"
+				actionSubmit="#{ygRicercaAdesioneBean.annullaAdesioneMancato()}">
+				<h:inputHidden id="id_mancato"></h:inputHidden>
+			</cc:modalDialog>
+
+			<cc:modalDialog id="rischiestaSap" submitLabel="Chiudi"
+				title="Richiesta Dati Anagrafici (Min.)" width="540" height="auto"
+				renderedButtonAnnulla="false">
+				<h:panelGrid columns="1"
+					rendered="#{ygRicercaAdesioneBean.richiestaSapEseguita == 'OK'}">
+					<h:panelGroup id="cfSap">
+						<h:outputLabel value="Codice fiscale: " styleClass="labelbold" />
+						<h:outputText styleClass="marginButton"
+							value="#{ygRicercaAdesioneBean.ygMiniSapAdesioneDTO.codiceFiscale}" />
+					</h:panelGroup>
+					<h:panelGroup id="cognomeSap">
+						<h:outputLabel value="Cognome: " styleClass="labelbold" />
+						<h:outputText styleClass="marginButton"
+							value="#{ygRicercaAdesioneBean.ygMiniSapAdesioneDTO.cognome}" />
+					</h:panelGroup>
+					<h:panelGroup id="nomeSap">
+						<h:outputLabel value="Nome: " styleClass="labelbold" />
+						<h:outputText styleClass="marginButton"
+							value="#{ygRicercaAdesioneBean.ygMiniSapAdesioneDTO.nome}" />
+					</h:panelGroup>
+					<h:panelGroup id="domicilioSap">
+						<h:outputLabel value="Domicilio: " styleClass="labelbold" />
+						<h:outputText styleClass="marginButton"
+							value="#{ygRicercaAdesioneBean.ygMiniSapAdesioneDTO.indirizzoDom}" />
+					&nbsp;
+					<h:outputText styleClass="marginButton"
+							value="#{ygRicercaAdesioneBean.ygMiniSapAdesioneDTO.capDom}" />
+					&nbsp;
+					<h:outputText styleClass="marginButton"
+							value="#{ygRicercaAdesioneBean.ygMiniSapAdesioneDTO.comuneDom}" />
+					</h:panelGroup>
+					<h:panelGroup id="residenzaSap">
+						<h:outputLabel value="Residenza: " styleClass="labelbold" />
+						<h:outputText styleClass="marginButton"
+							value="#{ygRicercaAdesioneBean.ygMiniSapAdesioneDTO.indirizzoRes}" />
+					&nbsp;
+					<h:outputText styleClass="marginButton"
+							value="#{ygRicercaAdesioneBean.ygMiniSapAdesioneDTO.capRes}" />
+					&nbsp;
+					<h:outputText styleClass="marginButton"
+							value="#{ygRicercaAdesioneBean.ygMiniSapAdesioneDTO.comuneRes}" />
+					</h:panelGroup>
+					<h:panelGroup id="emailSap">
+						<h:outputLabel value="Email: " styleClass="labelbold" />
+						<h:outputText styleClass="marginButton"
+							value="#{ygRicercaAdesioneBean.ygMiniSapAdesioneDTO.email}" />
+					</h:panelGroup>
+					<h:panelGroup id="cellSap">
+						<h:outputLabel value="Cellulare: " styleClass="labelbold" />
+						<h:outputText styleClass="marginButton"
+							value="#{ygRicercaAdesioneBean.ygMiniSapAdesioneDTO.cellulare}" />
+					</h:panelGroup>
+					<h:panelGroup id="telSap">
+						<h:outputLabel value="Telefono: " styleClass="labelbold" />
+						<h:outputText styleClass="marginButton"
+							value="#{ygRicercaAdesioneBean.ygMiniSapAdesioneDTO.telefono}" />
+					</h:panelGroup>
+				</h:panelGrid>
+				<h:panelGrid columns="1"
+					rendered="#{ygRicercaAdesioneBean.richiestaSapEseguita == 'NULLA'}">
+					<h:panelGroup id="servNull">
+						<h:outputLabel value="Dati non pervenuti" styleClass="labelbold" />
+					</h:panelGroup>
+				</h:panelGrid>
+				<h:panelGrid columns="1"
+					rendered="#{ygRicercaAdesioneBean.richiestaSapEseguita == 'KO'}">
+					<h:panelGroup id="servKo">
+						<h:outputLabel value="Servizio temporaneamente non disponibile"
+							styleClass="labelbold" />
+					</h:panelGroup>
+				</h:panelGrid>
+			</cc:modalDialog>
+
+			<script type="text/javascript">								
+					function viewCallback(data) {
+						if (data.status == 'success') {							
+							document.getElementById('rischiestaSap').open(null,this);							
+						}
+					}
+				
+
+					var openModalAnnulla = function(params) {
+							var itemId = params.cvid;
+							var status = params.stat;
+							//alert(itemId);
+							
+							$('[id$="modalAnnulla\:modal_form\:id_delete"]').val(itemId);
+							$('[id$="modalAnnulla"] .message_content').text("Cancellazione per mancanza dei requisiti. Lo stato attuale è: "+status+". Sei sicuro di voler cancellare l'adesione per mancanza di requisiti?");
+
+					};
+					
+					var openModalMancato = function(params) {
+						var itemId = params.cvid;
+						var status = params.stat;
+						//alert(itemId);
+						$('[id$="modalMancato\:modal_form\:id_mancato"]').val(itemId);
+						$('[id$="modalMancato"] .message_content').text("Cancellazione per mancato appuntamento. Lo stato attuale è: "+status+". Sei sicuro di voler cancellare l'adesione?");
+					};	
+					
+				</script>
+		</ui:define>
+
+	</ui:composition>
+
+</h:body>
+
+</html>

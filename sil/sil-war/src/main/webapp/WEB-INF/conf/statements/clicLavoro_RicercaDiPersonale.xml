@@ -1,0 +1,540 @@
+<!-- CLIC LAVORO -->
+				       
+	       
+<STATEMENT
+        name="RP_GET_CDN_LAVORATORE"
+        query="SELECT an.cdnlavoratore
+		       FROM an_lavoratore an 		       
+		       WHERE an.strcodicefiscale = ?" />				       
+ 
+<STATEMENT
+        name="RP_GET_DOMICILIO"
+        query="SELECT an.cdnlavoratore
+		       FROM an_lavoratore an 		       
+		       WHERE an.strcodicefiscale = ?" />		       
+				       
+<STATEMENT
+        name="RP_GET_RECAPITI"
+        query="SELECT an.cdnlavoratore
+		       FROM an_lavoratore an 		       
+		       WHERE an.strcodicefiscale = ?" />		      				       
+				       
+				       
+<STATEMENT
+        name="RP_GET_PRGAZIENDA"
+        query="SELECT aa.prgazienda
+		       FROM an_azienda aa 		       
+		       WHERE aa.strcodicefiscale = ?" />			
+		       
+		       
+		       
+<STATEMENT
+        name="RP_GET_PRGRICHIESTAAZ"
+        query="	select prgrichiestaaz
+				from do_alternativa
+				where prgalternativa = ?" />
+		       
+		     
+<STATEMENT
+        name="RP_GET_PRGAZIENDA_PRGUNITA"
+        query="	select prgazienda, prgunita
+				from do_richiesta_az
+				where prgrichiestaaz = ?" />
+
+
+
+
+<STATEMENT
+        name="RP_GET_DATIANAGRAFICI"
+        query="select 	trim(aa.strcodicefiscale) as codicefiscale, 
+        				trim(Aa.Strragionesociale) As Denominazione,
+	        			mn.codatecodot as settore, 	        			
+	        			nvl(aa.numsoci,0) + nvl(aa.numdipendenti,0) + nvl(aa.numcollaboratori,0) + nvl(aa.numaltraposizione,0) as ampiezza, 
+	        			aa.strsitointernet as web         			
+				from an_unita_azienda aua
+				join an_azienda aa on aua.prgazienda = aa.prgazienda
+                left join de_attivita mn on (aua.codateco = mn.codateco and
+                							 sysdate between mn.datinizioval and mn.datfineval)
+				where				
+				aua.prgazienda = ?
+				and aua.flgsede = 'S'" />		       				       
+		       
+		       
+<STATEMENT
+        name="RP_GET_DATICONTATTO"
+        query="select   aua.strindirizzo as indirizzo, 
+                aua.codcom as idcomune, 
+                aua.strcap as cap, 
+                substr(DRA.STRTELRIFERIMENTO,0,15) as telefono, 
+                substr(DRA.STRFAXRIFERIMENTO,0,15) as fax, 
+                trim(Nvl(dra.STREMAILRIFPUBB, dra.stremailriferimento)) As Email
+            From Do_Richiesta_Az Dra 
+            inner Join An_Unita_Azienda Aua On Dra.Prgazienda = Aua.Prgazienda and aua.prgunita = dra.prgunita    
+            inner join CL_VACANCY VAC on DRA.PRGRICHIESTAAZ = VAC.PRGRICHIESTAAZ                      
+            inner join DE_CPI CPI on vac.CODCPI = CPI.CODCPI                                                                                      
+                        where dra.prgrichiestaaz = ?
+                        AND VAC.CODTIPOCOMUNICAZIONECL = ?" />	
+
+<STATEMENT
+        name="RP_GET_DATICONTATTO_PREINVIO"
+        query="select   aua.strindirizzo as indirizzo, 
+                aua.codcom as idcomune, 
+                aua.strcap as cap, 
+                substr(DRA.STRTELRIFERIMENTO,0,15) as telefono, 
+                substr(DRA.STRFAXRIFERIMENTO,0,15) as fax, 
+                trim(Nvl(dra.STREMAILRIFPUBB, dra.stremailriferimento)) As Email
+            From Do_Richiesta_Az Dra 
+            inner Join An_Unita_Azienda Aua On Dra.Prgazienda = Aua.Prgazienda and aua.prgunita = dra.prgunita
+            inner join DE_CPI CPI on cpi.CODCPI = ?                                                                                      
+                        where dra.prgrichiestaaz = ?
+                        " />		       
+
+       
+<STATEMENT
+	name="RP_GET_MAIL_CPI"
+	query="Select trim(cpi.STREMAILRIFCL) as email
+			From CL_VACANCY VAC                                                              
+            join DE_CPI CPI on vac.CODCPI = CPI.CODCPI  		
+			where 
+			sysdate between cpi.datinizioval and cpi.datfineval and			
+			vac.prgrichiestaaz = ?
+			AND VAC.CODTIPOCOMUNICAZIONECL = ?" />        
+	
+
+<STATEMENT
+        name="RP_GET_PROFILORICHIESTO"
+        query="select dra.numprofrichiesti as numerolavoratori,
+		      de.codmansionedot as idprofessione, 
+		      De.Strdescrizione As Descrprofessione,
+		      decode(cv.strprofilorichiesto, null, NVL(?,'Non inserito'), cv.strprofilorichiesto) As Descrizionericerca,		      
+		      Decode(Da.Flgesperienza,'S','SI','NO') As Esperienzarichiesta,				          
+		      null as descrizioneesperienza
+		      From Do_Richiesta_Az Dra
+		      join do_alternativa da on dra.prgrichiestaaz = da.prgrichiestaaz
+		      left join  do_mansione dm on da.prgrichiestaaz = dm.prgrichiestaaz
+		                               and da.prgalternativa = dm.prgalternativa                 
+		      left join de_mansione De On (Dm.Codmansione = De.Codmansione 
+		      							   and sysdate between de.datinizioval and de.datfineval)
+		      left join cl_vacancy cv on (cv.prgrichiestaaz = dra.prgrichiestaaz and cv.codtipocomunicazionecl = ?)           
+		      where 		      			  
+		      dra.prgrichiestaaz = ? 
+		      and da.prgalternativa = ?
+		      and dm.flginviocl = 'S'
+		      order by de.codmansionedot, dra.numprofrichiesti,da.flgesperienza" />
+
+
+<STATEMENT
+        name="RP_GET_TITOLOSTUDIO"
+        query="select (case 
+				    When 
+				     SUBSTR(ds.CODTITOLO,1,2) in ('81', '83') then SUBSTR(ds.CODTITOLO,1,2)
+				    else SUBSTR(ds.CODTITOLO, 1, 1) || '0' 
+				    end) as idtitolostudio,
+				dt.strdescrizione as descrizionestudio                   
+				From Do_Studio Ds
+				join de_titolo dt on (ds.codtitolo = dt.codtitolo and
+									  sysdate between dt.datinizioval and dt.datfineval)
+				where 							  
+				ds.prgrichiestaaz = ?
+				and ds.prgalternativa = ?
+				and dt.flgmin = 'S'" />
+				
+<STATEMENT
+        name="RP_GET_IDALBO"
+        query="select dag.codabilitazionegen as idalbo
+			from do_abilitazione_gen dag
+			join de_abilitazione_gen da on dag.codabilitazionegen = da.codabilitazionegen
+			Left Join Ma_Abilitazione Ma On  Dag.Codabilitazionegen = Ma.Codabilitazionegen
+			where 
+			sysdate between da.datinizioval and da.datfineval
+			and da.codtipoabilitazionegen = 'AL'
+			and dag.prgrichiestaaz = ?
+			and dag.flginviocl = 'S'
+			and ma.codabilitazione is not null
+			order by dag.flgindispensabile" />
+						
+<STATEMENT
+        name="RP_GET_CONDIZIONIOFFERTE"
+		query="select 
+				(select dc.Codcom 
+				        from do_richiesta_az raz
+				        inner join do_comune dc on dc.prgrichiestaaz = raz.prgrichiestaaz
+				        inner Join De_Comune De On (Dc.Codcom = De.Codcom 
+                                                    and sysdate between de.datinizioval and de.datfineval)
+				        where dc.flginviocl = 'S'
+				        and raz.prgrichiestaaz = ?) As Idcomune,
+				(select dra1.codrapportolav from do_richiesta_az dra1 where dra1.prgrichiestaaz = ?) as idtipologiacontratto,                    
+				null as durata,
+				null as idccnl,
+				Null As Idlivellocontrattuale,
+				(select decode(deor.codmonoorario,'T','FT','P','PT',null)
+				        from do_richiesta_az raz
+				        inner join do_orario dor on dor.prgrichiestaaz = raz.prgrichiestaaz
+				        inner join de_orario deor on deor.codorario = dor.codorario 
+				        where dor.flginviocl = 'S'
+				        and sysdate between deor.datinizioval and deor.datfineval
+				        and raz.prgrichiestaaz = ?) as idmodalitalavoro,
+				Null As Retribuzioneannualorda,
+				Null As Ulterioricondizioni     
+				from do_richiesta_az raz
+				where raz.prgrichiestaaz = ?" />
+       
+<STATEMENT
+        name="RP_GET_ALTREINFORMAZIONI"
+		query="select 
+          nvl(decode(raz.flgNullaOsta,'S','SI','N','NO', null),'NO') flgNullaOsta  
+          from do_richiesta_az raz    
+				where raz.prgrichiestaaz = ?" />		
+
+<STATEMENT
+        name="RP_GET_ALTREINFORMAZIONI_BLEN"
+		query="select 
+          'NO'  flgNullaOsta  
+          from  dual" />						       
+                            
+<STATEMENT
+	name="RP_GET_LINGUE"
+	query="Select L.Codlingua as idlingua, 
+				  letto.cod_conoscenza as idlivelloletto, 
+				  scritto.cod_conoscenza as idlivelloscritto,
+				  parlato.cod_conoscenza as idlivelloparlato
+			From Do_Lingua L
+			inner join Ma_GRADO_CONSC_LIN letto on letto.cdngrado = l.cdngradoletto
+			Inner Join Ma_GRADO_CONSC_LIN Scritto On Scritto.Cdngrado = L.Cdngradoscritto
+			inner join Ma_GRADO_CONSC_LIN parlato on parlato.cdngrado = l.cdngradoparlato   
+			inner join DE_LINGUA de on (de.codlingua = l.codlingua and
+										sysdate between de.datinizioval and de.datfineval)
+			where 
+			l.prgrichiestaaz = ?
+			and l.prgalternativa = ?"/>
+          
+<STATEMENT
+	name="RP_GET_DURATARICHIESTA"
+	query="select to_char(dra.datpubblicazione,'yyyy-mm-dd')||'T'||to_char(dra.datpubblicazione,'HH24:mi:ss') as datapubblicazione,
+       			  /*To_Char((Case 
+				         When Dra.Datscadenza > Sysdate+60
+				          Then Sysdate+60
+				         Else Dra.Datscadenza
+				          end),'yyyy-mm-dd') as datascadenza*/
+		   TO_CHAR(TO_DATE(?,'DD/MM/YYYY'),'yyyy-mm-dd') datascadenza
+		   from do_richiesta_az dra
+		   where dra.prgrichiestaaz = ?" />
+
+<STATEMENT
+	name="RP_GET_DURATARICHIESTA_DES"
+	query="select to_char(dra.datpubblicazione,'DD/MM/YYYY') as datapubblicazione,
+       			  /*To_Char((Case 
+				         When Dra.Datscadenza > Sysdate+60
+				          Then Sysdate+60
+				         Else Dra.Datscadenza
+				          end),'yyyy-mm-dd') as datascadenza*/
+		   ? datascadenza
+		   from do_richiesta_az dra
+		   where dra.prgrichiestaaz = ?" />        
+        
+<STATEMENT
+	name="RP_GET_DATISISTEMA"
+	query="Select SUBSTR(DC.CODINTERMEDIARIOCL,0,11) As Intermediario,
+			null As Codicefiscaleintermediario,
+			Dc.Strdescrizione As Denominazioneintermediario,
+			Dc.Strindirizzo As Indirizzo,
+			Dc.Codcom As Idcomune,
+			Dc.Strcap As Cap,
+			substr(Dc.STRTELRIFCL,0,15) As Telefono,
+			substr(Dc.strfax,0,15) As Fax,
+			trim(Dc.STREMAILRIFCL) as email,
+			DECODE(
+				(select count(*)
+				from de_evasione_rich dee
+				inner join do_evasione doe on dee.codevasione = doe.codevasione
+				inner join do_richiesta_az dora on doe.prgrichiestaaz = dora.prgrichiestaaz
+				where dee.codevasione IN ('DFD', 'DPR')
+				and dee.flgpubblica = 'S'
+				and doe.cdnstatorich in (1, 2, 3)
+				and dora.flgpubblicata = 'S'  
+				and doe.flgpubbweb = 'S'
+				and dora.prgrichiestaaz = ?),
+				1,
+				'SI',
+				'NO'
+			) as visibilita,
+			'01' as tipoofferta,
+			(select codofferta from cl_vacancy where prgrichiestaaz = ? and codtipocomunicazionecl = ?  ) as codiceofferta,
+			(select codoffertainterm from cl_vacancy where prgrichiestaaz = ? and codtipocomunicazionecl = ? ) as codiceoffertaintermediario
+			/*,(select numrichiesta from do_richiesta_az where prgrichiestaaz = ?)||'_'||(select numanno from do_richiesta_az where prgrichiestaaz = ?) as codiceoffertaintermediario*/
+			From De_Cpi Dc			
+			where dc.codcpi = ?" />        
+		   
+<STATEMENT
+	name="RP_GET_DATISISTEMA_PREINVIO"
+	query="Select SUBSTR(DC.CODINTERMEDIARIOCL,0,11) As Intermediario,
+			null As Codicefiscaleintermediario,
+			Dc.Strdescrizione As Denominazioneintermediario,
+			Dc.Strindirizzo As Indirizzo,
+			Dc.Codcom As Idcomune,
+			Dc.Strcap As Cap,
+			substr(Dc.STRTELRIFCL,0,15) As Telefono,
+			substr(Dc.strfax,0,15) As Fax,
+			trim(Dc.STREMAILRIFCL) as email,
+			DECODE(
+				(select count(*)
+				from de_evasione_rich dee
+				inner join do_evasione doe on dee.codevasione = doe.codevasione
+				inner join do_richiesta_az dora on doe.prgrichiestaaz = dora.prgrichiestaaz
+				where dee.codevasione IN ('DFD', 'DPR')
+				and dee.flgpubblica = 'S'
+				and doe.cdnstatorich in (1, 2, 3)
+				and dora.flgpubblicata = 'S'  
+				and doe.flgpubbweb = 'S'
+				and dora.prgrichiestaaz = ?),
+				1,
+				'SI',
+				'NO'
+			) as visibilita,
+			'01' as tipoofferta,
+			? as codiceofferta,
+			/*'000000000' as codiceoffertaintermediario*/
+			(select numrichiesta from do_richiesta_az where prgrichiestaaz = ?)||'_'||(select numanno from do_richiesta_az where prgrichiestaaz = ?) as codiceoffertaintermediario
+			From De_Cpi Dc			
+			where dc.codcpi = ?" />        
+		   
+<STATEMENT
+	name="RP_GET_CONOSCENZEINFORMATICHE"
+	query=" Select Tipoinfo.Strdescrizione Tipo, Dettinfo.Strdescrizione Descrizione
+	       	From do_info di
+            Join De_Dett_Info Dettinfo On (di.Coddettinfo = Dettinfo.Coddettinfo)
+            Join De_Tipo_Info Tipoinfo On (di.Codtipoinfo = Tipoinfo.Codtipoinfo)
+			where 
+			sysdate between tipoinfo.datinizioval and tipoinfo.datfineval and
+			sysdate between dettinfo.datinizioval and dettinfo.datfineval and
+			di.prgrichiestaaz = ?
+			and di.prgalternativa = ?
+			order by Tipo asc"/>
+			
+<STATEMENT
+	name="RP_GET_ALTRECAPACITA"
+	query="select dc.strdescrizione as capacita
+			from do_competenza c
+			Join De_Competenza Dc On Dc.Codcompetenza = C.Codcompetenza
+			where 
+			sysdate between dc.datinizioval and dc.datfineval and
+			c.prgrichiestaaz = ?
+			And C.Prgalternativa = ?" />
+			
+<STATEMENT
+	name="RP_GET_TRASFERTE"
+	query="select decode(dra.codtrasferta,
+			             null,'NO',
+			             '1','NO',
+			             'SI') as trasferte
+			from do_richiesta_az dra
+			where dra.prgrichiestaaz = ?"/>
+			
+<STATEMENT
+	name="RP_GET_PATENTIGUIDA"
+	query=" select distinct ma.codabilitazione as idpatenteguida
+		  From Do_Abilitazione_Gen Dag
+		  Join De_Abilitazione_Gen Da On Dag.Codabilitazionegen = Da.Codabilitazionegen
+		  left join ma_abilitazione ma on  dag.codabilitazionegen = ma.codabilitazionegen
+		  where 
+		  sysdate between da.datinizioval and da.datfineval and
+		  da.codtipoabilitazionegen = 'PG'
+			and dag.prgrichiestaaz = ?"/>
+
+
+<STATEMENT
+	name="RP_GET_MEZZIDITRASPORTO"
+	query=" select decode(dra.flgautomunito,
+              'S','SI',              
+              'N','NO',
+              null) as idmezzitrasporto
+			from do_richiesta_az dra
+			where dra.prgrichiestaaz = ?"/>			
+			
+<STATEMENT
+	name="RP_GET_PATENTINI"			
+	query="select distinct ma.codabilitazione as idpatentino
+		  From Do_Abilitazione_Gen Dag
+		  Join De_Abilitazione_Gen Da On Dag.Codabilitazionegen = Da.Codabilitazionegen
+		  Left Join Ma_Abilitazione Ma On  Dag.Codabilitazionegen = Ma.Codabilitazionegen
+		  where 
+		  sysdate between da.datinizioval and da.datfineval
+		  and da.codtipoabilitazionegen = 'PT'
+		  and ma.codabilitazione is not null
+		  and dag.prgrichiestaaz = ?" />
+		  
+<STATEMENT
+	name="RP_GET_PATENTINI_DES"			
+	query="select distinct ma.codabilitazione as idpatentino, mn.des_desabilitazione as patentino
+		  From Do_Abilitazione_Gen Dag
+		  Join De_Abilitazione_Gen Da On Dag.Codabilitazionegen = Da.Codabilitazionegen
+		  Left Join Ma_Abilitazione Ma On  Dag.Codabilitazionegen = Ma.Codabilitazionegen
+		  inner join mn_abilitazione mn on  ma.codabilitazione = mn.cod_abilitazione
+		  where 
+		  sysdate between da.datinizioval and da.datfineval
+		  and da.codtipoabilitazionegen = 'PT'
+		  and ma.codabilitazione is not null
+		  and dag.prgrichiestaaz = ?
+		  order by ma.codabilitazione" />
+			
+<STATEMENT
+	name="RP_GET_LISTE_SPECIALI"
+	query=" Select decode(dra.numpostomb,null,decode(dra.numposticm,null,null,3),1) as idlistespeciali
+		   From Do_Richiesta_Az Dra 
+		   where dra.prgrichiestaaz = ?" />			
+
+<STATEMENT
+	name="GET_CL_TARGA_PROVINCIA"
+	query="select dep.strtarga 
+			from TS_GENERALE tsg 
+			join DE_PROVINCIA dep on tsg.codprovinciasil = dep.codprovincia"/>
+
+<STATEMENT
+	name="GET_CL_CODCOMUNICAZIONE"
+	query="select lpad(codcomunicazione + 1, 17, '0') as codcom, codcomunicazione, to_char(sysdate, 'yy') as anno
+			from ts_progressivo t
+			where tipocomunicazione = ?
+			and numanno = to_char(sysdate, 'yyyy')"/>
+
+<STATEMENT name="UPDATE_CL_CODCOMUNICAZIONE" query="UPDATE ts_progressivo
+							SET CODCOMUNICAZIONE    = ?
+							WHERE TIPOCOMUNICAZIONE = ?
+							AND NUMANNO             = to_char(sysdate, 'yyyy')"/> 					
+				
+<STATEMENT name="GET_DATI_SEDE_RICH_PERSONALE_CLIC_LAVORO"
+           query="
+           SELECT 
+      az.PRGRICHIESTAAZ,
+      az.CODCPI,
+      trim(ANAZ.STRCODICEFISCALE) STRCODICEFISCALE,
+      ANAZ.STRRAGIONESOCIALE,
+      Unit.Codcom,
+      unit.PRGAZIENDA,
+      unit.PRGUNITA,
+      trim(NVL(UNIT.STREMAIL,CPI.STREMAIL)) as EMAIL,
+                DEAZ.CODATECODOT
+        FROM
+            Do_Richiesta_Az Az
+            Join An_Azienda Anaz on (anaz.PRGAZIENDA = az.PRGAZIENDA)
+            Join An_Unita_Azienda Unit On (Anaz.Prgazienda = Unit.Prgazienda)
+            Left Join De_Attivita Deaz On (Unit.Codateco = Deaz.Codateco
+            								and sysdate between deaz.datinizioval and deaz.datfineval)
+            left join de_cpi cpi on (az.codcpi = cpi.codcpi)
+        where 
+          az.NUMSTORICO = 0
+          And Unit.Flgsede = 'S'
+          
+          and az.PRGRICHIESTAAZ = ?" />			
+          
+<STATEMENT name="GET_COMU_DESC" 
+			query="SELECT COM1.CODCOM as CODICE, 
+				   COM1.STRDENOMINAZIONE || ' (' || rtrim(p.strIstat) || ') ' as DESCRIZIONE
+                    FROM DE_COMUNE COM1
+                    inner join de_provincia p on com1.codprovincia=p.codprovincia"/>	
+                    
+<STATEMENT
+	name="RP_GET_PATENTIGUIDA_DES"
+	query=" select distinct ma.codabilitazione as idpatenteguida, mn.des_desabilitazione as descrizione
+          From Do_Abilitazione_Gen Dag
+          Join De_Abilitazione_Gen Da On Dag.Codabilitazionegen = Da.Codabilitazionegen
+          left join ma_abilitazione ma on  dag.codabilitazionegen = ma.codabilitazionegen
+          inner join mn_abilitazione mn on  ma.codabilitazione = mn.cod_abilitazione
+          join de_abilitazione_gen de on de.Codabilitazionegen = ma.Codabilitazionegen
+          where 
+          sysdate between da.datinizioval and da.datfineval and
+          da.codtipoabilitazionegen = 'PG'
+          and dag.prgrichiestaaz = ?
+          order by idpatenteguida"/>                    
+                    	
+<STATEMENT
+	name="RP_GET_LINGUE_DES"
+	query="Select L.Codlingua as idlingua, 
+           de.strdenominazione as strLingua, 
+                  letto.cod_conoscenza idlivelloletto,
+                  Scritto.cod_conoscenza idlivelloscritto,
+                  parlato.cod_conoscenza idlivelloparlato
+            From Do_Lingua L
+            inner join Ma_GRADO_CONSC_LIN letto on letto.cdngrado = l.cdngradoletto
+            Inner Join Ma_GRADO_CONSC_LIN Scritto On Scritto.Cdngrado = L.Cdngradoscritto
+            inner join Ma_GRADO_CONSC_LIN parlato on parlato.cdngrado = l.cdngradoparlato   
+            inner join DE_LINGUA de on (de.codlingua = l.codlingua and sysdate between de.datinizioval and de.datfineval)
+            inner join DE_GRADO_LIN grad_letto on letto.cdngrado = grad_letto.cdngrado       
+            inner join DE_GRADO_LIN grad_scritto on scritto.cdngrado = grad_scritto.cdngrado 
+            inner join DE_GRADO_LIN grad_parlato on parlato.cdngrado = grad_parlato.cdngrado                                  
+            where
+			l.prgrichiestaaz = ?
+			and l.prgalternativa = ?"/>                    	
+					          		
+<STATEMENT
+        name="RP_GET_CONDIZIONIOFFERTE_DES"
+		query="select 
+				(select dc.Codcom 
+				        from do_richiesta_az raz
+				        inner join do_comune dc on dc.prgrichiestaaz = raz.prgrichiestaaz
+				        inner Join De_Comune De On (Dc.Codcom = De.Codcom 
+                                                    and sysdate between de.datinizioval and de.datfineval)
+				        where dc.flginviocl = 'S'
+				        and raz.prgrichiestaaz = ?) As Idcomune,
+				nvl((select deraplav.strdescrizione from de_rapporto_lav deraplav where deraplav.codrapportolav in (select vaca.codrapportolav from do_richiesta_az vaca where vaca.prgrichiestaaz = ?)),' ') as STRDESCRIZIONE,                    
+				null as durata,
+				null as idccnl,
+				Null As Idlivellocontrattuale,
+				(select decode(deor.codmonoorario,'T','Full Time','P','Part Time',null)
+				        from do_richiesta_az raz
+				        inner join do_orario dor on dor.prgrichiestaaz = raz.prgrichiestaaz
+				        inner join de_orario deor on deor.codorario = dor.codorario 
+				        where dor.flginviocl = 'S'
+				        and sysdate between deor.datinizioval and deor.datfineval
+				        and raz.prgrichiestaaz = ?) as idmodalitalavoro,
+				Null As Retribuzioneannualorda,
+				Null As Ulterioricondizioni,
+				decode(raz.flgNullaOsta,'S','SI','N','NO', null) flgNullaOsta	     
+				from do_richiesta_az raz
+				where raz.prgrichiestaaz = ?" />					          		
+					          	
+<STATEMENT
+	name="RP_GET_ALBI_DES"
+	query="select dag.codabilitazionegen as codice,
+        		da.strdescrizione as descrizione
+            from do_abilitazione_gen dag
+            join de_abilitazione_gen da on dag.codabilitazionegen = da.codabilitazionegen
+            Left Join Ma_Abilitazione Ma On  Dag.Codabilitazionegen = Ma.Codabilitazionegen
+            where 
+            sysdate between da.datinizioval and da.datfineval
+            and da.codtipoabilitazionegen = 'AL'
+            and dag.prgrichiestaaz = ?
+            and dag.flginviocl = 'S'
+            and ma.codabilitazione is not null
+            order by dag.flgindispensabile"/>  				
+            
+<STATEMENT
+        name="RP_GET_DATIANAGRAFICI_ANTEPRIMA"
+        query="select trim(aa.strcodicefiscale) as codicefiscale, 
+                    trim(Aa.Strragionesociale) As Denominazione,
+                    mn.strdescrizione as settore,                         
+                    nvl(aa.numsoci,0) + nvl(aa.numdipendenti,0) + nvl(aa.numcollaboratori,0) + nvl(aa.numaltraposizione,0) as ampiezza, 
+                    aa.strsitointernet as web,
+                    mn.DATINIZIOVAL dataInizio,
+                    mn.DATFINEVAL dataFine, 
+                    CASE    
+                        WHEN sysdate between mn.datinizioval and mn.datfineval THEN 'SI'                              
+                        ELSE 'NO'
+                    END as codAtecoValido             
+                from an_unita_azienda aua
+	                join an_azienda aa on aua.prgazienda = aa.prgazienda
+	                left join de_attivita mn on (aua.codateco = mn.codateco)
+				where				
+				aua.prgazienda = ?
+				and aua.flgsede = 'S'" />         	          		
+
+<STATEMENT
+        name="RP_UPDATE_DESCRIZIONE_PROFILO_RICHIESTO"
+        query="
+
+	UPDATE cl_vacancy
+	SET 
+		strprofilorichiesto = ?,
+		numklovacancy = (numklovacancy+1)
+	WHERE prgvacancy = ?
+
+"/>

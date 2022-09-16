@@ -1,0 +1,119 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+	<h:form id="supportForm">
+		<p:remoteCommand name="initList" actionListener="#{aziendaTirociniBean.initList()}" update=":content" process="@this" autoRun="true"
+			onstart="contentLoading()" oncomplete="$('.message-date').timeago();" global="false"></p:remoteCommand>
+	</h:form>
+
+	<div class="row">
+		<div class="col-md-12">
+			<h3>
+				#{ui['tirocini.title']} <br />
+				<div class="pull-right">
+					<a href="create" class="btn ui-button btn-primary btn-grey uk-padding-large-left uk-padding-large-right navYuri pull-right"> <i
+						class="fa fa-pencil"></i> #{ui['tirocini.nuovaRichiesta']}
+					</a>
+				</div>
+			</h3>
+		</div>
+	</div>
+
+	<h:panelGroup id="content" layout="block" styleClass="row">
+		<h:panelGroup id="tirociniTable" layout="block" styleClass="col-md-12">
+			<h:form>
+				<p:dataGrid value="#{aziendaTirociniBean.doTirociniList}" var="tirocini" paginator="true" rows="10"
+					emptyMessage="#{ui['shared.emptyAutoComplete']}" paginatorTemplate="{CurrentPageReport}  {PageLinks}" widgetVar="tirociniGridWV"
+					styleClass="default-data-table" columns="1" lazy="true">
+					<p:ajax event="page" oncomplete="$('.message-date').timeago();"></p:ajax>
+					<a data-toggle="collapse" href="#tirocini#{tirocini.idDoTirocinio}">
+						<div class="message-header uk-margin-top">
+							<div class="message-sender">
+								<em class="fa fa-fw fa-circle-o text-muted"></em> <span class="uk-margin-left">#{tirocini.deQualificaSrq.descrizione}</span>
+							</div>
+							<div class="message-date">
+								<span class="uk-margin-small-right" title="#{ui['tirocini.numFigProf']}">#{tirocini.numFigureProf}</span><em
+									class="fa fa-fw fa-users fa-errorRed"></em> - <small> <h:outputText value="#{tirocini.dataRichiesta}"
+										title="Data richiesta">
+										<f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+									</h:outputText>
+								</small>
+							</div>
+						</div>
+					</a>
+					<div id="tirocini#{tirocini.idDoTirocinio}" class="message-info collapse">
+						<div class="row" style="width: 100%">
+							<div class="pull-right uk-margin-top">
+								<a onclick="editTirocini(#{tirocini.idDoTirocinio})" class="ui-commandlink btn btn-primary action-link uk-margin-small-left" title="#{ui['shared.modifica']}"> <i
+									class="fa fa-pencil-square-o"></i>
+								</a>
+							</div>
+							<div class="col-md-12 ticket-message-body">
+								<div class="col-md-4">
+									<legend> #{ui['tirocini.datiOfferta']} </legend>
+									<dl class="dl-horizontal">
+										<dt>#{ui['tirocini.numFigProfShort']}</dt>
+										<dd>#{tirocini.numFigureProf}</dd>
+										<dt>#{ui['tirocini.dataRichiesta']}</dt>
+										<dd>
+											<h:outputText value="#{tirocini.dataRichiesta}" title="Data richiesta">
+												<f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+											</h:outputText>
+										</dd>
+									</dl>
+									<legend> #{ui['tirocini.rif']} </legend>
+									<dl class="dl-horizontal">
+										<dt>#{ui['shared.cfPiva']}</dt>
+										<dd>#{tirocini.cfRif}</dd>
+										<dt>#{ui['shared.ragSoc']}</dt>
+										<dd>#{tirocini.ragSocRif}</dd>
+										<dt>#{ui['shared.lastname']}</dt>
+										<dd>#{tirocini.cognomeRif}</dd>
+										<dt>#{ui['shared.name']}</dt>
+										<dd>#{tirocini.nomeRif}</dd>
+										<dt>#{ui['shared.email']}</dt>
+										<dd>#{tirocini.emailRif}</dd>
+									</dl>
+								</div>
+								<div class="col-md-4">
+									<legend> #{ui['tirocini.luogoDiLavoro']} </legend>
+									<dl class="dl-horizontal">
+										<dt>#{ui['shared.comune']}</dt>
+										<dd>#{tirocini.deComune.strDenominazioneConTarga}</dd>
+										<dt>#{ui['shared.provincia']}</dt>
+										<dd>#{tirocini.deProvincia.denominazione}</dd>
+										<dt>CPI</dt>
+										<dd>#{tirocini.deCpi.descrizione}</dd>
+									</dl>
+									<legend> #{ui['tirocini.rifAzienda']} </legend>
+									<dl class="dl-horizontal">
+										<dt>#{ui['shared.lastname']}</dt>
+										<dd>#{tirocini.pfPrincipal.cognome}</dd>
+										<dt>#{ui['shared.name']}</dt>
+										<dd>#{tirocini.pfPrincipal.nome}</dd>
+										<dt>#{ui['shared.delegato']}</dt>
+										<dd>#{tirocini.tipoDelegatoRifAzienda}</dd>
+									</dl>
+								</div>
+								<div class="col-md-4">
+									<legend> #{ui['tirocini.ambitoProf']} </legend>
+									<dl class="dl-custom">
+										<dt>#{ui['tirocini.qualifSRQ']}</dt>
+										<dd>#{tirocini.deQualificaSrq.descrizione}</dd>
+										<dt>#{ui['tirocini.grupProf']}</dt>
+										<dd>#{tirocini.deMansione.descrizione}</dd>
+										<dt>#{ui['tirocini.qualifISTAT']}</dt>
+										<dd>#{tirocini.deMansioneMin.descrizione}</dd>
+										<dt>#{ui['tirocini.titoloDiStudio']}</dt>
+										<dd>#{tirocini.deTitolo.descrizione}</dd>
+									</dl>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+				</p:dataGrid>
+			</h:form>
+		</h:panelGroup>
+	</h:panelGroup>
+</ui:composition>
+

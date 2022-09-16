@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="../../template/main.xhtml"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<ui:define name="title">
+		<h:outputText value="#{msg['cittadino.ricerca_corso.titolo']}"
+			escape="false" />
+	</ui:define>
+	<ui:define name="content">
+		<ui:param name="form_libera_id" value="ricerca_corsi_libera_form" />
+		<ui:param name="form_specifica_id"
+			value="ricerca_corsi_specifica_form" />
+		<ui:param name="form_riferimento_id"
+			value="ricerca_corsi_riferimento_form" />
+		<ui:param name="form_formazione_regolamentata_id"
+			value="ricerca_corsi_formazione_regolamentata_form" />
+		<ui:param name="bean" value="#{ricercaCorsiBean}" />
+
+		<h:outputText value="#{txt['portlet_corsi.descrizione']}"
+			escape="false" />
+
+		<div class="widget_container ui-tabs ui-widget-content ui-corner-all">
+			<h:form id="#{form_specifica_id}">
+				<h:outputText
+					value="#{msg['cittadino.ricerca_corso.ricerca_semplice.guida']}"
+					escape="false" />
+
+				<h:panelGrid>
+					<cc:inputSuggestion id="provincia" label="Provincia"
+						required="false" valueCod="#{bean.parametriRicerca.codProvincia}"
+						value="#{bean.parametriRicerca.provincia}" showButton="false"
+						suggestionPath="province" size="22">
+						<f:validator validatorId="provinciaSuggestionValidator"
+							for="function">
+						</f:validator>
+					</cc:inputSuggestion>
+					<cc:selectOneMenu id="tipo_formazione"
+						label="Tipologia di formazione" required="false"
+						value="#{bean.parametriRicerca.codFormazione}">
+						<f:selectItems value="#{bean.listDeTipoFormazione}" />
+					</cc:selectOneMenu>
+					<cc:inputSuggestion id="settore" label="Gruppo professionale"
+						required="false"
+						valueCod="#{bean.parametriRicerca.codGruppoProfessionale}"
+						value="#{bean.parametriRicerca.strGruppoProfessionale}"
+						showButton="true" suggestionPath="mansioni" size="45">
+						<f:validator validatorId="mansioneSuggestionValidator"
+							for="function" />
+					</cc:inputSuggestion>
+				</h:panelGrid>
+				<br />
+
+				<h:commandButton id="cerca_specifica" value="Cerca" alt="Cerca"
+					action="#{bean.multipleSearch}" title="Avvia la ricerca specifica"
+					styleClass="buttonStyle" />
+				<br />
+				<br />
+			</h:form>
+		</div>
+
+		<fieldset
+			class="widget_container ui-tabs ui-widget-content ui-corner-all">
+			<legend>
+				<h:outputText
+					value="#{msg['cittadino.ricerca_corso.formazione_regolamentata.titolo']}"
+					escape="false" />
+			</legend>
+			<h:form id="#{form_formazione_regolamentata_id}">
+				<h:outputText
+					value="#{txt['formazione_regolamentata.descrizione']}"
+					escape="false" />
+
+				<h:panelGrid>
+					<cc:inputSuggestion id="provincia" label="Provincia"
+						required="false"
+						valueCod="#{bean.parametriRicerca.codProvinciaFR}"
+						value="#{bean.parametriRicerca.provinciaFR}" showButton="false"
+						suggestionPath="province" size="22">
+						<f:validator validatorId="provinciaSuggestionValidator"
+							for="function">
+						</f:validator>
+					</cc:inputSuggestion>
+					<cc:inputSuggestion id="professione" label="Professione"
+						rendered="true" required="false"
+						valueCod="#{bean.parametriRicerca.codProfessione}"
+						value="#{bean.parametriRicerca.strProfessione}" showButton="true"
+						suggestionPath="professione" size="45">
+						<f:validator validatorId="professioneSuggestionValidator"
+							for="function">
+						</f:validator>
+					</cc:inputSuggestion>
+				</h:panelGrid>
+				<br />
+
+				<h:commandButton id="cerca_specifica" value="Cerca" alt="Cerca"
+					action="#{bean.multipleSearchFR}"
+					title="Avvia la ricerca specifica" styleClass="buttonStyle" />
+				<br />
+				<br />
+			</h:form>
+		</fieldset>
+
+		<fieldset
+			class="widget_container ui-tabs ui-widget-content ui-corner-all">
+			<legend>
+				<h:outputText
+					value="#{msg['cittadino.ricerca_corso.ricerca_libera.titolo']}"
+					escape="false" />
+			</legend>
+			<h:form id="#{form_libera_id}">
+				<h:outputText
+					value="#{msg['cittadino.ricerca_corso.ricerca_libera.descrizione']}"
+					escape="false" />
+
+				<cc:inputText id="input_libera"
+					value="#{bean.parametriRicerca.ricercaLibera}" size="65"></cc:inputText>
+				<br />
+
+				<h:commandButton id="cerca_libera" value="Cerca" alt="Cerca"
+					action="#{bean.freeSearch}" title="Avvia la ricerca libera"
+					styleClass="buttonStyle" />
+				<br />
+				<br />
+			</h:form>
+		</fieldset>
+
+		<fieldset
+			class="widget_container ui-tabs ui-widget-content ui-corner-all">
+			<legend>
+				<h:outputText
+					value="#{msg['cittadino.ricerca_corso.ricerca_riferimento.titolo']}"
+					escape="false" />
+			</legend>
+			<h:form id="#{form_riferimento_id}">
+				<h:outputText
+					value="#{msg['cittadino.ricerca_corso.ricerca_riferimento.descrizione']}"
+					escape="false" />
+
+				<cc:inputText id="input_riferimento"
+					value="#{bean.parametriRicerca.codRifPA}" size="65" />
+				<h:outputText value="(es. 2008-116/MO/3)" />
+				<br />
+				<br />
+
+				<h:commandButton id="cerca_riferimento" value="Cerca" alt="Cerca"
+					action="#{bean.rifPaSearch}"
+					title="Avvia la ricerca per riferimento" styleClass="buttonStyle" />
+				<br />
+				<br />
+			</h:form>
+		</fieldset>
+
+		<h:panelGroup id="risultati" layout="block"
+			rendered="#{bean.eseguitaRicerca}">
+			<h:outputText rendered="#{1 != bean.corsi.size()}"
+				value="Sono stati trovati #{bean.corsi.size()} corsi" />
+			<h:outputText rendered="#{1 == bean.corsi.size()}"
+				value="E' stato trovato un corso" />
+			<h:dataTable id="corsi_list" value="#{bean.corsi}"
+				rendered="#{not empty bean.corsi}" columnClasses=",,, notSortable"
+				var="corso">
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Titolo" />
+					</f:facet>
+
+					<h:link outcome="/secure/utente/corsi/dettaglio_corso"
+						title="Visualizza il dettaglio del corso">
+						<f:param name="id" value="#{corso.id}" />
+						<h:outputText value="#{corso.titoloCorso}"
+							rendered="#{corso.titoloCorso != null}" />
+					</h:link>
+
+				</h:column>
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Codice identificativo" />
+					</f:facet>
+
+					<h:outputText value="#{corso.codiceIdentificativo}"
+						rendered="#{corso.codiceIdentificativo != null}" />
+				</h:column>
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Sedi di svolgimento" />
+					</f:facet>
+
+					<ui:repeat var="sede" value="#{corso.orSedeCorsos}">
+						<h:outputText value="#{sede.strComune} (#{sede.targa})"
+							rendered="#{sede.strComune != null}" />
+						<br />
+					</ui:repeat>
+				</h:column>
+			</h:dataTable>
+		</h:panelGroup>
+
+		<cc:btnBack backTo="#{visCvBean.backTo}" />
+
+		<script type="text/javascript">
+			$(function() {
+				$('#risultati a:visible:enabled:first').focus();
+			});
+			
+			function checkTipoFormazione() {
+				var tipoFormazione = $(jq('ricerca_corsi_specifica_form:tipo_formazione:inputText')).prop('value');
+				
+				if (tipoFormazione == 'FORMAZIONE REGOLAMENTATA') {
+					$(jq('ricerca_corsi_specifica_form:professione')).show();
+					$(jq('ricerca_corsi_specifica_form:settore')).hide();
+	
+					if (event.keyCode == 9) {
+						$(jq('ricerca_corsi_specifica_form:professione:inputText')).focus();
+					}
+				} else if (tipoFormazione == 'FORMAZIONE FINANZIATA') {
+					$(jq('ricerca_corsi_specifica_form:professione')).hide();
+					$(jq('ricerca_corsi_specifica_form:settore')).show();
+				} else {
+					$(jq('ricerca_corsi_specifica_form:professione')).hide();
+					$(jq('ricerca_corsi_specifica_form:settore')).hide();
+				}
+			}
+		
+			$(function() {
+				generateDataTable(jq('corsi_list'));
+				
+				disegnaBottoni();
+			});			
+		</script>
+		<cc:btnBack backTo="#{bean.backTo}" />
+	</ui:define>
+
+</ui:composition>

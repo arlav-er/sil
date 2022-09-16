@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.name']}" styleClass="col-lg-2 control-label" for="nome" />
+		<div class="col-lg-10">
+			<p:inputText id="nome" value="#{provinciaCreaCittadinoBean.newCittadino.pfPrincipal.nome}" required="true" styleClass="form-control" maxlength="30"
+				widgetVar="nomeWV" />
+			<p:message id="nomeMessage" for="nome"></p:message>
+		</div>
+	</div>
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.lastname']}" styleClass="col-lg-2 control-label" for="cognome" />
+		<div class="col-lg-10">
+			<p:inputText id="cognome" value="#{provinciaCreaCittadinoBean.newCittadino.pfPrincipal.cognome}" required="true" styleClass="form-control"
+				maxlength="30" widgetVar="cognomeWV" />
+			<p:message id="cognomeMessage" for="cognome"></p:message>
+		</div>
+	</div>
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.comuneNascita']}" styleClass="col-lg-2 control-label" for="comuneNascita" />
+		<div class="col-lg-10">
+			<p:autoComplete id="comuneNascita" required="true" value="#{provinciaCreaCittadinoBean.newCittadino.deComuneNascita}" converter="deComuneConverter"
+				forceSelection="true" var="comune" itemLabel="#{comune.strDescrizioneConTarga}" itemValue="#{comune}"
+				emptyMessage="#{ui['shared.emptyAutoComplete']}" completeMethod="#{decodificheAutoComplete.completeComuneNascita}" 
+				minQueryLength="2" styleClass="form-control" widgetVar="comuneNascitaWV" />
+			<p:message id="comuneNascitaMessage" for="comuneNascita"></p:message>
+		</div>
+	</div>
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.cellulare']}" styleClass="col-lg-2 control-label" for="cellulare" />
+		<div class="col-lg-10">
+			<p:inputText id="cellulare" value="#{provinciaCreaCittadinoBean.newCittadino.cellulare}" 
+				required="true" styleClass="form-control" maxlength="20" widgetVar="cellulareWV" 
+				converter="phoneConverter">
+				<o:validator validatorId="javax.faces.RegularExpression"
+					pattern="#{validation['pattern.phoneNumber']}"
+					message="#{validation['message.phoneNumber']}"></o:validator>
+			</p:inputText>
+			<p:message id="cellulareMessage" for="cellulare"></p:message>
+		</div>
+	</div>
+	<div class="form-group">
+		<p:outputLabel value="#{ui['prof.indirizzoResidenza']}" styleClass="col-lg-2 control-label" for="indirizzoResidenza" />
+		<div class="col-lg-10">
+			<p:inputText id="indirizzoResidenza" value="#{provinciaCreaCittadinoBean.newCittadino.indirizzoResidenza}" 
+				required="true" styleClass="form-control" maxlength="100" widgetVar="indirizzoResidenzaWV" />
+			<p:message id="indirizzoResidenzaMessage" for="indirizzoResidenza"></p:message>
+		</div>
+	</div>
+	<div class="form-group">
+		<p:outputLabel id="comuneResidenzaLabel" value="#{ui['shared.comuneResidenza']}" 
+			styleClass="col-lg-2 control-label" for="comuneResidenza" />
+		<div class="col-lg-10">
+			<p:autoComplete id="comuneResidenza" value="#{provinciaCreaCittadinoBean.newCittadino.deComuneResidenza}"
+				converter="deComuneConverter" forceSelection="true" var="comune" itemLabel="#{comune.strDescrizioneConTarga}"
+				itemValue="#{comune}" emptyMessage="#{ui['shared.emptyAutoComplete']}" styleClass="form-control"
+				completeMethod="#{decodificheAutoComplete.completeComune}" minQueryLength="2" widgetVar="comuneResidenzaWV">
+				<p:ajax event="itemSelect" process="@this" update="@this" />
+			</p:autoComplete>
+			<p:message id="comuneResidenzaMessage" for="comuneResidenza" />
+		</div>
+	</div>
+	<div class="form-group">
+		<p:outputLabel value="#{ui['prof.indirizzoDomicilio']}" styleClass="col-lg-2 control-label" for="indirizzoDomicilio" />
+		<div class="col-lg-10">
+			<p:inputText id="indirizzoDomicilio" value="#{provinciaCreaCittadinoBean.newCittadino.indirizzoDomicilio}" 
+				required="true" styleClass="form-control" maxlength="512" widgetVar="indirizzoDomicilioWV" />
+			<p:message id="indirizzoDomicilioMessage" for="indirizzoDomicilio"></p:message>
+		</div>
+	</div>
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.comuneDomicilio']}" styleClass="col-lg-2 control-label" for="comuneDomicilio" />
+		<div class="col-lg-10">
+			<p:autoComplete id="comuneDomicilio" required="true" value="#{provinciaCreaCittadinoBean.newCittadino.deComuneDomicilio}"
+				converter="deComuneConverter" forceSelection="true" var="comune" itemLabel="#{comune.strDescrizioneConTarga}" itemValue="#{comune}"
+				emptyMessage="#{ui['shared.emptyAutoComplete']}" completeMethod="#{decodificheAutoComplete.completeComune}" minQueryLength="2"
+				styleClass="form-control" widgetVar="comuneDomicilioWV">
+				<p:ajax event="itemSelect" update="provinciaGroup"
+					listener="#{provinciaCreaCittadinoBean.comuneDomicilioChanged}" process="comuneDomicilio" />
+			</p:autoComplete>
+			<p:message id="comuneDomicilioMessage" for="comuneDomicilio"></p:message>
+		</div>
+	</div>
+	<h:panelGroup id="provinciaGroup">
+		<div class="form-group spacer">
+			<p:outputLabel value="#{ui['shared.provincia']}" styleClass="col-lg-2 control-label" for="provinciaRiferimento" />
+			<div class="col-lg-10">
+				<p:selectOneMenu id="provinciaRiferimento" widgetVar="provRifWV" required="true" converter="deProvinciaConverter" style="width: 100%;"
+					value="#{provinciaCreaCittadinoBean.newCittadino.deProvincia}" styleClass="form-control">
+						<f:selectItem itemLabel="" itemValue="" />
+					<f:selectItems value="#{decodificheBean.provinceByCurrentRegione}" var="provincia" itemLabel="#{provincia.descrizione}"
+						itemValue="#{provincia}" />
+				</p:selectOneMenu>
+				<ui:fragment rendered="#{provinciaCreaCittadinoBean.currentRegione() == 8}">
+					<span class="help-block m-b-none">#{ui['regCit.rer.fuoriprovincia']}</span>
+				</ui:fragment>
+				<ui:fragment rendered="#{provinciaCreaCittadinoBean.currentRegione() == 22}">
+					<span class="help-block m-b-none">#{ui['regCit.pat.fuoriprovincia']}</span>
+				</ui:fragment>
+				<ui:fragment rendered="#{provinciaCreaCittadinoBean.currentRegione() == 10}">
+					<span class="help-block m-b-none">#{ui['regCit.umbria.fuoriprovincia']}</span>
+				</ui:fragment>
+				<p:message id="provinciaRiferimentoMessage" for="provinciaRiferimento" />
+			</div>
+		</div>
+	</h:panelGroup>
+</ui:composition>

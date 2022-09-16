@@ -1,0 +1,66 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+
+	<h:form>
+		<p:remoteCommand name="showMessageWithTicketId" actionListener="#{utenteMessagingBean.loadMessageContattiInviati()}" process="@this" update=":ticket"
+			onstart="ticketLoading()" oncomplete="showMessageComplete(xhr, status, args); comeToYuri();" global="false"></p:remoteCommand>
+	</h:form>
+	<h:panelGroup id="ticket">
+		<ui:repeat var="message" value="#{utenteMessagingBean.ticketMessages}" varStatus="status">
+			<ui:fragment rendered="#{status.index == 0}">
+				<h3>
+					#{message.oggetto} <small>#{ui['messaging.ticketN']}: #{message.ticket}</small> <a href="contactSent"
+						class="btn ui-button btn-primary btn-grey uk-padding-large-left uk-padding-large-right navYuri pull-right" title="Torna"> <i
+						class="fa fa-arrow-left"></i>
+					</a>
+				</h3>
+			</ui:fragment>
+
+			<a data-toggle="collapse" href="#ticket#{message.idMsgMessaggio}">
+				<div class="message-header uk-margin-top">
+					<div class="message-sender">
+						<ui:fragment rendered="#{status.index == 0}">
+							<span class="fa fa-envelope-o"></span>
+						</ui:fragment>
+						<ui:fragment rendered="#{status.index != 0}">
+							<span class="fa fa-reply"></span>
+						</ui:fragment>
+
+						<span class="uk-margin-left">#{message.pfPrincipalFrom.nome} #{message.pfPrincipalFrom.cognome}</span>
+					</div>
+					<div class="message-date">
+						<small> <h:outputText value="#{message.dtmIns}">
+								<f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+							</h:outputText> -
+						</small>
+						<time class="timeago" datetime="#{message.dtmIns}"></time>
+					</div>
+				</div>
+			</a>
+			<div id="ticket#{message.idMsgMessaggio}" class="message-info collapse #{status.last?'in':''}">
+				<div class="row uk-margin-left">
+					<div class="col-md-12 ticket-message-body">
+						<blockquote>
+							<h:outputFormat escape="false" value="#{message.corpo}"></h:outputFormat>
+						</blockquote>
+						<h:outputLink value="#{utenteMessagingBean.linkRiferimentoMessaggio}" disabled="#{utenteMessagingBean.idVaDatiVacancy == null}">
+							<f:param name="id" value="#{utenteMessagingBean.idVaDatiVacancy}" />
+							<h:outputText value="#{utenteMessagingBean.testoLinkRiferimentoMessaggio}" rendered="#{utenteMessagingBean.idVaDatiVacancy != null}"/>							
+						</h:outputLink>
+					</div>
+				</div>
+			</div>
+		</ui:repeat>
+
+	</h:panelGroup>
+
+	<div class="notfound text-center hidden">
+		<i class="fa fa-frown-o fa-5 not-found-face"></i>
+		<p>#{ui['messaging.noMessageFound']}</p>
+		<p>
+			<a class="btn ui-button btn-primary navYuri" href="contactSent"> <i class="fa fa-left-arrow"></i> #{ui['shared.back']}
+			</a>
+		</p>
+	</div>
+</ui:composition>
+

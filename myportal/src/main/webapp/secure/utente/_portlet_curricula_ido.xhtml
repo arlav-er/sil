@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/template_portlet.xhtml">
+	
+	<ui:param name="portletCssClass" value="portletElencoCurricula" />
+	
+	<ui:define name="portlet_title">
+		<h:outputText value="#{msg['cittadino.portlet.ido.cv.titolo']}"
+			escape="false" />
+	</ui:define>
+
+	<ui:define name="portlet_content">
+		<h:outputText value="#{txt['cittadino.portlet.ido.cv.descrizione']}"
+			escape="false" />
+		<h:form id="curriculum_form">
+			<ui:repeat var="curriculum" value="#{utenteHomeBean.curricula}">
+				<div class="ui-widget-content ui-corner-all cv-element card">
+					<div style="float: left; width: 315px; margin: 5px;">
+						<h:outputLabel for="descrizion_cv" value="Nome CV:" />
+						<h:link outcome="/secure/utente/curriculum/view_pf.xhtml"
+							title="Visualizza il CV">
+							<b> <h:outputText id="descrizion_cv"
+									value="#{curriculum.descrizione}" /></b>
+							<f:param name="id" value="#{curriculum.id}" />
+						</h:link>
+						<br />
+						<h:outputLabel for="ultima_modifica_cv" value="Ultima modifica:" />
+						<b><h:outputText id="ultima_modifica_cv"
+								value="#{curriculum.dtmMod}">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="date" />
+							</h:outputText></b> <br />
+						<h:outputLabel for="scadenza_cv" value="Scadenza cv:" />
+						<b><h:outputText id="scadenza_cv"
+										 value="#{curriculum.dtScadenza}">
+							<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+						</h:outputText></b> <br />
+						<h:outputLabel for="ambito_diffusione_cliclavoro"
+							value="Ambito diffusione cv:"
+							rendered="#{utenteHomeBean.checkAbilitazioneVisibile('cliclavoro')}" />
+						<b> <h:outputText id="ambito_diffusione_cliclavoro"
+								rendered="#{utenteHomeBean.checkAbilitazioneVisibile('cliclavoro')}"
+								value="#{curriculum.descAmbDiff}" /></b><br />
+						<h:outputLabel for="ricercabilita"
+							value="Visibile alle aziende:" />
+						<b> <h:outputText id="ricercabilita"
+								value="#{curriculum.ricercabile ? 'Si' : 'No'}" /></b><br />
+						<b> <h:outputText id="validita"
+								value="#{curriculum.valido ? 'Stato cv: valido' : 'Stato cv: scaduto'}" /></b>
+					</div>
+					<div style="float: right; margin: 13px 5px;">
+						<h:link rendered="#{curriculum.fromMyPortal}"
+							styleClass="buttonStyle yellowButton"
+							outcome="/secure/utente/curriculum/edit_pf.xhtml" title="Modifica">
+							<f:param name="id" value="#{curriculum.id}" />
+							<span class="ui-icon ui-icon-pencil fix_icon" />
+						</h:link>
+
+						<a tabindex="0" class="selectAction buttonStyle yellowButton"
+							title="Scegli un'azione"> <span
+							class="ui-icon ui-icon-triangle-1-s fix_icon" />
+						</a>
+					</div>
+
+					<ul class="option-menu">
+						<li><h:link tabindex="0"
+								outcome="/secure/utente/curriculum/view_pf.xhtml"
+								onclick="save_last_action(this,'Apri')">
+								<f:param name="id" value="#{curriculum.id}" />
+								<span class="ui-icon ui-icon-document fix_icon" />
+										Visualizza
+									</h:link></li>
+						<ui:fragment rendered="#{curriculum.fromMyPortal}">
+							<li><h:link tabindex="0"
+									outcome="/secure/utente/curriculum/edit_pf.xhtml" title="Modifica"
+									onclick="save_last_action(this,'Modifica')">
+									<f:param name="id" value="#{curriculum.id}" />
+									<span class="ui-icon ui-icon-pencil fix_icon" />
+										Modifica
+									</h:link></li>
+							<li><a tabindex="0" href="#"
+								onclick="return eliminaCv({cvid: #{curriculum.id}, referenziato: #{curriculum.referenziatoInMsg}, component: this});"
+								onkeypress="if (event.keyCode==13) {return eliminaCv({cvid: #{curriculum.id}, referenziato: #{curriculum.referenziatoInMsg}, component: this});return false;} else {return true;}">
+									<span class="ui-icon ui-icon-trash fix_icon" /> Elimina
+							</a></li>
+						</ui:fragment>
+						<li class="copia-cv-menu"><a tabindex="0" href="#"
+							onclick="return copiaCv({cvid: #{curriculum.id}, cvdescr: '#{utilsBean.escapeJS(curriculum.descrizione)}', component: this});"
+							onkeypress="if (event.keyCode==13) {return copiaCv({cvid: #{curriculum.id}, cvdescr: '#{utilsBean.escapeJS(curriculum.descrizione)}', component: this});return false; } else {return true;}">
+								<span class="ui-icon ui-icon-copy fix_icon" /> Copia
+						</a></li>
+						<li><h:outputLink tabindex="0"
+								onclick="fetchStampa('#{request.contextPath}/secure/rest/services/getCurriculumUtente?curriculumId='+#{curriculum.id});return false;"
+								title="Stampa">
+								<f:param name="curriculumId" value="#{curriculum.id}" />
+								<span class="ui-icon ui-icon-print fix_icon" />
+									Stampa
+								</h:outputLink></li>
+
+					</ul>
+					<div style="clear: both;"></div>
+				</div>
+			</ui:repeat>
+
+			<script type="text/javascript">
+				//<![CDATA[
+				
+				function checkMaxCurricula() {
+					// Confronta il numero di CV inseriti con il massimo permesso.
+					// Se si e' superato il limite allora nasconde i pulsanti/voci di menu per l'inserimento di nuovi CV
+					var maxCV = #{const['curriculum.max']};
+					var currCV = #{utenteHomeBean.numeroLiveCurricula}; 
+					
+					if (currCV < maxCV) {
+						$('#portlet-#{portlet.id}\\:nuovo_cv_button').show();
+						$('.copia-cv-menu').show();
+					} else {
+						$('#portlet-#{portlet.id}\\:nuovo_cv_button').hide();
+						$('.copia-cv-menu').hide();
+						//$.jnotify(("Non è possibile inserire più di "+ #{const['curriculum.max']} +" curriculum"), "warn");
+					}
+				};
+
+				var copiaCv = function(params) {
+					// Viene richiamata quando si clicca o preme invio sulla voce di menu Copia
+					document.getElementById('portlet-#{portlet.id}:curriculum_copy').open(
+							{cvid: params.cvid, cvdescr: params.cvdescr},
+							params.component);
+				};
+
+				var openCopyCv = function(params) {
+					// Apre la modale per la copia del CV
+					var itemId = params.cvid;
+					var itemDescrizione = params.cvdescr;
+					var copyItemDescrizione = itemDescrizione;
+					$('[id$="curriculum_copy\:modal_form\:descrizione_copia"]').val(copyItemDescrizione);
+					$('[id$="curriculum_copy\:modal_form\:id_copia"]').val(itemId);
+				};
+
+				function eliminaCv(params) {
+					// Viene richiamata quando si clicca o preme invio sulla voce di menu Elimina
+					document.getElementById('portlet-#{portlet.id}:curriculum_delete').open(
+							{cvid: params.cvid, referenziato: params.referenziato},
+							params.component);
+				};
+
+				var openDeleteCv = function(params) {
+					// Apre la modale per l'eliminazione del CV
+					var itemId = params.cvid;
+					var referenziato = params.referenziato;
+					
+					$('[id$="curriculum_delete\:modal_form\:id_delete"]').val(itemId);
+
+					if (referenziato) {
+						$('[id$="curriculum_delete"] .message_content').text("Questo curriculum è referenziato all'interno di una richiesta di supporto. Sei sicuro di volerlo eliminare?");
+					} else {
+						$('[id$="curriculum_delete"] .message_content').text("Sei sicuro di voler eliminare il curriculum?");
+					}					
+				};
+
+				$(function() {	
+					disegnaBottoni();
+
+					checkMaxCurricula();					
+					
+					generateActionMenus("[id$=curriculum_form] .selectAction");
+				});
+				//]]>
+			</script>
+		</h:form>
+		
+		<cc:modalDialog id="curriculum_delete" title="Elimina"
+			openF="openDeleteCv"
+			actionSubmit="#{utenteHomeBean.deleteCurriculum}"
+			submitLabel="Elimina"
+			renderAjax=":portlet-#{portlet.id}:curriculum_form :global_messages">
+			<h:inputHidden id="id_delete"></h:inputHidden>
+		</cc:modalDialog>
+
+		<cc:modalDialog id="curriculum_copy" title="Copia" openF="openCopyCv"
+			actionSubmit="#{utenteHomeBean.copyCurriculum}" submitLabel="Copia"
+			renderAjax=":portlet-#{portlet.id}:curriculum_form :global_messages"
+			width="450" height="150">
+			<h:inputHidden id="id_copia"></h:inputHidden>
+			<h:inputHidden id="descrizione_hidden"></h:inputHidden>
+			<h:outputText value="Descrizione"></h:outputText>
+			<h:inputText id="descrizione_copia" maxlength="100" style="width: 100%;box-sizing: border-box;"/>
+		</cc:modalDialog>
+		<br />
+		
+		
+		<h:link styleClass="buttonStyle" id="nuovo_cv_button"
+			outcome="/secure/utente/curriculum/edit_pf"
+			title="Compila un nuovo Curriculum Vitae">
+			Compila il tuo CV 
+		</h:link>
+	</ui:define>
+</ui:composition>

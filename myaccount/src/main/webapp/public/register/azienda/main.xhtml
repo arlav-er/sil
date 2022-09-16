@@ -1,0 +1,181 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/templates/#{godfatherBean.theme}/main.xhtml">
+	<ui:param name="pagetitle" value="#{ui['regAz.registerModel']}" />
+	<ui:define name="content">
+		<h:outputScript library="commons" name="js/testUnits/registerAz.js"
+			rendered="#{facesContext.application.projectStage == 'Development' or facesContext.application.projectStage == 'SystemTest'}" />
+		<div class="container register-module m-t-20">
+			<h3>
+				#{ui['regAz.registerModel']}
+				<br />
+				<small>#{ui['regAz.azienda']}</small>
+			</h3>
+			<h:form id="registerForm" styleClass="form-horizontal">
+				<p:hotkey bind="ctrl+shift+f" onstart="registerAzienda()"
+					rendered="#{facesContext.application.projectStage == 'Development' or facesContext.application.projectStage == 'SystemTest'}"></p:hotkey>
+				<!-- START row-->
+				<div class="row animated fadeIn">
+					<div class="col-sm-6">
+						<!-- START panel-->
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h5>#{ui['regAz.datiAccount']}</h5>
+							</div>
+							<div class="panel-body">
+								<ui:include src="_datiAccount.xhtml" />
+							</div>
+						</div>
+						<!-- END panel-->
+					</div>
+					<div class="col-sm-6">
+						<!-- START panel-->
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h5>#{ui['regAz.datiAzienda']}</h5>
+							</div>
+							<div class="panel-body">
+								<ui:include src="_datiAzienda.xhtml" />
+							</div>
+						</div>
+						<!-- END panel-->
+					</div>
+					<div class="col-sm-12">
+						<ui:include src="_ricSARE.xhtml" />
+					</div>
+				</div>
+
+				<div class="row informativa-privacy">
+					<div>
+						<!-- START panel-->
+						<div class="panel panel-default">
+							<div class="panel-heading">#{ui['regCit.infoDatiPer']}</div>
+							<div class="panel-body">
+
+								<h:panelGroup id="privacy">
+
+									<h:panelGroup
+										rendered="#{registerAzienda.aziendaInfo.pfPrincipal.flagAbilitatoSare}">
+										<h:panelGrid
+											rendered="#{registerAzienda.currentRegione() == 2}">
+											<ui:include src="terms/_informativaAziendaSare_VDA.xhtml">
+												<ui:param name="chiamante" value="azienda" />
+											</ui:include>
+										</h:panelGrid>
+										<h:panelGrid
+											rendered="#{registerAzienda.currentRegione() != 2}">
+											<ui:include src="terms/_informativaAziendaSare.xhtml">
+												<ui:param name="chiamante" value="azienda" />
+											</ui:include>
+										</h:panelGrid>
+									</h:panelGroup>
+									
+									<h:panelGroup
+										rendered="#{not registerAzienda.aziendaInfo.pfPrincipal.flagAbilitatoSare}">
+										<h:panelGrid
+											rendered="#{registerAzienda.currentRegione() == 8}">
+											<ui:include src="terms/_informativaAzienda_RER.xhtml">
+												<ui:param name="chiamante" value="azienda" />
+											</ui:include>
+										</h:panelGrid>
+										<h:panelGrid class="centered widthMax"
+											rendered="#{registerAzienda.currentRegione() == 22}">
+											<ui:include src="terms/_informativaAzienda_PAT.xhtml">
+												<ui:param name="chiamante" value="azienda" />
+											</ui:include>
+										</h:panelGrid>
+										<h:panelGrid
+											rendered="#{registerAzienda.currentRegione() == 10}">
+											<ui:include src="terms/_informativaAzienda_UMBRIA.xhtml">
+												<ui:param name="chiamante" value="azienda" />
+											</ui:include>
+										</h:panelGrid>
+										<h:panelGrid
+											rendered="#{registerAzienda.currentRegione() == 2}">
+											<ui:include src="terms/_informativaAzienda_VDA.xhtml">
+												<ui:param name="chiamante" value="azienda" />
+											</ui:include>
+										</h:panelGrid>
+									</h:panelGroup>
+								</h:panelGroup>
+
+							</div>
+							<ui:fragment
+								rendered="#{registerAzienda.constantsSingleton.getCaptchaRequired()}">
+								<div id="captchaGroup">
+									<p:captcha required="true" id="captcha" secure="true"
+										language="it"
+										validatorMessage="Testo inserito non corrispondente"
+										requiredMessage="#{validation['message.captcha']}"
+										theme="#{registerAzienda.constantsSingleton.isTrento()?'white':'red'}" />
+									<div class="captchaMessage">
+										<p:message for="captcha" id="captchaMessage" />
+									</div>
+								</div>
+								<div class="panel-footer text-center">
+									<div class="clearfix">
+										<div class="pull-left">
+											<div class="checkbox c-checkbox">
+												<p:selectBooleanCheckbox
+													value="#{registerAzienda.acceptTerms}"
+													widgetVar="acceptTermsWV">
+													<p:ajax update="registerBtn" process="@this"></p:ajax>
+												</p:selectBooleanCheckbox>
+												<strong>#{ui['shared.acceptTerms']}</strong>
+
+											</div>
+										</div>
+									</div>
+									<p:commandButton id="registerBtn"
+										action="#{registerAzienda.save}"
+										value="#{ui['shared.register']}" styleClass="btn btn-primary"
+										update="@(.ui-message)" widgetVar="registerBtnWV"
+										onclick="PF('registerBtnWV').disable()"
+										oncomplete="PF('registerBtnWV').enable(); scrollToFirstMessage();"
+										disabled="#{not registerAzienda.acceptTerms}"></p:commandButton>
+								</div>
+							</ui:fragment>
+							<ui:fragment
+								rendered="#{not registerAzienda.constantsSingleton.getCaptchaRequired()}">
+								<div class="panel-footer text-center">
+									<div class="clearfix">
+										<div class="pull-left">
+											<div class="checkbox c-checkbox">
+												<p:selectBooleanCheckbox
+													value="#{registerAzienda.acceptTerms}"
+													widgetVar="acceptTermsWV">
+													<p:ajax update="registerBtn2" process="@this"></p:ajax>
+												</p:selectBooleanCheckbox>
+												<strong>#{ui['shared.acceptTerms']}</strong>
+
+											</div>
+										</div>
+									</div>
+									<p:commandButton id="registerBtn2"
+										action="#{registerAzienda.save}"
+										value="#{ui['shared.register']}" styleClass="btn btn-primary"
+										update="@(.ui-message)" widgetVar="registerBtnWV2"
+										onclick="PF('registerBtnWV2').disable()"
+										oncomplete="PF('registerBtnWV2').enable(); scrollToFirstMessage()}"
+										disabled="#{not registerAzienda.acceptTerms}"></p:commandButton>
+								</div>
+							</ui:fragment>
+							<p class="text-center">
+								<a href="#{registerAzienda.loginURL}" class="uk-button">
+									<i class="uk-icon-home"></i>
+									#{ui['shared.tornaHomepage']}
+								</a>
+							</p>
+						</div>
+						<!-- END panel-->
+					</div>
+				</div>
+			</h:form>
+			<!-- END row-->
+		</div>
+	</ui:define>
+</ui:composition>
+</html>

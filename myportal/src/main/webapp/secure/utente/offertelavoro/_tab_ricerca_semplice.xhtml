@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<ui:param name="form_id" value="ricerca_semplice" />
+
+	<h:form id="#{form_id}">
+		<h:panelGroup id="panel" layout="block">
+			<h:panelGrid columns="2">
+				<h:outputLabel>Gruppo professionale: </h:outputLabel>
+				<cc:inputSuggestion id="mansione" disableLabel="true"
+					required="false" valueCod="#{bean.data.codMansione}"
+					value="#{bean.data.strMansione}" showButton="true"
+					suggestionPath="mansioni">
+					<f:validator validatorId="mansioneSuggestionValidator"
+						for="function">
+					</f:validator>
+				</cc:inputSuggestion>
+
+				
+				<h:panelGroup id="luogo_combo_input">
+				<h:outputLabel>Luogo di lavoro: </h:outputLabel>
+					<h:selectOneMenu id="luogo_combo">
+						<f:selectItem itemLabel="Comune" itemValue="0"></f:selectItem>
+						<f:selectItem itemLabel="Provincia" itemValue="1"></f:selectItem>
+						<f:selectItem itemLabel="Regione" itemValue="2"></f:selectItem>
+					</h:selectOneMenu>
+				</h:panelGroup>
+				<h:panelGroup>
+					<cc:inputSuggestion style="display:none" id="comune"
+						disableLabel="true" hidden="true" required="false"
+						valueCod="#{bean.data.codComune}" value="#{bean.data.strComune}"
+						showButton="false" suggestionPath="comuni">
+						<f:validator validatorId="comuneSuggestionValidator"
+							for="function">
+						</f:validator>
+					</cc:inputSuggestion>
+
+					<cc:inputSuggestion style="display:none" id="provincia"
+						disableLabel="true" hidden="true" required="false"
+						valueCod="#{bean.data.codProvincia}"
+						value="#{bean.data.strProvincia}" showButton="false"
+						suggestionPath="province">
+						<f:validator validatorId="provinciaSuggestionValidator"
+							for="function">
+						</f:validator>
+					</cc:inputSuggestion>
+
+					<cc:inputSuggestion style="display:none" id="regione"
+						disableLabel="true" hidden="true" required="false"
+						valueCod="#{bean.data.codRegione}" value="#{bean.data.strRegione}"
+						showButton="false" suggestionPath="regioni">
+						<f:validator validatorId="regioneSuggestionValidator"
+							for="function">
+						</f:validator>
+					</cc:inputSuggestion>
+				</h:panelGroup>
+
+
+				<h:outputLabel>Entro un raggio di</h:outputLabel>
+				<h:panelGroup>
+					<h:selectOneMenu id="raggio_ricerca_combo"
+						value="#{bean.data.raggioRicerca}">
+						<f:selectItem itemLabel="0" itemValue="0"></f:selectItem>
+						<f:selectItem itemLabel="10" itemValue="10"></f:selectItem>
+						<f:selectItem itemLabel="50" itemValue="50"></f:selectItem>
+						<f:selectItem itemLabel="100" itemValue="100"></f:selectItem>
+					</h:selectOneMenu>
+					<h:outputLabel>km</h:outputLabel>
+				</h:panelGroup>
+			</h:panelGrid>
+			<h:commandButton id="searchButton" value="Cerca"
+				action="#{bean.search}">
+				<!-- render va solo sulla lista -->
+				<f:ajax execute="@form" render=":form_lista_offerte"
+					onevent="startSearch"></f:ajax>
+			</h:commandButton>
+
+			<h:commandButton id="insertButton" value="Salva ricerca"
+				onclick="showSaveDialog();return false;" styleClass="insertButton"
+				onkeypress="if (event.keyCode==13) showSaveDialog();return false;">
+			</h:commandButton>
+		</h:panelGroup>
+
+		<script type="text/javascript">
+			// l'oggetto combobox che seleziona quale suggestion attivare
+			var luogoCombo;
+			
+			$(function() {
+				luogoCombo = $( "[id$=luogo_combo]" );
+
+				//va chiamata dopo checkCombo
+				setCombo();
+				
+				$( "[id$=dialog-save]" ).dialog({
+					height: 150,
+					width: 300,
+					modal: true,
+					autoOpen: false,
+					show: "blind"		
+				});
+			});
+		
+			$( "[id$=luogo_combo]" ).change(
+				function() {
+					checkCombo(luogoCombo.val());
+				}
+			);
+
+			function setCombo() {
+				// nascondo tutti i combo box
+				$( "[id$=comune\\:group]" ).css('display', 'none');
+				$( "[id$=provincia\\:group]" ).css('display', 'none');
+				$( "[id$=regione\\:group]" ).css('display', 'none');
+				
+				if ("#{bean.data.codComune}" != "") {
+					$( "[id$=comune\\:inputText]" ).val("#{bean.data.strComune}");
+					$( "[id$=comune\\:inputHidden]" ).val("#{bean.data.codComune}");
+					$( "[id$=luogo_combo]").val(0);
+					$( "[id$=comune\\:group]" ).css('display', '');
+				} else if ("#{bean.data.codProvincia}" != "") {
+					$( "[id$=provincia\\:inputText]" ).val("#{bean.data.strProvincia}");
+					$( "[id$=provincia\\:inputHidden]" ).val("#{bean.data.codProvincia}");
+					$( "[id$=luogo_combo]").val(1);
+					$( "[id$=provincia\\:group]" ).css('display', '');
+				} else if ("#{bean.data.codRegione}" != "") {
+					$( "[id$=regione\\:inputText]" ).val("#{bean.data.strRegione}");
+					$( "[id$=regione\\:inputHidden]" ).val("#{bean.data.codRegione}");
+					$( "[id$=luogo_combo]").val(2);
+					$( "[id$=regione\\:group]" ).css('display', '');
+				} else {
+					$( "[id$=comune\\:group]" ).css('display', '');
+				}
+			};
+
+			//Funzione che controlla quale elemento e' stato selezionato
+			//nella combobox e attiva solo l'elemento corrispondente
+			function checkCombo(selectedComponent) {
+				// nascondo tutti i combo box
+				$( "[id$=comune\\:group]" ).css('display', 'none');
+				$( "[id$=provincia\\:group]" ).css('display', 'none');
+				$( "[id$=regione\\:group]" ).css('display', 'none');
+
+				// annullo tutti gli input dei combo box
+				$( "[id$=comune\\:inputText]" ).val("");
+				$( "[id$=comune\\:inputHidden]" ).val("");
+				$( "[id$=provincia\\:inputText]" ).val("");
+				$( "[id$=provincia\\:inputHidden]" ).val("");
+				$( "[id$=regione\\:inputText]" ).val("");
+				$( "[id$=regione\\:inputHidden]" ).val("");
+
+				// rendo visibile solo il componente selezionato
+				if ( selectedComponent == 0) {
+					$( "[id$=comune\\:group]" ).css('display', '');
+				} else if ( selectedComponent == 1) {
+					$( "[id$=provincia\\:group]" ).css('display', '');
+				} else if ( selectedComponent == 2) {
+					$( "[id$=regione\\:group]" ).css('display', '');
+				}
+			};
+
+			function startSearch(data) {
+				if (data.status == 'begin') {
+					$( "[id$=form_lista_offerte]" ).css('display', 'none');
+					$( "[id$=loader_lista_offerte]" ).css('display', '');
+					
+					checkInput();
+				}
+				if (data.status == 'success') {
+					$( "[id$=loader_lista_offerte]" ).css('display', 'none');
+					$( "[id$=form_lista_offerte]" ).css('display', '');
+				}
+			}
+			
+			function checkInput(data) {
+				//if (data.status == 'begin') {
+					/* Se il campo descrizione delle suggestion e' vuoto, allora
+					 * svuoto anche il campo nascosto che contiene il codice
+					 */
+					if ($( "[id$=comune\\:inputText]" ).val() == "") {
+						$( "[id$=comune\\:inputHidden]" ).val("");
+					}
+					if ($( "[id$=provincia\\:inputText]" ).val() == "") {
+						$( "[id$=provincia\\:inputHidden]" ).val("");
+					}
+					if ($( "[id$=regione\\:inputText]" ).val() == "") {
+						$( "[id$=regione\\:inputHidden]" ).val("");
+					}
+					if ($( "[id$=mansione\\:inputText]" ).val() == "") {
+						$( "[id$=mansione\\:inputHidden]" ).val("");
+					}
+				//}
+				return true;
+			};
+
+			function showSaveDialog() {
+				$( "[id$=dialog-save]" ).dialog('open');
+			};
+
+			function closeSaveDialog() {
+				$( "[id$=descrizione\\:inputText]" ).val($( "[id$=descrizione_hidden]" ).val());
+				$( "[id$=dialog-save]" ).dialog('close');
+			};
+
+			function setHiddenInputs() {
+				$( "[id$=mansione_hidden]" ).val($( "[id$=mansione\\:inputHidden]" ).val());
+				$( "[id$=comune_hidden]" ).val($( "[id$=comune\\:inputHidden]" ).val());
+				$( "[id$=provincia_hidden]" ).val($( "[id$=provincia\\:inputHidden]" ).val());
+				$( "[id$=regione_hidden]" ).val($( "[id$=regione\\:inputHidden]" ).val());
+				$( "[id$=raggio_ricerca_hidden]" ).val($( "[id$=raggio_ricerca_combo]" ).val());
+			};
+		</script>
+	</h:form>
+
+	<!--  modale per il salvataggio dei criteri di ricerca -->
+	<div id="ricerca_vacancy_dialog-save" class="modal_dialog"
+		style="display: none;" title="Vuoi salvare la ricerca?">
+		<h:form id="ricerca_vacancy_dialog-save_form">
+			<h:inputHidden id="mansione_hidden" value="#{bean.data.codMansione}"></h:inputHidden>
+			<h:inputHidden id="comune_hidden" value="#{bean.data.codComune}"></h:inputHidden>
+			<h:inputHidden id="provincia_hidden"
+				value="#{bean.data.codProvincia}"></h:inputHidden>
+			<h:inputHidden id="regione_hidden" value="#{bean.data.codRegione}"></h:inputHidden>
+			<h:inputHidden id="raggio_ricerca_hidden"
+				value="#{bean.data.raggioRicerca}"></h:inputHidden>
+			<h:inputHidden id="descrizione_hidden"
+				value="#{bean.data.descrizione}"></h:inputHidden>
+			<cc:inputText id="descrizione" label="Descrizione della ricerca"
+				value="#{bean.data.descrizione}" maxlength="100" required="true"
+				disableAjax="true">
+			</cc:inputText>
+			<br />
+			<h:commandButton styleClass="updateButton"
+				value="Aggiorna i criteri di ricerca" id="dialog-save_updateButton"
+				action="#{bean.updateFilter}" onclick="setHiddenInputs()"
+				rendered="#{bean.data.id != null}">
+				<f:ajax execute="@form"></f:ajax>
+			</h:commandButton>
+			<h:commandButton styleClass="insertButton"
+				value="Salva i criteri di ricerca" id="dialog-save_insertButton"
+				action="#{bean.saveFilter}" onclick="setHiddenInputs();">
+			</h:commandButton>
+			<h:commandButton styleClass="cancelButton" value="Annulla"
+				id="dialog-save_cancelButton"
+				onclick="closeSaveDialog();return false;" onkeypress="if (event.keyCode==13) closeSaveDialog();return false;" immediate="true">
+			</h:commandButton>
+		</h:form>
+	</div>
+</ui:composition>

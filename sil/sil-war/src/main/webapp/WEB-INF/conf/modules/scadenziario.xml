@@ -1,0 +1,547 @@
+<!-- Giovanni Landi -->
+<!-- Gestione Scadenziario -->
+<MODULE name="M_GetTipiScadenze" class="it.eng.sil.module.scadenziario.GetTipiScadenze">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERIES>
+      <QUERY statement="GetTipiScadenze">
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="SCADENZIARIO"/>
+        <PARAMETER name="DATAVAL" type="RELATIVE" value="DATAVAL" scope="SERVICE_REQUEST"/>
+      </QUERY>    
+    </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="COMBO_VALIDITA_SCAD" class="it.eng.sil.module.scadenziario.GetValiditaScad">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GetValiditaScad">
+    </QUERY>
+    </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetValidita_SCAD" class="it.eng.sil.module.scadenziario.GetDettaglioValiditaScad">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GetDettaglioValiditaScad">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOVALIDITA"/>
+    </QUERY>
+    </CONFIG> 
+</MODULE>
+
+<MODULE name="M_GetValiditaCurr" class="it.eng.sil.module.scadenziario.GetDettaglioValiditaScad">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GetValiditaCurr">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="statoValCV"/>
+    </QUERY>
+    </CONFIG> 
+</MODULE>
+    
+<MODULE name="M_CpiPoloProv" class="it.eng.sil.module.scadenziario.GetDettaglioCentroImpiego">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GetDettaglioCentroImpiego">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codCPI"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codCPI"/>
+		</QUERY>
+	</CONFIG>
+</MODULE> 
+
+<!-- <MODULE name="M_GetCpiPProv" class="it.eng.sil.module.scadenziario.GetDettaglioCentroImpiego">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GetDettaglioCentroImpiego">
+    </QUERY>
+    </CONFIG>
+</MODULE> -->
+
+<!-- <MODULE name="M_CENTRO_IMPIEGO" class="it.eng.sil.module.scadenziario.GetDettaglioCentroImpiego">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GetDettaglioCentroImpiego">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPITIT"/> 
+    </QUERY>
+    </CONFIG>
+</MODULE> -->
+
+<MODULE name="M_ListScadenze" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERIES>
+       <SELECT_QUERY>
+        <STATEMENT_PROVIDER CLASS="it.eng.sil.module.scadenziario.DynStatementRicercaScadenze"/>
+      </SELECT_QUERY>
+    </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_FILTROCPILAV" class="it.eng.sil.module.scadenziario.GetDettaglioCentroImpiego">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_FILTROCPILAV">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_FILTROCPIAZI" class="it.eng.sil.module.scadenziario.GetDettaglioCentroImpiego">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_FILTROCPIAZI">
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+      	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGUNITA"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetContattiLavoratore" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" rows="15" title="">
+    <QUERIES>
+       <SELECT_QUERY>>
+          <STATEMENT_PROVIDER CLASS="it.eng.sil.module.scadenziario.DynStatementRicercaContatti"/> 
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="DATCONTATTO" label="Data"/>
+      <COLUMN name="STRORACONTATTO" label="Ora"/>
+      <COLUMN name="STRNOMEOPERATORE" label="Operatore"/>
+      <COLUMN name="FLGRICONTATTARE" label="Da Ricontattare"/>
+      <COLUMN name="DATENTROIL" label="Entro Il"/>
+      <COLUMN name="TXTCONTATTO" label="Note"/>
+      <COLUMN name="DISPROSA" label="Disp. Rosa"/>      
+    </COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio contatto" confirm="FALSE">
+        <PARAMETER name="prgContatto" type="RELATIVE" value="PRGCONTATTO" scope="LOCAL"/>
+        <PARAMETER name="PRGSPI" type="RELATIVE" value="PRGSPI" scope="LOCAL"/>
+      </SELECT_CAPTION>
+    </CAPTIONS>
+    
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetAppuntamentiLavoratore" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" rows="5" title="">
+    <QUERIES>
+       <SELECT_QUERY>
+        <STATEMENT_PROVIDER CLASS="it.eng.sil.module.scadenziario.DynStatementRicercaAppuntamenti"/>
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="DATA" label="Data"/>
+      <COLUMN name="ORARIO" label="Orario"/>
+      <COLUMN name="NUMMINUTI" label="Durata"/>
+      <COLUMN name="SERVIZIO" label="Servizio" label2="Area"/>
+      <COLUMN name="OPERATORE" label="Operatore"/>
+      <COLUMN name="ESITO" label="Esito"/>
+    </COLUMNS>
+    <CAPTIONS>
+    
+      <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio appuntamento" confirm="FALSE">
+        <PARAMETER name="PRGAPPUNTAMENTO" type="RELATIVE" value="PRGAPPUNTAMENTO" scope="LOCAL"/>
+        <PARAMETER name="PRGSPI" type="RELATIVE" value="PRGSPI" scope="LOCAL"/>
+        <PARAMETER name="PRGSPIEFF" type="RELATIVE" value="PRGSPIEFF" scope="LOCAL"/>
+      </SELECT_CAPTION>
+      <!-- utilizzata la delete_caption per la stampa promemoria in quanto devo aprire
+      una nuova finestra per la stampa del promemoria. Si consiglia di generalizzare 
+      la possibilità di chiamare una funzione client-side su qualsiasi caption -->
+      <DELETE_CAPTION image="../../img/stampa.gif" label="Stampa promemoria" confirm="false">
+        <PARAMETER name="PAGE" type="ABSOLUTE" value="StampaPromemoriaPage" scope=""/>
+        <PARAMETER name="PRGAPPUNTAMENTO" type="RELATIVE" value="PRGAPPUNTAMENTO" scope="LOCAL"/>
+        <PARAMETER name="PRGAZIENDA" type="RELATIVE" value="PRGAZIENDA" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="PRGUNITA" type="RELATIVE" value="PRGUNITA" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+      </DELETE_CAPTION>
+      
+    </CAPTIONS>    
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_SOGetAppuntamentiLavoratore" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" rows="5" title="">
+    <QUERIES>
+       <SELECT_QUERY>
+        <STATEMENT_PROVIDER CLASS="it.eng.sil.module.scadenziario.DynStatementRicercaSOAppuntamenti"/>
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="DATA" label="Data"/>
+      <COLUMN name="ORARIO" label="Orario"/>
+      <COLUMN name="NUMMINUTI" label="Durata"/>
+      <COLUMN name="SERVIZIO" label="Servizio"/>
+      <COLUMN name="OPERATORE" label="Operatore"/>
+      <COLUMN name="CPI" label="Centro per l'impiego"/>
+      <COLUMN name="ESITO" label="Esito"/>
+    </COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio appuntamento" confirm="FALSE">
+        <PARAMETER name="PRGAPPUNTAMENTO" type="RELATIVE" value="PRGAPPUNTAMENTO" scope="LOCAL"/>
+        <PARAMETER name="CODCPI" type="RELATIVE" value="CODCPI" scope="LOCAL"/>
+      </SELECT_CAPTION>
+   </CAPTIONS>    
+  </CONFIG>
+</MODULE>
+
+<MODULE name="LISTA_LAVORATORI_APPUNTAMENTO_SCAD" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" rows="5" title="">
+    <QUERIES>
+      <!-- 15/07/2004 Esecuzione query dinamica ******
+       <SELECT_QUERY statement="SELECT_LAVORATORI_APPUNTAMENTO_AGENDA">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAPPUNTAMENTO"/>
+      </SELECT_QUERY>
+      -->
+      <SELECT_QUERY>>
+          <STATEMENT_PROVIDER CLASS="it.eng.sil.module.scadenziario.DynStatementRicercaLavAppScad"/> 
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="STRCOGNOME" label="Cognome"/>
+      <COLUMN name="STRNOME" label="Nome"/>
+      <COLUMN name="STRCODICEFISCALE" label="Codice Fiscale"/>
+      <COLUMN name="DATNASC" label="Data Nascita"/>
+    </COLUMNS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="LISTA_AZIENDE_APPUNTAMENTO_SCAD" class="it.eng.afExt.dispatching.module.impl.ListModule">
+  <CONFIG pool="SIL_DATI" rows="5" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="SELECT_AZIENDE_ASSOCIATE_APPUNTAMENTO_SCAD">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAPPUNTAMENTO"/>
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="STRPARTITAIVA" label="Partita Iva"/>
+      <COLUMN name="STRDESCRIZIONE" label="Tipo"/>
+      <COLUMN name="STRRAGIONESOCIALE" label="Ragione Sociale"/>
+      <COLUMN name="STRCODICEFISCALE" label="Codice Fiscale"/>
+      <COLUMN name="STRINDIRIZZO" label="Indirizzo"/>
+      <COLUMN name="DESCRIZIONECOMUNE" label="Comune"/>
+    </COLUMNS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetSlotPrenotabili" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" rows="5" title="">
+    <QUERIES>
+       <SELECT_QUERY>>
+          <STATEMENT_PROVIDER CLASS="it.eng.sil.module.scadenziario.DynStatementRicercaSlotPrenotabili"/> 
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="DATA" label="Data"/>
+      <COLUMN name="ORARIO" label="Orario"/>
+      <COLUMN name="NUMMINUTI" label="Durata"/>
+      <COLUMN name="SERVIZIO" label="Servizio" label2="Area"/>
+      <COLUMN name="OPERATORE" label="Operatore"/>
+    </COLUMNS>
+  
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/caselle.gif" label="Inserisci Appuntamento" confirm="FALSE">
+        <PARAMETER name="prgSlot" type="RELATIVE" value="PRGSLOT" scope="LOCAL"/>
+        <PARAMETER name="dataslot" type="RELATIVE" value="DATA" scope="LOCAL"/>
+      </SELECT_CAPTION>
+    </CAPTIONS>
+    
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_SOGetSlotPrenotabili" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" rows="5" title="">
+    <QUERIES>
+       <SELECT_QUERY>>
+          <STATEMENT_PROVIDER CLASS="it.eng.sil.module.scadenziario.DynStatementRicercaSOSlotPrenotabili"/> 
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="DATA" label="Data"/>
+      <COLUMN name="ORARIO" label="Orario"/>
+      <COLUMN name="NUMMINUTI" label="Durata"/>
+      <COLUMN name="SERVIZIO" label="Servizio"/>
+      <COLUMN name="OPERATORE" label="Operatore"/>
+    </COLUMNS>
+  
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/caselle.gif" label="Inserisci Appuntamento" confirm="FALSE">
+        <PARAMETER name="prgSlot" type="RELATIVE" value="PRGSLOT" scope="LOCAL"/>
+        <PARAMETER name="dataslot" type="RELATIVE" value="DATA" scope="LOCAL"/>
+        <PARAMETER name="codice" type="RELATIVE" value="CODCPI" scope="LOCAL"/>
+      </SELECT_CAPTION>
+    </CAPTIONS>
+    
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ScadGetServizio" class="it.eng.sil.module.scadenziario.ScadGetServizio">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="SCAD_GETSERVIZIO"/>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_ScadUnitaAzienda" class="it.eng.afExt.dispatching.module.impl.ListModule">
+  <CONFIG pool="SIL_DATI" rows="15" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="LIST_UNITA_AZIENDA">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="desStato" label="Stato attivit&amp;agrave;"/>
+      <COLUMN name="strIndirizzo" label="Indirizzo"/>
+      <COLUMN name="descomune" label="Comune"/>
+    </COLUMNS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MVerificaDataNL" class="it.eng.sil.module.scadenziario.VerificaDataNonLavorativa">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="VerificaDataNonLavorativa">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATCONTATTO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATCONTATTO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATCONTATTO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATCONTATTO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATCONTATTO"/>
+      <!--PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATCONTATTO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATCONTATTO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATCONTATTO"/-->
+    </QUERY>    
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaColloquiLav" class="it.eng.afExt.dispatching.module.impl.ListModule">
+  <CONFIG pool="SIL_DATI" rows="15" title="Lista Colloqui">
+    <QUERIES>
+      <SELECT_QUERY statement="LISTA_COLLOQUI_LAV">
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="DESCRIZIONESERVIZIO" label="Servizio"/>
+      <COLUMN name="OPERATORE" label="Operatore"/>
+      <COLUMN name="DATACOLLOQUIO" label="Data colloquio"/>
+    </COLUMNS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="COMBO_MOTIVO_CONTATTO_AG_DETTAGLIO" class="it.eng.sil.module.scadenziario.GetDettaglioMotivoContattoScad">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="ScadDettaglioMotivoContatto">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="MOTIVO_CONTATTO"/>
+    </QUERY>
+    </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaScadLavRicontattare" class="it.eng.sil.module.scadenziario.ScadenzeLavoratore">
+  <CONFIG pool="SIL_DATI" title="Da ricontattare">
+    <QUERY statement="ListaScadLavRicontattare">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY>
+    <COLUMNS>
+      <COLUMN name="STRDATCONTATTO" label="Data contatto"/>
+      <COLUMN name="NOMEOPERATORE" label="Operatore"/>
+      <COLUMN name="STRDATENTROIL" label="Ricontattare entro"/>
+    </COLUMNS>  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaScadValiditaSchedaLav" class="it.eng.sil.module.scadenziario.ScadenzeLavoratore">
+  <CONFIG pool="SIL_DATI" title="Scadenze validit&amp;agrave; della scheda lavoratore">
+    <QUERY statement="ListaScadSchedaLav">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY>
+    <COLUMNS>
+      <COLUMN name="STRDESCVALIDITA" label="Validit&amp;agrave;"/>
+       <COLUMN name="STRDESCCURRVALIDITA" label="Stato del curriculum"/>
+       <COLUMN name="STRDATINIZIOCURR" label="Data inizio validit&amp;agrave;"/>
+      <COLUMN name="STRDATFINECURR" label="Data scadenza"/>
+    </COLUMNS>  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaScadPermessoSoggLav" class="it.eng.sil.module.scadenziario.ScadenzeLavoratore">
+  <CONFIG pool="SIL_DATI" title="Scadenze permessi di soggiorno">
+    <QUERY statement="ListaScadPermessoSoggLav">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY>
+    <COLUMNS>
+      <COLUMN name="STRDATRICHIESTA" label="Data richiesta"/>
+      <COLUMN name="STRDATSCADENZA" label="Data scadenza"/>
+    </COLUMNS>  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaScadAzioniConcordLav" class="it.eng.sil.module.scadenziario.ScadenzeLavoratore">
+  <CONFIG pool="SIL_DATI" title="Azioni concordate">
+    <QUERY statement="ListaScadAzioniConcordLav">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+    </QUERY>
+    <COLUMNS>
+      <COLUMN name="STRDESCRIZIONE" label="Azione"/>
+      <COLUMN name="FlgPatto297" label="Legame patto/accordo"/>
+      <COLUMN name="STRDATSTIMATA" label="Data scadenza"/>
+    </COLUMNS>  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaScadPrimoCollLav" class="it.eng.sil.module.scadenziario.ScadenzeLavoratore">
+  <CONFIG pool="SIL_DATI" title="Primo colloquio di orientamento">
+    <QUERY statement="ListaScadPrimoCollLav">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+    </QUERY>
+    <COLUMNS>
+      <COLUMN name="STRDICHIARAZIONE" label="Data dichiarazione"/>
+      <COLUMN name="SCADENZA" label="Data scadenza"/>
+    </COLUMNS>  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaScadStipulaPattoLav" class="it.eng.sil.module.scadenziario.ScadenzeLavoratore">
+  <CONFIG pool="SIL_DATI" title="Stipula patto">
+    <QUERY statement="ListaScadStipulaPattoLav">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+    </QUERY>
+    <COLUMNS>
+      <COLUMN name="STRDICHIARAZIONE" label="Data dichiarazione"/>
+      <COLUMN name="SCADENZA" label="Data scadenza"/>
+    </COLUMNS>  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaScadenzaPattoLav" class="it.eng.sil.module.scadenziario.ScadenzeLavoratore">
+  <CONFIG pool="SIL_DATI" title="Scadenza patto">
+    <QUERY statement="ListaScadenzaPattoLav">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY>
+    <COLUMNS>
+      <COLUMN name="FlgPatto297" label="Patto 150"/>
+      <COLUMN name="STIPULA" label="Data stipula"/>
+      <COLUMN name="SCADENZA" label="Data scadenza"/>
+    </COLUMNS>  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaVerAppStatoOccVariato" class="it.eng.sil.module.scadenziario.ScadenzeLavoratore">
+  <CONFIG pool="SIL_DATI" title="Appuntamenti e stato occupazionale variato">
+    <QUERY statement="ListaVerAppStatoOccVariato">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY>
+    <COLUMNS>
+      <COLUMN name="DATAAPPUNTAMENTO" label="Data appuntamento"/>
+      <COLUMN name="STRDESCSTATOOCC" label="Stato occupazionale"/>
+    </COLUMNS>  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaVerNonDispTerritorio" class="it.eng.sil.module.scadenziario.ScadenzeLavoratore">
+  <CONFIG pool="SIL_DATI" title="Assenza di disponibilit&amp;agrave; territoriale">
+    <QUERY statement="ListaVerNonDispTerritorio">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY>
+    <COLUMNS>
+      <COLUMN name="codmansione" label="Codice"/>
+      <COLUMN name="descrizioneMansione" label="Mansione"/>
+    </COLUMNS>  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaVerEsclusiRosa" class="it.eng.sil.module.scadenziario.ScadenzeLavoratore">
+  <CONFIG pool="SIL_DATI" title="Esclusione dalla rosa con DID">
+    <QUERY statement="ListaVerEsclusiRosa">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY>
+    <COLUMNS>
+      <COLUMN name="IDROSA" label="Codice Rosa"/>
+      <COLUMN name="IDRICHIESTA" label="Codice Richiesta"/>
+      <COLUMN name="STRMOTIVOCANC" label="Motivo Esclusione"/>
+      <COLUMN name="DTMCANC" label="Data Esclusione"/>            
+    </COLUMNS>  
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_ListaVerProntoIncNoMans" class="it.eng.sil.module.scadenziario.ScadenzeLavoratore">
+  <CONFIG pool="SIL_DATI" title="Curriculum pronto all'incrocio senza indicazioni di disponibilit&amp;agrave; per alcuna mansione">
+    <QUERY statement="ListaVerProntoIncNoMans">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    </QUERY>
+    <COLUMNS>
+      <COLUMN name="DATINIZIOCURR" label="Data inizio validit&amp;agrave;"/>
+      <COLUMN name="DATFINECURR" label="Data scadenza"/>
+    </COLUMNS>  
+  </CONFIG>
+</MODULE>
+
+<!-- evidenze -->
+<MODULE name="ListaGeneraleEvidenze" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+	<CONFIG pool="SIL_DATI" title="EVIDENZE" rows="15">
+		<QUERIES>
+        	<SELECT_QUERY>   
+        		<STATEMENT_PROVIDER CLASS="it.eng.sil.module.scadenziario.DynStatementRicercaEvidenze"/>
+        	</SELECT_QUERY>
+    	</QUERIES>    
+	    <COLUMNS>
+		    <COLUMN name="strCognome"       label="Cognome"/>
+		    <COLUMN name="strNome"          label="Nome"/>
+		    <COLUMN name="strCodiceFiscale" label="Codice Fiscale"/>
+		    <COLUMN name="strEvidenza"      label="Messaggio"/>
+	    </COLUMNS>	  
+	    <CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" label="" confirm="false">
+				<PARAMETER name="PAGE" scope="ABSOLUTE" value="AnagDettaglioPageAnag" />
+				<PARAMETER name="MODULE" scope="ABSOLUTE" value="M_GetLavoratoreAnag" />				
+				<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="LOCAL" />
+				<PARAMETER name="CDNFUNZIONE" value="1" scope="ABSOLUTE" />
+			</SELECT_CAPTION>
+			<DELETE_CAPTION image="../../img/del.gif" label="" confirm="TRUE">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="ListaGeneraleEvidenzePage" />
+				<PARAMETER name="MODULE" type="ABSOLUTE" value="CEV" />
+				<PARAMETER name="PRGEVIDENZA" type="RELATIVE" value="PRGEVIDENZA" scope="LOCAL" />
+				<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="LOCAL" />
+				<PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST" />
+				<!-- parametri della ricerca -->
+				<PARAMETER name="prgTipoEvidenzaRic" type="RELATIVE" value="prgTipoEvidenzaRic" scope="SERVICE_REQUEST" />
+				<PARAMETER name="messaggioRic" type="RELATIVE" value="messaggioRic" scope="SERVICE_REQUEST" />
+				<PARAMETER name="tipoRicerca" type="RELATIVE" value="tipoRicerca" scope="SERVICE_REQUEST" />
+				<PARAMETER name="strCodiceFiscaleRic" type="RELATIVE" value="strCodiceFiscaleRic" scope="SERVICE_REQUEST" />
+				<PARAMETER name="strCognomeRic" type="RELATIVE" value="strCognomeRic" scope="SERVICE_REQUEST" />
+				<PARAMETER name="strNomeRic" type="RELATIVE" value="strNomeRic" scope="SERVICE_REQUEST" />
+			</DELETE_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_getInfoLavoratorePerCig" class="it.eng.sil.module.ido.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="getInfoLavoratorePerCig">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPIOPERATORE"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAPPUNTAMENTO"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_getInfoPerInvioSmsCig" class="it.eng.sil.module.ido.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="getInfoPerInvioSmsCig"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="COMBO_TIPO_SMS" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="SELECT_COMBO_TIPO_SMS" />
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_inviaSmsCig" class="it.eng.sil.module.agenda.InvioSMSCig">
+	<CONFIG pool="SIL_DATI" title="">
+	</CONFIG>
+</MODULE>

@@ -1,0 +1,74 @@
+  <STATEMENT name="AppEsterne"
+            query="SELECT STRURL FROM TS_APP_ESTERNA
+				   where cdnurl=?"
+	/>
+		
+  <STATEMENT name="GET_LISTA_PROSP_DA_SARE"
+            query="select p.PRGPROSPETTOINF, p.PRGAZIENDA, p.PRGUNITA, p.PRGAZREFERENTE,  
+					az.strcodicefiscale as codicefiscale,  
+					az.strpartitaiva as piva,  
+					az.strragionesociale as ragionesociale,  
+					p.numannorifprospetto as anno,  
+					to_char(p.datprospetto, 'DD/MM/YYYY') as datprospetto,  
+					to_char(p.datConsegnaProspetto, 'DD/MM/YYYY') as datConsegnaProspetto,  
+					( decode(to_char(p.datprospetto, 'DD/MM/YYYY'),NULL,' ',to_char(p.datprospetto, 'DD/MM/YYYY')) || ' ' || to_char(p.datConsegnaProspetto, 'DD/MM/YYYY') ) as datprospCons,  
+					p.codmonostatoprospetto,  
+					CASE  
+					WHEN p.codmonostatoprospetto = 'A'                   
+					THEN 'In corso d''anno'  
+					WHEN p.codmonostatoprospetto = 'S'              
+					THEN 'Storicizzato'  
+					WHEN p.codmonostatoprospetto = 'V'  
+					THEN 'SARE: storicizzato'  
+					WHEN p.codmonostatoprospetto = 'N'  
+					THEN 'Annullato'  
+					WHEN p.codmonostatoprospetto = 'U'
+			      	THEN 'Storicizzato:uscita dall'' obbligo' 
+					END as stato, 												   
+					CASE  
+					WHEN p.codmonocategoria = 'A'                   
+					THEN 'più di 50 dipendenti'  
+					WHEN p.codmonocategoria = 'B'              
+					THEN 'da 36 a 50 dipendenti'  
+					WHEN p.codmonocategoria = 'C'  
+					THEN 'da 15 a 35 dipendenti'  
+					END as fascia, 
+					p.codprovincia as prov,  
+					dp.strdenominazione as provincia,  
+					doc.codStatoAtto,  
+					stato.STRDESCRIZIONE as statoAtto,  
+					to_char(doc.DATPROTOCOLLO,'dd/mm/yyyy') as dataProt,  
+					to_char(doc.DATINIZIO,'dd/mm/yyyy') as DatInizio,  
+					to_char(doc.DATACQRIL,'dd/mm/yyyy') as DatAcqRil,  
+					to_char(doc.DATPROTOCOLLO,'DD/MM/YYYY hh24:mi') as dataOraProt,  
+					doc.NUMPROTOCOLLO as NUMPROTOCOLLO, 
+					doc.NUMANNOPROT as numAnnoProt,  
+					coll.PRGDOCUMENTO,
+					de_doc_tipo.strio striodoc, 
+					de_doc_tipo.codtipodocumento codtipodoc,  
+					de_doc_tipo.strdescrizione strtipodoc, 
+					de_doc_tipo.codambitodoc codambitodoc,  
+					de_doc_ambito.strdescrizione strambitodoc  
+					from cm_prospetto_inf p  
+					inner join an_azienda az on az.prgazienda = p.prgazienda  
+					inner join AN_UNITA_AZIENDA auz on az.prgAzienda=auz.prgAzienda   
+					and auz.prgunita = p.prgunita  
+					inner join de_provincia dp on dp.codprovincia = p.codprovincia  
+					inner join AM_DOCUMENTO_COLL coll ON (p.PRGPROSPETTOINF = to_number(coll.STRCHIAVETABELLA))  
+					inner join AM_DOCUMENTO doc ON (doc.PRGDOCUMENTO = coll.PRGDOCUMENTO)  
+					inner join AM_DOCUMENTO_BLOB blo ON (blo.PRGDOCUMENTO = coll.PRGDOCUMENTO)
+					inner join de_stato_atto stato on (doc.CODSTATOATTO = stato.CODSTATOATTO)  
+					inner join de_doc_tipo on (de_doc_tipo.codtipodocumento = doc.codtipodocumento)  
+					inner join de_doc_ambito on (de_doc_ambito.codambitodoc = de_doc_tipo.codambitodoc)  
+					where 1=1 and doc.CODTIPODOCUMENTO = 'PINF' 					
+					and p.codMonoProv = 'S' 
+					and CODMONOSTATOPROSPETTO = 'V'"
+	/>	
+
+<STATEMENT name="GET_UPDATE_COLL"
+          query="update AM_DOCUMENTO_COLL
+          		 set AM_DOCUMENTO_COLL.STRCHIAVETABELLA= (8000000+?)
+                 where AM_DOCUMENTO_COLL.STRCHIAVETABELLA = ? "/>	
+
+		
+		

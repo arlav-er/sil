@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="/secure/template/messages_index.xhtml">
+
+	<ui:param name="bean" value="#{provinciaMessagesBean}" />
+
+	<ui:define name="tab_list">
+		<h:outputStylesheet library="css" name="pagination_datatable.css" />
+		<h:inputHidden value="#{provinciaMessagesBean}" />
+		
+		<style>
+			a.page-link{ text-decoration: none; }
+		</style>
+
+		<h:outputText value="#{msg['provincia.messaggi.descrizione']}"
+			escape="false" />
+
+		<div id="tabs" class="widget_container">
+			<ul>
+				<li>
+					<h:link id="notifiche_ricevute_link"
+						outcome="_notifiche_ricevute"
+						title="#{msg['provincia.messaggi.notifiche_ricevute.titolo']}">
+						<h:outputText
+							value="#{msg['provincia.messaggi.notifiche_ricevute.titolo']}"
+							escape="false" />
+						<h:outputText styleClass="boldText"
+							value="(#{provinciaMessagesBean.nuoviMsgNotifica})"
+							rendered="#{provinciaMessagesBean.nuoviMsgNotifica > 0}" />
+					</h:link>
+				</li>
+				
+				<li>
+					<h:link id="notifiche_inviate_link"
+						outcome="_notifiche_inviate"
+						title="#{msg['provincia.messaggi.notifiche_inviate.titolo']}">
+						<h:outputText
+							value="#{msg['provincia.messaggi.notifiche_inviate.titolo']}"
+							escape="false" />
+					</h:link>
+				</li>
+				
+				<ui:fragment rendered="#{sessionBean.checkAbilitazioneVisibile('SUPP')}">
+					<li>
+						<h:link id="supporto_link" outcome="_supporto"
+							title="#{msg['provincia.messaggi.supporto.titolo']}">
+							<h:outputText
+								value="#{msg['provincia.messaggi.supporto.titolo']}"
+								escape="false" />
+							<h:outputText styleClass="boldText"
+								value="(#{provinciaMessagesBean.nuoviMsgSupporto})"
+								rendered="#{provinciaMessagesBean.nuoviMsgSupporto > 0}" />
+						</h:link>
+					</li>
+				</ui:fragment>
+				
+				<ui:fragment rendered="#{sessionBean.checkAbilitazioneVisibile('ESP')}">
+					<li>
+						<h:link id="esperto_link" outcome="_esperto"
+							title="#{msg['provincia.messaggi.consulenza.titolo']}">
+							<h:outputText
+								value="#{msg['provincia.messaggi.consulenza.titolo']}"
+								escape="false" />
+							<h:outputText styleClass="boldText"
+									value="(#{provinciaMessagesBean.nuoviMsgEsperto})"
+									rendered="#{provinciaMessagesBean.nuoviMsgEsperto > 0}" />
+						</h:link>
+					</li>
+				</ui:fragment>
+				
+				<li>
+					<h:link id="contatti_link" outcome="_contatti"
+						title="#{msg['provincia.messaggi.contatti.titolo']}">
+						<f:param name="redo_by_session" value="#{param.redo_by_session}" />
+						<h:outputText value="#{msg['provincia.messaggi.contatti.titolo']}"
+							escape="false" />
+						<h:outputText styleClass="boldText"
+							value=" (#{provinciaMessagesBean.nuoviMsgContatti})"
+							rendered="#{provinciaMessagesBean.nuoviMsgContatti > 0}" />
+					</h:link>
+				</li>
+				
+				<li>
+					<h:link id="app_link"
+						outcome="_app"
+						title="#{msg['provincia.messaggi.app.titolo']}"
+						includeViewParams="true" rendered="#{appNotificaBean.isCruscottoVisible()}">
+						<f:param name="notificheTitle" value="#{msg['provincia.messaggi.notifiche_app_inviate.titolo']}" />
+						<f:param name="valutazioniTitle" value="#{msg['provincia.messaggi.valutazioni_app.titolo']}" />
+						<h:outputText
+							value="#{msg['provincia.messaggi.app.titolo']}"
+							escape="false"/>
+					</h:link>
+				</li>
+				
+			</ul>
+		</div>
+		<script type="text/javascript">
+			$(function() {
+				selectMasterTab('#messages_area_link');
+			});					
+		</script>
+	</ui:define>
+
+</ui:composition>

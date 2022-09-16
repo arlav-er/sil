@@ -1,0 +1,518 @@
+<!-- ANAGRAFICA AZIENDE -->
+				       
+<STATEMENT
+        name="WS_GET_CDN_LAVORATORE"
+        query="SELECT an.cdnlavoratore
+		       FROM an_lavoratore an 		       
+		       WHERE upper(an.strcodicefiscale) = upper(?)" />
+		       
+		       
+<STATEMENT
+        name="WS_GET_CODICEFISCALE_LAVORATORE"
+        query="SELECT an.strcodicefiscale
+		       FROM an_lavoratore an 		       
+		       WHERE an.cdnlavoratore = ?" />		       
+	
+<STATEMENT
+        name="WS_GET_ANAGRAFICA_LAVORATORE"
+        query="SELECT an.strcodicefiscale, 
+				       an.strcognome, 
+				       an.strnome,
+				       an.strsesso,
+				       TO_CHAR(an.datnasc, 'YYYY-MM-DD')/* || 'T' || TO_CHAR(an.datnasc, 'HH24:MI:SS')*/ datnasc,
+				       an.codcomnas,
+				       an.codcittadinanza,
+				       an.codcittadinanza2,
+				       an.codstatocivile,
+				       an.flgmilite,
+				       an.codcomres,
+				       an.strindirizzores,
+				       an.strlocalitares,
+				       an.strcapres,
+				       an.codcomdom,
+				       an.strindirizzodom,
+				       an.strlocalitadom,
+				       an.strcapdom,
+				       an.codcomrec,
+				       an.strindirizzorec,
+				       an.strlocalitarec,
+				       an.strcaprec,
+				       an.strtelres,
+				       an.strteldom,
+				       an.strtelaltro,
+				       an.strcell,
+				       an.stremail,
+				       an.strfax,
+				       an.flgcfok,
+				       dc.strdescrizione as strcittadinanza,
+				       dc.strnazione as strnazione,
+				       dc2.strdescrizione as strcittadinanza2,
+				       dc2.strnazione as strnazione2
+				       FROM an_lavoratore an 
+				       LEFT JOIN de_cittadinanza dc ON an.codcittadinanza = dc.codcittadinanza
+				       LEFT JOIN de_cittadinanza dc2 ON an.codcittadinanza2 = dc2.codcittadinanza
+				       WHERE an.cdnlavoratore = ?" />
+				       
+	       
+<STATEMENT
+        name="WS_GET_INDIRIZZI_LAVORATORE"
+        query="SELECT AN.CODCOMRES CODCOMRES, 
+		       AN.STRINDIRIZZORES STRINDIRIZZORES, 
+		       AN.STRLOCALITARES STRLOCALITARES, 
+		       AN.STRCAPRES STRCAPRES, 
+		       AN.CODCOMDOM CODCOMDOM, 
+		       AN.STRINDIRIZZODOM STRINDIRIZZODOM, 
+		       AN.STRLOCALITADOM STRLOCALITADOM, 
+		       AN.STRCAPDOM STRCAPDOM,                     
+		       AN.STRTELRES STRTELRES, 
+		       AN.STRTELDOM STRTELDOM, 
+		       AN.STRTELALTRO STRTELALTRO, 
+		       AN.STRCELL STRCELL, 
+		       AN.STREMAIL STREMAIL, 
+		       AN.STRFAX STRFAX,
+		       AN_SINF.CODCPITIT as CODCPITIT, 
+		       AN_SINF.CODMONOTIPOCPI AS CODMONOTIPOCPITIT,       
+		       DE.STRDESCRIZIONE as STRDESCRIZIONECPITIT,
+		       AN_SINF.CODCPIORIG AS CODCPIORIG,
+		       DEORIG.STRDESCRIZIONE as STRDESCRIZIONECPIORIG 
+		FROM AN_LAVORATORE AN 
+		left join AN_LAV_STORIA_INF AN_SINF ON ( AN.cdnLavoratore = AN_SINF.cdnLavoratore AND AN_SINF.datFine is null )
+		left join DE_CPI DE ON ( DE.codcpi = AN_SINF.CODCPITIT )
+		left join DE_CPI DEORIG ON ( DEORIG.codcpi = AN_SINF.CODCPIORIG )
+		WHERE AN.cdnLavoratore = ?" />
+		
+				
+		       
+		       
+<STATEMENT
+        name="WS_GET_RECAPITI_LAVORATORE"
+        query="SELECT an.strindirizzorec,
+		       an.strlocalitarec,
+		       an.strcaprec,
+		       an.codcomrec, 
+		       dc.strdenominazione as strdenominazionecomrec, 
+		       rtrim(dp.stristat) as stristatprovrec
+		  	   FROM an_lavoratore an
+		       left join de_comune dc on an.codcomrec = dc.codcom 
+       		   left join de_provincia dp on dc.codprovincia = dp.codprovincia
+ 			   WHERE an.cdnlavoratore = ?" />
+ 			   
+
+<!-- Query un po' bruttina per tirare fuori il record con datInizio maggiore di tutte ma mi permette di passare cdnlavoratore una sola volta come parametro --> 			   
+<STATEMENT
+        name="WS_GET_STATO_OCCUPAZIONALE"
+        query="select codstatooccupaz,strdescrizione,datinizio
+				from (
+				select aso.codstatooccupaz,
+				 dso.strdescrizione,
+				 to_char(aso.datinizio,'yyyy-mm-dd') datinizio,
+				 row_number() over (order by aso.datinizio desc) r
+				     from am_stato_occupaz aso
+				     join an_lavoratore al on aso.cdnlavoratore = al.cdnlavoratore
+				     join de_stato_occupaz dso on aso.codstatooccupaz = dso.codstatooccupaz
+				     WHERE al.cdnlavoratore = ?
+				     order by aso.datinizio desc)
+				where r = 1" />
+			   
+			   
+			   
+<STATEMENT
+        name="WS_GET_TITOLI_STUDIO_LAVORATORE"        
+        query="SELECT ps.codtitolo, 
+        dt2.strdescrizione as strdescrtitolo,
+        ps.strspecifica, 
+        ps.stristscolastico, 
+        ps.codcom, 
+        ps.strlocalita,
+        ps.strindirizzo, 
+        ps.numanno, 
+        ps.strvoto, 
+        ps.stresimi, 
+        ps.strtittesi,
+        ps.strargtesi, 
+        ps.flglode, 
+        ps.codmonostato, 
+        ps.numannifreq, 
+        ps.numanniprev, 
+        ps.strmotabbandono, 
+        ps.flgprincipale,
+        ps.codmonostatotit,
+        dt2.flgLaurea as flgLaurea
+  FROM 
+    pr_studio ps
+    join de_titolo dt on ps.codtitolo = dt.codtitolo
+    join de_titolo dt2 on ps.codtipotitolo = dt2.codtitolo
+    left join de_comune dc on ps.codcom = dc.codcom
+    left join de_provincia dp on dc.codprovincia = dp.codprovincia
+  WHERE 
+    ps.cdnLavoratore= ?" />
+    
+    
+<STATEMENT
+        name="WS_GET_MANSIONI_LAVORATORE"        
+        query="SELECT dm.codmansione, 
+        p_dm.strdescrizione AS desc_tipomansione,
+        dm.strdescrizione AS desc_mansione,
+         man.flgesperienza,
+         man.flgdisponibile,
+         man.flgdispformazione,
+         man.flgespform 
+    FROM pr_mansione man
+   left join de_mansione dm on man.codmansione = dm.codmansione
+   left join de_mansione p_dm on p_dm.codmansione = substr(man.codmansione,0,5) || '00'
+   WHERE man.cdnlavoratore = ?" />    
+   
+   
+   
+<STATEMENT
+        name="WS_GET_LISTA_FORMAZIONE_LAVORATORE"        
+        query="SELECT c.codcorso, 
+       c.strdescrizione, 
+       c.strcontenuto, 
+       c.strente, 
+       c.codcomente,
+       c.strlocalitaente, 
+       c.strindirizzoente, 
+       c.numanno, 
+       c.nummesi, 
+       c.numore, 
+       c.numorespese, 
+       c.flgcompletato,
+       c.strmotcessazione, 
+       c.codtipocertificato, 
+       c.cdnambitodisciplinare, 
+       c.flgstage, 
+       c.numorestage,
+       c.strazienda, 
+       c.codcomazienda, 
+       c.strlocalitaazienda, 
+       c.strindirizzoazienda
+FROM pr_corso c
+ WHERE c.cdnlavoratore = ?"/>
+ 
+ 
+ 
+ <STATEMENT
+        name="WS_GET_LISTA_ESPERIENZE_LAVORATORE"        
+        query="SELECT  el.codcontratto,
+         el.strdesattivita, 
+         el.codarea, 
+         el.nummeseinizio, 
+         el.numannoinizio,
+         el.nummesefine, 
+         el.numannofine, 
+         el.nummesi, 
+         el.strcodfiscaleazienda, 
+         el.strragsocialeazienda, 
+         el.strpartitaivaazienda,
+         el.codcomazienda, 
+         el.codateco, 
+         el.strindirizzoazienda, 
+         el.codnatgiuridica,
+         el.strtipoclienti, 
+         el.flgcompletato, 
+         el.codmvcessazione,
+         el.strmotcessazione, 
+         el.codtipocertificato,
+         att.strdescrizione AS strdescrizioneateco,
+         att2.strdescrizione AS strdescrizionetipoateco,
+         pr_mansione.codmansione,
+         de_mansione.strdescrizione AS strdescrizionemansione
+    FROM pr_esp_lavoro el,
+         de_comune com,
+         de_provincia p,
+         de_contratto_collettivo de_ccnl,
+         de_attivita att,
+         de_attivita att2,
+         de_contratto c,
+         pr_mansione,
+         de_mansione
+   WHERE el.codcomazienda = com.codcom(+)
+     AND com.codprovincia = p.codprovincia(+)
+     AND de_ccnl.codccnl(+) = el.codccnl
+     AND att.codateco(+) = el.codateco
+     AND att.codpadre = att2.codateco(+)
+     AND el.codcontratto = c.codcontratto(+)     
+     AND el.prgmansione = pr_mansione.prgmansione 
+     AND NVL(pr_mansione.flgdisponibile,'N') &lt;&gt; 'L'
+     AND pr_mansione.codmansione = de_mansione.codmansione
+     AND NVL(c.flgtirocini,'N')  &lt;&gt; 'S'
+     AND pr_mansione.cdnlavoratore = ?
+ORDER BY el.numannofine DESC, el.nummesefine DESC" />
+
+
+
+<STATEMENT
+        name="WS_GET_LISTA_ESPERIENZE_NON_LAVORATIVE_LAVORATORE"        
+        query="SELECT el.codcontratto, 
+       el.codateco,
+       att.strdescrizione AS strdescrizioneateco,
+       att2.strdescrizione AS strdescrizionetipoateco,
+       el.strriflegge, 
+       el.strdesattivita, 
+       el.strlivello,
+       el.codarea, 
+       el.nummeseinizio, 
+       el.numannoinizio, 
+       el.nummesefine, 
+       el.numannofine, 
+       el.nummesi,
+       el.numore, 
+       el.numoresett, 
+       el.codorario, 
+       el.strcodfiscaleazienda, 
+       el.strragsocialeazienda,
+       el.strpartitaivaazienda, 
+       el.codcomazienda, 
+       el.strindirizzoazienda, 
+       el.codnatgiuridica,
+       el.strtipoclienti, 
+       el.numstipendio, 
+       el.flgcompletato, 
+       el.codmvcessazione,
+       el.strmotcessazione, 
+       el.codtipocertificato, 
+       pr_mansione.codmansione,
+       de_mansione.strdescrizione AS strdescrizionemansione,
+       c.strdescrizione AS strdescrizionecontratto,
+       
+       decode(el.nummeseinizio,
+               null, null,
+               decode(el.numannoinizio,
+                      null,null,
+                      decode(el.nummeseinizio,
+                              1, '0' || TO_CHAR (el.nummeseinizio),
+                              2, '0' || TO_CHAR (el.nummeseinizio),
+                              3, '0' || TO_CHAR (el.nummeseinizio),
+                              4, '0' || TO_CHAR (el.nummeseinizio),
+                              5, '0' || TO_CHAR (el.nummeseinizio),
+                              6, '0' || TO_CHAR (el.nummeseinizio),
+                              7, '0' || TO_CHAR (el.nummeseinizio),
+                              8, '0' || TO_CHAR (el.nummeseinizio),
+                              9, '0' || TO_CHAR (el.nummeseinizio),
+                              TO_CHAR (el.nummeseinizio)) || '/' || TO_CHAR(el.numannoinizio) 
+                       )
+              ) AS meseannoinizio,
+       decode(el.nummesefine,
+               null, null,
+               decode(el.numannofine,
+                      null,null,
+                      decode(el.nummesefine,
+                              1, '0' || TO_CHAR (el.nummesefine),
+                              2, '0' || TO_CHAR (el.nummesefine),
+                              3, '0' || TO_CHAR (el.nummesefine),
+                              4, '0' || TO_CHAR (el.nummesefine),
+                              5, '0' || TO_CHAR (el.nummesefine),
+                              6, '0' || TO_CHAR (el.nummesefine),
+                              7, '0' || TO_CHAR (el.nummesefine),
+                              8, '0' || TO_CHAR (el.nummesefine),
+                              9, '0' || TO_CHAR (el.nummesefine),
+                              TO_CHAR (el.nummesefine)) || '/' || TO_CHAR(el.numannofine) 
+                       )
+              ) AS meseannofine
+  FROM pr_esp_lavoro el,
+       de_comune com,
+       de_provincia p,
+       de_contratto_collettivo de_ccnl,
+       de_attivita att,
+       de_attivita att2,
+       de_contratto c,
+       pr_mansione,
+       de_mansione
+ WHERE el.codcomazienda = com.codcom(+)
+   AND com.codprovincia = p.codprovincia(+)
+   AND de_ccnl.codccnl(+) = el.codccnl
+   AND att.codateco(+) = el.codateco
+   AND att.codpadre = att2.codateco(+)
+   AND el.codcontratto = c.codcontratto(+)
+   AND pr_mansione.cdnlavoratore = ?
+   AND el.prgmansione = pr_mansione.prgmansione 
+   AND NVL(pr_mansione.flgdisponibile,'N') &lt;&gt; 'L' 
+   AND pr_mansione.codmansione = de_mansione.codmansione
+   AND c.flgtirocini = 'S'
+   ORDER BY el.numannofine desc, el.NUMMESEFINE desc" />
+   
+   
+   
+<STATEMENT
+        name="WS_GET_INDISPONIBILITA_LAVORATORE"        
+        query="SELECT 
+      STRRAGSOCIALEAZIENDA
+    FROM 
+      PR_INDISPONIBILITA
+    WHERE CDNLAVORATORE = ?
+    ORDER BY
+      STRRAGSOCIALEAZIENDA" />
+      
+      
+      
+<STATEMENT
+        name="WS_GET_LISTA_CONTRATTI_MANSIONI_LAVORATORE"        
+        query="SELECT MAN.CODMANSIONE AS codmansione,
+      DM.STRDESCRIZIONE AS strdescrizionemansione,
+      DC.CODCONTRATTO AS codcontratto,
+      DC.STRDESCRIZIONE AS strdescrizionecontratto
+FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_CONTRATTO PDC JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = PDC.CDNUTINS),
+      DE_MANSIONE DM,
+      DE_CONTRATTO DC	  
+    WHERE 
+      MAN.CDNLAVORATORE      = ?
+      AND MAN.FLGDISPONIBILE IN ('S','P')
+      AND MAN.PRGMANSIONE    = PDC.PRGMANSIONE
+      AND DM.CODMANSIONE     = MAN.CODMANSIONE
+      AND DC.CODCONTRATTO    = PDC.CODCONTRATTO
+      AND DC.FLGDISPONIBILITA = 'S'	  	        
+    ORDER BY
+      DM.STRDESCRIZIONE,
+      DC.STRDESCRIZIONE" />
+      
+      
+      
+<STATEMENT
+        name="WS_GET_LISTA_ORARI_MANSIONI_LAVORATORE"        
+        query="SELECT
+      MAN.CODMANSIONE   AS codmansione,
+      DM.STRDESCRIZIONE AS strdescrizionemansione,
+      DO.CODORARIO      AS codorario,
+      DO.STRDESCRIZIONE AS strdescrizioneorario
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_ORARIO PDO JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = PDO.CDNUTINS),
+      DE_MANSIONE DM,
+      DE_ORARIO DO	  
+    WHERE 
+      MAN.CDNLAVORATORE      = ?
+      AND MAN.FLGDISPONIBILE IN ('S','P')
+      AND MAN.PRGMANSIONE    = PDO.PRGMANSIONE
+      AND DM.CODMANSIONE     = MAN.CODMANSIONE
+      AND DO.CODORARIO       = PDO.CODORARIO	  
+    ORDER BY
+      DM.STRDESCRIZIONE,
+      DO.STRDESCRIZIONE" />
+      
+      
+<STATEMENT
+        name="WS_GET_LISTA_TURNI_MANSIONI_LAVORATORE"        
+        query="SELECT
+      DM.CODMANSIONE    AS codmansione,      
+      DM.STRDESCRIZIONE AS strdescrizionemansione,
+      DT.CODTURNO       AS codturno,
+      DT.STRDESCRIZIONE AS strdescrizioneturno
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_TURNO PDT JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = PDT.CDNUTINS),
+      DE_MANSIONE DM,
+      DE_TURNO DT	  
+    WHERE 
+      MAN.CDNLAVORATORE      = ?
+      AND MAN.FLGDISPONIBILE IN ('S','P')
+      AND MAN.PRGMANSIONE    = PDT.PRGMANSIONE
+      AND DM.CODMANSIONE     = MAN.CODMANSIONE
+      AND DT.CODTURNO        = PDT.CODTURNO          
+    ORDER BY
+      DM.STRDESCRIZIONE,
+      DT.STRDESCRIZIONE" />
+      
+      
+      
+ <STATEMENT
+     name="WS_GET_LISTA_MOBILITA_GEO_MANSIONI"        
+     query="select
+         pr_mansione.codmansione,
+         de_mansione.strdescrizione as strdescrizionemansione,         
+         pr_mobil_geogr.flgdispauto,
+         pr_mobil_geogr.flgdispmoto,
+         pr_mobil_geogr.flgmezzipub,
+         pr_mobil_geogr.flgpendolarismo,
+         pr_mobil_geogr.flgmobsett,
+         pr_mobil_geogr.numoreperc,                       
+         pr_mobil_geogr.codtrasferta,
+         de_trasferta.strdescrizione as strdescrizionetrasferta
+      from 
+         pr_mobil_geogr
+         inner join pr_mansione on (pr_mobil_geogr.PRGMANSIONE = pr_mansione.PRGMANSIONE)
+         inner join de_mansione on (pr_mansione.CODMANSIONE = de_mansione.CODMANSIONE)
+         left join de_trasferta on (pr_mobil_geogr.CODTRASFERTA = de_trasferta.CODTRASFERTA)
+      where
+         pr_mansione.CDNLAVORATORE = ?
+         and pr_mansione.FLGDISPONIBILE IN ('S','P') 
+      order by
+        de_mansione.STRDESCRIZIONE" />
+        
+        
+ <STATEMENT
+     name="WS_GET_COMPETENZE_LAVORATORE"        
+     query="SELECT prc.codcompetenza, 
+        dc.strdescrizione strdescrizionecompetenza, 
+        dct.strdescrizione strdescrizionetipocompetenza
+    FROM pr_competenza prc
+    INNER JOIN de_competenza dc ON prc.codcompetenza=dc.codcompetenza
+    INNER JOIN de_tipo_competenza dct ON dc.codtipocompetenza=dct.codtipocompetenza
+    WHERE cdnLavoratore=?" />
+    
+    
+  <STATEMENT
+     name="WS_GET_ABILITAZIONI_LAVORATORE"        
+     query="select dab.codabilitazionegen, 
+        dab.strdescrizione strdescrizioneabilitazione, 
+        dabt.strdescrizione strdescrizionetipoabilitazione 
+  from pr_abilitazione prab
+      inner join de_abilitazione_gen dab on dab.codabilitazionegen=prab.codabilitazionegen
+      inner join de_tipo_abilitazione_gen dabt on dab.codtipoabilitazionegen=dabt.codtipoabilitazionegen
+    WHERE cdnLavoratore=?
+    order by prab.codabilitazionegen" />
+    
+    
+ <STATEMENT
+     name="WS_GET_INFORMATICA_LAVORATORE"        
+     query="SELECT PRI.FLGCERTIFICATO, 
+       TI.CODTIPOINFO, 
+       TI.STRDESCRIZIONE AS STRDESCRIZIONETIPOINFO, 
+       DI.CODDETTINFO, 
+       DI.STRDESCRIZIONE AS STRDESCRIZIONEDETTINFO,
+       PRI.STRDESCINFO AS STRDESCRIZIONEINFO, 
+       GI.CDNGRADO, 
+       GI.STRDESCRIZIONE AS STRDESCRIZIONEGRADO, 
+       MI.CODMODOINFO, 
+       MI.STRDESCRIZIONE AS STRDESCRIZIONEMODOINFO
+  FROM 
+      PR_INFO PRI
+      left join DE_TIPO_INFO TI on ti.codtipoinfo = pri.codtipoinfo
+      left join DE_DETT_INFO DI on di.coddettinfo = pri.coddettinfo
+      left join DE_GRADO_INFO GI on gi.cdngrado = pri.cdngrado
+      left join DE_MODO_INFO MI on mi.codmodoinfo = pri.codmodoinfo
+  WHERE PRI.CDNLAVORATORE = ?" />
+  
+  
+ <STATEMENT
+     name="WS_GET_LINGUE_LAVORATORE"        
+     query="SELECT L.CODLINGUA,
+    DL.STRDENOMINAZIONE,
+		L.CDNGRADOLETTO,
+		DGL.STRDESCRIZIONE AS STRDESCRIZIONEGRADOLETTO, 
+		L.CDNGRADOSCRITTO,
+		DGS.STRDESCRIZIONE AS STRDESCRIZIONEGRADOSCRITTO, 
+		L.CDNGRADOPARLATO,
+    DGP.STRDESCRIZIONE AS STRDESCRIZIONEGRADOPARLATO, 
+    L.CODMODLINGUA,
+  	DM.STRDESCRIZIONE as STRDESCRIZIONEMODLINGUA, 
+    L.STRMODLINGUA, 
+  	L.FLGCERTIFICATO,
+  	L.FLGPRIMALINGUA
+    FROM PR_LINGUA L
+     join DE_LINGUA DL on l.codlingua = dl.codlingua
+     left join DE_GRADO_LIN DGL on l.cdngradoletto = dgl.cdngrado
+		 left join DE_GRADO_LIN DGS on l.cdngradoscritto = dgs.cdngrado 
+     left join DE_GRADO_LIN DGP on l.cdngradoparlato = dgp.cdngrado 
+     left join DE_MOD_LINGUA DM on l.codmodlingua = dm.codmodlingua
+    WHERE L.CDNLAVORATORE=?" />
+    
+    
+<STATEMENT
+     name="WS_GET_CREDITI_FORMATIVI_LAVORATORE"        
+     query="SELECT STRSPECIFICA
+		    FROM PR_CREDITO
+		    WHERE CDNLAVORATORE = ?
+		    ORDER BY STRSPECIFICA" />

@@ -1,0 +1,160 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<h:panelGroup
+		rendered="#{provinciaViewUtenteBean.utenteInfo.pfPrincipal.flagAbilitatoServizi}">
+		<div class="well">#{ui['accreditamentoForte.abilitatoServizi']}
+		</div>
+	</h:panelGroup>
+
+	<h:panelGroup
+		rendered="#{not provinciaViewUtenteBean.utenteInfo.pfPrincipal.flagAbilitatoServizi
+		and not empty provinciaViewUtenteBean.utenteInfo.numeroDocumento}">
+		<div class="well">#{ui['prof.richiestaServiziInCorso']}</div>
+	</h:panelGroup>
+
+	<h:panelGroup
+		rendered="#{provinciaViewUtenteBean.utenteInfo.pfPrincipal.flagAbilitaPec
+			or not empty provinciaViewUtenteBean.utenteInfo.emailPEC}">
+		<div class="form-group">
+			<p:outputLabel value="#{ui['prof.emailPec']}" for="emailPec"
+				styleClass="col-md-4 control-label text-muted" />
+			<div class="col-md-8">
+				<p:inputText id="emailPec" required="true"
+					value="#{provinciaEditUtenteBean.utenteInfo.emailPEC}"
+					validator="uniqueEmailValidator" maxlength="80"
+					styleClass="form-control">
+					<f:attribute name="pec" value="true" />
+					<f:attribute name="skipValue"
+						value="#{provinciaEditUtenteBean.oldPecEmail}" />
+					<o:validator validatorId="javax.faces.RegularExpression"
+						pattern="#{validation['pattern.email']}"
+						message="#{validation['message.email']}" />
+				</p:inputText>
+				<p:message id="emailPecMessage" for="emailPec"></p:message>
+			</div>
+		</div>
+	</h:panelGroup>
+
+	<h:panelGroup id="cittadinanzaGroup">
+		<ui:fragment
+			rendered="#{provinciaEditUtenteBean.utenteInfo.deCittadinanza.flgCee == 'S'}">
+			<div class="form-group">
+				<p:outputLabel value="#{ui['regCit.documentoIdentita']}"
+					for="documentoIdentita"
+					styleClass="col-md-4 control-label text-muted" />
+				<div class="col-md-8">
+					<p:inputText id="documentoIdentita" styleClass="form-control"
+						value="#{provinciaEditUtenteBean.utenteInfo.documentoIdentita}"
+						label="#{ui['regCit.documentoIdentita']}" required="true">
+					</p:inputText>
+					<p:message id="documentoIdentitaMessage" for="documentoIdentita" />
+				</div>
+			</div>
+		</ui:fragment>
+
+		<ui:fragment
+			rendered="#{provinciaEditUtenteBean.utenteInfo.deCittadinanza.flgCee == 'N'}">
+			<div class="form-group">
+				<p:outputLabel value="#{ui['regCit.titoloSoggiorno']}"
+					for="documentoSoggiorno"
+					styleClass="col-md-4 control-label text-muted" />
+				<div class="col-md-8">
+					<p:selectOneMenu id="documentoSoggiorno" style="width: 100%;"
+						value="#{provinciaEditUtenteBean.utenteInfo.documentoSoggiorno}"
+						converter="deTitoloSoggiornoConverter" styleClass="form-control"
+						required="true">
+						<f:selectItem itemLabel="" itemValue="" />
+						<f:selectItems value="#{decodificheBean.deTitoloSoggiorni}"
+							var="titolo" itemLabel="#{titolo.descrizione}"
+							itemValue="#{titolo}" />
+						<p:ajax update="assicurataGroup docSoggTip" oncomplete="pop()"
+							listener="#{provinciaEditUtenteBean.titoloSoggiornoChanged}" />
+					</p:selectOneMenu>
+					<p:message for="documentoSoggiorno" id="documentoSoggiornoMessage" />
+					<h:panelGroup id="docSoggTip">
+						<h:panelGroup rendered="#{provinciaEditUtenteBean.inRinnovoTip}">
+							<span class="help-block m-b-none">
+								#{ui['regCit.inRinnovoTip']} </span>
+						</h:panelGroup>
+						<h:panelGroup rendered="#{provinciaEditUtenteBean.inAttesaPerTip}">
+							<span class="help-block m-b-none">
+								#{ui['regCit.inAttesaPerTip']} </span>
+						</h:panelGroup>
+						<h:panelGroup rendered="#{provinciaEditUtenteBean.cartaPerTip}">
+							<span class="help-block m-b-none">
+								#{ui['regCit.cartaPerTip']} </span>
+						</h:panelGroup>
+					</h:panelGroup>
+				</div>
+			</div>
+		</ui:fragment>
+	</h:panelGroup>
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.numeroDocumento']}"
+			for="numeroDocumento" styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:inputText id="numeroDocumento" styleClass="form-control" required="true"
+				value="#{provinciaEditUtenteBean.utenteInfo.numeroDocumento}" />
+			<p:message for="numeroDocumento" id="numeroDocumentoMessage" />
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.dataScadenza']}" for="dataScadenza"
+			styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:calendar id="dataScadenza" styleClass="form-control"
+				navigator="true" required="true"
+				value="#{provinciaEditUtenteBean.utenteInfo.dataScadenzaDocumento}"
+				converterMessage="#{ui['shared.dateNotValid']}" size="20"
+				pattern="#{ui['shared.dateFormat']}"
+				label="#{ui['shared.dataScadenza']}" locale="it"
+				validator="dateValidator">
+				<f:convertDateTime type="date" pattern="#{ui['shared.dateFormat']}" />
+			</p:calendar>
+			<p:message for="dataScadenza" id="dataScadenzaMessage" />
+		</div>
+	</div>
+
+	<h:panelGroup id="assicurataGroup">
+		<ui:fragment
+			rendered="#{provinciaEditUtenteBean.rinnovoTitoloSoggiorno}">
+			<div class="form-group">
+				<p:outputLabel value="#{ui['regCit.numeroassicurataRaccomandata']}"
+					for="numeroAssicurata"
+					styleClass="col-md-4 control-label text-muted" />
+				<div class="col-md-8">
+					<p:inputText id="numeroAssicurata" styleClass="form-control"
+						value="#{provinciaEditUtenteBean.utenteInfo.numeroAssicurata}"
+						label="#{ui['regCit.numeroassicurataRaccomandata']}"
+						required="true">
+					</p:inputText>
+					<p:message id="numeroAssicurataMessage" for="numeroAssicurata" />
+				</div>
+			</div>
+
+			<div class="form-group">
+				<p:outputLabel value="#{ui['regCit.dataAssicurataRaccomandata']}"
+					for="dataAssicurata" styleClass="col-md-4 control-label text-muted" />
+				<div class="col-md-8">
+					<p:calendar id="dataAssicurata" styleClass="form-control"
+						navigator="true" required="true"
+						value="#{provinciaEditUtenteBean.utenteInfo.dataAssicurata}"
+						converterMessage="#{ui['shared.dateNotValid']}" size="20"
+						pattern="#{ui['shared.dateFormat']}"
+						label="#{ui['regCit.dataAssicurataRaccomandata']}" locale="it"
+						validator="dateValidator">
+						<f:convertDateTime type="date"
+							pattern="#{ui['shared.dateFormat']}" />
+					</p:calendar>
+					<p:message id="dataAssicurataMessage" for="dataAssicurata" />
+				</div>
+			</div>
+		</ui:fragment>
+	</h:panelGroup>
+</ui:composition>

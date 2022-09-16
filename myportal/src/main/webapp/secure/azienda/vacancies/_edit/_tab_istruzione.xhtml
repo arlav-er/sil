@@ -1,0 +1,179 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/tab.xhtml">
+
+	<ui:param name="tabBean" value="#{vaIstruzioneBean}" />
+	<ui:param name="form_id" value="istruzione" />
+	<ui:param name="deleteId" value="#{tabBean.data.idVaDatiVacancy}"></ui:param>
+
+	<ui:define name="tabcontent">
+
+		<h:form id="#{form_id}">
+			<script type="text/javascript">
+				checkSwitch('#{tabBean.switchtab}');
+			</script>
+			<h:inputHidden id="tabClick" value="#{tabBean.tabClick}">
+				<f:converter converterId="booleanConverter" />
+			</h:inputHidden>
+			<h:panelGroup id="istruzione_list" layout="block">
+				<h:outputText value="Nessun elemento inserito"
+					rendered="#{empty tabBean.list}" />
+
+				<h:dataTable id="table" rendered="#{not empty tabBean.list}"
+					columnClasses=",customcenter,customcenter,customcenter,customcenter notSortable"
+					value="#{tabBean.list}" var="element">
+					<h:column>
+						<f:facet name="header">
+							Titolo
+						</f:facet>
+						<h:outputText value="#{element.titolo.descrizioneParlante}"></h:outputText>
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">
+							Tipo titolo
+						</f:facet>
+						<h:outputText value="#{element.titolo.descrizioneTipoTitolo}" />
+					</h:column>
+					
+					<h:column rendered="#{tabBean.usaDecodificheSil()}">
+						<f:facet name="header">
+							Specifica
+						</f:facet>
+						<h:outputText value="#{element.specifica}" />
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">
+							Votazione
+						</f:facet>
+						<h:outputText value="#{element.votazione}" />
+					</h:column>
+
+					<h:column>
+						<h:commandLink styleClass="buttonStyle" immediate="true"
+							action="#{tabBean.edit}">
+							<span class="ui-icon ui-icon-pencil fix_icon"></span>
+							<f:param name="id" value="#{element.id}"></f:param>
+							<f:ajax execute="@this" render="@form"
+								onevent="showPanelCallback"></f:ajax>
+						</h:commandLink>
+
+						<h:commandLink type="reset" styleClass="buttonStyle"
+							onclick="return document.getElementById('delete_item').open({id: #{element.id}},this);">
+							<span class="ui-icon ui-icon-trash fix_icon"></span>
+						</h:commandLink>
+					</h:column>
+				</h:dataTable>
+				<br />
+				<h:commandLink id="insertButton" value="Inserisci nuovo titolo"
+					rendered="#{not tabBean.showPanel}" styleClass="insertButton"
+					action="#{tabBean.showInsertPanel}">
+					<f:ajax execute="@this" render="@form" onevent="showPanelCallback"></f:ajax>
+				</h:commandLink>
+			</h:panelGroup>
+
+			<h:panelGroup id="istrPanel" styleClass="insertPanel" layout="block"
+				rendered="#{tabBean.showPanel}">
+				
+				<h:panelGrid columns="1" cellspacing="10">
+					<cc:inputSuggestion size="100" id="titolo" label="Titolo"
+						valueCod="#{tabBean.data.titolo.id}"
+						value="#{tabBean.data.titolo.descrizione}" required="true"
+						showButton="true" requiredMessage="Il Titolo e' obbligatorio"
+						requiredMessageCod="E' necessario scegliere un titolo dalla lista a tendina"
+						suggestionPath="titoliStudio" title="Titoli di studio"
+						onSelectF="updateDescrizioneTipoTitolo">
+						<f:attribute name="list" value="#{tabBean.list}"></f:attribute>
+						<f:attribute name="current" value="#{tabBean.data}"></f:attribute>
+						<f:validator validatorId="titoloSuggestionValidator"
+							for="function" />
+						<f:validator validatorId="uniqueValidator" for="function"
+							disabled="#{tabBean.saved}" />
+					</cc:inputSuggestion>
+					
+					<h:panelGroup>
+						<h:outputLabel id="descrizione_tipo_titolo_label"
+							value="Tipo titolo: " />
+						<h:outputLabel id="descrizione_tipo_titolo" value="#{tabBean.data.titolo.descrizioneTipoTitolo}" />
+					</h:panelGroup>
+				</h:panelGrid>
+
+				<h:panelGrid id="insert_form" columns="4" cellspacing="10"
+					style="display:none">
+
+					<cc:inputText id="votazione" required="false" size="20"
+						requiredMessage="La votazione e' obbligatoria" label="Votazione"
+						value="#{tabBean.data.votazione}" maxlength="20">
+					</cc:inputText>
+					
+					<h:panelGroup>
+						<cc:inputText id="specifica" required="false" size="20" label="Specifica"
+							value="#{tabBean.data.specifica}" maxlength="100"
+							rendered="#{tabBean.usaDecodificheSil()}">
+						</cc:inputText>
+					</h:panelGroup>
+					
+					<h:panelGroup>
+						<cc:selectOneRadio value="#{tabBean.data.opzConseguito}"
+							valueDescription="#{tabBean.data.getOpzione(tabBean.data.opzConseguito)}"
+							label="Conseguito?" rendered="#{tabBean.usaDecodificheSil()}">
+							<f:selectItem itemLabel="Sì" itemValue="Y"></f:selectItem>
+							<f:selectItem itemLabel="No" itemValue="N"></f:selectItem>
+						</cc:selectOneRadio>
+					</h:panelGroup>
+			
+					<h:panelGroup>
+						<cc:selectOneRadio value="#{tabBean.data.opzIndispensabile}"
+							valueDescription="#{tabBean.data.getOpzione(tabBean.data.opzIndispensabile)}"
+							label="Indispensabile?" rendered="#{tabBean.usaDecodificheSil()}">
+							<f:selectItem itemLabel="Sì" itemValue="Y"></f:selectItem>
+							<f:selectItem itemLabel="No" itemValue="N"></f:selectItem>
+						</cc:selectOneRadio>
+					</h:panelGroup>
+				</h:panelGrid>
+
+				<ui:include src="../../../_buttons.xhtml" />
+			</h:panelGroup>
+			<script type="text/javascript">
+				var updateDescrizioneTipoTitolo = function(descrizioneTipoTitolo) {
+					$(jq('#{form_id}:descrizione_tipo_titolo')).html(descrizioneTipoTitolo);
+	
+					//$(jq('#{form_id}:descrizione_tipo_titolo')).attr('value','descrizioneTipoTitolo');
+				}
+					
+				$(function() {
+					disegnaBottoni();
+
+					generateDataTable(jq('#{form_id}:table'));
+					
+					attachListener();	
+
+					$('#Istruzione a:visible:enabled:first').focus();			
+				});	
+
+				var openDelete = function(params) {
+					var itemId = params.id;
+					$('[id$="delete_item\:modal_form\:objectId"]').val(itemId);
+				};	
+			</script>
+
+			<cc:messages />
+
+		</h:form>
+
+		<cc:modalDialog id="delete_item" title="Elimina il titolo di studio"
+			openF="openDelete"
+			message="Sei sicuro di voler eliminare il titolo di studio?"
+			actionSubmit="#{vaIstruzioneBean.delete}" submitLabel="Elimina"
+			renderAjax=":istruzione">
+			<h:inputHidden id="objectId"></h:inputHidden>
+			<h:outputText value="#{cc.attrs.message}"></h:outputText>
+		</cc:modalDialog>
+
+	</ui:define>
+
+</ui:composition>

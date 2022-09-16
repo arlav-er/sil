@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/templates/#{utilsBean.bootstrapTemplate}/main.xhtml">
+
+	<ui:param name="pagetitle" value="Trova Curriculum" />
+
+	<ui:define name="content">
+		<h:outputScript library="commons" name="js/components/eng.components.js"></h:outputScript>
+		<h:outputScript library="commons" name="js/components/treeAutoComplete.js"></h:outputScript>
+		<h:outputScript library="commons" name="js/timeago.js" />
+		<h:outputScript library="commons" name="js/azienda/curriculum/curriculum.search.js" />
+		<div class="container m-t-20 search-curriculum">
+			<h2 class="p-b-20">Trova Curriculum</h2>
+			<div class="row">
+				<h:form>
+					<p:remoteCommand name="doSearch" actionListener="#{aziendaCercaCurriculumPfBean.search()}" process="@form"
+						update=":curriculumResultsForm:curriculumResultsGroup @(.ui-datatable)"
+						oncomplete="CurriculumSearch.doSearchComplete(args)" />
+				</h:form>
+			</div>
+
+			<h:panelGroup id="searchResultsGroup">
+				<div class="row m-t-20 m-b-50">
+					<ui:include src="_search/_filters.xhtml" />
+
+					<ui:include src="_search/_results.xhtml" />
+				</div>
+			</h:panelGroup>
+		</div>
+
+		<ui:include src="_search/_contattaLavoratore.xhtml" />
+
+		<h:panelGroup id="canvasPanel">
+			<div id="canvasView" class="uk-offcanvas canvas-quick-view">
+				<div class="uk-offcanvas-bar uk-offcanvas-bar-flip">
+					<c:if test="#{not empty curriculumOffcanvasBean.selectedDatiPersonali}">
+						<ui:include src="../../utente/curriculum/_view/_offCanvas.xhtml">
+							<ui:param name="curriculum" value="#{curriculumOffcanvasBean.selectedDatiPersonali}" />
+							<ui:param name="altreInfo" value="#{curriculumOffcanvasBean.selectedCvAltreInfo}" />
+							<ui:param name="esperienze" value="#{curriculumOffcanvasBean.esperienzeSelezionate}" />
+							<ui:param name="lingue" value="#{curriculumOffcanvasBean.lingueSelezionate}" />
+							<ui:param name="istruzioni" value="#{curriculumOffcanvasBean.cvIstruzioniSelezionate}" />
+							<ui:param name="bean" value="#{curriculumOffcanvasBean}" />
+						</ui:include>
+					</c:if>
+				</div>
+			</div>
+		</h:panelGroup>
+		<script class="loadScript">
+			$(function () {
+				MyPortal.CurriculumSearch.init();
+			});
+        </script>
+	</ui:define>
+</ui:composition>
+

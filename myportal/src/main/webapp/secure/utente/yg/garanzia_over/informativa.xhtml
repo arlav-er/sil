@@ -1,0 +1,86 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components" xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui" template="../../../template/main_primefaces.xhtml">
+	
+	<f:metadata>
+		<f:event listener="#{ygOverAdesioneBean.checkViewPage()}" type="preRenderView" />
+	</f:metadata>
+	
+	<ui:define name="content">
+		<h:outputStylesheet library="css" name="#{sessionBean.cssStyle}/myportalPrimeFacesCittOrientamentoBase.css" />
+		<ui:include src="_header.xhtml" />
+		<div class="container-div">
+			<div style="margin: 1.5em;">
+				<h:panelGroup id="nessunaAdesioneGroup" rendered="#{not ygOverAdesioneBean.isAdesionePresente()}">
+					<ui:include src="_informativa/_informativa_pre_adesione.xhtml" />
+					<div>
+						<p:button outcome="home" value="Torna alla scrivania" title="Torna alla scrivania" 
+							alt="Effettua nuova ricerca" icon="ui-icon-close" styleClass="commandButtonMargin"/>
+					
+						<p:button outcome="/secure/utente/yg/garanzia_over/adesione.xhtml"
+							value="Aderisci ad Umbriattiva Adulti " alt="Aderisci" title="Aderisci" />
+					</div>
+				</h:panelGroup>
+					
+				<h:panelGroup id="adesioneErrataGroup" 
+					rendered="#{ygOverAdesioneBean.isAdesionePresente() and not ygOverAdesioneBean.isAdesioneValida()}">
+					<h3>
+						#{ygOverAdesioneBean.adesione.strMessInterfaccia}
+					</h3>
+					<h4>
+						Motivo della mancata adesione: #{ygOverAdesioneBean.adesione.strMessWsAdesione}
+					</h4>
+					<br />
+					<div>
+						<p:button outcome="/secure/utente/yg/garanzia_over/adesione.xhtml"
+							value="Invia una nuova richiesta" alt="Invia una nuova richiesta" 
+							title="Invia una nuova richiesta" />
+					</div>
+				</h:panelGroup>
+					
+				<h:panelGroup id="adesionePresenteGroup"
+					rendered="#{ygOverAdesioneBean.isAdesionePresente() and ygOverAdesioneBean.isAdesioneValida()}">
+					<h3>
+						La tua iscrizione a Umbriattiva Adulti è avvenuta in modo corretto.
+						A seguito della tua adesione, sarà cura di  ARPAL Umbria effettuare ulteriori verifiche del 
+						possesso dei requisiti  necessari per beneficiare degli strumenti previsti da Umbriattiva.
+						<h:outputText rendered="#{not ygOverAdesioneBean.isAdesionePresaInCarico()}"
+							value="Ricordati di prendere un appuntamento col CPI. In mancanza di tale appuntamento
+								non potrai attivare i percorsi di politica attiva previsti da tale programma." />
+						<h:outputText ></h:outputText>
+					</h3>
+					<ui:fragment rendered="#{ygOverAdesioneBean.isAdesionePresaInCarico()}">
+						<div>
+							<p:button outcome="/secure/utente/yg/garanzia_over/appuntamento.xhtml"
+								value="Visualizza dettagli appuntamento" alt="Visualizza dettagli appuntamento" 
+								title="Visualizza dettagli appuntamento" />
+						</div>
+					</ui:fragment>
+					<ui:fragment rendered="#{not ygOverAdesioneBean.isAdesionePresaInCarico()}">
+						<div>
+							<h3>
+								Ricordati di prendere un appuntamento col CPI. In mancanza di tale appuntamento
+								non potrai attivare i percorsi di politica attiva previsti da tale programma.
+							</h3>
+							<ui:fragment rendered="#{const['regione.cod'] == 10}">
+							<h3 style="color: red">
+								In caso di assenza di date disponibili per la prenotazione, attendere la disponibilità di nuove date che saranno pubblicate in questa sezione.
+							</h3>
+							</ui:fragment>
+							<ui:fragment rendered="#{const['regione.cod'] != 10}">
+							<h3 style="color: red">
+								In caso di assenza di date disponibili per la prenotazione, gli utenti verranno
+								prenotati dal Centro per l'Impiego in ordine cronologico di adesione e degli
+								appuntamenti fissati ne sarà data successiva comunicazione.
+							</h3>
+							</ui:fragment>
+							<p:button outcome="/secure/utente/yg/garanzia_over/appuntamento.xhtml"
+								value="Prenota appuntamento" alt="Prenota appuntamento" title="Prenota appuntamento" />
+						</div>
+					</ui:fragment>
+				</h:panelGroup>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

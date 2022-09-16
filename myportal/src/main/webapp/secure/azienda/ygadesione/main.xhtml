@@ -1,0 +1,152 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/main_primefaces.xhtml">
+
+	<ui:define name="content">
+		<ui:include src="_header.xhtml" />
+		<div class="widget_container">
+			<div class="ui-widget-content ui-widget ui-corner-all">
+				<h:form id="adesioneForm">
+					<h:panelGrid columns="1" cellspacing="10">
+						<p>Da questa pagina puoi manifestare il tuo interesse ad
+							aderire alla Garanzia Giovani. Per aderire è necessario inserire
+							il settore produttivo della tua azienda e almeno la sede legale.</p>
+						<p:outputLabel value="Ragione Sociale"></p:outputLabel>
+							#{ygAdesioneAziendaBean.aziendaSessionDTO.ragioneSociale}
+						<h:panelGrid columns="1">
+							<h:panelGrid columns="1">
+								<p:outputLabel value="Indirizzo email principale" for="emailInput"></p:outputLabel>
+								<p:inputText id="emailInput" required="true"      
+									value="#{ygAdesioneAziendaBean.adesioneAziendaDTO.email1}" size="50"
+									maxlength="255" requiredMessage="L'indirizzo email principale è obbligatorio"></p:inputText>
+									<p:message for="emailInput"></p:message>    									
+							</h:panelGrid>							
+							<h:panelGrid columns="1">
+								<p:outputLabel value="Indirizzo email facoltativo 1" for="email2"></p:outputLabel>
+								<p:inputText id="email2"
+									value="#{ygAdesioneAziendaBean.adesioneAziendaDTO.email2}" size="50"
+									maxlength="255"></p:inputText>
+							</h:panelGrid>      
+							
+							<h:panelGrid columns="1">
+								<p:outputLabel value="Indirizzo email facoltativo 3" for="email3"></p:outputLabel>
+								<p:inputText id="email3"
+									value="#{ygAdesioneAziendaBean.adesioneAziendaDTO.email3}" size="50"
+									maxlength="255"></p:inputText>
+							</h:panelGrid>   		
+							
+							<ui:remove>
+								<!-- this has been removed by the request of the ragione ER (Email from Angela Tagliaferro_
+								     in case they want it back otherwise it would be deleted.
+								     11/07/2014
+								 -->
+								<h:panelGrid columns="1">
+									<p:outputLabel value="Area Professionale"
+										for="areaProfessionaleInput"></p:outputLabel>
+									<p:autoComplete id="areaProfessionaleInput"
+										completeMethod="#{ygAdesioneAziendaBean.completeQualificaSrq}"
+										converter="deQualificaSrqDTOConverter" var="srq" maxResults="10"
+										itemLabel="#{srq.descrizione}" itemValue="#{srq}"
+										value="#{ygAdesioneAziendaBean.adesioneAziendaDTO.deQualificaSrqDTO}"
+										required="true" size="70" title="#{srq.descrizione}"></p:autoComplete>										
+								</h:panelGrid>
+							</ui:remove>
+
+							<h:panelGrid columns="1">
+								<p:outputLabel value="Settore" for="settoreInput"></p:outputLabel>
+								<p:autoComplete id="settoreInput"
+									completeMethod="#{ygAdesioneAziendaBean.completeAttivitaMin}"
+									converter="deAttivitaMinConverter" var="attiv" maxResults="10"
+									itemLabel="#{attiv.descrizione}" itemValue="#{attiv}"
+									value="#{ygAdesioneAziendaBean.adesioneAziendaDTO.deAttivitaMinDTO}"
+									required="true" size="70" title="#{mans.descrizione}" 
+									requiredMessage="Il settore è obbligatorio"></p:autoComplete>
+								<p:message for="settoreInput"></p:message>	 
+							</h:panelGrid>
+						</h:panelGrid>
+						<h:panelGroup id="dataAdesione">
+							<h:panelGrid columns="1"
+								rendered="#{not empty ygAdesioneAziendaBean.adesioneAziendaDTO.dtAdesione}">
+								<p:outputLabel value="Data adesione Garanzia Giovani"></p:outputLabel>
+								<h:outputText
+									value="#{ygAdesioneAziendaBean.adesioneAziendaDTO.dtAdesione}">
+									<f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+								</h:outputText>
+  
+							</h:panelGrid>
+						</h:panelGroup>
+						<p:dataTable id="sediTable"
+							value="#{ygAdesioneAziendaBean.adesioneAziendaDTO.ygAdesioneAziendaSedeDTOList}"
+							var="adesione" emptyMessage="Nessuna sede trovata">
+							<f:facet name="header">
+       							Elenco Sedi
+    						</f:facet>
+							<p:column headerText="Indirizzo">
+								<h:outputText value="#{adesione.indirizzo}" />
+							</p:column>
+							<p:column headerText="Comune">
+								<h:outputText value="#{adesione.deComuneDTO.descrizione}" />
+							</p:column>
+							<p:column headerText="CAP">
+								<h:outputText value="#{adesione.cap}" />
+							</p:column>
+							<p:column headerText="Telefono">
+								<h:outputText value="#{adesione.telefono}" />
+							</p:column>
+							<p:column headerText="Fax">
+								<h:outputText value="#{adesione.fax}" />
+							</p:column>
+							<p:column headerText="Sede Legale">
+								<h:outputText value="#{(adesione.flgSedeLegale)?'Sì':'No'}" />
+							</p:column>
+							<p:column headerText="Azioni">
+								<p:commandButton oncomplete="PF('addSedeWV').show()"
+									update=":addSedeDialog" icon="ui-icon-pencil"
+									styleClass="btnControls">
+									<f:setPropertyActionListener
+										target="#{ygAdesioneAziendaBean.newSede}" value="#{adesione}"></f:setPropertyActionListener>
+									<f:setPropertyActionListener
+										target="#{ygAdesioneAziendaBean.editSede}" value="#{true}"></f:setPropertyActionListener>
+								</p:commandButton>
+								<p:commandButton
+									action="#{ygAdesioneAziendaBean.removeSedeFromList}"
+									update="sediTable" icon="ui-icon-trash"
+									styleClass="btnControls"
+									onstart="return confirm('Sei sicuro di voler cancellare la sede?');">
+									<f:setPropertyActionListener
+										target="#{ygAdesioneAziendaBean.newSede}" value="#{adesione}"></f:setPropertyActionListener>
+								</p:commandButton>
+							</p:column>
+						</p:dataTable>
+						<p:commandButton value="Nuova Sede" oncomplete="PF('addSedeWV').show()"
+							update=":addSedeDialog"
+							actionListener="#{ygAdesioneAziendaBean.prepareNewSede}"
+							style="float: right;">
+							<f:setPropertyActionListener
+								target="#{ygAdesioneAziendaBean.editSede}" value="#{false}"></f:setPropertyActionListener>
+						</p:commandButton>
+					</h:panelGrid>
+					<h:panelGrid columns="3" id="controls">
+						<p:button outcome="home" title="Torna alla scrivania"
+							value="Torna alla scrivania"></p:button>
+						<p:commandButton value="Salva"
+							actionListener="#{ygAdesioneAziendaBean.sync}" update="@form controls"></p:commandButton>
+						<p:commandButton
+							disabled="#{not empty ygAdesioneAziendaBean.adesioneAziendaDTO.flgAdesione and not empty ygAdesioneAziendaBean.adesioneAziendaDTO.dtAdesione}"
+							rendered="#{not empty ygAdesioneAziendaBean.adesioneAziendaDTO.id}"
+							actionListener="#{ygAdesioneAziendaBean.aderisci}"
+							update=":adesioneForm:dataAdesione controls"
+							value="Invia Adesione Garanzia Giovani"
+							icon="ui-button-icon-primary ui-icon ui-icon-check">
+						</p:commandButton>
+					</h:panelGrid>
+				</h:form>
+				<ui:include src="_addSede.xhtml" />
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

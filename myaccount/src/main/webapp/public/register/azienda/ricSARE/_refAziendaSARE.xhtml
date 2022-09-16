@@ -1,0 +1,86 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+	<legend> #{ui['shared.refSAREAzienda']} </legend>
+	<div class="form-group">
+		<p:outputLabel value="#{ui['regAz.mittenteSARE']}" styleClass="col-lg-2 control-label" for="mittenteSare" />
+		<div class="col-lg-10">
+			<p:inputText id="mittenteSare" value="#{registerAzienda.aziendaInfo.mittenteSare}" required="true" label="#{ui['regAz.mittenteSARE']}"
+				maxlength="13" styleClass="form-control" widgetVar="mittenteSareWV">
+				<o:validator validatorId="javax.faces.RegularExpression" pattern="#{validation['pattern.alphanumeric']}"
+					message="#{validation['message.alphanumeric']}"></o:validator>
+			</p:inputText>
+			<p:message id="mittenteSareMessage" for="mittenteSare"></p:message>
+			<span class="help-block m-b-none">#{ui['regAz.mittenteSARETipo']} </span>
+		</div>
+	</div>
+	<div class="form-group spacer">
+		<p:outputLabel value="#{ui['regAz.referenteSAREAzienda']}" styleClass="col-lg-2 control-label" for="referenteSare" />
+		<div class="col-lg-10">
+			<p:inputText id="referenteSare" value="#{registerAzienda.aziendaInfo.referenteSare}" required="true"
+				label="#{ui['regAz.referenteSAREAzienda']}" maxlength="50" styleClass="form-control" widgetVar="referenteSareWV">
+			</p:inputText>
+			<p:message id="referenteSareMessage" for="referenteSare"></p:message>
+		</div>
+	</div>
+	<div class="form-group">
+		<p:outputLabel value="#{ui['regAz.telefonoRefSARE']}" styleClass="col-lg-2 control-label" for="telefonoReferente" />
+		<div class="col-lg-10">
+			<p:inputText id="telefonoReferente" value="#{registerAzienda.aziendaInfo.telefonoReferente}" required="true"
+				label="#{ui['regAz.telefonoRefSARE']}" maxlength="30" styleClass="form-control" widgetVar="telefonoReferenteWV">
+			</p:inputText>
+			<p:message id="telefonoReferenteMessage" for="telefonoReferente"></p:message>
+		</div>
+	</div>
+	<div class="form-group spacer">
+		<p:outputLabel value="#{ui['regAz.indirizzoEmRefSARE']}" styleClass="col-lg-2 control-label" for="emailReferente" />
+		<div class="col-lg-10">
+			<p:inputText id="emailReferente" value="#{registerAzienda.aziendaInfo.emailReferente}" required="true"
+				label="#{ui['regAz.indirizzoEmRefSARE']}" maxlength="50" styleClass="form-control" widgetVar="emailReferenteWV">
+				<o:validator validatorId="javax.faces.RegularExpression" pattern="#{validation['pattern.email']}"
+					message="#{validation['message.email']}" />
+			</p:inputText>
+			<p:message id="emailReferenteMessage" for="emailReferente"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['regAz.tipoRichiedente']}" styleClass="col-lg-2 control-label" for="tipoAbilitato" />
+		<div class="col-lg-10">
+			<p:selectOneRadio id="tipoAbilitato" required="true" converter="deTipoAbilitatoConverter" style="width: 100%;"
+				value="#{registerAzienda.aziendaInfo.deTipoAbilitato}" styleClass="form-control" label="#{ui['regAz.tipoRichiedente']}" layout="grid"
+				columns="1" widgetVar="tipoAbilitatoWV">
+				<f:selectItems value="#{decodificheBean.deTipiAbilitato}" var="deTipoAbilitato" itemLabel="#{deTipoAbilitato.descrizione}"
+					itemValue="#{deTipoAbilitato}" />
+				<p:ajax listener="#{registerAzienda.tipoAbilitatoChanged}" update="tipoDelegatoGroup extraSections"></p:ajax>
+			</p:selectOneRadio>
+			<p:message id="tipoAbilitatoMessage" for="tipoAbilitato" />
+		</div>
+	</div>
+
+	<h:panelGroup id="tipoDelegatoGroup">
+		<h:panelGroup rendered="#{registerAzienda.editTipoDelegato}">
+			<div class="form-group">
+				<p:outputLabel value="#{ui['regAz.tipoDelegato']}" styleClass="col-lg-2 control-label" for="tipoDelegato" />
+				<div class="col-lg-10">
+					<p:selectOneMenu id="tipoDelegato" required="true" converter="deTipoDelegatoConverter" style="width: 100%;"
+						value="#{registerAzienda.aziendaInfo.deTipoDelegato}" styleClass="form-control" label="#{ui['regAz.tipoDelegato']}"
+						widgetVar="tipoDelegatoWV">
+						<f:selectItem itemValue="" itemLabel=""></f:selectItem>
+						<f:selectItems value="#{decodificheBean.deTipiDelegato}" var="deTipoDelegato" itemLabel="#{deTipoDelegato.descrizione}"
+							itemValue="#{deTipoDelegato}" />
+					</p:selectOneMenu>
+					<p:message id="tipoDelegatoMessage" for="tipoDelegato" />
+				</div>
+			</div>
+		</h:panelGroup>
+
+		<h:panelGroup rendered="#{not registerAzienda.editTipoDelegato and not empty registerAzienda.aziendaInfo.deTipoDelegato}">
+			<div class="form-group">
+				<label class="col-lg-2 control-label">#{ui['regAz.tipoDelegato']}</label>
+				<div class="col-lg-10">
+					<p class="form-control-static">#{registerAzienda.aziendaInfo.deTipoDelegato.descrizione}</p>
+				</div>
+			</div>
+		</h:panelGroup>
+	</h:panelGroup>
+</ui:composition>

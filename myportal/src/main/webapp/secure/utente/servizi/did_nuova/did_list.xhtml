@@ -1,0 +1,121 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/main_primefaces.xhtml">
+	
+	<ui:define name="content">
+		<h:form id="remoteCommandForm">
+			<p:remoteCommand id="appuntamentoDialogRC" oncomplete="showAppuntamentoDialog();" 
+				autoRun="#{didNuovaListBean.mostraDialogAppuntamento()}" />
+			<p:remoteCommand id="didPresenteDialogRC" oncomplete="showDidGiaPresenteDialog();" 
+				autoRun="#{didNuovaListBean.mostraDialogDidPresente()}" />
+		</h:form>
+		
+		<div class="widget_container">
+			<h1>Dichiarazione di Immediata Disponibilità</h1>
+			<h:panelGroup layout="block" styleClass="ui-widget-content ui-widget ui-corner-all"
+				rendered="#{not empty didNuovaListBean.stampeDidRegionaliList}">
+				<h3>Elenco DID regionali effettuate precedentemente</h3>
+				<h:form id="didRegionaliForm">
+					<ul class="margin-2em">
+						<ui:repeat value="#{didNuovaListBean.stampeDidRegionaliList}" var="stampaDid">
+							<li>
+								<p:commandLink ajax="false">
+									<p:fileDownload value="#{didNuovaListBean.downloadStampaDidRegionale(stampaDid)}" />
+									Dichiarazione del
+									<h:outputText value="#{stampaDid.dtmIns}">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+								</p:commandLink>
+							</li>
+						</ui:repeat>
+					</ul>
+				</h:form>
+			</h:panelGroup>
+			<br />
+			
+			<h:panelGroup layout="block" styleClass="ui-widget-content ui-widget ui-corner-all"
+				rendered="#{not empty didNuovaListBean.didNazionaliList}">
+				<h3>Elenco DID Online effettuate precedentemente</h3>
+				<h:form id="didMinisterialiForm">
+					<ul class="margin-2em">
+						<ui:repeat value="#{didNuovaListBean.didNazionaliList}" var="conferimentoDid">
+							<li>
+								<p:commandLink ajax="false">
+									<p:fileDownload value="#{didNuovaListBean.downloadStampaDidMinistero(conferimentoDid)}" />
+									Dichiarazione del 
+									<h:outputText value="#{conferimentoDid.dataDid}">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+								</p:commandLink>
+							</li>
+						</ui:repeat>
+					</ul>
+				</h:form>
+			</h:panelGroup>
+			<br />
+			
+			<div class="ui-widget-content ui-widget ui-corner-all">
+				<h3>Richiedi una nuova DID</h3>
+				<h:form id="richiediDidForm">
+					<p:commandButton action="#{didNuovaListBean.controllaDisponibilitaDid}" ajax="false"
+						value="Richiedi nuova DID" title="Richiedi nuova DID" />
+					<p:messages globalOnly="true" />
+				</h:form>
+			</div>
+			
+			<div>
+				<p:button outcome="home" styleClass="margin-1em" title="Torna alla scrivania"
+					value="Torna alla scrivania" />
+			</div>
+		</div>
+		
+		<p:dialog id="prenotaAppuntamentoDialog" widgetVar="prenotaAppuntamentoDialogWV"
+			modal="true" header="Prenota un appuntamento" width="500">
+			<br />
+			<p>#{txt['cittadino.servizi.did_anpal.prenota_appuntamento']}</p>
+			<br />
+			<div class="text-center">
+				<h:form id="prenotaAppuntamentoDialogForm">
+					<p:commandButton value="Scarica stampa DID" ajax="false" >
+						<p:fileDownload value="#{didNuovaListBean.downloadStampaLatestDidMinistero()}" />
+					</p:commandButton>
+					<p:button value="Prenota un appuntamento" href="#{sessionBean.getUrlMyAgenda()}"
+						rendered="#{didNuovaListBean.checkAbilitazioneVisibile('did_anpal_appuntamento_btn')}"
+						target="_blank" onclick="hideAppuntamentoDialog();"/>
+					<p:commandButton value="Chiudi" onclick="hideAppuntamentoDialog();" styleClass="margin-1em" />
+				</h:form>
+			</div>
+		</p:dialog>
+		
+		<p:dialog id="didGiaPresenteDialog" widgetVar="didGiaPresenteDialogWV"
+			modal="true" header="Prenota un appuntamento" width="500">
+			<br />
+			<p>#{txt['cittadino.servizi.did_anpal.esiste_did']}</p>
+			<br />
+			<div class="text-center">
+			<p:commandButton value="Chiudi" onclick="hideDidGiaPresenteDialog();" styleClass="margin-1em" /></div>
+		</p:dialog>
+		
+		<script>
+			function showAppuntamentoDialog() {
+				PF('prenotaAppuntamentoDialogWV').show();
+			}
+			
+			function hideAppuntamentoDialog() {
+				PF('prenotaAppuntamentoDialogWV').hide();
+			}
+			
+			function showDidGiaPresenteDialog() {
+				PF('didGiaPresenteDialogWV').show();
+			}
+			
+			function hideDidGiaPresenteDialog() {
+				PF('didGiaPresenteDialogWV').hide();
+			}
+		</script>
+	</ui:define>
+</ui:composition>

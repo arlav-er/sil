@@ -1,0 +1,450 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:p="http://primefaces.org/ui">
+	<div class="modal fade schedaValutazione-modal " id="schedaValutazione-modal" tabindex="-1" role="dialog"
+		aria-labelledby="schedaValutazione-modal">
+		<div class="modal-dialog full-screen" role="document">
+			<div class="modal-content">
+				<div class="modal-header-background">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close" style="font-size: 18px; color: #000;">
+						<span aria-hidden="true">&#215;</span>
+					</button>
+					<h4 class="modal-title">SCHEDA VALUTAZIONE CANDIDATURA</h4>
+				</div>
+				<h:form id="schedaValutaForm" styleClass="form-horizontal" enctype="multipart/form-data">
+					<h:panelGroup id="schedaValutaGroup">
+						<div class="modal-body">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="panel panel-default">
+										<div class="panel-heading text-center">DATI OFFERTA</div>
+										<div class="panel-body">
+											<div class="col-md-12">
+												<div class="col-md-2">
+													<span>Identificativo richiesta:</span>
+												</div>
+												<div class="col-md-10">
+													<span>#{schedaValutazioneBean.vaDatiVacancy.numRichiesta}/#{schedaValutazioneBean.vaDatiVacancy.numAnno}</span>
+												</div>
+												<div class="col-md-2">
+													<span>Profilo richiesto:</span>
+												</div>
+												<div class="col-md-10">
+													<span>#{schedaValutazioneBean.vaDatiVacancy.attivitaPrincipale}</span>
+												</div>
+											</div>
+										</div>
+									</div>
+
+
+									<div class="panel panel-default">
+										<div class="panel-heading text-center">ANAGRAFICA CANDIDATO</div>
+										<div class="panel-body">
+											<div class="col-md-12">
+												<div class="col-md-2">
+													<span>Nome:</span>
+												</div>
+												<div class="col-md-10">
+													<span>#{schedaValutazioneBean.pfPrincipal.nome}</span>
+												</div>
+											</div>
+											<div class="col-md-12">
+												<div class="col-md-2">
+													<span>Cognome:</span>
+												</div>
+												<div class="col-md-10">
+													<span>#{schedaValutazioneBean.pfPrincipal.cognome}</span>
+												</div>
+											</div>
+											<div class="col-md-12">
+												<div class="col-md-2">
+													<span>Codice Fiscale:</span>
+												</div>
+												<div class="col-md-10">
+													<span>#{schedaValutazioneBean.pfPrincipal.utenteInfo.codiceFiscale}</span>
+												</div>
+
+											</div>
+											<div class="col-md-12">
+												<div class="col-md-2">
+													<span>N. Candidatura:</span>
+												</div>
+												<div class="col-md-10">
+													<span>#{schedaValutazioneBean.numberCheckOrderedVacancyToCandidate}</span>
+												</div>
+											</div>
+											<div class="col-md-12">
+												<div class="col-md-2">
+													<span>Data e ora candidatura:</span>
+												</div>
+												<div class="col-md-10">
+													<span>
+														<h:outputFormat value="#{schedaValutazioneBean.acCandidatura.dtmIns}">
+															<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+														</h:outputFormat>
+													</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="panel panel-default">
+										<div class="panel-heading text-center">ITEM VALUTAZIONE</div>
+										<div class="panel-body">
+											<div class="table-responsive">
+												<table class="table table-bordered">
+													<thead>
+														<tr>
+															<th>ITEM</th>
+															<th class="col-md-3">REQUISITI RICHIESTI</th>
+															<th class="col-md-3">REQUISITI POSSEDUTI</th>
+															<th class="col-md-3">PERTINENZA</th>
+															<th class="col-md-2">NOTE<br /> <h8>(inserire una breve motivazione che ha condotto alla valutazione degli item)</h8></th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<td>Esperienze (mansioni, attività, ..)</td>
+															<td>
+															  <div>
+																<h6>
+																<ui:fragment rendered="#{not empty schedaValutazioneBean.vaDatiVacancy.deBpMansione.descrizione}">
+																		 #{schedaValutazioneBean.vaDatiVacancy.deBpMansione.descrizione}<br />
+																		</ui:fragment>
+																		<ui:fragment rendered="#{not empty schedaValutazioneBean.vaDatiVacancy.professione}">
+																		#{schedaValutazioneBean.vaDatiVacancy.professione}				
+																</ui:fragment>
+																</h6>
+															  </div>
+															</td>
+															<td>
+																<div>
+																	<h6>
+																		<ul>
+																			<ui:repeat value="#{schedaValutazioneBean.esperienzeSelezionate}" var="esperienze">
+																				<li>
+																					<ui:fragment rendered="#{not empty esperienze.deBpMansione.descrizione}">#{esperienze.deBpMansione.descrizione}<br />
+																					</ui:fragment>
+																					<ui:fragment rendered="#{not empty esperienze.attivitaResponsabilita}">#{esperienze.attivitaResponsabilita}</ui:fragment>
+																				</li>
+																			</ui:repeat>
+																		</ul>
+																	</h6>
+																</div>
+															</td>
+															<td>
+															  <p:selectOneRadio id="tipoSceltaPrtinenzaEsp" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+																value="#{schedaValutazioneBean.acCandidaturaValutazione.tipoSceltaPertinenzaEsp}" unselectable="true">
+						                                            <f:selectItem itemLabel="Nessuna pertinenza" itemValue="L1" />
+						                                            <f:selectItem itemLabel="Bassa" itemValue="L2" />
+						                                            <f:selectItem itemLabel="Media" itemValue="L3" />
+						                                            <f:selectItem itemLabel="Alta" itemValue="L4" />
+					                                           </p:selectOneRadio>
+															</td>
+															<td>
+															<p:inputTextarea id="noteEsp" maxlength="2000" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+																   styleClass="form-control compact-textarea" autoResize="false" counter="noteEspCount"
+								 								   counterTemplate="{0} caratteri rimanenti"
+								 								   value="#{schedaValutazioneBean.acCandidaturaValutazione.note}"/>
+								 								   	<p:message id="noteEspMessage" for="noteEsp"></p:message>
+																	<h:outputText id="noteEspCount" />
+															</td>
+														</tr>
+														<tr>
+															<td>Titolo di studio</td>
+															<td>
+																<div>
+																	<h6>
+																		<ul>
+																			<ui:repeat
+																				value="#{schedaValutazioneBean.vaIstruzioneList}"
+																				var="istruzione">
+																				<li>#{istruzione.deTitolo.descrizione}</li>
+																			</ui:repeat>
+																		</ul>
+																	</h6>
+																</div>
+															</td>
+															<td>
+																<div>
+																	<h6>
+																		<ul>
+																			<ui:repeat value="#{schedaValutazioneBean.cvIstruzioniSelezionate}" var="istruzione">
+																				<li>#{istruzione.deTitolo.descrizione}</li>
+																			</ui:repeat>
+																		</ul>
+																	</h6>
+																</div>
+															</td>
+															<td>
+															 <p:selectOneRadio id="tipoSceltaPertinenzaTitoli" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+																value="#{schedaValutazioneBean.acCandidaturaValutazione.tipoSceltaPertinenzaTitoli}" unselectable="true">
+						                                            <f:selectItem itemLabel="Nessuna pertinenza" itemValue="L1" />
+						                                            <f:selectItem itemLabel="Bassa" itemValue="L2" />
+						                                            <f:selectItem itemLabel="Media" itemValue="L3" />
+						                                            <f:selectItem itemLabel="Alta" itemValue="L4" />
+					                                           </p:selectOneRadio></td>
+															<td><p:inputTextarea id="noteIstr" maxlength="2000" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+																	styleClass="form-control compact-textarea"
+																	autoResize="false" counter="noteIstrCount"
+																	counterTemplate="{0} caratteri rimanenti"
+																	value="#{schedaValutazioneBean.acCandidaturaValutazione.notePertinenzaTitoli}" />
+																<p:message id="noteIstrMessage" for="noteIstr"></p:message>
+																<h:outputText id="noteIstrCount" />
+															</td>
+														</tr>
+	<tr>
+															<td>Altri Titoli</td>
+															<td>
+																<div>
+																	<h6>
+																		<ui:fragment rendered="#{not empty schedaValutazioneBean.vaPubblicazione and not empty schedaValutazioneBean.vaPubblicazione.formazione}">
+																		    Formazione:<br />
+																		  #{schedaValutazioneBean.vaPubblicazione.formazione}<br />
+																		</ui:fragment>
+																		<ui:fragment rendered="#{not empty schedaValutazioneBean.vaAlboSelezionate}">
+																		  <span>Albi:</span>
+																		  <ul>
+																			<ui:repeat
+																				value="#{schedaValutazioneBean.vaAlboSelezionate}"
+																				var="albo">
+																				<li>#{albo.deAlboSil.descrizione}</li>
+																			</ui:repeat>																		
+																		  </ul>
+																		</ui:fragment>
+																		<ui:fragment rendered="#{not empty schedaValutazioneBean.vaPatenteSelezionate}">
+																		  <span>Patenti:</span>
+																		  <ul>
+																			<ui:repeat
+																				value="#{schedaValutazioneBean.vaPatenteSelezionate}"
+																				var="patente">
+																				<li>#{patente.dePatenteSil.descrizione}</li>
+																			</ui:repeat>																		
+																		  </ul>
+																		</ui:fragment>
+																		<ui:fragment rendered="#{not empty schedaValutazioneBean.vaPatentinoSelezionate}">
+																		  <span>Patentini:</span>
+																		  <ul>
+																			<ui:repeat
+																				value="#{schedaValutazioneBean.vaPatentinoSelezionate}"
+																				var="patentino">
+																				<li>#{patentino.dePatentinoSil.descrizione}</li>
+																			</ui:repeat>																		
+																		  </ul>
+																		</ui:fragment>
+																	</h6>
+																</div>
+															</td>
+															<td>
+																<div>
+																	<h6>
+																	    <ui:fragment rendered="#{not empty schedaValutazioneBean.cvFormazioniSelezionate}">
+																		  <span>Formazioni:</span>
+																		  <ul>
+																			<ui:repeat
+																				value="#{schedaValutazioneBean.cvFormazioniSelezionate}"
+																				var="formazione">
+																				<li>#{formazione.titoloCorso}</li>
+																			</ui:repeat>																		
+																		  </ul>
+																		</ui:fragment>
+
+																		<ui:fragment rendered="#{not empty schedaValutazioneBean.cvAlboSelezionate}">
+																		  <span>Albi:</span>
+																		  <ul>
+																			<ui:repeat
+																				value="#{schedaValutazioneBean.cvAlboSelezionate}"
+																				var="cvalbo">
+																				<li>#{cvalbo.deAlboSil.descrizione}</li>
+																			</ui:repeat>																		
+																		  </ul>
+																		</ui:fragment>
+																		<ui:fragment rendered="#{not empty schedaValutazioneBean.cvPatenteSelezionate}">
+																		  <span>Patenti:</span>
+																		  <ul>
+																			<ui:repeat
+																				value="#{schedaValutazioneBean.cvPatenteSelezionate}"
+																				var="cvpatente">
+																				<li>#{cvpatente.dePatenteSil.descrizione}</li>
+																			</ui:repeat>																		
+																		  </ul>
+																		</ui:fragment>
+																		<ui:fragment rendered="#{not empty schedaValutazioneBean.cvPatentinoSelezionate}">
+																		  <span>Patentini:</span>
+																		  <ul>
+																			<ui:repeat
+																				value="#{schedaValutazioneBean.cvPatentinoSelezionate}"
+																				var="cvpatentino">
+																				<li>#{cvpatentino.dePatentinoSil.descrizione}</li>
+																			</ui:repeat>																		
+																		  </ul>
+																		</ui:fragment>
+																	</h6>
+																</div>
+															</td>
+															<td>
+															 <p:selectOneRadio id="tipoSceltaPertinenzaAltriTitoli" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+																value="#{schedaValutazioneBean.acCandidaturaValutazione.tipoSceltaPertinenzaAltriTitoli}" unselectable="true">
+						                                            <f:selectItem itemLabel="Nessuna pertinenza" itemValue="L1" />
+						                                            <f:selectItem itemLabel="Bassa" itemValue="L2" />
+						                                            <f:selectItem itemLabel="Media" itemValue="L3" />
+						                                            <f:selectItem itemLabel="Alta" itemValue="L4" />
+					                                           </p:selectOneRadio></td>
+															<td>
+															    <p:inputTextarea id="noteAltriTitoli" maxlength="2000" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+																	styleClass="form-control compact-textarea"
+																	autoResize="false" counter="noteAltriTitoliCount"
+																	counterTemplate="{0} caratteri rimanenti"
+																	value="#{schedaValutazioneBean.acCandidaturaValutazione.noteAltriTitoli}" />
+																<p:message id="noteAltriTitoliMessage" for="noteAltriTitoli"></p:message>
+																<h:outputText id="noteAltriTitoliCount" />															
+															</td>
+														</tr>														
+														<tr>
+															<td>Competenze</td>
+															<td>
+															<div>
+																	<h6>
+																		<ui:fragment rendered="#{not empty schedaValutazioneBean.vaInformatica.conoscenzaInfo}">
+																		#{schedaValutazioneBean.vaInformatica.conoscenzaInfo}<br />
+																		</ui:fragment>
+																	</h6>
+																</div>
+															</td>
+															<td>
+																<div>
+																	<h6>
+																		<ui:fragment rendered="#{not empty schedaValutazioneBean.cvInformatica.descrizione}">
+																		#{schedaValutazioneBean.cvInformatica.descrizione}<br />
+																		</ui:fragment>
+																		<ui:fragment rendered="#{not empty schedaValutazioneBean.cvInformatica.certificazione}">
+																		#{schedaValutazioneBean.cvInformatica.certificazione}				
+																		</ui:fragment>
+																	</h6>
+																</div>
+															</td>
+															<td>
+															 <p:selectOneRadio id="tipoSceltaPertinenzaCompetenze" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+																value="#{schedaValutazioneBean.acCandidaturaValutazione.tipoSceltaPertinenzaCompetenze}" unselectable="true">
+						                                            <f:selectItem itemLabel="Nessuna pertinenza" itemValue="L1" />
+						                                            <f:selectItem itemLabel="Bassa" itemValue="L2" />
+						                                            <f:selectItem itemLabel="Media" itemValue="L3" />
+						                                            <f:selectItem itemLabel="Alta" itemValue="L4" />
+					                                           </p:selectOneRadio></td>
+															<td><p:inputTextarea id="noteCompet" maxlength="2000" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+																	styleClass="form-control compact-textarea"
+																	autoResize="false" counter="noteCompetCount"
+																	counterTemplate="{0} caratteri rimanenti"
+																	value="#{schedaValutazioneBean.acCandidaturaValutazione.notePertinenzaCompetenze}" />
+																<p:message id="noteCompetMessage" for="noteCompet"></p:message>
+																<h:outputText id="noteCompetCount" />
+															</td>
+														</tr>
+														<tr>
+															<td>Altre condizioni</td>
+															<td>
+															<div>
+																	<h6>
+																		<ui:fragment rendered="#{not empty schedaValutazioneBean.vaAltreInfo.ulterioriRequisiti}">
+																		#{schedaValutazioneBean.vaAltreInfo.ulterioriRequisiti}
+																		</ui:fragment>
+																	</h6>
+																</div></td>
+															<td>
+																<div>
+																	<h6>
+																		<ui:fragment rendered="#{not empty schedaValutazioneBean.cvAltreInfo.ulterioriInfo}">
+																		#{schedaValutazioneBean.cvAltreInfo.ulterioriInfo}
+																		</ui:fragment>
+																	</h6>
+																</div>
+															</td>
+															<td> <p:selectOneRadio id="tipoSceltaAltreCondizioni" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+																value="#{schedaValutazioneBean.acCandidaturaValutazione.tipoSceltaAltreCondizioni}" unselectable="true">
+						                                            <f:selectItem itemLabel="Nessuna pertinenza" itemValue="L1" />
+						                                            <f:selectItem itemLabel="Bassa" itemValue="L2" />
+						                                            <f:selectItem itemLabel="Media" itemValue="L3" />
+						                                            <f:selectItem itemLabel="Alta" itemValue="L4" />
+					                                           </p:selectOneRadio></td>
+															<td><p:inputTextarea id="noteCond" maxlength="2000" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+																	styleClass="form-control compact-textarea"
+																	autoResize="false" counter="noteCondCount"
+																	counterTemplate="{0} caratteri rimanenti"
+																	value="#{schedaValutazioneBean.acCandidaturaValutazione.noteAltreCondizioni}" />
+																<p:message id="noteCondMessage" for="noteCond"></p:message>
+																<h:outputText id="noteCondCount" />
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+									<div class="panel panel-default">
+										<div class="panel-heading text-center">ULTERIORI ELEMENTI RITENUTI SIGNIFICATIVI <br /> <h8>(inserire quegli eventuali ulteriori aspetti che unitamente agli item specifici considerati supportano la valutazione della candidatura)</h8></div>
+										<div class="panel-body">
+											<p:inputTextarea id="ulterioriElementi" maxlength="2000" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+												styleClass="form-control compact-textarea"
+												autoResize="false" counter="ulterioriElementiCount"
+												counterTemplate="{0} caratteri rimanenti"
+												value="#{schedaValutazioneBean.acCandidaturaValutazione.ulterioriElementi}" />
+											<p:message id="ulterioriElementiMessage" for="ulterioriElementi"></p:message>
+											<h:outputText id="ulterioriElementiCount" />
+										</div>
+									</div>
+									<div class="panel panel-default">
+										<div class="panel-heading text-center">Valutazione complessiva candidatura</div>
+										<div class="panel-body text-center">
+											<p:selectOneRadio id="tipoValutazioneComplessiva" styleClass="panelCenter" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+												value="#{schedaValutazioneBean.acCandidaturaValutazione.tipoValutazioneComplessiva}"
+												unselectable="true">
+												<f:selectItem itemLabel="Non idoneo" itemValue="L0" />
+												<f:selectItem itemLabel="1" itemValue="L1" />
+												<f:selectItem itemLabel="2" itemValue="L2" />
+												<f:selectItem itemLabel="3" itemValue="L3" />
+												<f:selectItem itemLabel="4" itemValue="L4" />
+											</p:selectOneRadio>
+										</div>
+									</div>									
+									<div>
+											<h5>Operatore che ha effettuato la valutazione : #{schedaValutazioneBean.pfPrincipalAzienda.cognome} #{schedaValutazioneBean.pfPrincipalAzienda.nome} </h5>
+									</div>
+									 <div>
+											<h5>Data completamento valutazione : 
+											 	<h:outputFormat value="#{schedaValutazioneBean.acCandidaturaValutazione.dtmMod}">
+														<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+												</h:outputFormat>											
+											 </h5>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					    <div class="row">
+							<div class="col-md-12">
+							<div class="col-md-6 text-right">
+							<p:commandLink id="annullaBtn" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+								styleClass="btn btn-primary btn-search"
+								action="#"
+								onclick="$('#schedaValutazione-modal').modal('hide')"
+								global="false">
+								<p:ajax update=":schedaValutaForm:schedaValutaGroup" 
+									listener="#{schedaValutazioneBean.cancelEdit()}"
+									resetValues="true" />
+								Annulla</p:commandLink>
+								</div>
+							<div class="col-md-6">
+							<p:commandLink id="salva" actionListener="#{schedaValutazioneBean.sync}" update="@(.ui-message) :schedaValutaForm:schedaValutaGroup"
+								styleClass="btn btn-primary btn-search" onclick="buttonToDisable = MyPortal.enableLoadingButton(this)" disabled="#{!schedaValutazioneBean.checkModifiyAssegnaValutazioneSchedaVal()}"
+								oncomplete="MyPortal.disableLoadingButton(this); MyPortal.CurriculumView.schedaValutaOnComplete(args);"
+								title="Salva">
+                                Salva
+                            </p:commandLink>
+                             </div>
+						</div>
+					  </div>
+					</h:panelGroup>
+				</h:form>
+			</div>
+		</div>
+	</div>
+</ui:composition>

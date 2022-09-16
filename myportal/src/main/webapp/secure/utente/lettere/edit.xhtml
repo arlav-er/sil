@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/main.xhtml">
+
+	<ui:param name="bean" value="#{letteraAccompagnamentoBean}" />
+
+	<ui:define name="title">
+	
+	
+		<h:outputText value="#{msg['cittadino.lettere.edita.titolo']} "
+			escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+	 	<h:outputText value="#{msg['cittadino.lettere.edita.descrizione']}"
+			escape="false" />
+		<h:form id="lettera" styleClass="fix_margin">
+			<h:panelGrid columns="1" cellspacing="10">
+				<script type="text/javascript">
+				if (window.tinyMCE) window.tinyMCE = undefined;
+				if (window.tinymce) window.tinymce = undefined;
+				</script>
+				<script type="text/javascript"
+					src="${request.contextPath}/resources/js/tinymce/jscripts/tiny_mce/tiny_mce.js" />
+
+				<cc:inputText id="nome" label="Nome lettera"
+					value="#{bean.data.nome}" required="true"
+					requiredMessage="La descrizione è obbligatoria">
+				</cc:inputText>
+
+				<cc:inputTextarea id="breve_presentazione" label="Presentazione"
+					required="true" value="#{bean.data.brevePresentazione}"
+					requiredMessage="La Presentazione è obbligatoria" maxlength="2000"
+					style="width: 100%;">
+				</cc:inputTextarea>
+				<cc:infoSectionPanel target_id="breve_presentazione_info_panel"
+					message="#{bean.brevePresentazioneInfo.testo}" />
+				<div id="breve_presentazione_info_panel" class="helpPanelMessage" />
+
+				<cc:inputTextarea id="motivazione_obiettivi"
+					label="Motivazioni e obiettivi"
+					value="#{bean.data.motivazObiettivi}"
+					requiredMessage="Motivazioni e obiettivi sono obbligatori"
+					maxlength="2000" style="width: 100%;">
+				</cc:inputTextarea>
+				<cc:infoSectionPanel target_id="motivazioni_benefici_info_panel"
+					message="#{bean.motivazioniObiettiviInfo.testo}" />
+				<div id="motivazioni_benefici_info_panel" class="helpPanelMessage" />
+
+				<cc:inputTextarea id="benefici" label="Benefici"
+					value="#{bean.data.benefici}" maxlength="2000" style="width: 100%;">
+				</cc:inputTextarea>
+				<cc:infoSectionPanel target_id="benefici_info_panel"
+					message="#{bean.beneficiInfo.testo}" />
+				<div id="benefici_info_panel" class="helpPanelMessage" />
+
+				<cc:inputTextarea id="punti_forza_qualita" label="Punti di forza"
+					value="#{bean.data.puntiForzaQualita}" maxlength="2000"
+					style="width: 100%;">
+				</cc:inputTextarea>
+				<cc:infoSectionPanel target_id="punti_forza_info_panel"
+					message="#{bean.puntiForzaInfo.testo}" />
+				<div id="punti_forza_info_panel" class="helpPanelMessage" />
+
+				<cc:inputTextarea id="saluti" label="Saluti"
+					value="#{bean.data.saluti}" maxlength="1000" style="width: 100%;">
+				</cc:inputTextarea>
+				<cc:infoSectionPanel target_id="saluti_info_panel"
+					message="#{bean.salutiInfo.testo}" />
+				<div id="saluti_info_panel" class="helpPanelMessage" />
+			</h:panelGrid>
+			<br />
+
+			<h:commandLink styleClass="buttonStyle marginButton saveButton"
+				action="#{bean.save}" value="Salva e procedi" id="currentButton"
+				rendered="#{not bean.saved}">
+				<f:ajax execute="@form" render="@form"></f:ajax>
+			</h:commandLink>
+
+			<h:commandLink action="#{bean.update}" onclick="saveEditors()"
+				value="Modifica" id="updateButton" rendered="#{bean.saved}"
+				styleClass="buttonStyle updateButton">
+				<f:ajax execute="@form" render="@form lettera_messages"></f:ajax>
+			</h:commandLink>
+
+			<cc:messages id="lettera_messages" />
+
+			<script type="text/javascript">
+				function saveEditors() {
+					var editors = $('[id$=\\:inputTextarea]').cleditor();
+
+						jQuery.each(editors, function() {
+							this.updateTextArea();
+						});
+				}
+					 
+				$(function() {									
+					disegnaBottoni();
+				});
+			</script>
+		</h:form>
+
+		<br />
+		<br />
+		<cc:btnBack backTo="#{bean.backTo}" />
+	</ui:define>
+
+</ui:composition>

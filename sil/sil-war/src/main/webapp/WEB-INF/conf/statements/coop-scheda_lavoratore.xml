@@ -1,0 +1,1357 @@
+<STATEMENT  name="COOP_GET_AN_LAVORATORE_RECAPITI"
+        query="
+SELECT /*an.cdnlavoratore cdnlavoratore,*/ an.strindirizzorec, an.strlocalitarec, an.strcaprec,
+       an.codcomrec, com.strdenominazione AS strcomrec, RTRIM (p.stristat) AS provrec       
+  FROM an_lavoratore an, de_comune com, de_provincia p
+ WHERE an.cdnlavoratore = ?
+   AND an.codcomrec = com.codcom(+)
+   AND com.codprovincia = p.codprovincia(+)
+   AND (   an.strindirizzorec IS NOT NULL
+        OR an.codcomrec IS NOT NULL
+        OR an.strlocalitarec IS NOT NULL
+        OR an.strcaprec IS NOT NULL
+       ) 
+"/>
+
+<STATEMENT name="COOP_INSERT_FOR_PRO" query="
+    INSERT INTO PR_CORSO (
+       PRGCORSO, CDNLAVORATORE, CODCORSO, 
+       STRDESCRIZIONE, STRCONTENUTO, STRENTE, 
+       CODCOMENTE, STRLOCALITAENTE, STRINDIRIZZOENTE, 
+       NUMANNO, NUMMESI, NUMORE, 
+       NUMORESPESE, FLGCOMPLETATO, STRMOTCESSAZIONE, 
+       CODTIPOCERTIFICATO, CDNAMBITODISCIPLINARE, FLGSTAGE, 
+       NUMORESTAGE, STRAZIENDA, CODCOMAZIENDA, 
+       STRLOCALITAAZIENDA, STRINDIRIZZOAZIENDA,
+       CDNUTINS, DTMINS, CDNUTMOD, 
+       DTMMOD) 
+    VALUES ( S_PR_CORSO.nextval, ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
+        ?, ?,
+        ?, SYSDATE, ?, 
+        SYSDATE)
+  "/>
+
+<STATEMENT name="COOP_LOAD_FOR_PRO" query="
+SELECT prgcorso, /*cdnlavoratore,*/ c.codcorso, c.strdescrizione, strcontenuto, strente, codcomente,
+       strlocalitaente, strindirizzoente, c.numanno, nummesi, numore, numorespese, flgcompletato,
+       strmotcessazione, codtipocertificato, cdnambitodisciplinare, flgstage, numorestage,
+       strazienda, codcomazienda, strlocalitaazienda, strindirizzoazienda, 
+       dc.strdescrizione AS strdescdecod,
+       ce.strdenominazione AS strdesccomente, ca.strdenominazione AS strdesccomazienda,
+	   NVL (dc.strdescrizione, c.strdescrizione) AS strdecodcorso
+  FROM pr_corso c, de_corso dc, de_comune ce, de_comune ca
+ WHERE c.codcorso = dc.codcorso(+) AND c.codcomente = ce.codcom(+) AND c.codcomazienda = ca.codcom(+)
+       AND cdnlavoratore = ?
+ORDER BY strdescrizione	       
+"/>
+
+
+ <STATEMENT name="COOP_SELECT_LOCAL_PRGMANSIONE" query="
+ 	SELECT PRGMANSIONE FROM PR_MANSIONE WHERE CODMANSIONE = ? AND CDNLAVORATORE = ?
+ "/>
+ 
+ <STATEMENT name="COOP_INSERT_CONTRATTO_IN_MANSIONE" query="
+    INSERT INTO PR_DIS_CONTRATTO (
+      PRGDISCONTRATTO,
+      PRGMANSIONE,
+      CODCONTRATTO,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_CONTRATTO.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>  
+    
+ <STATEMENT name="COOP_LOAD_CONTRATTI_MANSIONI" query="
+    SELECT
+      /*MAN.PRGMANSIONE     AS PRGMANSIONE,*/
+      MAN.CODMANSIONE     AS CODMANSIONE,
+      DM.STRDESCRIZIONE   AS DESC_MANSIONE,
+      DC.CODCONTRATTO     AS CODCONTRATTO,
+      DC.STRDESCRIZIONE   AS DESC_CONTRATTO
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_CONTRATTO PDC JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = PDC.CDNUTINS),
+      DE_MANSIONE DM,
+      DE_CONTRATTO DC	  
+    WHERE 
+      MAN.CDNLAVORATORE      = ?
+      AND MAN.FLGDISPONIBILE IN ('S','P')
+      AND MAN.PRGMANSIONE    = PDC.PRGMANSIONE
+      AND DM.CODMANSIONE     = MAN.CODMANSIONE
+      AND DC.CODCONTRATTO    = PDC.CODCONTRATTO
+      AND DC.FLGDISPONIBILITA = 'S'	  	        
+    ORDER BY
+      DM.STRDESCRIZIONE,
+      DC.STRDESCRIZIONE
+    "/>
+ 
+  <STATEMENT name="COOP_INSERT_ORARIO_IN_MANSIONE" query="
+    INSERT INTO PR_DIS_ORARIO (
+      PRGDISORARIO,
+      PRGMANSIONE,
+      CODORARIO,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_ORARIO.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+
+  <STATEMENT name="COOP_LOAD_ORARI_MANSIONI" query="
+    SELECT
+      /*MAN.PRGMANSIONE   AS PRGMANSIONE,*/
+      MAN.CODMANSIONE   AS CODMANSIONE,
+      DM.STRDESCRIZIONE AS DESC_MANSIONE,
+      DO.CODORARIO      AS CODORARIO,
+      DO.STRDESCRIZIONE AS DESC_ORARIO
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_ORARIO PDO JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = PDO.CDNUTINS),
+      DE_MANSIONE DM,
+      DE_ORARIO DO	  
+    WHERE 
+      MAN.CDNLAVORATORE      = ?
+      AND MAN.FLGDISPONIBILE IN ('S','P')
+      AND MAN.PRGMANSIONE    = PDO.PRGMANSIONE
+      AND DM.CODMANSIONE     = MAN.CODMANSIONE
+      AND DO.CODORARIO       = PDO.CODORARIO	  
+    ORDER BY
+      DM.STRDESCRIZIONE,
+      DO.STRDESCRIZIONE
+    "/>
+    
+  <STATEMENT name="COOP_INSERT_TURNO_IN_MANSIONE" query="
+    INSERT INTO PR_DIS_TURNO (
+      PRGDISTURNO,
+      PRGMANSIONE,
+      CODTURNO,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_TURNO.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+
+   <STATEMENT name="COOP_LOAD_TURNI_MANSIONI" query="
+    SELECT
+      /*MAN.PRGMANSIONE   AS PRGMANSIONE,*/
+      DM.CODMANSIONE    AS CODMANSIONE,
+      DT.CODTURNO       AS CODTURNO,
+      DM.STRDESCRIZIONE AS DESC_MANSIONE,
+      DT.STRDESCRIZIONE AS DESC_TURNO
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_TURNO PDT JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = PDT.CDNUTINS),
+      DE_MANSIONE DM,
+      DE_TURNO DT	  
+    WHERE 
+      MAN.CDNLAVORATORE      = ?
+      AND MAN.FLGDISPONIBILE IN ('S','P')
+      AND MAN.PRGMANSIONE    = PDT.PRGMANSIONE
+      AND DM.CODMANSIONE     = MAN.CODMANSIONE
+      AND DT.CODTURNO        = PDT.CODTURNO          
+    ORDER BY
+      DM.STRDESCRIZIONE,
+      DT.STRDESCRIZIONE
+    "/>
+  <STATEMENT name="COOP_INSERT_TERRITORIO_COMUNE" query="
+    INSERT INTO PR_DIS_COMUNE (
+      PRGDISCOMUNE,
+      PRGMANSIONE,
+      CODCOM,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_COMUNE.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+    
+  <STATEMENT name="COOP_INSERT_TERRITORIO_PROVINCIA" query="
+    INSERT INTO PR_DIS_PROVINCIA (
+      PRGDISPROVINCIA,
+      PRGMANSIONE,
+      CODPROVINCIA,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_PROVINCIA.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+    
+  <STATEMENT name="COOP_INSERT_TERRITORIO_REGIONE" query="
+    INSERT INTO PR_DIS_REGIONE (
+      PRGDISREGIONE,
+      PRGMANSIONE,
+      CODREGIONE,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_REGIONE.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+    
+  <STATEMENT name="COOP_INSERT_TERRITORIO_STATO" query="
+    INSERT INTO PR_DIS_STATO (
+      PRGDISSTATO,
+      PRGMANSIONE,
+      CODCOM,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_STATO.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+  <!-- questa query non viene usata: cancellare  
+   <STATEMENT name="COOP_LOAD_MANSIONI_DISPO_LAV" query="
+    SELECT 
+      MAN.PRGMANSIONE AS PRGMANSIONE,
+      DM.CODMANSIONE AS CODMANSIONE,
+      DECODE( 
+        GREATEST(LENGTH(DM.STRDESCRIZIONE),45), 
+          45, 
+          DM.STRDESCRIZIONE, 
+          SUBSTR(DM.STRDESCRIZIONE, 1, 45) || '...'
+      ) AS DESC_MANSIONE,
+      MAN.FLGESPERIENZA AS ESPERIENZA,
+      MAN.FLGDISPONIBILE AS DISPONIBILE,
+      MAN.FLGDISPFORMAZIONE AS DISP_FORMAZIONE,
+      MAN.FLGESPFORM AS ESPERIENZA_FORMATIVA,
+      MAN.FLGPIP AS DISPO_PIANI_INS_PROF
+    FROM 
+      PR_MANSIONE MAN,  
+      DE_MANSIONE DM
+    WHERE 
+      MAN.CDNLAVORATORE = ?
+      AND FLGDISPONIBILE = 'S'
+      AND DM.CODMANSIONE(+) = MAN.CODMANSIONE
+    ORDER BY
+      DM.STRDESCRIZIONE
+    "/> 
+    -->
+   <STATEMENT name="COOP_LOAD_TERRITORIO_MANSIONE" query="
+  	SELECT 
+      DE_MAN.STRDESCRIZIONE AS DESCRIZIONE, 
+      PG_UTILS.CONCATENA_COMUNI (MAN.PRGMANSIONE, DE_MAN.STRDESCRIZIONE) AS COMUNI , 
+      PG_UTILS.CONCATENA_REGIONI (MAN.PRGMANSIONE, DE_MAN.STRDESCRIZIONE) AS REGIONI,  
+      PG_UTILS.CONCATENA_PROVINCE (MAN.PRGMANSIONE, DE_MAN.STRDESCRIZIONE) AS PROVINCE,
+      PG_UTILS.CONCATENA_STATI (MAN.PRGMANSIONE, DE_MAN.STRDESCRIZIONE) AS STATI
+  	FROM 
+      PR_MANSIONE MAN, DE_MANSIONE DE_MAN
+  	WHERE 
+      MAN.CODMANSIONE = DE_MAN.CODMANSIONE AND
+      MAN.CDNLAVORATORE = ? AND
+      MAN.FLGDISPONIBILE IN ('S','P') 
+      ORDER BY DESCRIZIONE
+  	"/>
+  	
+  <STATEMENT name="COOP_GET_MANSIONI_LAV" query="
+  SELECT 
+      DE_MAN.STRDESCRIZIONE AS DESCRIZIONE, MAN.PRGMANSIONE,MAN.CODMANSIONE
+  FROM 
+      PR_MANSIONE MAN, DE_MANSIONE DE_MAN
+  WHERE 
+      MAN.CODMANSIONE = DE_MAN.CODMANSIONE 
+  	  AND MAN.FLGDISPONIBILE IN ('S','P') 
+      AND MAN.CDNLAVORATORE = ? 
+	    ORDER BY DESCRIZIONE"
+  />
+
+  <STATEMENT name="COOP_GET_COMUNI_MANSIONE"
+		query="SELECT
+					/*COM.PRGDISCOMUNE,*/
+					COM.CODCOM AS CODCOMUNE,
+					DE_COM.STRDENOMINAZIONE ||' (' || TRIM(DE_PROV.STRISTAT) || ')' AS STRDENOMINAZIONE
+				FROM PR_DIS_COMUNE COM,
+					DE_COMUNE DE_COM, DE_PROVINCIA DE_PROV
+				WHERE COM.CODCOM = DE_COM.CODCOM
+				AND   DE_COM.CODPROVINCIA = DE_PROV.CODPROVINCIA 
+				AND   COM.PRGMANSIONE = ?
+				ORDER BY STRDENOMINAZIONE
+	"/>
+
+  <STATEMENT name="COOP_GET_PROVINCE_MANSIONE"
+		query="SELECT
+					/*PRO.PRGDISPROVINCIA,*/
+					PRO.CODPROVINCIA,
+					DE_PRO.STRDENOMINAZIONE
+				FROM PR_DIS_PROVINCIA PRO,
+					DE_PROVINCIA DE_PRO
+				WHERE PRO.CODPROVINCIA = DE_PRO.CODPROVINCIA
+				AND   PRO.PRGMANSIONE = ?
+				ORDER BY STRDENOMINAZIONE
+	"/>
+
+  <STATEMENT name="COOP_GET_REGIONI_MANSIONE"
+		query="SELECT
+					/*REG.PRGDISREGIONE,*/
+					REG.CODREGIONE,
+					DE_REG.STRDENOMINAZIONE
+				FROM PR_DIS_REGIONE REG,
+					DE_REGIONE DE_REG
+				WHERE REG.CODREGIONE = DE_REG.CODREGIONE
+				AND   REG.PRGMANSIONE = ?
+				ORDER BY STRDENOMINAZIONE
+	"/>
+
+  <STATEMENT name="COOP_GET_STATI_MANSIONE"
+  		query="SELECT
+  					/*STA.PRGDISSTATO,*/
+  					STA.CODCOM AS CODSTATO,
+  					DE_STA.STRDENOMINAZIONE
+  				FROM PR_DIS_STATO STA,
+  					DE_COMUNE DE_STA
+  				WHERE STA.CODCOM = DE_STA.CODCOM
+  				AND   STA.PRGMANSIONE = ?
+  				ORDER BY STRDENOMINAZIONE
+  "/>
+  
+ <STATEMENT name="COOP_INS_MOBGEO_MANSIONE"
+             query="insert into pr_mobil_geogr
+                    (PRGMANSIONE, FLGDISPAUTO, FLGDISPMOTO, FLGMEZZIPUB, FLGPENDOLARISMO, FLGMOBSETT, 
+                    NUMOREPERC, CODTRASFERTA, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)
+                    values
+                    (?,?,?,?,?,
+                    ?,?,?,?,sysdate,?,sysdate)
+  "/>
+
+  <STATEMENT name="COOP_LOAD_MOBGEO_MANSIONI"
+             query="select 
+                       /*pr_mobil_geogr.PRGMANSIONE,*/
+                       de_mansione.STRDESCRIZIONE,
+                       pr_mansione.CODMANSIONE,
+                       pr_mobil_geogr.FLGDISPAUTO,
+                       pr_mobil_geogr.FLGDISPMOTO,
+                       pr_mobil_geogr.FLGMEZZIPUB,
+                       pr_mobil_geogr.FLGPENDOLARISMO,
+                       pr_mobil_geogr.FLGMOBSETT,
+                       pr_mobil_geogr.NUMOREPERC,                       
+                       pr_mobil_geogr.CODTRASFERTA,
+                       de_trasferta.STRDESCRIZIONE as trasferta
+                    from 
+                       pr_mobil_geogr
+                       inner join pr_mansione on (pr_mobil_geogr.PRGMANSIONE = pr_mansione.PRGMANSIONE)
+                       inner join de_mansione on (pr_mansione.CODMANSIONE = de_mansione.CODMANSIONE)
+                       left join de_trasferta on (pr_mobil_geogr.CODTRASFERTA = de_trasferta.CODTRASFERTA)
+                    where
+                       pr_mansione.CDNLAVORATORE = ?
+                       and pr_mansione.FLGDISPONIBILE IN ('S','P') 
+                    order by
+                      de_mansione.STRDESCRIZIONE
+  "/>
+ 
+ <!-- TODO Savino 10/10/2006:  Query COOP_GET_AN_LAVORATORE_ANAG corretta e riveduta. Potrebbe sostituire le altre due query indirizzi e recapiti
+ 
+ SELECT  
+//	cancellare CDNLAVORATORE, 
+	STRCODICEFISCALE, 
+	STRCOGNOME, 
+	STRNOME, 
+	STRSESSO, 
+	TO_CHAR(AN.DATNASC, 'DD/MM/YYYY') DATNASC,          
+	CODCOMNAS, 
+	AN.CODCITTADINANZA, 
+	AN.CODCITTADINANZA2, 
+	CODSTATOCIVILE, 
+	FLGMILITE, 
+	CODCOMRES,  /* indirizzi */ 
+//  aggiungere descrizione comune residenza "STRCOMRES"
+    COM2.STRDENOMINAZIONE as STRCOMRES,
+//  aggiungere stristat provincia comune residenza "provRes"
+    rtrim(p2.strIstat) as provRes,
+//	NUMFIGLI,  sul db sono tutti null e nella jsp non viene usato!!!!               
+    STRINDIRIZZORES, 
+	STRLOCALITARES, 
+	STRCAPRES, 
+	CODCOMDOM,
+//  aggiungere descrizione comune domicilio "STRCOMDOM"
+	COM3.STRDENOMINAZIONE as STRCOMDOM, 
+//  aggiungere stristat provincia comune domicilio "provDom"
+    rtrim(p3.strIstat) as provDom,
+	STRINDIRIZZODOM, 
+	STRLOCALITADOM, 
+	STRCAPDOM,            
+	CODCOMREC,
+	// descrizione comune recapito "strcomrec"
+	COM4.STRDENOMINAZIONE as STRCOMREC, 
+	// stristat provincia comune recapito "provrec"
+	rtrim(p4.strIstat) as provrec,
+	STRINDIRIZZOREC, 
+	STRLOCALITAREC, 
+	STRCAPREC, 
+	// STRTELRES,  i recapiti non vengono mostrati: vanno posti a null?
+	// STRTELDOM, 
+	// STRTELALTRO, 
+	// STRCELL,            
+	// STREMAIL, 
+	// STRFAX, 
+//	cancellare STRNOTE,  
+	FLGCFOK,                      
+	COM1.STRDENOMINAZIONE || ' (' || rtrim(p.strIstat) || ') ' as STRCOMNAS,
+	CIT1.STRDESCRIZIONE STRCITTADINANZA, 
+	CIT1.STRNAZIONE STRNAZIONE, 
+	CIT2.STRDESCRIZIONE STRCITTADINANZA2, 
+	CIT2.STRNAZIONE STRNAZIONE2,
+//  aggiungere CODCPITIT 
+//  aggiungere CODMONOTIPOCPI
+//  aggiungereCODCPIORIG	
+    INF.CODCPITIT as CODCPITIT, 
+	INF.CODMONOTIPOCPI AS CODMONOTIPOCPI,
+    INF.CODCPIORIG AS CODCPIORIG,
+//  aggiungere descrizione cpi titolare  "STRDESCRIZIONE"
+    cpitit.STRDESCRIZIONE as STRDESCRIZIONE,
+//  aggiungere descrizione cpi origine "STRDESCRIZIONEORIG"
+    cpiorig.STRDESCRIZIONE as STRDESCRIZIONEORIG
+	from AN_LAVORATORE AN 
+	     INNER JOIN DE_COMUNE COM1        ON AN.CODCOMNAS=COM1.CODCOM
+         inner join de_provincia p        on com1.codprovincia=p.codprovincia 
+         INNER JOIN DE_CITTADINANZA CIT1  ON AN.CODCITTADINANZA=CIT1.CODCITTADINANZA
+         LEFT  JOIN DE_CITTADINANZA CIT2  ON AN.CODCITTADINANZA2=CIT2.CODCITTADINANZA
+		 INNER JOIN DE_COMUNE COM2        ON AN.CODCOMRES=COM2.CODCOM
+		 left  join de_provincia p2       on com2.codprovincia=p2.codprovincia
+		 inner JOIN DE_COMUNE COM3        ON AN.CODCOMDOM=COM3.CODCOM
+		 left join  de_provincia p3       on com3.codprovincia=p3.codprovincia
+		 left JOIN  DE_COMUNE COM4        ON AN.CODCOMDOM=COM4.CODCOM
+		 left join  de_provincia p4       on com3.codprovincia=p4.codprovincia   
+		 left join  AN_LAV_STORIA_INF INF ON ( AN.cdnLavoratore = INF.cdnLavoratore AND INF.datFine is null )
+		 left join  DE_CPI cpitit         ON cpitit.codcpi = INF.CODCPITIT 
+	     left join  DE_CPI cpiorig        ON cpiorig.codcpi = INF.CODCPIORIG
+ 
+  -->
+ 
+ 
+ 
+ 
+<STATEMENT
+        name="COOP_GET_AN_LAVORATORE_ANAG"
+        query="
+SELECT  
+	/*CDNLAVORATORE, */
+	STRCODICEFISCALE, 
+	STRCOGNOME, 
+	STRNOME, 
+	STRSESSO, 
+	TO_CHAR(AN.DATNASC, 'DD/MM/YYYY') DATNASC,          
+	CODCOMNAS, 
+	AN.CODCITTADINANZA, 
+	AN.CODCITTADINANZA2, 
+	CODSTATOCIVILE, 
+	FLGMILITE, 
+	CODCOMRES, 
+	/*NUMFIGLI,                 */
+	STRINDIRIZZORES, 
+	STRLOCALITARES, 
+	STRCAPRES, 
+	CODCOMDOM, 
+	STRINDIRIZZODOM, 
+	STRLOCALITADOM, 
+	STRCAPDOM,            
+	CODCOMREC,
+	STRINDIRIZZOREC, 
+	STRLOCALITAREC, 
+	STRCAPREC, 
+	STRTELRES, 
+	STRTELDOM, 
+	STRTELALTRO, 
+	STRCELL,            
+	STREMAIL, 
+	STRFAX, 
+	/*STRNOTE, */
+	FLGCFOK,                      
+	COM1.STRDENOMINAZIONE || ' (' || rtrim(p.strIstat) || ') ' as STRCOMNAS,
+	CIT1.STRDESCRIZIONE STRCITTADINANZA, 
+	CIT1.STRNAZIONE STRNAZIONE, 
+	CIT2.STRDESCRIZIONE STRCITTADINANZA2, 
+	CIT2.STRNAZIONE STRNAZIONE2
+FROM AN_LAVORATORE AN 
+   INNER JOIN DE_COMUNE COM1 ON AN.CODCOMNAS=COM1.CODCOM
+   inner join de_provincia p on com1.codprovincia=p.codprovincia 
+   INNER JOIN DE_CITTADINANZA CIT1 ON AN.CODCITTADINANZA=CIT1.CODCITTADINANZA
+   LEFT JOIN DE_CITTADINANZA CIT2 ON AN.CODCITTADINANZA2=CIT2.CODCITTADINANZA
+WHERE AN.cdnLavoratore = ? 
+"/>
+
+ 
+ <STATEMENT
+        name="COOP_GET_AN_LAVORATORE_INDIRIZZI"
+        query="SELECT /*AN.CDNLAVORATORE CDNLAVORATORE, */
+                 AN.CODCOMRES CODCOMRES, COM2.STRDENOMINAZIONE as STRCOMRES, rtrim(p2.strIstat) as provRes , STRINDIRIZZORES STRINDIRIZZORES, 
+                 AN.STRLOCALITARES STRLOCALITARES, AN.STRCAPRES STRCAPRES, 
+                 AN.CODCOMDOM CODCOMDOM, COM3.STRDENOMINAZIONE as STRCOMDOM, rtrim(p3.strIstat) as provDom,
+                 AN.STRINDIRIZZODOM STRINDIRIZZODOM, AN.STRLOCALITADOM STRLOCALITADOM, AN.STRCAPDOM STRCAPDOM,                 
+                 AN_SINF.CODCPITIT as CODCPITIT, AN_SINF.CODMONOTIPOCPI AS CODMONOTIPOCPI,
+				 AN_SINF.CODCPIORIG AS CODCPIORIG,
+                 DE.STRDESCRIZIONE as STRDESCRIZIONE,
+                 AN.STRTELRES STRTELRES, AN.STRTELDOM STRTELDOM, AN.STRTELALTRO STRTELALTRO, AN.STRCELL STRCELL, 
+                 AN.STREMAIL STREMAIL, AN.STRFAX STRFAX,
+				 DEORIG.STRDESCRIZIONE as STRDESCRIZIONEORIG /*, */
+				 /*AN_SINF.PRGLAVSTORIAINF*/
+				 /* AN.CDNUTINS CDNUTINS, 
+                 TO_CHAR(AN.DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS, 
+                 AN.CDNUTMOD, TO_CHAR(AN.DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD,  */
+               FROM                
+               AN_LAVORATORE AN 
+               LEFT JOIN DE_COMUNE COM2 ON AN.CODCOMRES=COM2.CODCOM
+               left join de_provincia p2 on com2.codprovincia=p2.codprovincia
+               LEFT JOIN DE_COMUNE COM3 ON AN.CODCOMDOM=COM3.CODCOM
+               left join de_provincia p3 on com3.codprovincia=p3.codprovincia
+               left join AN_LAV_STORIA_INF AN_SINF ON ( AN.cdnLavoratore = AN_SINF.cdnLavoratore AND AN_SINF.datFine is null )
+               left join DE_CPI DE ON ( DE.codcpi = AN_SINF.CODCPITIT )
+			   left join DE_CPI DEORIG ON ( DEORIG.codcpi = AN_SINF.CODCPIORIG )
+               WHERE AN.cdnLavoratore = ? "/>
+ 
+<STATEMENT
+        name="COOP_INSERT_PR_STUDIO"
+        query="INSERT INTO PR_STUDIO
+                  (prgstudio,
+                  cdnLavoratore,
+                  codTitolo,
+                  codTipoTitolo,
+                  strSpecifica,
+                  strIstScolastico,                  
+                  codCom,
+                  strLocalita,                  
+                  strIndirizzo,
+                  numAnno,
+                  strVoto,
+                  strEsimi,
+                  strTitTesi,
+                  strArgTesi,                  
+                  flgLode,
+                  codMonoStato,
+                  numAnniFreq,
+                  numAnniPrev,
+                  strMotAbbandono,
+                  numesami,                                                      
+                  flgPrincipale,
+                  codMonoStatoTit,
+                  cdnUtins, dtmins,
+                  cdnUtmod, dtmmod)
+                  VALUES 
+                  ( S_PR_STUDIO.nextval,
+                    ?, ?,
+                    substr(?,0,2)||'000000', ?, 
+                    ?,
+                    ?,
+                    ?, ?, ?, ?,
+                    ?,
+                    ?, ?, ?, ?, ?, ?, 
+                    ?, ?, ?, ?,
+                   ?, SYSDATE, 
+                   ?, SYSDATE 
+                   )
+ "/>
+
+ <STATEMENT
+        name="COOP_GET_LAVORATORE_TITOLI"
+        query="SELECT prs.prgstudio, /*prs.cdnLavoratore, */prs.codtitolo, /*prs.codtipotitolo, */
+                  prs.strspecifica, prs.stristscolastico, prs.codcom, prs.strlocalita,
+                  prs.strindirizzo, prs.numanno, prs.strvoto, prs.stresimi, prs.strtittesi,
+                  prs.strargtesi, prs.flglode, prs.codmonostato, prs.numannifreq, 
+                  prs.numanniprev, prs.strmotabbandono, /*prs.numesami, */prs.flgprincipale,
+                  prs.codmonostatotit,
+                  tit_it.STRDESCRIZIONE as descrizione_stato,
+                  tit_it.flgcompleto as flgcompletato,
+                  com.strdenominazione  as strcom, trim(p.strIstat) as provincia, 
+                  tit.strdescrizione as destitolo, 
+                  tit2.strdescrizione as destipotitolo, tit2.flgLaurea as flgLaurea 
+            FROM 
+              PR_STUDIO prs,
+              de_titolo tit,
+              de_titolo tit2,
+              de_titolo_italiano tit_it,
+              de_comune com,
+              de_provincia p
+            WHERE 
+              prs.cdnLavoratore=?
+              AND prs.codtitolo=tit.codtitolo
+              AND prs.codmonostato = tit_it.codmonostato 
+              AND prs.codtipotitolo=tit2.codtitolo
+              AND prs.codcom=com.codcom(+)
+              AND com.codprovincia=p.codprovincia(+)   
+               ORDER BY 
+             NVL (flgprincipale, ' ') DESC, NVL (prs.numanno, 0) DESC"
+/>
+<!--
+<STATEMENT
+    name="COOP_GET_TITOLO"
+    query="SELECT prs.prgstudio, prs.cdnLavoratore, prs.codtitolo, prs.codtipotitolo, 
+                  prs.strspecifica, prs.stristscolastico, prs.codcom, prs.strlocalita,
+                  prs.strindirizzo, prs.numanno, prs.strvoto, prs.stresimi, prs.strtittesi,
+                  prs.strargtesi, prs.flglode, prs.codmonostato, prs.numannifreq, 
+                  prs.numanniprev, prs.strmotabbandono, prs.numesami, prs.flgprincipale,
+                  prs.codmonostatotit,
+                  decode (prs.codMonoStato,'C','Completato','A','Abbandonato','I','In corso') as descrizione_stato,
+                  /*prs.cdnutins, TO_CHAR(prs.dtmins, 'DD/MM/YYYY hh24:mi') dtmins, prs.cdnutmod, 
+                  TO_CHAR(prs.dtmmod, 'DD/MM/YYYY hh24:mi') dtmmod, */
+                  com.strdenominazione  as strcom, trim(p.strIstat) as provincia, 
+                  tit.strdescrizione as destitolo, 
+                  tit2.strdescrizione as destipotitolo, tit2.flgLaurea as flgLaurea 
+            FROM 
+              PR_STUDIO prs,
+              de_titolo tit,
+              de_titolo tit2,
+              de_comune com,
+              de_provincia p
+            WHERE 
+              prgStudio=?
+              AND prs.codtitolo=tit.codtitolo
+              AND prs.codtipotitolo=tit2.codtitolo
+              AND prs.codcom=com.codcom(+)
+              AND com.codprovincia=p.codprovincia(+)"
+/>
+-->
+<STATEMENT
+        name="COOP_GET_ESP_LAVORO"
+        query="
+SELECT   el.prgesplavoro, /*el.prgmansione,*/ el.codcontratto, /*el.codccnl,*//* el.strriflegge,*/
+         el.strdesattivita, /*el.strlivello,*/ el.codarea, el.nummeseinizio, el.numannoinizio,
+         el.nummesefine, el.numannofine, el.nummesi, /*el.numore, el.numoresett, */ /*el.codorario,*/
+         el.strcodfiscaleazienda, el.strragsocialeazienda, el.strpartitaivaazienda,
+         el.codcomazienda, el.codateco, el.strindirizzoazienda, el.codnatgiuridica,
+         el.strtipoclienti, /*el.numstipendio,*/ el.flgcompletato, el.codmvcessazione,
+         el.strmotcessazione, el.codtipocertificato,
+         DECODE (GREATEST (LENGTH (att.strdescrizione), 45),
+                 45, att.strdescrizione,
+                  SUBSTR (att.strdescrizione, 1, 45) || '...'
+                ) AS strdesateco,
+         DECODE (GREATEST (LENGTH (att2.strdescrizione), 45),
+                 45, att2.strdescrizione,
+                  SUBSTR (att2.strdescrizione, 1, 45) || '...'
+                ) AS tipo_ateco,
+         /*c.flgautonomo,*/ /*de_ccnl.codpadre AS tipo_ccnl,*/ com.strdenominazione AS strcomazienda,
+         TRIM (p.stristat) AS provincia, pr_mansione.codmansione,
+         DECODE (GREATEST (LENGTH (de_mansione.strdescrizione), 45),
+                 45, de_mansione.strdescrizione,
+                  SUBSTR (de_mansione.strdescrizione, 1, 45) || '...'
+                ) AS descrizione_mansione,
+         c.strdescrizione AS descrizionecontratto,
+         de_mansione.strdescrizione AS descrizionemansione,
+         DECODE (el.nummeseinizio,
+                 NULL, TO_CHAR (el.numannoinizio),
+                     TO_CHAR (DECODE (el.nummeseinizio,
+                                      1, '0' || TO_CHAR (el.nummeseinizio),
+                                      2, '0' || TO_CHAR (el.nummeseinizio),
+                                      3, '0' || TO_CHAR (el.nummeseinizio),
+                                      4, '0' || TO_CHAR (el.nummeseinizio),
+                                      5, '0' || TO_CHAR (el.nummeseinizio),
+                                      6, '0' || TO_CHAR (el.nummeseinizio),
+                                      7, '0' || TO_CHAR (el.nummeseinizio),
+                                      8, '0' || TO_CHAR (el.nummeseinizio),
+                                      9, '0' || TO_CHAR (el.nummeseinizio),
+                                      TO_CHAR (el.nummeseinizio)
+                                     )
+                             )
+                  || '/'
+                  || TO_CHAR (el.numannoinizio)
+                ) AS annoinizio,
+         DECODE (el.nummesefine,
+                 NULL, TO_CHAR (el.numannofine),
+                     TO_CHAR (DECODE (el.nummesefine,
+                                      1, '0' || TO_CHAR (el.nummesefine),
+                                      2, '0' || TO_CHAR (el.nummesefine),
+                                      3, '0' || TO_CHAR (el.nummesefine),
+                                      4, '0' || TO_CHAR (el.nummesefine),
+                                      5, '0' || TO_CHAR (el.nummesefine),
+                                      6, '0' || TO_CHAR (el.nummesefine),
+                                      7, '0' || TO_CHAR (el.nummesefine),
+                                      8, '0' || TO_CHAR (el.nummesefine),
+                                      9, '0' || TO_CHAR (el.nummesefine),
+                                      TO_CHAR (el.nummesefine)
+                                     )
+                             )
+                  || '/'
+                  || TO_CHAR (el.numannofine)
+                ) AS annofine
+    FROM pr_esp_lavoro el,
+         de_comune com,
+         de_provincia p,
+         de_contratto_collettivo de_ccnl,
+         de_attivita att,
+         de_attivita att2,
+         de_contratto c,
+         pr_mansione,
+         de_mansione
+   WHERE el.codcomazienda = com.codcom(+)
+     AND com.codprovincia = p.codprovincia(+)
+     AND de_ccnl.codccnl(+) = el.codccnl
+     AND att.codateco(+) = el.codateco
+     AND att.codpadre = att2.codateco(+)
+     AND el.codcontratto = c.codcontratto(+)
+     AND pr_mansione.cdnlavoratore = ?
+     AND el.prgmansione = pr_mansione.prgmansione 
+     AND NVL(pr_mansione.flgdisponibile,'N') &lt;&gt; 'L'
+     AND pr_mansione.codmansione = de_mansione.codmansione
+     AND NVL(c.flgtirocini,'N') &lt;&gt; 'S'
+ORDER BY el.numannofine DESC, el.nummesefine DESC
+"/>
+
+  <STATEMENT name="COOP_LOAD_MANSIONI" query="
+	SELECT   dm.codmansione, 
+         p_dm.strdescrizione AS desc_tipomansione,
+         DECODE (GREATEST (LENGTH (dm.strdescrizione), 45),
+                 45, dm.strdescrizione,
+                 SUBSTR (dm.strdescrizione, 1, 45) || '...'
+                ) AS desc_mansione,
+         DECODE (man.flgesperienza,
+                 'E', 'ND',
+                 man.flgesperienza
+                ) AS esperienza,
+         decode(NVL(man.flgdisponibile,'N'), 'S', 'P', man.flgdisponibile) as flgdisponibile, 
+         man.flgdispformazione,
+         man.flgespform 
+    FROM pr_mansione man, de_mansione dm, de_mansione p_dm
+   WHERE man.cdnlavoratore = ?
+     AND dm.codmansione(+) = man.codmansione
+     AND p_dm.codmansione(+) = SUBSTR (man.codmansione, 0, 5) || '00' 
+     AND NVL(man.flgdisponibile,'N') &lt;&gt; 'L'
+	ORDER BY DECODE(flgdisponibile, 'P', 2, 'N', 1, '', 0) DESC,
+         NVL (flgdispformazione, 'N') DESC,
+         NVL (esperienza, 'N') DESC,
+         NVL (flgespform, 'N') DESC,
+         desc_mansione
+  "/>
+  
+  <STATEMENT name="COOP_INSERT_INDISP" query="
+    INSERT INTO PR_INDISPONIBILITA (
+       PRGINDISPONIBILITA, CDNLAVORATORE, STRRAGSOCIALEAZIENDA, 
+       CDNUTINS, DTMINS, 
+       CDNUTMOD, DTMMOD) 
+    VALUES (S_PR_INDISPONIBILITA.nextval, ?, ?,
+        ?, SYSDATE,
+        ?, SYSDATE)
+  "/>
+  <STATEMENT name="COOP_LOAD_INDISP" query="
+    SELECT 
+      STRRAGSOCIALEAZIENDA
+    FROM 
+      PR_INDISPONIBILITA
+    WHERE CDNLAVORATORE = ?
+    ORDER BY
+      STRRAGSOCIALEAZIENDA
+  "/> 
+
+<!--
+<STATEMENT
+        name="COOP_GET_TIPO_MOV_ESP"
+        query="SELECT DISTINCT AM_MOVIMENTO.CODMONOMOVDICH, prgesplavoro
+               FROM AM_MOVIMENTO INNER JOIN PR_ASS_ESP_MOVI
+               ON AM_MOVIMENTO.PRGMOVIMENTO = PR_ASS_ESP_MOVI.PRGMOVIMENTO
+               WHERE PR_ASS_ESP_MOVI.PRGESPLAVORO = ?" 
+/>
+-->
+
+<STATEMENT
+        name="COOP_ESPERIENZE_NON_LAVORATIVE"
+        query="
+SELECT el.prgesplavoro, /*el.prgmansione,*/ el.codcontratto, /*c.flgautonomo,*/ el.codateco,
+       DECODE (GREATEST (LENGTH (att.strdescrizione), 45),
+               45, att.strdescrizione,
+                SUBSTR (att.strdescrizione, 1, 45) || '...'
+              ) AS strdesateco,
+       DECODE (GREATEST (LENGTH (att2.strdescrizione), 45),
+               45, att2.strdescrizione,
+                SUBSTR (att2.strdescrizione, 1, 45) || '...'
+              ) AS tipo_ateco,
+       /*de_ccnl.codpadre AS tipo_ccnl, el.codccnl,*/ el.strriflegge, el.strdesattivita, el.strlivello,
+       el.codarea, el.nummeseinizio, el.numannoinizio, el.nummesefine, el.numannofine, el.nummesi,
+       el.numore, el.numoresett, el.codorario, el.strcodfiscaleazienda, el.strragsocialeazienda,
+       el.strpartitaivaazienda, el.codcomazienda, com.strdenominazione AS strcomazienda,
+       TRIM (p.stristat) AS provincia, el.strindirizzoazienda, el.codnatgiuridica,
+       el.strtipoclienti, el.numstipendio, el.flgcompletato, el.codmvcessazione,
+       el.strmotcessazione, el.codtipocertificato, pr_mansione.codmansione,
+       DECODE (GREATEST (LENGTH (de_mansione.strdescrizione), 45),
+               45, de_mansione.strdescrizione,
+                SUBSTR (de_mansione.strdescrizione, 1, 45) || '...'
+              ) AS descrizione_mansione,
+       c.strdescrizione AS descrizionecontratto, de_mansione.strdescrizione AS descrizionemansione,
+       DECODE (el.nummeseinizio,
+               NULL, TO_CHAR (el.numannoinizio),
+                   TO_CHAR (DECODE (el.nummeseinizio,
+                                    1, '0' || TO_CHAR (el.nummeseinizio),
+                                    2, '0' || TO_CHAR (el.nummeseinizio),
+                                    3, '0' || TO_CHAR (el.nummeseinizio),
+                                    4, '0' || TO_CHAR (el.nummeseinizio),
+                                    5, '0' || TO_CHAR (el.nummeseinizio),
+                                    6, '0' || TO_CHAR (el.nummeseinizio),
+                                    7, '0' || TO_CHAR (el.nummeseinizio),
+                                    8, '0' || TO_CHAR (el.nummeseinizio),
+                                    9, '0' || TO_CHAR (el.nummeseinizio),
+                                    TO_CHAR (el.nummeseinizio)
+                                   )
+                           )
+                || '/'
+                || TO_CHAR (el.numannoinizio)
+              ) AS annoinizio,
+       DECODE (el.nummesefine,
+               NULL, TO_CHAR (el.numannofine),
+                   TO_CHAR (DECODE (el.nummesefine,
+                                    1, '0' || TO_CHAR (el.nummesefine),
+                                    2, '0' || TO_CHAR (el.nummesefine),
+                                    3, '0' || TO_CHAR (el.nummesefine),
+                                    4, '0' || TO_CHAR (el.nummesefine),
+                                    5, '0' || TO_CHAR (el.nummesefine),
+                                    6, '0' || TO_CHAR (el.nummesefine),
+                                    7, '0' || TO_CHAR (el.nummesefine),
+                                    8, '0' || TO_CHAR (el.nummesefine),
+                                    9, '0' || TO_CHAR (el.nummesefine),
+                                    TO_CHAR (el.nummesefine)
+                                   )
+                           )
+                || '/'
+                || TO_CHAR (el.numannofine)
+              ) AS annofine /*,
+       el.cdnutins, TO_CHAR (el.dtmins, 'DD/MM/YYYY hh24:mi') dtmins, el.cdnutmod,
+       TO_CHAR (el.dtmmod, 'DD/MM/YYYY hh24:mi') dtmmod*/
+  FROM pr_esp_lavoro el,
+       de_comune com,
+       de_provincia p,
+       de_contratto_collettivo de_ccnl,
+       de_attivita att,
+       de_attivita att2,
+       de_contratto c,
+       pr_mansione,
+       de_mansione
+ WHERE el.codcomazienda = com.codcom(+)
+   AND com.codprovincia = p.codprovincia(+)
+   AND de_ccnl.codccnl(+) = el.codccnl
+   AND att.codateco(+) = el.codateco
+   AND att.codpadre = att2.codateco(+)
+   AND el.codcontratto = c.codcontratto(+)
+   AND pr_mansione.cdnlavoratore = ?
+   AND el.prgmansione = pr_mansione.prgmansione 
+   AND NVL(pr_mansione.flgdisponibile,'N') &lt;&gt; 'L' 
+   AND pr_mansione.codmansione = de_mansione.codmansione
+   AND c.flgtirocini = 'S'
+   ORDER BY el.numannofine desc, el.NUMMESEFINE desc
+" 
+/>					 
+
+<STATEMENT
+        name="COOP_INSERT_CONOSCENZA_COMPETENZA"
+        query="INSERT INTO PR_COMPETENZA
+                  (prgcompetenza,
+                  cdnLavoratore,
+                  codcompetenza,
+                  cdnUtins, dtmins,
+                  cdnUtmod, dtmmod)
+                  VALUES 
+                  ( s_pr_competenza.nextval,
+                    ?,
+                    ?,
+                   ?, SYSDATE, 
+                   ?, SYSDATE 
+                   )
+"/>
+
+<STATEMENT
+        name="COOP_GET_LAVORATORE_COMPETENZE"
+        query=" SELECT prc.codcompetenza, dc.strdescrizione strcompetenza, /*dc.codtipocompetenza tipocompetenza,*/ dct.strdescrizione strtipocompetenza
+                FROM pr_competenza prc
+                INNER JOIN de_competenza dc ON prc.codcompetenza=dc.codcompetenza
+                INNER JOIN de_tipo_competenza dct ON dc.codtipocompetenza=dct.codtipocompetenza
+                WHERE cdnLavoratore=?"/>  
+  
+<STATEMENT
+        name="COOP_INSERT_CONOSCENZA_ABILITAZIONE"
+        query="INSERT INTO PR_ABILITAZIONE
+                  (prgabilitazione,
+                  cdnLavoratore,
+                  codabilitazionegen,
+                  cdnUtins, dtmins,
+                  cdnUtmod, dtmmod)
+                  VALUES 
+                  ( s_pr_abilitazione.nextval,
+                    ?,
+                    ?,
+                   ?, SYSDATE, 
+                   ?, SYSDATE 
+                   )
+     "/>
+              
+<STATEMENT
+        name="COOP_GET_LAVORATORE_ABILITAZIONI"
+        query=" select dab.codabilitazionegen, dab.strdescrizione strabilitazione, dabt.strdescrizione strtipoabilitazione 
+        			from pr_abilitazione prab
+                	inner join de_abilitazione_gen dab on dab.codabilitazionegen=prab.codabilitazionegen
+                	inner join de_tipo_abilitazione_gen dabt on dab.codtipoabilitazionegen=dabt.codtipoabilitazionegen
+                WHERE cdnLavoratore=?
+                order by prab.codabilitazionegen, strabilitazione"/>   
+                
+  <STATEMENT name="COOP_INSERT_CONOSCENZA_INFO" query="
+    INSERT INTO PR_INFO(
+      PRGINFO,
+      CDNLAVORATORE,
+      CODTIPOINFO,
+      CODDETTINFO,
+      STRDESCINFO,
+      CDNGRADO,
+      CODMODOINFO,
+      FLGCERTIFICATO,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_INFO.nextval, 
+      ?,
+      ?, ?, ?,
+      ?,
+      ?,
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+
+<STATEMENT 
+				name="COOP_LOAD_CONOSCENZE_INFO" 
+				query=" SELECT PRI.FLGCERTIFICATO AS CERTIFICATO, TI.CODTIPOINFO, TI.STRDESCRIZIONE AS DESC_TIPO, DI.CODDETTINFO AS CODICE, DI.STRDESCRIZIONE AS DESC_DETTAGLIO,
+      						PRI.STRDESCINFO AS DESC_DESCDETTAGLIO, GI.CDNGRADO, GI.STRDESCRIZIONE AS DESC_GRADO, MI.CODMODOINFO, MI.STRDESCRIZIONE AS DESC_MODALITA
+	  					FROM 
+      						PR_INFO PRI,  
+      						DE_TIPO_INFO TI,
+      						DE_DETT_INFO DI,
+  	  						DE_GRADO_INFO GI,
+	  						DE_MODO_INFO MI
+    					WHERE PRI.CDNLAVORATORE = ?
+      						AND TI.CODTIPOINFO(+)=PRI.CODTIPOINFO
+      						AND DI.CODDETTINFO(+)=PRI.CODDETTINFO
+  	  						AND GI.CDNGRADO(+)=PRI.CDNGRADO
+  	  						AND MI.CODMODOINFO(+)=PRI.CODMODOINFO
+"/>
+								
+
+<STATEMENT 
+  			name="COOP_LOAD_CONOSCENZE_LING" 
+  			query="
+  	SELECT /*L.PRGLINGUA, */
+  		L.CODLINGUA, 		
+		DL.STRDENOMINAZIONE AS LINGUA, 
+		L.CDNGRADOLETTO,
+		DGL.STRDESCRIZIONE AS LETTO, 
+		L.CDNGRADOSCRITTO,
+		DGS.STRDESCRIZIONE AS SCRITTO, 
+		L.CDNGRADOPARLATO,
+  		DGP.STRDESCRIZIONE AS PARLATO, 
+  		L.CODMODLINGUA,
+  		DM.STRDESCRIZIONE as MODALITA, 
+  		L.STRMODLINGUA, 
+  		L.FLGCERTIFICATO,
+  		L.FLGPRIMALINGUA
+    FROM PR_LINGUA L, 
+		DE_GRADO_LIN DGL, 
+		DE_GRADO_LIN DGS, 
+      	DE_GRADO_LIN DGP, 
+      	DE_LINGUA DL, 
+      	DE_MOD_LINGUA DM
+    WHERE L.CODLINGUA=DL.CODLINGUA
+		AND L.CDNGRADOLETTO=DGL.CDNGRADO(+)
+		AND L.CDNGRADOSCRITTO=DGS.CDNGRADO(+)
+		AND L.CDNGRADOPARLATO=DGP.CDNGRADO(+)
+		AND L.CODMODLINGUA=DM.CODMODLINGUA(+)
+		AND L.CDNLAVORATORE=?
+"/>
+    		
+<STATEMENT 
+				name="COOP_LOAD_ALT_CRED" 
+				query=" SELECT /*PRGCREDITO,*/ STRSPECIFICA
+    		FROM PR_CREDITO
+    		WHERE CDNLAVORATORE = ?
+    		ORDER BY STRSPECIFICA"/>
+
+<STATEMENT name="COOP_INSERT_ALT_CRED" query="
+    INSERT INTO PR_CREDITO (
+       PRGCREDITO, CDNLAVORATORE, STRSPECIFICA, 
+       CDNUTINS, DTMINS, CDNUTMOD, 
+       DTMMOD) 
+    VALUES ( S_PR_CREDITO.nextval, ?, ?,
+        ?, SYSDATE, ?, 
+        SYSDATE)
+"/>
+<STATEMENT name="COOP_INSERT_CONOSCENZA_LING" query="
+    INSERT INTO PR_LINGUA (
+       PRGLINGUA, CODLINGUA, CDNLAVORATORE, 
+       CDNGRADOLETTO, CDNGRADOSCRITTO, CDNGRADOPARLATO, 
+       CODMODLINGUA, STRMODLINGUA, FLGCERTIFICATO, 
+       FLGPRIMALINGUA, CDNUTINS, DTMINS, 
+       CDNUTMOD, DTMMOD) 
+    VALUES ( S_PR_LINGUA.nextval, ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
+        ?, ?, SYSDATE,
+        ?, SYSDATE) "/>
+        
+<STATEMENT name="COOP_INSERT_AN_LAVORATOREANAGIND" query="
+INSERT INTO AN_LAVORATORE (
+  cdnLavoratore,
+  strCodiceFiscale,
+  strCognome,
+  strNome,
+  strSesso,
+  datNasc,
+  codComNas,
+  codCittadinanza,
+  codCittadinanza2,
+  codstatoCivile,
+  flgMilite,
+  numFigli,
+  FLGCFOK,
+  cdnUtins, dtmins,
+  cdnUtmod, dtmmod,
+  CODCOMRES,
+  STRINDIRIZZORES,
+  STRLOCALITARES,
+  STRCAPRES,
+  CODCOMDOM,
+  STRINDIRIZZODOM,
+  STRLOCALITADOM,
+  STRCAPDOM,
+  STRTELRES, STRTELDOM, STRTELALTRO,
+  STRCELL,
+  STREMAIL,
+  STRFAX,
+  CODCOMREC,
+  STRINDIRIZZOREC,
+  STRLOCALITAREC,
+  STRCAPREC
+)
+VALUES (
+?,
+  UPPER(?),
+  UPPER(?),
+  UPPER(?),
+  ?,
+   TO_DATE(?,'DD/MM/YYYY'),
+   ?,
+   ?,
+   ?,
+   ?,
+   ?,
+   ?,
+   ?,
+   ?,
+  SYSDATE,
+    ?,
+  SYSDATE,
+    ?,
+   ?,
+   ?,
+   ?,
+   ?,
+    ?,
+    ?,
+    ?,
+   ?,
+   ?,
+   ?,
+   ?,
+   ?,
+   ?,
+   ?,
+   ?,
+   ?,?
+)
+"/>             
+<STATEMENT name="COOP_INSERT_MANSIONE" query="
+    INSERT INTO PR_MANSIONE(
+      PRGMANSIONE,
+      CDNLAVORATORE,
+      CODMANSIONE,
+      FLGESPERIENZA,
+      FLGDISPONIBILE,
+      FLGDISPFORMAZIONE,
+      FLGESPFORM,
+      FLGPIP,
+      CODMONOTEMPO,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      s_pr_mansione.nextval,
+      ?, ?,
+      decode(?, 'ND', 'E',?), ?, ?, ?, ?,
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+<STATEMENT name="COOP_INSERT_ESP_LAVORO"
+           query="
+INSERT INTO PR_ESP_LAVORO
+  (PRGESPLAVORO, PRGMANSIONE, 
+   CODCONTRATTO, CODATECO, CODCCNL, STRRIFLEGGE, 
+   STRDESATTIVITA, STRLIVELLO, CODAREA, NUMMESEINIZIO, 
+   NUMANNOINIZIO, NUMMESEFINE, NUMANNOFINE, NUMMESI, NUMORE, 
+   NUMORESETT, CODORARIO, STRCODFISCALEAZIENDA, STRPARTITAIVAAZIENDA,
+   STRRAGSOCIALEAZIENDA, CODCOMAZIENDA, STRINDIRIZZOAZIENDA, 
+   CODNATGIURIDICA, STRTIPOCLIENTI, NUMSTIPENDIO, 
+   FLGCOMPLETATO, CODMVCESSAZIONE, 
+   STRMOTCESSAZIONE, CODTIPOCERTIFICATO, 
+   CDNUTINS, DTMINS, 
+   CDNUTMOD, DTMMOD)
+  VALUES 
+  ( s_pr_esp_lavoro.nextval, ?,
+    ?, ?, ?, ?,
+    ?, ?, ?, ?,
+    ?, ?, ?, ?, ?,
+    ?, ?, ?, ?,
+    ?, ?, ?,
+    ?, ?, ?,
+    ?, ?,
+    ?, ?,                    
+    ?, SYSDATE, 
+    ?, SYSDATE)
+"/>
+
+
+<STATEMENT name="COOP_UPDATE_ANAGRAFICA_LAVORATORE"  query="
+UPDATE AN_LAVORATORE SET
+  strCodiceFiscale = UPPER(?),
+  strCognome = UPPER(?),
+  strNome = UPPER(?),
+  strSesso = ?,
+  datNasc = TO_DATE(?,'DD/MM/YYYY'),
+  codComNas = ?,
+  codCittadinanza = ?,
+  codCittadinanza2 = ?,
+  codstatoCivile = ?,
+  flgMilite = ?,
+  numFigli = ?,
+  FLGCFOK = ?,
+  cdnUtmod = ?,
+  dtmmod = sysdate,
+  CODCOMRES = ?,
+  STRINDIRIZZORES = ?,
+  STRLOCALITARES = ?,
+  STRCAPRES = ?,
+  CODCOMDOM = ?,
+  STRINDIRIZZODOM = ?,
+  STRLOCALITADOM = ?,
+  STRCAPDOM = ?,
+  STRTELRES = ?,
+  STRTELDOM = ?,
+  STRTELALTRO = ?,
+  STRCELL = ?,
+  STREMAIL = ?,
+  STRFAX = ?,
+  CODCOMREC = ?,
+  STRINDIRIZZOREC = ?,
+  STRLOCALITAREC = ?,
+  STRCAPREC = ?,
+  numKloLavoratore = numKloLavoratore+1
+where cdnLavoratore = ?
+"/>
+
+<STATEMENT name="COOP_DELETE_FOR_PRO" query="
+	DELETE 
+		FROM PR_CORSO 
+    WHERE 
+    	CDNLAVORATORE=?
+"/>
+<STATEMENT name="COOP_DELETE_CONTRATTO_IN_MANSIONE" query="
+	DELETE 
+		FROM PR_DIS_CONTRATTO 
+	WHERE PRGMANSIONE IN 
+		(SELECT PRGMANSIONE FROM PR_MANSIONE WHERE CDNLAVORATORE = ?)
+"/>
+<STATEMENT name="COOP_DELETE_ORARIO_IN_MANSIONE" query="
+  	DELETE 
+  		FROM PR_DIS_ORARIO 
+  	WHERE PRGMANSIONE IN 
+  		(SELECT PRGMANSIONE FROM PR_MANSIONE WHERE CDNLAVORATORE = ?)
+"/>
+<STATEMENT name="COOP_DELETE_TURNO_IN_MANSIONE" query="
+  	DELETE 
+  		FROM PR_DIS_TURNO 
+  	WHERE PRGMANSIONE IN 
+  		(SELECT PRGMANSIONE FROM PR_MANSIONE WHERE CDNLAVORATORE = ?)
+"/>
+<STATEMENT name="COOP_DELETE_TERRITORIO_COMUNE" query="
+  	DELETE 
+  		FROM PR_DIS_COMUNE 
+  	WHERE PRGMANSIONE IN 
+  		(SELECT PRGMANSIONE FROM PR_MANSIONE WHERE CDNLAVORATORE = ?)  	
+"/>
+<STATEMENT name="COOP_DELETE_TERRITORIO_PROVINCIA" query="
+  	DELETE 
+  		FROM PR_DIS_PROVINCIA 
+  	WHERE PRGMANSIONE IN 
+  		(SELECT PRGMANSIONE FROM PR_MANSIONE WHERE CDNLAVORATORE = ?)  	
+"/>
+<STATEMENT name="COOP_DELETE_TERRITORIO_REGIONE" query="
+  	DELETE 
+  		FROM PR_DIS_REGIONE
+  	WHERE PRGMANSIONE IN 
+  		(SELECT PRGMANSIONE FROM PR_MANSIONE WHERE CDNLAVORATORE = ?)  	
+"/>
+<STATEMENT name="COOP_DELETE_TERRITORIO_STATO" query="
+  	DELETE 
+  		FROM PR_DIS_STATO
+  	WHERE PRGMANSIONE IN 
+  		(SELECT PRGMANSIONE FROM PR_MANSIONE WHERE CDNLAVORATORE = ?)  	
+"/>
+<STATEMENT name="COOP_DEL_MOBGEO_MANSIONE" query="
+	DELETE 
+		FROM PR_MOBIL_GEOGR 
+	WHERE PRGMANSIONE IN 
+		(SELECT PRGMANSIONE FROM PR_MANSIONE WHERE CDNLAVORATORE = ?)
+"/>
+<STATEMENT
+        name="COOP_DELETE_PR_STUDIO"
+        query="DELETE FROM PR_STUDIO 
+           WHERE CDNLAVORATORE=?
+"/>
+<STATEMENT name="COOP_DELETE_INDISP" query="
+    DELETE FROM PR_INDISPONIBILITA       
+    WHERE CDNLAVORATORE=?
+"/>
+<STATEMENT name="COOP_DELETE_CONOSCENZA_COMPETENZA"  query="
+DELETE FROM PR_COMPETENZA WHERE CDNLAVORATORE = ?
+"/>
+<STATEMENT
+        name="COOP_DELETE_CONOSCENZA_ABILITAZIONE"
+        query="DELETE 
+        		FROM PR_ABILITAZIONE 
+        		WHERE CDNLAVORATORE = ?
+"/>
+<STATEMENT name="COOP_DELETE_CONOSCENZA_INFO" query="
+  	DELETE FROM PR_INFO WHERE CDNLAVORATORE = ?
+"/>
+<STATEMENT name="COOP_DELETE_CONOSCENZA_LING" query="
+	DELETE FROM PR_LINGUA WHERE CDNLAVORATORE = ?
+"/>
+<STATEMENT name="COOP_DELETE_ALT_CRED" query="
+	DELETE FROM PR_CREDITO WHERE CDNLAVORATORE = ?
+"/>
+
+<STATEMENT name="COOP_DELETE_MANSIONE" query="
+	DELETE FROM
+      PR_MANSIONE
+    WHERE
+      CDNLAVORATORE=? 
+	AND PRGMANSIONE NOT IN (SELECT PRGMANSIONE FROM PR_ESP_LAVORO) 
+	AND PRGMANSIONE NOT IN (SELECT PRGMANSIONE FROM PR_DIS_CONTRATTO)
+	AND PRGMANSIONE NOT IN (SELECT PRGMANSIONE FROM PR_DIS_ORARIO)
+	AND PRGMANSIONE NOT IN (SELECT PRGMANSIONE FROM PR_DIS_TURNO)
+	AND PRGMANSIONE NOT IN (SELECT PRGMANSIONE FROM PR_DIS_COMUNE)
+	AND PRGMANSIONE NOT IN (SELECT PRGMANSIONE FROM PR_DIS_PROVINCIA)
+	AND PRGMANSIONE NOT IN (SELECT PRGMANSIONE FROM PR_DIS_REGIONE)
+	AND PRGMANSIONE NOT IN (SELECT PRGMANSIONE FROM PR_DIS_STATO)
+	AND PRGMANSIONE NOT IN (SELECT PRGMANSIONE FROM PR_MOBIL_GEOGR)	       
+"/>
+
+<STATEMENT name="COOP_DELETE_ESP_LAVORO"
+           query="DELETE 
+           			FROM PR_ESP_LAVORO 
+           		WHERE PRGMANSIONE IN 
+           		(SELECT PRGMANSIONE FROM PR_MANSIONE WHERE CDNLAVORATORE = ?) AND CODCONTRATTO IN 
+           		(SELECT CODCONTRATTO FROM DE_CONTRATTO WHERE NVL(FLGTIROCINI,'N') &lt;&gt; 'S')
+"/>
+
+<STATEMENT name="COOP_DELETE_ESP_NO_LAVORO"
+           query="DELETE 
+           			FROM PR_ESP_LAVORO 
+           		WHERE PRGMANSIONE IN 
+           		(SELECT PRGMANSIONE FROM PR_MANSIONE WHERE CDNLAVORATORE = ?) AND CODCONTRATTO IN 
+           		(SELECT CODCONTRATTO FROM DE_CONTRATTO WHERE FLGTIROCINI = 'S')
+"/>
+
+<STATEMENT name="COOP_SELECT_PATTI_ASSOCIATI"
+           query="select COUNT(*) AS NUM_PATTI
+				from am_patto_lavoratore p, am_lav_patto_scelta aps, an_lavoratore lav
+				where p.PRGPATTOLAVORATORE = aps.PRGPATTOLAVORATORE
+				and aps.CODLSTTAB IN ('PR_MAN','PR_IND','PR_ESP_L','PR_COR','PR_STU')
+				and p.CDNLAVORATORE = lav.CDNLAVORATORE
+				and lav.STRCODICEFISCALE= ?
+"/>
+
+<STATEMENT name="COOP_SELECT_ASSOCIAZIONI_ESP_MOV"
+           query="SELECT COUNT(AEM.PRGMOVIMENTO) AS NUM_ASSESPMOV
+				FROM PR_ASS_ESP_MOVI AEM, PR_ESP_LAVORO EL
+				WHERE EL.PRGESPLAVORO = AEM.PRGESPLAVORO
+				AND EL.PRGMANSIONE IN 
+ 				(SELECT PRGMANSIONE FROM PR_MANSIONE WHERE CDNLAVORATORE IN 
+ 		 			(SELECT CDNLAVORATORE FROM AN_LAVORATORE WHERE STRCODICEFISCALE = ?))
+"/>
+
+<STATEMENT name="COOP_COMUNE_IN_PROVINCIA_SIL"
+           query="
+SELECT decode (count(codprovincia), 0, 'N', 1, 'S', 'BO') as in_provincia FROM DE_COMUNE, TS_GENERALE WHERE DE_COMUNE.CODPROVINCIA = TS_GENERALE.CODPROVINCIASIL and codcom = ?
+"/>
+
+<STATEMENT name="COOP_COMUNE_IN_REGIONE_SIL"
+           query="
+SELECT decode (count(de_provincia.codregione), 0, 'N', 1, 'S', 'BO') as in_regione 
+	FROM DE_COMUNE, DE_PROVINCIA, TS_GENERALE 
+	WHERE DE_COMUNE.CODPROVINCIA = DE_PROVINCIA.CODPROVINCIA AND
+	DE_PROVINCIA.CODREGIONE = TS_GENERALE.CODREGIONESIL 
+	AND DE_COMUNE.CODCOM = ?
+"/>

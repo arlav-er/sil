@@ -1,0 +1,1535 @@
+<MODULE name="M_Amm_cercaDichSosp"
+	class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" rows="15"
+		title="LISTA DICHIARAZIONI DI SOSPENSIONE PER CONTRAZIONE D'ATTIVITA'">
+		<QUERIES>
+			<SELECT_QUERY>
+				<STATEMENT_PROVIDER
+					CLASS="it.eng.sil.module.amministrazione.DynStatementRicercadDichSospensione" />
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRCOGNOME" label="Cognome" />
+			<COLUMN name="STRNOME" label="Nome" />
+			<COLUMN name="STRCODICEFISCALE" label="CF" />
+			<COLUMN name="DATDICHIARAZIONE" label="Data Dichiarazione" />
+			<COLUMN name="DATFINE" label="Data Fine" />
+			<COLUMN name="STRRAGIONESOCIALE" label="Ragione Sociale" />
+			<COLUMN name="STRINDIRIZZO" label="Indirizzo Azienda" />
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="" confirm="FALSE" label="Dettaglio">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="AmmDettDichSospPage" />
+				<PARAMETER name="prgDichSospensione" scope="LOCAL" type="RELATIVE"
+					value="prgDichSospensione" />
+				<PARAMETER name="cdnFunzione" scope="SERVICE_REQUEST"
+					type="RELATIVE" value="cdnFunzione" />
+				<PARAMETER name="contestuale" scope="LOCAL" type="ABSOLUTE"
+					value="true" />
+				<PARAMETER name="PAGE_LISTA" type="RELATIVE" SCOPE="SERVICE_REQUEST"
+					value="PAGE" />
+			</SELECT_CAPTION>
+			<DELETE_CAPTION image="" confirm="FALSE" label="Cancella"
+				hiddenColumn="protocollato">
+				<!-- se la dichiarazione e' protocollata non puo' essere cancellata -->
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="AmmListaDichSospPage"
+					scope="" />
+				<PARAMETER name="prgDichSospensioneCanc" scope="LOCAL"
+					type="RELATIVE" value="prgDichSospensione" />
+				<PARAMETER name="cdnFunzione" scope="SERVICE_REQUEST"
+					type="RELATIVE" value="cdnFunzione" />
+			</DELETE_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_Amm_cercaDichSospContestuale"
+	class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" rows="15"
+		title="LISTA DICHIARAZIONI DI SOSPENSIONE PER CONTRAZIONE D'ATTIVITA'">
+		<QUERIES>
+			<SELECT_QUERY>
+				<STATEMENT_PROVIDER
+					CLASS="it.eng.sil.module.amministrazione.DynStatementRicercadDichSospensione" />
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRCOGNOME" label="Cognome" />
+			<COLUMN name="STRNOME" label="Nome" />
+			<COLUMN name="STRCODICEFISCALE" label="CF" />
+			<COLUMN name="DATDICHIARAZIONE" label="Data Dichiarazione" />
+			<COLUMN name="DATFINE" label="Data Fine" />
+			<COLUMN name="STRRAGIONESOCIALE" label="Ragione Sociale" />
+			<COLUMN name="STRINDIRIZZO" label="Indirizzo Azienda" />
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="" confirm="FALSE" label="Dettaglio">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="AmmDettDichSospPage" />
+				<PARAMETER name="PAGE_LISTA" type="RELATIVE" SCOPE="SERVICE_REQUEST"
+					value="PAGE" />
+				<PARAMETER name="prgDichSospensione" scope="LOCAL" type="RELATIVE"
+					value="prgDichSospensione" />
+				<PARAMETER name="contestuale" scope="LOCAL" type="ABSOLUTE"
+					value="true" />
+				<PARAMETER name="cdnFunzione" scope="SERVICE_REQUEST"
+					type="RELATIVE" value="cdnFunzione" />
+			</SELECT_CAPTION>
+			<DELETE_CAPTION image="" confirm="FALSE" label="Cancella"
+				hiddenColumn="protocollato">
+				<!-- se la dichiarazione e' protocollata non puo' essere cancellata -->
+				<PARAMETER name="PAGE" type="ABSOLUTE"
+					value="AmmListaContestualeDichSospPage" scope="" />
+				<PARAMETER name="prgDichSospensioneCanc" scope="LOCAL"
+					type="RELATIVE" value="prgDichSospensione" />
+				<PARAMETER name="cdnFunzione" scope="SERVICE_REQUEST"
+					type="RELATIVE" value="cdnFunzione" />
+				<PARAMETER name="contestuale" scope="LOCAL" type="ABSOLUTE"
+					value="true" />
+			</DELETE_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_AmmGetDatiLavoratore" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<QUERY statement="AMM_GET_DATI_LAVORATORE">
+			<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE"
+				scope="SERVICE_REQUEST" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_AmmGetDatiUnitaAzienda" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<QUERY statement="AMM_GET_DATI_UNITA_AZIENDA">
+			<PARAMETER name="prgAzienda" type="RELATIVE" value="prgAzienda"
+				scope="SERVICE_REQUEST" />
+			<PARAMETER name="prgUnita" type="RELATIVE" value="prgUnita"
+				scope="SERVICE_REQUEST" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+
+
+	<!-- M_AmmInsertDichSosp -->
+<MODULE name="M_AmmInsertDichSosp" class="it.eng.sil.module.amministrazione.InsertDichSosp">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_INSERT statement="INSERT_AMM_DICH_SOSPENSIONE">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE"
+				value="prgDichSospensione" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datDichiarazione" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datFine" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgUnita" />
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_" />
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_" />
+		</QUERY_INSERT>
+		<QUERY_NEXTVAL statement="SELECT_AMM_DICH_SOSPENSIONE_SEQUENCE" />
+		<QUERY_SELECT statement="AMM_GET_DUPLICATE_DICH_SOSP">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datDichiarazione" />
+		</QUERY_SELECT>
+	</CONFIG>
+</MODULE>
+
+	<!-- M_AmmUpdateDichSosp -->
+<MODULE name="M_AmmUpdateDichSosp" class="it.eng.sil.module.amministrazione.UpdateDichSosp">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_UPDATE statement="UPDATE_AMM_DICH_SOSPENSIONE">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datDichiarazione" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datFine" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgUnita" />
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE"
+				value="numKloDichSospensione" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE"
+				value="prgDichSospensione" />
+		</QUERY_UPDATE>
+		<QUERY_SELECT statement="AMM_GET_DUPLICATE_DICH_SOSP">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datDichiarazione" />
+		</QUERY_SELECT>
+	</CONFIG>
+</MODULE>
+
+
+	<!--M_AmmGetDichSosp-->
+<MODULE name="M_AmmGetDichSosp" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<QUERY statement="AMM_GET_DICHIARAZIONE_SOSPENSIONE">
+			<PARAMETER name="prgDichSospensione" type="RELATIVE"
+				value="prgDichSospensione" scope="SERVICE_REQUEST" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+	<!--M_AmmDelDichSosp-->
+<MODULE name="M_AmmDelDichSosp" class="it.eng.sil.module.amministrazione.GenericDelete">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<QUERY statement="AMM_DEL_DICHIARAZIONE_SOSPENSIONE">
+			<PARAMETER name="prgDichSospensioneCanc" type="RELATIVE"
+				value="prgDichSospensioneCanc" scope="SERVICE_REQUEST" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+
+
+	<!-- M_Amm_GetListaDichSospStorico -->
+<MODULE name="M_Amm_GetListaDichSospStorico" class="it.eng.afExt.dispatching.module.impl.ListModule">
+	<CONFIG pool="SIL_DATI" rows="15"
+		title="LISTA STORICO DICHIARAZIONI DI SOSPENSIONE PER CONTRAZIONE D'ATTIVITA'">
+		<QUERIES>
+			<SELECT_QUERY statement="AMM_GET_LISTA_DICH_SOSP_STORICO">
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" value="cdnLavoratore"
+					scope="SERVICE_REQUEST" />
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRCOGNOME" label="Cognome" />
+			<COLUMN name="STRNOME" label="Nome" />
+			<COLUMN name="STRCODICEFISCALE" label="CF" />
+			<COLUMN name="DATDICHIARAZIONE" label="Data Dichiarazione" />
+			<COLUMN name="DATFINE" label="Data Fine" />
+			<COLUMN name="STRRAGIONESOCIALE" label="Ragione Sociale" />
+			<COLUMN name="STRINDIRIZZO" label="Indirizzo Azienda" />
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="" confirm="FALSE" label="Dettaglio">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="AmmDettDichSospPage" />
+				<PARAMETER name="prgDichSospensione" scope="LOCAL" type="RELATIVE"
+					value="prgDichSospensione" />
+				<PARAMETER name="storico" scope="SERVICE_REQUEST" type="ABSOLUTE"
+					value="true" />
+			</SELECT_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+	<!--M_AmmGetDichSosp-->
+<MODULE name="M_AmmHasDichSospStorico" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<QUERY statement="AMM_HAS_DICHIARAZIONI_SOSPENSIONE_STORICO">
+			<PARAMETER name="cdnLavoratore" type="RELATIVE" value="cdnLavoratore"
+				scope="SERVICE_REQUEST" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GETDOCPROTOCOLLATO" class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<QUERY statement="GET_DOC_PROTOCOLLATO">
+			<PARAMETER type="RELATIVE" value="PRGDICHSOSPENSIONE"
+				scope="SERVICE_REQUEST" />
+			<PARAMETER type="RELATIVE" value="PAGE" scope="SERVICE_REQUEST" />
+			<PARAMETER type="ABSOLUTE" value="SOSP" scope="" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+
+
+	<!--
+		=================== Ricerca Mobilità ===============================
+	-->
+	<!-- M_MobilitaRicerca -->
+<MODULE name="M_MobilitaRicerca"
+	class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" title="" rows="20">
+		<QUERIES>
+			<SELECT_QUERY>
+				<STATEMENT_PROVIDER
+					CLASS="it.eng.sil.module.amministrazione.MobilitaRicerca" />
+			</SELECT_QUERY>
+		</QUERIES>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_MobilitaRicercaSaveCsv" class="it.eng.sil.module.amministrazione.MobilitaRicercaSaveCsv">
+	<CONFIG pool="SIL_DATI" title="" rows="20">
+			
+	<QUERY_SELECT>
+		<STATEMENT_PROVIDER CLASS="it.eng.sil.module.amministrazione.MobilitaRicercaCsv"/>
+	</QUERY_SELECT>
+
+	</CONFIG>
+</MODULE>
+
+	<!-- gestione dichiarazioni e  attestazionii -->
+<MODULE name="ComboStModelloStampa" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<QUERY statement="COMBO_ST_MODELLO_STAMPA">
+			<PARAMETER type="RELATIVE" value="PRGTIPOMODELLO" scope="SERVICE_REQUEST" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="ListaDichiarazioniLav"
+	class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" title="" rows="10">
+		<QUERIES>
+			<SELECT_QUERY>
+				<STATEMENT_PROVIDER CLASS="it.eng.sil.module.documenti.documentiList" />
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRINFRIFAZILAV" label="Cognome Nome" />
+			<COLUMN name="STRCODICEFISCALE" label="CF" />
+			<COLUMN name="DATACQRIL" label="Data inizio" />
+			<COLUMN name="STRENTERILASCIO" label="Ente" />
+			<COLUMN name="STRDESCRIZIONETIPODOC" label="Tipo di documento" />
+			<COLUMN name="STRDESCRIZIONEDOC" label="Descrizione" />
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio"
+				confirm="false">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="DettagliDocumentoPage" />
+				<PARAMETER name="prgdocumento" type="RELATIVE" scope="LOCAL"
+					value="prgdocumento" />
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="LOCAL"
+					value="cdnLavoratore" />
+				<PARAMETER name="prgAzienda" type="RELATIVE" scope="LOCAL"
+					value="prgAzienda" />
+				<PARAMETER name="prgUnita" type="RELATIVE" scope="LOCAL"
+					value="prgUnita" />
+				<PARAMETER name="lookLavoratore" type="RELATIVE" scope="SERVICE_REQUEST"
+					value="lookLavoratore" />
+				<PARAMETER name="lookAzienda" type="RELATIVE" scope="SERVICE_REQUEST"
+					value="lookAzienda" />
+				<PARAMETER name="contesto" type="RELATIVE" scope="SERVICE_REQUEST"
+					value="contesto" />
+				<PARAMETER name="cdnFunzione" type="RELATIVE" scope="SERVICE_REQUEST"
+					value="cdnFunzione" />
+				<PARAMETER name="pagina" type="RELATIVE" scope="SERVICE_REQUEST"
+					value="pagina" />
+				<PARAMETER name="popUp" type="RELATIVE" scope="SERVICE_REQUEST"
+					value="popUp" />
+				<PARAMETER name="strChiaveTabella" type="RELATIVE" scope="SERVICE_REQUEST"
+					value="strChiaveTabella" />
+				<PARAMETER name="infStoriche" type="RELATIVE" scope="SERVICE_REQUEST"
+					value="infStoriche" />
+				<PARAMETER name="goBackListPage" type="ABSOLUTE"
+					value="ListaDichiarazioniPage" />
+				<!--PARAMETER name="forzaSolaLettura"   type="ABSOLUTE" value="1" /-->
+				<!-- POPUP EVIDENZE -->
+				<PARAMETER name="APRI_EV" type="ABSOLUTE" value="1" scope="" />
+			</SELECT_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="ComboTipoModello" class="it.eng.sil.module.doDynamicSelectModule">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<QUERY>
+			<STATEMENT_PROVIDER
+				CLASS="it.eng.sil.module.amministrazione.DynamicStatementTipoModello" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="InserisciDichiarazione" class="it.eng.sil.module.doInsertModule">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<QUERY statement="INS_STAMPA_DICH_ATT">
+			<PARAMETER type="RELATIVE" value="PRGSTDICHATT" scope="SERVICE_REQUEST" />
+			<PARAMETER type="RELATIVE" value="PRGTIPOMODELLO" scope="SERVICE_REQUEST" />
+			<PARAMETER type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST" />
+			<PARAMETER type="RELATIVE" value="PRGMODELLOSTAMPA" scope="SERVICE_REQUEST" />
+			<PARAMETER type="RELATIVE" value="DATINIZIO" scope="SERVICE_REQUEST" />
+			<PARAMETER type="RELATIVE" value="DATFINE" scope="SERVICE_REQUEST" />
+			<PARAMETER type="RELATIVE" value="STRNOTESPECIFICHE" scope="SERVICE_REQUEST" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="StampaDichAttNextval" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<QUERY statement="GET_ST_DICH_ATT_NEXTVAL" />
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="GetDeRelMod" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<QUERY statement="GET_DE_REL_MOD">
+			<PARAMETER type="RELATIVE" value="PRGTIPOMODELLO" scope="SERVICE_REQUEST" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+	<!-- ACCORPAMENTO LAVORATORI -->
+
+<MODULE name="M_LIST_GEST_ROSE_LAV1" class="it.eng.afExt.dispatching.module.impl.ListModule">
+	<CONFIG pool="SIL_DATI" rows="50" title="">
+		<QUERIES>
+			<SELECT_QUERY statement="AMM_GET_LISTA_ROSE_LAV">
+				<PARAMETER name="cdnLavoratore1" type="RELATIVE" value="cdnLavoratore1"
+					scope="SERVICE_REQUEST" />
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="richiesta" label="Richiesta" />
+			<COLUMN name="descrInc" label="Tipologia" />
+			<COLUMN name="prgrosa" label="Rosa/Grad." />
+		</COLUMNS>
+		<CAPTIONS>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_LIST_GEST_ROSE_LAV2" class="it.eng.afExt.dispatching.module.impl.ListModule">
+	<CONFIG pool="SIL_DATI" rows="50" title="">
+		<QUERIES>
+			<SELECT_QUERY statement="AMM_GET_LISTA_ROSE_LAV">
+				<PARAMETER name="cdnLavoratore2" type="RELATIVE" value="cdnLavoratore2"
+					scope="SERVICE_REQUEST" />
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="richiesta" label="Richiesta" />
+			<COLUMN name="descrInc" label="Tipologia" />
+			<COLUMN name="prgrosa" label="Rosa/Grad." />
+		</COLUMNS>
+		<CAPTIONS>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="GET_DETT_LAV_DA_ACCORPARE"
+	class="it.eng.sil.module.amministrazione.accorpamento.InfoLavDaAccorpare">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<GET_AN_LAVORATORE_ANAG statement="GET_AN_LAVORATORE_ANAG">
+			<PARAMETER type="RELATIVE" value="cdnLavoratore" scope="SERVICE_REQUEST" />
+		</GET_AN_LAVORATORE_ANAG>
+		<GET_AN_LAVORATORE_INDIRIZZI statement="GET_AN_LAVORATORE_INDIRIZZI">
+			<PARAMETER type="RELATIVE" value="cdnLavoratore" scope="SERVICE_REQUEST" />
+		</GET_AN_LAVORATORE_INDIRIZZI>
+		<GET_ULTIMO_AN_DISPO_DA_CDNLAV
+			statement="GET_ULTIMO_AN_DISPO_DA_CDNLAV">
+			<PARAMETER type="RELATIVE" value="cdnLavoratore" scope="SERVICE_REQUEST" />
+		</GET_ULTIMO_AN_DISPO_DA_CDNLAV>
+		<PROTOCOLLO_DID>
+			<STATEMENT_PROVIDER
+				CLASS="it.eng.sil.module.patto.GetProtocolloDynStatement" />
+		</PROTOCOLLO_DID>
+		<GET_ULTIMO_MOV statement="GET_ULTIMO_MOV">
+			<PARAMETER type="RELATIVE" value="cdnLavoratore" scope="SERVICE_REQUEST" />
+		</GET_ULTIMO_MOV>
+		<GET_AN_DISPO statement="GET_AN_DISPO">
+			<PARAMETER type="RELATIVE" value="prgDichDisponibilita"
+				scope="SERVICE_REQUEST" />
+		</GET_AN_DISPO>
+	</CONFIG>
+</MODULE>
+<MODULE name="GET_LAVORATORI"
+	class="it.eng.sil.module.amministrazione.accorpamento.GetLavoratori">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<QUERY statement="GET_AN_LAVORATORE_ANAG">
+			<PARAMETER type="RELATIVE" value="cdnLavoratore" scope="SERVICE_REQUEST" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+<MODULE name="ACCORPA_LAVORATORE"
+	class="it.eng.sil.module.amministrazione.accorpamento.AccorpaLavoratore">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<PROC_ACCORPA_LAVORATORE statement="PROC_ACCORPA_LAVORATORE" />
+	</CONFIG>
+</MODULE>
+
+	<!-- FINE ACCORPAMENTO LAVORATORI -->
+
+<MODULE name="M_MovimentiLavoratore"
+	class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" rows="15" title="Lista Movimenti">
+
+		<QUERIES>
+			<SELECT_QUERY>
+				<STATEMENT_PROVIDER CLASS="it.eng.sil.module.movimenti.DynListaMovimenti" />
+			</SELECT_QUERY>
+		</QUERIES>
+
+	</CONFIG>
+</MODULE>
+
+	<!-- Ricerca QUALIFICA SRQ dal codice -->
+<MODULE name="M_CercaQualificaCodSRQ" class="it.eng.afExt.dispatching.module.impl.ListModule">
+	<CONFIG pool="SIL_DATI" rows="15" title="">
+		<QUERIES>
+			<SELECT_QUERY statement="CERCA_QUALIFICA_SRQ_CODICE">
+				<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codQualificaSRQ" />
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="codice" label="Codice" />
+			<COLUMN name="descrizione" label="Mansione" />
+			<COLUMN name="descrizioneTipo" label="Area professionale" />
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/add.gif" confirm="FALSE"
+				label="Dettaglio">
+				<PARAMETER scope="LOCAL" type="RELATIVE" name="codice"
+					value="codice" />
+				<PARAMETER scope="LOCAL" type="RELATIVE" name="descrizione"
+					value="descrizione" />
+				<PARAMETER scope="LOCAL" type="RELATIVE" name="descrizioneTipo"
+					value="descrizioneTipo" />
+			</SELECT_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_CercaQualificaDescSRQ" class="it.eng.afExt.dispatching.module.impl.ListModule">
+	<CONFIG pool="SIL_DATI" rows="15" title="">
+		<QUERIES>
+			<SELECT_QUERY statement="CERCA_QUALIFICA_SRQ_DESCRIZIONE">
+				<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="descQualificaSrq" />
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="codice" label="Codice" />
+			<COLUMN name="descrizione" label="Mansione" />
+			<COLUMN name="descrizioneTipo" label="Area professionale" />
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/add.gif" confirm="FALSE"
+				label="Dettaglio">
+				<PARAMETER scope="LOCAL" type="RELATIVE" name="codice"
+					value="codice" />
+				<PARAMETER scope="LOCAL" type="RELATIVE" name="descrizione"
+					value="descrizione" />
+				<PARAMETER scope="LOCAL" type="RELATIVE" name="descrizioneTipo"
+					value="descrizioneTipo" />
+			</SELECT_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ListPadreQualificheSRQ"
+	class="it.eng.sil.module.amministrazione.ListPadreQualificheSRQ">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="SELECT_TPI_QUALIFICHE_SRQ" />
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_AlberoQualificheSRQ"
+	class="it.eng.sil.module.amministrazione.AlberoQualificheSRQ">
+</MODULE>
+
+
+
+	<!-- RICERCA AVVIAMENTI A SELEZIONE - MODULO AS -->
+<MODULE name="M_STATO_AVVIAMENTO" class="it.eng.sil.module.amministrazione.StatoAvviamento">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_STATO_AVVIAMENTO" />
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_LISTA_AVVIAMENTI"
+	class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" rows="15"
+		title="Risultato della ricerca degli avviamenti a selezione / a lavoro">
+		<QUERIES>
+			<SELECT_QUERY>
+				<STATEMENT_PROVIDER
+					CLASS="it.eng.sil.module.amministrazione.DynRicercaAvviamenti" />
+			</SELECT_QUERY>
+		</QUERIES>
+		<CHECKBOXES>
+			<CHECKBOX name="prgEvidenza" label="" refColumn=""
+				jsCheckBoxClick="">
+				<CHECKBOXVALUE name="prgEvidenza" scope="LOCAL" type="RELATIVE"
+					value="CDNLAVORATORE" />
+			</CHECKBOX>
+		</CHECKBOXES>
+		<COLUMNS>
+			<COLUMN name="datiLav" label="CF cognome nome" />
+			<COLUMN name="ente" label="Ente" />
+			<COLUMN name="ind_Ente" label="Ind. ente" />
+			<COLUMN name="rif" label="Rif." />
+			<COLUMN name="DATAINIZIO" label="Data avv." />
+			<COLUMN name="statoAvv" label="Stato avv." />
+			<COLUMN name="StatoOccupaz" label="Stato occ.  " />&lt;br&gt;
+			<COLUMN name="DID" label="D&lt;br&gt;I&lt;br&gt;D" />
+			<COLUMN name="MOB" label="M&lt;br&gt;O&lt;br&gt;B" />
+			<COLUMN name="cpi" label="Cpi" />
+			<COLUMN name="EV" label="E&lt;br&gt;v&lt;br&gt;i&lt;br&gt;d" />
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" confirm="FALSE" label="Dettaglio Avviamento">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="AS_DETTAGLIO_AVVIAMENTI_PAGE" scope="" />
+				<PARAMETER name="DATAINIZIO" type="RELATIVE" value="DATAINIZIO" scope="LOCAL" />
+				<PARAMETER name="ente" type="RELATIVE" value="ente" scope="LOCAL" />
+				<PARAMETER name="cf_Ente" type="RELATIVE" value="cf_Ente" scope="LOCAL" />
+				<PARAMETER name="ind_Ente" type="RELATIVE" value="ind_Ente" scope="LOCAL" />
+				<PARAMETER name="numRich" type="RELATIVE" value="numRich" scope="LOCAL" />
+				<PARAMETER name="numAnno" type="RELATIVE" value="numAnno" scope="LOCAL" />
+				<PARAMETER name="PRGRICHIESTAAZ" type="RELATIVE" value="PRGRICHIESTAAZ" scope="LOCAL" />
+				<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="LOCAL" />
+				<PARAMETER name="PRGAVVSELEZIONE" type="RELATIVE" value="PRGAVVSELEZIONE" scope="LOCAL" />	
+				<PARAMETER name="_backToList" type="RELATIVE" value="_backToList" scope="SERVICE_REQUEST" />
+				<PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST" />
+				<PARAMETER name="APRI_EV" type="RELATIVE" value="APRI_EV" scope="SERVICE_REQUEST" />											
+			</SELECT_CAPTION>
+		</CAPTIONS>
+		<BUTTONS></BUTTONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_TIPO_MESS_EVIDENZA" class="it.eng.sil.module.amministrazione.TipoMessaggioEvidenza">
+    <CONFIG pool="SIL_DATI" title="">
+    	<QUERY statement="GET_TIPO_MESS_EVIDENZA"/> 
+    </CONFIG>
+</MODULE>
+
+<MODULE name="M_AS_INS_EVIDENZA" class="it.eng.sil.module.amministrazione.InserimentoEvidenza">
+    <CONFIG pool="SIL_DATI" title="" rows="-1">
+    	<QUERY statement="AS_INS_EVIDENZA">
+    		<PARAMETER type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+    		<PARAMETER type="RELATIVE" value="DATDATASCAD" scope="SERVICE_REQUEST"/>
+    		<PARAMETER type="RELATIVE" value="STREVIDENZA" scope="SERVICE_REQUEST"/>
+    		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    		<PARAMETER type="RELATIVE" value="PRGTIPOEVIDENZA" scope="SERVICE_REQUEST"/>
+    	</QUERY>
+    </CONFIG>
+</MODULE>
+
+<MODULE name="M_AS_LISTA_AVVIAMENTI_CONTESTUALE" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" rows="15" title="Elenco avviamenti a selezione">
+		<QUERIES>
+			<SELECT_QUERY>				
+				<STATEMENT_PROVIDER CLASS="it.eng.sil.module.amministrazione.ASListaContestualeAvviamenti" />
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="DATAINIZIO" label="Data avv." />
+			<COLUMN name="ente" label="Ente" />
+			<COLUMN name="ind_Ente" label="Ind. ente" />
+			<COLUMN name="rif" label="Rif." />			
+			<COLUMN name="statoAvv" label="Stato avv." />
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" confirm="FALSE" label="Dettaglio Avviamento">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="AS_DETTAGLIO_AVVIAMENTI_PAGE" scope="" />
+				<PARAMETER name="DATAINIZIO" type="RELATIVE" value="DATAINIZIO" scope="LOCAL" />
+				<PARAMETER name="ente" type="RELATIVE" value="ente" scope="LOCAL" />
+				<PARAMETER name="cf_Ente" type="RELATIVE" value="cf_Ente" scope="LOCAL" />
+				<PARAMETER name="ind_Ente" type="RELATIVE" value="ind_Ente" scope="LOCAL" />
+				<PARAMETER name="numRich" type="RELATIVE" value="numRich" scope="LOCAL" />
+				<PARAMETER name="numAnno" type="RELATIVE" value="numAnno" scope="LOCAL" />
+				<PARAMETER name="PRGRICHIESTAAZ" type="RELATIVE" value="PRGRICHIESTAAZ" scope="LOCAL" />
+				<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="LOCAL" />
+				<PARAMETER name="PRGAVVSELEZIONE" type="RELATIVE" value="PRGAVVSELEZIONE" scope="LOCAL" />
+				<PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST" />
+				<PARAMETER name="APRI_EV" type="ABSOLUTE" value="1" scope="SERVICE_REQUEST" />															
+			</SELECT_CAPTION>
+		</CAPTIONS>
+		<BUTTONS></BUTTONS>
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_AS_AVVIAMENTI_QUALIFICA" class="it.eng.sil.module.amministrazione.ASQualificaAvviamenti">
+    <CONFIG pool="SIL_DATI" title="" rows="-1">
+    	<QUERY statement="AS_COMBO_AVVIAMENTI_QUALIFICA">
+    		<PARAMETER type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+    		<PARAMETER type="RELATIVE" value="PRGRICHIESTAAZ" scope="SERVICE_REQUEST"/>
+    	</QUERY>    	
+    </CONFIG>
+</MODULE>
+<!-- modulo per la selezione nella combo della mansione -->
+<MODULE name="M_AS_AVVIAMENTI_QUALIFICA_SEL" class="it.eng.sil.module.amministrazione.GenericSelect">
+    <CONFIG pool="SIL_DATI" title="" rows="-1">
+    	<QUERY statement="AS_SEL_AVVIAMENTI_QUALIFICA">
+    		<PARAMETER type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+    		<PARAMETER type="RELATIVE" value="PRGRICHIESTAAZ" scope="SERVICE_REQUEST"/>
+    	</QUERY>    	
+    </CONFIG>
+</MODULE>
+
+<MODULE name="M_AS_AVVIAMENTI_RAPPORTO" class="it.eng.sil.module.amministrazione.ASRapportoAvviamenti">
+    <CONFIG pool="SIL_DATI" title="" rows="-1">
+    	<QUERY statement="AS_COMBO_AVVIAMENTI_RAPPORTO">
+    		<PARAMETER type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+    		<PARAMETER type="RELATIVE" value="PRGRICHIESTAAZ" scope="SERVICE_REQUEST"/>
+    	</QUERY>    	
+    </CONFIG>
+</MODULE>
+<!-- modulo per la selezione nella combo del tipo di contratto -->
+<MODULE name="M_AS_AVVIAMENTI_RAPPORTO_SEL" class="it.eng.sil.module.amministrazione.GenericSelect">
+    <CONFIG pool="SIL_DATI" title="" rows="-1">
+    	<QUERY statement="AS_SEL_AVVIAMENTI_RAPPORTO">
+    		<PARAMETER type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+    		<PARAMETER type="RELATIVE" value="PRGRICHIESTAAZ" scope="SERVICE_REQUEST"/>
+    	</QUERY>    	
+    </CONFIG>
+</MODULE>
+
+<MODULE name="M_AS_AVVIAMENTI_ESITO" class="it.eng.sil.module.amministrazione.ASEsitoAvviamenti">
+    <CONFIG pool="SIL_DATI" title="" rows="-1">
+    	<QUERY statement="AS_COMBO_AVVIAMENTI_ESITO"/>    	
+    </CONFIG>
+</MODULE>
+<!-- modulo per la selezione nella combo del esito dell'avviamento -->
+<MODULE name="M_AS_AVVIAMENTI_ESITO_SEL" class="it.eng.sil.module.amministrazione.GenericSelect">
+    <CONFIG pool="SIL_DATI" title="" rows="-1">
+    	<QUERY statement="AS_SEL_AVVIAMENTI_ESITO">  
+    		<PARAMETER type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+    		<PARAMETER type="RELATIVE" value="PRGRICHIESTAAZ" scope="SERVICE_REQUEST"/>
+    	</QUERY>  	
+    </CONFIG>
+</MODULE>
+<!-- modulo per la selezione della nota dell'avviamento a selezione-->
+<MODULE name="M_AS_AVVIAMENTI_NOTA_SEL" class="it.eng.sil.module.amministrazione.GenericSelect">
+    <CONFIG pool="SIL_DATI" title="" rows="-1">
+    	<QUERY statement="AS_SEL_AVVIAMENTI_NOTA">  
+    		<PARAMETER type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+    		<PARAMETER type="RELATIVE" value="PRGRICHIESTAAZ" scope="SERVICE_REQUEST"/>
+    	</QUERY>  	
+    </CONFIG>
+</MODULE>
+
+<MODULE name="M_AS_AVVIAMENTI_STATOATTO" class="it.eng.sil.module.amministrazione.ASStatoAttoAvviamenti">
+    <CONFIG pool="SIL_DATI" title="" rows="-1">
+    	<QUERY statement="AS_AVVIAMENTI_STATOATTO">
+    		<PARAMETER type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+    		<PARAMETER type="RELATIVE" value="PRGRICHIESTAAZ" scope="SERVICE_REQUEST"/>
+    	</QUERY>    	
+    </CONFIG>
+</MODULE>
+
+<MODULE name="M_AS_UPD_AVVIAMENTI" class="it.eng.sil.module.amministrazione.ASUpdAvviamenti">
+    <CONFIG pool="SIL_DATI" title="" rows="-1">
+    	<QUERY statement="AS_UPD_AVVIAMENTI">
+    		<PARAMETER type="RELATIVE" value="esito" scope="SERVICE_REQUEST"/>
+    		<PARAMETER type="RELATIVE" value="qualifica" scope="SERVICE_REQUEST"/>
+    		<PARAMETER type="RELATIVE" value="rapporto" scope="SERVICE_REQUEST"/>    		
+    		<PARAMETER type="RELATIVE" value="strnote" scope="SERVICE_REQUEST"/> 
+    		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    		<PARAMETER type="RELATIVE" value="prgAvvSelezione" scope="SERVICE_REQUEST"/>    		   	
+    	</QUERY>
+    </CONFIG>
+</MODULE>
+
+<!-- moduli aggiuntivi per MO -->
+
+<MODULE name="M_MO_TIPO_LISTA" 
+        class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="GET_MO_TIPO_LISTA"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_MO_STATO" 
+        class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="GET_MO_STATO"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_MO_MOTIVO_FINE" 
+        class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="GET_MO_MOTIVO_FINE"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_MO_MOTIVO_SCOR" 
+        class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="GET_MO_MOTIVO_SCOR"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_MO_PROVENIENZA" 
+        class="it.eng.sil.module.amministrazione.MobilitaComboProvenienza" >
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="GET_MO_PROVENIENZA"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_MO_INDENNITA" 
+        class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="GET_MO_INDENNITA"/>
+  </CONFIG>
+</MODULE>
+
+<!-- M_ELENCOTIPOMOB -->
+<MODULE name="M_ELENCOTIPOMOB" 
+        class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="GET_ELENCO_TIPO_MOB"/>
+  </CONFIG>
+</MODULE>
+
+<!-- M_ELENCOPROVINCE -->
+<MODULE name="M_ELENCOPROVINCE" 
+        class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="GET_ELENCO_PROVINCE"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MobilitaListaFileReg" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+    <CONFIG pool="SIL_DATI" title="" rows="15">
+      <QUERIES>
+          <SELECT_QUERY>   
+           <STATEMENT_PROVIDER CLASS="it.eng.sil.module.amministrazione.DynamicMobListaFileReg"/>
+          </SELECT_QUERY>
+      </QUERIES>
+      <COLUMNS>
+          <COLUMN name="CFCOGNOMENOME" label="CF&lt;BR&gt;Cognome Nome"/>           
+          <COLUMN name="STRAZRAGIONESOCIALE" label="Ragione Sociale&lt;BR&gt;Azienda"/>
+          <COLUMN name="CODTIPOMOB" label="Tipo Mob"/>                        
+          <COLUMN name="STRDATINIZIO" label="Data Inizio&lt;BR&gt;Mob"/>
+          <COLUMN name="STRDATFINE" label="Data Fine&lt;BR&gt;Mob"/>
+          <COLUMN name="STRDATMAXDIFF" label="Data Massimo&lt;BR&gt;Differim"/>            
+          <COLUMN name="CODCPI" label="Centro per&lt;BR&gt;l'impiego"/>                        
+          <COLUMN name="STRNUMATTO" label="Numero&lt;BR&gt;approv"/>
+          <COLUMN name="STRDATCRT" label="Data&lt;BR&gt;approv"/>  
+          <COLUMN name="CODENTEDETERMINA" label="Ente&lt;BR&gt;approv"/>                          
+      </COLUMNS>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_GetListaNullaOsta" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+    <CONFIG pool="SIL_DATI" title="" rows="10">
+      <QUERIES>
+          <SELECT_QUERY>   
+           <STATEMENT_PROVIDER CLASS="it.eng.sil.module.amministrazione.DynamicNullaOsta"/>
+          </SELECT_QUERY>
+      </QUERIES>
+      <COLUMNS>
+          <COLUMN name="AZIENDA" label="CF&lt;BR&gt;P.Iva Rag.Sociale"/>           
+          <COLUMN name="Lavoratore" label="CF&lt;BR&gt;Cognome Nome"/>
+          <COLUMN name="STATO" label="Stato dell'atto"/>                        
+          <COLUMN name="dataProt" label="Data"/> 
+          <COLUMN name="CATEGORIA" label="Categoria&lt;BR&gt;del lavoratore"/>
+          <COLUMN name="TIPOLOGIA" label="Tipologia&lt;BR&gt;nulla osta"/>            
+          <COLUMN name="DATAINIZIO" label="Data Inizio&lt;BR&gt;periodo lavorativo"/>                        
+          <COLUMN name="TEMPO" label="TEMPO"/>
+          <COLUMN name="PROVINCIA_ISCR" label="Ambito Territoriale"/>
+       </COLUMNS>
+       <CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" confirm="FALSE" label="Dettaglio Nulla Osta">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="CMNullaOstaPage" scope="" />
+				<PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST" />
+				<PARAMETER name="PRGNULLAOSTA" type="RELATIVE" value="PRGNULLAOSTA" scope="LOCAL" />
+				<PARAMETER name="CODSTATOATTO" type="RELATIVE" value="CODSTATOATTO" scope="LOCAL" />
+				<PARAMETER name="dataProt" type="RELATIVE" value="dataProt" scope="LOCAL" />
+				<PARAMETER name="dataOraProt" type="RELATIVE" value="dataOraProt" scope="LOCAL" />
+				<PARAMETER name="NUMPROTOCOLLO" type="RELATIVE" value="NUMPROTOCOLLO" scope="LOCAL" />
+				<PARAMETER name="numAnnoProt" type="RELATIVE" value="numAnnoProt" scope="LOCAL" />
+				<PARAMETER name="DatInizio" type="RELATIVE" value="DatInizio" scope="LOCAL" />
+				<PARAMETER name="DatAcqRil" type="RELATIVE" value="DatAcqRil" scope="LOCAL" />
+				<PARAMETER name="striodoc" type="RELATIVE" value="striodoc" scope="LOCAL" />
+				<PARAMETER name="codTipoDocumento" type="RELATIVE" value="codtipodoc" scope="LOCAL" />
+				<PARAMETER name="strtipodoc" type="RELATIVE" value="strtipodoc" scope="LOCAL" />
+				<PARAMETER name="codAmbito" type="RELATIVE" value="codambitodoc" scope="LOCAL" />
+				<PARAMETER name="strambitodoc" type="RELATIVE" value="strambitodoc" scope="LOCAL" />
+				<PARAMETER name="NUMKLONULLAOSTA" type="RELATIVE" value="NUMKLONULLAOSTA" scope="LOCAL" />
+				<PARAMETER name="PROVINCIA_ISCR" scope="LOCAL" type="RELATIVE" value="PROVINCIA_ISCR" />
+				<PARAMETER name="COD_PROVINCIA_ISCR" scope="LOCAL" type="RELATIVE" value="COD_PROVINCIA_ISCR" />
+				<PARAMETER name="infoDatiNOLav" type="RELATIVE" value="infoDatiNOLav" scope="SERVICE_REQUEST" />
+				<PARAMETER name="infoDatiNOAzi" type="RELATIVE" value="infoDatiNOAzi" scope="SERVICE_REQUEST" />
+			</SELECT_CAPTION>
+		</CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetInfoDeDoc_NullaOsta" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GetInfoDeDoc_NullaOsta"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="COMBO_STATO_ATTO_NULLA_OSTA" class="it.eng.sil.module.amministrazione.DynGenericNullaOsta">
+	<CONFIG pool="SIL_DATI" >
+		<QUERY> 
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.amministrazione.DynComboNullaOsta"/>
+   		</QUERY> 
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_NullaOstaGetAziende" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" rows="15" title="Lista Aziende">
+		<QUERIES>
+			<SELECT_QUERY>
+				<STATEMENT_PROVIDER class="it.eng.sil.module.amministrazione.DynNullaOstaSelAzienda"/>
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="strRagioneSociale" label="Ragione&lt;BR&gt;&amp;nbsp;Sociale"/>
+			<COLUMN name="STRCODICEFISCALE" label="C.F."/>
+			<COLUMN name="STRPARTITAIVA" label="P.IVA"/>
+			<COLUMN name="FLGDATIOK" label="Validit&amp;agrave;&lt;BR&gt;&amp;nbsp;C.F./P.&lt;BR&gt;&amp;nbsp;IVA"/>
+			<COLUMN name="STRINDIRIZZO" label="Indirizzo"/>
+			<COLUMN name="comune_az" label="Comune"/>
+			<COLUMN name="STRTEL" label="Tel."/>
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/add.gif" confirm="FALSE" label="Aggiungi Azienda">
+				<PARAMETER name="PAGE"          type="ABSOLUTE" value="NullaOstaDatiAziendaRefreshPage" />
+				<PARAMETER name="cdnFunzione"   type="RELATIVE" scope="SERVICE_REQUEST" value="cdnFunzione"/>
+				<PARAMETER name="AGG_FUNZ"   type="RELATIVE" scope="SERVICE_REQUEST" value="AGG_FUNZ"/>
+				<PARAMETER name="prgAzienda"    type="RELATIVE" scope="LOCAL" value="prgAzienda"/>
+				<PARAMETER name="prgUnita"    type="RELATIVE" scope="LOCAL" value="prgUnita"/>
+				<PARAMETER name="strCodFiscAzi" type="RELATIVE" scope="LOCAL" value="STRCODICEFISCALE"/>
+				<PARAMETER name="strPartitaIva" type="RELATIVE" scope="LOCAL" value="STRPARTITAIVA"/>
+				<PARAMETER name="strRagioneSociale" type="RELATIVE" scope="LOCAL" value="STRRAGIONESOCIALE"/>
+				<PARAMETER name="strIndirizzo" type="RELATIVE" scope="LOCAL" value="STRINDIRIZZO"/>
+				<PARAMETER name="comune" type="RELATIVE" scope="LOCAL" value="comune_az"/>
+				<PARAMETER name="CAP" type="RELATIVE" scope="LOCAL" value="STRCAP"/>
+			</SELECT_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetLavIscrCMfromRic" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" rows="15" title="Lista Lavoratori">
+		<QUERIES>
+			<SELECT_QUERY>
+				<STATEMENT_PROVIDER class="it.eng.sil.module.collocamentoMirato.DynRicercaLavIscrCM"/>
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRCODICEFISCALE" label="Codice Fiscale"/>
+       		<COLUMN name="FLGCFOK" label="Validit&amp;agrave; C.F."/>
+       		<COLUMN name="STRCOGNOME" label="Cognome"/>
+        	<COLUMN name="STRNOME" label="Nome"/>
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/add.gif" confirm="FALSE" label="Aggiungi Lavoratore">
+				<PARAMETER name="PAGE"          type="ABSOLUTE" value="NullaOstaDatiLavRefreshPage" />
+				<PARAMETER name="cdnFunzione"   type="RELATIVE" scope="SERVICE_REQUEST" value="cdnFunzione"/>
+				<PARAMETER name="AGG_FUNZ"   type="RELATIVE" scope="SERVICE_REQUEST" value="AGG_FUNZ"/>
+				<PARAMETER name="fromWhere"   type="RELATIVE" scope="SERVICE_REQUEST" value="fromWhere"/>
+				<PARAMETER name="cdnLavoratore"    type="RELATIVE" scope="LOCAL" value="cdnLavoratore"/>
+				<PARAMETER name="STRCODICEFISCALE" type="RELATIVE" scope="LOCAL" value="STRCODICEFISCALE"/>
+				<PARAMETER name="STRCOGNOME" type="RELATIVE" scope="LOCAL" value="STRCOGNOME"/>
+				<PARAMETER name="STRNOME" type="RELATIVE" scope="LOCAL" value="STRNOME"/>
+				<PARAMETER name="FLGCFOK" type="RELATIVE" scope="LOCAL" value="FLGCFOK"/>
+			</SELECT_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetLavIscrCMfromDet" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" rows="15" title="Lista Lavoratori iscritti al Collocamento Mirato">
+		<QUERIES>
+			<SELECT_QUERY>
+				<STATEMENT_PROVIDER class="it.eng.sil.module.collocamentoMirato.DynRicercaLavIscrCM"/>
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRCODICEFISCALE" label="Codice Fiscale"/>
+       		<COLUMN name="STRCOGNOME" label="Cognome"/>
+        	<COLUMN name="STRNOME" label="Nome"/>
+        	<COLUMN name="CATEGORIA" label="D/A"/>
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/add.gif" confirm="FALSE" label="Aggiungi Lavoratore">
+				<PARAMETER name="PAGE"          type="ABSOLUTE" value="NullaOstaDatiLavRefreshPage" />
+				<PARAMETER name="cdnFunzione"   type="RELATIVE" scope="SERVICE_REQUEST" value="cdnFunzione"/>
+				<PARAMETER name="AGG_FUNZ"   type="RELATIVE" scope="SERVICE_REQUEST" value="AGG_FUNZ"/>
+				<PARAMETER name="fromWhere"   type="RELATIVE" scope="SERVICE_REQUEST" value="fromWhere"/>
+				<PARAMETER name="cdnLavoratore"    type="RELATIVE" scope="LOCAL" value="cdnLavoratore"/>
+				<PARAMETER name="STRCODICEFISCALE" type="RELATIVE" scope="LOCAL" value="STRCODICEFISCALE"/>
+				<PARAMETER name="STRCOGNOME" type="RELATIVE" scope="LOCAL" value="STRCOGNOME"/>
+				<PARAMETER name="STRNOME" type="RELATIVE" scope="LOCAL" value="STRNOME"/>
+				<PARAMETER name="CODMONOTIPORAGG" type="RELATIVE" scope="LOCAL" value="CODMONOTIPORAGG"/>
+			</SELECT_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_TipologiaAss" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_TipologiaAss"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_CercaAssunzioneCODASS" class="it.eng.afExt.dispatching.module.impl.ListModule">
+  <CONFIG pool="SIL_DATI" rows="15" title="Lista Assunzioni">
+    <QUERIES>
+       <SELECT_QUERY statement="CERCA_ASSUNZIONE_CODASS">
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codiceAss" />
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="CODTIPOASS" label="Codice"/>
+      <COLUMN name="STRDESCRIZIONE" label="Tipo di assunzione"/>
+     </COLUMNS>
+ <CAPTIONS>
+      <SELECT_CAPTION image="../../img/add.gif" confirm="FALSE" label="Dettaglio">
+           <PARAMETER scope="LOCAL" type="RELATIVE" name="codAss" value="CODTIPOASS" />
+           <PARAMETER scope="LOCAL" type="RELATIVE" name="desAss" value="STRDESCRIZIONE" />
+     </SELECT_CAPTION>
+  </CAPTIONS>    
+    </CONFIG>
+</MODULE>
+
+<MODULE name="M_CercaAssunzioneDESCRIZIONE" class="it.eng.afExt.dispatching.module.impl.ListModule">
+<CONFIG pool="SIL_DATI" rows="15" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="CERCA_ASSUNZIONE_DESCRIZIONE">
+         <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strdenominazione" />
+      </SELECT_QUERY>
+    </QUERIES>
+   <COLUMNS>
+      <COLUMN name="CODTIPOASS" label="Codice"/>
+      <COLUMN name="STRDESCRIZIONE" label="Tipo di assunzione"/>
+   </COLUMNS>
+  <CAPTIONS>
+      <SELECT_CAPTION image="../../img/add.gif" confirm="FALSE" label="Dettaglio">
+             <PARAMETER scope="LOCAL" type="RELATIVE" name="codAss" value="CODTIPOASS"/>
+             <PARAMETER scope="LOCAL" type="RELATIVE" name="desAss" value="STRDESCRIZIONE"/>
+      </SELECT_CAPTION>
+ 		 </CAPTIONS>    
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_MotivoRichiesta" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="Get_MotivoRichiesta"/>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_Insert_NullaOsta" class="it.eng.sil.module.amministrazione.NullaOsta">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_NEXTVAL statement="SELECT_PRGNULLAOSTA_SEQUENCE"/>  
+    	<QUERY_INSERT_NULLA_OSTA statement="INS_NULLA_OSTA">
+	    	<PARAMETER name="PRGNULLAOSTA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGNULLAOSTA"/>
+	        <PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda"/>
+	        <PARAMETER name="PRGUNITA" scope="SERVICE_REQUEST" type="RELATIVE" value="prgUnita"/>
+	        <PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+	        <PARAMETER name="PRGAZIENDAUTILIZ" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDAUTILIZ"/>
+	        <PARAMETER name="PRGUNITAUTILIZ" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGUNITAUTILIZ"/>
+	        <PARAMETER name="CODMONOCATEGORIA" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOCATEGORIA"/>
+	        <PARAMETER name="CODMONOTIPO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOTIPO"/>
+	        <PARAMETER name="FLGCONVENZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="FLGCONVENZIONE"/>
+	        <PARAMETER name="PRGCONV" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONV"/>
+	        <PARAMETER name="CODMOTIVO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMOTIVO"/>
+	        <PARAMETER name="DATINIZIO" scope="SERVICE_REQUEST" type="RELATIVE" value="DATAINIZIOCM"/>
+	        <PARAMETER name="DATSPEDIZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="DATSPEDIZIONE"/>
+	        <PARAMETER name="CODMONOTEMPO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOTEMPO"/>
+	        <PARAMETER name="DATFINE" scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINE"/>
+	        <PARAMETER name="CODORARIO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODORARIO"/>
+	        <PARAMETER name="CODTIPOCONTRATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOCONTRATTO"/>
+	        <PARAMETER name="CODAGEVOLAZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="CODAGEVOLAZIONE"/>
+	        <PARAMETER name="DECORESETT" scope="SERVICE_REQUEST" type="RELATIVE" value="DECORESETT"/>
+	        <PARAMETER name="CODMANSIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMANSIONE"/>
+	        <PARAMETER name="NUMLIVELLO" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMLIVELLO"/>
+	        <PARAMETER name="CODCCNL" scope="SERVICE_REQUEST" type="RELATIVE" value="codCCNL"/>
+	        <PARAMETER name="DECRETRIBUZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="DECRETRIBUZIONE"/>
+	        <PARAMETER name="PROVINCIA_ISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="PROVINCIA_ISCR" />
+	        <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>	
+		</QUERY_INSERT_NULLA_OSTA>
+		<CM_AGG_LAV_IN_CONV statement="CM_AGG_LAV_IN_CONV"/>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_InfoNullaOsta" class="it.eng.sil.module.amministrazione.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="SELECT_INFONULLAOSTA">
+    	<PARAMETER name="PRGNULLAOSTA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGNULLAOSTA"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Save_NullaOsta" class="it.eng.sil.module.amministrazione.SaveNullaOsta">
+  <CONFIG pool="SIL_DATI" title="">
+  <QUERY_SELECT statement="SELECT_NUMKLONULLAOSTA">			
+        	<PARAMETER name="PRGNULLAOSTA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGNULLAOSTA"/>	
+   </QUERY_SELECT>
+    <QUERY_UPDATE_NULLA_OSTA statement="UPDATE_NULLAOSTA">    
+       	<PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+       	<PARAMETER name="PRGUNITA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGUNITA"/>
+       	<PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+       	<PARAMETER name="PRGAZIENDAUTILIZ" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDAUTILIZ"/>
+       	<PARAMETER name="PRGUNITAUTILIZ" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGUNITAUTILIZ"/>
+       	<PARAMETER name="CODMONOCATEGORIA" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOCATEGORIA"/>
+       	<PARAMETER name="CODMONOTIPO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOTIPO"/>
+       	<PARAMETER name="FLGCONVENZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="FLGCONVENZIONE"/>
+       	<PARAMETER name="PRGCONV" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONV"/>
+       	<PARAMETER name="CODMOTIVO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMOTIVO"/>
+       	<PARAMETER name="DATINIZIO" scope="SERVICE_REQUEST" type="RELATIVE" value="DATAINIZIOCM"/>
+       	<PARAMETER name="DATSPEDIZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="DATSPEDIZIONE"/>
+       	<PARAMETER name="CODMONOTEMPO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOTEMPO"/>
+       	<PARAMETER name="DATFINE" scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINE"/>
+       	<PARAMETER name="CODORARIO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODORARIO"/>
+       	<PARAMETER name="CODTIPOCONTRATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOCONTRATTO"/>
+       	<PARAMETER name="CODAGEVOLAZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="CODAGEVOLAZIONE"/>
+       	<PARAMETER name="DECORESETT" scope="SERVICE_REQUEST" type="RELATIVE" value="DECORESETT"/>
+       	<PARAMETER name="CODMANSIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMANSIONE"/>
+       	<PARAMETER name="NUMLIVELLO" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMLIVELLO"/>
+       	<PARAMETER name="CODCCNL" scope="SERVICE_REQUEST" type="RELATIVE" value="CODCCNL"/>
+       	<PARAMETER name="DECRETRIBUZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="DECRETRIBUZIONE"/>
+       	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER name="NUMKLONULLAOSTA" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLONULLAOSTA"/> 
+       	<PARAMETER name="PRGNULLAOSTA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGNULLAOSTA"/>
+     </QUERY_UPDATE_NULLA_OSTA>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="SalvaNullaOstaDoc" class="it.eng.sil.module.amministrazione.NullaOsta">
+    <CONFIG pool="SIL_DATI" title="">
+		<QUERY_SELECT_DOC statement="SELECT_PRG_DOC_NULLAOSTA">			
+        	<PARAMETER name="STRCHIAVETABELLA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGNULLAOSTA"/>      							
+		</QUERY_SELECT_DOC>
+		<QUERY_UPDATE_DOC statement="UPDATE_DOC_ASS_NULLA_OSTA">
+        	<PARAMETER name="CODSTATOATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODSTATOATTO"/>			
+		    <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>			
+        	<PARAMETER name="NUMKLODOCUMENTO" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLODOCUMENTO"/>
+        	<PARAMETER name="PRGDOCUMENTO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGDOCUMENTO"/>        	      							
+		</QUERY_UPDATE_DOC>	
+		<CM_AGG_LAV_IN_CONV statement="CM_AGG_LAV_IN_CONV"/>			            		
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="CHECK_LAV_PROVINCIA" class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="GET_LAV_PROVINCIA">
+		<PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="CM_CHECK_ISCR_CM" class="it.eng.sil.module.documenti.GenericSelect" >
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_LAV_ISCR_CM" >
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>    
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_ENCRYPTER_KEY_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Load_Doc_NullaOsta" class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="SELECT_FROM_DOCUMENTO_NULLAOSTA">
+		<PARAMETER name="STRCHIAVETABELLA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGNULLAOSTA"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_InserisciLavNullaOsta" class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="SELECT_LAV_NULLAOSTA">
+		<PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_InserisciAziendaNullaOsta" class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="SELECT_AZIENDA_NULLAOSTA">
+		<PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+		<PARAMETER name="PRGUNITA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGUNITA"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_ASSOCIA_CONVENZIONI_NO" class="it.eng.afExt.dispatching.module.impl.ListModule">
+<CONFIG pool="SIL_DATI" rows="15" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="ASSOCIA_CONVENZIONI_NULLAOSTA">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA" />	      
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="COD_PROVINCIA_ISCR" />
+         
+      </SELECT_QUERY>
+    </QUERIES>
+   <COLUMNS>
+      <COLUMN name="DESCSTATO" label="Stato" />
+	  <COLUMN name="CONV" label="Num/Anno" />
+	  <COLUMN name="DATCONVENZIONE" label="Data convenzione" />
+	  <COLUMN name="DATSCADENZA" label="Data scadenza" />
+	  <COLUMN name="PROVINCIA_ISCR" label="Ambito Territoriale"/>
+   </COLUMNS>
+  <CAPTIONS>
+      <SELECT_CAPTION image="../../img/add.gif" confirm="FALSE" label="Dettaglio">
+             <PARAMETER name="PAGE"          type="ABSOLUTE" value="RefreshConvenzioniPage" />
+				<PARAMETER name="cdnFunzione"   type="RELATIVE" scope="SERVICE_REQUEST" value="cdnFunzione"/>
+				<PARAMETER name="AGG_FUNZ"   type="RELATIVE" scope="SERVICE_REQUEST" value="AGG_FUNZ"/>
+				<PARAMETER name="prgConv"    type="RELATIVE" scope="LOCAL" value="prgconv"/>
+				<PARAMETER name="prgAzienda"    type="RELATIVE" scope="LOCAL" value="prAzienda"/>
+				
+      </SELECT_CAPTION>
+  </CAPTIONS>    
+</CONFIG>
+</MODULE>
+
+<MODULE name="M_NUMKLONULLAOSTA" class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="GET_NUMKLONULLAOSTA">
+		<PARAMETER name="PRGNULLAOSTA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGNULLAOSTA"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE> 
+
+<MODULE name="M_ST_MODELLO_NULLAOSTA" class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="ST_MODELLO_STAMPA_NULLAOSTA">
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE> 
+
+
+
+
+<!-- *************************************************************************** 
+                                    CM Carico
+     *************************************************************************** -->
+
+<MODULE name="M_inserisci_carico" class="it.eng.sil.module.amministrazione.InsertCarico">
+  <CONFIG pool="SIL_DATI" title="">
+	<QUERY_NEXTVAL statement="GET_CM_LAV_CARICO_NEXTVAL"/>  
+    <QUERY_INSERT_CARICO statement="INSERT_CARICO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGLAVCARICO"/>		
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>    	
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMPERSONE"/>    	
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATDICHIARAZIONE"/>
+		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>		
+	</QUERY_INSERT_CARICO>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Load_Carico" class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="LOAD_CARICO">
+		<PARAMETER name="PRGLAVCARICO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGLAVCARICO"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Load_Lav_Carico" class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT statement="LOAD_LAV_CARICO">
+		<PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+	</QUERY_SELECT>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Save_Carico" class="it.eng.sil.module.amministrazione.SaveCarico">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_UPDATE_CARICO statement="UPDATE_CARICO">    
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMPERSONE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATDICHIARAZIONE"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGLAVCARICO"/>      
+    </QUERY_UPDATE_CARICO>
+  </CONFIG>
+</MODULE>
+
+
+
+<!-- *************************************************************************** 
+                                    CM Servizi
+     *************************************************************************** -->
+
+<MODULE name="ListaServiziSelezionati" class="it.eng.afExt.dispatching.module.impl.ListModule">
+  <CONFIG pool="SIL_DATI" rows="20" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="LIST_CM_SERVIZI_SELEZIONATI">
+       	  <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" />
+       </SELECT_QUERY>
+    </QUERIES>  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Inserisci_CM_Servizio" class="it.eng.sil.module.amministrazione.InsertCMServizio">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY_LOAD_SERVIZI statement="LOAD_SERVIZI">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+  	</QUERY_LOAD_SERVIZI>
+    <QUERY_INSERT_SERVIZI statement="INSERT_CM_SERVIZIO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codServizio"/>
+		<PARAMETER name="STRSPECIFICA" scope="SERVICE_REQUEST" type="RELATIVE" value="STRSPECIFICA"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+		<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+	</QUERY_INSERT_SERVIZI>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Delete_Servizio" class="it.eng.sil.module.anag.DeleteServ">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DELETE_CM_SERVIZIO">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codServizio"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_AggiornaMobRicerca" class="it.eng.sil.module.amministrazione.AggiornaMobRicerca">
+  <CONFIG pool="SIL_DATI" title="">
+  </CONFIG>
+</MODULE>
+
+
+<!-- *************************************************************************** 
+                                   Obbligo di Istruzione
+     *************************************************************************** -->
+
+<MODULE name="ListaObbligoIstruzione" class="it.eng.afExt.dispatching.module.impl.ListModule">
+  <CONFIG pool="SIL_DATI" rows="20" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="LIST_AM_OBBLIGO_ISTRUZIONE">
+       	  <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" />
+       </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="codice" label="Codice"/>
+      <COLUMN name="descrizione" label="Descrizione"/>
+      <COLUMN name="datainizio" label="Data Inizio"/>
+      <COLUMN name="datafine" label="Data Fine"/>
+    </COLUMNS>
+    <CAPTIONS>
+       <DELETE_CAPTION confirm="TRUE" label="Cancella">
+	       <PARAMETER name="prgobbligoistruzione" type="RELATIVE" value="prgobbligoistruzione" scope="LOCAL"/>
+       </DELETE_CAPTION>
+      <SELECT_CAPTION image="" confirm="FALSE" label="Dettaglio">
+	       <PARAMETER name="prgobbligoistruzione" type="RELATIVE" value="prgobbligoistruzione" scope="LOCAL"/>
+      </SELECT_CAPTION>
+    </CAPTIONS> 
+<!-- 
+      	   <PARAMETER name="PAGE"   type="ABSOLUTE" value="ObbligoIstruzionePage"/>
+      	   <PARAMETER name="MODULE" type="ABSOLUTE" value="M_Delete_Servizio" scope=""/>
+	       <PARAMETER name="bottonePremuto" type="ABSOLUTE" value="cancella"/>
+	       <PARAMETER name="cdnLavoratore" type="RELATIVE" value="cdnLavoratore" scope="SERVICE_REQUEST"/>
+	       <PARAMETER name="cdnFunzione" scope="SERVICE_REQUEST" type="RELATIVE" value="cdnFunzione"/>	       
+    <CAPTIONS>
+       <DELETE_CAPTION confirm="TRUE" label="Cancella">
+      	   <PARAMETER name="PAGE"   type="ABSOLUTE" value="ObbligoIstruzionePage"/>
+      	   <PARAMETER name="MODULE" type="ABSOLUTE" value="M_Delete_Servizio" scope=""/>
+	       <PARAMETER name="eliminaServizio" type="ABSOLUTE" value="1"/>
+	       <PARAMETER name="cdnLavoratore" type="RELATIVE" value="cdnLavoratore" scope="SERVICE_REQUEST"/>
+	       <PARAMETER name="cdnFunzione" scope="SERVICE_REQUEST" type="RELATIVE" value="cdnFunzione"/>	       
+	       <PARAMETER name="codServizio" scope="LOCAL" type="RELATIVE" value="codice"/>
+	       <PARAMETER name="STRSPECIFICA" scope="LOCAL" type="RELATIVE" value="STRSPECIFICA"/>
+       </DELETE_CAPTION>
+    </CAPTIONS>    
+-->
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GET_DETTAGLIO_CONDIZIONE" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="" rows="-1">
+      <QUERY statement="GET_DETTAGLIO_CONDIZIONE">
+          <PARAMETER name="prgobbligoistruzione" type="RELATIVE" value="prgobbligoistruzione" scope="SERVICE_REQUEST"/>
+      </QUERY>
+  </CONFIG>
+</MODULE>
+
+<!-- Caricamento combo TIPO CONDIZIONE -->
+<MODULE name="M_COMBO_TIPO_CONDIZIONE" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="" rows="-1">
+      <QUERY statement="COMBO_TIPO_CONDIZIONE">
+      </QUERY>
+  </CONFIG>
+</MODULE>
+
+<!-- Caricamento PRGLAVSTORIAINF by cdnLavoratore -->
+<MODULE name="M_GET_ANLAVSTORIAINF_DA_CDNLAV" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="" rows="-1">
+      <QUERY statement="GET_ANLAVSTORIAINF_DA_CDNLAV">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+      </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Inserisci_Condizione" class="it.eng.sil.module.amministrazione.obbligoIstruzione.InsertCondizione">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT statement="INSERT_CONDIZIONE">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgobbligoistruzione"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codtipocondizione"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGLAVSTORIAINF"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datainizioobbligo"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datafineobbligo"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strnote"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="numLock"/>
+		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>		
+		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+<!--
+-->
+	</QUERY_INSERT>	
+	<QUERY_NEXTVAL statement="INSERT_CONDIZIONE_NextVal"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_AGGIORNA_CONDIZIONE" class="it.eng.sil.module.amministrazione.GenericUpdate">
+  <CONFIG pool="SIL_DATI" title="">
+      <QUERY statement="AGGIORNA_CONDIZIONE">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codtipocondizione"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prglavstoriainf"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datainizioobbligo"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="datafineobbligo"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strnote"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="numLock4upd"/>
+	      <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgobbligoistruzione"/>
+      </QUERY>
+  </CONFIG>
+</MODULE>
+
+<!--M_AmmDelDichSosp-->
+<MODULE name="M_DELETE_AM_OBBLIGO_ISTRUZIONE" class="it.eng.sil.module.amministrazione.GenericDelete">
+  <CONFIG pool="SIL_DATI" title="" rows="-1">
+      <QUERY statement="DELETE_AM_OBBLIGO_ISTRUZIONE">
+          <PARAMETER name="prgobbligoistruzione" type="RELATIVE" value="prgobbligoistruzione" scope="SERVICE_REQUEST"/>
+      </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetConfig_Mobilita" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="" rows="-1">
+      <QUERY statement="ST_GETCONFIGURAZIONE_MOBILITA_GEN"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetConfig_Tirocinio" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="ST_GET_CONFIG_TIROCINIO"/>	  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetDescQualificaSRQ" class="it.eng.sil.module.amministrazione.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="ST_GET_DESC_QUALIFICASRQ">
+    	<PARAMETER name="CODQUALIFICASRQ" type="RELATIVE" value="CODQUALIFICASRQ" scope="SERVICE_REQUEST"/>
+    </QUERY>	  
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_LIST_GEST_CIG_LAV1" class="it.eng.afExt.dispatching.module.impl.ListModule">
+<CONFIG pool="SIL_DATI" rows="50" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="AMM_GET_LISTA_CIG_LAV">
+          <PARAMETER name="cdnLavoratore1" type="RELATIVE" value="cdnLavoratore1" scope="SERVICE_REQUEST"/>
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="descrIscr" label="Iscrizione"/>
+      <COLUMN name="stato" label="Stato"/>
+      <COLUMN name="descrAz" label="Rag. Soc. - CF"/>
+      <COLUMN name="pic" label="PIC"/>  
+      <COLUMN name="numCorsiOrienter" label="Corsi Orienter"/>  
+      <COLUMN name="numCorsiCatalogo" label="Corsi Catalogo"/>       
+    </COLUMNS>
+    <CAPTIONS>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_LIST_GEST_CIG_LAV2" class="it.eng.afExt.dispatching.module.impl.ListModule">
+<CONFIG pool="SIL_DATI" rows="50" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="AMM_GET_LISTA_CIG_LAV">
+          <PARAMETER name="cdnLavoratore2" type="RELATIVE" value="cdnLavoratore2" scope="SERVICE_REQUEST"/>
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="descrIscr" label="Iscrizione"/>
+      <COLUMN name="stato" label="Stato"/>
+      <COLUMN name="descrAz" label="Rag. Soc. - CF"/>
+      <COLUMN name="pic" label="PIC"/>  
+      <COLUMN name="numCorsiOrienter" label="Corsi Orienter"/>  
+      <COLUMN name="numCorsiCatalogo" label="Corsi Catalogo"/>       
+    </COLUMNS>
+    <CAPTIONS>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+
+
+<MODULE name="M_configurazione" class="it.eng.afExt.dispatching.module.impl.ListModule">
+<CONFIG pool="SIL_DATI" rows="15" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="S_configurazione_provincie"/>      
+    </QUERIES>
+    
+   <COLUMNS>
+      <COLUMN name="codtipoconfig" label="Codice Configurazione"/>
+      <COLUMN name="strdescrizione" label="Descrizione"/>    
+      <COLUMN name="num" label="Numero della Configurazione"/>     
+      <COLUMN name="datinizioval" label="Data Inizio"/>  
+      <COLUMN name="datfineval" label="Data Fine"/>  
+      <COLUMN name="strcategoria" label="Categoria"/>                
+    </COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/detail.gif" label="consulta o modifica" confirm="false" hiddenColumn="attiva">
+        <PARAMETER name="PAGE" type="ABSOLUTE" value="DettaglioConfPage"/>
+		<PARAMETER name="codtipoconfig" type="RELATIVE" scope="LOCAL" value="codtipoconfig"/>                          
+      </SELECT_CAPTION>      
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_dett_configurazione" class="it.eng.afExt.dispatching.module.impl.ListModule">
+<CONFIG pool="SIL_DATI" rows="15" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="S_dettaglio_configurazione_provincie">   
+       		<PARAMETER name="codtipoconfig" type="RELATIVE" scope="SERVICE_REQUEST" value="codtipoconfig"/>       		
+       </SELECT_QUERY>  
+    </QUERIES>   
+	<COLUMNS>
+      <COLUMN name="codtipoconfig" label="Codice Configurazione"/>
+      <COLUMN name="strdescrizione" label="Descrizione"/>
+      <COLUMN name="strnote" label="Note"/>
+      <COLUMN name="num" label="Num della Configurazione"/>     
+      <COLUMN name="datinizioval" label="Data inizio"/>  
+      <COLUMN name="datfineval" label="Data fine"/>  
+      <COLUMN name="strcategoria" label="Categoria"/>
+      <COLUMN name="nometabella" label="Tabella"/>     
+      <COLUMN name="codice" label="Codice Parametro"/>       
+	  <COLUMN name="configurazione" label="Numero della Configurazione Usata"/>           
+    </COLUMNS>   
+ 
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_LoadServizioCM" class="it.eng.sil.module.presel.SelectGenerica">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_DETTAGLIO_SERVIZIO_CM">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_Aggiorna_CM_Servizio" class="it.eng.sil.module.amministrazione.UpdateCMServizio">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_UPDATE_SERVIZI statement="UPDATE_CM_SERVIZIO">
+		<PARAMETER name="STRSPECIFICA" scope="SERVICE_REQUEST" type="RELATIVE" value="STRSPECIFICA"/>
+		<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codServizio"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+	</QUERY_UPDATE_SERVIZI>	
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_InsertInvioAutSAP" class="it.eng.sil.module.doInsertModule">
+	<CONFIG pool="SIL_DATI" title="" rows="-1">
+		<QUERY statement="INSERT_TS_INVIO_AUT_SAP">
+			<PARAMETER type="RELATIVE" value="cdnLavInCuiAccorpare" scope="SERVICE_REQUEST" />
+			<PARAMETER type="RELATIVE" value="codiceFiscaleTo" scope="SERVICE_REQUEST" />
+		</QUERY>
+	</CONFIG>
+</MODULE>

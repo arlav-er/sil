@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/template_portlet.xhtml">
+
+	<ui:param name="portletCssClass" value="portletServiziAmministrativi" />
+
+	<ui:define name="portlet_title">
+		<h:outputText value="#{msg['cittadino.portlet.servizi.titolo']}"
+			escape="false" />
+	</ui:define>
+
+	<ui:define name="portlet_content">
+		<div style="text-align: justify;">
+			<h:outputText value="#{txt['cittadino.portlet.servizi.descrizione_abilitato_servizi']}" escape="false" 
+				rendered="#{sessionBean.connectedUtente.abilitatoServizi}"/>
+			<h:outputText value="#{txt['cittadino.portlet.servizi.descrizione']}" escape="false" 
+				rendered="#{not sessionBean.connectedUtente.abilitatoServizi}"/>
+			
+			<h:panelGroup rendered="#{not sessionBean.connectedUtente.abilitatoServizi }">
+				<hr style="border-color: #FFCC3D;" />
+				
+				<h:panelGroup rendered="#{empty sessionBean.connectedUtente.pfPrincipalDTO.flagAbilitaPec}">
+					<p>Per accedere ai servizi, è necessario ottenere il riconoscimento
+						"Abilita i servizi amministrativi".</p>
+					<a class="buttonStyle" href="#{sessionBean.getUrlMyAccount()}/secure/account/edit">
+						Richiedi abilitazione</a>
+				</h:panelGroup>
+				
+				<h:panelGroup rendered="#{not empty sessionBean.connectedUtente.pfPrincipalDTO.flagAbilitaPec
+					and not sessionBean.connectedUtente.pfPrincipalDTO.flagAbilitaPec}">
+					<h4>Richiesta di abilitazione in corso. Attendere risposta dal CPI.</h4>
+				</h:panelGroup>
+				
+				<h:panelGroup rendered="#{sessionBean.connectedUtente.pfPrincipalDTO.flagAbilitaPec}">
+					<p>Per accedere ai servizi, è necessario inserire il codice di autenticazione
+						fornito dal CPI nella pagina "abilita ai servizi amministrativi".</p>
+					<a class="buttonStyle" href="#{sessionBean.getUrlMyAccount()}/secure/account/edit">
+						Richiedi il codice di abilitazione</a>
+					<a class="buttonStyle" href="servizi/confermaRegistrazione.xhtml">
+						Abilita ai servizi amministrativi</a>
+				</h:panelGroup>
+			</h:panelGroup>
+			 
+		</div>	
+		
+		<h:link rendered="#{sessionBean.connectedUtente.abilitatoServizi and utenteHomeBean.checkAbilitazioneVisibile('servizi_amministrativi_btn')}"
+				styleClass="buttonStyle" 
+				outcome="/secure/utente/servizi/index.xhtml"
+				title="Accedi ai servizi per il cittadino">Accedi ai servizi amministrativi</h:link>
+	</ui:define>
+</ui:composition>

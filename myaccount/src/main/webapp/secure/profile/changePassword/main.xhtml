@@ -1,0 +1,140 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui">
+
+<ui:composition template="/templates/#{godfatherBean.theme}/infoBox.xhtml">
+	<ui:param name="pagetitle" value="#{ui['changeP.title']}" />
+	<ui:define name="boxTitle">
+		<p class="text-center mb-lg">
+			<a href="#"> </a>
+		</p>
+		<p class="text-center mb-lg">
+			<strong>#{ui['changeP.title']}</strong>
+		</p>
+	</ui:define>
+	<ui:define name="boxBody">
+		<h:form id="changePasswordForm" styleClass="form-horizontal">
+			<p:defaultCommand target="changeBtn"></p:defaultCommand>
+			<h:panelGroup rendered="#{not secureChangePasswordBean.passwordChanged}">
+				<p>#{ui['changeP.desc']}</p>
+				<div class="form-group has-feedback">
+					<p:outputLabel value="#{ui['prof.oldPassword']}" styleClass="col-lg-2 control-label" for="oldPassword" />
+					<div class="col-lg-10">
+						<p:password id="oldPassword" required="true" label="#{ui['prof.oldPassword']}" styleClass="form-control"
+							maxlength="32" validator="#{secureChangePasswordBean.checkOldPasswordValidator}">
+						</p:password>
+						<span class="fa fa-lock form-control-feedback text-muted"></span>
+						<p:message id="oldPasswordMessage" for="oldPassword"></p:message>
+					</div>
+				</div>
+				<div class="form-group has-feedback">
+					<p:outputLabel value="#{ui['changeP.newPassword']}" styleClass="col-lg-2 control-label" for="password" />
+					<div class="col-lg-10">
+						<p:password id="password" match="passwordRepeat" required="true" label="#{ui['changeP.newPassword']}"
+							styleClass="form-control">
+							<o:validator validatorId="javax.faces.RegularExpression" pattern="#{validation['pattern.password']}"
+								message="#{validation['message.password']}" />
+						</p:password>
+						<span class="fa fa-lock form-control-feedback text-muted"></span>
+						<p:message id="passwordMessage" for="password"></p:message>
+					</div>
+				</div>
+				<div class="form-group has-feedback">
+					<p:outputLabel value="#{ui['shared.repeatPassword']}" styleClass="col-lg-2 control-label" for="passwordRepeat" />
+					<div class="col-lg-10">
+						<p:password id="passwordRepeat" value="#{secureChangePasswordBean.newPassword}" required="true"
+							label="#{ui['shared.repeatPassword']}" styleClass="form-control">
+							<o:validator validatorId="javax.faces.RegularExpression" pattern="#{validation['pattern.password']}"
+								message="#{validation['message.password']}" />
+						</p:password>
+						<span class="fa fa-lock form-control-feedback text-muted"></span>
+						<p:message id="repeatPasswordMessage" for="passwordRepeat"></p:message>
+					</div>
+				</div>
+
+				<ui:fragment rendered="#{secureChangePasswordBean.constantsSingleton.getCaptchaRequired()}">
+					<div class="uk-width-medium-1-2 uk-container-center" id="captchaGroup">
+						<p:captcha required="true" id="captcha" secure="true" language="it"
+							validatorMessage="Testo inserito non corrispondente" requiredMessage="#{validation['message.captcha']}"
+							theme="#{secureChangePasswordBean.constantsSingleton.isTrento()?'white':'red'}" />
+						<p:message for="captcha" id="captchaMessage" />
+					</div>
+				</ui:fragment>
+
+				<div class="text-center">
+					<ui:fragment rendered="#{not empty param['sociale']}">
+						<p:commandLink id="changeBtnSociale" actionListener="#{secureChangePasswordBean.changePassword}"
+							styleClass="ui-button btn btn-primary action-link" onstart="onActionStart()" oncomplete="onActionComplete()"
+							global="false" ajax="false">
+							<f:param name="sociale" value="0" />
+							<i class="fa fa-lock"></i> #{ui['changeP.cambia']}
+						</p:commandLink>
+					</ui:fragment>
+					<ui:fragment rendered="#{empty param['sociale']}">
+						<p:commandLink id="changeBtn" actionListener="#{secureChangePasswordBean.changePassword}"
+							styleClass="ui-button btn btn-primary action-link" onstart="onActionStart()" oncomplete="onActionComplete()"
+							global="false" ajax="false">
+							<i class="fa fa-lock"></i> #{ui['changeP.cambia']}
+						</p:commandLink>
+					</ui:fragment>
+					<h:graphicImage styleClass="action-loader" library="#{godfatherBean.theme}" name="images/loader.gif" alt="loader"
+						style="display: none" />
+				</div>
+			</h:panelGroup>
+			<h:panelGroup rendered="#{secureChangePasswordBean.passwordChanged}">
+				<p class="text-center">
+					<i class="fa fa-check-circle fa-3 fa-success "></i>
+				<blockquote class="text-center">
+					<p>#{ui['msg.updated']}</p>
+				</blockquote>
+				</p>
+				<p class="text-center">
+					<ui:fragment rendered="#{empty param['sociale']}">
+						<a href="#{secureChangePasswordBean.loginURL}" class="btn ui-button btn-primary btn-lg">#{ui['shared.tornaHomepage']}</a>
+					</ui:fragment>
+					<ui:fragment rendered="#{not empty param['sociale']}">
+						<a href="#{secureChangePasswordBean.loginSocialeURL}" class="btn ui-button btn-primary btn-lg">#{ui['shared.tornaHomepage']}</a>
+					</ui:fragment>
+				</p>
+			</h:panelGroup>
+		</h:form>
+		<script>				
+				function onActionStart() {
+					$('.action-link').hide();
+					$('.action-loader').show();
+				}
+
+				function onActionComplete() {
+					$('.action-link').show();
+					$('.action-loader').hide();
+				}
+
+		</script>
+		<style>
+@media only screen and (max-width: 1350px) {
+	#captchaGroup {
+		width: 80%;
+	}
+}
+
+@media only screen and (max-width: 1150px) {
+	#captchaGroup {
+		width: 50%;
+	}
+}
+</style>
+
+		<style>
+		@media screen and (max-height: 575px) {
+			#rc-imageselect, .g-recaptcha, .rc-anchor-container, #captchaGroup {
+				transform: scale(0.77);
+				-webkit-transform: scale(0.77);
+				transform-origin: 0 0;
+				-webkit-transform-origin: 0 0;
+				width: 100%;
+			}
+		}
+		</style>
+	</ui:define>
+</ui:composition>
+</html>

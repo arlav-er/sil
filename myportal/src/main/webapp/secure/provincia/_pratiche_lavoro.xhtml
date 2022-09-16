@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../template/tab.xhtml">
+
+	<ui:define name="tabcontent">
+		<ui:param name="bean" value="#{atipiciProvinciaBean}" />
+		
+		<style type="text/css">
+			a.page-link { text-decoration: none; }
+		</style>
+		
+		<h:outputText escape="false"
+			value="#{msg['provincia.pratiche_atipici.consulenza_lavoro.descrizione']}" />
+
+		<cc:waiting id="lavoroRispostaLoader" hidden="true" waitMessage="Risposta in corso..." />
+		<cc:waiting id="lavoroInoltroLoader" hidden="true" waitMessage="Inoltro in corso..." />
+		<cc:messages id="lavoroMessages" />
+			
+		<h:form id="lavoroListForm">
+			<div style="display: none;">
+				<h:inputHidden id="pageValue" value="#{bean.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{bean.changePage}" value="DUMMY FOR PAGINATION">
+					<f:ajax execute=":lavoroListForm:pageValue" 
+						render=":lavoroListForm:tabella :lavoroDetailForm" />
+				</h:commandButton>
+			</div>
+			
+			<ui:fragment rendered="#{empty bean.pratiche}">
+				<h2 class="nessun_elemento_trovato">Nessun elemento trovato.</h2>
+			</ui:fragment>
+			
+			<ui:fragment rendered="#{not empty bean.pratiche}">
+				<script type="text/javascript">
+					$(function() {							
+						$(jq("lavoroPaginationBar")).pagination({							    
+						pages: #{bean.paginationHandler.pages()},						       
+						cssStyle: 'light-theme',
+						prevText: 'Prec.',
+						nextText: 'Succ.',
+						onPageClick: function (pageNumber, event) {							        
+							document.getElementById('lavoroListForm:pageValue').value = pageNumber;
+							document.getElementById('lavoroListForm:pageCommand').click();
+							$(jq("lavoroDetailForm")).hide();
+							$(jq("lavoroListForm:tabella")).css("display", "none");					            
+							$(jq("lavoroListForm:paginationLoader")).css("display", "block");
+							$(jq("lavoroListForm:paginationLoader")).fadeIn();
+							}
+						});
+					});
+				</script>
+				
+				<div id="lavoroPaginationBar" class="widget_container ui-tabs ui-widget-content ui-corner-all" />
+				<br />
+			
+				<cc:waiting id="paginationLoader" hidden="true" waitMessage="Caricamento..." />	
+				
+				<h:panelGroup layout="block" id="tabella" class="dataTables_wrapper">		
+					<table class="dataTable">
+						<tr>
+							<th class="ui-state-default"></th>
+							<th class="ui-state-default">ID</th>
+							<th class="ui-state-default">Nome</th>
+							<th class="ui-state-default">Cognome</th>
+							<th class="ui-state-default">Data della richiesta</th>
+							<th class="ui-state-default">Inoltrata al CPI il:</th>
+							<th class="ui-state-default">Risposta all'utente il:</th>
+							<th class="ui-state-default">Stato</th>
+							<th class="ui-state-default">CPI incaricato</th>
+						</tr>
+						
+						<ui:repeat value="#{bean.pratiche}" var="pratica" varStatus="status">
+							<tr>
+								<td class="clickable-td">
+									<h:commandLink immediate="true" title="Apri"
+										class="myClass" action="#{bean.view}">
+										<span
+											class="ui-icon #{pratica.daLeggere ? 'ui-icon-mail-closed' : 
+											'ui-icon-mail-open'} fix_icon" />
+										<f:param name="id" value="#{pratica.id}" />
+										<f:ajax execute="@this" onevent="onShowDetail" 
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink immediate="true" title="Apri"
+										class="myClass" action="#{bean.view}">
+										<h:outputText value="#{pratica.id} &nbsp;"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:param name="id" value="#{pratica.id}" />
+										<f:ajax execute="@this" onevent="onShowDetail" 
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink immediate="true" title="Apri"
+										class="myClass" action="#{bean.view}">
+										<h:outputText value="#{pratica.nome} &nbsp;"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:param name="id" value="#{pratica.id}" />
+										<f:ajax execute="@this" onevent="onShowDetail" 
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink immediate="true" title="Apri"
+										class="myClass" action="#{bean.view}">
+										<h:outputText value="#{pratica.cognome} &nbsp;"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:param name="id" value="#{pratica.id}" />
+										<f:ajax execute="@this" onevent="onShowDetail" 
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view}">
+										<h:outputText value="#{empty pratica.dtInvio ? '&nbsp;' : pratica.dtInvio}"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}">
+											<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+										</h:outputText>
+										<f:param name="id" value="#{pratica.id}" />
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view}">
+										<h:outputText value="#{empty pratica.dtInoltroCPI ? '&nbsp;' : pratica.dtInoltroCPI}"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}">
+											<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+										</h:outputText>
+										<f:param name="id" value="#{pratica.id}" />
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view}">
+										<h:outputText value="#{empty pratica.dtRisposta ? '&nbsp;' : pratica.dtRisposta}"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}">
+											<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+										</h:outputText>
+										<f:param name="id" value="#{pratica.id}" />
+										<f:ajax execute="@this" onevent="onShowDetail"
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink immediate="true" title="Apri"
+										class="myClass" action="#{bean.view}">
+										<h:outputText value="#{pratica.statoPratica} &nbsp;"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:param name="id" value="#{pratica.id}" />
+										<f:ajax execute="@this" onevent="onShowDetail" 
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+								
+								<td class="clickable-td">
+									<h:commandLink immediate="true" title="Apri"
+										class="myClass" action="#{bean.view}">
+										<h:outputText value="#{pratica.targaCPIincaricato} &nbsp;"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:param name="id" value="#{pratica.id}" />
+										<f:ajax execute="@this" onevent="onShowDetail" 
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+							</tr>
+						</ui:repeat>
+					</table>
+						
+					<script>
+						disegnaBottoni();
+			       		$(jq("lavoroListForm:paginationLoader")).hide();
+					</script>
+				</h:panelGroup>
+			</ui:fragment>
+		</h:form>
+		<br />
+				
+		<cc:waiting id="lavoroDetailLoader" hidden="true" waitMessage="Caricamento..." />	
+		
+		<h:form id="lavoroDetailForm">
+			<h:panelGroup layout="block" rendered="#{bean.showPanel}" styleClass="insertPanel">
+
+				<div id="lavoroCorpoPraticaAtipici">
+					<ui:include src="/secure/atipici/corpo_pratica_atipici.xhtml">
+						<ui:param name="pratica" value="#{bean.pratica}" />
+						<ui:param name="readonly" value="#{true}" />
+					</ui:include>
+				</div>
+
+				<div>
+					<ui:include src="/secure/atipici/lista_messaggi_atipici.xhtml">
+						<ui:param name="pratica" value="#{bean.pratica}" />
+						<ui:param name="type" value="cpi" />
+					</ui:include>
+				</div>
+
+				<h:panelGroup layout="block" styleClass="multiMessageDiv messageDiv"
+					rendered="#{bean.pratica.rispostoCittadino}">
+							
+					<h:outputText value="Risposta/Integrazione del CPI" styleClass="mittente" />
+					
+					<div class="corpo">									
+						#{bean.pratica.risposte.get(0).corpo}
+					</div>
+
+					<cc:upload readonly="#{true}" label="Allegato"
+						rendered="#{not empty bean.pratica.consulenza.allegati}"
+						idAllegato="#{bean.pratica.consulenza.allegati[0].id}"
+						value="#{bean.pratica.consulenza.allegati[0].filename}" />
+				</h:panelGroup>
+				<br />
+
+				<h:panelGroup rendered="#{bean.pratica.consulenteKo || bean.pratica.inoltratoCpi 
+					|| bean.pratica.consulenteOk}">
+					
+					<cc:inputTextarea label="Risposta" maxlength="3000" richTextMode="false"
+						value="#{bean.risposta.corpo}" style="width:60%" />
+					<br />
+					
+					<cc:upload label="Inserisci un allegato"
+						value="#{bean.risposta.allegatoFileName}"
+						tmpValue="#{bean.risposta.allegatoFileNameTmp}" />
+					<br />
+					<br />
+
+					<h:commandLink styleClass="replyButton" value="Rispondi"
+						action="#{bean.rispondiCittadino}">
+							<f:ajax execute="@form" render=":lavoroListForm :lavoroDetailForm :lavoroMessages"
+								onevent="onReply" />
+					</h:commandLink>
+
+					<h:panelGroup rendered="#{bean.pratica.consulenteOk}">
+						<h:commandLink styleClass="forwardButton"
+							value="Inoltra risposta al cittadino"
+							action="#{bean.inoltraCittadino}">
+							<f:ajax execute="@form" render=":lavoroListForm :lavoroDetailForm :lavoroMessages"
+								onevent="onReply" />
+						</h:commandLink>
+					</h:panelGroup>
+					<br />
+				</h:panelGroup>
+				
+				<div style="margin-top: 0.5em;">
+					<h:commandLink styleClass="marginButton closeButton" id="closeButton"
+						action="#{bean.setShowPanel(false)}" value="Chiudi" immediate="true">
+						<f:ajax execute="@this" render=":lavoroDetailForm" 
+							onevent="onHideDetail" />
+					</h:commandLink>
+				</div>
+				
+				<script type="text/javascript">
+					disegnaBottoni();
+					$(jq("lavoroDetailLoader")).hide();
+				</script>
+			</h:panelGroup>
+		</h:form>
+		
+		<script type="text/javascript">
+			function onShowDetail(data) {
+				if (data.status == 'begin') {
+					$(jq("lavoroDetailForm")).hide();
+					$(jq("lavoroDetailLoader")).show();
+				} else if (data.status == 'success') {
+					PrimeFaces.scrollTo("lavoroDetailForm");
+				}
+			}
+		
+			function onHideDetail(data) {
+				if (data.status == 'begin') {
+					$(jq("lavoroDetailForm")).slideUp("slow");
+				}
+			}
+		
+			function onReply(data) {
+				if (data.status == 'begin') {
+					$(jq("lavoroListForm")).hide();
+					$(jq("lavoroDetailForm")).hide();
+					$(jq("lavoroRispostaLoader")).show();
+				}
+				if (data.status == 'success') {
+    	  			$(jq("lavoroRispostaLoader")).hide();
+				}
+			}
+		</script>
+	</ui:define>
+</ui:composition>

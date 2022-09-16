@@ -1,0 +1,52 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:pretty="http://ocpsoft.com/prettyfaces"
+	template="/templates/#{godfatherBean.theme}/main.xhtml">
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{sessionLogger.grantAccessFor(sessionLogger.getProvinciaAccess())}" />
+	</f:metadata>
+	<ui:param name="pagetitle" value="Profile" />
+	<ui:define name="content">
+		<div class="container-fluid">
+			<h:form id="creaCittadinoForm" enctype="multipart/form-data" styleClass="form-horizontal">
+				<h3>Creazione nuovo utente cittadino</h3>
+				<div class="panel-body profile-information row">
+					<div class="col-sm-5">
+						<div class="panel panel-default">
+							<div class="panel-heading">#{ui['regCit.datiAccount']}</div>
+							<div class="panel-body">
+								<ui:include src="creaCittadino/_datiAccount.xhtml" />
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-5">
+						<div class="panel panel-default">
+							<div class="panel-heading">#{ui['regCit.datiPersonali']}</div>
+							<div class="panel-body">
+								<ui:include src="creaCittadino/_datiPersonali.xhtml" />
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-12 panel-body text-center">
+						<p:commandButton value="Registra nuovo utente" styleClass="btn btn-primary"
+							action="#{provinciaCreaCittadinoBean.confermaCreazione}"
+							onclick="onActionStart();" oncomplete="onActionComplete();" 
+							update="@form" widgetVar="registraBtnWV"/>
+					</div>
+				</div>
+			</h:form>
+			<script>
+				function onActionStart() {
+					PF('registraBtnWV').disable();
+					$('.action-link').hide();
+					$('.action-loader').show();
+				}
+
+				function onActionComplete() {
+					PF('registraBtnWV').enable();
+					$('.action-link').show();
+					$('.action-loader').hide();
+				}
+			</script>
+		</div>
+	</ui:define>
+</ui:composition>

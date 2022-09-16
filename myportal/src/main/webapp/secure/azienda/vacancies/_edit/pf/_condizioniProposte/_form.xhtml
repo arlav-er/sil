@@ -1,0 +1,184 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:eng="http://java.sun.com/jsf/composite/components">
+	<div class="row">
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="contratti" value="Tipologia di contratto" styleClass="col-sm-3 control-label" />
+				<div class="col-md-9 col-lg-9">
+					<ui:fragment rendered="#{!vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}">
+					  <div class="input-group">
+						<p:autoComplete id="contratti" disabled="#{vacancyFormPfBean.isArchivedNoModify()}"
+							value="#{vacancyFormPfBean.vaCondizioniProposteSection.contrattiSelezionati}" converter="deContrattoSilConverter"
+							forceSelection="true" var="deContrattoSil" itemLabel="#{deContrattoSil.descrizione}"
+							label="Tipologia di contratto" itemValue="#{deContrattoSil}" emptyMessage="#{ui['shared.emptyAutoComplete']}"
+							completeMethod="#{vacancyFormPfBean.vaCondizioniProposteSection.completeContrattoSilFlagIdoTrueWithoutSelected}"
+							styleClass="form-control" widgetVar="contrattiWV" size="55" minQueryLength="2" scrollHeight="200" multiple="true">
+							<p:ajax event="itemSelect" listener="#{vacancyFormPfBean.vaCondizioniProposteSection.handleChangeContratto}"
+								process="@this" oncomplete="MyPortal.Vacancy.notifySave();" />
+
+							<p:ajax event="itemUnselect" listener="#{vacancyFormPfBean.vaCondizioniProposteSection.handleChangeContratto}"
+								process="@this" oncomplete="MyPortal.Vacancy.notifySave();" />							
+						</p:autoComplete>
+						<ui:fragment rendered="#{!vacancyFormPfBean.isArchivedNoModify() and !vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}">
+							<span class="input-group-btn input-button">
+								<button class="btn btn-default " type="button" onclick="MyPortal.fireAutocompleteSearch('contrattiWV')"
+									aria-label="Mostra Contratti">
+									<i class="fa fa-search" aria-hidden="true"></i>
+								</button>
+							</span>
+						</ui:fragment>
+					  </div>
+                    </ui:fragment>
+					<p:message id="contrattiMessage" for="contratti"></p:message>
+					<ui:fragment rendered="#{vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}">
+				      <div class="form-group">
+						 <p:inputTextarea maxlength="250" disabled="true" value="#{vacancyFormPfBean.vaCondizioniProposteSection.concatContrattiReadOnly}"
+							styleClass="form-control" >
+						 </p:inputTextarea>
+				      </div>
+				    </ui:fragment>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="benefit" value="Benefit (rimborsi, buoni pasto, altro)" styleClass="col-sm-3 control-label" />
+				<div class="col-md-9 col-lg-9">
+					<p:inputTextarea id="benefit" maxlength="250" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+						styleClass="form-control compact-textarea" autoResize="false" counter="benefitCount"
+						counterTemplate="{0} caratteri rimanenti"
+						value="#{vacancyFormPfBean.vaCondizioniProposteSection.vaRetribuzione.benefit}">
+						<f:validateLength for="function" maximum="250" />
+					</p:inputTextarea>
+					<br />
+					<p:message for="benefit" />
+					<h:outputText id="benefitCount" />
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="retribuzione" value="Retribuzione lorda mensile indicativa" styleClass="col-sm-3 control-label" />
+				<div class="col-md-9 col-lg-9">
+					<p:inputText id="retribuzione" maxlength="100" type="number" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+						value="#{vacancyFormPfBean.vaCondizioniProposteSection.vaRetribuzione.retribuzione}" styleClass="form-control">
+						<f:validateLength for="function" maximum="100" />
+					</p:inputText>
+					<p:message for="retribuzione" />
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="ccnl" value="CCNL" styleClass="col-sm-3 control-label" />
+				<div class="col-md-9 col-lg-9">
+					<p:inputText id="ccnl" maxlength="100" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+						value="#{vacancyFormPfBean.vaCondizioniProposteSection.vaRetribuzione.ccnl}" styleClass="form-control">
+						<f:validateLength for="function" maximum="100" />
+					</p:inputText>
+					<p:message for="ccnl" />
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="orari" value="Orari" styleClass="col-sm-3 control-label" />
+				<div class="col-md-6 col-lg-6">
+					<ui:fragment rendered="#{!vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}">
+					  <div class="input-group">
+						<p:autoComplete id="orari" disabled="#{vacancyFormPfBean.isArchivedNoModify()}"
+							value="#{vacancyFormPfBean.vaCondizioniProposteSection.orariSelezionati}" converter="deOrarioSilConverter"
+							forceSelection="true" var="deOrarioSil" itemLabel="#{deOrarioSil.descrizioneIdo}" label="Orari"
+							itemValue="#{deOrarioSil}" emptyMessage="#{ui['shared.emptyAutoComplete']}"
+							completeMethod="#{vacancyFormPfBean.vaCondizioniProposteSection.completeOrarioSilFlagIdoTrueWithoutSelected}"
+							styleClass="form-control" widgetVar="orariWV" size="55" minQueryLength="2" scrollHeight="200" multiple="true">
+							<p:ajax event="itemSelect" listener="#{vacancyFormPfBean.vaCondizioniProposteSection.handleChangeOrario}"
+								process="@this" oncomplete="MyPortal.Vacancy.notifySave();" />
+							<p:ajax event="itemUnselect" listener="#{vacancyFormPfBean.vaCondizioniProposteSection.handleChangeOrario}"
+								process="@this" oncomplete="MyPortal.Vacancy.notifySave();" />
+						</p:autoComplete>
+						<ui:fragment rendered="#{!vacancyFormPfBean.isArchivedNoModify() and !vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}">
+							<span class="input-group-btn input-button">
+								<button class="btn btn-default " type="button" onclick="MyPortal.fireAutocompleteSearch('orariWV')"
+									aria-label="Mostra Orari">
+									<i class="fa fa-search" aria-hidden="true"></i>
+								</button>
+							</span>
+						</ui:fragment>
+					  </div>
+					</ui:fragment>
+					<p:message id="orariMessage" for="orari"></p:message>
+					<ui:fragment rendered="#{vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}">
+				      <div class="form-group">
+						 <p:inputText maxlength="250" disabled="true" value="#{vacancyFormPfBean.vaCondizioniProposteSection.concatOrariReadOnly}"
+							styleClass="form-control" >
+						 </p:inputText>
+				      </div>
+				    </ui:fragment>
+				</div>
+				<div class="form-group">
+					<p:selectBooleanCheckbox disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+						value="#{vacancyFormPfBean.vaCondizioniProposteSection.vaAltreInfo.flagOrarioContinuato}"
+						widgetVar="OrarioContinuatoWV" rendered="true" id="OrarioContinuato">
+						<p:ajax event="change" process="@this" />
+					</p:selectBooleanCheckbox>
+					<h:outputLabel id="OrarioContinuatolabel" for="OrarioContinuato" styleClass="col-sm-2">
+						<h:outputText value="Orario Continuato" />
+					</h:outputLabel>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-12"></div>
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel value="Data presunta di inizio del rapporto" for="dtInizio" styleClass="col-sm-3 control-label" />
+				<div class="col-md-9 col-lg-9">
+					<p:calendar id="dtInizio" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+						label="Data presunta di inizio del rapporto" navigator="true" pattern="dd/MM/yyyy"
+						requiredMessage="Data Inizio Obbligatoria"
+						value="#{vacancyFormPfBean.vaCondizioniProposteSection.vaAltreInfo.dataPresuntaAssunzione}"
+						converterMessage="Data non valida!" mindate="#{vacancyFormPfBean.vaCondizioniProposteSection.getCurrentDate()}"
+						styleClass="form-control" locale="it" widgetVar="dtInizioWV" mask="true">
+						<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+						<f:attribute name="limitDate" value="#{vacancyFormPfBean.vaCondizioniProposteSection.getCurrentDate()}" />
+
+					</p:calendar>
+					Inserisci la data con il formato gg/mm/aaaa
+					<p:message id="dtInizioMessage" for="dtInizio"></p:message>
+				</div>
+
+
+			</div>
+		</div>
+
+		<div class="col-md-12">
+			<div class="form-group">
+				<p:outputLabel for="turni" value="Turni" styleClass="col-sm-3 control-label">
+					<i class="m-l-10 fa fa-info-circle info-circile"
+						title="Tipologia di articolazione su turni, se prevista (es. pomeridiano, notturno, ecc.)" data-toggle="tooltip"
+						data-placement="top" data-container="body"></i>
+				</p:outputLabel>
+				<div class="col-md-9 col-lg-9">
+					<p:inputTextarea id="turni" maxlength="250" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+						value="#{vacancyFormPfBean.vaCondizioniProposteSection.vaAltreInfo.turni}"
+						styleClass="form-control compact-textarea" autoResize="false" counter="turniCount"
+						counterTemplate="{0} caratteri rimanenti">
+						<f:validateLength for="turni" maximum="250" />
+					</p:inputTextarea>
+					<br />
+					<p:message for="turni" />
+					<h:outputText id="turniCount" />
+				</div>
+			</div>
+		</div>
+
+	</div>
+</ui:composition>

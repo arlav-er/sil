@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<composite:interface componentType="">
+		<composite:attribute name="label" />
+		<composite:attribute name="value" required="true" />
+		<composite:attribute name="disabled" type="java.lang.Boolean"
+			default="false" />
+		<composite:attribute name="disableLabel" type="java.lang.Boolean"
+			default="false" />
+		<composite:attribute name="disableInput" type="java.lang.Boolean"
+			default="false" />
+		<composite:attribute name="editingMode" default="true"
+			type="java.lang.Boolean"
+			shortDescription="visualizzato come checkbox oppure come testo" />
+		<composite:attribute name="readonly" type="java.lang.Boolean" />
+		<composite:attribute name="helpMessage" />
+		<composite:attribute name="onchange" />
+		<composite:attribute name="required" default="false" />
+		<composite:attribute name="requiredMessage"
+			default="Campo obbligatorio" />
+		<composite:attribute name="style" />
+		<composite:attribute name="styleClass" default="inner-shadow" />
+		<composite:attribute name="title" />
+		<composite:attribute name="inline" type="java.lang.Boolean"
+			default="false" />
+
+	</composite:interface>
+
+	<composite:implementation>
+		<span id="#{cc.clientId}"> <h:outputLabel id="label"
+				for="checkbox"
+				rendered="#{not empty cc.attrs.label and not cc.attrs.disableLabel}">
+				<h:outputText value="#{cc.attrs.label}" />
+				<h:outputText value=" *"
+					rendered="#{cc.attrs.required and cc.attrs.editingMode}" />
+			</h:outputLabel> <cc:helpButton rendered="#{not empty cc.attrs.helpMessage}"
+				message="#{cc.attrs.helpMessage}" /> <h:panelGroup id="sublabel"
+				>
+				<h:outputText value="#{cc.attrs.subLabel}" />
+			</h:panelGroup> <h:outputText value="&lt;br /&gt;" escape="false"
+				rendered="#{not cc.attrs.inline}" /> <h:panelGroup id="inputblock"
+				style="width:100%" rendered="#{cc.attrs.editingMode}">
+				<h:selectBooleanCheckbox id="checkbox"
+					styleClass="#{cc.attrs.styleClass}" style="#{cc.attrs.style}"
+					value="#{cc.attrs.value}" onchange="#{cc.attrs.onchange}"
+					readonly="#{cc.attrs.readonly}" disabled="#{cc.attrs.disabled}"
+					required="#{cc.attrs.required}" title="#{cc.attrs.title}"
+					requiredMessage="#{cc.attrs.requiredMessage}">
+					<composite:insertChildren />
+				</h:selectBooleanCheckbox>
+
+				<h:panelGroup id="underlabel" layout="block">
+					<h:outputText value="#{cc.attrs.underLabel}" style="color:red;" />
+				</h:panelGroup>
+
+				<h:panelGroup id="effect" class="toggler" style="display:none;">
+					<h:message id="message" for="checkbox"
+						errorClass="ui-state-error ui-corner-all" />
+					<script type="text/javascript">
+						$(function() {
+							runEffectError(jq('#{cc.clientId}:effect'));
+						}); 
+					</script>
+				</h:panelGroup>
+			</h:panelGroup> <h:panelGroup id="outputblock" layout="block" style="width:100%"
+				rendered="#{not cc.attrs.editingMode}">
+				<h:outputText id="outputText" styleClass="#{cc.attrs.styleClass}"
+					style="#{cc.attrs.style}" value="#{cc.attrs.value ? 'Si' : 'No'}" />
+			</h:panelGroup>
+		</span>
+
+		<script type="text/javascript"></script>
+
+	</composite:implementation>
+
+</ui:composition>

@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<ui:param name="beanValutazione" value="#{appValutazioneBean}" />
+		
+	<cc:messages id="valutazioniAppMessages" />
+
+	<div class="widget_container ui-tabs ui-widget-content ui-corner-all">
+		<h:form id="ricercaValutazioneForm">
+			<h:panelGrid columns="3" columnClasses="width30,width30,width40">				
+				<cc:selectOneMenu id="stelle" value="#{beanValutazione.filtriRicerca.numStelle}" label="Stelle">
+					<f:selectItems value="#{beanValutazione.listaStelle}" />
+				</cc:selectOneMenu>
+				
+				<h:panelGroup>
+					<h:selectBooleanCheckbox value="#{beanValutazione.filtriRicerca.escludiAnonime}" id="escludiAnonime"/>
+					<h:outputLabel value="Escludi Valutazioni Anonime"/>
+				</h:panelGroup>
+				<h:panelGroup>
+					<h:selectBooleanCheckbox value="#{beanValutazione.filtriRicerca.soloAnonime}" id="soloAnonime"/>
+					<h:outputLabel value="Solo Valutazioni Anonime"/>
+				</h:panelGroup>
+				
+				<cc:inputText id="data_ricerca_da" type="date" value="#{beanValutazione.filtriRicerca.dtaDa}" label="Data dal"/>
+				<cc:inputText id="data_ricerca_a" type="date" value="#{beanValutazione.filtriRicerca.dtaA}"  label="Data al">
+					<f:attribute name="data_da_id" value="ricercaValutazioneForm:data_ricerca_da:inputText" />
+					<f:validator validatorId="twoDatesEqualOrLessValidator" for="function" />
+				</cc:inputText>
+				
+				<h:commandLink id="searchButton" styleClass="searchButton" value="Cerca" action="#{beanValutazione.search}">
+					<f:ajax immediate="true" execute="@form" render=":ricercaValutazioneForm :valutazioniAppForm :valutazioniAppDetailForm :valutazioniAppMessages"/>
+				</h:commandLink>					
+			</h:panelGrid>
+		</h:form>
+	</div>
+		
+	<h:form id="valutazioniAppForm">
+
+		<ui:fragment rendered="#{beanValutazione.ricercaEseguita and empty beanValutazione.list and not beanValutazione.editing}">
+			<h3 class="nessun_elemento_trovato">Non è stata ricevuta alcuna valutazione</h3>
+		</ui:fragment>
+		
+		<ui:fragment rendered="#{not empty beanValutazione.list}">
+			<div style="display: none;">
+				<h:inputHidden id="pageValue" value="#{beanValutazione.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{beanValutazione.changePage}" value="DUMMY FOR PAGINATION">
+					<f:ajax execute=":valutazioniAppForm:pageValue" 
+						render=":valutazioniAppForm:tabella :valutazioniAppDetailForm" />
+				</h:commandButton>
+			</div>
+			
+			<script type="text/javascript">				
+				$(jq("valutazioniAppForm:paginationBar")).pagination({							    
+					pages: #{beanValutazione.paginationHandler.pages()},						       
+					cssStyle: 'light-theme',
+					prevText: 'Prec.',
+					nextText: 'Succ.',
+					onPageClick: function (pageNumber, event) {
+						document.getElementById("valutazioniAppForm:pageValue").value = pageNumber;
+						document.getElementById("valutazioniAppForm:pageCommand").click();
+						$(jq("valutazioniAppDetailForm")).hide();
+						$(jq("valutazioniAppForm:tabella")).hide();					            
+						$(jq("valutazioniAppForm:paginationLoader")).show();
+						$(jq("valutazioniAppForm:paginationLoader")).fadeIn();
+					}
+				});
+			</script>
+			
+			<h:panelGroup layout="block" id="paginationBar" 
+				styleClass="widget_container ui-tabs ui-widget-content ui-corner-all" />
+			<br />
+			
+			<cc:waiting id="paginationLoader" hidden="true" waitMessage="Caricamento..." />	
+			
+			<h:panelGroup layout="block" id="tabella" class="dataTables_wrapper">
+				<table class="dataTable">
+					<tr>
+						<th class="ui-state-default"></th>
+						<th class="ui-state-default">Mittente</th>
+						<th class="ui-state-default">Stelle</th>
+						<th class="ui-state-default">Data</th>
+					</tr>
+					
+					<ui:repeat value="#{beanValutazione.list}" var="valutazione" varStatus="status">
+						<tr>
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{beanValutazione.view}">
+									<span class="ui-icon ui-icon-mail-open" />
+									<f:param name="id" value="#{valutazione.id}" />
+									<f:ajax execute="@this" onevent="onShowDetail"
+										render=":valutazioniAppDetailForm :valutazioniAppForm:tabella" />
+								</h:commandLink>
+							</td>
+						
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{beanValutazione.view}">
+									<h:outputText value="#{valutazione.email!=null?valutazione.email:'Anonima'} &nbsp;"
+										styleClass="" />
+									<f:param name="id" value="#{valutazione.id}" />
+									<f:ajax execute="@this" onevent="onShowDetail"
+										render=":valutazioniAppDetailForm :valutazioniAppForm:tabella" />
+								</h:commandLink>
+							</td>
+						
+							<td class="clickable-td" align="center">
+								<h:commandLink immediate="true" action="#{beanValutazione.view}">
+									<h:outputText value="#{valutazione.numStelle} &nbsp;"
+										styleClass="" />
+									<f:param name="id" value="#{valutazione.id}" />
+									<f:ajax execute="@this" onevent="onShowDetail"
+										render=":valutazioniAppDetailForm :valutazioniAppForm:tabella" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{beanValutazione.view}">
+									<h:outputText value="#{empty valutazione.dtmIns ? '&nbsp;' : valutazione.dtmIns}"
+										styleClass="">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+									<f:param name="id" value="#{valutazione.id}" />
+									<f:ajax execute="@this" onevent="onShowDetail"
+										render=":valutazioniAppDetailForm :valutazioniAppForm:tabella" />
+								</h:commandLink>
+							</td>
+						</tr>
+					</ui:repeat>
+				</table>
+				<script type="text/javascript">
+					$(jq("valutazioniAppForm:paginationLoader")).hide();
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+		</ui:fragment>
+	</h:form>
+	<br />
+	
+	<cc:waiting id="valutazioniAppDetailLoader" waitMessage="Caricamento..." hidden="true" />
+
+	<h:form id="valutazioniAppDetailForm">
+		<h:panelGroup layout="block" id="detail" styleClass="insertPanel" 
+			rendered="#{beanValutazione.showPanel}">
+			<h:panelGrid id="view_form" columns="2" cellspacing="10">
+				<h:panelGroup />
+
+				<cc:inputText value="#{beanValutazione.data.numStelle}"
+					label="Stelle" required="false"
+					editingMode="false"/>
+
+				<cc:inputText type="date"
+					value="#{beanValutazione.data.dtmIns}" label="Data ricezione"
+					editingMode="false" />
+					
+				<cc:inputText value="#{beanValutazione.data.email!=null?beanValutazione.data.email :'Anonima'}"
+					label="Mittente" required="false"
+					editingMode="false"/>
+	
+				<h:panelGroup />
+					
+				<cc:inputTextarea style="width:81%" maxlength="2000"
+					label="Messaggio" required="false" richTextMode="false"
+					value="#{beanValutazione.data.messaggio}" editingMode="false"/>					
+			</h:panelGrid>
+		</h:panelGroup>
+		
+		<script type="text/javascript">
+			disegnaBottoni();
+		</script>
+	</h:form>
+
+	<script type="text/javascript">
+		function onHideDetail(data) {
+			if (data.status == 'begin') {
+				$(jq("valutazioniAppDetailForm")).slideUp("slow");
+			}
+		}
+	
+		function onShowDetail(data) {
+			if (data.status == 'begin') {
+				$(jq("valutazioniAppDetailForm")).hide();
+				$(jq("nvalutazioniAppDetailLoader")).show();
+			} else if (data.status == 'success') {
+				$(jq("valutazioniAppDetailLoader")).hide();
+				PrimeFaces.scrollTo("valutazioniAppDetailForm");
+			}
+		}
+
+	</script>
+</ui:composition>

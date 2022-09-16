@@ -1,0 +1,136 @@
+<wsdl:definitions name="PattoOnline"
+	targetNamespace="http://pattoonline.ws.myportal.eng.it/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://pattoonline.ws.myportal.eng.it/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<wsdl:types>
+		<xs:schema elementFormDefault="qualified"
+			targetNamespace="http://pattoonline.ws.myportal.eng.it/" version="1.0"
+			xmlns:tns="http://pattoonline.ws.myportal.eng.it/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+			<xs:element name="InvioPatto" type="tns:InvioPatto" />
+			<xs:element name="InvioPattoResponse" type="tns:EsitoType" />
+			<xs:element name="RichiestaPatto" type="tns:RichiestaPatto" />
+			<xs:element name="RichiestaPattoResponse" type="tns:ResponsePatto" />
+			<xs:complexType name="InvioPatto">
+				<xs:sequence>
+					<xs:element name="Patto" type="tns:PattoType" />
+					<xs:element name="PDFPatto" type="xs:base64Binary" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="PattoType">
+				<xs:sequence>
+					<xs:element name="CodiceFiscale" type="xs:string" />
+					<xs:element name="DataPatto" type="xs:date" />
+					<xs:element name="CodServiziAmministrativi" type="xs:string" />
+					<xs:element name="NumProtocollo" type="xs:string" />
+					<xs:element name="AnnoProtocollo" type="xs:integer" />
+					<xs:element name="CodProvinciaProv" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:simpleType name="CodiceFiscaleType">
+				<xs:restriction base="xs:string" />
+			</xs:simpleType>
+			<xs:complexType name="EsitoType">
+				<xs:sequence>
+					<xs:element name="Esito" type="xs:string" />
+					<xs:element minOccurs="0" name="Descrizione" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="RichiestaPatto">
+				<xs:sequence>
+					<xs:element name="Patto" type="tns:PattoType" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="ResponsePatto">
+				<xs:sequence>
+					<xs:element name="PattoPortale" type="tns:PattoPortaleType" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="PattoPortaleType">
+				<xs:sequence>
+					<xs:element name="Patto" type="tns:PattoType" />
+					<xs:element minOccurs="0" name="AccettazionePatto"
+						type="tns:AccettazionePattoType" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="AccettazionePattoType">
+				<xs:sequence>
+					<xs:element name="DtmAccettazione" type="xs:dateTime" />
+					<xs:element name="TipoAccettazione">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="OTP" />
+								<xs:enumeration value="SPID" />
+								<xs:enumeration value="CIE" />
+								<xs:enumeration value="RV" />
+								<xs:enumeration value="SMS" />
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="PattoAccettatoType">
+				<xs:sequence>
+					<xs:element name="Patto" type="tns:PattoType" />
+					<xs:element name="AccettazionePatto" type="tns:AccettazionePattoType" />
+				</xs:sequence>
+			</xs:complexType>
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="RichiestaPattoResponse">
+		<wsdl:part element="tns:RichiestaPattoResponse" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="InvioPatto">
+		<wsdl:part element="tns:InvioPatto" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="InvioPattoResponse">
+		<wsdl:part element="tns:InvioPattoResponse" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="RichiestaPatto">
+		<wsdl:part element="tns:RichiestaPatto" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:portType name="GestionePattoOnline">
+		<wsdl:operation name="InvioPatto">
+			<wsdl:input message="tns:InvioPatto" name="InvioPatto">
+			</wsdl:input>
+			<wsdl:output message="tns:InvioPattoResponse" name="InvioPattoResponse">
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="RichiestaPatto">
+			<wsdl:input message="tns:RichiestaPatto" name="RichiestaPatto">
+			</wsdl:input>
+			<wsdl:output message="tns:RichiestaPattoResponse" name="RichiestaPattoResponse">
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="PattoOnlineSoapBinding" type="tns:GestionePattoOnline">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="InvioPatto">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="InvioPatto">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="InvioPattoResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="RichiestaPatto">
+			<soap:operation soapAction="" style="document" />
+			<wsdl:input name="RichiestaPatto">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="RichiestaPattoResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="PattoOnline">
+		<wsdl:port binding="tns:PattoOnlineSoapBinding" name="GestionePattoPort">
+			<soap:address location="http://localhost:20000/MyPortal/PattoOnline" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

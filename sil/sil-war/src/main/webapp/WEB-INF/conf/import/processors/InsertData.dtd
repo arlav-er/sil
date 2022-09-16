@@ -1,0 +1,40 @@
+<!--DTD relativa al recordProcessor InsertData. Configura il processor per l'inserimento dei dati nella tabella indicata, 
+Ogni tabella possiede un nome, una chiave e un insieme di colonne.
+Per ogni inserimento viene specificato:
+  il nome dell'inserimento (attributo name, identificatore unico)
+  il nome della tabella in cui inserire i dati (attributo table)
+  se occorre fermare la processazione del record a seguito del fallimento nell'inserimento dei dati (errorLevel = ERROR),
+  oppure se occorre solo fornire un messaggio di avvertimento (errorLevel = WARNING).
+  se occorre inserire i dati dell'utente (passati nel costruttore) nelle colonne cdnUtIns e cdnUtMod (specifyUser).
+Per la chiave viene specificato:
+  il nome della colonna corrispondente (name),
+  il formato (formato),
+  se il valore viene estratto dal record (type = record) e il nome dell'attributo (data) in cui procurarselo,
+  se occorre creare un nuovo valore della chiave con il DBKeyGenerator del Framework (type = new). In questo caso 
+  l'attributo data indica sotto quale nome inserire nella Map del record il valore della chiave generata.
+Per le colonne viene specificato:
+  il nome della colonna corrispondente (name),
+  il formato (formato),
+  se è possibile inserire il valore null in questa colonna,
+  se il valore viene estratto dal record (type = record) e il nome dell'attributo (data) in cui procurarselo,
+  se il valore fornito in data è quello da utilizzare direttamente nella Query di insert (type = absolute).
+-->
+                  <!ELEMENT CONFIG (INSERT*)>
+                  <!ELEMENT INSERT (KEY, COLUMN*)>
+                  <!ELEMENT KEY EMPTY>
+                  <!ELEMENT COLUMN EMPTY>
+
+                  <!ATTLIST INSERT name ID #REQUIRED
+                                   table CDATA #REQUIRED
+                                   errorLevel (ERROR|WARNING) "ERROR"
+                                   specifyUser (true|false) "false">
+                  <!ATTLIST KEY name CDATA #REQUIRED 
+                                format (number|char) "char"
+                                type (record|new) "new"
+                                data CDATA #REQUIRED>
+                  <!ATTLIST COLUMN name CDATA #REQUIRED
+                                   format (number|float|char|date|flag) "char"
+                                   nullable (true|false) "true"
+                                   type (record|absolute) "record"
+                                   data CDATA #REQUIRED
+                                   description CDATA #IMPLIED>

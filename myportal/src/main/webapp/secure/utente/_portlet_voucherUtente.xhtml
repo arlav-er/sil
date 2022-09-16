@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:p="http://primefaces.org/ui"
+	template="../../template/template_portlet.xhtml">
+
+	<ui:define name="portlet_title">
+		<h:outputText value="#{txt['cittadino.portlet.voucher.titolo']}"
+			escape="false" />
+	</ui:define>
+
+	<ui:define name="portlet_content">
+		<div id="attivaVoucherLink" style="text-align: justify;">
+			<h:outputText value="#{txt['cittadino.portlet.voucher.descrizione']}"
+				escape="false" />
+			<h:link styleClass="buttonStyle" outcome="/secure/utente/voucher/vchUtente.xhtml" value="Attiva Titolo" >
+				<!-- <f:ajax execute="@form" render="@this" /> -->
+			</h:link>
+		</div>
+		<br />
+
+		<script>
+			$(document).ready(function() {
+				$("#attivaVoucherLink > a").click(function(evt){
+					if(#{not utenteHomeBean.isCodiceFiscaleSettato()}){
+						evt.preventDefault();
+						
+						$("body").append(
+							'<div class="jnotify-container">' +
+								'<div class="jnotify-notification jnotify-notification-error">' +
+									'<div class="jnotify-background">' + 
+									'</div>' +
+									'<a class="jnotify-close">×</a>' +
+									'<div class="jnotify-message">' +
+										'<div>' +
+											'Per poter attivare un Titoli Di Acquisto inserire il tuo codice fiscale nella sezione Profilo.' +
+										'</div>' +
+									'</div>' +
+								'</div>'+
+							'</div>');
+								
+						$('.jnotify-close').click(function(evt2){
+							$('.jnotify-container').fadeOut( 'slow', function() {
+								$('.jnotify-container').remove();
+							});
+						}); 
+					}
+				});
+			})
+		</script>
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,1033 @@
+<STATEMENT name="GET_TIPO_ISCR"
+	query="SELECT TI.CODTIPOISCR AS CODICE,
+						  TI.STRDESCRIZIONE || DECODE(SYSDATE, GREATEST(SYSDATE, TI.DATINIZIOVAL, 
+						  TI.DATFINEVAL),&apos; (scaduto) &apos;,
+						  LEAST(SYSDATE, TI.DATINIZIOVAL, TI.DATFINEVAL),&apos; (scaduto) &apos;,
+						  &apos;&apos;) AS DESCRIZIONE, TI.FLGOBBAZ
+					FROM DE_TIPO_ISCR TI
+					WHERE TI.CODTIPOISCR IN (
+						SELECT TC.CODICE
+						FROM TS_CONFIG_CODIFICA TC
+						WHERE sysdate between tc.datinizioval and tc.datfineval and  TC.NOMETABELLA='DE_TIPO_ISCR' AND TC.CODTIPOCONFIG = 'ISCR_DE' AND TC.CONFIGURAZIONE = NVL(
+							(SELECT TL.NUM
+							 FROM TS_CONFIG_LOC TL
+							 WHERE TL.STRCODRIF = (SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE)
+								   AND TL.CODTIPOCONFIG = 'ISCR_REL'),0) ) 
+					ORDER BY DESCRIZIONE" />
+
+<STATEMENT name="GET_MOTIVO_CHIUSURA"
+	query="select R.CODTIPOISCR || '-' || MC.CODMOTCHIUSURAISCR AS CODICE, 
+	   					  MC.STRDESCRIZIONE || DECODE(SYSDATE,GREATEST(SYSDATE, MC.DATINIZIOVAL, MC.DATFINEVAL),&apos; (scaduto) &apos;,
+	   					  LEAST(SYSDATE, MC.DATINIZIOVAL, MC.DATFINEVAL),&apos; (scaduto) &apos;,&apos;&apos;) AS DESCRIZIONE	
+				   FROM DE_MOTIVO_CHIUSURAISCR MC, DE_REL_TIPO_CHIU_AISCR R
+				   WHERE MC.CODMOTCHIUSURAISCR = R.CODMOTCHIUSURAISCR
+				   		 AND R.CODTIPOISCR IN ( 
+				   			SELECT TC.CODICE 
+				   			FROM TS_CONFIG_CODIFICA TC 
+				   			WHERE TC.NOMETABELLA='DE_TIPO_ISCR' AND TC.CODTIPOCONFIG = 'ISCR_DE' AND TC.CONFIGURAZIONE = NVL(
+				   				(SELECT TL.NUM 
+				   				 FROM TS_CONFIG_LOC TL 
+				   				 WHERE TL.STRCODRIF = (SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE) 
+				   					   AND TL.CODTIPOCONFIG = 'ISCR_REL'),0)
+				   				) ORDER BY R.CODTIPOISCR" />
+				   				
+<STATEMENT name="GET_COMUNI_COMPETENZA"
+	query="SELECT DE_COM.CODCOM AS CODICE,
+					  	  DE_COM.STRDENOMINAZIONE ||' (' || TRIM(DE_PROV.STRISTAT) || ')' AS DESCRIZIONE
+			   	   FROM DE_COMUNE DE_COM, DE_PROVINCIA DE_PROV
+			       WHERE DE_COM.CODPROVINCIA = DE_PROV.CODPROVINCIA 
+			       ORDER BY DE_COM.STRDENOMINAZIONE" />
+
+<STATEMENT name="GET_STATO_ALTRA_ISCR"
+	query="SELECT DISTINCT SI.CODSTATO AS CODICE,
+	   			   		  SI.STRDESCRIZIONE || DECODE(SYSDATE,    
+			   			  GREATEST(SYSDATE, SI.DATINIZIOVAL, SI.DATFINEVAL),' (scaduto) ',
+			   			  LEAST(SYSDATE, SI.DATINIZIOVAL, SI.DATFINEVAL),' (scaduto) ', 
+			   			  '') AS DESCRIZIONE									  
+				   FROM DE_STATO_ALTRA_ISCR SI, DE_REL_TIPO_STATO_ALTRA_ISCR RI 
+				   WHERE SI.CODSTATO = RI.CODSTATO 
+				   		 AND RI.CODTIPOISCR IN ( 
+				   		 	SELECT TC.CODICE 
+				   		 	FROM TS_CONFIG_CODIFICA TC 
+				   			WHERE TC.NOMETABELLA='DE_TIPO_ISCR' AND TC.CODTIPOCONFIG = 'ISCR_DE' AND TC.CONFIGURAZIONE = NVL(
+				   				(SELECT TL.NUM 
+				   				 FROM TS_CONFIG_LOC TL 
+				   				 WHERE TL.STRCODRIF = (SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE) 
+				   					   AND TL.CODTIPOCONFIG = 'ISCR_REL'),0)
+				   				 ) ORDER BY DESCRIZIONE" />
+
+
+<STATEMENT name="GET_STATO_ALTRA_ISCR_NO_FLAG"
+	query="SELECT DISTINCT SI.CODSTATO AS CODICE,
+	   			   		  SI.STRDESCRIZIONE || DECODE(SYSDATE,    
+			   			  GREATEST(SYSDATE, SI.DATINIZIOVAL, SI.DATFINEVAL),' (scaduto) ',
+			   			  LEAST(SYSDATE, SI.DATINIZIOVAL, SI.DATFINEVAL),' (scaduto) ', 
+			   			  '') AS DESCRIZIONE									  
+				   FROM DE_STATO_ALTRA_ISCR SI, DE_REL_TIPO_STATO_ALTRA_ISCR RI 
+				   WHERE SI.CODSTATO = RI.CODSTATO AND (SI.FLGSL = 'N' or SI.FLGSL is null)
+				   		 AND RI.CODTIPOISCR IN ( 
+				   		 	SELECT TC.CODICE 
+				   		 	FROM TS_CONFIG_CODIFICA TC 
+				   			WHERE TC.NOMETABELLA='DE_TIPO_ISCR' AND TC.CODTIPOCONFIG = 'ISCR_DE' AND TC.CONFIGURAZIONE = NVL(
+				   				(SELECT TL.NUM 
+				   				 FROM TS_CONFIG_LOC TL 
+				   				 WHERE TL.STRCODRIF = (SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE) 
+				   					   AND TL.CODTIPOCONFIG = 'ISCR_REL'),0)
+				   				 ) ORDER BY DESCRIZIONE" />
+
+<STATEMENT name="GET_STATO_ALTRA_ISCR_FLAG"
+	query="SELECT DISTINCT SI.CODSTATO AS CODICE,
+	   			   		  SI.STRDESCRIZIONE || DECODE(SYSDATE,    
+			   			  GREATEST(SYSDATE, SI.DATINIZIOVAL, SI.DATFINEVAL),' (scaduto) ',
+			   			  LEAST(SYSDATE, SI.DATINIZIOVAL, SI.DATFINEVAL),' (scaduto) ', 
+			   			  '') AS DESCRIZIONE									  
+				   FROM DE_STATO_ALTRA_ISCR SI, DE_REL_TIPO_STATO_ALTRA_ISCR RI 
+				   WHERE SI.CODSTATO = RI.CODSTATO AND SI.FLGSL = 'S'
+				   		 AND RI.CODTIPOISCR IN ( 
+				   		 	SELECT TC.CODICE 
+				   		 	FROM TS_CONFIG_CODIFICA TC 
+				   			WHERE TC.NOMETABELLA='DE_TIPO_ISCR' AND TC.CODTIPOCONFIG = 'ISCR_DE' AND TC.CONFIGURAZIONE = NVL(
+				   				(SELECT TL.NUM 
+				   				 FROM TS_CONFIG_LOC TL 
+				   				 WHERE TL.STRCODRIF = (SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE) 
+				   					   AND TL.CODTIPOCONFIG = 'ISCR_REL'),0)
+				   				 ) ORDER BY DESCRIZIONE" />
+
+<STATEMENT name="INSERT_CI_ACCORDO"
+	query="INSERT INTO CI_ACCORDO
+				(PRGACCORDO,
+				CODACCORDO,
+				STRPROTOCOLLO,
+				DATPROTOCOLLO,
+				CODTIPOCONCESSIONE,
+				NUMCONCESSIONE,
+				DATCONCESSIONE,
+				NUMTOTORECIGCONCES,
+				NUMTOTLAVCIGCONCES,
+				STRNOTA,
+				DATLIQINPS,
+				NUMLIQINPS,
+				FLGCIGSANTICIP,
+				CODMONOPROV,
+				NUMKLOACCORDO,
+				CDNUTINS,
+				CDNUTMOD,
+				DATACCORDO,
+				CODTIPOACCORDO,
+				CODACCORDOORIG,
+				CODSTATOATTO,
+				STRCOGNOMELEGALE,
+				STRNOMELEGALE,
+				FLGPAGDIRETTO,
+				DATCONSULTASIND,
+				NUMLAVFORZACOMPL,
+				STRCOGNOMEREF,
+				STRNOMEREF,
+				STRTELREF,
+				STRFAXREF,
+				STREMAILREF,
+				FLGUANONCOINVOLTA,
+				DTMINVIO,
+				FLGRICHPAGANTICIPATO,
+				FLGPROROGA,
+				CODDOMANDACIGPROROGATA,
+				FLGIMPRARTIGIANA,
+				CODNATGIURIDICAFSE,
+				CODMACROCATEGORIA,
+				NUMVERSIONE,
+				CODDOMANDACIGSMB,
+				DTMINS,
+				DTMMOD)VALUES(
+				?,?,?,to_date(?,'dd/mm/yyyy'),
+				?,?,to_date(?,'dd/mm/yyyy'),
+				?,?,?,to_date(?,'dd/mm/yyyy'),
+				?,?,?,?,?,?,to_date(?,'dd/mm/yyyy'),
+				?,?,?,?,?,?,to_date(?,'dd/mm/yyyy'),
+				?,?,?,?,?,?,?,to_date(?,'dd/mm/yyyy'),
+				?,?,?,?,?,?,?,?,sysdate, sysdate)" />
+
+<STATEMENT name="INSERT_CI_ESAME_CONGIUNTO"
+	query="INSERT INTO CI_ESAME_CONGIUNTO
+				(PRGESAMECONG,
+				PRGACCORDO,
+				STRCOGNOMERAPPRESCONG,
+				STRNOMERAPPRESCONG,
+				STRCOGNOMEORGDATOR,
+				STRNOMEORGDATOR,
+				STRMOTIVORICHIESTA,
+				DATRICHIESTADAL,
+				DATRICHIESTAAL,
+				NUMMESI,
+				NUMLAVORATORI,
+				FLGESAMECONGANNO1,
+				FLGESAMECONGANNO2,
+				FLGESAMECONGANNO3,
+				FLGESAMECONGANNO4,
+				FLGESAMECONGANNO5,
+				FLGSOSPANNO1,
+				FLGSOSPANNO2,
+				FLGSOSPANNO3,
+				FLGSOSPANNO4,
+				FLGSOSPANNO5,
+				CDNUTINS,
+				DTMINS,
+				CDNUTMOD,
+				DTMMOD,
+				NUMKLOESAMECONG
+				)VALUES(
+				?,?,?,?,?,
+				?,?,to_date(?,'dd/mm/yyyy'),
+				to_date(?,'dd/mm/yyyy'),?,
+				?,?,?,?,?,
+				?,?,?,?,?,
+				?,?,sysdate,
+				?,sysdate,
+				?)" />
+
+<STATEMENT name="INSERT_CI_SINDACATO"
+	query="INSERT INTO CI_SINDACATO(
+				PRGSINDACCORDO,
+				PRGACCORDO,
+				STRCOGNOME,
+				STRNOME,
+				STRSINDACATO,
+				CDNUTINS,
+				DTMINS,
+				CDNUTMOD,
+				DTMMOD,
+				NUMKLOSIND
+				)VALUES(
+				?,?,?,?,?,
+				?,sysdate,?,
+				sysdate,?
+				)" />
+<STATEMENT name="INSERT_CI_LAV_ACCORDO"
+	query="INSERT INTO CI_LAV_ACCORDO(
+				PRGLAVACCORDO,
+				PRGACCORDO,
+				FLGACCOLTO,
+				CODMACROQUALIFICA,
+				NUMOREPTSETT,
+				NUMOREFTSETT,
+				DATFINECIGS,
+				DATINIZIOCIGS,
+				NUMTOTGGCIGS,
+				NUMTOTORECIGS,
+				STRNOTA,
+				CODTIPOCONTRATTO,
+				PRGLAVORATORE,
+				NUMKLOLAVACCORDO,
+				CDNUTINS,
+				CDNUTMOD,
+				DTMINS,
+				DTMMOD)
+				VALUES(
+				?,?,?,?,?,?,
+				to_date(?,'dd/mm/yyyy'),to_date(?,'dd/mm/yyyy'),
+				?,?,?,?,?,?,?,?,sysdate,sysdate)" />
+
+<STATEMENT name="INSERT_CI_LAVORATORE"
+	query="INSERT INTO CI_LAVORATORE(
+				PRGLAVORATORE,
+				CDNLAVORATORE,
+				PRGACCORDO,
+				STRCODICEFISCALE,
+				STRCOGNOME,
+				STRNOME,
+				STRSESSO,
+				DATASSUNZIONE,
+				CODCOMNASCITA,
+				DATNASCITA,
+				STRCELL,
+				STRALTROTEL,
+				CODLINEAAZ,
+				CODQUALIFICASRQ,
+				CODCOMRES,
+				STRINDRES,
+				CODCOMDOM,
+				STRINDDOM,
+				CODCITTADINANZA,
+				CODTITOLO,
+				PRGAZIENDA,
+				PRGUNITA,
+				STRNOTA,
+				CDNUTINS,
+				DTMINS,
+				CDNUTMOD,
+				DTMMOD,
+				NUMKLOLAVORATORE,
+				DATLICENZIAMENTO,FLGDIRITTODO,CODMOTIVONOTDO)
+				VALUES(
+				?,?,?,?,?,?,
+				?,to_date(?,'dd/mm/yyyy'),?,
+				to_date(?,'dd/mm/yyyy'),?,
+				?,?,?,?,?,
+				?,?,?,?,?,
+				?,?,?,sysdate,?,
+				sysdate,?,
+				to_date(?,'dd/mm/yyyy'),?,?)" />
+
+<STATEMENT name="INSERT_CI_RELACCORDOUNITAAZ"
+	query="INSERT INTO CI_REL_ACCORDO_UNIT_AZ(
+					codaztipo,
+					strorgdatoriale,
+					strconsulentelav,
+					prgazienda,
+					prgunita,
+					prgaccordo,
+					flgcoinvolta,
+					numlavforza,
+					strnumeroinps,
+					strsedeinps)
+					values(
+					?,?,?,?,?,?,
+					?,?,?,?)" />
+
+<STATEMENT name="SELECT_PRGALTRAISCR_SEQUENCE"
+	query="SELECT S_AM_ALTRA_ISCR.nextval AS PRGALTRAISCR
+      		   FROM DUAL" />
+
+
+
+<STATEMENT name="INSERT_AM_ALTRA_ISCR"
+  query="INSERT INTO AM_ALTRA_ISCR (PRGALTRAISCR,CDNLAVORATORE,PRGAZIENDA,PRGUNITA,PRGACCORDO,
+									CODCOMCOMPETENZA,CODMONOTIPOCOMPETENZA,CODMOTCHIUSURAISCR,
+									CODSTATO,CODTIPOISCR,DATCHIUSURAISCR,DATCOMPETENZA,
+									DATFINE,DATINIZIO,NUMKLOALTRAISCR,DTMINS,
+									DTMMOD,CDNUTINS,CDNUTMOD,
+									DATLICENZIAMENTO,FLGDIRITTODO,CODMOTIVONOTDO)
+						    VALUES (?,?,?,?,?,
+								    ?,?,?,
+								    ?,?,to_date(?,'dd/mm/yyyy'),to_date(?,'dd/mm/yyyy'),
+									to_date(?,'dd/mm/yyyy'),to_date(?,'dd/mm/yyyy'),?,sysdate,
+									sysdate,?,?,
+									to_date(?,'dd/mm/yyyy'),?,?)" />
+
+
+<STATEMENT name="INS_DOMANDA_CIG"
+	query="INSERT INTO AM_ALTRA_ISCR (PRGALTRAISCR,CDNLAVORATORE,PRGAZIENDA,PRGUNITA,PRGACCORDO, 
+   										  CODCOMCOMPETENZA,CODMONOTIPOCOMPETENZA,CODMOTCHIUSURAISCR, 
+   										  CODSTATO,CODTIPOISCR,DATCHIUSURAISCR,DATCOMPETENZA, 
+   										  DATFINE,DATINIZIO,STRNOTA,NUMKLOALTRAISCR,DTMINS, 
+   										  DTMMOD,CDNUTINS,CDNUTMOD) 
+			   VALUES (?,?,?,?,?,?,?,?,?,?,to_date(?,'dd/mm/yyyy'),to_date(?,'dd/mm/yyyy'),
+					   to_date(?,'dd/mm/yyyy'),to_date(?,'dd/mm/yyyy'),?,?,sysdate,sysdate,?,?)" />
+
+<STATEMENT name="CHECK_ESISTE_LAV_ANAG"
+	query="SELECT CDNLAVORATORE FROM AN_LAVORATORE WHERE STRCODICEFISCALE=?" />
+	
+<STATEMENT name="CHECK_ESISTE_CELL_NUM"
+	query="SELECT STRCELL FROM AN_LAVORATORE WHERE CDNLAVORATORE=?" />	
+	
+
+<STATEMENT name="M_GetIscrizioniCIG"
+	query="select iscr.prgazienda, uni.prgunita, azi.strragionesociale, uni.strindirizzo, 
+						  com.STRDENOMINAZIONE comune, to_char(iscr.datInizio, 'DD/MM/YYYY') as datInizio,
+	   					  to_char(iscr.datFine, 'DD/MM/YYYY') as datFine,
+	   					  tipo.STRDESCRIZIONE as tipoIscr, azi.strcodicefiscale, tipo.flgModDate,
+	   					  to_char(iscr.DATCOMPETENZA, 'DD/MM/YYYY') as datCompetenza,
+	   					  motChius.strDescrizione motChiusura, 
+	   					  to_char(iscr.DATCHIUSURAISCR, 'DD/MM/YYYY') as datChiusuraIscr,
+	   				      iscr.STRNOTA, stato.STRDESCRIZIONE descrStato, 
+	   					  decode (iscr.CODMONOTIPOCOMPETENZA, 'A', 'Competenza amministrativa', 'D', 'Competenza sul domicilio indicato nella domanda', 'R', 'Competenza sulla residenza indicata nella domanda', 'S','Competenza in base al comune della sede',NULL) as Competenza,
+	   					  iscr.codMonoTipoCompetenza, iscr.codStato,iscr.codMotChiusuraIscr, iscr.codtipoiscr,
+	   					  statoIscr.strdescrizione descrStato, acc.CODACCORDO, iscr.prgaccordo, statoIscr.flgSl,
+	   					  to_char(iscr.NUMKLOALTRAISCR) NUMKLOALTRAISCR, 
+	   					  to_char(iscr.dtmins, 'DD/MM/YYYY hh24:mi') dtmins,
+					      to_char(iscr.dtmmod, 'DD/MM/YYYY hh24:mi') dtmmod,
+	   					  iscr.CDNUTINS, iscr.CDNUTMOD, to_char(iscr.datLicenziamento, 'DD/MM/YYYY') as datLicenz,
+	   					  iscr.flgdirittodo, iscr.codmotivonotdo
+				  from am_altra_iscr iscr
+					inner join an_lavoratore lav on (lav.cdnlavoratore = iscr.cdnlavoratore)
+					left join de_motivo_chiusuraiscr motChius on (motChius.codMotChiusuraIscr = iscr.codMotChiusuraIscr)
+					left join de_stato_altra_iscr statoIscr on (statoIscr.codstato = iscr.codstato) 
+					left join an_azienda azi on (azi.prgazienda = iscr.prgazienda)
+					left join an_unita_azienda uni on (iscr.prgazienda = uni.prgazienda and iscr.prgunita = uni.prgunita)
+					left join de_comune com on (COM.codCom = uni.codCom)
+					inner join de_tipo_iscr tipo on (tipo.CODTIPOISCR = iscr.CODTIPOISCR)
+					left join de_stato_altra_iscr stato on (stato.codstato = iscr.CODSTATO)
+					left join ci_accordo acc on (acc.prgaccordo = iscr.prgaccordo)
+				 where iscr.PRGALTRAISCR = ?" />
+
+<STATEMENT name="SELECT_NUMKLOALTRAISCR"
+	query="SELECT PRGALTRAISCR, NUMKLOALTRAISCR
+                from AM_ALTRA_ISCR
+                where PRGALTRAISCR=?" />
+
+<STATEMENT name="UPDATE_ISCR_CIG"
+	query="UPDATE AM_ALTRA_ISCR SET 
+        			  	CDNLAVORATORE=?,
+        				PRGAZIENDA=?,
+        				PRGUNITA=?,
+        				PRGACCORDO=?, 
+   						CODCOMCOMPETENZA=?,
+   						CODMONOTIPOCOMPETENZA=?,
+   						CODMOTCHIUSURAISCR=?, 
+   						CODSTATO=?,
+   						CODTIPOISCR=?,
+   						DATCHIUSURAISCR=TO_DATE(?,'DD/MM/YYYY'),
+   						DATCOMPETENZA=TO_DATE(?,'DD/MM/YYYY'), 
+   						DATFINE=TO_DATE(?,'DD/MM/YYYY'),
+   						DATINIZIO=TO_DATE(?,'DD/MM/YYYY'),
+   						STRNOTA=?,
+   						CDNUTMOD=?, 
+        				DTMMOD=SYSDATE,
+   						NUMKLOALTRAISCR = TO_NUMBER(?) + 1,
+   						DATLICENZIAMENTO=TO_DATE(?,'DD/MM/YYYY'),
+   						FLGDIRITTODO=?,
+   						CODMOTIVONOTDO=?
+   			WHERE PRGALTRAISCR=?" />
+   			
+<STATEMENT name="UPDATE_CELL_NUM"
+	query="UPDATE AN_LAVORATORE SET 
+        			  	STRCELL = ?,
+        			  	CDNUTMOD = ?,
+        			  	DTMMOD = sysdate,
+        			  	NUMKLOLAVORATORE = NUMKLOLAVORATORE+1
+   			WHERE CDNLAVORATORE=?" />   			
+   			
+
+<STATEMENT name="DELETE_ISCRIZIONE_CIG"
+	query="DELETE FROM AM_ALTRA_ISCR WHERE PRGALTRAISCR=? " />
+
+<STATEMENT name="CHECK_VALORIZZA_FLAGS"
+	query="SELECT 'ESISTE_ALTRO_ACCORDO' AS NOMEFLAG, PRGACCORDO
+					  FROM CI_ACCORDO WHERE CODACCORDO=?
+					UNION
+					SELECT 'ESISTE_DOMANDA_PREC' AS NOMEFLAG, PRGACCORDO
+					  FROM CI_ACCORDO WHERE CODACCORDO=?
+					UNION
+					SELECT 'ESISTE_DOMANDA_SUCC' AS NOMEFLAG, PRGACCORDO
+					  FROM CI_ACCORDO WHERE CODACCORDOORIG=?" />
+
+<STATEMENT name="CI_IS_DOM_ANAG_IN_PROV"
+	query="SELECT DECODE(LAVINF.CODMONOTIPOCPI,'C','TRUE','FALSE') AS FLAG,
+				 	   LAV.CODCOMDOM
+				  FROM AN_LAVORATORE LAV, 
+				  	   DE_COMUNE COM,
+					   AN_LAV_STORIA_INF LAVINF,
+					   TS_GENERALE TS
+				 WHERE LAV.CDNLAVORATORE = ?
+				   AND COM.CODCOM = LAV.CODCOMDOM
+				   AND TS.CODPROVINCIASIL (+)= COM.CODPROVINCIA
+				   AND LAV.CDNLAVORATORE = LAVINF.CDNLAVORATORE
+				   AND LAVINF.DATFINE IS NULL" />
+
+<STATEMENT name="CI_IS_SEDE_IN_PROV"
+	query="SELECT DECODE(TSSEDE.CODPROVINCIASIL,NULL,'FALSE','TRUE') AS FLAGSEDE,
+				COMSEDE.CODCOM as CODCOMSEDE 
+				  FROM DE_COMUNE COMSEDE, 
+					   TS_GENERALE TSSEDE
+				 WHERE COMSEDE.CODCOM = ? 
+				   AND TSSEDE.CODPROVINCIASIL (+)= COMSEDE.CODPROVINCIA" />
+
+<STATEMENT name="CI_IS_RES_IN_PROV"
+	query="SELECT DECODE(TSRES.CODPROVINCIASIL,
+                                NULL,
+                                'FALSE',
+                                'TRUE') AS FLAGRES,
+				        DECODE(TSRES.CODPROVINCIASIL,
+				                                NULL,
+				                                DECODE(REGRES.CODREGIONE,
+				                                                      (SELECT CODREGIONE 
+				                                                      FROM DE_PROVINCIA  
+				                                                      WHERE CODPROVINCIA = (SELECT CODPROVINCIASIL FROM TS_GENERALE)),
+				                                                      'TRUE',
+				                                                      'FALSE'),
+				                                'TRUE') AS FLAGREGRES
+	              FROM DE_COMUNE COMRES, 
+	                   TS_GENERALE TSRES, 
+	                   DE_PROVINCIA REGRES
+	             WHERE COMRES.CODCOM = ? 
+	               AND TSRES.CODPROVINCIASIL (+)= COMRES.CODPROVINCIA
+	               AND COMRES.CODPROVINCIA (+)= REGRES.CODPROVINCIA" />
+
+<STATEMENT name="CI_IS_DOM_IN_PROV"
+	query="SELECT DECODE(TSDOM.CODPROVINCIASIL,
+                                NULL,
+                                'FALSE',
+                                'TRUE') AS FLAGDOM,
+				        DECODE(TSDOM.CODPROVINCIASIL,
+				                                NULL,
+				                                DECODE(REGDOM.CODREGIONE,
+				                                                      (SELECT CODREGIONE 
+				                                                      FROM DE_PROVINCIA  
+				                                                      WHERE CODPROVINCIA = (SELECT CODPROVINCIASIL FROM TS_GENERALE)),
+				                                                      'TRUE',
+				                                                      'FALSE'),
+				                                'TRUE') AS FLAGREGDOM
+	              FROM DE_COMUNE COMDOM, 
+	                   TS_GENERALE TSDOM, 
+	                   DE_PROVINCIA REGDOM
+	             WHERE COMDOM.CODCOM = ? 
+	               AND TSDOM.CODPROVINCIASIL (+)= COMDOM.CODPROVINCIA
+	               AND COMDOM.CODPROVINCIA (+)= REGDOM.CODPROVINCIA" />
+
+<STATEMENT name="GET_GG_TOLLERANZA"
+	query="SELECT NVL(
+					(SELECT TL.STRVALORE FROM TS_CONFIG_LOC TL
+					WHERE TL.STRCODRIF=(SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE)
+					AND TL.CODTIPOCONFIG='CI_GG'),
+					10) AS GG_TOLLERANZA
+					FROM DUAL" />
+
+<STATEMENT name="GET_ISCR_COMPATIBILE"
+	query="SELECT ISC.PRGALTRAISCR, ISC.NUMKLOALTRAISCR 
+				  FROM AM_ALTRA_ISCR ISC
+				 WHERE ISC.CDNLAVORATORE = ?
+				   AND ISC.PRGAZIENDA = ?
+				   AND ISC.PRGACCORDO IS NULL
+				   AND abs(ISC.DATINIZIO-to_date(?,'dd/mm/yyyy')) &lt;= ?
+				   AND abs(ISC.DATFINE-to_date(?,'dd/mm/yyyy')) &lt;= ?" />
+
+<STATEMENT name="CHECK_ISCR_INTER_DATE"
+	query="select count(*) numIscr 
+				from am_altra_iscr iscr 
+				where cdnlavoratore = ?
+  				and ((iscr.DATINIZIO &gt;= to_date(?, 'DD/MM/YYYY')
+  				and iscr.DATINIZIO &lt;= to_date(?, 'DD/MM/YYYY') )
+   				or (iscr.DATFINE &gt;= to_date(?, 'DD/MM/YYYY')
+  				and iscr.DATFINE &lt;= to_date(?, 'DD/MM/YYYY') )
+   				or (iscr.DATINIZIO &lt;= to_date(?, 'DD/MM/YYYY')
+  				and iscr.DATFINE &gt;= to_date(?, 'DD/MM/YYYY') ) )" />
+
+<!-- 
+In questa versione si considerano anche le iscrizioni con prgaccordo = null 
+STATEMENT name="CHECK_ALTRE_ISCR_APERTE_OLD"
+	query="select count(*) iscrAperta
+					from am_altra_iscr iscr
+					where iscr.CODSTATO is null and iscr.CODMOTCHIUSURAISCR is null
+					 and iscr.CDNLAVORATORE = ?
+					 and iscr.PRGAZIENDA = ?
+					 and (iscr.PRGACCORDO is null 
+					 or iscr.PRGACCORDO IN (select acc.prgaccordo 
+					 from am_altra_iscr iscr2
+					 left join ci_accordo acc on (acc.prgaccordo = iscr2.prgaccordo)))" -->
+
+<!--Nella nuova versione elimino il controllo prgaccordo is null -->
+<STATEMENT name="CHECK_ALTRE_ISCR_APERTE"
+	query="	select count(*) iscrAperta
+			from am_altra_iscr iscr, ci_accordo acc
+			where iscr.prgaccordo = acc.prgaccordo
+			and iscr.codstato is null 
+			and iscr.codmotchiusuraiscr is null
+			and iscr.cdnlavoratore = ?
+			and iscr.prgazienda = ?
+			and acc.codaccordo = ?" />
+
+<STATEMENT name="UPDATE_AM_ALTRA_ISCR"
+	query="UPDATE AM_ALTRA_ISCR
+				   SET PRGACCORDO = ?,
+				   	   DTMMOD = SYSDATE,
+				   	   CDNUTMOD = ?,
+				   	   DATINIZIO = to_date(?,'dd/mm/yyyy'),
+				   	   DATFINE = to_date(?,'dd/mm/yyyy'),
+				   	   CODTIPOISCR = ?,
+				   	   NUMKLOALTRAISCR = ? + 1
+				 WHERE PRGALTRAISCR = ?" />
+
+<STATEMENT name="GetDataInizioCig"
+	query="select min(to_char(ci_lav_accordo.datiniziocigs,'dd/mm/yyyy') ) datiniziocigs 
+				  from ci_accordo inner join 
+				  ci_lav_accordo on (ci_accordo.prgaccordo = ci_lav_accordo.prgaccordo)
+				  left join ci_lavoratore on (ci_lavoratore.prglavoratore = ci_lav_accordo.prglavoratore ) 
+				  where ci_lavoratore.cdnlavoratore = ?
+				  and nvl(ci_lav_accordo.flgaccolto, 'S') = 
+		  		        case 
+                      		when ci_accordo.codtipoaccordo &lt;&gt; 'M' then 'S'
+                      		else nvl(ci_lav_accordo.flgaccolto, 'S')
+                    	end  
+	  					and ci_lav_accordo.prgaccordo = ? " />
+
+
+<STATEMENT name="GetDataFineCig"
+	query="select max(to_char(ci_lav_accordo.datfinecigs,'dd/mm/yyyy') ) datfinecigs 
+		   		  from ci_accordo inner join 
+				  ci_lav_accordo on (ci_accordo.prgaccordo = ci_lav_accordo.prgaccordo)
+				  left join ci_lavoratore on (ci_lavoratore.prglavoratore = ci_lav_accordo.prglavoratore ) 
+				  where ci_lavoratore.cdnlavoratore = ? 
+	  					and nvl(ci_lav_accordo.flgaccolto, 'S') = 
+		  		        case 
+                      		when ci_accordo.codtipoaccordo &lt;&gt; 'M' then 'S'
+                      		else nvl(ci_lav_accordo.flgaccolto, 'S')
+                    	end 
+	  					and ci_lav_accordo.prgaccordo = ? " />
+
+<STATEMENT name="GetCodComDomLav"
+	query="SELECT CODCOMDOM as codComCompetenza FROM AN_LAVORATORE WHERE CDNLAVORATORE=? " />
+
+
+
+<STATEMENT name="GET_AZIONI_CIG"
+	query="SELECT PRGAZIONI AS CODICE, STRDESCRIZIONE || 
+		   				 DECODE(SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto) &apos;,
+						 LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto) &apos;,
+						 &apos;&apos;) AS DESCRIZIONE
+		   		  FROM DE_AZIONE 
+		   		  ORDER BY PRGAZIONI " />
+
+<STATEMENT name="ESITO_CIG"
+	query="SELECT codEsito as codice, strDescrizione || DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL), '(scaduto)',
+		   				 LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),'(scaduto)', '') as descrizione 
+		   		  FROM DE_ESITO 
+		   		  WHERE CODESITO = ? " />
+
+
+<STATEMENT name="AZIONI_CIG"
+	query="SELECT PRGAZIONI AS CODICE, STRDESCRIZIONE || 
+		   				 DECODE(SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto) &apos;,
+						 LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto) &apos;,
+						 &apos;&apos;) AS DESCRIZIONE
+		   		  FROM DE_AZIONE
+		   		  WHERE PRGAZIONI = ? " />
+
+	<!-- Gestione Corsi CIG -->
+
+<STATEMENT name="ContaIscrAperte"
+	query="select count(*) as numIscrAperte
+				  from am_altra_iscr iscr, de_tipo_iscr tipo_iscr
+				  where iscr.CODSTATO is null
+				  and iscr.CODMOTCHIUSURAISCR is null
+				  and iscr.cdnlavoratore = ?
+				  and SYSDATE between iscr.datinizio and iscr.datfine
+				  and iscr.codtipoiscr = tipo_iscr.codtipoiscr
+   				  and tipo_iscr.flgcorso = 'S'" />
+
+<STATEMENT name="DettaglioCorso"
+	query="select to_char(cic.DATINIZIOPREV,'dd/mm/yyyy') as DATINIZIOPREV,
+					   to_char(cic.DATFINEPREV,'dd/mm/yyyy') as DATFINEPREV,
+					   to_char(cic.DATINIZIO,'dd/mm/yyyy') as DATINIZIO,
+					   to_char(cic.DATFINE,'dd/mm/yyyy') as DATFINE,
+					   to_char(cic.DATPRESAINCARICO,'dd/mm/yyyy') as DATPRESAINCARICO,
+					   to_char(cic.DATRITIRO,'dd/mm/yyyy') as DATRITIRO,
+					   cic.STRMOTIVORITIRO,
+					   c_or.CODRIFPA,
+					   c_or.STRDESCRIZIONERIFPA,
+					   c_or.STRREFERENTENOME,
+					   c_or.STRREFERENTECOGNOME,
+					   c_or.STRREFERENTETEL,
+					   c_or.CODSEDE,
+					   (select strdenominazione from de_comune where codcom = c_or.codcomsede) as COMSEDE,
+					   az.STRCODICEFISCALE,
+					   az.STRRAGIONESOCIALE,
+					   uaz.STRINDIRIZZO,
+					   com.STRDENOMINAZIONE,
+					   to_char(coll.datcolloquio,'dd/mm/yyyy') as datcolloquio,
+					   to_char(per.datstimata,'dd/mm/yyyy') as datstimata,
+					   es.strdescrizione as esito,
+					   to_char(per.dateffettiva,'dd/mm/yyyy') as dateffettiva,
+					   c_or.PRGAZIENDA,
+					   c_or.PRGUNITA,
+					   cic.strnote as note,
+					   to_char(cic.dtmins, 'DD/MM/YYYY hh24:mi') dtmins,
+					   to_char(cic.dtmmod, 'DD/MM/YYYY hh24:mi') dtmmod,
+					   cic.cdnutins,
+					   cic.cdnutmod,
+					   cic.prgcorsoci,
+                       to_char(isc.DATINIZIO,'dd/mm/yyyy') datInizioIscr,
+                       to_char(isc.DATFINE,'dd/mm/yyyy') datFineIscr,
+                       TIPO_ISCR.STRDESCRIZIONE tipoIscr,
+                       statoIscr.strdescrizione statoIscr, acc.codAccordo
+				  from ci_corso cic
+                  inner join ci_corso_orienter c_or on cic.PRGCORSOCI = c_or.PRGCORSOCI
+                  inner join am_altra_iscr isc on (isc.PRGALTRAISCR = cic.PRGALTRAISCR)
+                  inner join de_tipo_iscr tipo_iscr on (tipo_iscr.CODTIPOISCR = isc.CODTIPOISCR )
+                  left join an_azienda az on c_or.PRGAZIENDA = az.prgazienda
+                  left join an_unita_azienda uaz on (c_or.PRGUNITA = uaz.PRGUNITA and az.PRGAZIENDA = uaz.PRGAZIENDA)
+                  left join de_comune com on uaz.CODCOM = com.CODCOM 
+                  left join or_colloquio coll on cic.PRGCOLLOQUIO = coll.PRGCOLLOQUIO
+                  left join or_percorso_concordato per on cic.PRGPERCORSO = per.PRGPERCORSO 
+                  left join de_esito es on per.codesito = es.CODESITO
+                  left join de_stato_altra_iscr statoIscr on (statoIscr.codstato = isc.codstato)
+	              left join ci_accordo acc on (acc.prgaccordo = isc.prgaccordo)
+				  where cic.PRGCORSOCI = ?" />
+				  
+
+<STATEMENT name="ContaPercorsi"
+	query="select count(*) as numPercorsi
+				  	 from am_altra_iscr isc
+				left join or_colloquio coll on isc.PRGALTRAISCR = coll.prgaltraiscr
+				     join or_percorso_concordato per on coll.prgcolloquio = per.prgcolloquio
+				left join ci_corso co on per.PRGPERCORSO = co.PRGPERCORSO
+					where isc.PRGALTRAISCR = ?
+					  and per.prgazioni = 152 
+					  and co.prgpercorso is null" />
+
+<STATEMENT name="ContaPresaIncarico"
+	query="SELECT COUNT (*) AS numPresaIncarico
+			  FROM am_altra_iscr isc
+       		LEFT JOIN or_colloquio coll
+          		ON isc.PRGALTRAISCR = coll.prgaltraiscr
+       		JOIN or_percorso_concordato per
+          		ON coll.prgcolloquio = per.prgcolloquio
+       		JOIN de_esito des
+          		ON PER.CODESITO = DES.CODESITO
+  			WHERE isc.PRGALTRAISCR = ?
+       			AND per.prgazioni = 151
+       			AND NVL (per.dateffettiva, per.datstimata) &lt;= SYSDATE
+       			AND des.CODESITO IN ('FC', 'PR')" />
+
+<STATEMENT name="getSequenceCiCorso"
+	query="select s_ci_corso.nextval as prgcorsoci from dual" />
+
+
+
+
+<STATEMENT name="InsertCiCorso"
+	query="INSERT INTO CI_CORSO ( 
+						PRGCORSOCI, PRGALTRAISCR, 
+						DATINIZIOPREV, DATFINEPREV, 
+						CDNUTINS, DTMINS, CDNUTMOD, DTMMOD,
+						DTMEVENTO, PRGCOLLOQUIO, PRGPERCORSO, STRNOTE ) VALUES ( 
+						?, ?, 
+						TO_Date( ?, 'DD/MM/YYYY'),  
+						TO_Date( ?, 'DD/MM/YYYY'),  
+						?, sysdate, ?, sysdate, 
+						systimestamp, ?, ?, ?)" />
+
+<STATEMENT name="InsertCorsoOrienter"
+	query="INSERT INTO CI_CORSO_ORIENTER ( 
+					PRGCORSOCI, CODRIFPA, STRDESCRIZIONERIFPA, CODSEDE, DTMEVENTOORIENTER) VALUES ( 
+					?, ?, ?, ?, systimestamp)" />
+
+<STATEMENT name="DeleteCiCorso"
+	query="UPDATE ci_corso
+   SET dtmmod = SYSDATE,
+       cdnutmod = ?,
+       dtmcancellazione = SYSDATE,
+       cdnutentecancellazione = ?,
+       prgcolloquio = NULL,
+       prgpercorso = NULL
+ WHERE prgcorsoci = ?" />
+
+<STATEMENT name="DeleteCiCorsoCatalogo"
+	query="update ci_corso_catalogo set
+  				   prgcontattoiscr = null
+				   where prgcorsoci = ?" />
+
+<STATEMENT name="DeleteAgContatto"
+	query="delete
+			       from ag_contatto
+			       where prgcontatto = ?" />
+
+
+<STATEMENT name="SelectPrgContatto"
+	query="	select ci.prgcontattoiscr
+		  			from ci_corso_catalogo ci
+					where ci.prgcorsoci = ? " />
+
+<STATEMENT name="SelectAgContatto"
+	query="	select  PRGCONTATTO, CODCPICONTATTO, 
+			        to_char(DATCONTATTO, 'dd/mm/yyyy') AS DATCONTATTO, 
+			        STRORACONTATTO, PRGSPICONTATTO, 
+			        TXTCONTATTO, FLGRICONTATTARE, STRIO, 
+			        to_char(DATENTROIL, 'dd/mm/yyyy') as DATENTROIL, 
+			        PRGMOTCONTATTO, PRGTIPOCONTATTO, PRGEFFETTOCONTATTO, 
+			        CDNLAVORATORE, PRGAZIENDA, PRGUNITA, 
+			        CDNUTINS, DTMINS, 
+			        CDNUTMOD, DTMMOD,
+			        CODDISPONIBILITAROSA, FLGINVIATOSMS,STRCELLSMSINVIO
+				   	from ag_contatto ag  
+					where ag.prgcontatto = ? " />
+
+<STATEMENT name="IsContattiAbilitato"
+	query=" select conf.strvalore as abilitato
+				 from ts_config_loc conf, ts_generale gen 
+				 where codtipoconfig = 'CORSOCIG' and 
+				 conf.strcodrif = gen.codprovinciasil and 
+				 conf.datinizioval &lt;= sysdate and 
+				 conf.datfineval > sysdate " />
+
+
+<STATEMENT name="SELECT_PRGCORSOCI_SEQUENCE"
+	query="SELECT S_CI_CORSO.nextval AS PRGCORSOCI
+			   FROM DUAL" />
+
+<STATEMENT name="INS_CI_CORSO"
+	query="INSERT INTO CI_CORSO (PRGCORSOCI, PRGALTRAISCR, DATINIZIOPREV, 
+   									DATFINEPREV, DATPRESAINCARICO, DATINIZIO, 
+   									DATFINE, DATRITIRO, STRMOTIVORITIRO, 
+   									CDNUTENTECANCELLAZIONE, DTMCANCELLAZIONE, 
+   									DTMEVENTO, PRGCOLLOQUIO, PRGPERCORSO, STRNOTE,
+   									CDNUTINS,DTMINS,CDNUTMOD, DTMMOD) 
+			 VALUES (?, ?, to_date(?,'dd/mm/yyyy'), to_date(?,'dd/mm/yyyy'),
+			 		  to_date(?,'dd/mm/yyyy'), to_date(?,'dd/mm/yyyy') ,to_date(?,'dd/mm/yyyy'),
+			 		  to_date(?,'dd/mm/yyyy'),? , ? , to_date(?,'dd/mm/yyyy'), systimestamp ,
+			 		  ?,?,?,?,sysdate ,? ,sysdate)" />
+
+<STATEMENT name="SELECT_AGCONTATTO_SEQUENCE"
+	query="SELECT S_AG_CONTATTO.nextval AS PRGCONTATTO
+			   FROM DUAL" />
+
+<STATEMENT name="SELECT_AZIENDA_UNITA"
+	query="SELECT PRGAZIENDA, PRGUNITA FROM DE_CATALOGO_PROPOSTA where NUMIDPROPOSTA = ?" />
+
+<STATEMENT name="SELECT_CATSEDE_EMAIL"
+	query="SELECT STREMAIL FROM DE_CATALOGO_SEDE where NUMIDPROPOSTA = ? and NUMRECID = ?" />
+
+<STATEMENT name="INSERT_CONTATTO_CORSO"
+	query="INSERT INTO AG_CONTATTO (PRGCONTATTO, CODCPICONTATTO, DATCONTATTO, STRORACONTATTO, PRGSPICONTATTO, 
+						 TXTCONTATTO, FLGRICONTATTARE, STRIO, DATENTROIL, PRGMOTCONTATTO, PRGTIPOCONTATTO, 
+						 PRGEFFETTOCONTATTO, CDNLAVORATORE, PRGAZIENDA, PRGUNITA, NUMKLOCONTATTO, CDNUTINS, DTMINS, 
+                         CDNUTMOD, DTMMOD, CODDISPONIBILITAROSA, FLGINVIATOSMS, STRCELLSMSINVIO)
+     VALUES (?, ?, TO_DATE(?,'dd/mm/yyyy'), ?, ?, ?, NULL, 'O', NULL, ?, 3, NULL,
+             NULL, DECODE(?, 0, NULL), DECODE(?, 0, NULL), NULL, ?, SYSDATE, ?, SYSDATE, NULL, NULL, ?)" />
+
+<STATEMENT name="UPDATE_CORSO_CATALOGO"
+	query="UPDATE CI_CORSO_CATALOGO SET PRGCONTATTOISCR = ? WHERE PRGCORSOCI = ?" />
+
+<STATEMENT name="UPDATE_CORSO_CATALOGO_DISDETTA"
+	query="UPDATE CI_CORSO_CATALOGO SET PRGCONTATTODISD = ? WHERE PRGCORSOCI = ?" />
+
+<STATEMENT name="CIG_GET_PRGSPIUT"
+	query="select sp.PRGSPI, sp.STRCOGNOME || ' ' || sp.STRNOME AS NOME, SP.STRSIGLAOPERATORE  
+           		    from an_spi sp, ts_utente ut
+ 				    where SP.PRGSPI = UT.PRGSPI and cdnut = ?" />
+
+
+
+<STATEMENT name="GET_CPI_DESCRIZIONE"
+	query="select strdescrizione from de_cpi where codcpi = ?" />
+
+<STATEMENT name="GET_CONTATTO_EMAIL_BODY"
+	query="SELECT CS.STRNOMINATIVO AS REFERENTESEDE,
+			       CS.STRSEDE || ' (' || CS.STRCODSEDE || ')' AS STRSEDE,
+			       AL.STRCOGNOME || ' ' || AL.STRNOME || ' (Cod. Fisc.: ' || AL.STRCODICEFISCALE || ')' AS LAVORATORE,
+			           cp.STRCODICEORGANISMO
+			       || ' - '
+			       || cp.NUMIDAREAPROFESSIONALE
+			       || ' - '
+			       || cp.NUMIDQUALIFICA
+			       || ' '
+			       || cp.STRDESCRIZIONEAREA
+			       || ' '
+			       || CP.STRTITOLOQUALIFICA
+			          AS DENOMINAZIONE,
+			       AI.CODTIPOISCR
+			  FROM DE_CATALOGO_SEDE cs,
+			       DE_CATALOGO_PROPOSTA cp,
+			       AM_ALTRA_ISCR ai,
+			       AN_LAVORATORE al,
+			       CI_CORSO ci,
+			       CI_CORSO_CATALOGO cc
+			 WHERE     CS.NUMIDPROPOSTA = CP.NUMIDPROPOSTA
+			       AND CC.NUMIDPROPOSTA = CS.NUMIDPROPOSTA
+			       AND CS.NUMRECID = CC.NUMRECID
+			       AND CC.NUMIDPROPOSTA = CP.NUMIDPROPOSTA
+			       AND CI.PRGCORSOCI = CC.PRGCORSOCI
+			       AND CI.PRGALTRAISCR = AI.PRGALTRAISCR
+			       AND AI.CDNLAVORATORE = AL.CDNLAVORATORE
+			       AND CC.PRGCORSOCI = ?" />
+
+<STATEMENT name="INS_CI_CORSO_CAT"
+	query="INSERT INTO CI_CORSO_CATALOGO (PRGCORSOCI, NUMIDPROPOSTA, NUMRECID,FLGITALIANOSTRANIERI) 
+			   VALUES ( ?, ?, ?,?)" />
+
+<STATEMENT name="GET_CATALOGO"
+	query="select prop.strcodiceproposta, sede.strsede, sede.STRNOMINATIVO, sede.STREMAIL, prop.STRDESCRIZIONEAREA,
+	   				  prop.STRTITOLOQUALIFICA, prop.STRRAGIONESOCIALEENTE, sede.strambitoprovinciale, 
+	   				  cor.strnote, corso.FLGITALIANOSTRANIERI,
+	   				  to_char(coll.datcolloquio,'dd/mm/yyyy') as datcolloquio,
+	   				  to_char(per.datstimata,'dd/mm/yyyy') as datstimata,
+					  es.strdescrizione as esito,
+					  to_char(per.dateffettiva,'dd/mm/yyyy') as dateffettiva,
+					  cor.prgcorsoci,
+					  to_char(cor.DATINIZIOPREV,'dd/mm/yyyy') as DATINIZIOPREV,
+					   to_char(cor.DATFINEPREV,'dd/mm/yyyy') as DATFINEPREV,
+					   to_char(cor.DATINIZIO,'dd/mm/yyyy') as DATINIZIO,
+					   to_char(cor.DATFINE,'dd/mm/yyyy') as DATFINE,
+					   to_char(cor.DATPRESAINCARICO,'dd/mm/yyyy') as DATPRESAINCARICO,
+					   to_char(cor.DATRITIRO,'dd/mm/yyyy') as DATRITIRO,
+					   cor.STRMOTIVORITIRO,
+					   to_char(cor.dtmins, 'DD/MM/YYYY hh24:mi') dtmins,
+					   to_char(cor.dtmmod, 'DD/MM/YYYY hh24:mi') dtmmod,
+					   cor.cdnutins,
+					   cor.cdnutmod,
+					   to_char(isc.DATINIZIO,'dd/mm/yyyy') datInizioIscr,
+                       to_char(isc.DATFINE,'dd/mm/yyyy') datFineIscr,
+                       TIPO_ISCR.STRDESCRIZIONE tipoIscr,
+                       statoIscr.strdescrizione statoIscr, acc.codAccordo
+			   from ci_corso_catalogo corso
+               inner join de_catalogo_proposta prop on (prop.numidproposta = corso.NUMIDPROPOSTA)
+               inner join de_catalogo_sede sede on (sede.NUMRECID = corso.NUMRECID)
+               inner join ci_corso cor on (cor.prgcorsoci = corso.prgcorsoci)
+               inner join am_altra_iscr isc on (isc.PRGALTRAISCR = cor.PRGALTRAISCR)
+               inner join de_tipo_iscr tipo_iscr on (tipo_iscr.CODTIPOISCR = isc.CODTIPOISCR )
+               left join or_colloquio coll on cor.PRGCOLLOQUIO = coll.PRGCOLLOQUIO
+               left join or_percorso_concordato per on cor.PRGPERCORSO = per.PRGPERCORSO 
+               left join de_esito es on per.codesito = es.CODESITO
+               left join de_stato_altra_iscr statoIscr on (statoIscr.codstato = isc.codstato)
+               left join ci_accordo acc on (acc.prgaccordo = isc.prgaccordo)
+			   where corso.PRGCORSOCI = ? " />
+
+<STATEMENT name="Get_AltraIscrizione"
+	query="select iscr.prgazienda, uni.prgunita, azi.strragionesociale, uni.strindirizzo, 
+						  com.STRDENOMINAZIONE comune, to_char(iscr.datInizio, 'DD/MM/YYYY') as datInizio,
+	   					  to_char(iscr.datFine, 'DD/MM/YYYY') as datFine,
+	   					  tipo.STRDESCRIZIONE as tipoIscr, azi.strcodicefiscale, tipo.flgModDate,
+	   					  to_char(iscr.DATCOMPETENZA, 'DD/MM/YYYY') as datCompetenza,
+	   					  motChius.strDescrizione motChiusura, 
+	   					  to_char(iscr.DATCHIUSURAISCR, 'DD/MM/YYYY') as datChiusuraIscr,
+	   				      iscr.STRNOTA, stato.STRDESCRIZIONE descrStato, 
+	   					  decode (iscr.CODMONOTIPOCOMPETENZA, 'A', 'Competenza amministrativa', 'D', 'Competenza sul domicilio indicato nella domanda', 'R', 'Competenza sulla residenza indicata nella domanda', 'S','Competenza in base al comune della sede',NULL) as Competenza,
+	   					  iscr.codMonoTipoCompetenza, iscr.codStato,iscr.codMotChiusuraIscr, iscr.codtipoiscr,
+	   					  statoIscr.strdescrizione descrStato, iscr.prgaccordo, statoIscr.flgSl,
+	   					  to_char(iscr.NUMKLOALTRAISCR) NUMKLOALTRAISCR, 
+	   					  to_char(iscr.dtmins, 'DD/MM/YYYY hh24:mi') dtmins,
+					   	  to_char(iscr.dtmmod, 'DD/MM/YYYY hh24:mi') dtmmod,
+	   					  iscr.CDNUTINS, iscr.CDNUTMOD, to_char(iscr.datLicenziamento, 'DD/MM/YYYY') as datLicenz,
+	   					  iscr.flgdirittodo, iscr.codmotivonotdo
+				  from am_altra_iscr iscr
+					inner join an_lavoratore lav on (lav.cdnlavoratore = iscr.cdnlavoratore)
+					left join de_motivo_chiusuraiscr motChius on (motChius.codMotChiusuraIscr = iscr.codMotChiusuraIscr)
+					left join de_stato_altra_iscr statoIscr on (statoIscr.codstato = iscr.codstato) 
+					left join an_azienda azi on (azi.prgazienda = iscr.prgazienda)
+					left join an_unita_azienda uni on (iscr.prgazienda = uni.prgazienda and iscr.prgunita = uni.prgunita)
+					left join de_comune com on (COM.codCom = uni.codCom)
+					inner join de_tipo_iscr tipo on (tipo.CODTIPOISCR = iscr.CODTIPOISCR)
+					left join de_stato_altra_iscr stato on (stato.codstato = iscr.CODSTATO)
+				 where iscr.PRGALTRAISCR = ?" />
+
+<STATEMENT name="UPDATE_NOTE_CI_CORSO"
+	query="update ci_corso ci set
+				   ci.STRNOTE = ?,
+				   ci.DTMMOD = sysdate,
+				   ci.CDNUTMOD = ?
+				where ci.PRGCORSOCI = ?" />
+
+<STATEMENT name="GET_INFO_CPI_STAMPE"
+	query="select cpi.strdescrizione, cpi.strindirizzo, 
+				com.strdenominazione,cpi.strtel, cpi.strresponsabile
+			 from de_cpi cpi, de_comune com
+			 where cpi.codcom = com.codcom (+)
+			 	and cpi.codcpi = ?" />
+
+<STATEMENT name="GET_INFO_MAIL_CIG"
+	query="select ts_email.stroggetto, ts_email.stremailmittente, ts_generale.strsmtpserver, ts_email.strcorpoemail
+			 from ts_email, ts_generale
+			 where  ts_email.codtipoemail = ?" />
+
+<STATEMENT name="GET_CONTATTI_ISCR_DISDETTA_CIG"
+	query="SELECT PRGCONTATTO, TXTCONTATTO, STRCELLSMSINVIO, NUMKLOCONTATTO
+			 FROM AG_CONTATTO
+			 WHERE STRIO = 'O' AND PRGMOTCONTATTO = ? AND PRGTIPOCONTATTO = ? AND FLGINVIATOSMS IS NULL" />
+
+<STATEMENT name="UPDATE_CONTATTO_PER_INVIO_MAIL"
+	query="UPDATE AG_CONTATTO SET FLGINVIATOSMS = ?,
+				CDNUTMOD = ?,
+				DTMMOD = SYSDATE,
+				NUMKLOCONTATTO = ?
+				WHERE PRGCONTATTO = ?" />
+
+<STATEMENT name="GET_CONFIGURAZIONE_POLO_CIG"
+	query="select ts_config_loc.strvalore
+				from ts_config_loc, ts_generale
+				where ts_config_loc.strcodrif = ts_generale.codprovinciasil
+				and ts_config_loc.codtipoconfig = 'CORSOCIG' 
+				and trunc(ts_config_loc.datinizioval) &lt;= trunc(sysdate)
+				and trunc(ts_config_loc.datfineval) &gt; trunc(sysdate)" />
+
+<STATEMENT name="S_ControlCorsiCig"
+	query="select PRGCORSOCI as corsi from CI_CORSO_CATALOGO 
+where PRGCORSOCI in (select PRGCORSOCI from CI_CORSO 
+where  (DTMCANCELLAZIONE is null or (DATFINE is null  and DATFINE > sysdate)) and
+PRGALTRAISCR in (select PRGALTRAISCR from AM_ALTRA_ISCR where CDNLAVORATORE = ?))" />
+
+<STATEMENT name="S_Limite_Iscrizione"
+	query="select to_char(num) as limitecorso from TS_CONFIG_LOC where CODTIPOCONFIG='LICTLGO' 
+and STRCODRIF = (select codprovinciasil from ts_generale)" />
+
+<STATEMENT name="GET_MOTIVO_NOT_DO" query="select CODMOTIVONOTDO as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_MOTIVO_NOT_DO order by STRDESCRIZIONE" />
+                  
+
+<STATEMENT name="GetAccorpaIscrizione" 
+		   query="SELECT iscr.cdnlavoratore, iscr.prgazienda, iscr.prgaltraiscr, iscr.prgunita,
+         				 DECODE (azi.strragionesociale,NULL, '',azi.strragionesociale || ' - ') 
+                				|| DECODE (azi.strcodicefiscale,NULL, '','CF ' || azi.strcodicefiscale ) AS strragionesociale,
+                		azi.strragionesociale as ragSoc, azi.strcodicefiscale as cf,
+         				TO_CHAR (iscr.datinizio, 'DD/MM/YYYY') AS datinizio,
+         				TO_CHAR (iscr.datfine, 'DD/MM/YYYY') AS datfine,
+         				tipo.strdescrizione tipoiscr, 
+         				statoiscr.strdescrizione descrstato, acc.codaccordo, iscr.prgaccordo
+				FROM am_altra_iscr iscr 
+     				INNER JOIN de_tipo_iscr tipo ON (tipo.codtipoiscr = iscr.codtipoiscr)
+     				LEFT JOIN de_stato_altra_iscr statoiscr ON (statoiscr.codstato = iscr.codstato)
+     				LEFT JOIN an_azienda azi ON (azi.prgazienda = iscr.prgazienda) 
+     				LEFT JOIN an_unita_azienda uni_azi ON ( uni_azi.prgazienda = iscr.prgazienda AND uni_azi.prgunita = iscr.prgunita)
+     				LEFT JOIN ci_accordo acc ON (acc.prgaccordo = iscr.prgaccordo)
+   				WHERE iscr.cdnlavoratore = ?
+				ORDER BY iscr.datinizio DESC" />
+				
+<STATEMENT name="GET_INFO_ALTRA_ISCR" 
+		   query="SELECT iscr.cdnlavoratore, to_char(iscr.prgazienda) prgazienda, iscr.prgaltraiscr, iscr.prgunita,
+       					 azi.strragionesociale as ragSoc, azi.strcodicefiscale as cf,
+       					 TO_CHAR (iscr.datinizio, 'DD/MM/YYYY') AS datinizio,
+       					 TO_CHAR (iscr.datfine, 'DD/MM/YYYY') AS datfine,
+       					 iscr.codtipoiscr, tipo.strdescrizione tipoiscr, 
+       					 statoiscr.strdescrizione descrstato, acc.codaccordo, iscr.prgaccordo,
+       					 TO_CHAR (COLL.DATCOLLOQUIO, 'DD/MM/YYYY') AS datcolloquio,
+       					 TO_CHAR (COLL.DATCHIUSURAPER, 'DD/MM/YYYY') AS datchiusura,
+       					 CHIU.STRDESCRIZIONE motChiusura, COLL.STRNOTE
+				FROM am_altra_iscr iscr
+				INNER JOIN de_tipo_iscr tipo ON (tipo.codtipoiscr = iscr.codtipoiscr)
+				LEFT JOIN de_stato_altra_iscr statoiscr ON (statoiscr.codstato = iscr.codstato)
+				LEFT JOIN an_azienda azi ON (azi.prgazienda = iscr.prgazienda) 
+				LEFT JOIN an_unita_azienda uni_azi ON ( uni_azi.prgazienda = iscr.prgazienda AND uni_azi.prgunita = iscr.prgunita)
+				LEFT JOIN ci_accordo acc ON (acc.prgaccordo = iscr.prgaccordo)
+				LEFT JOIN or_colloquio coll on iscr.prgaltraiscr = coll.prgaltraiscr
+				left join de_motivo_chiusuraper chiu on (CHIU.CODMOTCHIUSURAPER = COLL.CODMOTIVOCHIUSURAPER)
+				WHERE iscr.prgaltraiscr = ? " />
+				
+<STATEMENT name="GET_LISTA_PIC_ISCR" 
+		   query="SELECT DISTINCT to_char(per.datstimata, 'dd/mm/yyyy') as datstimata,
+                				  az.strDescrizione as azione,
+                				  az_ra.strDescrizione as obiettivo,
+                				  es.strDescrizione as esito,
+                				  to_char(per.dateffettiva, 'dd/mm/yyyy') as dateffettiva 
+                  FROM or_percorso_concordato per,
+                	   de_esito es,
+                	   de_azione az,
+                       or_colloquio coll,
+                       am_altra_iscr iscr,
+                       de_azione_ragg az_ra, 
+                       de_servizicig prest
+                 WHERE per.prgcolloquio = coll.prgcolloquio
+            		   AND coll.cdnlavoratore = ?
+                       AND coll.prgaltraiscr = iscr.prgaltraiscr (+)
+                       AND per.codesito = es.codesito (+)
+                       AND per.prgazioni = az.prgazioni                        
+                       AND prest.codServiziCig (+) = per.codServiziCig
+                       AND iscr.prgaltraiscr = ?
+            		   AND az.prgAzioneRagg = az_ra.prgAzioniRagg 
+         	    ORDER BY datstimata" />
+         	    
+         	    
+<STATEMENT name="GET_LISTA_CORSI_ISCR" 
+		   query="select isc.cdnlavoratore,
+       					 decode(c_or.prgcorsoci,null,prop.strcodiceproposta,c_or.codRifPA) as idCorso,
+       					 decode(c_or.prgcorsoci,null,prop.strdescrizionearea||' '||prop.strtitoloqualifica,c_or.strDescrizioneRifPA) as descrizione,
+       					 decode(c_or.prgcorsoci,null,prop.strragionesocialeente,az_or.strRagioneSociale) as ente,
+       					 decode(c_or.prgcorsoci,null,'CA','OR') as tipo,
+       					 to_char(c.dtmcancellazione,'dd/mm/yyyy') as dataCancellazione
+				 from ci_corso c 
+				 inner join am_altra_iscr isc on (isc.PRGALTRAISCR = c.PRGALTRAISCR)
+				 inner join de_tipo_iscr tipo_iscr on (TIPO_ISCR.CODTIPOISCR = ISC.CODTIPOISCR )
+				 left join ci_corso_orienter c_or on ( c.PRGCORSOCI = c_or.PRGCORSOCI )
+				 left join ci_corso_catalogo c_cat on ( c.PRGCORSOCI = c_cat.PRGCORSOCI )
+				 left join de_catalogo_proposta prop on (prop.numidproposta = c_cat.NUMIDPROPOSTA)
+				 left join an_azienda az_or on (c_or.prgazienda = az_or.prgazienda)
+				 where isc.cdnlavoratore = ? and isc.prgaltraiscr = ? " />
+				 
+				 
+<STATEMENT name="PROC_ACCORPA_ISCRIZIONE"
+          query="{ call ? := PG_ACCORPA_LAVORATORE.accorpa_iscrizione(?,?,?,?) }"/>			
+
+				
+			
+
+				

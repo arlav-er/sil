@@ -1,0 +1,192 @@
+<!--
+questa query sembra che non sia usata da nessun modulo o classe.
+<STATEMENT
+        name="COOP_GETDATIPERSONALI"
+        query="SELECT AN.STRCODICEFISCALE as STRCODICEFISCALE, 
+                      AN.STRCOGNOME as STRCOGNOME, 
+                      AN.STRNOME as STRNOME, 
+                      AN.STRSESSO as STRSESSO, TO_CHAR(AN.DATNASC, 'DD/MM/YYYY') as DATNASC,
+                      COM1.STRDENOMINAZIONE || ' (' || rtrim(p.strIstat) || ') ' as STRCOMNAS,
+                      CIT1.STRNAZIONE as STRNAZIONE,
+                      CIT2.STRNAZIONE as STRNAZIONE2,
+                      AN.FLGMILITE as FLGMILITE,
+
+					  AN.STRINDIRIZZORES  as STRINDIRIZZORES, 
+	                  AN.STRLOCALITARES as STRLOCALITARES,					  
+     				  COM2.STRDENOMINAZIONE  ||' (' || rtrim(p2.strIstat) || ') ' as STRCOMRES, 
+					  AN.STRCAPRES as STRCAPRES, 
+
+					  AN.STRINDIRIZZODOM as STRINDIRIZZODOM, 
+					  AN.STRLOCALITADOM as STRLOCALITADOM, 
+	                  COM3.STRDENOMINAZIONE ||' (' || rtrim(p3.strIstat) || ') ' as STRCOMDOM,
+                 	  AN.STRCAPDOM as STRCAPDOM,
+                 	  AN_SINF.CODCPITIT as CODCPITIT
+               FROM AN_LAVORATORE AN 
+               INNER JOIN DE_COMUNE COM1 ON AN.CODCOMNAS=COM1.CODCOM
+               inner join de_provincia p on com1.codprovincia=p.codprovincia 
+               LEFT JOIN DE_COMUNE COM2 ON AN.CODCOMRES=COM2.CODCOM
+               left join de_provincia p2 on com2.codprovincia=p2.codprovincia
+               LEFT JOIN DE_COMUNE COM3 ON AN.CODCOMDOM=COM3.CODCOM
+               left join de_provincia p3 on com3.codprovincia=p3.codprovincia
+               INNER JOIN DE_CITTADINANZA CIT1 ON AN.CODCITTADINANZA=CIT1.CODCITTADINANZA
+               LEFT JOIN DE_CITTADINANZA CIT2 ON AN.CODCITTADINANZA2=CIT2.CODCITTADINANZA
+               left join AN_LAV_STORIA_INF AN_SINF ON ( AN.cdnLavoratore = AN_SINF.cdnLavoratore AND AN_SINF.datFine is null )
+               WHERE AN.strCodiceFiscale = ? "/>
+ -->              
+<STATEMENT
+        name="SELECT_EVIDENZE_IR"
+        query="SELECT AN.STRCODICEFISCALE as STRCODICEFISCALE,         			  
+                      AN.STRCOGNOME as STRCOGNOME, 
+                      AN.STRNOME as STRNOME,
+                      EV.STREVIDENZA as STREVIDENZA
+               FROM AN_EVIDENZA EV
+			   inner join an_lavoratore an on an.cdnlavoratore = ev.cdnlavoratore 
+			   where ev.prgtipoevidenza=?"/>               
+
+<STATEMENT name="CONTROLLO_CPI_PROVINCIA_POLO"
+        query="
+SELECT (CASE
+           WHEN (p1.codprovincia = p2.codprovincia)
+              THEN '1'
+           WHEN (p1.codregione = p2.codregione)
+              THEN '2'
+           ELSE '3'
+        END
+       ) as controllo
+  FROM de_cpi, de_provincia p1, de_provincia p2
+ WHERE de_cpi.codprovincia = p1.codprovincia AND p2.codprovincia = ?
+       AND de_cpi.codcpi = ?
+"/>
+
+<STATEMENT name="CHECK_PROVINCIA_ATTIVA"
+	query="SELECT FLGPOLOATTIVO
+		FROM TS_ENDPOINT
+		WHERE STRNAME = 'MessageReceiver_'||?
+		AND CODPROVINCIA = ?	
+"/>
+
+<STATEMENT name="ESPORTA_MOVIMENTO"
+           query="{ call ? := PG_MIGRAZIONI.ESPORTA_MOVIMENTO(?) }"
+/>
+
+<STATEMENT name="INS_MIGRAZIONE_ERR"
+	query="INSERT INTO TS_MIGRAZIONE_ERR
+	      (PRGMIGRAZIONEERR, 
+	      DTMINSERR,
+	      DATINIZIOMOV,
+	      STRCODICEFISCALELAV,
+	      STRCODICEFISCALEAZIENDA,
+	      CODCOMUNICAZIONE,
+	      CODPROVINCIADEST,
+	      TXTMOV,
+	      TXTERRORE)
+	      VALUES 
+	      (S_TS_MIGRAZIONE_ERR.NEXTVAL,
+	      SYSDATE,
+	      to_date(?, 'dd/mm/yyyy'),
+	      ?,
+	      ?,
+	      ?,
+	      ?,
+	      ?,
+	      ?)"/>
+	      
+<STATEMENT name="GET_NEXT_PRGWSERR"
+		   query="SELECT S_TS_WS_ERR.NEXTVAL PRGWSERR FROM DUAL"/>
+		   
+<STATEMENT name="INSERT_LOG_COMUNICAZIONE"
+		   query="INSERT INTO TS_WS_ERR
+				  		 (PRGWSERR, 
+				   DTMELABORAZIONE, 
+				       CODMONOTIPO, 
+		    STRCODICECOMUNICAZIONE, 
+		    TXTTRACCIATOXML,
+		    STRSQLCODE,
+		    STRSQLERRM)VALUES(
+		    ?, SYSDATE, ?,?, EMPTY_CLOB(), ?, ?)"/>
+	      
+<STATEMENT name="WRITE_CLOB_COMUNICAZIONE"
+            query="SELECT TXTTRACCIATOXML 
+            		FROM TS_WS_ERR
+					WHERE PRGWSERR = ? 
+					FOR UPDATE"/>
+
+<STATEMENT name="COOP_GET_STATO_OCC_APERTO"
+	query="SELECT TO_CHAR(am_stato_occupaz.datinizio, 'DD/MM/YYYY') datinizio, 
+				de_stato_occupaz.codstatooccupazragg
+		 	FROM am_stato_occupaz
+         	INNER JOIN de_stato_occupaz ON (am_stato_occupaz.codstatooccupaz = de_stato_occupaz.codstatooccupaz)
+         	WHERE am_stato_occupaz.cdnlavoratore = ?
+         	AND am_stato_occupaz.datfine IS NULL
+"/>
+
+<STATEMENT name="COOP_GET_DID_APERTA"
+	query="select did.prgdichdisponibilita, to_char(did.datdichiarazione, 'dd/mm/yyyy') datdichiarazione, 
+			did.codstatoatto, did.prgelencoanagrafico, did.codtipodichdisp
+			from am_dich_disponibilita did
+			inner join am_elenco_anagrafico el on (did.prgelencoanagrafico = el.prgelencoanagrafico)
+			where el.cdnlavoratore = ?
+			and did.codstatoatto = 'PR'
+			and did.datfine is null
+"/>
+
+<STATEMENT name="GET_SP_NOTIFICA_PN_NEXTVAL" query="
+	select S_SP_NOTIFICA_PN.nextval as do_nextval from dual
+"/>
+
+<STATEMENT name="INSERT_NOTIFICA_BONUS_OCCUPAZIONALE"
+	query="INSERT INTO SP_NOTIFICA_PN (PRGSPNOTIFICAPN, DATRICEZIONE, DATADESIONE, STRCODICEFISCALE, CODPROVINCIA,
+			IDENTIFICATIVOSAP, CDNUTINS, CDNUTMOD, DTMINS, DTMMOD) 
+		VALUES (?, SYSDATE, TO_DATE(?,'DD/MM/YYYY'), UPPER(?), ?,
+			?, ?, ?, SYSDATE, SYSDATE)" />
+			
+<STATEMENT name="INSERT_POLITICA_BONUS_OCCUPAZIONALE"
+	query="INSERT INTO SP_POLITICA_NAZIONALE (PRGSPPOLITICANAZIONALE, PRGSPNOTIFICAPN, CODTIPOATTIVITA, DATPROPOSTA, DATINIZIO,
+			DATFINE, CODTIPOLOGIADURATA, NUMDURATA, STRDESCRIZIONE, CODPROGETTO, STRCODENTEPROMOTORE, CDNUTINS, CDNUTMOD, DTMINS, DTMMOD, STRDENOMINAZIONE) 
+		VALUES (S_SP_POLITICA_NAZIONALE.nextval, ?, ?, TO_DATE(?,'DD/MM/YYYY'), TO_DATE(?,'DD/MM/YYYY'),
+		TO_DATE(?,'DD/MM/YYYY'), ?, ?, ?, ?, ?, ?, ?, SYSDATE, SYSDATE, ?)" />
+		
+<STATEMENT name="GET_TRACCIATO_FLUSSO"
+	query="select prgflusso, strtipoflusso, numpatti, numazioni, nummovimenti, to_char(datinvio, 'dd/mm/yyyy') datinvio
+			from ts_flussi
+			where prgflusso = ?
+"/>
+
+<STATEMENT name="GET_ULTIMO_TRACCIATO_FLUSSO_LAVORATORE"
+	query="select prgflusso, strtipoflusso, numpatti, numazioni, nummovimenti, to_char(datinvio, 'dd/mm/yyyy') datinvio
+			from ts_flussi
+			where prgflusso = (select max(flusso.prgflusso) 
+							  from ts_flusso_lavoratore inner join ts_flussi flusso on (ts_flusso_lavoratore.prgflusso = flusso.prgflusso)
+							  where upper(strcodicefiscalelav) = upper(?) and upper(flusso.strtipoflusso) = upper(?))
+"/>
+
+<STATEMENT name="GET_TRACCIATO_FLUSSO_LAV"
+	query="select prgflusso, strcodicefiscalelav, codcomdomlav, strindirizzodomlav, codcomreslav, strindirizzoreslav, cdnlavoratore
+			from ts_flusso_lavoratore
+			where prgflusso = ?
+"/>
+
+<STATEMENT name="GET_TRACCIATO_FLUSSO_PATTI"
+	query="select prgflusso, prgpattolavoratore, codtipopatto, to_char(datstipula, 'dd/mm/yyyy') datstipula,
+			codstatoatto, to_char(dataadesionegg, 'dd/mm/yyyy') dataadesionegg, numindicesvantaggio2, to_char(datriferimento, 'dd/mm/yyyy') datriferimento,
+			numprofiling, to_char(datriferimento150, 'dd/mm/yyyy') datriferimento150, codstatooccupaz, striddomandadote, numprotocollo,
+			to_char(datfine, 'dd/mm/yyyy') datfine, codmotivofineatto, strentecodicefiscale
+			from ts_flusso_patti
+			where prgflusso = ?
+"/>
+
+<STATEMENT name="GET_TRACCIATO_FLUSSO_MOV"
+	query="select prgflusso, prgmovimento, codtipomov, to_char(datinizio, 'dd/mm/yyyy') datinizio, 
+			to_char(datfine, 'dd/mm/yyyy') datfine, codstatoatto, codcomunicazione, prgmovimentorett, datorecodicefiscale, utilizzatorecodicefiscale,
+			codmansionedot, codtipocontratto, codcomlavoro, codorario
+			from ts_flusso_movimenti
+			where prgflusso = ?
+"/>
+
+<STATEMENT name="GET_TRACCIATO_FLUSSO_AZ"
+	query="select prgflusso, prgpercorso, prgcolloquio, prgazioni, codesito, to_char(datstimata, 'dd/mm/yyyy') datstimata,
+			to_char(dateffettiva, 'dd/mm/yyyy') dateffettiva, to_char(datavvioazione, 'dd/mm/yyyy') datavvioazione,
+			codtipologiadurata, numygduratamin, numygduratamax, numygdurataeff
+			from ts_flusso_azioni
+			where prgflusso = ?
+"/> 

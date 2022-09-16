@@ -1,0 +1,243 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/main.xhtml">
+
+	<ui:param name="bean" value="#{vetrinaAziendaBean}"></ui:param>
+	
+	<ui:define name="title">
+		<h:outputText value="Vetrina" rendered="#{sessionBean.azienda}" />
+		<h:outputText value="Vetrina di #{bean.data.ragioneSociale}"
+			rendered="#{not sessionBean.azienda}" />
+	</ui:define>
+	<ui:define name="content">
+		<f:loadBundle basename="messages.errors" var="err_msg" />
+		<f:event listener="#{vetrinaAziendaBean.preRenderListener}"
+			type="preRenderView" />
+
+		<div>
+			<f:subview id="classic"
+				rendered="#{bean.data.codiceTemplate != 'TABS'}">
+				<ui:include src="template/classic.xhtml" />
+			</f:subview>
+
+			<f:subview id="tab" rendered="#{bean.data.codiceTemplate == 'TABS'}">
+				<ui:include src="template/tabs.xhtml" />
+			</f:subview>
+
+			 <h:link styleClass="editButton" id="editButton" outcome="edit"
+				value="Modifica" title="Modifica" rendered="#{bean.canEdit}"/> 
+		   <!--  <p:button id="editButton" outcome="edit"
+				value="Modifica" title="Modifica" rendered="#{bean.canEdit}"></p:button> -->		
+			<br />
+			<h:panelGroup id="buttons">
+				<h:link styleClass="buttonStyle" id="candidatiButton"
+					onclick="return document.getElementById('candida_vacancy_dialog').open({},this);"
+					value="Invia un' autocandidatura a questa azienda"
+					title="Invia un' autocandidatura a questa azienda"
+					rendered="#{not bean.canEdit and not bean.hasCandidatura and (sessionBean.connectedUtente != null) and (not empty bean.myCurricula)}" />
+				<h:link styleClass="buttonStyle"
+					onclick="alert('Prima di poter inviare un\'autocandidatura a quest\'azienda devi compilare un Curriculum.'); return false"
+					value="Invia un' autocandidatura a questa azienda"
+					title="Invia un' autocandidatura a questa azienda"
+					rendered="#{not bean.canEdit and not bean.hasCandidatura and (sessionBean.connectedUtente != null) and (empty bean.myCurricula)}" />
+				<h:link styleClass="buttonStyle" id="alreadyButton" disabled="true"
+					value="Hai già inviato un' autocandidatura a questa azienda"
+					title="Hai già inviato un' autocandidatura a questa azienda"
+					rendered="#{bean.hasCandidatura}" />
+			</h:panelGroup>
+			<br />
+
+			<ui:fragment rendered="#{sessionBean.utente}">
+				<cc:modalDialog id="candida_vacancy_dialog"
+					title="Invia una autocandidatura" message=""
+					actionSubmit="#{vetrinaAziendaBean.inviaAutocandidatura}"
+					submitLabel="Invia autocandidatura!"
+					renderAjax=":buttons comment :messages" eventAjax="modalVacancyCallback" width="540" height="470">
+					<h:inputHidden id="objectId"></h:inputHidden>
+					<h:outputText value="#{cc.attrs.message}"></h:outputText>
+					<cc:selectOneMenu id="curriculum" styleClass="width400"
+						label="Seleziona un Curriculum"
+						value="#{bean.candidatura.idCvDatiPersonali}" disableInput="true">
+						<f:selectItems value="#{bean.myCurricula}" />
+					</cc:selectOneMenu>
+					<hr />
+					<cc:selectOneMenu id="lettera" styleClass="width400"
+						label="Seleziona una lettera di presentazione"
+						value="#{bean.candidatura.idCvLetteraAcc}" disableInput="true">
+						<f:selectItems value="#{bean.myLettere}" />
+					</cc:selectOneMenu>
+					<h:panelGroup>
+						<h:commandLink id="dialog_attach_opener"
+							value="Inserisci un allegato" name="Inserisci un allegato"
+							title="Inserisci un allegato" class="buttonStyle"
+							onclick="$('#dialog_allegato').dialog('open'); return false;">
+							<span class="ui-icon ui-icon-disk fix_icon" />
+						</h:commandLink>
+
+						<h:outputText id="original_file_name_display" style="margin:10px" />
+						<h:commandLink id="attach_cleaner" value="Rimuovi"
+							title="Rimuovi allegato" class="buttonStyle"
+							onclick="removeFileAttach(); return false;">
+							<span class="ui-icon ui-icon-trash fix_icon" />
+						</h:commandLink>
+						<h:inputHidden
+							value="#{bean.candidatura.allegatoFileName}"
+							id="original_file_name" />
+						<h:inputHidden
+							value="#{bean.candidatura.allegatoFileNameTmp}"
+							id="file_name" />
+					</h:panelGroup>
+					<h:panelGroup layout="block" id="txt">
+						<b><h:outputText
+								value="A seguito della candidatura sarà inviato un messaggio all'azienda interessata." /><br />
+							<h:outputText
+								value="Occorre pertanto compilare la sezione sottostante. " />
+						</b>
+					</h:panelGroup>
+					<cc:inputTextarea 
+						value="#{bean.candidatura.commento}" 
+						id="comment" label="Commento personale al messaggio" 
+						richTextMode="false" required="true" maxlength="2000">					
+					</cc:inputTextarea>				
+				</cc:modalDialog>
+			</ui:fragment>
+			<script type="text/javascript">
+					var mappa = document.getElementById("map");
+					var map;
+
+
+					function modalVacancyCallback(data) {
+						//console.log(data);
+						if (data.status == 'success') {
+							//se ci sono errori di validazione lascia aperto
+							var fieldValidationFailed = (data.responseText.indexOf('ui-state-error') != -1);
+							if (fieldValidationFailed) {
+								//alert('fieldValidationFailed');
+								disegnaBottoni();
+								return 'leaveOpen'
+							}
+							//controlla se la Candidatura è andata a buon fine
+							var validationFailed = (data.responseText.indexOf('Autocandidatura inviata correttamente') == -1);
+							console.log('valRes: ' + validationFailed);
+							//chiudi solo se la Candidatura è andata a buon fine
+							if (validationFailed) {
+								$.jnotify('#{err_msg["generic.error"]}', 'error',true);
+								disegnaBottoni();
+								return 'leaveOpen'
+							}
+							disegnaBottoni();
+							return 'close'
+							//disegnaBottoni();
+						}
+						disegnaBottoni();
+						return 'leaveOpen'
+					}
+
+					function callback(data) {
+						if (data.status == 'success') {
+							disegnaBottoni();
+						}
+					}
+
+					function openMapDialog() {
+						$('#dialog').dialog('open');
+						google.maps.event.trigger(mappa, 'resize');
+						return false;
+					}
+
+					$('#dialog').dialog({
+						height: 200,
+						width: 400,
+						modal: true,
+						autoOpen: false,
+						show: "blind"		
+					});
+					
+					$(function() {
+						disegnaBottoni();
+					});
+				</script> 
+		</div>
+
+		<cc:messages id="messages" />
+<!-- Modale per la scelta dell'allegato -->
+	<div id="dialog_allegato" title="Seleziona un file da allegare">
+		<form name="allegatoUpload" id="allegatoUpload"
+			enctype="multipart/form-data"
+			action="#{request.contextPath}/secure/rest/uploadFileService/uploadAttachment" method="post">
+			<label for="fileupload" title="Attach"> Allegato </label>
+			<input type="file" name="fileupload" title="Carica un allegato" size="70"
+				id="fileupload" /> <br />
+			<button type="submit" id="UploadBtn" title="Carica"
+				class="buttonStyle">Carica</button>
+		</form>
+	</div>
+	<script type="text/javascript">
+		//<![CDATA[ 
+		function removeFileAttach() {
+		    $('#candida_vacancy_dialog\\:modal_form\\:original_file_name_display').text('');
+		    $('#candida_vacancy_dialog\\:modal_form\\:original_file_name').val('');
+		    $('#candida_vacancy_dialog\\:modal_form\\:file_name').val('');
+		    $('#fileupload').val('');
+		    return false;
+		}
+			
+		function showResponse(responseJson, statusText, xhr, $form)  {
+			//console.log("responseJson:"+responseJson);
+			//console.log("responseJson.statusCode:"+responseJson.statusCode);
+			if(responseJson.statusCode==200){
+				//console.log("responseJson:"+responseJson);
+			    $('#candida_vacancy_dialog\\:modal_form\\:original_file_name_display').text(responseJson.original_file_name);
+			    $('#candida_vacancy_dialog\\:modal_form\\:original_file_name').val(responseJson.original_file_name);
+			    $('#candida_vacancy_dialog\\:modal_form\\:file_name').val(responseJson.file_name);
+			} else {
+				$.jnotify("Errore durante il caricamento dell'allegato:"+responseJson.error_code,"error",true);
+			}			    
+		    $( "#dialog_allegato" ).dialog('close');
+		}
+		$(function() {
+			$('#dialog_allegato').dialog({
+				width: 520,
+				autoOpen: false,
+				modal: true
+			});
+
+			var options = {
+					success:       showResponse,  // post-submit callback 
+					dataType:  'json'
+					}; 
+			$('#allegatoUpload').ajaxForm(options);
+		});
+		//]]> 
+	</script>	
+	
+		<br />
+		  <h:link 
+			rendered="true"
+			styleClass="buttonStyle backButtonStyle yg_margin_right" 
+			outcome="home"
+			title="Torna alla scrivania" style="-webkit-border-radius: 0px;
+	                                                    background: none repeat scroll 0 0 #CB1D15;
+	                                                    border-color: #D85650 #981610 #981610 #D85650;
+	                                                    border-style: solid;
+	                                                    border-width: 1px;
+	                                                    color: white;
+	                                                    text-shadow: none;
+	                                                    box-shadow: none;
+	                                                    margin-left:-1px">Torna alla scrivania
+		</h:link>
+		<!--  <p:button rendered="true"
+			
+			outcome="home"
+			title="Torna alla scrivania" value="Torna alla scrivania">
+		 
+		</p:button> --> 
+		
+	</ui:define>
+
+</ui:composition>

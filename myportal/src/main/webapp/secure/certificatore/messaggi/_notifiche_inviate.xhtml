@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+		
+	<cc:messages id="notificheInviateMessages" />
+		
+	<h:form id="notificheInviateForm">
+		<ui:fragment rendered="#{empty notificheInviateBean.list}">
+			<h3 class="nessun_elemento_trovato">Non è stata inviata alcuna notifica</h3>
+		</ui:fragment>
+		
+		<ui:fragment rendered="#{not empty notificheInviateBean.list}">
+			<div style="display: none;">
+				<h:inputHidden id="pageValue" value="#{notificheInviateBean.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{notificheInviateBean.changePage}" value="DUMMY FOR PAGINATION">
+					<f:ajax execute=":notificheInviateForm:pageValue" 
+						render=":notificheInviateForm:tabella :notificheInviateDetailForm" />
+				</h:commandButton>
+			</div>
+			
+			<script type="text/javascript">				
+				$(jq("notificheInviateForm:paginationBar")).pagination({							    
+					pages: #{notificheInviateBean.paginationHandler.pages()},						       
+					cssStyle: 'light-theme',
+					prevText: 'Prec.',
+					nextText: 'Succ.',
+					onPageClick: function (pageNumber, event) {
+						document.getElementById("notificheInviateForm:pageValue").value = pageNumber;
+						document.getElementById("notificheInviateForm:pageCommand").click();
+						$(jq("notificheInviateDetailForm")).hide();
+						$(jq("notificheInviateForm:tabella")).hide();					            
+						$(jq("notificheInviateForm:paginationLoader")).show();
+						$(jq("notificheInviateForm:paginationLoader")).fadeIn();
+					}
+				});
+			</script>
+			
+			<h:panelGroup layout="block" id="paginationBar" 
+				styleClass="widget_container ui-tabs ui-widget-content ui-corner-all" />
+			<br />
+			
+			<cc:waiting id="paginationLoader" hidden="true" waitMessage="Caricamento..." />	
+			
+			<h:panelGroup layout="block" id="tabella" class="dataTables_wrapper">
+				<table class="dataTable">
+					<tr>
+						<th class="ui-state-default"></th>
+						<th class="ui-state-default">Mittente</th>
+						<th class="ui-state-default">Oggetto</th>
+						<th class="ui-state-default">Data</th>
+					</tr>
+					
+					<ui:repeat value="#{notificheInviateBean.list}" var="notifica" varStatus="status">
+						<tr>
+						</tr>
+					</ui:repeat>
+				</table>
+				<script type="text/javascript">
+					$(jq("notificheInviateForm:paginationLoader")).hide();
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+		</ui:fragment>
+	</h:form>
+	<br />
+			
+	<cc:waiting id="notificheInviateDetailLoader" waitMessage="Caricamento..." hidden="true" />
+	<cc:waiting id="notificheInviateInsertLoader" waitMessage="Invio notifica in corso..." hidden="true" />
+		
+	<h:form id="notificheInviateDetailForm">
+		<h:panelGroup layout="block" rendered="#{not notificheInviateBean.showPanel}">
+			<h:commandLink styleClass="newAlertButton" value="Invia una nuova notifica"
+				action="#{notificheInviateBean.showInsertPanel}">
+				<f:ajax execute="@this" render="@form" onevent="onShowDetail" />
+			</h:commandLink>
+		</h:panelGroup>
+		
+		<h:panelGroup styleClass="insertPanel" layout="block" rendered="#{notificheInviateBean.showPanel}">
+			<h:panelGrid columns="2" cellspacing="10" >
+				<h:panelGroup />					
+				
+				<cc:inputText value="#{notificheInviateBean.data.oggetto}" label="Oggetto" 
+					editingMode="#{notificheInviateBean.editing}" maxlength="250"/>
+				
+				<cc:inputText type="date" value="#{notificheInviateBean.data.dtmIns}" 
+					label="Data invio" editingMode="false"/>
+				
+				<cc:selectOneMenu id="destinatari" editingMode="#{notificheInviateBean.editing}"
+					label="Destinatari"	value="#{notificheInviateBean.data.provinciaTo.id}" 
+					valueDescription="#{notificheInviateBean.data.provinciaTo.descrizione}">
+					<f:selectItems value="#{notificheInviateBean.destinatari}"/>
+				</cc:selectOneMenu>
+				
+				<h:panelGroup/>
+				
+				<cc:inputTextarea style="width:81%" maxlength="1000"
+					label="Testo della notifica" richTextMode="false"
+					value="#{notificheInviateBean.data.corpo}" 
+					editingMode="#{notificheInviateBean.editing}"/>
+			</h:panelGrid>
+					
+			<div id="buttons">
+				<h:commandLink styleClass="marginButton commentButton" action="#{notificheInviateBean.save}" 
+					value="Invia notifica" rendered="#{notificheInviateBean.editing}">
+					<f:ajax execute="@form" onevent="onInsert"
+						render=":notificheInviateForm :notificheInviateMessages :notificheInviateDetailForm" />
+				</h:commandLink>
+				
+				<h:commandLink action="#{notificheInviateBean.dontedit}" value="Chiudi" immediate="true"
+					styleClass="marginButton closeButton #{notificheInviateBean.editing ? 'secondButton' : ''}" >
+					<f:ajax execute="@this" render="@form" onevent="onHideDetail" />
+				</h:commandLink>
+			</div>
+		</h:panelGroup>
+		<script type="text/javascript">
+			disegnaBottoni();
+		</script>
+	</h:form>
+		
+	<script type="text/javascript">
+	// <![CDATA[
+		function onHideDetail(data) {
+			if (data.status == 'begin') {
+				$(jq("notificheInviateDetailForm")).slideUp("slow");
+			}
+		}
+	
+		function onShowDetail(data) {
+			if (data.status == 'begin') {
+				$(jq("notificheInviateDetailForm")).hide();
+				$(jq("notificheInviateDetailLoader")).show();
+			} else if (data.status == 'success') {
+				$(jq("notificheInviateDetailLoader")).hide();
+				PrimeFaces.scrollTo("notificheInviateDetailForm");
+			}
+		}
+		
+		function onInsert(data) {
+			if (data.status == 'begin') {
+				$(jq("notificheInviateDetailForm")).hide();
+				$(jq("notificheInviateInsertLoader")).show();
+			} else if (data.status == 'success') {
+				$(jq("notificheInviateInsertLoader")).hide();
+			}
+		}
+	//]]> 
+	</script>
+</ui:composition>

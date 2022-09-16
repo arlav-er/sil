@@ -1,0 +1,457 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+	<h:outputStylesheet target="head"> 
+	
+	  
+	  
+	</h:outputStylesheet><br/>
+	<h:panelGroup rendered="#{not fbSchedaFormBean.isProfiloLegaleCompleto() and not fbSchedaFormBean.isProfiloOperativoCompleto() and fbSchedaFormBean.isEditSchedaMode()}">
+	<div class="alert alert-danger">
+	<h:outputLink value="#{sessionBean.getUrlMyAccount()}/secure/account" target="_blank"><strong style="padding: 10px;background-color: #f44336;color: white;
+    margin-bottom: 15px; border: 1px solid transparent;border-radius: 4px">Dati del profilo incompleti, impossibile procedere!</strong></h:outputLink>
+	</div>
+	<!-- <p:commandLink value="Fill comune" target="_blank">
+	   <p:button outcome="google.it"/>
+	</p:commandLink> -->
+	</h:panelGroup>
+	<fieldset>
+		<legend>Dati Azienda</legend>
+		<table style="width: 100%;">
+			<tr>
+				<td style="width: 25%;">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and empty fbSchedaFormBean.aziendaInfo.ragioneSociale}">
+						<p:outputLabel for="ragioneSocialeInput" value="Ragione sociale" styleClass="block-label" />
+						<p:inputText id="ragioneSocialeInput" value="#{fbSchedaFormBean.aziendaInfo.ragioneSociale}"
+							required="true" requiredMessage="La ragione sociale è obbligatoria" maxlength="100"/>
+						<p:message for="ragioneSocialeInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or not empty fbSchedaFormBean.aziendaInfo.ragioneSociale}">
+						<p:outputLabel value="Ragione sociale" styleClass="block-label" />
+						#{fbSchedaFormBean.aziendaInfo.ragioneSociale}
+					</ui:fragment>
+				</td>
+					<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and empty fbSchedaFormBean.aziendaInfo.codiceFiscale}">
+						<p:outputLabel for="codiceFiscaleInput" value="Codice fiscale" styleClass="block-label"/>
+						<p:inputText id="codiceFiscaleInput" value="#{fbSchedaFormBean.aziendaInfo.codiceFiscale}"
+							required="true" requiredMessage="Il codice fiscale è obbligatorio" maxlength="16" />
+						<p:message for="codiceFiscaleInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or not empty fbSchedaFormBean.aziendaInfo.codiceFiscale}">
+						<p:outputLabel value="Codice fiscale" styleClass="block-label"/>
+						#{fbSchedaFormBean.aziendaInfo.codiceFiscale}
+					</ui:fragment>
+				</td>
+					<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and empty fbSchedaFormBean.aziendaInfo.partitaIva}">
+						<p:outputLabel for="partitaIvaInput" value="Partita IVA" styleClass="block-label" style="margin-bottom: 20px;"/>
+						<h:inputHidden id="partitaIvaInput" value="#{fbSchedaFormBean.aziendaInfo.partitaIva}" 
+							  maxlength="11" />
+						<p:message for="partitaIvaInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or not empty fbSchedaFormBean.aziendaInfo.partitaIva}">
+						<p:outputLabel value="Partita IVA" styleClass="block-label"/>
+						#{fbSchedaFormBean.aziendaInfo.partitaIva}
+					</ui:fragment>
+				</td>
+				</tr>
+				<tr>
+				 	<td style="width: 25%;">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel for="indSedeLegaleInput" value="Indirizzo sede legale" styleClass="block-label"/>
+						<p:inputText id="indSedeLegaleInput" value="#{fbSchedaFormBean.indirizzoEffettivo}"
+							required="true" requiredMessage="L'indirizzo è obbligatorio" maxlength="100" disabled="true">
+							<p:ajax event="blur" update="indSedeLegaleInputMessage"/>
+							</p:inputText>
+						<p:message for="indSedeLegaleInput" id="indSedeLegaleInputMessage" />
+					</ui:fragment>
+					<!-- <ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or not empty fbSchedaFormBean.aziendaInfo.sedeLegale.indirizzo}">
+						<p:outputLabel value="Indirizzo sede legale" styleClass="block-label"/>
+						#{fbSchedaFormBean.indirizzoEffettivo}
+					</ui:fragment> -->
+				</td>
+				<td style="width: 25%;">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel for="comSedeLegaleInput" value="Comune sede legale" styleClass="block-label"/>
+						<p:autoComplete id="comSedeLegaleInput" value="#{fbSchedaFormBean.comuneEffettivo}"
+							required="true" requiredMessage="Il comune è obbligatorio(Riferimento Azienda)" converter="deComuneDTOConverter" 
+							completeMethod="#{utilsBean.completeDeComuneValido}" var="comune" itemLabel="#{comune.descrizione}" 
+							itemValue="#{comune}" minQueryLength="2" maxResults="10" emptyMessage="Impostare queste informazioni dal" 
+							forceSelection="true" disabled="true">
+							<p:ajax event="blur" update="comSedeLegaleInputMassage"/>
+							</p:autoComplete>
+						<!-- <p:watermark for="comSedeLegaleInput" value="Scrivi le prime lettere..." /> -->
+						<p:message for="comSedeLegaleInput" id="comSedeLegaleInputMassage"/>
+					</ui:fragment>
+					<!-- <ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or not empty fbSchedaFormBean.aziendaInfo.sedeLegale.comune}">
+						<p:outputLabel value="Comune sede legale" styleClass="block-label" />
+						#{fbSchedaFormBean.comuneEffettivo}
+					</ui:fragment> -->
+				</td>
+			    <td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel for="capsInput" value="Cap" styleClass="block-label"/>
+						<p:inputText id="capsInput" value="#{fbSchedaFormBean.capEffettivo}"
+							required="true" requiredMessage="La Cap è obbligatoria" maxlength="11" disabled="true"/>
+						<p:message for="capsInput" />
+					</ui:fragment>
+					<!-- <ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or not empty fbSchedaFormBean.aziendaInfo.sedeLegale.cap or empty fbSchedaFormBean.aziendaInfo.sedeLegale.cap}">
+						<p:outputLabel value="Cap" styleClass="block-label"/>
+						#{fbSchedaFormBean.capEffettivo}
+					</ui:fragment> -->
+				</td>
+				</tr>
+				<tr>
+					<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel for="nomeRapInput" value="Nome del legale rappresentante" styleClass="block-label"/>
+						<p:inputText id="nomeRapInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.nomeLegale}"
+							required="true" requiredMessage="Il nome del rappresentante è obbligatorio" maxlength="30" />
+						<p:message for="nomeRapInput" />
+					</ui:fragment>
+					 <ui:fragment rendered="#{fbSchedaFormBean.isPubblicaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Nome del legale rappresentante" styleClass="block-label"/>
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.nomeLegale}
+					</ui:fragment> 
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="cognomeRapInput" value="Cognome del legale rappresentante" styleClass="block-label" />
+						<p:inputText id="cognomeRapInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.cognomeLegale}"
+							required="true" requiredMessage="Il cognome del rappresentante è obbligatorio" maxlength="30" />
+						<p:message for="cognomeRapInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Cognome del legale rappresentante" styleClass="block-label"/>
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.cognomeLegale}
+					</ui:fragment>
+				</td>
+				<td>
+				  <ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+				     <p:outputLabel for="tipologiaSoggettoInput" value="Tipologia soggetto ospitante" styleClass="block-label" /> 
+				     	<p:autoComplete id="tipologiaSoggettoInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.deNaturaGiuridicaDTO}" 
+				     	    maxlength="200" converterMessage="deNaturaGiuridicaDTOConverter"
+							required="true" requiredMessage="Il Tipologia soggetto ospitante è obbligatorio" converter="deNaturaGiuridicaDTOConverter"
+							completeMethod="#{utilsBean.completeDeNaturaGiuridica}" var="natura" itemLabel="#{natura.descrizione}" 
+							itemValue="#{natura}" 
+							 minQueryLength="2" maxResults="20" emptyMessage="Nessun Tipologia soggetto ospitante trovato" 
+							forceSelection="true" dropdown="true">
+							<p:ajax event="itemSelect" process="@this" 
+								update="tipologiaSoggettoInputMessage" />
+						</p:autoComplete>
+						<p:message for="tipologiaSoggettoInput" id="tipologiaSoggettoInputMessage"/>
+				  </ui:fragment>
+				   <ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Tipologia soggetto ospitante" styleClass="block-label" />
+						 #{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.deNaturaGiuridicaDTO.descrizione}
+					</ui:fragment> 
+				</td>
+				<td style="width: 25%;">
+				</td>
+			</tr>
+		
+			<tr>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="numCciaaInput" value="Numero iscrizione CCIAA" styleClass="block-label"/>
+						<p:inputText id="numCciaaInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.numCciaa}"
+							required="false" requiredMessage="Il numero iscrizione CCIAA è obbligatorio" maxlength="100" />
+						<p:message for="numCciaaInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Numero iscrizione CCIAA" styleClass="block-label"/>
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.numCciaa}
+					</ui:fragment>
+				</td>
+			<!-- 	<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel for="inpsInput" value="Matricola INPS" styleClass="block-label"/>
+						<p:inputText id="inpsInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.matricolaInps}"
+							required="true" requiredMessage="Il numero matricola Inps è obbligatorio" maxlength="100" />
+						<p:message for="inpsInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Matricola INPS" styleClass="block-label"/>
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.matricolaInps}
+					</ui:fragment>
+				</td> -->
+			</tr>
+			<tr>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="attivitaInput" value="Settore ATECO" styleClass="block-label" />
+						<p:autoComplete id="attivitaInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.deAttivita}"
+							required="true" requiredMessage="Il settore ATECO è obbligatorio" converter="deAttivitaDTOConverter" 
+							completeMethod="#{utilsBean.completeDeAttivita}" var="attivita" itemLabel="#{attivita.descrizione}" 
+							itemValue="#{attivita}" minQueryLength="2" maxResults="20" emptyMessage="Nessun settore ATECO trovato" 
+							forceSelection="true" dropdown="true">
+							<p:ajax event="itemSelect" process="@this" 
+								update="attivitaMinInput attivitaMinLabel attivitaMinFiglioLabel attivitaMinFiglioInput" 
+								listener="#{fbSchedaFormBean.onAttivitaSelected}"/>
+						</p:autoComplete>
+						<p:watermark for="attivitaInput" value="Scrivi le prime lettere..." />
+						<p:message for="attivitaInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Settore ATECO" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.deAttivita.descrizione}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel id="attivitaMinLabel" for="attivitaMinInput" value="Attività" styleClass="block-label"/>
+						<p:autoComplete id="attivitaMinInput" value="#{fbSchedaFormBean.deAttivitaMinTemp}"
+							required="true" requiredMessage="L'attività è obbligatoria" converter="deAttivitaMinDTOConverter" 
+							completeMethod="#{fbSchedaFormBean.completeDeAttivitaMin}" var="attivita" itemLabel="#{attivita.descrizione}" 
+							itemValue="#{attivita}" minQueryLength="2" maxResults="10" emptyMessage="Nessuna attività trovata" 
+							forceSelection="true" disabled="#{empty fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.deAttivita}" 
+							dropdown="true" >
+							<p:ajax event="itemSelect" process="@this" 
+								update="attivitaMinFiglioLabel attivitaMinFiglioInput" 
+								listener="#{fbSchedaFormBean.onAttivitaMinSelected}"/>
+						</p:autoComplete>
+						<p:watermark for="attivitaMinInput" value="Scrivi le prime lettere..." />
+						<p:message for="attivitaMinInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Attività" styleClass="block-label"/>
+						#{fbSchedaFormBean.deAttivitaMinTemp.descrizione}
+					</ui:fragment>
+					</td>				
+				<td colspan="2">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel id="attivitaMinFiglioLabel" for="attivitaMinFiglioInput" value="Attività specifica" 
+							styleClass="block-label"/>
+						<p:autoComplete id="attivitaMinFiglioInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.deAttivitaMin}"
+							required="true" requiredMessage="L'attività specifica è obbligatoria" converter="deAttivitaMinDTOConverter" 
+							completeMethod="#{fbSchedaFormBean.completeDeAttivitaMinFiglio}" var="attivita" itemLabel="#{attivita.descrizione}" 
+							itemValue="#{attivita}" minQueryLength="2" maxResults="10" emptyMessage="Nessuna attività specifica trovata" 
+							forceSelection="true" disabled="#{empty fbSchedaFormBean.deAttivitaMinTemp}" 
+							dropdown="true"  panelStyle="margin-left: 476px;"/>
+						<p:watermark for="attivitaMinFiglioInput" value="Scrivi le prime lettere..." />
+						<p:message for="attivitaMinFiglioInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Attività specifica" styleClass="block-label"/>
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.deAttivitaMin.descrizione}
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+			  <td>
+						
+					 <ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="noteInput" value="Note Attivita" 
+							styleClass="block-label" />
+						<p:inputTextarea id="noteInput" rows="4" maxlength="2000" style="width:200%;" 
+							value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.noteAttivita}" counter="note" counterTemplate="{0} caratteri rimanenti."/>
+							<h:outputText id="note"/>										 	
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode()}">
+						<p:outputLabel value="Note Attivita" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.noteAttivita}
+					</ui:fragment>										
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+	
+	<fieldset>
+		<legend>Riferimenti</legend>
+		<table style="width: 75%;">
+			<tr>
+				 <td style="width: 33%;">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="telefonoInput" value="Telefono" styleClass="block-label" />
+						<p:inputText id="telefonoInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.telRiferimento}"
+							required="false" requiredMessage="Il numero di telefono è obbligatorio" maxlength="50">
+							<p:ajax event="blur" update="telefonoInputMessage"/>
+						 <f:validator validatorId="numeroTelefonicoValidator"></f:validator>
+						</p:inputText>	
+						<p:message for="telefonoInput" id="telefonoInputMessage"/>
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Telefono" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.telRiferimento}
+					</ui:fragment>
+				</td>
+				<td style="width: 33%;">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="cellulareInput" value="Cellulare" styleClass="block-label" />
+						<p:inputText id="cellulareInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.cellRiferimento}"
+							required="false" requiredMessage="Il numero di telefono è obbligatorio" maxlength="50" />
+						<p:message for="cellulareInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Cellulare" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.cellRiferimento}
+					</ui:fragment>
+				</td>
+			
+				<td style="width: 33%;">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="faxInput" value="Fax" styleClass="block-label" />
+						<p:inputText id="faxInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.faxRiferimento}" maxlength="50" />
+						<p:message for="faxInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Fax" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.faxRiferimento}
+					</ui:fragment>
+				</td>		
+			</tr>	
+			<tr>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="emailInput" value="Email" styleClass="block-label" />
+						<p:inputText id="emailInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.emailRiferimento}"
+							required="true" requiredMessage="L'indirizzo email è obbligatorio" maxlength="100">
+							<p:ajax event="blur" update="emailInputMessage"/>
+							<f:validator validatorId="emailValidator"></f:validator>
+					  </p:inputText>		
+						<p:message for="emailInput" id="emailInputMessage"/>
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Email" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.emailRiferimento}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="pecInput" value="Email PEC" styleClass="block-label" />
+						<p:inputText id="pecInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.pec}" maxlength="255" required="true"
+						             requiredMessage="Email PEC è obbligatorio">
+						     <p:ajax event="blur" update="pecInputMessage"/>        
+						   <f:validator validatorId="emailValidator"></f:validator>
+						 </p:inputText>            
+						<p:message for="pecInput" id="pecInputMessage"/>
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Email PEC" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.pec}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="sitoWebInput" value="Sito web" styleClass="block-label" />
+						<p:inputText id="sitoWebInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.sitoWeb}" maxlength="255" />
+						<p:message for="sitoWebInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Sito web" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.sitoWeb}
+					</ui:fragment>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+	<fieldset>
+		<legend>Altre informazioni</legend>
+		<table style="width: 100%;">
+			<tr>
+				<td style="width: 25%;"></td>
+				<td style="width: 25%;"></td>
+				<td style="width: 25%;"></td>
+				<td style="width: 25%;"></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="altreEsperienzeInput" styleClass="block-label"
+							value="La sua azienda ha già avuto esperienze di attivazione di Tirocini?"  />
+						<p:selectOneMenu id="altreEsperienzeInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.flgTirocinio}"
+							required="false" requiredMessage="Questa informazione è obbligatoria">							
+							<f:selectItem itemLabel="Sì" itemValue="#{false}" />
+							<f:selectItem itemLabel="No" itemValue="#{true}" />
+						</p:selectOneMenu>
+						<p:message for="altreEsperienzeInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() and fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel styleClass="block-label"
+							value="La sua azienda ha già avuto esperienze di attivazione di Tirocini?"  />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.flgTirocinio ? 'Sì' : 'No'}
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="esitiInput" value="Se sì, con quali esiti?" 
+							styleClass="block-label" />
+						<p:inputTextarea id="esitiInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.esitiTirocini}" 
+							rows="3" size="100" required="flase" requiredMessage="Gli esiti sono obbligatori" 
+							maxlength="2000" counter="esiti" counterTemplate="{0} caratteri rimanenti."/>
+						<p:message for="esitiInput" />
+						<h:outputText id="esiti"/>
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Se sì, con quali esiti?" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.esitiTirocini}
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="numDipTotaleInput" value="Numero dipendenti totale" 
+							styleClass="block-label" />
+						<p:inputText id="numDipTotaleInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.numDipendentiTot}" 
+							required="true" requiredMessage="Il numero di dipendenti è obbligatorio" 
+							converterMessage="Il valore deve essere un numero" />
+						<p:message for="numDipTotaleInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() or fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel value="Numero dipendenti totale" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.numDipendentiTot}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="numDipIndetInput" value="Numero dipendenti a tempo indeterminato" 
+							styleClass="block-label" />
+						<p:inputText id="numDipIndetInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.numDipendentiIndet}" 
+							required="false" requiredMessage="Il numero di dipendenti è obbligatorio" 
+							converterMessage="Il valore deve essere un numero"/>
+						<p:message for="numDipIndetInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() and fbSchedaFormBean.isPubblicaMode() and not empty fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.numDipendentiIndet}">
+						<p:outputLabel value="Numero dipendenti a tempo indeterminato" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.numDipendentiIndet}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="numDipDetInput" value="Numero dipendenti a tempo determinato" 
+							styleClass="block-label" />
+						<p:inputText id="numDipDetInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.numDipendentiDet}" 
+							required="false" requiredMessage="Il numero di dipendenti è obbligatorio" 
+							converterMessage="Il valore deve essere un numero"/>
+						<p:message for="numDipDetInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() and fbSchedaFormBean.isPubblicaMode() and not empty fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.numDipendentiDet}">
+						<p:outputLabel value="Numero dipendenti a tempo determinato" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.numDipendentiDet}
+					</ui:fragment>
+				</td>
+				<td>
+					<ui:fragment rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}">
+						<p:outputLabel for="numDipParttimeInput" value="Di cui Part-time" 
+							styleClass="block-label" />
+						<p:inputText id="numDipParttimeInput" value="#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.numDipendentiParttime}" 
+							required="false" requiredMessage="Il numero di dipendenti è obbligatorio" 
+							converterMessage="Il valore deve essere un numero"/>
+						<p:message for="numDipParttimeInput" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not fbSchedaFormBean.isEditSchedaMode() and fbSchedaFormBean.isPubblicaMode() and not empty fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.numDipendentiParttime}">
+						<p:outputLabel value="Numero dipendenti con part-time" styleClass="block-label" />
+						#{fbSchedaFormBean.fbSchedaFabbisogno.fbDatiAzienda.numDipendentiParttime}
+					</ui:fragment>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+</ui:composition>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="StatoOccupazionale">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="Esito">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="1" maxOccurs="1" name="codice">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:length value="3" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element minOccurs="1" maxOccurs="1" name="descrizione">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+		<xs:element minOccurs="0" maxOccurs="1" ref="CF"/>
+		<xs:element minOccurs="0" maxOccurs="1" ref="Cognome"/>
+		<xs:element minOccurs="0" maxOccurs="1" ref="Nome"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="CodStatoOccupazionale"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="DescStatoOccupazionale"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Movimenti"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="EsperienzaEdile"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Mobilita"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Cigs"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>  
+  <xs:element name="Movimenti">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Movimento"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Movimento">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Settore"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Ccnl"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="CodProfessione"/>
+      </xs:sequence>
+      <xs:attribute name="DataAssunzione" use="required" type="CustomData"/>
+	  <xs:attribute name="DataPresuntaFine" use="required" type="CustomData"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="Stringa3Obbl">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="3" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Stringa4Obbl">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="4" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Stringa50Obbl">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="50" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SINOCheck">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SI" />
+      <xs:enumeration value="NO" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Stringa250">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="250" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="AtecoCheck">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{2}\.\d{2}\.\d{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ProfessioneCheck">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([0-9]\.){5}[0-9]{1,2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="CustomData">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-3]{1}[0-9]{1}/[0-1]{1}[0-9]{1}/[0-9]{4}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="CodiceFiscale">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Z]{6}[0-9LMNPQRSTUV]{2}[ABCDEHLMPRST]{1}[0-9LMNPQRSTUV]{2}[A-Z]{1}[0-9LMNPQRSTUV]{3}[A-Z]{1}" />
+      <xs:pattern value="[0-9]{11}" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="CF" type="CodiceFiscale"/>
+  <xs:element name="Cognome" type="Stringa50Obbl"/>
+  <xs:element name="Nome" type="Stringa50Obbl"/>  
+  <xs:element name="CodStatoOccupazionale" type="Stringa4Obbl"/>
+  <xs:element name="DescStatoOccupazionale" type="Stringa250"/>
+  <xs:element name="Settore" type="AtecoCheck"/>
+  <xs:element name="Ccnl" type="Stringa3Obbl"/>
+  <xs:element name="CodProfessione" type="ProfessioneCheck"/>
+  <xs:element name="EsperienzaEdile" type="SINOCheck"/>
+  <xs:element name="Mobilita" type="SINOCheck"/>
+  <xs:element name="Cigs" type="SINOCheck"/>    
+</xs:schema>

@@ -1,0 +1,127 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui"
+	xmlns:pretty="http://ocpsoft.com/prettyfaces">
+
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{sessionLogger.grantAccessFor(sessionLogger.getUtenteAccess())}" />
+	</f:metadata>
+	<h:outputStylesheet library="commons" name="css/gamification/style.css" />
+
+	<ui:fragment rendered="#{not empty param['saveSucess']}">
+		<script>
+			sucessMessage("#{ui['msg.updated']}")
+		</script>
+	</ui:fragment>
+	<div class="container-fluid">
+		<div class="panel-body profile-information animated fadeIn">
+			<div class="col-md-2">
+				<div class="profile-pic text-center">
+					<h:panelGroup id="userProfilePic">
+						<h:panelGroup rendered="#{empty utenteViewBean.utenteInfo.foto}">
+							<h:graphicImage library="commons" name="images/profilePic.jpg"></h:graphicImage>
+						</h:panelGroup>
+						<h:panelGroup rendered="#{not empty utenteViewBean.utenteInfo.foto}">
+							<pretty:urlbuffer var="imgURL" mappingId="profilePicture">
+								<f:param id="type" value="utente" />
+								<f:param id="id" value="#{utenteViewBean.utenteInfo.pfPrincipal.idPfPrincipal}" />
+								<f:param id="username" value="#{utenteViewBean.utenteInfo.pfPrincipal.username}" />
+							</pretty:urlbuffer>
+							<img class="animated fadeInUp" src="#{imgURL}?#{utils.currentTimeMillis()}" />
+						</h:panelGroup>
+					</h:panelGroup>
+					<h3>
+						#{utenteViewBean.utenteInfo.pfPrincipal.nome} #{utenteViewBean.utenteInfo.pfPrincipal.cognome} <br />
+					</h3>
+
+					<pretty:urlbuffer var="editProfileURL" mappingId="editProfile"></pretty:urlbuffer>
+					<a href="#{editProfileURL}" class="btn btn-primary"> <i class="fa fa-edit"></i> #{ui['shared.modifica']}
+					</a>
+				</div>
+			</div>
+
+			<div class="col-md-5">
+				<div class="panel panel-warning">
+					<div class="panel-heading">#{ui['prof.datiAccount']}</div>
+					<div class="panel-body">
+						<ui:include src="view/_datiAccount.xhtml" />
+					</div>
+				</div>
+
+				<ui:remove>
+					<!-- Specific for RER-->
+				</ui:remove>
+				<ui:fragment rendered="#{utenteViewBean.checkSezioneServiziAmministrativiAbilitato()}">
+					<div class="panel panel-warning">
+						<div class="panel-heading">#{ui['prof.serviziAmministrativi']}</div>
+						<div class="panel-body">
+							<h:panelGroup
+								rendered="#{not utenteViewBean.utenteInfo.pfPrincipal.flagAbilitatoServizi
+									and empty utenteViewBean.utenteInfo.pfPrincipal.flagAbilitaPec}">
+								<div class="uk-panel uk-panel-box" role="alert">#{ui['prof.servAmNoTactive']}</div>
+							</h:panelGroup>
+
+
+
+							<h:panelGroup
+								rendered="#{not utenteViewBean.utenteInfo.pfPrincipal.flagAbilitatoServizi
+									and not empty utenteViewBean.utenteInfo.numeroDocumento}">
+								<div class="uk-panel uk-panel-box" role="alert">#{ui['prof.richiestaServiziInCorso']}</div>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{utenteViewBean.utenteInfo.pfPrincipal.flagAbilitatoServizi}">
+								<div class="uk-panel uk-panel-box" role="alert">#{ui['prof.abilitatoServiziTip']}</div>
+								<ui:fragment rendered="#{not empty utenteViewBean.utenteInfo.codServiziAmministrativi}">
+									<table class="table table-condensed table-hover">
+										<tbody>
+
+											<tr>
+												<td class="text-muted">#{ui['prof.codServiziAmministrativi']}</td>
+												<td>#{utenteViewBean.getRenderCodServiziAmministrativi()}</td>
+											</tr>
+											<ui:fragment rendered="#{utils.isAbilitatoCanaleSms()}">
+												<h:panelGroup>
+													<tr>
+														<td class="text-muted">#{ui['prof.cellulareFirmaElettronicaOTPSMS']}</td>
+														<td>#{utenteViewBean.utenteInfo.cellulareOTP}</td>
+													</tr>
+												</h:panelGroup>
+											</ui:fragment>
+										</tbody>
+									</table>
+								</ui:fragment>
+							</h:panelGroup>
+
+
+
+							<h:panelGroup rendered="#{not empty utenteViewBean.utenteInfo.numeroDocumento}">
+								<ui:include src="view/_servAmini.xhtml" />
+							</h:panelGroup>
+
+
+						</div>
+					</div>
+				</ui:fragment>
+				<h:panelGroup rendered="#{utenteViewBean.constantsSingleton.isGamificationEnabled()}">
+					<div class="panel panel-warning">
+						<div class="panel-heading">Ultimo riconoscimento ottenuto</div>
+						<div class="panel-body">
+							<ui:include src="view/_badges.xhtml" />
+						</div>
+					</div>
+				</h:panelGroup>
+			</div>
+
+			<div class="col-md-5">
+				<div class="panel panel-warning">
+					<div class="panel-heading">#{ui['prof.datiPersonali']}</div>
+					<div class="panel-body">
+						<ui:include src="view/_datiPers.xhtml" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+</ui:composition>
+

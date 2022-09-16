@@ -1,0 +1,336 @@
+<dataConfig>
+	<dataSource type="JdbcDataSource" driver="org.postgresql.Driver" url="jdbc:postgresql://TODO" user="" password=""/>
+	<document>                                                                              
+		<entity name="vacancy"
+                                query="SELECT distinct va_dati_vacancy.id_va_dati_vacancy as id_va_dati_vacancy,
+poi.descrizione as descrizione,
+poi.lat as latitudine,
+poi.lon as longitudine,
+poi.lat || ',' || poi.lon as punto,
+va_dati_vacancy.dtm_mod + interval '2 hours' as data_modifica,
+va_dati_vacancy.attivita_principale as attivita_principale,
+va_dati_vacancy.attivita_descrizione_estesa as attivita_descrizione_estesa,
+va_dati_vacancy.dt_pubblicazione + interval '2 hours' as data_pubblicazione,
+va_dati_vacancy.dt_scadenza_pubblicazione + interval '2 hours' as data_scadenza_pubblicazione,
+de_comune.cod_com as codcomune,
+de_comune.denominazione as comune,
+de_provincia.denominazione as provincia,
+de_provincia.targa as targa,
+de_regione.denominazione as regione,
+de_comune.cap as cap,
+va_dati_vacancy.cod_mansione as codmansione,
+de_mansione.descrizione as mansione,
+va_dati_vacancy.cod_mansione || '|' || de_mansione.descrizione as coddescmansione,
+va_dati_vacancy.cod_mansione_min as codmansionemin,
+mans.cod_mansione_dot as codmansionedot,
+mans.descrizione as mansionemin,
+padre.cod_mansione_min as codmansioneminpadre,
+padre.cod_mansione_dot as codmansionedotpadre,
+padre.descrizione as mansioneminpadre,
+va_dati_vacancy.cod_ateco as codsettore,
+de_attivita.descrizione as settore,
+va_dati_vacancy.cod_ateco || '|' || de_attivita.descrizione as coddescsettore,
+va_dati_vacancy.cod_trasferta as codtrasferta,
+de_trasferta.descrizione as trasferta,
+de_retribuzione.lim_inf_decimale as lim_inf_decimale,
+de_retribuzione.lim_sup_decimale as lim_sup_decimale,
+(select count(distinct id_cv_dati_personali) from ac_candidatura where ac_candidatura.id_va_dati_vacancy = va_dati_vacancy.id_va_dati_vacancy) as numcandidati,
+azienda_info.ragione_sociale as ragione_sociale,
+va_dati_vacancy.cod_provenienza_vacancy as provenienza,
+va_dati_vacancy.num_anno as anno,
+va_dati_vacancy.num_richiesta as numero,
+va_dati_vacancy.cod_comunicazione_sil as codcomunicazione,
+va_dati_vacancy.flag_invio_cl as flag_invio_cl,
+va_dati_vacancy.nota_operatore,
+va_dati_vacancy.opz_tipo_decodifiche,
+va_altre_info.ulteriori_requisiti,
+va_altre_info.localita,
+va_pubblicazione.dati_azienda as dati_azienda_pub,
+va_pubblicazione.contenuto as contenuto_pub,
+va_pubblicazione.luogo as luogo_pub,
+va_pubblicazione.formazione as formazione_pub,
+va_pubblicazione.contratto as contratto_pub,
+va_pubblicazione.conoscenze as conoscenze_pub,
+va_pubblicazione.caratteristiche as caratteristiche_pub,
+va_pubblicazione.orario as orario_pub,
+va_pubblicazione.candidatura as candidatura_pub,
+va_dati_vacancy.id_pf_principal_palese,
+va_informatica.conoscenza_info as conoscenze_informatiche,
+azienda_info.indirizzo_sede_legale,
+va_contatto.cognome_riferimento_pub,
+va_contatto.nome_riferimento_pub,
+va_contatto.tel_riferimento_pub,
+va_contatto.fax_riferimento_pub,
+va_contatto.mail as mail_riferimento_pub,
+va_esperienze.num_anni_esperienza,
+va_esperienze.opz_esperienza,
+va_dati_vacancy.flg_pacchetto_cresco,
+va_dati_vacancy.flg_candidatura,
+va_dati_vacancy.cod_stato_vacancy,
+bpmans.cod_mansione as codmansioneistat, 
+bpmans.descrizione as mansioneistat,
+bpmans.cod_mansione || '|' || bpmans.descrizione as coddescmansioneistat,
+bpmans.flg_agricoltura,
+va_dati_vacancy.professione,
+case
+    when va_dati_vacancy.flg_ido=true then 'IDO_' || substr(va_dati_vacancy.cod_mansione_istat,1,1)
+    else va_dati_vacancy.cod_mansione
+end as codiconaapp,
+va_dati_vacancy.flg_ido,
+va_esperienze.desc_esperienza_lav as descesperienzalav
+FROM va_dati_vacancy
+inner join mycas.azienda_info on azienda_info.id_pf_principal = va_dati_vacancy.id_pf_principal
+left join poi on poi.id_poi = va_dati_vacancy.id_poi_vacancy
+inner join de_comune on de_comune.cod_com = va_dati_vacancy.cod_com_lavoro
+inner join de_provincia on de_provincia.cod_provincia = de_comune.cod_provincia
+inner join de_regione on de_provincia.cod_regione = de_regione.cod_regione
+left join va_contratto on va_dati_vacancy.id_va_dati_vacancy = va_contratto.id_va_dati_vacancy
+left join mycas.de_mansione on va_dati_vacancy.cod_mansione = de_mansione.cod_mansione
+left join mycas.de_mansione_min mans on va_dati_vacancy.cod_mansione_min = mans.cod_mansione_min
+left join mycas.de_mansione_min padre on mans.cod_mansione_padre = padre.cod_mansione_min
+left join va_orario on va_dati_vacancy.id_va_dati_vacancy = va_orario.id_va_dati_vacancy
+left join va_lingua on va_dati_vacancy.id_va_dati_vacancy = va_lingua.id_va_dati_vacancy
+left join va_istruzione on va_dati_vacancy.id_va_dati_vacancy = va_istruzione.id_va_dati_vacancy
+left join va_patente on va_dati_vacancy.id_va_dati_vacancy = va_patente.id_va_dati_vacancy
+left join de_trasferta on va_dati_vacancy.cod_trasferta = de_trasferta.cod_trasferta
+left join mycas.de_attivita on va_dati_vacancy.cod_ateco = de_attivita.cod_ateco
+left join va_retribuzione on va_dati_vacancy.id_va_dati_vacancy = va_retribuzione.id_va_dati_vacancy
+left join de_retribuzione on de_retribuzione.cod_retribuzione = va_retribuzione.cod_retribuzione
+left join va_altre_info on va_dati_vacancy.id_va_dati_vacancy = va_altre_info.id_va_dati_vacancy
+left join va_pubblicazione on va_dati_vacancy.id_va_dati_vacancy = va_pubblicazione.id_va_dati_vacancy
+left join va_esperienze on va_dati_vacancy.id_va_dati_vacancy = va_esperienze.id_va_dati_vacancy
+left join va_informatica on va_dati_vacancy.id_va_dati_vacancy = va_informatica.id_va_dati_vacancy
+left join va_albo on va_dati_vacancy.id_va_dati_vacancy = va_albo.id_va_dati_vacancy
+left join va_patentino on va_dati_vacancy.id_va_dati_vacancy = va_patentino.id_va_dati_vacancy
+left join va_contatto on va_contatto.id_va_contatto = va_dati_vacancy.id_va_contatto_princ
+left join de_bp_mansione bpmans on va_dati_vacancy.cod_mansione_istat = bpmans.cod_mansione
+where num_anno >= 2017 and (va_dati_vacancy.dtm_mod > to_date('${dataimporter.last_index_time}','YYYY-MM-DD')
+or va_contratto.dtm_mod > to_date('${dataimporter.last_index_time}','YYYY-MM-DD')
+or va_orario.dtm_mod > to_date('${dataimporter.last_index_time}','YYYY-MM-DD')
+or va_lingua.dtm_mod > to_date('${dataimporter.last_index_time}','YYYY-MM-DD')
+or va_istruzione.dtm_mod > to_date('${dataimporter.last_index_time}','YYYY-MM-DD')
+or va_patente.dtm_mod > to_date('${dataimporter.last_index_time}','YYYY-MM-DD')
+or va_informatica.dtm_mod > to_date('${dataimporter.last_index_time}','YYYY-MM-DD')
+or va_albo.dtm_mod > to_date('${dataimporter.last_index_time}','YYYY-MM-DD')
+or va_patentino.dtm_mod > to_date('${dataimporter.last_index_time}','YYYY-MM-DD')
+or va_contatto.dtm_mod > to_date('${dataimporter.last_index_time}','YYYY-MM-DD')
+or va_esperienze.dtm_mod > to_date('${dataimporter.last_index_time}','YYYY-MM-DD'))
+and va_dati_vacancy.cod_stato_vacancy = 'PUB'
+">
+			<field column="id_va_dati_vacancy" name="id_va_dati_vacancy"/>
+			<field column="descrizione" name="descrizione"/>
+			<field column="latitudine" name="latitudine"/>
+			<field column="longitudine" name="longitudine" />
+			<field column="punto" name="punto" />
+			<field column="data_modifica" name="data_modifica" />
+			<field column="attivita_principale" name="attivita_principale" />
+			<field column="attivita_descrizione_estesa," name="attivita_descrizione_estesa" />
+			<field column="data_pubblicazione" name="data_pubblicazione" />
+			<field column="data_scadenza_pubblicazione" name="data_scadenza_pubblicazione" />
+			<field column="codcomune" name="codcomune" />
+			<field column="comune" name="comune" />
+			<field column="provincia" name="provincia" />
+			<field column="targa" name="targa" />
+			<field column="regione" name="regione" />
+			<field column="cap" name="cap" />
+			
+			<entity name="contratti"
+				query="select va_contratto.cod_contratto as codcontratto,
+							va_contratto.cod_contratto_sil as codcontrattosil,
+							de_contratto.descrizione as contratto,
+							de_contratto_sil.descrizione as contrattosil,
+							va_contratto.cod_contratto || '|' || de_contratto.descrizione as coddesccontratto,
+							va_contratto.cod_contratto_sil || '|' || de_contratto_sil.descrizione as coddesccontrattosil
+						from va_contratto
+						left join mycas.de_contratto on va_contratto.cod_contratto = de_contratto.cod_contratto
+						left join mycas.de_contratto_sil on va_contratto.cod_contratto_sil = de_contratto_sil.cod_contratto_sil
+				        where va_contratto.id_va_dati_vacancy = ${vacancy.id_va_dati_vacancy}
+					order by 1">
+				<field column="codcontratto" name="codcontratto" />
+				<field column="codcontrattosil" name="codcontrattosil" />			
+				<field column="contratto" name="contratto" />
+				<field column="contrattosil" name="contrattosil" />
+			</entity>
+
+			<field column="lim_inf_decimale" name="lim_inf_decimale" />
+			<field column="lim_sup_decimale" name="lim_sup_decimale" />
+			<field column="numcandidati" name="numcandidati" />
+			<field column="codmansione" name="codmansione" />
+			<field column="mansione" name="mansione" />			
+			<field column="codmansionemin" name="codmansionemin" />
+			<field column="codmansionedot" name="codmansionedot" />
+			<field column="mansionemin" name="mansionemin" />
+                       
+			<field column="codmansioneminpadre" name="codmansioneminpadre" /> 
+			<field column="codmansionedotpadre" name="codmansionedotpadre" />
+			<field column="mansioneminpadre" name="mansioneminpadre" />
+			
+			<field column="codmansioneistat" name="codmansioneistat" />
+			<field column="mansioneistat" name="mansioneistat" />	
+			<field column="professione" name="professione" />	
+			
+			<field column="descesperienzalav" name="descesperienzalav" />
+			
+			<entity name="orari"
+				query="select va_orario.cod_orario as codorario,
+							va_orario.cod_orario_sil as codorariosil,
+							de_orario.descrizione as orario,
+							de_orario_sil.descrizione as orariosil,
+							va_orario.cod_orario || '|' || de_orario.descrizione as coddescorario,
+							de_orario_sil.descrizione_ido as orariosilido,
+							de_orario_sil.cod_orario_sil  || '|' || de_orario_sil.descrizione_ido as coddescorariosilido,
+							de_orario_sil.descrizione_ido as descrizioneido
+						from va_orario
+						left join de_orario on va_orario.cod_orario = de_orario.cod_orario
+						left join mycas.de_orario_sil on va_orario.cod_orario_sil = de_orario_sil.cod_orario_sil
+				        where va_orario.id_va_dati_vacancy = ${vacancy.id_va_dati_vacancy}
+					order by 1">
+				<field column="codorario" name="codorario" />
+				<field column="codorariosil" name="codorariosil" />
+				<field column="orario" name="orario" />
+				<field column="orariosil" name="orariosil" />
+				<field column="descrizioneido" name="descrizioneido" />
+			</entity>			
+			
+			<field column="codsettore" name="codsettore" />
+			<field column="settore" name="settore" />
+			
+			<entity name="lingue"
+				query="select va_lingua.cod_lingua as codlingua,
+							  de_lingua.denominazione as lingua,
+							  va_lingua.cod_lingua || '|' || de_lingua.denominazione as coddesclingua,
+							  parlato.descrizione as linguaparlato,
+							  parlato_sil.descrizione as linguaparlatosil,
+								letto.descrizione as lingualetto,
+								letto_sil.descrizione as lingualettosil,
+								scritto.descrizione as linguascritto,
+								scritto_sil.descrizione as linguascrittosil,
+								case when parlato_sil.cod_ido  is null then 'MADRELINGUA' else parlato_sil.cod_ido end as codidolinguaparlatosil,
+								case when letto_sil.cod_ido  is null then 'MADRELINGUA' else letto_sil.cod_ido end as codidolingualettosil,
+								case when scritto_sil.cod_ido  is null then 'MADRELINGUA' else scritto_sil.cod_ido end as codidolinguascrittosil
+								
+						from va_lingua
+						left join mycas.de_lingua on va_lingua.cod_lingua = de_lingua.cod_lingua
+						left join mycas.de_grado_lin parlato on va_lingua.cod_grado_parlato = parlato.cod_grado_lin
+						left join mycas.de_grado_lin_sil parlato_sil on va_lingua.cod_grado_sil_parlato = parlato_sil.cod_grado_lin_sil
+						left join mycas.de_grado_lin letto on va_lingua.cod_grado_letto = letto.cod_grado_lin
+						left join mycas.de_grado_lin_sil letto_sil on va_lingua.cod_grado_sil_letto = letto_sil.cod_grado_lin_sil
+						left join mycas.de_grado_lin scritto on va_lingua.cod_grado_scritto = scritto.cod_grado_lin
+						left join mycas.de_grado_lin_sil scritto_sil on va_lingua.cod_grado_sil_scritto = scritto_sil.cod_grado_lin_sil
+				        where va_lingua.id_va_dati_vacancy = ${vacancy.id_va_dati_vacancy}
+					order by 1">
+				<field column="codlingua" name="codlingua" />
+				<field column="lingua" name="lingua" />
+				<field column="linguaparlato" name="linguaparlato" />
+				<field column="linguaparlatosil" name="linguaparlatosil" />
+				<field column="lingualetto" name="lingualetto" />
+				<field column="lingualettosil" name="lingualettosil" />
+				<field column="linguascritto" name="linguascritto" />
+				<field column="linguascrittosil" name="linguascrittosil" />
+				<field column="codidolinguaparlatosil" name="codidolinguaparlatosil" />
+				<field column="codidolingualettosil" name="codidolingualettosil" />
+				<field column="codidolinguascrittosil" name="codidolinguascrittosil" />
+			</entity>					
+			
+			<entity name="titolo"
+				query="select va_istruzione.cod_titolo as codtitoloorig,
+						de_titolo.descrizione as titoloorig,
+						(select dt.cod_titolo from de_titolo dt where dt.cod_titolo = substring(va_istruzione.cod_titolo for 1)||'0000000') as codtitolo,
+						(select dt.descrizione from de_titolo dt where dt.cod_titolo = substring(va_istruzione.cod_titolo for 1)||'0000000') as titolo,
+						(select dt.cod_titolo from de_titolo dt where dt.cod_titolo = substring(va_istruzione.cod_titolo for 1)||'0000000') || '|' || (select dt.descrizione from de_titolo dt where dt.cod_titolo = substring(va_istruzione.cod_titolo for 1)||'0000000') as coddesctitolo,
+						va_istruzione.specifica
+						from va_istruzione
+						left join de_titolo on va_istruzione.cod_titolo = de_titolo.cod_titolo
+				        where va_istruzione.id_va_dati_vacancy = ${vacancy.id_va_dati_vacancy}
+					order by 1">
+				<field column="codtitoloorig" name="codtitoloorig" />
+				<field column="titoloorig" name="titoloorig" />				
+				<field column="codtitolo" name="codtitolo" />
+				<field column="titolo" name="titolo" />				
+				<field column="specifica" name="specifica" />
+			</entity>		
+
+			<entity name="patenti"
+				query="select va_patente.cod_patente as codpatente,
+							va_patente.cod_patente_sil as codpatentesil,
+							de_patente.descrizione as patente,
+							de_patente_sil.descrizione as patentesil,
+							va_patente.cod_patente || '|' || de_patente.descrizione as coddescpatente,
+							va_patente.cod_patente_sil || '|' || de_patente_sil.descrizione as coddescpatentesil
+						from va_patente
+						left join de_patente on va_patente.cod_patente= de_patente.cod_patente
+						left join mycas.de_patente_sil on va_patente.cod_patente_sil= de_patente_sil.cod_patente_sil
+				        where va_patente.id_va_dati_vacancy = ${vacancy.id_va_dati_vacancy}
+					order by 1">
+				<field column="codpatente" name="codpatente" />
+				<field column="codpatentesil" name="codpatentesil" />
+				<field column="patente" name="patente" />
+				<field column="patentesil" name="patentesil" />
+			</entity>
+						
+			<field column="codtrasferta" name="codtrasferta" />
+			<field column="trasferta" name="trasferta" />
+			<field column="ragione_sociale" name="ragione_sociale" />
+			<field column="nota_operatore" name="nota_operatore" />
+			<field column="ulteriori_requisiti" name="ulteriori_requisiti" />
+			<field column="localita" name="localita" />
+			<field column="dati_azienda_pub" name="dati_azienda_pub" />
+			<field column="contenuto_pub" name="contenuto_pub" />
+			<field column="luogo_pub" name="luogo_pub" />
+			<field column="formazione_pub" name="formazione_pub" />
+			<field column="contratto_pub" name="contratto_pub" />
+			<field column="conoscenze_pub" name="conoscenze_pub" />
+			<field column="caratteristiche_pub" name="caratteristiche_pub" />
+			<field column="candidatura_pub" name="candidatura_pub" />
+			
+			<field column="id_pf_principal_palese" name="id_pf_principal_palese" />
+			<field column="conoscenze_informatiche" name="conoscenze_informatiche" />
+			
+			<entity name="albi"
+				query="select va_albo.cod_albo as codalbo,
+							va_albo.cod_albo_sil as codalbosil,
+							de_albo.descrizione as albo,
+							de_albo_sil.descrizione as albosil
+						from va_albo
+						left join de_albo on va_albo.cod_albo = de_albo.cod_albo
+						left join mycas.de_albo_sil on va_albo.cod_albo_sil = de_albo_sil.cod_albo_sil
+				        where va_albo.id_va_dati_vacancy = ${vacancy.id_va_dati_vacancy}
+					order by 1">
+				<field column="codalbo" name="codalbo" />
+				<field column="codalbosil" name="codalbosil" />
+				<field column="albo" name="albo" />
+				<field column="albosil" name="albosil" />
+			</entity>
+			
+			<entity name="patentini"
+				query="select va_patentino.cod_patentino as codpatentino,
+							va_patentino.cod_patentino_sil as codpatentinosil,
+							de_patentino.descrizione as patentino,
+							de_patentino_sil.descrizione as patentinosil
+						from va_patentino
+						left join de_patentino on va_patentino.cod_patentino = de_patentino.cod_patentino
+						left join mycas.de_patentino_sil on va_patentino.cod_patentino_sil = de_patentino_sil.cod_patentino_sil
+				        where va_patentino.id_va_dati_vacancy = ${vacancy.id_va_dati_vacancy}
+					order by 1">
+				<field column="codpatentino" name="codpatentino" />
+				<field column="codpatentinosil" name="codpatentinosil" />
+				<field column="patentino" name="patentino" />
+				<field column="patentinosil" name="patentinosil" />
+			</entity>			
+			
+			<field column="indirizzo_sede_legale" name="indirizzo_sede_legale" />
+			<field column="cognome_riferimento_pub" name="cognome_riferimento_pub" />
+			<field column="nome_riferimento_pub" name="nome_riferimento_pub" />
+			<field column="tel_riferimento_pub" name="tel_riferimento_pub" />
+			<field column="fax_riferimento_pub" name="fax_riferimento_pub" />
+			<field column="mail_riferimento_pub" name="mail_riferimento_pub" />			
+			<field column="num_anni_esperienza" name="num_anni_esperienza" />
+			<field column="opz_esperienza" name="opz_esperienza" />
+			<field column="opz_tipo_decodifiche" name="opz_tipo_decodifiche" />
+			<field column="flg_pacchetto_cresco" name="flg_pacchetto_cresco" />
+			<field column="flg_candidatura" name="flg_candidatura" />	
+			<field column="cod_stato_vacancy" name="cod_stato_vacancy" />	
+			<field column="flg_agricoltura" name="flg_agricoltura" />
+		</entity>
+	</document>
+</dataConfig>

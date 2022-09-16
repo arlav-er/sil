@@ -1,0 +1,315 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui">
+
+	<h:panelGroup rendered="#{utenteEditBean.utenteInfo.pfPrincipal.flagAbilitatoServizi}">
+		<div class="uk-panel uk-panel-box">#{ui['prof.abilitatoServiziTip']}</div>
+	</h:panelGroup>
+
+	<h:panelGroup
+		rendered="#{not utenteEditBean.richiestaAccreditamentoForteInCorso
+		and not utenteEditBean.utenteInfo.pfPrincipal.flagAbilitatoServizi}">
+		<h5>
+			<p:selectBooleanCheckbox value="#{utenteEditBean.richiestaAccreditamentoForte}">
+				<p:ajax event="change" process="@this"
+					update="servAminiGroup codiceFiscaleGroup dataNascitaGroup cittadinanzaMainGroup"
+					listener="#{utenteEditBean.canAbilitatoServizi}" oncomplete="pop()"></p:ajax>
+			</p:selectBooleanCheckbox>
+			#{ui['regCit.efetServAmini']}
+		</h5>
+		<p>#{ui['regCit.efetServAminiDes']}</p>
+	</h:panelGroup>
+
+	<h:panelGroup rendered="#{utenteEditBean.richiestaAccreditamentoForteInCorso}">
+		<div class="uk-panel uk-panel-box">
+			<p>
+				<h:outputText value="#{ui['prof.servAminiTip1']}" escape="false" rendered="#{not utils.isUmbria()}" />
+			</p>
+			<p>
+				<h:outputText value="#{ui['regCit.servAminiTipUM1']}" rendered="#{utils.isUmbria()}" />
+			</p>
+			<p>
+				<h:outputText value="#{ui['prof.servAminiTip2']}" escape="false" rendered="#{not utils.isUmbria()}" />
+			</p>
+			<p>
+				<h:outputText value="#{ui['regCit.servAminiTipUM2']}" escape="false" rendered="#{utils.isUmbria()}" />
+			</p>
+			<p>
+				<h:outputText value="#{ui['prof.servAminiTip3']}" escape="false" rendered="#{not utils.isUmbria()}" />
+			</p>
+		</div>
+		<div class="form-group">
+			<p:outputLabel value="#{ui['prof.abilitaPec']}" for="abilitaPecRadio" styleClass="col-md-8 control-label text-muted"
+				rendered="#{not utils.isUmbria()}" />
+			<div class="col-md-4">
+				<p:selectOneRadio id="abilitaPecRadio" required="#{not utils.isUmbria()}" rendered="#{not utils.isUmbria()}"
+					disabled="#{not utenteEditBean.richiestaAccreditamentoForte}" requiredMessage="#{ui['prof.abilitaPecRequired']}"
+					value="#{utenteEditBean.utenteInfo.pfPrincipal.flagAbilitaPec}">
+					<p:ajax event="change" process="@this" oncomplete="pop()"
+						update="infoPerRichiestaAbilitazioneGroup abilitaPecMessage"></p:ajax>
+					<f:selectItem itemLabel="#{ui['shared.si']}" itemValue="true" />
+					<f:selectItem itemLabel="#{ui['shared.no']}" itemValue="false" />
+				</p:selectOneRadio>
+			</div>
+			<p:message id="abilitaPecMessage" for="abilitaPecRadio" />
+		</div>
+	</h:panelGroup>
+
+	<h:panelGroup
+		rendered="#{utenteEditBean.utenteInfo.pfPrincipal.flagAbilitatoServizi 
+		or utenteEditBean.richiestaAccreditamentoForteInCorso}">
+
+		<h:panelGroup id="infoPerRichiestaAbilitazioneGroup">
+			<ui:fragment
+				rendered="#{utenteEditBean.utenteInfo.pfPrincipal.flagAbilitaPec
+				or not empty utenteEditBean.utenteInfo.emailPEC}">
+				<div class="form-group">
+					<p:outputLabel value="#{ui['prof.emailPec']}" for="emailPec" styleClass="col-md-4 control-label text-muted" />
+					<div layout="block" class="col-md-8">
+						<ui:fragment
+							rendered="#{utenteEditBean.utenteInfo.pfPrincipal.flagAbilitatoServizi
+								or not empty utenteEditBean.utenteInfo.pfPrincipal.registrazioneForteToken
+								or not empty utenteEditBean.utenteInfo.pfPrincipal.richiestaRegForteToken}">
+							<p class="form-control-static">#{utenteEditBean.utenteInfo.emailPEC}</p>
+						</ui:fragment>
+						<ui:fragment
+							rendered="#{not utenteEditBean.utenteInfo.pfPrincipal.flagAbilitatoServizi
+								and empty utenteEditBean.utenteInfo.pfPrincipal.registrazioneForteToken
+								and empty utenteEditBean.utenteInfo.pfPrincipal.richiestaRegForteToken}">
+							<p:inputText required="true" id="emailPec" value="#{utenteEditBean.utenteInfo.emailPEC}"
+								styleClass="form-control" validator="uniqueEmailValidator" maxlength="80">
+								<f:attribute name="pec" value="true" />
+								<f:attribute name="skipValue" value="#{utenteEditBean.oldPecEmail}" />
+								<o:validator validatorId="javax.faces.RegularExpression" pattern="#{validation['pattern.email']}"
+									message="#{validation['message.email']}" />
+							</p:inputText>
+							<p:message id="emailPecMessage" for="emailPec"></p:message>
+						</ui:fragment>
+					</div>
+				</div>
+			</ui:fragment>
+			<h:panelGroup id="seriviziAmminGroup">
+				<ui:fragment
+					rendered="#{utenteEditBean.utenteInfo.pfPrincipal.flagAbilitatoServizi
+									and not empty utenteEditBean.utenteInfo.codServiziAmministrativi}">
+					<div class="form-group">
+						<p:outputLabel value="#{ui['prof.codServiziAmministrativi']}" for="codServiziAmm"
+							styleClass="col-md-4 control-label text-muted" />
+						<div class="col-md-8">
+							<p:inputText id="codServiziAmm" value="#{utenteEditBean.getRenderCodServiziAmministrativi()}" disabled="true"
+								label="#{ui['regCit.documentoIdentita']}" styleClass="form-control">
+							</p:inputText>
+						</div>
+					</div>
+
+
+					<ui:fragment
+						rendered="#{utils.isAbilitatoCanaleSms()}">
+						<div class="form-group">
+							<p:outputLabel value="#{ui['prof.cellulareFirmaElettronicaOTPSMS']}"
+								styleClass="col-md-4 control-label text-muted" />
+							<div class="col-md-8">
+								<div class="form-control-static">
+									<ui:fragment rendered="#{not empty utenteEditBean.utenteInfo.cellulareOTP}">
+									#{utenteEditBean.utenteInfo.cellulareOTP}
+									<p:commandLink value="Modifica" update=":cellulareFirmaOTP" oncomplete="PF('cellulareFirmaOTPWV').show()"></p:commandLink>
+									</ui:fragment>
+									<ui:fragment rendered="#{empty utenteEditBean.utenteInfo.cellulareOTP}">
+										<p:commandLink value="#{ui['prof.cellulareFirmaElettronicaOTPSMSLink']}" update=":cellulareFirmaOTP"
+											oncomplete="PF('cellulareFirmaOTPWV').show()"></p:commandLink>
+									</ui:fragment>
+								</div>
+							</div>
+						</div>
+					</ui:fragment>
+				</ui:fragment>
+			</h:panelGroup>
+			<h:panelGroup id="cittadinanzaGroup">
+				<ui:fragment rendered="#{utenteEditBean.utenteInfo.deCittadinanza.flgCee == 'S'}">
+					<div class="form-group">
+						<p:outputLabel value="#{ui['regCit.documentoIdentita']}" for="documentoIdentita"
+							styleClass="col-md-4 control-label text-muted" />
+						<div class="col-md-8">
+							<ui:fragment rendered="#{utenteEditBean.datiAbilitazionePecBloccati}">
+								<p class="form-control-static">#{utenteEditBean.utenteInfo.documentoIdentita}</p>
+							</ui:fragment>
+							<ui:fragment rendered="#{not utenteEditBean.datiAbilitazionePecBloccati}">
+								<p:inputText id="documentoIdentita" value="#{utenteEditBean.utenteInfo.documentoIdentita}" required="true"
+									label="#{ui['regCit.documentoIdentita']}" styleClass="form-control">
+								</p:inputText>
+								<p:message id="documentoIdentitaMessage" for="documentoIdentita" />
+							</ui:fragment>
+						</div>
+					</div>
+				</ui:fragment>
+
+				<ui:fragment rendered="#{utenteEditBean.utenteInfo.deCittadinanza.flgCee == 'N'}">
+					<div class="form-group">
+						<p:outputLabel value="#{ui['regCit.titoloSoggiorno']}" for="documentoSoggiorno"
+							styleClass="col-md-4 control-label text-muted" />
+						<div class="col-md-8">
+							<ui:fragment rendered="#{utenteEditBean.datiAbilitazionePecBloccati}">
+								<p class="form-control-static">#{utenteEditBean.utenteInfo.documentoSoggiorno.descrizione}</p>
+							</ui:fragment>
+							<ui:fragment rendered="#{not utenteEditBean.datiAbilitazionePecBloccati}">
+								<p:selectOneMenu id="documentoSoggiorno" value="#{utenteEditBean.utenteInfo.documentoSoggiorno}"
+									converter="deTitoloSoggiornoConverter" required="true" styleClass="form-control" style="width: 100%;">
+									<f:selectItem itemLabel="" itemValue="" />
+									<f:selectItems value="#{decodificheBean.deTitoloSoggiorni}" var="titolo" itemLabel="#{titolo.descrizione}"
+										itemValue="#{titolo}" />
+									<p:ajax update="assicurataGroup docSoggTip" listener="#{utenteEditBean.titoloSoggiornoChanged}"
+										oncomplete="pop()" />
+								</p:selectOneMenu>
+								<p:message for="documentoSoggiorno" id="documentoSoggiornoMessage" />
+								<h:panelGroup id="docSoggTip">
+									<h:panelGroup rendered="#{utenteEditBean.inRinnovoTip}">
+										<span class="help-block m-b-none"> #{ui['regCit.inRinnovoTip']} </span>
+									</h:panelGroup>
+									<h:panelGroup rendered="#{utenteEditBean.inAttesaPerTip}">
+										<span class="help-block m-b-none"> #{ui['regCit.inAttesaPerTip']} </span>
+									</h:panelGroup>
+									<h:panelGroup rendered="#{utenteEditBean.cartaPerTip}">
+										<span class="help-block m-b-none"> #{ui['regCit.cartaPerTip']} </span>
+									</h:panelGroup>
+								</h:panelGroup>
+							</ui:fragment>
+						</div>
+					</div>
+				</ui:fragment>
+			</h:panelGroup>
+
+			<div class="form-group">
+				<p:outputLabel value="#{ui['shared.numeroDocumento']}" for="numeroDocumento"
+					styleClass="col-md-4 control-label text-muted" />
+				<div class="col-md-8">
+					<ui:fragment rendered="#{utenteEditBean.datiAbilitazionePecBloccati}">
+						<p class="form-control-static">#{utenteEditBean.utenteInfo.numeroDocumento}</p>
+					</ui:fragment>
+					<ui:fragment rendered="#{not utenteEditBean.datiAbilitazionePecBloccati}">
+						<p:inputText id="numeroDocumento" value="#{utenteEditBean.utenteInfo.numeroDocumento}" required="true"
+							styleClass="form-control" />
+						<p:message for="numeroDocumento" id="numeroDocumentoMessage" />
+					</ui:fragment>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<p:outputLabel value="#{ui['shared.dataScadenza']}" for="dataScadenza"
+					styleClass="col-md-4 control-label text-muted" />
+				<div class="col-md-8">
+					<ui:fragment rendered="#{utenteEditBean.datiAbilitazionePecBloccati}">
+						<p class="form-control-static">
+							<h:outputText value="#{utenteEditBean.utenteInfo.dataScadenzaDocumento}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p>
+					</ui:fragment>
+					<ui:fragment rendered="#{not utenteEditBean.datiAbilitazionePecBloccati}">
+						<p:calendar id="dataScadenza" value="#{utenteEditBean.utenteInfo.dataScadenzaDocumento}"
+							converterMessage="#{ui['shared.dateNotValid']}" size="20" required="true" styleClass="form-control"
+							navigator="true" pattern="#{ui['shared.dateFormat']}" label="#{ui['shared.dataScadenza']}" locale="it"
+							validator="dateValidator">
+							<f:convertDateTime type="date" pattern="#{ui['shared.dateFormat']}" />
+						</p:calendar>
+						<p:message for="dataScadenza" id="dataScadenzaMessage" />
+					</ui:fragment>
+				</div>
+			</div>
+
+			<h:panelGroup id="assicurataGroup">
+				<ui:fragment rendered="#{utenteEditBean.rinnovoTitoloSoggiorno}">
+					<div class="form-group">
+						<p:outputLabel value="#{ui['regCit.numeroassicurataRaccomandata']}" for="numeroAssicurata"
+							styleClass="col-md-4 control-label text-muted" />
+						<div class="col-md-8">
+							<ui:fragment rendered="#{utenteEditBean.datiAbilitazionePecBloccati}">
+								<p class="form-control-static">#{utenteEditBean.utenteInfo.numeroAssicurata}</p>
+							</ui:fragment>
+							<ui:fragment rendered="#{not utenteEditBean.datiAbilitazionePecBloccati}">
+								<p:inputText id="numeroAssicurata" value="#{utenteEditBean.utenteInfo.numeroAssicurata}"
+									label="#{ui['regCit.numeroassicurataRaccomandata']}" required="true" styleClass="form-control">
+								</p:inputText>
+								<p:message id="numeroAssicurataMessage" for="numeroAssicurata" />
+							</ui:fragment>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<p:outputLabel value="#{ui['regCit.dataAssicurataRaccomandata']}" for="dataAssicurata"
+							styleClass="col-md-4 control-label text-muted" />
+						<div class="col-md-8">
+							<ui:fragment rendered="#{utenteEditBean.datiAbilitazionePecBloccati}">
+								<p class="form-control-static">
+									<h:outputText value="#{utenteEditBean.utenteInfo.dataAssicurata}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p>
+							</ui:fragment>
+							<ui:fragment rendered="#{not utenteEditBean.datiAbilitazionePecBloccati}">
+								<p:calendar id="dataAssicurata" value="#{utenteEditBean.utenteInfo.dataAssicurata}"
+									converterMessage="#{ui['shared.dateNotValid']}" size="20" required="true" styleClass="form-control"
+									navigator="true" pattern="#{ui['shared.dateFormat']}" label="#{ui['regCit.dataAssicurataRaccomandata']}"
+									locale="it" validator="dateValidator">
+									<f:convertDateTime type="date" pattern="#{ui['shared.dateFormat']}" />
+								</p:calendar>
+								<p:message id="dataAssicurataMessage" for="dataAssicurata" />
+							</ui:fragment>
+						</div>
+					</div>
+				</ui:fragment>
+			</h:panelGroup>
+
+			<h:panelGroup id="tokenGroup"
+				rendered="#{utenteEditBean.utenteInfo.pfPrincipal.flagAbilitaPec
+				or not empty utenteEditBean.utenteInfo.emailPEC}">
+				<h:panelGroup
+					rendered="#{not empty utenteEditBean.utenteInfo.pfPrincipal.richiestaRegForteToken 
+						and not utenteEditBean.utenteInfo.pfPrincipal.flagAbilitatoServizi
+						and not utenteEditBean.richiestaAccreditamentoForte}">
+					<p class="text-center">
+					<blockquote class="text-center">
+						<p>
+							<i>#{ui['confirm.codiceAttivazione']}</i>
+						</p>
+						<pre>
+								<h4>#{utenteEditBean.utenteInfo.pfPrincipal.richiestaRegForteToken}</h4>
+							</pre>
+						<p>#{ui['prof.activeCodeDes']}</p>
+						<a href="mailto:#{utenteEditBean.emailAbilitazionePecCpi}">#{utenteEditBean.emailAbilitazionePecCpi}</a>
+					</blockquote>
+					</p>
+				</h:panelGroup>
+
+				<h:panelGroup id="ottCodGroup">
+					<h:panelGroup
+						rendered="#{empty utenteEditBean.utenteInfo.pfPrincipal.richiestaRegForteToken 
+						and not utenteEditBean.utenteInfo.pfPrincipal.flagAbilitatoServizi 
+						and not utenteEditBean.richiestaAccreditamentoForte
+						and empty utenteEditBean.utenteInfo.pfPrincipal.registrazioneForteToken}">
+						<div class="well text-center">
+							<p:commandButton id="ottCodAtt" value="#{ui['prof.ottCodAtt']}"
+								actionListener="#{utenteEditBean.generateRichiestaToken}" styleClass="btn btn-primary" process="@form"
+								update="@(.ui-message) infoPerRichiestaAbilitazioneGroup">
+							</p:commandButton>
+						</div>
+					</h:panelGroup>
+				</h:panelGroup>
+			</h:panelGroup>
+
+			<h:panelGroup
+				rendered="#{not empty utenteEditBean.utenteInfo.pfPrincipal.flagAbilitaPec 
+				and not utenteEditBean.utenteInfo.pfPrincipal.flagAbilitaPec
+				and not utenteEditBean.utenteInfo.pfPrincipal.flagAbilitatoServizi
+				and not utenteEditBean.richiestaAccreditamentoForte}">
+				<div class="well text-center">
+					<p class="text-center">
+					<blockquote class="text-center">
+						<p>#{ui['prof.activeNoPecDes']}</p>
+						<a href="mailto:#{utenteEditBean.emailAbilitazioneNoPecCpi}">#{utenteEditBean.emailAbilitazioneNoPecCpi}</a>
+					</blockquote>
+					</p>
+				</div>
+			</h:panelGroup>
+		</h:panelGroup>
+	</h:panelGroup>
+</ui:composition>

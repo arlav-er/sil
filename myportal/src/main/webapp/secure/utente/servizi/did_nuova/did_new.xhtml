@@ -1,0 +1,379 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/main_primefaces.xhtml">
+	
+	<ui:define name="content">
+		<div class="widget_container">
+			<h1>Nuova Dichiarazione di Immediata Disponibilità</h1>
+			<div class="ui-widget-content ui-widget ui-corner-all">
+				<h3>Richiedi una nuova DID</h3>
+				<p>Completa eventuali dati mancanti, prima di poter fare una DID.</p>
+				<h:form id="richiediDidForm">
+					<fieldset style="width: 80%">
+						<legend>Dati personali</legend>
+						<table style="border-spacing: 1em; width: 100%">
+							<tr>
+								<td>
+									<p:outputLabel for="cognomeInput" value="Cognome" styleClass="block-label"/>
+									<p:inputText id="cognomeInput" required="true" maxlength="50"
+										value="#{didNuovaFormBean.utenteCompleto.utenteDTO.pfPrincipalDTO.cognome}"
+										requiredMessage="Il cognome è obbligatorio" />
+									<p:message for="cognomeInput" />
+								</td>
+								<td>
+									<p:outputLabel for="nomeInput" value="Nome" styleClass="block-label" />
+									<p:inputText id="nomeInput" required="true" maxlength="50"
+										value="#{didNuovaFormBean.utenteCompleto.utenteDTO.pfPrincipalDTO.nome}"
+										requiredMessage="Il nome è obbligatorio" />
+									<p:message for="nomeInput" />
+								</td>
+								<td>
+									<p:outputLabel for="sessoInput" value="Genere" styleClass="block-label" />
+									<p:selectOneMenu id="sessoInput" required="true" 
+										value="#{didNuovaFormBean.utenteCompleto.utenteInfo.genere.id}"
+										requiredMessage="Il genere è obbligatorio" >
+										<f:selectItems value="#{utilsBean.genere}" var="entry"
+											itemValue="#{entry.id}" itemLabel="#{entry.descrizione}" />
+									</p:selectOneMenu>
+									<p:message for="sessoInput" />
+								</td>
+								<td>
+									<ui:fragment rendered="#{empty didNuovaFormBean.utenteCompleto.utenteInfo.codiceFiscale}">
+										<p:outputLabel for="cfInput" value="Codice fiscale" styleClass="block-label" />
+										<p:inputText id="cfInput" required="true" maxlength="16"
+											value="#{didNuovaFormBean.utenteCompleto.utenteInfo.codiceFiscale}"
+											requiredMessage="Il codice fiscale è obbligatorio" >
+											<f:validator validatorId="codiceFiscaleValidator" />
+										</p:inputText>
+										<p:message for="cfInput" />
+									</ui:fragment>
+									<ui:fragment rendered="#{not empty didNuovaFormBean.utenteCompleto.utenteInfo.codiceFiscale}">
+										<p:outputLabel value="Codice fiscale" styleClass="block-label" />
+										<h:outputText value="#{didNuovaFormBean.utenteCompleto.utenteInfo.codiceFiscale}" />
+									</ui:fragment>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<p:outputLabel for="dataNascitaInput" value="Data di nascita" styleClass="block-label" />
+									<p:calendar id="dataNascitaInput" required="true" pattern="dd/MM/yyyy"
+										value="#{didNuovaFormBean.utenteCompleto.utenteInfo.dataNascita}"
+										requiredMessage="La data di nascita è obbligatoria" />
+									<p:message for="dataNascitaInput" />
+								</td>
+								<td>
+									<p:outputLabel for="comNascitaInput" value="Comune o stato di nascita" styleClass="block-label" />
+									<p:autoComplete id="comNascitaInput" required="true" forceSelection="true"
+										value="#{didNuovaFormBean.utenteCompleto.utenteInfo.comuneNascita}"
+										completeMethod="#{didNuovaFormBean.completeComuneValido}" var="comNascita"
+										itemLabel="#{comNascita.descrizione}" itemValue="#{comNascita}"
+										converter="deComuneDTOConverter" requiredMessage="Il luogo di nascita è obbligatorio"
+										minQueryLength="2" maxResults="10" emptyMessage="Nessun comune trovato">
+									</p:autoComplete>
+									<p:message for="comNascitaInput" />
+								</td>
+								<td>
+									<p:outputLabel for="cittadinanzaInput" value="Cittadinanza" styleClass="block-label" />
+									<p:autoComplete id="cittadinanzaInput" required="true" forceSelection="true"
+										value="#{didNuovaFormBean.utenteCompleto.utenteInfo.cittadinanza}"
+										completeMethod="#{didNuovaFormBean.completeCittadinanza}" var="cittadinanza"
+										itemLabel="#{cittadinanza.descrizione}" itemValue="#{cittadinanza}"
+										converter="deCittadinanzaDTOConverter" requiredMessage="La cittadinanza è obbligatoria"
+										minQueryLength="2" maxResults="10" emptyMessage="Nessuna cittadinanza trovata">
+										<p:ajax event="itemSelect" update="presenzaItaliaInput presenzaItaliaLabel" />
+										<p:ajax event="change" update="presenzaItaliaInput presenzaItaliaLabel" />
+									</p:autoComplete>
+									<p:message for="cittadinanzaInput" />
+								</td>
+							</tr>
+						</table>
+					</fieldset>
+					
+					<fieldset style="width: 80%">
+						<legend>Indirizzo e residenza</legend>
+						<table style="border-spacing: 1em; width: 80%">
+							<tr>
+								<td>
+									<p:outputLabel for="indirizzoDomInput" value="Indirizzo domicilio" styleClass="block-label" />
+									<p:inputText id="indirizzoDomInput" required="true" maxlength="512"
+										value="#{didNuovaFormBean.utenteCompleto.utenteInfo.indirizzoDomicilio}"
+										requiredMessage="L'indirizzo di domicilio è obbligatorio" />
+									<p:message for="indirizzoDomInput" />
+								</td>
+								<td>
+									<p:outputLabel for="comuneDomInput" value="Comune domicilio" styleClass="block-label" />
+									<p:autoComplete id="comuneDomInput" required="true" forceSelection="true"
+										value="#{didNuovaFormBean.utenteCompleto.utenteInfo.comuneDomicilio}"
+										completeMethod="#{didNuovaFormBean.completeComuneValido}" var="comDomicilio"
+										itemLabel="#{comDomicilio.descrizione}" itemValue="#{comDomicilio}"
+										converter="deComuneDTOConverter" requiredMessage="Il comune di domicilio è obbligatorio"
+										minQueryLength="2" maxResults="10" emptyMessage="Nessun comune trovato">
+										<p:ajax event="itemSelect" listener="#{didNuovaFormBean.comuneDomicilioSelected}" 
+											update="@this @(.ui-message) capDomInput" />
+									</p:autoComplete>
+									<p:message for="comuneDomInput" />
+								</td>
+								<td>
+									<p:outputLabel for="capDomInput" value="CAP domicilio" styleClass="block-label" />
+									<p:inputMask id="capDomInput" required="true" maxlength="5" mask="9?9999" size="5"
+										value="#{didNuovaFormBean.utenteCompleto.utenteInfo.capDomicilio}" 
+										requiredMessage="Il CAP del domicilio è obbligatorio" />
+									<p:message for="capDomInput" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<p:outputLabel for="indirizzoResInput" value="Indirizzo residenza" styleClass="block-label" />
+									<p:inputText id="indirizzoResInput" required="true" maxlength="100"
+										value="#{didNuovaFormBean.utenteCompleto.utenteInfo.indirizzoResidenza}"
+										requiredMessage="L'indirizzo di residenza è obbligatorio" />
+									<p:message for="indirizzoResInput" />
+								</td>
+								<td>
+									<p:outputLabel for="comuneResInput" value="Comune residenza" styleClass="block-label" />
+									<p:autoComplete id="comuneResInput" required="true" forceSelection="true"
+										value="#{didNuovaFormBean.utenteCompleto.utenteInfo.comuneResidenza}"
+										completeMethod="#{didNuovaFormBean.completeComuneValido}" var="comResidenza"
+										itemLabel="#{comResidenza.descrizione}" itemValue="#{comResidenza}"
+										converter="deComuneDTOConverter" requiredMessage="Il comune di residenza è obbligatorio"
+										minQueryLength="2" maxResults="10" emptyMessage="Nessun comune trovato">
+										<p:ajax event="itemSelect" listener="#{didNuovaFormBean.comuneResidenzaSelected}" 
+											update="@this @(.ui-message) capResInput" />
+									</p:autoComplete>
+									<p:message for="comuneResInput" />
+								</td>
+								<td>
+									<p:outputLabel for="capResInput" value="CAP residenza" styleClass="block-label" />
+									<p:inputMask id="capResInput" required="true" maxlength="5" mask="9?9999" size="5"
+										value="#{didNuovaFormBean.utenteCompleto.utenteInfo.capResidenza}"
+										requiredMessage="Il CAP della residenza è obbligatorio"  />
+									<p:message for="capResInput" />
+								</td>
+							</tr>
+						</table>
+					</fieldset>
+					
+					<fieldset style="width: 80%">
+						<legend>Contatti</legend>
+						<table style="border-spacing: 1em; width: 80%">
+							<tr>
+								<td>
+									<p:outputLabel value="E-mail" styleClass="block-label" />
+									<h:outputText value="#{didNuovaFormBean.utenteCompleto.utenteDTO.pfPrincipalDTO.email}" />
+								</td>
+								<td>
+									<p:outputLabel for="telefonoInput" value="Telefono" styleClass="block-label" />
+									<p:inputText id="telefonoInput" required="true" maxlength="20"
+										value="#{didNuovaFormBean.utenteCompleto.utenteInfo.telCasa}" />
+									<p:message for="telefonoInput" />
+								</td>
+								<td>
+									<p:outputLabel for="cellulareInput" value="Cellulare" styleClass="block-label" />
+									<p:inputText id="cellulareInput" required="true" maxlength="20"
+										value="#{didNuovaFormBean.utenteCompleto.utenteInfo.cellulare}"/>
+									<p:message for="cellulareInput" />
+								</td>
+							</tr>
+						</table>
+					</fieldset>
+					
+					<fieldset style="width: 80%">
+						<legend>Dati sul nucleo familiare</legend>
+						<table style="border-spacing: 1em; width: 80%">
+							<tr>
+								<td>
+									<p:outputLabel for="componentiFamigliaInput" value="Numero componenti della famiglia"
+										styleClass="block-label" />
+									<p:inputText id="componentiFamigliaInput" size="5" required="true"
+										requiredMessage="Il numero di componenti è obbligatorio"
+										converterMessage="Il valore deve essere un numero"
+										value="#{didNuovaFormBean.conferimentoDid.numComponentiFamiglia}">
+										<p:ajax event="change" update="@this figliCaricoLabel figliCaricoInput minoriCaricoLabel minoriCaricoInput"
+											listener="#{didNuovaFormBean.componentiFamigliaSelected}" />
+									</p:inputText>
+									<p:message for="componentiFamigliaInput" />
+								</td>
+								<td>
+									<p:outputLabel id="figliCaricoLabel" for="figliCaricoInput"
+										value="Presenza di figli coabitanti e/o a carico" styleClass="block-label" />
+									<p:selectOneButton id="figliCaricoInput" required="true"
+										requiredMessage="Questo campo è obbligatorio"
+										disabled="#{didNuovaFormBean.isFigliCaricoDisabled()}"
+										value="#{didNuovaFormBean.conferimentoDid.flgFigliCarico}">
+										<f:selectItem itemLabel="Sì" itemValue="true" />
+										<f:selectItem itemLabel="No" itemValue="false" />
+										<p:ajax event="change" update="@this minoriCaricoLabel minoriCaricoInput" 
+											listener="#{didNuovaFormBean.figliCaricoSelected}" />
+									</p:selectOneButton>
+									<p:message for="figliCaricoInput" />
+								</td>
+								<td>
+									<p:outputLabel id="minoriCaricoLabel" for="minoriCaricoInput" 
+										value="Presenza di figli coabitanti e/o a carico con meno di 18 anni" styleClass="block-label" />
+									<p:selectOneButton id="minoriCaricoInput" required="true"
+										disabled="#{didNuovaFormBean.isMinoriCaricoDisabled()}"	
+										requiredMessage="Questo campo è obbligatorio"
+										value="#{didNuovaFormBean.conferimentoDid.flgFigliMinoriCarico}">
+										<f:selectItem itemLabel="Sì" itemValue="true" />
+										<f:selectItem itemLabel="No" itemValue="false" />
+									</p:selectOneButton>
+									<p:message for="minoriCaricoInput" />
+								</td>
+							</tr>
+						</table>
+					</fieldset>
+					
+					<fieldset style="width: 80%">
+						<legend>Esperienze precedenti</legend>
+						<table style="border-spacing: 1em; width: 80%">
+							<tr>
+								<td>
+									<p:outputLabel for="esperienzaLavoroInput" value="Ha mai avuto un lavoro?" 
+										styleClass="block-label" />
+									<p:selectOneButton id="esperienzaLavoroInput" required="true"
+										requiredMessage="La conferma di lavori precedenti è obbligatoria"
+										value="#{didNuovaFormBean.conferimentoDid.flgEsperienzaLavoro}">
+										<f:selectItem itemLabel="Sì" itemValue="true" />
+										<f:selectItem itemLabel="No" itemValue="false" />
+										<p:ajax event="change" update="posizioneProfInput posizioneProfLabel numMesiRapportoInput numMesiRapportoLabel" 
+											listener="#{didNuovaFormBean.haMaiAvutoLavoroSelected}"/>
+									</p:selectOneButton>
+									<p:message for="esperienzaLavoroInput" />
+								</td>
+								<td>
+									<p:outputLabel id="numMesiRapportoLabel" for="numMesiRapportoInput" 
+										value="Da quanti mesi ha concluso l'ultimo rapporto di lavoro" styleClass="block-label" />
+									<p:inputText id="numMesiRapportoInput" required="true" size="5"
+										converterMessage="Il valore deve essere un numero"
+										requiredMessage="Questo campo è obbligatorio"
+										disabled="#{not empty didNuovaFormBean.conferimentoDid.flgEsperienzaLavoro
+											and not didNuovaFormBean.conferimentoDid.flgEsperienzaLavoro}"
+										value="#{didNuovaFormBean.conferimentoDid.numMesiRapporto}" />
+									<p:message for="numMesiRapportoInput" />
+								</td>
+								<td>
+									<p:outputLabel for="condizioneOccupazInput" value="Condizione occupazionale un anno prima" 
+										styleClass="block-label" />
+									<p:selectOneMenu id="condizioneOccupazInput" maxlength="20" required="true"
+										requiredMessage="La condizione occupazionale è obbligatoria"
+										value="#{didNuovaFormBean.conferimentoDid.deCondizioneOccupazMinDTO}"
+										converter="deCondizioneOccupazMinDTOConverter">
+										<f:selectItem itemValue="" itemLabel="" />
+										<f:selectItems value="#{utilsBean.getDeCondizioneOccupazMinList()}" var="entry"
+											itemValue="#{entry}" itemLabel="#{entry.descrizione}" />
+									</p:selectOneMenu>
+									<p:message for="condizioneOccupazInput" />
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<p:outputLabel id="posizioneProfLabel" for="posizioneProfInput" styleClass="block-label"
+										value="Posizione nella professione dell'ultima occupazione svolta" />
+									<p:selectOneMenu id="posizioneProfInput" maxlength="20" required="true"
+										disabled="#{not empty didNuovaFormBean.conferimentoDid.flgEsperienzaLavoro
+											and not didNuovaFormBean.conferimentoDid.flgEsperienzaLavoro}"
+										value="#{didNuovaFormBean.conferimentoDid.dePosizioneProfessionaleMinDTO}"
+										requiredMessage="La posizione professionale è obbligatoria"
+										converter="dePosizioneProfessionaleMinDTOConverter">
+										<f:selectItem itemValue="" itemLabel="" />
+										<f:selectItems value="#{utilsBean.getDePosizioneProfessionaleMinList()}" var="entry"
+											itemValue="#{entry}" itemLabel="#{entry.descrizione}" />
+									</p:selectOneMenu>
+									<p:message for="posizioneProfInput" />
+								</td>
+							</tr>
+						</table>
+					</fieldset>
+					
+					<fieldset style="width: 80%">
+						<legend>Altre informazioni</legend>
+						<table style="border-spacing: 1em; width: 90%">
+							<tr>
+								<td>
+									<p:outputLabel id="presenzaItaliaLabel" for="presenzaItaliaInput" 
+										value="Durata presenza in Italia" styleClass="block-label" />
+									<p:selectOneMenu id="presenzaItaliaInput" maxlength="20" required="true"
+										value="#{didNuovaFormBean.conferimentoDid.dePresenzaItaliaMinDTO}"
+										converter="dePresenzaItaliaMinDTOConverter" requiredMessage="La durata della presenza è obbligatoria" >
+										<f:selectItem itemLabel="" itemValue="" />
+										<f:selectItems value="#{utilsBean.getDePresenzaItaliaMinList()}" var="entry"
+											itemValue="#{entry}" itemLabel="#{entry.descrizione}" />
+									</p:selectOneMenu>
+									<p:message for="presenzaItaliaInput" />
+								</td>
+								<td>
+									<p:outputLabel for="numMesiRicercaInput" value="Da quanti mesi sta cercando lavoro"
+										styleClass="block-label" />
+									<p:inputText id="numMesiRicercaInput" required="true" size="5"
+										converterMessage="Il valore deve essere un numero"
+										value="#{didNuovaFormBean.conferimentoDid.numMesiRicercaLavoro}"
+										requiredMessage="Questo campo è obbligatorio" />
+									<p:message for="numMesiRicercaInput" />
+								</td>
+								<td colspan="2">
+									<p:outputLabel for="iscrizioneCorsoInput" styleClass="block-label"
+										value="Attualmente è iscritto a scuola/università o corso di formazione professionale (IFP, IFTS, ITS)" />
+									<p:selectOneMenu id="iscrizioneCorsoInput" required="true" maxlength="20"
+										value="#{didNuovaFormBean.conferimentoDid.deIscrizioneCorsoMinDTO}"
+										converter="deIscrizioneCorsoMinDTOConverter" requiredMessage="Questo campo è obbligatorio">
+										<f:selectItem itemValue="" itemLabel="" />
+										<f:selectItems value="#{utilsBean.getDeIscrizioneCorsoMinList()}" var="entry"
+											itemValue="#{entry}" itemLabel="#{entry.descrizione}" />
+									</p:selectOneMenu>
+									<p:message for="iscrizioneCorsoInput" />
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<p:outputLabel for="titoloStudioInput" value="Titolo di studio" styleClass="block-label" />
+									<p:autoComplete id="titoloStudioInput" required="true" forceSelection="true"
+										value="#{didNuovaFormBean.conferimentoDid.deTitoloDTO}" size="50"
+										completeMethod="#{didNuovaFormBean.completeDeTitolo}" var="titolo"
+										itemLabel="#{titolo.descrizione}" itemValue="#{titolo}"
+										converter="deTitoloDTOConverter" requiredMessage="Il titolo di studio è obbligatorio"
+										minQueryLength="2" maxResults="10" emptyMessage="Nessun titolo trovato">
+									</p:autoComplete>
+									<p:message for="titoloStudioInput" />
+								</td>
+								<td>
+									<ui:fragment rendered="#{empty didNuovaFormBean.codEntePromotoreSap}">
+										<p:outputLabel for="entePromotoreInput" value="#{utilsBean.isPuglia()? 'Centro per l\'impiego di riferimento': 'Ente titolare SAP' }" styleClass="block-label" />
+										<p:selectOneMenu id="entePromotoreInput" required="true"
+											requiredMessage="#{utilsBean.isPuglia()? 'Il centro per l\'impiego di riferimento è obbligatorio' : 'L\'ente titolare SAP di riferimento è obbligatorio' }"
+											value="#{didNuovaFormBean.cpiPromotore}" converter="deCpiDTOConverter">
+											<f:selectItem itemValue="" itemLabel="" />
+											<f:selectItems value="#{didNuovaFormBean.getCpiPromotoreList()}" var="entry"
+												itemValue="#{entry}" itemLabel="#{entry.descrizione}" />
+										</p:selectOneMenu>
+										<p:message for="entePromotoreInput" />
+									</ui:fragment>
+									<ui:fragment rendered="#{not empty didNuovaFormBean.codEntePromotoreSap}">
+										<p:outputLabel value="#{utilsBean.isPuglia()? 'Centro per l\'impiego di riferimento': 'Ente titolare SAP' }" styleClass="block-label" />
+										#{didNuovaFormBean.cpiPromotore.descrizione}
+									</ui:fragment>
+								</td>
+							</tr>
+						</table>
+					</fieldset>
+					
+					<fieldset style="width: 80%">
+						<legend>Richiedi la Dichiarazione di Immediata Disponibilità</legend>
+						<div style="display: inline-block;">
+							<p:commandButton value="Richiedi DID" actionListener="#{didNuovaFormBean.richiediDid}" 
+								update="@form" />
+							<p:messages globalOnly="true" />
+						</div>
+					</fieldset>
+				</h:form>
+			</div>
+			<div>
+				<p:button outcome="home" styleClass="margin-1em" title="Torna alla scrivania"
+					value="Torna alla scrivania" />
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

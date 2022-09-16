@@ -1,0 +1,655 @@
+<!-- File di Franco Vuoto -->
+
+<MODULE name="login"   class="it.eng.sil.module.login.Login" />
+
+<MODULE name="loginNO"   class="it.eng.sil.module.login.LoginNO" />
+
+<MODULE name="eseguiLogin"   class="it.eng.sil.module.login.EseguiLogin" >
+   <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <SELECT_QUERY statement="LOGIN">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="USERNAME"/>
+        </SELECT_QUERY>           
+        <QUERY_PARAM statement="QUERY_PARAM_TENTATIVI" />             		
+        <QUERY_NUMTENTATIVI statement="AGGIORNA_NUMTENTATIVI_UTENTE"/>        
+        <QUERY_RESET_NUMTENTATIVI statement="RESET_NUMTENTATIVI">      
+       		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_" /> 
+    	</QUERY_RESET_NUMTENTATIVI>
+      </QUERIES>
+    </CONFIG>
+</MODULE>
+
+<MODULE name="registraAccesso"  class="it.eng.sil.module.login.RegistraAccesso" >
+   <CONFIG pool="SIL_DATI">
+        <QUERY statement="REGISTRA_ACCESSO"/>
+   </CONFIG>
+</MODULE>  
+
+
+<MODULE name="cambioPwdSalva" class="it.eng.sil.module.login.CambioPwd" >
+   <CONFIG pool="SIL_DATI" title="">
+      <QUERY statement="CAMBIO_PWD">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="newPwd"/>
+          <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      </QUERY>
+    </CONFIG>
+</MODULE> 
+
+
+<MODULE name="recuperaPwd" class="it.eng.sil.module.login.RecuperaPwd" >
+   <CONFIG pool="SIL_DATI" title="">
+      <QUERY statement="RECUPERA_PWD">
+          <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      </QUERY>
+    </CONFIG>
+</MODULE> 
+
+
+
+
+
+<MODULE name="frameset"   class="it.eng.sil.module.fs.Frameset" />
+<MODULE name="top"   class="it.eng.sil.module.fs.Top" />
+<MODULE name="main"   class="it.eng.sil.module.fs.Main">
+ <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <SELECT_QUERY statement="CARICA_PROFILI_UTENTI">
+          <PARAMETER scope="SESSION" type="RELATIVE" value="_USERID_"/>
+        </SELECT_QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE> 
+    
+
+
+
+<MODULE name="menu"   class="it.eng.sil.module.fs.Menu" />
+<MODULE name="footer"   class="it.eng.sil.module.fs.Footer" />
+
+
+<MODULE name="menuCompleto"   class="it.eng.sil.module.fs.MenuCompleto" >
+ <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+
+        <SELECT_QUERY0 statement="CARICA_IDENT_LAV">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+        </SELECT_QUERY0>
+
+
+        <SELECT_QUERY1 statement="CARICA_PROFILO_UTENTE">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRG_PROF_UT"/>
+          <PARAMETER scope="SESSION" type="RELATIVE" value="_USERID_"/>
+        </SELECT_QUERY1>
+
+        <SELECT_QUERY2 statement="MENU_GENERALE">
+          <PARAMETER scope="SESSION" type="RELATIVE" value="PRG_PROF_UT"/>
+        </SELECT_QUERY2>
+        
+        <SELECT_QUERY3 statement="MENU_LAVORATORE">
+          <PARAMETER scope="SESSION" type="RELATIVE" value="PRG_PROF_UT"/>
+        </SELECT_QUERY3>
+
+        <SELECT_QUERY4 statement="MENU_AZIENDA">
+          <PARAMETER scope="SESSION" type="RELATIVE" value="PRG_PROF_UT"/>
+        </SELECT_QUERY4>
+
+        <SELECT_QUERY5 statement="CARICA_IDENT_AZIENDA">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGUNITA"/>
+        </SELECT_QUERY5>
+
+
+
+
+      </QUERIES>
+    </CONFIG>
+</MODULE> 
+
+<MODULE name="mainBlank"   class="it.eng.sil.module.fs.MainBlank" />
+
+
+
+
+
+
+
+<MODULE name="stampaReport"   class="it.eng.sil.util.StampaReport" /> 
+
+
+
+
+
+
+
+
+
+
+
+<MODULE name="ProfRicercaUtente"   class="it.eng.sil.module.profil.ProfRicercaUtente" />
+
+
+<MODULE name="ComboTipoOrganizzazioni"   class="it.eng.sil.module.ComboGenerica">
+ <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <SELECT_QUERY statement="COMBO_TIPO_ORGANIZZAZIONI">
+        </SELECT_QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE> 
+
+
+
+<MODULE name="ComboOrganizzazioni"   class="it.eng.sil.module.ComboGenerica">
+ <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <SELECT_QUERY statement="COMBO_ORGANIZZAZIONI">
+        </SELECT_QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE> 
+
+
+
+<MODULE name="ComboRuoli"   class="it.eng.sil.module.ComboGenerica">
+ <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <SELECT_QUERY statement="COMBO_RUOLI">
+        </SELECT_QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE> 
+
+
+  <MODULE name="ProfListaUtenti" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+      <CONFIG pool="SIL_DATI" title="ESITO RICERCA ELENCO ANAGRAFICO UTENTI" rows="20">
+        <QUERIES>
+            <SELECT_QUERY>   
+             <STATEMENT_PROVIDER CLASS="it.eng.sil.module.profil.DynamicRicUtenti"/>
+            </SELECT_QUERY>
+        </QUERIES>
+        <COLUMNS>
+            <COLUMN name="Nominativo" label="Nominativo"/>            
+            <COLUMN name="Login" label="login"/>                    
+            <COLUMN name="Periodo_val" label="Periodo di validit&amp;agrave;"/>
+            <COLUMN name="FlgAbilitato" label="Abilitato"/>
+            <COLUMN name="FlgUtConvenzione" label="Convenzionato"/>
+        </COLUMNS>
+        <CAPTIONS>
+            <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+                    <PARAMETER name="PAGE" type="ABSOLUTE" value="ProfDettaglioUtentePage" scope=""/>
+                    <PARAMETER name="CDUT" type="RELATIVE" value="CDUT" scope="LOCAL"/>
+                    <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/> 
+            </SELECT_CAPTION>
+<!--
+            <DELETE_CAPTION confirm="TRUE" label="Cancella">
+                   <PARAMETER name="PAGE" type="ABSOLUTE" value="ProfCancellaUtentePage" scope=""/>
+                    <PARAMETER name="CDUT" type="RELATIVE" value="CDUT" scope="LOCAL"/>                
+            </DELETE_CAPTION>
+-->
+        </CAPTIONS>
+
+    </CONFIG>
+  </MODULE>
+
+
+
+
+
+<MODULE name="ProfDettaglioUtente"   class="it.eng.sil.module.profil.ProfDettaglioUtente" >
+   <CONFIG pool="SIL_DATI" title="">
+       <QUERIES>
+        <SELECT_QUERY statement="PROF_DETT_UTENTE">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDUT"/>
+        </SELECT_QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE>
+
+
+<MODULE name="ProfDettaglioUtenteSession" class="it.eng.sil.module.amministrazione.GenericSelect" >
+   	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="PROF_DETT_UTENTE">
+          	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      	</QUERY>
+   	</CONFIG>
+</MODULE>
+
+
+<MODULE name="PROF_TESTATA_UTENTE"   class="it.eng.sil.module.profil.TestataUtente" >
+   <CONFIG pool="SIL_DATI" title="">
+      <QUERY statement="PROF_TESTATA_UTENTE">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDUT"/>
+      </QUERY>
+    </CONFIG>
+</MODULE> 
+
+
+<MODULE name="ProfSalvaUtente"   class="it.eng.sil.module.profil.ProfSalvaUtente" >
+   <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <UPDATE_QUERY statement="PROF_UPDATE_UTENTE">
+         <PARAMETER scope="SERVICE_REQUEST" value="strlogin" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="password" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="strCodiceFiscale" type="RELATIVE" />
+          <PARAMETER scope="SERVICE_REQUEST" value="strCognome" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="strNome" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="datNasc" type="RELATIVE"/>		
+          <PARAMETER scope="SERVICE_REQUEST" value="strSesso" type="RELATIVE"/>	
+		  <PARAMETER scope="SERVICE_REQUEST" value="Telefono" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="Fax" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="mail" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="luogorif"  type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="flgAbilitato" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="flgUtConvenzione" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="note" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="codOP" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="datinizioval" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="datfineval" type="RELATIVE"/>
+          <PARAMETER scope="SESSION" value="_CDUT_" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="CDUT" type="RELATIVE"/>
+        </UPDATE_QUERY>
+
+       <UPDATE_QUERY2 statement="PROF_UPDATE_UTENTE2">
+         <PARAMETER scope="SERVICE_REQUEST" value="strlogin" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="strCodiceFiscale" type="RELATIVE" />
+          <PARAMETER scope="SERVICE_REQUEST" value="strCognome" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="strNome" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="datNasc" type="RELATIVE"/>		
+          <PARAMETER scope="SERVICE_REQUEST" value="strSesso" type="RELATIVE"/>	
+		  <PARAMETER scope="SERVICE_REQUEST" value="Telefono" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="Fax" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="mail" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="luogorif"  type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="flgAbilitato" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="flgUtConvenzione" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="note" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="codOP" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="datinizioval" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="datfineval" type="RELATIVE"/>
+          <PARAMETER scope="SESSION" value="_CDUT_" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="CDUT" type="RELATIVE"/>
+        </UPDATE_QUERY2>
+     	
+     	<INSERT_QUERY statement="PROF_INSERT_UTENTE">
+          <PARAMETER scope="SERVICE_REQUEST" value="CDUT" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="strlogin" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="password" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="strCodiceFiscale" type="RELATIVE" />
+          <PARAMETER scope="SERVICE_REQUEST" value="strCognome" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="strNome" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="datNasc" type="RELATIVE"/>		
+          <PARAMETER scope="SERVICE_REQUEST" value="strSesso" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="Telefono" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="Fax" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="mail" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="luogorif"  type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="flgAbilitato" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="flgUtConvenzione" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="note" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="codOP" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="datinizioval" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="datfineval" type="RELATIVE"/>
+          <PARAMETER scope="SERVICE_REQUEST" value="cdnLavoratore" type="RELATIVE"/> 
+          <PARAMETER scope="SESSION" value="_CDUT_" type="RELATIVE"/>
+          <PARAMETER scope="SESSION" value="_CDUT_" type="RELATIVE"/>
+        </INSERT_QUERY>
+        
+        </QUERIES>
+    </CONFIG>
+</MODULE> 
+
+<MODULE name="ProfNuovoUtente"   class="it.eng.sil.module.profil.ProfNuovoUtente" />
+
+
+<MODULE name="ProfProfilaturaUtente"   class="it.eng.sil.module.profil.ProfProfilaturaUtente" >
+   <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <SELECT_QUERY statement="PROF_SEL_PROFIL_UT">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdut"/>
+        </SELECT_QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE> 
+
+
+
+
+
+<MODULE name="ComboProfProfilDisponib"   class="it.eng.sil.module.ComboGenerica">
+ <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <SELECT_QUERY statement="PROF_SEL_PROFIL_DISPONIB">
+         <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdut"/>
+         </SELECT_QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE> 
+
+
+
+
+<MODULE name="ProfSalvaProfUt"   class="it.eng.sil.module.profil.ProfSalvaProfUt" >
+   <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <INSERT_QUERY statement="PROF_INSERT_PROFIL_DISPONIB">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgProfUt"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDUT"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnGruppo"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnProfilo"/>
+          <PARAMETER scope="SESSION" value="_CDUT_" type="RELATIVE"/>
+          <PARAMETER scope="SESSION" value="_CDUT_" type="RELATIVE"/>
+        </INSERT_QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE> 
+
+
+
+
+<MODULE name="ProfCancellaProfUt"   class="it.eng.sil.module.profil.ProfCancellaProfUt" >
+   <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <DELETE_QUERY statement="PROF_DELETE_PROFILAT_UT">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgProfilatura"/>
+        </DELETE_QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE> 
+
+
+
+
+<MODULE name="ComboTipoDoc"   class="it.eng.sil.module.ComboGenerica">
+ <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <SELECT_QUERY statement="COMBO_TIPO_DOC">
+        </SELECT_QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE> 
+
+
+<MODULE name="ComboTipoFile"   class="it.eng.sil.module.ComboGenerica">
+ <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <SELECT_QUERY statement="COMBO_TIPO_FILE">
+        </SELECT_QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE> 
+
+
+
+
+  <MODULE name="ListaTabDecod" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+      <CONFIG pool="SIL_DATI" rows="20">
+        <QUERIES>
+            <SELECT_QUERY>   
+             <STATEMENT_PROVIDER CLASS="it.eng.sil.module.preferenze.DynamicTabDecod"/>
+            </SELECT_QUERY>
+        </QUERIES>
+    </CONFIG>
+  </MODULE>
+
+
+  <MODULE name="DettaglioTabDecod" class="it.eng.sil.module.preferenze.DettaglioTabDecod" >
+      <CONFIG pool="SIL_DATI">
+      		<QUERY>
+		        <STATEMENT_PROVIDER CLASS="it.eng.sil.module.preferenze.DynamicDettaglioTabDecod"/>
+      		</QUERY>
+	  </CONFIG>
+  </MODULE>
+
+
+
+  <MODULE name="SalvaTabDecod" class="it.eng.sil.module.preferenze.SalvaTabDecod" >
+      <CONFIG pool="SIL_DATI">
+      		<QUERY_UPDATE>
+		        <STATEMENT_PROVIDER CLASS="it.eng.sil.module.preferenze.DynamicSalvaTabDecod"/>
+      		</QUERY_UPDATE>
+   			<QUERY_INSERT>
+		        <STATEMENT_PROVIDER CLASS="it.eng.sil.module.preferenze.DynamicNuovoTabDecod"/>
+      		</QUERY_INSERT>
+	  </CONFIG>
+  </MODULE>
+
+
+  <MODULE name="NuovoTabDecod" class="it.eng.sil.module.preferenze.NuovoTabDecod" >
+      <CONFIG pool="SIL_DATI" />
+  </MODULE>
+
+  <MODULE name="CancellaTabDecod" class="it.eng.sil.module.preferenze.CancellaTabDecod" >
+      <CONFIG pool="SIL_DATI">
+      		<QUERY/>
+	  </CONFIG>
+  </MODULE>
+
+
+	<MODULE name="M_CercaOperatori" class="it.eng.afExt.dispatching.module.impl.ListModule" >
+
+      <CONFIG pool="SIL_DATI" rows="15" title="Operatori">
+      <QUERIES>
+		<SELECT_QUERY statement="LOGINCERCA_OPERATORI">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="nome"/>
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cognome"/>
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="nome"/>
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cognome"/>
+		</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="strcognome" label="Cognome"/>
+			<COLUMN name="strnome" label="Nome"/>
+			<COLUMN name="datNasc" label="Data di nascita"/>
+			<COLUMN name="strSesso" label="Sesso"/>
+			<COLUMN name="strCodiceFiscale" label="Codice Fiscale"/>
+		</COLUMNS>
+		<CAPTIONS>
+		<SELECT_CAPTION image="../../img/add.gif" confirm="FALSE" label="Associa l'operatore">
+          <PARAMETER name="prgSpi" scope="LOCAL" type="RELATIVE" value="prgSpi" />
+          <PARAMETER name="strNome" scope="LOCAL" type="RELATIVE" value="strNome" />
+          <PARAMETER name="strCognome" scope="LOCAL" type="RELATIVE" value="strCognome" />
+          <PARAMETER name="strCodiceFiscale" scope="LOCAL" type="RELATIVE" value="strCodiceFiscale" />
+          <PARAMETER name="datNasc" scope="LOCAL" type="RELATIVE" value="datNasc" />
+      	</SELECT_CAPTION>
+      	</CAPTIONS>
+      </CONFIG>
+  </MODULE>
+
+  <MODULE name="UtentiConnessi"
+          class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+    <CONFIG pool="SIL_DATI" rows="30" title="LISTA UTENTI CONNESSI">
+      <QUERIES>
+            <SELECT_QUERY>
+             	<STATEMENT_PROVIDER CLASS="it.eng.sil.module.login.DynamicUtentiConnessiQuery"/>
+            </SELECT_QUERY>
+        </QUERIES>
+      <COLUMNS>
+        <COLUMN name="strlogin" label="User"/>
+        <COLUMN name="nominativo" label="Nominativo"/>
+        <COLUMN name="strip" label="IP"/>
+        <COLUMN name="dtminiziosessione" label="Data di accesso" />       
+        <COLUMN name="time" label="Tempo di connessione" />
+      </COLUMNS>
+      <CAPTIONS>
+        <SELECT_CAPTION image="../../img/detail.gif" confirm="FALSE" label="Visualizza Utente">
+          <PARAMETER name="PAGE" type="ABSOLUTE" value="DettaglioUtenteConnessoPage" scope=""/>
+          <PARAMETER name="CDUT" type="RELATIVE" value="CDUT" scope="LOCAL"/>
+          <PARAMETER name="ID" type="RELATIVE" value="id" scope="LOCAL"/>
+          <PARAMETER name="CDNFUNZIONE" scope="SERVICE_REQUEST" type="RELATIVE"  value="CDNFUNZIONE"/>
+        </SELECT_CAPTION>
+      </CAPTIONS>
+      <BUTTONS>
+      </BUTTONS>
+    </CONFIG>
+  </MODULE>
+  
+ <MODULE name="DettaglioUtenteConnesso"   class="it.eng.sil.module.login.DettaglioUtenteConnesso">
+ <CONFIG pool="SIL_DATI" title="">
+        <QUERY statement="DettaglioUtenteConnessoQuery">
+        	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDUT"/>
+        	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="id"/>
+        </QUERY>
+    </CONFIG>
+</MODULE>
+
+<MODULE name="checkMessage"   class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+    	<QUERY statement="checkMessageQuery">
+    		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	</QUERY>
+    </CONFIG>
+</MODULE>
+
+<MODULE name="message"   class="it.eng.sil.module.alert.MessageModule">
+	<CONFIG pool="SIL_DATI" title="">
+    	<QUERY statement="messageQuery">
+    		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	</QUERY>
+    </CONFIG>
+</MODULE>
+
+<MODULE name="MessaggiVisti"   class="it.eng.sil.module.alert.MessaggiVisti">
+	<CONFIG pool="SIL_DATI" title="">
+    	<QUERY />    		
+    </CONFIG>
+</MODULE>
+
+<MODULE name="InsertMessageForm"   class="com.engiweb.framework.dispatching.module.AbstractModule">
+	<CONFIG pool="SIL_DATI" title="">
+    	<QUERY />    		
+    </CONFIG>
+</MODULE>
+
+<MODULE name="InsertMessage"   class="it.eng.sil.module.amministrazione.GenericInsert">
+	<CONFIG pool="SIL_DATI" title="">
+	   	<QUERY statement="messageInsert">    
+    		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="MITTENTE"/>
+    		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CORPO"/>
+    		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="OGGETTO"/>
+    		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRIORITA"/>
+    		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATAINIZIO"/>
+    		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="ORAINIZIO"/>
+    		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATAFINE"/>
+    		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="ORAFINE"/>
+    	</QUERY>	
+    </CONFIG>
+</MODULE>
+<!-- 
+<MODULE name="RicercaMessage"   class="com.engiweb.framework.dispatching.module.AbstractModule">
+	<CONFIG pool="SIL_DATI" title="">
+	   	<QUERY/>	
+    </CONFIG>
+</MODULE>
+-->
+<MODULE name="ListaMessage"
+          class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+    <CONFIG pool="SIL_DATI" rows="30" title="LISTA MESSAGGI">
+      <QUERIES>
+            <SELECT_QUERY>
+             	<STATEMENT_PROVIDER CLASS="it.eng.sil.module.alert.DynamicListaMessageQuery"/>
+            </SELECT_QUERY>
+        </QUERIES>
+      <COLUMNS>
+        <COLUMN name="login" label="Mittente"/>
+        <COLUMN name="oggetto" label="Oggetto"/>
+        <COLUMN name="datainserimento" label="Data inserimento"/>
+        <COLUMN name="iniziovalidita" label="Data di inizio validit&amp;agrave;" />       
+        <COLUMN name="finevalidita" label="Data di fine validit&amp;agrave;" />
+      </COLUMNS>
+      <CAPTIONS>
+        <SELECT_CAPTION image="../../img/detail.gif" confirm="FALSE" label="Visualizza messaggio">
+          <PARAMETER name="PAGE" type="ABSOLUTE" value="DettaglioMessagePage" scope=""/>
+          <PARAMETER name="codmessaggio" type="RELATIVE" value="codmessaggio" scope="LOCAL"/>
+          <PARAMETER name="CDNFUNZIONE" scope="SERVICE_REQUEST" type="RELATIVE"  value="CDNFUNZIONE"/>
+        </SELECT_CAPTION>
+        <DELETE_CAPTION confirm="TRUE" label="Cancella">
+        	<PARAMETER name="PAGE" type="ABSOLUTE" value="ListaMessagePage" scope=""/>
+			<PARAMETER name="ELIMINA" type="ABSOLUTE" value="TRUE" scope=""/>	
+          	<PARAMETER name="codmessaggio" type="RELATIVE" value="codmessaggio" scope="LOCAL"/>
+          	<PARAMETER name="TIPORICERCA" type="RELATIVE" value="TIPORICERCA" scope="SERVICE_REQUEST"/>
+        </DELETE_CAPTION>
+      </CAPTIONS>
+      <BUTTONS>
+      </BUTTONS>
+    </CONFIG>
+  </MODULE>
+  
+  <MODULE name="DeleteMessage"   class="it.eng.sil.module.amministrazione.GenericDelete">
+	<CONFIG pool="SIL_DATI" title="">
+	   	<QUERY statement="messageDelete">    
+    		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codmessaggio"/>
+    	</QUERY>	
+    </CONFIG>
+</MODULE>
+
+  <MODULE name="DettaglioMessage"   class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+	   	<QUERY statement="messageSelect">    
+	 		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codmessaggio"/>
+    	</QUERY>	
+    </CONFIG>
+</MODULE>
+
+
+  <MODULE name="Monitoraggio"   class="it.eng.sil.module.login.Monitoraggio">
+	<CONFIG pool="SIL_DATI" title="" >
+		  <QUERIES>
+	        <SELECT_QUERY statement="MONITORAGGIO_LOGIN">
+	                <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+	        </SELECT_QUERY>
+	      </QUERIES> 
+     </CONFIG>
+  </MODULE>
+
+
+
+  <MODULE name="profMonitoraggio"   class="it.eng.sil.module.profil.ProfMonitoraggio" />
+
+
+  <MODULE name="ProfMonitoraggioSalva"   class="it.eng.sil.module.profil.ProfMonitoraggioSalva" />
+	
+
+
+
+
+<MODULE name="loginConvenzione"   class="it.eng.sil.module.login.Login" />
+
+<MODULE name="eseguiLoginConvenzione"   class="it.eng.sil.module.login.EseguiLoginConvenzione" >
+   <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <SELECT_QUERY statement="LOGIN_CONVENZIONE">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="USERNAME"/>          
+        </SELECT_QUERY>       
+        <QUERY_PARAM statement="QUERY_PARAM_TENTATIVI" />             		
+        <QUERY_NUMTENTATIVI statement="AGGIORNA_NUMTENTATIVI_UTENTE"/>        
+        <QUERY_RESET_NUMTENTATIVI statement="RESET_NUMTENTATIVI">      
+       		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_" /> 
+    	</QUERY_RESET_NUMTENTATIVI>
+      </QUERIES>
+    </CONFIG>
+</MODULE>
+
+<MODULE name="registraAccessoUtConvenzionato"  class="it.eng.sil.module.login.RegistraAccessoUtConvenzionato" >
+   <CONFIG pool="SIL_DATI">
+        <QUERY statement="REGISTRA_ACCESSO_UT_CONVENZIONATO"/>
+   </CONFIG>
+</MODULE>  
+
+ <MODULE name="checkUtenteConvenzione"   class="it.eng.sil.module.amministrazione.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" > 
+	    <QUERY statement="CHECK_UTENTE_CONVENZIONE">    
+	 		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	</QUERY>
+     </CONFIG>
+ </MODULE>
+
+<MODULE name="ProfSbloccaUtente"   class="it.eng.sil.module.profil.ProfSbloccaUtente" >
+	<CONFIG pool="SIL_DATI" title="" > 
+		<QUERIES>
+		    <UPDATE_QUERY statement="PROF_SBLOCCA_UTENTE">    
+		 		<PARAMETER scope="SESSION" value="_CDUT_" type="RELATIVE"/>
+	          <PARAMETER scope="SERVICE_REQUEST" value="CDUT" type="RELATIVE"/>
+	    	</UPDATE_QUERY>
+	    </QUERIES>
+     </CONFIG>
+</MODULE> 

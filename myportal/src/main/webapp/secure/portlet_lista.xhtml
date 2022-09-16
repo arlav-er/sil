@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="/secure/template/main.xhtml">
+
+	<ui:param name="bean" value="#{listaPortletBean}" />
+	<ui:param name="form_id" value="listaPortletForm" />
+
+	<ui:define name="title"><h:outputText value="#{msg['personalizza_scrivania.titolo']}" escape="false" /></ui:define>
+
+	<ui:define name="custom_js">
+		<h:outputScript library="js" name="jquery.form.js"></h:outputScript>
+	</ui:define>
+
+	<ui:define name="content">
+		<br />
+		<h:outputText value="#{msg['personalizza_scrivania.descrizione']}" escape="false" />
+		<br />
+		<h:form id="#{form_id}">
+			<center>
+				<h:dataTable id="portlet_list" style="width: 50%;"
+					rendered="#{not empty listaPortletBean.portletsAttive}"
+					summary="Lista delle portlet" columnClasses=",,ac_col4 notSortable"
+					value="#{listaPortletBean.portletsAttive}" var="portlet">
+					<h:column>
+						<f:facet name="header">Servizio</f:facet>
+						<h:outputText value="#{portlet.descrizione}" />
+					</h:column>
+
+					<h:column>
+						<h:commandLink styleClass="buttonStyle width-auto"
+							rendered="#{not portlet.visualizza}"
+							title="Aggiungi alla scrivania"
+							action="#{listaPortletBean.visualizzaPortletScrivania(portlet.idPortlet)}"
+							value="Aggiungi" id="aggiungiPortlet">
+						</h:commandLink>
+					</h:column>
+
+				</h:dataTable>
+			</center>
+
+			<script type="text/javascript">
+				$(function() {
+					selectMasterTab('#portlets_link');
+					generateDataTable(jq('#{form_id}:portlet_list'));		
+					disegnaBottoni();				
+				});				
+			</script>
+			<cc:messages />
+
+		</h:form>
+
+		<br />
+	</ui:define>
+</ui:composition>

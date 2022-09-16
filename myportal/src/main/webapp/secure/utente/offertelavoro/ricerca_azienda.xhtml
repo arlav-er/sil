@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/secure/template/main.xhtml"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<ui:param name="bean" value="#{ricercaAziendaBean}" />
+	
+	<ui:define name="title">
+		<h:outputText value="#{msg['cittadino.ricerca_azienda.titolo']}"
+			escape="false" />
+	</ui:define>
+	
+	<ui:define name="content">
+		<h:outputStylesheet library="css" name="pagination_datatable.css"/>
+		<style>
+			a.page-link{ text-decoration: none; }
+		</style>
+		
+		<h:outputText value="#{msg['cittadino.ricerca_azienda.descrizione']}"
+			escape="false" />
+		<cc:messages id="messages" />
+		
+		<h:form id="ricercaForm">
+			<div style="height: 60%" class="widget_container ui-tabs ui-widget-content ui-corner-all inheritOverflow">
+				<h:outputScript library="js" name="utils.js" />
+				<div>
+					<span style="margin: 0em 2em">
+						<h:outputLabel id="label_nome" value="Nome:"
+							class="ricercaCosa" style="margin-right: 1em" />
+						<cc:inputText id="nome" disableLabel="true" layout="inline"
+							title="Nome dell'azienda" required="false" value="#{bean.nome}"
+							styleClass="inner-shadow ricercaCosaInputText" />
+					</span>
+				
+					<span style="margin: 0em 2em">
+						<h:outputLabel id="label_dove" value="Dove:" 
+							class="ricercaDove" style="margin-right: 1em"/>
+	
+						<ui:fragment rendered="#{bean.searchType=='C'}">
+							<cc:inputSuggestion id="doveComune" disableLabel="true"
+								required="false" value="#{bean.dove}" autocomplete="false"
+								valueCod="#{bean.doveCod}" disableAjax="false"
+								styleClass="inner-shadow ricercaDoveInputText"
+								suggestionPath="comuni" layout="inline">
+								<f:validator validatorId="comuneSuggestionValidator"
+									for="function" />
+							</cc:inputSuggestion>
+						</ui:fragment>
+	
+						<ui:fragment rendered="#{bean.searchType=='P'}">
+							<cc:inputSuggestion id="doveProvincia" disableLabel="true"
+								required="false" value="#{bean.dove}" autocomplete="false"
+								valueCod="#{bean.doveCod}" disableAjax="false"
+								styleClass="inner-shadow ricercaDoveInputText"
+								suggestionPath="provincie" layout="inline">
+								<f:validator validatorId="provinciaSuggestionValidator"
+									for="function" />
+							</cc:inputSuggestion>
+						</ui:fragment>
+					</span>
+						
+					<span style="display: inline-block; vertical-align: middle">
+					<cc:selectOneRadio id="tipo_ricerca" value="#{bean.searchType}"
+						style="width: 15em" disableAjaxChange="false" eventChange="sbiancaCampi"
+						valueDescription="Area amministrativa">
+						<f:selectItem id="comune" itemLabel="Comune" itemValue="C" />
+						<f:selectItem id="provincia" itemLabel="Provincia" itemValue="P" />
+					</cc:selectOneRadio>
+					</span>
+					
+					<span>
+						<h:commandLink tabindex="0" id="searchButton" style="margin-left: 1em"
+							styleClass="searchButton" value="Cerca" action="#{bean.search}">
+						</h:commandLink>
+					</span>
+				</div>
+				<ui:fragment rendered="#{bean.showEntiAccreditatiParam()}">
+					<div style="margin-top: 1em;">
+						<h:outputLabel value="Mostra:" 
+							style="font-size: large; font-style: italic; margin: 0em 1em; width: 6em; text-align: center;" />
+						<span style="display: inline-block; vertical-align: middle;">
+							<cc:selectOneMenu id="enti_accreditati" value="#{bean.entiAccreditati}"
+								disableAjaxChange="false" eventChange="sbiancaCampi"
+								valueDescription="Area amministrativa">
+								<f:selectItem itemLabel="Tutte le aziende" itemValue="TUTTI" />
+								<f:selectItem itemLabel="Solo enti accreditati" itemValue="SI" />
+								<f:selectItem itemLabel="Escludi gli enti accreditati" itemValue="NO" />
+							</cc:selectOneMenu>
+						</span>
+					</div>
+				</ui:fragment>
+			</div>
+		</h:form>
+		<br />
+		
+		<cc:waiting id="searchLoader" hidden="true" waitMessage="Ricerca in corso..." />
+		
+		<h:form id="listForm">
+			<div style="display:none">
+				<h:inputHidden id="pageValue" value="#{bean.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{bean.changePage}" value="PAGINATION DUMMY">
+					<f:ajax execute=":listForm:pageValue" render=":listForm:tabella" />
+				</h:commandButton>
+			</div>
+				
+			<ui:fragment rendered="#{bean.ricercaEseguita and empty bean.risultato}">	
+				<h3 class="nessun_elemento_trovato">Nessuna azienda trovata</h3>
+			</ui:fragment>
+					
+			<ui:fragment rendered="#{bean.ricercaEseguita and not empty bean.risultato}">
+				<script type="text/javascript">
+					$(function() {							
+					    $("#listForm\\:paginationBar").pagination({							    
+					    	pages: #{bean.paginationHandler.pages()},						       
+					        cssStyle: 'light-theme',
+					        prevText: 'Prec.',
+					        nextText: 'Succ.',
+					        onPageClick: function (pageNumber, event) {							        
+					        	document.getElementById('listForm:pageValue').value = pageNumber;
+					            document.getElementById('listForm:pageCommand').click();
+					            $(jq("listForm:tabella")).hide();					            
+					            $(jq("listForm:paginationLoader")).show();
+						    }
+					    });
+					});
+				</script>
+					
+				<h:panelGroup id="paginationBar" class="widget_container ui-tabs ui-widget-content ui-corner-all" />
+				<br />
+				
+				<cc:waiting id="paginationLoader" hidden="true" waitMessage="Caricamento..." />
+					
+				<h:panelGroup id="tabella" class="dataTables_wrapper">
+					<table class="dataTable">
+						<tr>
+							<th class="ui-state-default">Nome</th>
+							<th class="ui-state-default">Comune</th>
+						</tr>	
+						
+						<ui:repeat value="#{bean.risultato}" var="azienda" varStatus="status">
+							<tr>
+								<td>
+									<h3>
+										<h:outputLink rendered="#{azienda.vetrina}" class="detail"
+											value="#{request.contextPath}/faces/secure/azienda/vetrina/view_new.xhtml?id=#{azienda.id}"
+											title="Visualizza vetrina">
+											<h:outputText value="#{azienda.ragioneSociale}" />
+										</h:outputLink>
+
+										<h:outputText rendered="#{not azienda.vetrina}"
+											value="#{azienda.ragioneSociale}" />
+									</h3>
+								</td>
+								
+								<td>
+									<h:outputText value="#{azienda.denominazioneComune}" />
+								</td>
+							</tr>
+						</ui:repeat>
+							
+						<script type="text/javascript">
+							$(jq("listForm:paginationLoader")).hide();
+							disegnaBottoni();		
+						</script>
+					</table>
+				</h:panelGroup>
+			</ui:fragment>
+		</h:form>
+		
+		<div>
+			<cc:btnBack backTo="#{ricercaAziendaBean.backTo}" />
+		</div>
+			
+		<script type="text/javascript">	
+			function onSearch(data) {
+				if(data.status == 'begin') {
+					$(jq("searchLoader")).show();
+					$(jq("listForm")).hide();
+				} else if (data.status == 'success') {
+					$(jq("searchLoader")).hide();
+				}
+			}
+					
+			function sbiancaCampi() {
+				disegnaBottoni();
+				$(jq("ricercaForm:doveComune:inputText")).prop('value','');
+				$(jq("ricercaForm:doveProvincia:inputText")).prop('value','');
+			}
+		</script>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,209 @@
+<PAGE distributed="false" name="CL_testPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CLCandidatura"/>
+	    <MODULE keep="false" name="M_CLRicercaPersonale"/>		
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CL_testPage" target="M_CLCandidatura">
+			<CONDITIONS>
+					<PARAMETER name="CODICEFISCALE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+					<PARAMETER name="TIPOLOGIA" scope="SERVICE_REQUEST" value="1"/>
+			</CONDITIONS>
+     	</DEPENDENCE>
+		<DEPENDENCE source="CL_testPage" target="M_CLRicercaPersonale">
+			<CONDITIONS>
+				<PARAMETER name="PRGRICHIESTA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="PRGALTERNATIVA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="TIPOLOGIA" scope="SERVICE_REQUEST" value="2"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CL_INVIO_CANDIDATURA" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_INVIO_CURRICULUM" />
+		<MODULE keep="false" name="M_CL_ESISTE_CV_VALIDO"/>
+		<MODULE keep="false" name="M_CL_CHECK_CITTADINANZA_VALIDA"/>
+		<MODULE keep="false" name="M_CL_CHECK_TIPO_ESPERIENZA"/>
+		<MODULE keep="false" name="M_CL_CHECK_TIPO_ESPERIENZA_CONTRATTO"/>
+		<MODULE keep="false" name="M_CL_GET_CANDIDATURA"/>
+		<MODULE keep="false" name="M_CL_GET_AMBITO_CANDIDATURA"/>
+		<MODULE keep="false" name="M_CL_COMBO_AMBITO_DIFFUSIONE"/>
+		<MODULE keep="false" name="M_CLCandidatura"/>
+		<MODULE keep="false" name="M_GetCpiPoloProvinciale"/>
+		<MODULE keep="false" name="M_CL_GET_CPI_CAPOLUOGO"/>
+		<MODULE keep="false" name="M_CL_COMBO_STATO_INVIO"/>
+		<MODULE keep="false" name="M_CONFIG_D_VAL_CURR"/>		
+	</MODULES>
+	<DEPENDENCIES>
+	
+		<DEPENDENCE source="CL_INVIO_CANDIDATURA" target="M_CONFIG_INVIO_CURRICULUM"/>
+		<DEPENDENCE source="CL_INVIO_CANDIDATURA" target="M_CONFIG_D_VAL_CURR"/>		
+		
+		<DEPENDENCE source="M_CONFIG_INVIO_CURRICULUM" target="M_CL_GET_CPI_CAPOLUOGO"/>
+		<DEPENDENCE source="M_CONFIG_INVIO_CURRICULUM" target="M_CLCandidatura">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="CODICEFISCALE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="TIPOLOGIA" scope="SERVICE_REQUEST" value="1"/>
+				<PARAMETER name="EXEC_SEND" scope="SERVICE_REQUEST" value="YES"/> 
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CONFIG_INVIO_CURRICULUM" target="M_CL_GET_CANDIDATURA">
+			<CONDITIONS>
+				<PARAMETER name="prgcandidatura" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="is_insert" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CONFIG_INVIO_CURRICULUM" target="M_CL_GET_AMBITO_CANDIDATURA">
+			<CONDITIONS>
+				<PARAMETER name="prgcandidatura" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="is_insert" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CONFIG_INVIO_CURRICULUM" target="M_CL_COMBO_AMBITO_DIFFUSIONE"/>
+		<DEPENDENCE source="M_CONFIG_INVIO_CURRICULUM" target="M_CL_COMBO_STATO_INVIO"/>
+		<DEPENDENCE source="M_CONFIG_INVIO_CURRICULUM" target="M_CL_ESISTE_CV_VALIDO">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CONFIG_INVIO_CURRICULUM" target="M_CL_CHECK_CITTADINANZA_VALIDA">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CONFIG_INVIO_CURRICULUM" target="M_CL_CHECK_TIPO_ESPERIENZA">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CONFIG_INVIO_CURRICULUM" target="M_CL_CHECK_TIPO_ESPERIENZA_CONTRATTO">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CONFIG_INVIO_CURRICULUM" target="M_GetCpiPoloProvinciale"/>
+		
+		<DEPENDENCE source="M_CLCandidatura" target="M_CL_GET_CANDIDATURA">
+			<CONDITIONS>
+				<PARAMETER name="is_insert" scope="SERVICE_REQUEST" value="1"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+		      	<PARAMETER name="prgcandidatura" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_CLCANDIDATURA.new_prgcandidatura"/>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CLCandidatura" target="M_CL_GET_AMBITO_CANDIDATURA">
+			<CONDITIONS>
+				<PARAMETER name="is_insert" scope="SERVICE_REQUEST" value="1"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+		      	<PARAMETER name="prgcandidatura" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_CLCANDIDATURA.new_prgcandidatura"/>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CL_LIST_INVII_CANDIDATURE_PAGE" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CL_LIST_INVII_CANDIDATURE"/>
+		<MODULE keep="false" name="M_CL_ESISTE_CANDIDATURA_VALIDA"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CL_LIST_INVII_CANDIDATURE_PAGE" target="M_CL_LIST_INVII_CANDIDATURE">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="CL_LIST_INVII_CANDIDATURE_PAGE" target="M_CL_ESISTE_CANDIDATURA_VALIDA">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CL_INVIO_CANDIDATURA_ANTEPRIMA" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_CONFIG_INVIO_CURRICULUM" />
+		<MODULE name="M_GetDatiAnagraficiAnteprimaCandidatura" />
+		<MODULE name="M_GetDatiDomicilioAnteprimaCandidatura" />
+		<MODULE name="M_GetDatiRecapitiAnteprimaCandidatura" />
+		<MODULE name="M_GetDatiEsperienzaLavAnteprimaCandidatura" />
+		<MODULE name="M_GetDatiEsperienzaLavAnteprimaCandidaturaDefault" />
+		<MODULE name="M_GetDatiIstruzioneAnteprimaCandidatura" />
+		<MODULE name="M_GetDatiFormazioneAnteprimaCandidatura" />
+		<MODULE name="M_GetDatiLingueAnteprimaCandidatura" />
+		<MODULE name="M_GetDatiConoscenzeInformaticheAnteprimaCandidatura" />
+		<MODULE name="M_GetDatiAlbiAnteprimaCandidatura" />
+		<MODULE name="M_GetDatiPatentiAnteprimaCandidatura" />
+		<MODULE name="M_GetDatiPatentiniAnteprimaCandidatura" />
+		<MODULE name="M_GetDatiMansioniAnteprimaCandidatura" />
+		<MODULE name="M_GetListaComuniAnteprimaCandidatura" />
+		<MODULE name="M_GetDatiAlbiAnteprimaCandidaturaDefault" />
+		<MODULE name="M_GetDatiPatentiAnteprimaCandidaturaDefault" />
+		<MODULE name="M_GetDatiPatentiniAnteprimaCandidaturaDefault" />
+		<MODULE name="M_ListForProTipoCorso" />
+		<MODULE name="M_ListForProAmbDiscip" />
+		<MODULE name="M_GetAnnotazioniAnteprimaCandidatura" />
+    </MODULES>   
+    <DEPENDENCIES>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_CONFIG_INVIO_CURRICULUM"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiAnagraficiAnteprimaCandidatura"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiDomicilioAnteprimaCandidatura"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiRecapitiAnteprimaCandidatura"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiEsperienzaLavAnteprimaCandidatura"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiEsperienzaLavAnteprimaCandidaturaDefault"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiIstruzioneAnteprimaCandidatura"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiFormazioneAnteprimaCandidatura"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiLingueAnteprimaCandidatura"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiConoscenzeInformaticheAnteprimaCandidatura"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiAlbiAnteprimaCandidatura"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiPatentiAnteprimaCandidatura"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiPatentiniAnteprimaCandidatura"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiAlbiAnteprimaCandidaturaDefault"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiPatentiAnteprimaCandidaturaDefault"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiPatentiniAnteprimaCandidaturaDefault"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetDatiMansioniAnteprimaCandidatura"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetListaComuniAnteprimaCandidatura"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_ListForProTipoCorso"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_ListForProAmbDiscip"/>
+    	<DEPENDENCE source="CL_INVIO_CANDIDATURA_ANTEPRIMA" target="M_GetAnnotazioniAnteprimaCandidatura"/>
+    </DEPENDENCIES> 
+</PAGE>
+<PAGE distributed="false" name="ImportazioneMassivaCandidaturePage" scope="REQUEST">
+	
+	<MODULES>
+		<MODULE keep="false" name="M_Num_Tmp_Massivo" />
+		<MODULE keep="false" name="M_CL_GET_CPI_CAPOLUOGO"/>
+		<MODULE keep="false" name="M_Check_Invio_InCorso"/>
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="ImportazioneMassivaCandidaturePage" target="M_Check_Invio_InCorso" />
+	    <DEPENDENCE source="ImportazioneMassivaCandidaturePage" target="M_CL_GET_CPI_CAPOLUOGO" />
+		<DEPENDENCE source="ImportazioneMassivaCandidaturePage" target="M_Num_Tmp_Massivo" />
+	</DEPENDENCIES>
+	
+</PAGE>
+<PAGE distributed="false" name="INVIO_MASSIVO_CV_PAGE" scope="REQUEST">
+       <MODULES>
+         <MODULE keep="false" name="M_Check_Invio_InCorso"/>
+         <MODULE keep="false" name="M_Load_Tmp_Massivo"/>
+		 <MODULE keep="false" name="M_Invio_Massivo"/>
+		 <MODULE keep="false" name="M_CL_GET_CPI_CAPOLUOGO"/>
+		 <MODULE keep="false" name="M_CONFIG_D_VAL_CURR"/>
+	   </MODULES>
+	   <DEPENDENCIES>
+	     <DEPENDENCE source="INVIO_MASSIVO_CV_PAGE" target="M_Check_Invio_InCorso" />
+	     <DEPENDENCE source="INVIO_MASSIVO_CV_PAGE" target="M_CONFIG_D_VAL_CURR" />
+	     <DEPENDENCE source="INVIO_MASSIVO_CV_PAGE" target="M_CL_GET_CPI_CAPOLUOGO" />
+	     <DEPENDENCE source="INVIO_MASSIVO_CV_PAGE" target="M_Load_Tmp_Massivo"/>
+	     <DEPENDENCE source="M_Load_Tmp_Massivo" target="M_Invio_Massivo">
+	         <CONDITIONS>
+				<PARAMETER name="M_Load_Tmp_Massivo.ROWS.ROW" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+			</CONDITIONS>
+	     </DEPENDENCE>
+	   </DEPENDENCIES>
+</PAGE>

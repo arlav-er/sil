@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<composite:interface>
+		<composite:attribute name="list" type="java.util.List"></composite:attribute>
+		<composite:attribute name="dirette" type="Boolean" default="true"
+			shortDescription="Se true significa che le vacancies visualizzate sono vacancies pubblicate direttamente dall'azienda"></composite:attribute>
+	</composite:interface>
+
+	<composite:implementation>
+		<div id="#{cc.clientId}">
+			<b><h:outputText
+					value="Elenco offerte di lavoro pubblicate"
+					rendered="#{not empty cc.attrs.list and cc.attrs.dirette}" /> <h:outputText
+					value="Elenco offerte di lavoro pubblicate da un Centro per l'impiego per conto dell'azienda"
+					rendered="#{not empty cc.attrs.list and not cc.attrs.dirette}" /></b>
+			<h:dataTable id="vacancy_list" value="#{cc.attrs.list}"
+				rendered="#{not empty cc.attrs.list}" columnClasses=",,notSortable"
+				var="vacancy">
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Gruppo professionale" />
+					</f:facet>
+
+					<h:outputText value="#{vacancy.strMansione}" />
+				</h:column>
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Ultima modifica" />
+
+					</f:facet>
+					<h:outputText value="#{vacancy.dtmMod}">
+						<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+					</h:outputText>
+				</h:column>
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="" />
+					</f:facet>
+
+					<h:link styleClass="buttonStyle" outcome="visualizza_vacancy"
+						title="Visualizza">
+						<f:param name="id" value="#{vacancy.id}" />
+						<span class="ui-icon ui-icon-document fix_icon"></span>
+					</h:link>
+
+				</h:column>
+			</h:dataTable>
+		</div>
+		<script type="text/javascript">
+			$(function() {
+				generateDataTable(jq('#{cc.clientId}:vacancy_list'));	
+				disegnaBottoni();
+			});
+		</script>
+	</composite:implementation>
+</ui:composition>

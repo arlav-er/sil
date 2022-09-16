@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui">
+
+	<ui:repeat var="lingue" value="#{curriculumVitaePfBean.cvLinguePfSection.listaLingue}">
+		<article id="#{lingue.idCvLingua}" class="media" tabindex="0">
+			<span class="pull-left">
+				<span class="fa-stack fa-lg">
+					<i class="fa fa-circle fa-stack-2x" aria-hidden="true"></i>
+					<i class="fa fa-language fa-stack-1x text-white" aria-hidden="true"></i>
+				</span>
+			</span>
+
+			<div class="media-body">
+				<div class="pull-right text-center text-muted article-controls-container">
+					<div class="article-controls hidden">
+						<p:commandLink actionListener="#{curriculumVitaePfBean.cvLinguePfSection.editLingue(lingue)}"
+							update=":lingueForm:syncForm"
+							oncomplete="MyPortal.Curriculum.callEditArticleComplete(args, xhr, status, this.source)"
+							styleClass="article-control" process="@this">Modifica</p:commandLink>
+
+						<a data-toggle="confirm" class="article-control">Cancella</a>
+						<p:commandLink name="removeArticle"
+							actionListener="#{curriculumVitaePfBean.cvLinguePfSection.removeLingua(lingue)}"
+							oncomplete="MyPortal.Curriculum.syncArticleComplete(args, xhr, status);" update=":lingueForm:articles"
+							process="@this" styleClass="remove-article hidden"></p:commandLink>
+
+					</div>
+					<br />
+				</div>
+				<span class="h4 title">#{lingue.deLingua.denominazione}</span>
+				<ui:fragment rendered="#{not lingue.flagMadrelingua	and not empty lingue.deGradoLinSilScritto}">
+					<small class="block" style="text-script: bold"> | Scritto: </small>
+					<span class="h5 uk-marign-small-left"> #{lingue.deGradoLinSilScritto.codIdo}</span>
+				</ui:fragment>
+
+				<ui:fragment rendered="#{not lingue.flagMadrelingua	and not empty lingue.deGradoLinSilLetto}">
+					<small class="block" style="text-script: bold"> | Letto: </small>
+					<span class="h5 uk-marign-small-left"> #{lingue.deGradoLinSilLetto.codIdo}</span>
+				</ui:fragment>
+
+				<ui:fragment rendered="#{not lingue.flagMadrelingua	and not empty lingue.deGradoLinSilParlato}">
+					<small class="block" style="text-script: bold"> | Parlato: </small>
+					<span class="h5 uk-marign-small-left"> #{lingue.deGradoLinSilParlato.codIdo}</span>
+				</ui:fragment>
+
+
+				<ui:fragment rendered="#{lingue.flagMadrelingua}">
+					<span class="h5 uk-marign-small-left"> | #{ui['lingue.madrelingua']}</span>
+				</ui:fragment>
+			</div>
+		</article>
+	</ui:repeat>
+</ui:composition>

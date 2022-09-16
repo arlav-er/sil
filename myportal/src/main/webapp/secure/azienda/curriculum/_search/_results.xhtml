@@ -1,0 +1,114 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui">
+	<h:form id="curriculumResultsForm">
+		<h:panelGroup id="curriculumResultsGroup">
+			<div class="col-md-12 m-t-20">
+				<div class="col-md-12 search-results jobs-items">
+					<p:dataGrid id="curriculumResultsDataGrid" lazy="true" rows="5" paginator="true" columns="1" var="curriculum"
+						value="#{cercaCurriculumPfBean.curriculumModel}" emptyMessage="#{ui['shared.noRecordsFound']}"
+						widgetVar="curriculumResultsGridWV" style="display: none;"
+						first="#{cercaCurriculumPfBean.dataGridFirstPage}" rowsPerPageTemplate="5, 10, 25"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink}
+								{LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="{currentPage} di {totalPages} ({totalRecords})">
+						<p:ajax event="page" listener="#{cercaCurriculumPfBean.onDataGridPageChange}"
+							oncomplete="MyPortal.CurriculumSearch.pageChangeEvent();" />
+						<div id="job-#{curriculum.idCvDatiPersonali}" class="job-item">
+							<div class="job-summary">
+								<div class="job-title">
+									<h2 class="curriculum-title">
+										<h:link outcome="/secure/utente/curriculum/view_pf.xhtml" styleClass="job-link">
+											<f:param name="id" value="#{curriculum.idCvDatiPersonali}" />
+                                             #{curriculum.descrizione} 
+                                        </h:link>
+										|
+										<small>
+											<p:commandLink actionListener="#{curriculumOffcanvasBean.onDatiPersonaliSelected(curriculum)}"
+												process="@this" update=":canvasPanel" oncomplete="$.UIkit.offcanvas.show('#canvasView');">
+												<i class="fa fa-bolt" aria-hidden="true"></i>
+                                                    Quick Preview
+                                            </p:commandLink>
+										</small>
+									</h2>
+									<div class="job-posted-date pull-right">
+										Aggiornato
+										<time class="timeago" datetime="#{cercaCurriculumPfBean.formatDateIntoISO(curriculum.dtmMod)}"></time>
+										<div class="grid-actions">
+											<ui:fragment rendered="#{!sessionBean.provincia}">
+												<p:commandLink oncomplete="$('#contatta-modal').modal('show')">
+													<f:setPropertyActionListener value="#{curriculum}"
+														target="#{cercaCurriculumPfBean.selectedDatiPersonali}"></f:setPropertyActionListener>
+										      Contatta lavoratore
+										    </p:commandLink>
+											</ui:fragment>
+
+											<ui:remove>
+												<h:link outcome="/secure/azienda/messaggi/index">
+													<ui:remove>
+														<!-- ID del messaggio non disponibile qui, capire come fare -->
+														<f:param name="id" value="#{curriculum.idMsgMessaggio}" />
+													</ui:remove>
+													<f:param name="tab" value="contatti_ricevuti" />
+												Messaggi</h:link>
+											</ui:remove>
+										</div>
+									</div>
+								</div>
+								<div class="job-description clamp">#{curriculum.indirizzoProfilo}</div>
+								<div class="job-istat">
+									<ui:fragment rendered="#{not empty curriculum.deComuneDomicilio}">
+										<span>Domicilio:</span>
+										<span style="color: #8e8e8e;">#{curriculum.deComuneDomicilio.denominazione}</span>
+									</ui:fragment>
+								</div>
+
+								<div class="job-istat">
+									<ui:fragment rendered="#{not empty curriculum.provenienzaCurriculum}">
+										<span>Provenienza:</span>
+										<span style="color: #8e8e8e;">#{curriculum.provenienzaCurriculum.descrizione}</span>
+									</ui:fragment>
+								</div>
+
+								<div class="job-tags">
+									<ui:fragment rendered="#{not empty curriculum.provenienzaCurriculum}">
+										<ui:fragment rendered="#{curriculum.cvAltreInfo.flagAutomunito}">
+											<span class="job-tag" href="#" title="#{curriculum.cvAltreInfo.flagAutomunito}">Automunito</span>
+										</ui:fragment>
+										<ui:fragment rendered="#{curriculum.cvAltreInfo.flagMotomunito}">
+											<span class="job-tag" href="#" title="#{curriculum.cvAltreInfo.flagMotomunito}">Motomunito</span>
+										</ui:fragment>
+									</ui:fragment>
+									<ui:fragment rendered="#{not empty curriculum.cvLinguas}">
+										<ui:repeat value="#{cercaCurriculumPfBean.getListFromSet(curriculum.cvLinguas)}" var="lingua"
+											varStatus="linguaLoop">
+											<ui:fragment rendered="#{linguaLoop.index lt 3}">
+												<span class="job-tag" href="#" title="">#{lingua.deLingua.denominazione}</span>
+											</ui:fragment>
+										</ui:repeat>
+									</ui:fragment>
+
+									<ui:fragment rendered="#{not empty curriculum.cvIstruziones}">
+										<ui:repeat value="#{cercaCurriculumPfBean.getListFromSet(curriculum.cvIstruziones)}" var="istr"
+											varStatus="istrLoop">
+											<ui:fragment rendered="#{istrLoop.index lt 3}">
+												<span class="job-tag" href="#" title="">#{istr.deTitolo.descrizione}</span>
+											</ui:fragment>
+										</ui:repeat>
+									</ui:fragment>
+
+								</div>
+							</div>
+						</div>
+					</p:dataGrid>
+
+				</div>
+				<br />
+				<p:button styleClass="btn btn-primary ui-button" href="#{cercaCurriculumPfBean.backTo}"
+						  rendered="#{not empty cercaCurriculumPfBean.backTo}" value="Torna alla scrivania"
+						  onclick="buttonToDisable = MyPortal.enableLoadingButton(this)" />
+			</div>
+		</h:panelGroup>
+	</h:form>
+</ui:composition>
+

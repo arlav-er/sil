@@ -1,0 +1,2781 @@
+<!-- Gestione Conoscenze Informatiche -->
+
+  <STATEMENT name="LOAD_CONOSCENZE_INFO" query="
+ SELECT 
+      PRI.PRGINFO,
+      PRI.FLGCERTIFICATO AS CERTIFICATO,
+      TI.STRDESCRIZIONE AS DESC_TIPO,
+      DI.STRDESCRIZIONE || decode(MNCI.DES_CONOSCENZA,'',' (Min: nessuna corrispondenza)',null,' (Min: nessuna corrispondenza)',' (Min: ' || MNCI.DES_CONOSCENZA || ')') AS DESC_DETTAGLIO,
+      GI.STRDESCRIZIONE || decode(MNGCI.DES_GRADOCONOSC,'',' (Min: nessuna corrispondenza)',null,' (Min: nessuna corrispondenza)',' (Min: ' || MNGCI.DES_GRADOCONOSC || ')') AS DESC_GRADO,
+      MI.STRDESCRIZIONE AS DESC_MODALITA
+    FROM 
+      PR_INFO PRI,  
+      DE_TIPO_INFO TI,
+      DE_DETT_INFO DI,
+  	  DE_GRADO_INFO GI,
+	  DE_MODO_INFO MI,
+	  MA_CONSC_INF MACI,
+	  MN_CONSC_INF MNCI,
+	  MN_GRADO_CONSC_INF MNGCI,
+	  MA_GRADO_CONSC_INF MAGCI
+    WHERE PRI.CDNLAVORATORE = ? 
+	  AND PRI.CDNGRADO = GI.CDNGRADO(+) 
+	  AND DI.CODDETTINFO = MACI.CODDETTINFO
+	  AND GI.CDNGRADO = MAGCI.CDNGRADO (+)
+	  AND MAGCI.COD_GRADOCONOSC = MNGCI.COD_GRADOCONOSC(+)
+	  AND MACI.COD_CONOSCENZA = MNCI.COD_CONOSCENZA(+)
+	  AND TI.CODTIPOINFO(+) = PRI.CODTIPOINFO
+      AND DI.CODDETTINFO(+) = PRI.CODDETTINFO
+  	  AND MI.CODMODOINFO(+) = PRI.CODMODOINFO
+    GROUP BY 
+      TI.STRDESCRIZIONE, 
+      DI.STRDESCRIZIONE,
+      GI.STRDESCRIZIONE, 
+	  MI.STRDESCRIZIONE,
+      PRI.PRGINFO,
+	  PRI.FLGCERTIFICATO,
+	  MNCI.DES_CONOSCENZA,
+	  MNGCI.DES_GRADOCONOSC"/>
+
+  <STATEMENT name="SELECT_CONOSCENZA_INFO" query="
+    SELECT 
+      pi.CDNGRADO,
+      pi.CDNLAVORATORE,
+      pi.CDNUTINS,
+      pi.CDNUTMOD,
+      pi.CODDETTINFO,
+      pi.CODMODOINFO,
+      pi.CODTIPOINFO,
+      TO_CHAR(pi.DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS,
+      TO_CHAR(pi.DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD,
+      pi.FLGCERTIFICATO,
+      pi.PRGINFO,
+      pi.STRDESCINFO, 
+      pi.STRMODINFO,
+
+      di.STRDESCRIZIONE ||
+	    DECODE(
+           SYSDATE, 
+           GREATEST(SYSDATE, di.DATINIZIOVAL, di.DATFINEVAL),
+           ' (scaduto)',
+           LEAST(SYSDATE, di.DATINIZIOVAL, di.DATFINEVAL),
+           ' (scaduto)', 
+           ''
+        ) || DECODE(MNCI.DES_CONOSCENZA,'',' (Min: nessuna corrispondenza)',null,' (Min: nessuna corrispondenza)',' (Min: '|| MNCI.DES_CONOSCENZA || ')') AS DESCDETTINFO
+    FROM 
+      PR_INFO pi,
+      DE_DETT_INFO di,
+	  MA_CONSC_INF MACI,
+	  MN_CONSC_INF MNCI
+    WHERE pi.PRGINFO = ?
+      AND di.CODDETTINFO(+)=pi.CODDETTINFO
+	  AND DI.CODDETTINFO = MACI.CODDETTINFO
+	  AND MACI.COD_CONOSCENZA = MNCI.COD_CONOSCENZA(+)"/>
+
+  <STATEMENT name="SELECT_LAST_CONOSCENZA_INFO" query="
+		    SELECT 
+		      pi.CDNGRADO,
+		      pi.CDNLAVORATORE,
+		      pi.CDNUTINS,
+		      pi.CDNUTMOD,
+		      pi.CODDETTINFO,
+		      pi.CODMODOINFO,
+		      pi.CODTIPOINFO,
+		      TO_CHAR(pi.DTMINS, 'DD/MM/YYYY') DTMINS,
+		      TO_CHAR(pi.DTMMOD, 'DD/MM/YYYY') DTMMOD,
+		      pi.FLGCERTIFICATO,
+		      pi.PRGINFO,
+		      pi.STRDESCINFO, 
+		      pi.STRMODINFO,
+		
+		      di.STRDESCRIZIONE ||
+		        DECODE(
+		           SYSDATE, 
+		           GREATEST(SYSDATE, di.DATINIZIOVAL, di.DATFINEVAL),
+		           ' (scaduto)',
+		           LEAST(SYSDATE, di.DATINIZIOVAL, di.DATFINEVAL),
+		           ' (scaduto)', 
+		           ''
+		        ) || DECODE(MNCI.DES_CONOSCENZA,'',' (Min: nessuna corrispondenza)',null,' (Min: nessuna corrispondenza)',' (Min: '|| MNCI.DES_CONOSCENZA || ')') AS DESCDETTINFO
+		    FROM 
+		      PR_INFO pi,
+		      DE_DETT_INFO di,
+			  MA_CONSC_INF MACI,
+			  MN_CONSC_INF MNCI
+		    WHERE 
+		      pi.PRGINFO = (
+		        SELECT MAX(PRGINFO) FROM PR_INFO
+		      )
+		      AND di.CODDETTINFO(+)=pi.CODDETTINFO
+			  AND DI.CODDETTINFO = MACI.CODDETTINFO
+			  AND MACI.COD_CONOSCENZA = MNCI.COD_CONOSCENZA(+)"/>
+
+  <STATEMENT name="DELETE_CONOSCENZA_INFO" query="
+    DELETE FROM
+      PR_INFO
+    WHERE
+      PRGINFO=?
+    "/>
+
+  <STATEMENT name="INSERT_CONOSCENZA_INFO" query="
+    INSERT INTO PR_INFO(
+      PRGINFO,
+      CDNLAVORATORE,
+      CODTIPOINFO,
+      CODDETTINFO,
+      STRDESCINFO,
+      CDNGRADO,
+      CODMODOINFO,
+      STRMODINFO,
+      FLGCERTIFICATO,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_INFO.nextval, 
+      ?,
+      ?, ?, ?,
+      ?,
+      ?,
+      ?, ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+
+  <STATEMENT name="PreselSelectUniqueInfo"
+            query="SELECT PRGINFO
+                   FROM PR_INFO
+                   WHERE CODTIPOINFO=?
+                   AND CODDETTINFO=?
+                   AND CDNLAVORATORE=?"/>  
+  
+  <STATEMENT name="UPDATE_CONOSCENZA_INFO" query="
+    UPDATE PR_INFO SET
+      CODTIPOINFO = ?,
+      CODDETTINFO = ?,
+      STRDESCINFO = ?,
+      CDNGRADO = ?,
+      CODMODOINFO = ?,
+      STRMODINFO = ?,
+      FLGCERTIFICATO = ?,
+      CDNUTMOD = ?,
+      DTMMOD = SYSDATE
+    WHERE PRGINFO = ?
+    "/>
+
+  <!-- Seleziona i Tipi disponibili, 
+       inserendo "(scaduto)" nella descrizione
+       dei record che alla data corrente sono scaduti -->
+  <STATEMENT name="SELECT_TIPI_CONOSCENZA_INFO" query="
+    SELECT
+      CODTIPOINFO AS CODICE,
+      STRDESCRIZIONE ||
+        DECODE(
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+        ) AS DESCRIZIONE
+    FROM DE_TIPO_INFO ORDER BY DECODE(CODTIPOINFO,'NT',1,0)||DECODE(CODTIPOINFO,'Z',1,0), STRDESCRIZIONE   
+  "/>
+
+  <!-- Seleziona i Gradi di Conoscenza disponibili, 
+       inserendo "(scaduto)" nella descrizione
+       dei record che alla data corrente sono scaduti -->
+  <STATEMENT name="SELECT_GRADI_CONOSCENZA_INFO" query="SELECT   de_grado_info.cdngrado AS codice,
+         de_grado_info.strdescrizione
+                  || DECODE (SYSDATE, GREATEST (SYSDATE, datinizioval, datfineval), ' (scaduto)', LEAST (SYSDATE, datinizioval, datfineval), ' (scaduto)', '' )
+                  || DECODE (mn_grado_consc_inf.des_gradoconosc, '', ' (Min: nessuna corrispondenza)', NULL, ' (Min: nessuna corrispondenza)', ' (Min: '
+                  || mn_grado_consc_inf.des_gradoconosc
+                  || ')' ) AS descrizione
+FROM     de_grado_info
+         LEFT JOIN ma_grado_consc_inf
+         ON (de_grado_info.cdngrado = ma_grado_consc_inf.cdngrado)
+         LEFT JOIN mn_grado_consc_inf
+         ON (ma_grado_consc_inf.cod_gradoconosc = mn_grado_consc_inf.cod_gradoconosc)
+ORDER BY 1"/>
+  
+  <!-- Seleziona i Modi di Conoscenza disponibili, 
+       inserendo "(scaduto)" nella descrizione
+       dei record che alla data corrente sono scaduti -->
+  <STATEMENT name="SELECT_MODI_CONOSCENZA_INFO" query="
+    SELECT 
+      CODMODOINFO AS CODICE,
+      STRDESCRIZIONE ||
+        DECODE(
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+        ) AS DESCRIZIONE
+    FROM DE_MODO_INFO ORDER BY STRDESCRIZIONE   
+  "/>
+
+  <!-- Seleziona i Dettagli di un Tipo di conoscenza disponibili, 
+       inserendo "(scaduto)" nella descrizione
+       dei record che alla data corrente sono scaduti -->
+  <STATEMENT name="SELECT_DETTAGLI_CONOSCENZA_INFO" query="
+    SELECT 
+      ri.CODTIPOINFO AS CODICETIPO,
+      di.CODDETTINFO AS CODICE,
+      di.STRDESCRIZIONE ||
+        DECODE(
+           SYSDATE, 
+           GREATEST(SYSDATE, di.DATINIZIOVAL, di.DATFINEVAL),
+           ' (scaduto)',
+           LEAST(SYSDATE, di.DATINIZIOVAL, di.DATFINEVAL),
+           ' (scaduto)', 
+           ''
+        ) || DECODE(MNCI.DES_CONOSCENZA,'',' (Min: nessuna corrispondenza)',null,' (Min: nessuna corrispondenza)',' (Min: '|| MNCI.DES_CONOSCENZA || ')') AS DESCRIZIONE
+    FROM 
+      DE_REL_INFO ri, 
+      DE_DETT_INFO di,
+	  MA_CONSC_INF MACI,
+	  MN_CONSC_INF MNCI
+    WHERE ri.CODTIPOINFO=?
+     AND ri.CODDETTINFO=di.CODDETTINFO
+	 AND DI.CODDETTINFO = MACI.CODDETTINFO
+	 AND MACI.COD_CONOSCENZA = MNCI.COD_CONOSCENZA(+)"/>
+
+  <!-- Seleziona i Dettagli di TUTTI I Tipi di conoscenza disponibili, 
+       inserendo "(scaduto)" nella descrizione
+       dei record che alla data corrente sono scaduti -->
+  <STATEMENT name="SELECT_DETTAGLI_ALL_CONOSCENZA_INFO" query="
+		    SELECT 
+		      ri.CODTIPOINFO AS CODICETIPO,
+		      di.CODDETTINFO AS CODICE,
+		      di.STRDESCRIZIONE ||
+		        DECODE(
+		           SYSDATE, 
+		           GREATEST(SYSDATE, di.DATINIZIOVAL, di.DATFINEVAL),
+		           ' (scaduto)',
+		           LEAST(SYSDATE, di.DATINIZIOVAL, di.DATFINEVAL),
+		           ' (scaduto)', 
+		           ''
+		        ) || DECODE(MNCI.DES_CONOSCENZA,'',' (Min: nessuna corrispondenza)',null,' (Min: nessuna corrispondenza)',' (Min: '|| MNCI.DES_CONOSCENZA || ')') AS DESCRIZIONE
+		    FROM 
+		      DE_REL_INFO ri, 
+		      DE_DETT_INFO di,
+			  MA_CONSC_INF MACI,
+			  MN_CONSC_INF MNCI
+		    WHERE ri.CODDETTINFO=di.CODDETTINFO 
+			AND DI.CODDETTINFO = MACI.CODDETTINFO
+			AND MACI.COD_CONOSCENZA = MNCI.COD_CONOSCENZA(+)
+			ORDER BY DESCRIZIONE"/>
+
+ 
+<!-- Gestione Conoscenze Linguistiche -->
+
+<STATEMENT name="LOAD_CONOSCENZE_LING" query="
+     SELECT L.PRGLINGUA, L.CODLINGUA,
+    DL.STRDENOMINAZIONE AS LINGUA,     
+       case   	   
+		    when mal.cod_conoscenza is not null
+		         then (DGL.STRDESCRIZIONE || ' (Min: ' || mnl.des_conoscenza|| ')')	     
+		    else DGL.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+		end as LETTO ,
+       case   	   
+		    when mas.cod_conoscenza is not null
+		         then (DGs.STRDESCRIZIONE || ' (Min: ' || mns.des_conoscenza|| ')')	     
+		    else DGs.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+		end as SCRITTO ,
+       case   	   
+		    when map.cod_conoscenza is not null
+		         then (DGP.STRDESCRIZIONE || ' (Min: ' || mnp.des_conoscenza|| ')')	     
+		    else DGP.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+		end as PARLATO ,   
+	  DM.STRDESCRIZIONE as MODALITA,
+	  L.FLGCERTIFICATO as CERTIFICATA    
+    FROM PR_LINGUA L, 
+    DE_GRADO_LIN DGL,
+    DE_GRADO_LIN DGS, 
+    DE_GRADO_LIN DGP, 
+    DE_LINGUA DL, 
+    DE_MOD_LINGUA DM,
+    mn_grado_consc_lin mnl, ma_grado_consc_lin mal,
+    mn_grado_consc_lin mns, ma_grado_consc_lin mas,
+    mn_grado_consc_lin mnp, ma_grado_consc_lin map
+    WHERE L.CODLINGUA=DL.CODLINGUA
+    AND L.CDNGRADOLETTO=DGL.CDNGRADO(+)
+    AND L.CDNGRADOSCRITTO=DGS.CDNGRADO(+)
+    AND L.CDNGRADOPARLATO=DGP.CDNGRADO(+)
+    AND L.CODMODLINGUA=DM.CODMODLINGUA(+)
+    and DGL.CDNGRADO = mal.cdngrado (+)
+    AND mal.cod_conoscenza = mnl.cod_conoscenza(+) 
+    and DGs.CDNGRADO = mas.cdngrado (+) 
+    AND mas.cod_conoscenza = mns.cod_conoscenza (+)  
+    and DGp.CDNGRADO = map.cdngrado (+)
+    AND map.cod_conoscenza = mnp.cod_conoscenza (+) 
+    AND L.CDNLAVORATORE=?"/>
+
+  <STATEMENT name="SELECT_CONOSCENZA_LING" query="
+    SELECT PRGLINGUA, CODLINGUA, CDNLAVORATORE, 
+       CDNGRADOLETTO, CDNGRADOSCRITTO, CDNGRADOPARLATO, 
+       CODMODLINGUA, STRMODLINGUA, FLGCERTIFICATO, 
+       FLGPRIMALINGUA, CDNUTINS, TO_CHAR(DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS, 
+       CDNUTMOD, TO_CHAR(DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD 
+    FROM PR_LINGUA
+    WHERE PRGLINGUA=?
+    AND CDNLAVORATORE=?
+  "/>
+
+  <STATEMENT name="SELECT_VERIFICA_INSERT_CONOSCENZA_LING" query="
+    SELECT COUNT(*) AS CONT
+    FROM PR_LINGUA
+    WHERE CODLINGUA=?
+    AND CDNLAVORATORE=?
+    "/>
+
+  <STATEMENT name="INSERT_CONOSCENZA_LING" query="
+    INSERT INTO PR_LINGUA (
+       PRGLINGUA, CODLINGUA, CDNLAVORATORE, 
+       CDNGRADOLETTO, CDNGRADOSCRITTO, CDNGRADOPARLATO, 
+       CODMODLINGUA, STRMODLINGUA, FLGCERTIFICATO, 
+       FLGPRIMALINGUA, CDNUTINS, DTMINS, 
+       CDNUTMOD, DTMMOD) 
+    VALUES ( S_PR_LINGUA.nextval, ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
+        ?, ?, SYSDATE,
+        ?, SYSDATE) "/>
+
+  <STATEMENT name="UPDATE_CONOSCENZA_LING" query="
+    UPDATE PR_LINGUA 
+    SET 
+      CODLINGUA =?,
+      CDNGRADOLETTO=?,
+      CDNGRADOSCRITTO=?,
+      CDNGRADOPARLATO=?,
+      CODMODLINGUA=?,
+      STRMODLINGUA=?,
+      FLGCERTIFICATO=?,
+      FLGPRIMALINGUA=?,
+      CDNUTMOD = ?,
+      DTMMOD = SYSDATE      
+    WHERE PRGLINGUA=?
+    AND CDNLAVORATORE=?
+    "/>
+
+  <STATEMENT name="DELETE_CONOSCENZA_LING" query="
+    DELETE FROM PR_LINGUA 
+    WHERE PRGLINGUA=?
+    AND CDNLAVORATORE=?"/>
+
+  <STATEMENT name="SELECT_LINGUE" query="
+    SELECT 
+      CODLINGUA AS CODICE,
+      STRDENOMINAZIONE ||
+        DECODE(
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+        ) AS DESCRIZIONE
+    FROM DE_LINGUA  
+    ORDER BY DECODE(DESCRIZIONE, 'Inglese', 1, 'Francese', 2, 'Tedesco', 3, 'Spagnolo', 4,'Italiano', 5),DESCRIZIONE
+  "/>
+
+ <STATEMENT name="SELECT_GRADO_LINGUE" query="
+    SELECT 
+      DE_GRADO_LIN.CDNGRADO AS CODICE,      
+      case   	   
+        when mal.cod_conoscenza is not null
+             then (DE_GRADO_LIN.STRDESCRIZIONE ||
+                    DECODE(
+                      SYSDATE, 
+                      GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                      ' (scaduto)',
+                      LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                      ' (scaduto)', 
+                      ''
+                    ) || ' (Min: ' || mnl.des_conoscenza|| ')')	     
+        else DE_GRADO_LIN.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)' ||
+              DECODE(
+                SYSDATE, 
+                GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                ' (scaduto)',
+                LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                ' (scaduto)', 
+                ''
+              ) 
+     end as DESCRIZIONE      
+    FROM DE_GRADO_LIN
+    left join ma_grado_consc_lin mal on mal.cdngrado = DE_GRADO_LIN.CDNGRADO
+    inner join mn_grado_consc_lin mnl on mnl.cod_conoscenza = mal.cod_conoscenza
+  "/>
+
+  <STATEMENT name="SELECT_MOD_LINGUE" query="
+    SELECT 
+      CODMODLINGUA AS CODICE,
+      STRDESCRIZIONE ||
+        DECODE(
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+        ) AS DESCRIZIONE
+    FROM DE_MOD_LINGUA ORDER BY DECODE(CODMODLINGUA,'NT',1,0), STRDESCRIZIONE
+  "/>
+
+
+<!-- Gestione Mansioni -->
+
+  <STATEMENT name="SELECT_MANSIONE_SEQUENCE" query="
+    SELECT
+      S_PR_MANSIONE.nextval AS PRGMANSIONE
+    FROM
+      DUAL
+  "/>
+
+  <!-- Seleziona tutte le esperienze di lavoro associate a questa mansione -->
+  <STATEMENT name="SELECT_MANSIONE_ESP_LAVORO" query="
+    SELECT 
+      * 
+    FROM 
+      PR_ESP_LAVORO 
+    WHERE 
+      PRGMANSIONE = ?
+  "/>
+  
+  <!-- Seleziona le mansioni per il lavoratore.
+       Il campo DESC_MANSIONE e' fisso a 45 caratteri,
+       dopo i quali viene inserito "..." se supera
+       questo limite.
+       -->
+  <STATEMENT name="LOAD_MANSIONI" query="
+SELECT dm.codmansione AS COD_MANSIONE, man.prgmansione AS prgmansione,
+       DECODE (GREATEST (LENGTH (dm.strdescrizione), 45),
+               45, dm.strdescrizione,
+                SUBSTR (dm.strdescrizione, 1, 45) || '...'
+              ) AS desc_mansione,
+       DECODE (man.flgesperienza,'E','ND',
+	           man.flgesperienza) AS esperienza, 
+	   man.flgdisponibile AS disponibile,
+       man.flgdispformazione AS disp_formazione,
+       man.flgespform AS esperienza_formativa,
+       man.flgpip AS dispo_piani_ins_prof
+    FROM pr_mansione man,
+       de_mansione dm
+    WHERE 
+	   man.cdnlavoratore = ?
+	   AND dm.codmansione(+) = man.codmansione
+	ORDER BY DECODE(disponibile, 'S',4,'P',3,'L',2,'N',1,'',0) desc, 
+		  	 nvl(disp_formazione,'N') desc,
+		  	 nvl(esperienza,'N') desc,			
+		  	 nvl(esperienza_formativa,'N') desc,				   
+         DESC_MANSIONE
+    "/>
+
+  <!-- Seleziona le mansioni per il lavoratore
+       per le quali e' stata data 
+       "Disponibilita' a lavorare con la mansione".
+       Il campo DESC_MANSIONE e' fisso a 45 caratteri,
+       dopo i quali viene inserito "..." se supera
+       questo limite.
+       -->
+  <STATEMENT name="LOAD_MANSIONI_DISPO_LAV" query="
+    SELECT 
+      MAN.PRGMANSIONE AS PRGMANSIONE,
+      DECODE( 
+        GREATEST(LENGTH(DM.STRDESCRIZIONE),45), 
+          45, 
+          DM.STRDESCRIZIONE, 
+          SUBSTR(DM.STRDESCRIZIONE, 1, 45) || '...'
+      ) AS DESC_MANSIONE,
+      MAN.FLGESPERIENZA AS ESPERIENZA,
+      MAN.FLGDISPONIBILE AS DISPONIBILE,
+      MAN.FLGDISPFORMAZIONE AS DISP_FORMAZIONE,
+      MAN.FLGESPFORM AS ESPERIENZA_FORMATIVA,
+      MAN.FLGPIP AS DISPO_PIANI_INS_PROF
+    FROM 
+      PR_MANSIONE MAN,  
+      DE_MANSIONE DM
+    WHERE 
+      MAN.CDNLAVORATORE = ?
+      AND FLGDISPONIBILE = 'S'
+      AND DM.CODMANSIONE(+) = MAN.CODMANSIONE
+    ORDER BY
+      DM.STRDESCRIZIONE
+    "/>
+
+<!-- Seleziona le mansioni per il lavoratore
+       per le quali e' stata data 
+       "Disponibilita' a lavorare con la mansione".
+       Il campo DESC_MANSIONE e' fisso a 45 caratteri,
+       dopo i quali viene inserito "..." se supera
+       questo limite.
+       -->
+  <STATEMENT name="LOAD_MANSIONI_DISPO_LAV_CM" query="
+    SELECT 
+      MAN.PRGMANSIONE AS PRGMANSIONE,
+      DECODE( 
+        GREATEST(LENGTH(DM.STRDESCRIZIONE),45), 
+          45, 
+          DM.STRDESCRIZIONE, 
+          SUBSTR(DM.STRDESCRIZIONE, 1, 45) || '...'
+      ) AS DESC_MANSIONE,
+      MAN.FLGESPERIENZA AS ESPERIENZA,
+      MAN.FLGDISPONIBILE AS DISPONIBILE,
+      MAN.FLGDISPFORMAZIONE AS DISP_FORMAZIONE,
+      MAN.FLGESPFORM AS ESPERIENZA_FORMATIVA,
+      MAN.FLGPIP AS DISPO_PIANI_INS_PROF
+    FROM 
+      PR_MANSIONE MAN,  
+      DE_MANSIONE DM
+    WHERE 
+      MAN.CDNLAVORATORE = ?
+      AND (FLGDISPONIBILE = 'S' OR FLGDISPONIBILE = 'P' OR FLGDISPONIBILE = 'L')
+      AND DM.CODMANSIONE(+) = MAN.CODMANSIONE
+    ORDER BY
+      DM.STRDESCRIZIONE
+    "/>
+
+  <STATEMENT name="SELECT_MANSIONE" query="
+    SELECT 
+      ma.PRGMANSIONE,
+      ma.CDNLAVORATORE,
+      ma.CODMANSIONE,
+      p_dm.strDescrizione as desTipoMansione,
+      ma.FLGESPERIENZA,
+      ma.FLGESPFORM,
+      ma.FLGDISPONIBILE,
+      ma.FLGPIP,
+      ma.FLGDISPFORMAZIONE,
+      ma.CODMONOTEMPO,
+      ma.CDNUTINS,
+      TO_CHAR(ma.DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS,
+      ma.CDNUTMOD,
+      ma.STRNOTE,
+      TO_CHAR(ma.DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD,
+      dm.STRDESCRIZIONE ||
+        DECODE(
+           SYSDATE, 
+           GREATEST(SYSDATE, dm.DATINIZIOVAL, dm.DATFINEVAL),
+           ' (scaduto)',
+           LEAST(SYSDATE, dm.DATINIZIOVAL, dm.DATFINEVAL),
+           ' (scaduto)', 
+           ''
+        ) AS DESC_MANSIONE
+    FROM 
+      PR_MANSIONE ma,
+      DE_MANSIONE dm,
+	  de_mansione p_dm  
+    WHERE 
+      ma.PRGMANSIONE =?
+      AND dm.CODMANSIONE(+)=ma.CODMANSIONE
+      and p_dm.codMansione(+)=substr(ma.codmansione, 0, 5) || '00'
+  "/>
+
+  <STATEMENT name="DELETE_MANSIONE" query="
+    DELETE FROM
+      PR_MANSIONE
+    WHERE
+      PRGMANSIONE=? 
+    "/>
+
+  <STATEMENT name="INSERT_MANSIONE" query="
+    INSERT INTO PR_MANSIONE(
+      PRGMANSIONE,
+      CDNLAVORATORE,
+      CODMANSIONE,
+      FLGESPERIENZA,
+      FLGDISPONIBILE,
+      FLGDISPFORMAZIONE,
+      FLGESPFORM,
+      FLGPIP,
+      CODMONOTEMPO,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD,
+      STRNOTE
+    ) VALUES (
+      ?, 
+      ?, ?,
+      ?, ?, ?, ?, ?,
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE,
+      ?
+    )
+    "/>
+  
+  <STATEMENT name="UPDATE_MANSIONE" query="
+    UPDATE PR_MANSIONE SET
+      CODMANSIONE = ?,
+      FLGESPERIENZA = ?,
+      FLGDISPONIBILE = ?,
+      FLGDISPFORMAZIONE = ?,
+      FLGESPFORM = ?,
+      FLGPIP = ?,
+      CODMONOTEMPO = ?,
+      CDNUTMOD = ?,
+      DTMMOD = SYSDATE,
+      STRNOTE = ?
+    WHERE PRGMANSIONE = ?
+    "/>
+
+  <!-- Seleziona i tipi di mansione, 
+       inserendo "(scaduto)" nella descrizione
+       dei record che alla data corrente sono scaduti.
+       Il campo DESCRIZIONE e' fisso a 45 caratteri,
+       dopo i quali viene inserito "..." se supera
+       questo limite.
+       -->
+  <STATEMENT name="SELECT_TIPI_MANSIONE" query="
+    SELECT
+      CODMANSIONE AS CODICE,
+        DECODE( 
+          GREATEST(LENGTH(STRDESCRIZIONE),60) , 60, STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 60) || '...'
+        ) 
+        || DECODE (
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+        ) AS DESCRIZIONE
+    FROM DE_MANSIONE    
+    WHERE CDNLIVELLO=0
+    ORDER BY CODICE
+  "/>
+
+	<!-- <STATEMENT name="SELECT_TIPI_MANSIONE_IDO" query="
+    SELECT
+      CODMANSIONE AS CODICE,
+        DECODE( 
+          GREATEST(LENGTH(STRDESCRIZIONE),60) , 60, STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 60) || '...'
+        ) 
+        || DECODE (
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+        ) AS DESCRIZIONE
+    FROM DE_MANSIONE    
+    WHERE CDNLIVELLO=0
+    AND FLGIDO = 'S'
+    ORDER BY CODICE
+  "/> -->
+
+  <!-- Seleziona la mansione CODMANSIONE
+       per il lavoratore CDNLAVORATORE -->
+  <STATEMENT name="SELECT_MANSIONE_LAVORATORE" query="
+    SELECT 
+      ma.*
+    FROM 
+      PR_MANSIONE ma
+    WHERE 
+      ma.CODMANSIONE = ?
+      AND ma.CDNLAVORATORE = ?
+  "/>
+
+<!--Gestione Formazione Professionale-->
+  
+  <STATEMENT name="FORPRO_NEXTVAL" query="
+    SELECT
+      S_PR_CORSO.nextval AS DO_NEXTVAL
+    FROM
+      DUAL
+  "/>
+
+  <!-- NOTE: In alternativa al codice corso si puo' avere una descrizione
+             quindi vengono selezionati i corsi anche se il codice non 
+             e' fra quelli presenti. -->
+  <STATEMENT name="LOAD_FOR_PRO" query="
+    SELECT 
+      PRGCORSO,
+      C.STRDESCRIZIONE,
+      STRENTE,
+      C.NUMANNO,
+      FLGCOMPLETATO,
+      FLGSTAGE,
+	  NVL(DC.STRDESCRIZIONE,C.STRDESCRIZIONE) AS STRDECODCORSO
+    FROM 
+      PR_CORSO C, DE_CORSO DC
+    WHERE C.CODCORSO=DC.CODCORSO(+) 
+    AND CDNLAVORATORE = ?
+    ORDER BY
+      STRDESCRIZIONE  "/>
+
+  <STATEMENT name="SELECT_FOR_PRO" query="
+    SELECT PRGCORSO, CDNLAVORATORE, C.CODCORSO, 
+       C.STRDESCRIZIONE, STRCONTENUTO, STRENTE, 
+       CODCOMENTE, STRLOCALITAENTE, STRINDIRIZZOENTE, 
+       C.NUMANNO, NUMMESI, NUMORE, 
+       NUMORESPESE, FLGCOMPLETATO, STRMOTCESSAZIONE, 
+       CODTIPOCERTIFICATO, CDNAMBITODISCIPLINARE, FLGSTAGE, 
+       NUMORESTAGE, STRAZIENDA, CODCOMAZIENDA, 
+       STRLOCALITAAZIENDA, STRINDIRIZZOAZIENDA, STRNOTACORSO, 
+       CDNUTINS, TO_CHAR(DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS, CDNUTMOD,
+       TO_CHAR(DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD,
+       DC.STRDESCRIZIONE AS STRDESCDECOD,
+       CE.STRDENOMINAZIONE AS STRDESCCOMENTE,
+       CA.STRDENOMINAZIONE AS STRDESCCOMAZIENDA,
+       C.FLGIMPORTATO, C.CODEDIZIONE, C.STREDIZIONE   
+    FROM PR_CORSO C, DE_CORSO DC, DE_COMUNE CE, DE_COMUNE CA
+    WHERE C.CODCORSO=DC.CODCORSO(+)
+    AND C.CODCOMENTE=CE.CODCOM(+)
+    AND C.CODCOMAZIENDA=CA.CODCOM(+)    
+    AND PRGCORSO=?
+    AND CDNLAVORATORE=?
+  "/>
+
+  <STATEMENT name="INSERT_FOR_PRO" query="
+    INSERT INTO PR_CORSO (
+       PRGCORSO, 
+       CDNLAVORATORE, 
+       CODCORSO, 
+       STRDESCRIZIONE, 
+       STRCONTENUTO, 
+       STRENTE, 
+       CODCOMENTE, 
+       STRLOCALITAENTE, 
+       STRINDIRIZZOENTE, 
+       NUMANNO, 
+       NUMMESI,
+       NUMORE, 
+       NUMORESPESE, 
+       FLGCOMPLETATO, 
+       STRMOTCESSAZIONE, 
+       CODTIPOCERTIFICATO, 
+       CDNAMBITODISCIPLINARE, 
+       FLGSTAGE, 
+       NUMORESTAGE, 
+       STRAZIENDA, 
+       CODCOMAZIENDA, 
+       STRLOCALITAAZIENDA, 
+       STRINDIRIZZOAZIENDA, 
+       STRNOTACORSO, 
+       CDNUTINS, 
+       DTMINS, 
+       CDNUTMOD, 
+       DTMMOD,
+       CODEDIZIONE, 
+       STREDIZIONE      
+	   DATINIZIO,
+	   DATFINE,
+	   FLGIMPORTATO)
+    VALUES ( ?, ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
+        ?, ?, ?,
+        ?, SYSDATE, ?, 
+        SYSDATE, ?, ?, TO_DATE(?, 'dd/mm/yyyy'), TO_DATE(?, 'dd/mm/yyyy'), ?)
+  "/>
+
+  <STATEMENT name="UPDATE_FOR_PRO" query="
+    UPDATE PR_CORSO
+    SET CODCORSO=?,
+        STRDESCRIZIONE=?, 
+        STRCONTENUTO=?, 
+        STRENTE=?, 
+        CODCOMENTE=?, 
+        STRLOCALITAENTE=?, 
+        STRINDIRIZZOENTE=?, 
+        NUMANNO=?, 
+        NUMMESI=?, 
+        NUMORE=?, 
+        NUMORESPESE=?, 
+        FLGCOMPLETATO=?, 
+        STRMOTCESSAZIONE=?, 
+        CODTIPOCERTIFICATO=?, 
+        CDNAMBITODISCIPLINARE=?, 
+        FLGSTAGE=?, 
+        NUMORESTAGE=?, 
+        STRAZIENDA=?, 
+        CODCOMAZIENDA=?, 
+        STRLOCALITAAZIENDA=?, 
+        STRINDIRIZZOAZIENDA=?, 
+        STRNOTACORSO=?, 
+        CDNUTMOD=?, 
+        DTMMOD=SYSDATE
+    WHERE PRGCORSO=?
+    AND CDNLAVORATORE=?
+  "/>
+
+  <STATEMENT name="DELETE_FOR_PRO" query="
+    DELETE FROM PR_CORSO 
+    WHERE PRGCORSO=?
+    AND CDNLAVORATORE=?"/>
+
+  <STATEMENT name="SELECT_FOR_PRO_CORSO" query="
+    SELECT
+      CODCORSO AS CODICE,
+      STRDESCRIZIONE ||
+        DECODE(
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+        ) AS DESCRIZIONE
+    FROM DE_CORSO
+    ORDER BY STRDESCRIZIONE
+  "/>
+
+  <STATEMENT name="SELECT_FOR_PRO_TIPO_CORSO" query="
+    SELECT
+      CODTIPOCERTIFICATO AS CODICE,
+      STRDESCRIZIONE ||
+        DECODE(
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+        ) ||' (Min: '||NVL( MN_ATTESTAZIONE.DES_TIPOATTESTAZ ,'nessuna corrispondenza') ||')' AS DESCRIZIONE
+    FROM DE_TIPO_CORSO 
+    LEFT JOIN MN_ATTESTAZIONE ON DE_TIPO_CORSO.CODCL = MN_ATTESTAZIONE.COD_TIPOATTESTAZ
+    ORDER BY DECODE(CODTIPOCERTIFICATO,'NT',1,0), STRDESCRIZIONE   
+  "/>
+
+  <STATEMENT name="SELECT_FOR_PRO_AMB_DISCIP" query="
+    SELECT
+      CDNAMBITODISCIPLINARE AS CODICE,
+      STRDESCRIZIONE ||
+        DECODE(
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+        ) AS DESCRIZIONE
+    FROM DE_AMB_DISCIP ORDER BY STRDESCRIZIONE   
+  "/>
+
+
+<!-- Gestione Disponibilita' Contratti Mansioni -->
+
+  <!-- Carica la lista dei contratti legati alla mansione,
+       un contratto viene caricato se:
+       - La mansione esiste ancora
+       - La mansione ha il flag FLGDISPONIBILE = 'S' -->
+  <STATEMENT name="LOAD_CONTRATTI_MANSIONI" query="
+    SELECT
+      PDC.PRGDISCONTRATTO AS PRGDISCONTRATTO,
+      MAN.PRGMANSIONE     AS PRGMANSIONE,
+      DM.STRDESCRIZIONE   AS DESC_MANSIONE,
+      DC.STRDESCRIZIONE   AS DESC_CONTRATTO,
+  	  STRCOGNOME || ' ' || STRNOME || ' - ' || TO_CHAR(PDC.DTMINS,'DD/MM/YYYY') AS STRINSERIMENTO      
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_CONTRATTO PDC JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = PDC.CDNUTINS),
+      DE_MANSIONE DM,
+      DE_CONTRATTO DC	  
+    WHERE 
+      MAN.CDNLAVORATORE      = ?
+      AND MAN.FLGDISPONIBILE = 'S'
+      AND MAN.PRGMANSIONE    = PDC.PRGMANSIONE
+      AND DM.CODMANSIONE     = MAN.CODMANSIONE
+      AND DC.CODCONTRATTO    = PDC.CODCONTRATTO
+      AND DC.FLGDISPONIBILITA = 'S'
+    GROUP BY
+      DM.STRDESCRIZIONE,
+      DC.STRDESCRIZIONE,
+      PDC.PRGDISCONTRATTO,
+      MAN.PRGMANSIONE,
+      STRCOGNOME, STRNOME,
+      PDC.DTMINS	  	        
+    ORDER BY
+      DM.STRDESCRIZIONE,
+      DC.STRDESCRIZIONE
+    "/>
+
+<!-- Carica la lista dei contratti legati alla mansione,
+       un contratto viene caricato se:
+       - La mansione esiste ancora
+       - La mansione ha il flag FLGDISPONIBILE = 'S', 'P' ed 'L' -->
+  <STATEMENT name="LOAD_CONTRATTI_MANSIONI_CM" query="
+    SELECT
+      PDC.PRGDISCONTRATTO AS PRGDISCONTRATTO,
+      MAN.PRGMANSIONE     AS PRGMANSIONE,
+      DM.STRDESCRIZIONE   AS DESC_MANSIONE,
+      DC.STRDESCRIZIONE   AS DESC_CONTRATTO,
+  	  STRCOGNOME || ' ' || STRNOME || ' - ' || TO_CHAR(PDC.DTMINS,'DD/MM/YYYY') AS STRINSERIMENTO      
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_CONTRATTO PDC JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = PDC.CDNUTINS),
+      DE_MANSIONE DM,
+      DE_CONTRATTO DC	  
+    WHERE 
+      MAN.CDNLAVORATORE      = ?
+      AND (MAN.FLGDISPONIBILE = 'S' OR MAN.FLGDISPONIBILE = 'P' OR MAN.FLGDISPONIBILE = 'L')
+      AND MAN.PRGMANSIONE    = PDC.PRGMANSIONE
+      AND DM.CODMANSIONE     = MAN.CODMANSIONE
+      AND DC.CODCONTRATTO    = PDC.CODCONTRATTO
+      AND DC.FLGDISPONIBILITA = 'S'
+    GROUP BY
+      DM.STRDESCRIZIONE,
+      DC.STRDESCRIZIONE,
+      PDC.PRGDISCONTRATTO,
+      MAN.PRGMANSIONE,
+      STRCOGNOME, STRNOME,
+      PDC.DTMINS	  	        
+    ORDER BY
+      DM.STRDESCRIZIONE,
+      DC.STRDESCRIZIONE
+    "/>
+
+  <STATEMENT name="DELETE_CONTRATTO_IN_MANSIONE" query="
+    DELETE FROM
+      PR_DIS_CONTRATTO
+    WHERE
+      PRGDISCONTRATTO = ?
+    "/>
+
+  <STATEMENT name="INSERT_CONTRATTO_IN_MANSIONE" query="
+    INSERT INTO PR_DIS_CONTRATTO (
+      PRGDISCONTRATTO,
+      PRGMANSIONE,
+      CODCONTRATTO,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_CONTRATTO.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+  
+  <!-- Seleziona tutti i tipi di contratto, 
+       inserendo "(scaduto)" nella descrizione
+       dei record che alla data corrente sono scaduti. 
+       Il campo DESCRIZIONE e' fisso a 45 caratteri,
+       dopo i quali viene inserito "..." se supera
+       questo limite. -->
+  <STATEMENT name="SELECT_CONTRATTI" query="
+    SELECT
+      CODCONTRATTO AS CODICE,
+      DECODE( 
+        GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...'
+      ) || 
+      DECODE (
+        SYSDATE, 
+        GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+        ' (scaduto)',
+        LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+        ' (scaduto)', 
+        ''
+       ) AS DESCRIZIONE
+    FROM DE_CONTRATTO
+    WHERE FLGDISPONIBILITA = 'S'
+    ORDER BY STRDESCRIZIONE
+    "/>
+
+  <!-- La tabella PR_MANSIONE viene usata per garantire 
+       che il contratto si riferisca ad una mansione 
+       correntemente presente per il lavoratore,
+       infatti potrebbe capitare che sia eliminato
+       il record di PR_MANSIONE mentre rimane 
+       il contratto in PR_DIS_CONTRATTO : questo
+       contratto non deve essere piu' visualizzato
+       perche' legato ad una mansione inesistente. -->
+  <STATEMENT name="SELECT_CONTRATTO_IN_MANSIONE" query="
+    SELECT
+      PDC.*
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_CONTRATTO PDC
+    WHERE 
+      PDC.PRGMANSIONE = ?
+      AND PDC.CODCONTRATTO= ?
+      AND MAN.CDNLAVORATORE = ?
+      AND MAN.PRGMANSIONE = PDC.PRGMANSIONE
+    "/>
+
+  <!-- Seleziona i progressivi delle mansioni (distinti)
+       utilizzate dai contratti 
+  <STATEMENT name="SELECT_DISTINCT_MANSIONI_CONTRATTI" query="
+    SELECT
+      DISTINCT MAN.PRGMANSIONE AS PRGMANSIONE
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_CONTRATTO PDC
+    WHERE 
+      MAN.CDNLAVORATORE   = ?
+      AND MAN.PRGMANSIONE = PDC.PRGMANSIONE
+   "/>
+   -->
+
+
+<!-- Gestione Disponibilita' Orari Mansioni -->
+
+  <!-- Carica la lista degli orari legati alla mansione,
+       un orario viene caricato se:
+       - La mansione esiste ancora
+       - La mansione ha il flag FLGDISPONIBILE = 'S' -->
+  <STATEMENT name="LOAD_ORARI_MANSIONI" query="
+    SELECT
+      PDO.PRGDISORARIO  AS PRGDISORARIO,
+      MAN.PRGMANSIONE   AS PRGMANSIONE,
+      DM.STRDESCRIZIONE AS DESC_MANSIONE,
+      DEO.STRDESCRIZIONE || 
+      decode(DEO.CODMONOORARIO,
+      'T',' (Min: Full Time)',
+      'P',' (Min: Part Time)',
+      ' (Min: nessuna corrispondenza)') AS DESC_ORARIO,
+  	  STRCOGNOME || ' ' || STRNOME || ' - ' || TO_CHAR(PDO.DTMINS,'DD/MM/YYYY') AS STRINSERIMENTO
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_ORARIO PDO JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = PDO.CDNUTINS),
+      DE_MANSIONE DM,
+      DE_ORARIO DEO	  
+    WHERE 
+      MAN.CDNLAVORATORE      = ?
+      AND MAN.FLGDISPONIBILE = 'S'
+      AND MAN.PRGMANSIONE    = PDO.PRGMANSIONE
+      AND DM.CODMANSIONE     = MAN.CODMANSIONE
+      AND DEO.CODORARIO       = PDO.CODORARIO	  
+    GROUP BY
+      DM.STRDESCRIZIONE,
+      DEO.STRDESCRIZIONE,
+      PDO.PRGDISORARIO,
+      MAN.PRGMANSIONE,
+  	  STRCOGNOME, STRNOME,
+      PDO.DTMINS, DEO.CODMONOORARIO 	 
+    ORDER BY
+      DM.STRDESCRIZIONE,
+      DEO.STRDESCRIZIONE
+    "/>
+
+<!-- Carica la lista degli orari legati alla mansione,
+       un orario viene caricato se:
+       - La mansione esiste ancora
+       - La mansione ha il flag FLGDISPONIBILE = 'S', 'P', 'L' -->
+  <STATEMENT name="LOAD_ORARI_MANSIONI_CM" query="
+    SELECT
+      PDO.PRGDISORARIO  AS PRGDISORARIO,
+      MAN.PRGMANSIONE   AS PRGMANSIONE,
+      DM.STRDESCRIZIONE AS DESC_MANSIONE,
+      DEO.STRDESCRIZIONE || 
+      decode(DEO.CODMONOORARIO,
+      'T',' (Min: Full Time)',
+      'P',' (Min: Part Time)',
+      ' (Min: nessuna corrispondenza)') AS DESC_ORARIO,
+  	  STRCOGNOME || ' ' || STRNOME || ' - ' || TO_CHAR(PDO.DTMINS,'DD/MM/YYYY') AS STRINSERIMENTO
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_ORARIO PDO JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = PDO.CDNUTINS),
+      DE_MANSIONE DM,
+      DE_ORARIO DEO	  
+    WHERE 
+      MAN.CDNLAVORATORE      = ?
+      AND (MAN.FLGDISPONIBILE = 'S' OR MAN.FLGDISPONIBILE = 'P' OR MAN.FLGDISPONIBILE = 'L')
+      AND MAN.PRGMANSIONE    = PDO.PRGMANSIONE
+      AND DM.CODMANSIONE     = MAN.CODMANSIONE
+      AND DEO.CODORARIO      = PDO.CODORARIO	
+    GROUP BY
+      DM.STRDESCRIZIONE,
+      DEO.STRDESCRIZIONE,
+      PDO.PRGDISORARIO,
+      MAN.PRGMANSIONE,
+  	  STRCOGNOME, STRNOME,
+      PDO.DTMINS, DEO.CODMONOORARIO	 
+    ORDER BY
+      DM.STRDESCRIZIONE,
+      DEO.STRDESCRIZIONE
+    "/>
+
+  <STATEMENT name="DELETE_ORARIO_IN_MANSIONE" query="
+    DELETE FROM
+      PR_DIS_ORARIO
+    WHERE
+      PRGDISORARIO = ?
+    "/>
+
+  <STATEMENT name="INSERT_ORARIO_IN_MANSIONE" query="
+    INSERT INTO PR_DIS_ORARIO (
+      PRGDISORARIO,
+      PRGMANSIONE,
+      CODORARIO,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_ORARIO.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+  
+  <!-- Seleziona tutti i tipi di orario, 
+       inserendo "(scaduto)" nella descrizione
+       dei record che alla data corrente sono scaduti. 
+       Il campo DESCRIZIONE e' fisso a 45 caratteri,
+       dopo i quali viene inserito "..." se supera
+       questo limite. -->
+  <STATEMENT name="SELECT_ORARI" query="
+    SELECT DE_ORARIO.CODORARIO AS CODICE,
+      DECODE( 
+        GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...'
+      ) || 
+      DECODE (
+        SYSDATE, 
+        GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+        ' (scaduto)',
+        LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+        ' (scaduto)', 
+        ''
+       ) || 
+       decode(de_orario.codmonoorario,
+       'T',' (Min: Full Time)',
+       'P',' (Min: Part Time)',
+       ' (Min: nessuna corrispondenza)') AS DESCRIZIONE
+    FROM DE_ORARIO	
+    ORDER BY STRDESCRIZIONE
+    "/>
+
+  <!-- La tabella PR_MANSIONE viene usata per garantire 
+       che l'orario si riferisca ad una mansione 
+       correntemente presente per il lavoratore,
+       infatti potrebbe capitare che sia eliminato
+       il record di PR_MANSIONE mentre rimane 
+       l'orario in PR_DIS_ORARIO : questo
+       orario non deve essere piu' visualizzato
+       perche' legato ad una mansione inesistente. -->
+  <STATEMENT name="SELECT_ORARIO_IN_MANSIONE" query="
+    SELECT
+      PDO.*
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_ORARIO PDO
+    WHERE 
+      PDO.PRGMANSIONE = ?
+      AND PDO.CODORARIO= ?
+      AND MAN.CDNLAVORATORE = ?
+      AND MAN.PRGMANSIONE = PDO.PRGMANSIONE
+    "/>
+
+  <!-- Seleziona i progressivi delle mansioni (distinti)
+       utilizzate dagli orari -->
+  <STATEMENT name="SELECT_DISTINCT_ORARI" query="
+    SELECT
+      DISTINCT MAN.PRGMANSIONE AS PRGMANSIONE
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_ORARIO PDO
+    WHERE 
+      MAN.CDNLAVORATORE   = ?
+      AND MAN.PRGMANSIONE = PDO.PRGMANSIONE
+   "/>
+
+
+
+<!-- Gestione Mobilita' Geografica -->
+  
+  <!-- Lista delle Disp. di Mobilita' Geografica relativa alle Mansioni.
+       Una disp. viene caricata se:
+       - La mansione esiste ancora
+       - La mansione ha il flag FLGDISPONIBILE = 'S' -->
+  <STATEMENT name="LOAD_MOBGEO_MANSIONI"
+             query="select 
+                       pr_mobil_geogr.PRGMANSIONE,
+                       de_mansione.STRDESCRIZIONE,
+                       pr_mobil_geogr.FLGDISPAUTO,
+                       pr_mobil_geogr.FLGDISPMOTO,
+                       pr_mobil_geogr.FLGMEZZIPUB,
+                       pr_mobil_geogr.FLGPENDOLARISMO,
+                       pr_mobil_geogr.FLGMOBSETT,
+                       pr_mobil_geogr.CODTRASFERTA,
+                       de_trasferta.STRDESCRIZIONE as trasferta
+                    from 
+                       pr_mobil_geogr
+                       inner join pr_mansione on (pr_mobil_geogr.PRGMANSIONE = pr_mansione.PRGMANSIONE)
+                       inner join de_mansione on (pr_mansione.CODMANSIONE = de_mansione.CODMANSIONE)
+                       left join de_trasferta on (pr_mobil_geogr.CODTRASFERTA = de_trasferta.CODTRASFERTA)
+                    where
+                       pr_mansione.CDNLAVORATORE = ?
+                       and pr_mansione.FLGDISPONIBILE = 'S'
+                    order by
+                      de_mansione.STRDESCRIZIONE"
+  />
+  
+  <!-- Lista delle Disp. di Mobilita' Geografica relativa alle Mansioni.
+       Una disp. viene caricata se:
+       - La mansione esiste ancora
+       - La mansione ha il flag FLGDISPONIBILE = 'S', 'P', 'L' -->
+  <STATEMENT name="LOAD_MOBGEO_MANSIONI_CM"
+             query="select 
+                       pr_mobil_geogr.PRGMANSIONE,
+                       de_mansione.STRDESCRIZIONE,
+                       pr_mobil_geogr.FLGDISPAUTO,
+                       pr_mobil_geogr.FLGDISPMOTO,
+                       pr_mobil_geogr.FLGMEZZIPUB,
+                       pr_mobil_geogr.FLGPENDOLARISMO,
+                       pr_mobil_geogr.FLGMOBSETT,
+                       pr_mobil_geogr.CODTRASFERTA,
+                       de_trasferta.STRDESCRIZIONE as trasferta
+                    from 
+                       pr_mobil_geogr
+                       inner join pr_mansione on (pr_mobil_geogr.PRGMANSIONE = pr_mansione.PRGMANSIONE)
+                       inner join de_mansione on (pr_mansione.CODMANSIONE = de_mansione.CODMANSIONE)
+                       left join de_trasferta on (pr_mobil_geogr.CODTRASFERTA = de_trasferta.CODTRASFERTA)
+                    where
+                       pr_mansione.CDNLAVORATORE = ?
+                       and (pr_mansione.FLGDISPONIBILE = 'S' OR pr_mansione.FLGDISPONIBILE = 'P' OR pr_mansione.FLGDISPONIBILE = 'L') 
+                    order by
+                      de_mansione.STRDESCRIZIONE"
+  />
+  
+  <!-- Eliminazione di una Disp. di Mobilita'  Geografica relativa ad una certa Mansione -->
+  <STATEMENT name="DEL_MOBGEO_MANSIONE"
+             query="DELETE FROM pr_mobil_geogr WHERE prgmansione = ?"
+  />
+  <!-- Inserimento di una Disp. di Mobilita' Geografica relativa ad una certa Mansione. -->
+  <STATEMENT name="INS_MOBGEO_MANSIONE"
+             query="insert into pr_mobil_geogr
+                    (PRGMANSIONE, FLGDISPAUTO, FLGDISPMOTO, FLGMEZZIPUB, FLGPENDOLARISMO, FLGMOBSETT, 
+                    FLGTURISMO, FLGALLOGGIO, FLGVITTO, NUMOREPERC, CODTRASFERTA, STRNOTE, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)
+                    values
+                    (?,?,?,?,?,?,?,?,?,
+                    ?,?,?,?,sysdate,?,sysdate)"
+  />
+
+  <STATEMENT name="SEL_TRASFERTA"
+             query="SELECT
+                    CODTRASFERTA AS CODICE,
+                    DECODE( 
+                      GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...'
+                    ) || 
+                    DECODE (
+                      SYSDATE, 
+                      GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                      ' (scaduto)',
+                      LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                      ' (scaduto)', 
+                      ''
+                     ) AS DESCRIZIONE
+                  FROM DE_TRASFERTA
+                  ORDER BY CODTRASFERTA"
+  />
+
+  <!--
+  <STATEMENT name="SEL_MANSIONI_LAV"
+             query="select 
+                      pr_mansione.PRGMANSIONE as codice,
+                      de_mansione.STRDESCRIZIONE as descrizione
+                    from
+                      pr_mansione
+                      inner join de_mansione on (pr_mansione.CODMANSIONE = de_mansione.CODMANSIONE)
+                    where
+                      pr_mansione.CDNLAVORATORE = ?"
+  />
+  -->
+  
+  <STATEMENT name="DETT_MOBGEO_MANSIONE"
+             query="select 
+                       pr_mobil_geogr.PRGMANSIONE,
+                       de_mansione.STRDESCRIZIONE,
+                       pr_mobil_geogr.FLGDISPAUTO,
+                       pr_mobil_geogr.FLGDISPMOTO,
+                       pr_mobil_geogr.FLGMEZZIPUB,
+                       pr_mobil_geogr.FLGPENDOLARISMO,
+                       pr_mobil_geogr.FLGMOBSETT,
+                       pr_mobil_geogr.FLGTURISMO,
+                       pr_mobil_geogr.FLGALLOGGIO,
+                       pr_mobil_geogr.FLGVITTO,
+                       pr_mobil_geogr.CODTRASFERTA,
+                       de_trasferta.STRDESCRIZIONE as trasferta,
+                       pr_mobil_geogr.NUMOREPERC,
+                       pr_mobil_geogr.STRNOTE,
+                       pr_mobil_geogr.CDNUTINS, 
+                         to_char(pr_mobil_geogr.DTMINS, 'dd/mm/yyyy hh24:mi') as DTMINS, 
+                         pr_mobil_geogr.CDNUTMOD, 
+                         to_char(pr_mobil_geogr.DTMMOD, 'dd/mm/yyyy hh24:mi') as DTMMOD
+                    from 
+                       pr_mobil_geogr
+                       inner join pr_mansione on (pr_mobil_geogr.PRGMANSIONE = pr_mansione.PRGMANSIONE)
+                       inner join de_mansione on (pr_mansione.CODMANSIONE = de_mansione.CODMANSIONE)
+                       left join de_trasferta on (pr_mobil_geogr.CODTRASFERTA = de_trasferta.CODTRASFERTA)
+                    where
+                       pr_mobil_geogr.PRGMANSIONE =?"
+  /> 
+  
+  <STATEMENT name="UPD_MOBGEO_MANSIONE"
+             query="update PR_MOBIL_GEOGR set
+                      FLGDISPAUTO = ?,
+                      FLGDISPMOTO = ?,
+                      FLGMEZZIPUB = ?,
+                      FLGPENDOLARISMO = ?,
+                      FLGMOBSETT = ?,
+                      FLGTURISMO = ?,
+                      FLGALLOGGIO = ?,
+                      FLGVITTO = ?,
+                      CODTRASFERTA = ?,
+                      NUMOREPERC = ?,
+                      STRNOTE = ?,
+                      CDNUTMOD = ?,
+                      DTMMOD = sysdate
+                    where
+                      PRGMANSIONE = ?"
+  />
+  <!-- FINE MOBILITA' GEOGRAFICA -->
+
+
+<!-- Gestione Disponibilita' Turni Mansioni -->
+
+  <!-- Carica la lista dei turni legati alla mansione,
+       un turno viene caricato se:
+       - La mansione esiste ancora
+       - La mansione ha il flag FLGDISPONIBILE = 'S' -->
+  <STATEMENT name="LOAD_TURNI_MANSIONI" query="
+    SELECT
+      PDT.PRGDISTURNO  AS PRGDISTURNO,
+      MAN.PRGMANSIONE   AS PRGMANSIONE,
+      DM.STRDESCRIZIONE AS DESC_MANSIONE,
+      DT.STRDESCRIZIONE AS DESC_TURNO,
+  	  STRCOGNOME || ' ' || STRNOME || ' - ' || TO_CHAR(PDT.DTMINS,'DD/MM/YYYY') AS STRINSERIMENTO      
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_TURNO PDT JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = PDT.CDNUTINS),
+      DE_MANSIONE DM,
+      DE_TURNO DT	  
+    WHERE 
+      MAN.CDNLAVORATORE      = ?
+      AND MAN.FLGDISPONIBILE = 'S'
+      AND MAN.PRGMANSIONE    = PDT.PRGMANSIONE
+      AND DM.CODMANSIONE     = MAN.CODMANSIONE
+      AND DT.CODTURNO        = PDT.CODTURNO
+    GROUP BY
+      DM.STRDESCRIZIONE,
+      DT.STRDESCRIZIONE,
+      PDT.PRGDISTURNO,
+      MAN.PRGMANSIONE,
+      STRCOGNOME, STRNOME,
+      PDT.DTMINS            
+    ORDER BY
+      DM.STRDESCRIZIONE,
+      DT.STRDESCRIZIONE
+    "/>
+    
+   <!-- Carica la lista dei turni legati alla mansione,
+       un turno viene caricato se:
+       - La mansione esiste ancora
+       - La mansione ha il flag FLGDISPONIBILE = 'S', 'P', 'L' -->
+  <STATEMENT name="LOAD_TURNI_MANSIONI_CM" query="
+    SELECT
+      PDT.PRGDISTURNO  AS PRGDISTURNO,
+      MAN.PRGMANSIONE   AS PRGMANSIONE,
+      DM.STRDESCRIZIONE AS DESC_MANSIONE,
+      DT.STRDESCRIZIONE AS DESC_TURNO,
+  	  STRCOGNOME || ' ' || STRNOME || ' - ' || TO_CHAR(PDT.DTMINS,'DD/MM/YYYY') AS STRINSERIMENTO      
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_TURNO PDT JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = PDT.CDNUTINS),
+      DE_MANSIONE DM,
+      DE_TURNO DT	  
+    WHERE 
+      MAN.CDNLAVORATORE      = ?
+      AND (MAN.FLGDISPONIBILE = 'S' OR MAN.FLGDISPONIBILE = 'P' OR MAN.FLGDISPONIBILE = 'L')
+      AND MAN.PRGMANSIONE    = PDT.PRGMANSIONE
+      AND DM.CODMANSIONE     = MAN.CODMANSIONE
+      AND DT.CODTURNO        = PDT.CODTURNO
+    GROUP BY
+      DM.STRDESCRIZIONE,
+      DT.STRDESCRIZIONE,
+      PDT.PRGDISTURNO,
+      MAN.PRGMANSIONE,
+      STRCOGNOME, STRNOME,
+      PDT.DTMINS            
+    ORDER BY
+      DM.STRDESCRIZIONE,
+      DT.STRDESCRIZIONE
+    "/> 
+
+  <STATEMENT name="DELETE_TURNO_IN_MANSIONE" query="
+    DELETE FROM
+      PR_DIS_TURNO
+    WHERE
+      PRGDISTURNO = ?
+    "/>
+
+  <STATEMENT name="INSERT_TURNO_IN_MANSIONE" query="
+    INSERT INTO PR_DIS_TURNO (
+      PRGDISTURNO,
+      PRGMANSIONE,
+      CODTURNO,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_TURNO.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+  
+  <!-- Seleziona tutti i tipi di turno, 
+       inserendo "(scaduto)" nella descrizione
+       dei record che alla data corrente sono scaduti. 
+       Il campo DESCRIZIONE e' fisso a 45 caratteri,
+       dopo i quali viene inserito "..." se supera
+       questo limite. -->
+  <STATEMENT name="SELECT_TURNI" query="
+    SELECT
+      CODTURNO AS CODICE,
+      DECODE( 
+        GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...'
+      ) || 
+      DECODE (
+        SYSDATE, 
+        GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+        ' (scaduto)',
+        LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+        ' (scaduto)', 
+        ''
+       ) AS DESCRIZIONE
+    FROM DE_TURNO
+    ORDER BY STRDESCRIZIONE
+    "/>
+
+  <!-- La tabella PR_MANSIONE viene usata per garantire 
+       che il turno si riferisca ad una mansione 
+       correntemente presente per il lavoratore,
+       infatti potrebbe capitare che sia eliminato
+       il record di PR_MANSIONE mentre rimane 
+       il turno in PR_DIS_TURNO : questo
+       turno non deve essere piu' visualizzato
+       perche' legato ad una mansione inesistente. -->
+  <STATEMENT name="SELECT_TURNO_IN_MANSIONE" query="
+    SELECT
+      PDT.*
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_TURNO PDT
+    WHERE 
+      PDT.PRGMANSIONE = ?
+      AND PDT.CODTURNO= ?
+      AND MAN.CDNLAVORATORE = ?
+      AND MAN.PRGMANSIONE = PDT.PRGMANSIONE
+    "/>
+
+  <!-- Seleziona i progressivi delle mansioni (distinti)
+       utilizzate dai turni -->
+  <STATEMENT name="SELECT_DISTINCT_TURNI" query="
+    SELECT
+      DISTINCT MAN.PRGMANSIONE AS PRGMANSIONE
+    FROM 
+      PR_MANSIONE MAN,
+      PR_DIS_TURNO PDT
+    WHERE 
+      MAN.CDNLAVORATORE   = ?
+      AND MAN.PRGMANSIONE = PDT.PRGMANSIONE
+   "/>
+
+
+<!-- Gestione Territorio -->
+
+  <!-- Per la mansione specificata, carica l'elenco di
+       - Comuni
+       - Province
+       - Regioni
+       - Stati
+       Raggruppandoli per tipo (i comuni con i comuni ecc)
+       e, all'interno del tipo, per descrizione 
+       (comuni in ordine alfabetico ecc).
+
+       Un elemento della lista viene caricato se:
+       - La mansione esiste ancora
+       - La mansione ha il flag FLGDISPONIBILE = 'S' -->
+
+       
+  <!-- CANCELLARE 
+  
+  STATEMENT name="LOAD_TERRITORIO_MANSIONE" query="
+    (
+      SELECT
+        P_MAN.PRGMANSIONE      AS PRGMANSIONE,
+        D_MAN.STRDESCRIZIONE   AS DESC_MANSIONE,
+        PD_COM.PRGDISCOMUNE    AS PRG,
+        D_COM.STRDENOMINAZIONE || ' (' || TRIM(D_PR.STRISTAT) ||')' AS DESCRIZIONE,
+        PD_COM.STRNOTE         AS NOTE,
+        'COMUNE'                AS TIPO
+
+      FROM 
+        PR_MANSIONE   P_MAN,
+        DE_MANSIONE   D_MAN,
+        PR_DIS_COMUNE PD_COM,
+        DE_COMUNE     D_COM,
+        DE_PROVINCIA  D_PR
+      WHERE 
+        P_MAN.PRGMANSIONE        = ? 
+        AND P_MAN.FLGDISPONIBILE = 'S'
+        AND D_MAN.CODMANSIONE    = P_MAN.CODMANSIONE
+        AND PD_COM.PRGMANSIONE   = P_MAN.PRGMANSIONE 
+        AND PD_COM.CODCOM        = D_COM.CODCOM
+        AND d_com.codprovincia  = d_PR.CODPROVINCIA
+    )    
+    UNION ALL
+    (
+      SELECT
+        P_MAN.PRGMANSIONE       AS PRGMANSIONE,
+        D_MAN.STRDESCRIZIONE    AS DESC_MANSIONE,
+        PD_PROV.PRGDISPROVINCIA AS PRG,
+        D_PROV.STRDENOMINAZIONE AS DESCRIZIONE,
+        ''                      AS NOTE,
+        'PROVINCIA'             AS TIPO
+      FROM 
+        PR_MANSIONE      P_MAN,
+        DE_MANSIONE      D_MAN,
+        PR_DIS_PROVINCIA PD_PROV,
+        DE_PROVINCIA     D_PROV
+      WHERE 
+        P_MAN.PRGMANSIONE        = ?
+        AND D_MAN.CODMANSIONE    = P_MAN.CODMANSIONE
+        AND PD_PROV.PRGMANSIONE  = P_MAN.PRGMANSIONE 
+        AND PD_PROV.CODPROVINCIA = D_PROV.CODPROVINCIA
+    )
+    UNION ALL
+    (
+      SELECT
+        P_MAN.PRGMANSIONE        AS PRGMANSIONE,
+        D_MAN.STRDESCRIZIONE     AS DESC_MANSIONE,
+        PD_REGIO.PRGDISREGIONE   AS PRG,
+        D_REGIO.STRDENOMINAZIONE AS DESCRIZIONE,
+        ''                       AS NOTE,
+        'REGIONE'                AS TIPO
+      FROM 
+        PR_MANSIONE    P_MAN,
+        DE_MANSIONE    D_MAN,
+        PR_DIS_REGIONE PD_REGIO,
+        DE_REGIONE     D_REGIO
+      WHERE 
+        P_MAN.PRGMANSIONE        = ?
+        AND D_MAN.CODMANSIONE    = P_MAN.CODMANSIONE
+        AND PD_REGIO.PRGMANSIONE = P_MAN.PRGMANSIONE 
+        AND PD_REGIO.CODREGIONE  = D_REGIO.CODREGIONE
+    )
+    UNION ALL
+    (
+      SELECT
+        P_MAN.PRGMANSIONE      AS PRGMANSIONE,
+        D_MAN.STRDESCRIZIONE   AS DESC_MANSIONE,
+        PD_STATO.PRGDISSTATO   AS PRG,
+        D_COM.STRDENOMINAZIONE AS DESCRIZIONE,
+        ''                     AS NOTE,
+        'STATO'                AS TIPO
+      FROM 
+        PR_MANSIONE   P_MAN,
+        DE_MANSIONE   D_MAN,
+        PR_DIS_STATO  PD_STATO,
+        DE_COMUNE     D_COM
+      WHERE 
+        P_MAN.PRGMANSIONE        = ? 
+        AND D_MAN.CODMANSIONE    = P_MAN.CODMANSIONE
+        AND PD_STATO.PRGMANSIONE = P_MAN.PRGMANSIONE 
+        AND PD_STATO.CODCOM      = D_COM.CODCOM 
+    )
+    ORDER BY
+      TIPO,
+      DESCRIZIONE
+  "/>
+  
+  -->
+  
+  <!-- NUOVA GESTIONE -->
+
+  <STATEMENT name="GET_MANSIONI_LAV" query="
+  SELECT 
+      DE_MAN.STRDESCRIZIONE AS DESCRIZIONE, MAN.PRGMANSIONE
+  FROM 
+      PR_MANSIONE MAN, DE_MANSIONE DE_MAN
+  WHERE 
+      MAN.CODMANSIONE = DE_MAN.CODMANSIONE 
+  	  AND MAN.FLGDISPONIBILE = 'S'
+      AND MAN.CDNLAVORATORE = ? 
+	    ORDER BY DESCRIZIONE"
+  />
+  
+   <STATEMENT name="GET_MANSIONI_LAV_CM" query="
+  SELECT 
+      DE_MAN.STRDESCRIZIONE AS DESCRIZIONE, MAN.PRGMANSIONE
+  FROM 
+      PR_MANSIONE MAN, DE_MANSIONE DE_MAN
+  WHERE 
+      MAN.CODMANSIONE = DE_MAN.CODMANSIONE 
+  	  AND (MAN.FLGDISPONIBILE = 'S' OR MAN.FLGDISPONIBILE = 'P' OR MAN.FLGDISPONIBILE = 'L')
+      AND MAN.CDNLAVORATORE = ? 
+	    ORDER BY DESCRIZIONE"
+  />
+
+  <STATEMENT name="GET_COMUNI_MANSIONE"
+		query="SELECT
+					COM.PRGDISCOMUNE,
+					DE_COM.STRDENOMINAZIONE ||' (' || TRIM(DE_PROV.STRISTAT) || ')' AS STRDENOMINAZIONE
+				FROM PR_DIS_COMUNE COM,
+					DE_COMUNE DE_COM, DE_PROVINCIA DE_PROV
+				WHERE COM.CODCOM = DE_COM.CODCOM
+				AND   DE_COM.CODPROVINCIA = DE_PROV.CODPROVINCIA 
+				AND   COM.PRGMANSIONE = ?
+				ORDER BY STRDENOMINAZIONE" />
+
+  <STATEMENT name="GET_PROVINCE_MANSIONE"
+		query="SELECT
+					PRO.PRGDISPROVINCIA,
+					DE_PRO.STRDENOMINAZIONE
+				FROM PR_DIS_PROVINCIA PRO,
+					DE_PROVINCIA DE_PRO
+				WHERE PRO.CODPROVINCIA = DE_PRO.CODPROVINCIA
+				AND   PRO.PRGMANSIONE = ?
+				ORDER BY STRDENOMINAZIONE" />
+
+  <STATEMENT name="GET_REGIONI_MANSIONE"
+		query="SELECT
+					REG.PRGDISREGIONE,
+					DE_REG.STRDENOMINAZIONE
+				FROM PR_DIS_REGIONE REG,
+					DE_REGIONE DE_REG
+				WHERE REG.CODREGIONE = DE_REG.CODREGIONE
+				AND   REG.PRGMANSIONE = ?
+				ORDER BY STRDENOMINAZIONE" />
+
+  <STATEMENT name="GET_STATI_MANSIONE"
+  		query="SELECT
+  					STA.PRGDISSTATO,
+  					DE_STA.STRDENOMINAZIONE
+  				FROM PR_DIS_STATO STA,
+  					DE_COMUNE DE_STA
+  				WHERE STA.CODCOM = DE_STA.CODCOM
+  				AND   STA.PRGMANSIONE = ?
+  				ORDER BY STRDENOMINAZIONE" />
+
+<!-- FINE NUOVA GESTIONE -->
+
+
+<!-- XMLType query -->
+
+  <!--STATEMENT name="XML_GET_TERRITORI_MANSIONI" query="
+  SELECT XMLELEMENT ("MANSIONI",XMLAGG(XMLELEMENT ("MANSIONE", XMLATTRIBUTES 
+      (DE_MAN.STRDESCRIZIONE, MAN.PRGMANSIONE),
+      (SELECT XMLELEMENT ("COMUNI", XMLAGG(XMLELEMENT("COMUNE",XMLATTRIBUTES
+         (COM.PRGDISCOMUNE, DE_COM.STRDENOMINAZIONE))))
+      FROM PR_DIS_COMUNE COM, DE_COMUNE DE_COM
+      WHERE
+          COM.CODCOM = DE_COM.CODCOM 
+          AND COM.PRGMANSIONE = MAN.PRGMANSIONE ),
+      (SELECT XMLELEMENT ("PROVINCE", XMLAGG(XMLELEMENT("PROVINCIA",XMLATTRIBUTES
+         (PRO.CODPROVINCIA, DE_PRO.STRDENOMINAZIONE))))
+      FROM PR_DIS_PROVINCIA PRO, DE_PROVINCIA DE_PRO
+      WHERE
+          PRO.CODPROVINCIA = DE_PRO.CODPROVINCIA
+	        AND PRO.PRGMANSIONE = MAN.PRGMANSIONE ),
+      (SELECT XMLELEMENT ("REGIONI", XMLAGG(XMLELEMENT("REGIONE",XMLATTRIBUTES
+         (REG.PRGDISREGIONE, DE_REG.STRDENOMINAZIONE))))
+      FROM PR_DIS_REGIONE REG, DE_REGIONE DE_REG
+      WHERE
+          REG.CODREGIONE = DE_REG.CODREGIONE
+          AND REG.PRGMANSIONE = MAN.PRGMANSIONE ),
+      (SELECT XMLELEMENT ("STATI", XMLAGG(XMLELEMENT("STATO",XMLATTRIBUTES
+         (STA.PRGDISSTATO, DE_STA.STRDENOMINAZIONE))))
+      FROM PR_DIS_STATO STA, DE_COMUNE DE_STA
+      WHERE
+          STA.CODCOM = DE_STA.CODCOM
+          AND STA.PRGMANSIONE = MAN.PRGMANSIONE ))))
+  FROM PR_MANSIONE MAN, DE_MANSIONE DE_MAN
+  WHERE MAN.CDNLAVORATORE = ? 
+        AND MAN.CODMANSIONE = DE_MAN.CODMANSIONE 
+        AND MAN.FLGDISPONIBILE = 'S' "
+  /-->
+
+     
+  <STATEMENT name="LOAD_TERRITORIO_MANSIONE" query="
+  SELECT 
+      DE_MAN.STRDESCRIZIONE AS DESCRIZIONE, 
+      PG_UTILS.CONCATENA_COMUNI (MAN.PRGMANSIONE, DE_MAN.STRDESCRIZIONE) AS COMUNI , 
+      PG_UTILS.CONCATENA_REGIONI (MAN.PRGMANSIONE, DE_MAN.STRDESCRIZIONE) AS REGIONI,  
+      PG_UTILS.CONCATENA_PROVINCE (MAN.PRGMANSIONE, DE_MAN.STRDESCRIZIONE) AS PROVINCE,
+      PG_UTILS.CONCATENA_STATI (MAN.PRGMANSIONE, DE_MAN.STRDESCRIZIONE) AS STATI
+  FROM 
+      PR_MANSIONE MAN, DE_MANSIONE DE_MAN
+  WHERE 
+      MAN.CODMANSIONE = DE_MAN.CODMANSIONE AND
+      MAN.CDNLAVORATORE = ? AND
+      MAN.FLGDISPONIBILE = 'S'
+      ORDER BY DESCRIZIONE"
+  />
+
+  <STATEMENT name="GET_DIS_COMUNE_TERRITORIO" query="
+  SELECT 
+      COM.PRGDISCOMUNE, DE_COM.STRDENOMINAZIONE AS STRCOMUNE, DE_MAN.STRDESCRIZIONE AS STRMANSIONE, COM.STRNOTE as STRNOTE,
+      COM.CDNUTINS, TO_CHAR(COM.DTMINS , 'DD/MM/YYYY hh24:mi') AS DTMINS,
+   	  COM.CDNUTMOD, TO_CHAR(COM.DTMMOD , 'DD/MM/YYYY hh24:mi') AS DTMMOD
+  FROM 
+      PR_DIS_COMUNE COM, DE_COMUNE DE_COM, PR_MANSIONE MAN, DE_MANSIONE DE_MAN
+  WHERE  
+      MAN.PRGMANSIONE = COM.PRGMANSIONE    AND
+      COM.CODCOM = DE_COM.CODCOM 		   AND
+  	  MAN.CODMANSIONE = DE_MAN.CODMANSIONE AND
+      COM.PRGDISCOMUNE = ?"
+  />
+
+  <STATEMENT name="UPD_DIS_COMUNE_TERRITORIO" query="
+  UPDATE PR_DIS_COMUNE
+  SET
+      STRNOTE = ?, 
+      cdnUtMod = ?,
+      dtmMod = sysdate
+  WHERE 
+      PRGDISCOMUNE = ?"
+  />
+
+
+  <STATEMENT name="DELETE_TERRITORIO_COMUNE" query="
+    DELETE FROM
+      PR_DIS_COMUNE
+    WHERE
+      PRGDISCOMUNE = ?
+    "/>
+
+  <STATEMENT name="DELETE_TERRITORIO_PROVINCIA" query="
+    DELETE FROM
+      PR_DIS_PROVINCIA
+    WHERE
+      PRGDISPROVINCIA = ?
+    "/>
+
+  <STATEMENT name="DELETE_TERRITORIO_REGIONE" query="
+    DELETE FROM
+      PR_DIS_REGIONE
+    WHERE
+      PRGDISREGIONE = ?
+    "/>
+
+  <STATEMENT name="DELETE_TERRITORIO_STATO" query="
+    DELETE FROM
+      PR_DIS_STATO
+    WHERE
+      PRGDISSTATO = ?
+    "/>
+    
+  <STATEMENT name="INSERT_TERRITORIO_COMUNE" query="
+    INSERT INTO PR_DIS_COMUNE (
+      PRGDISCOMUNE,
+      PRGMANSIONE,
+      CODCOM,
+      STRNOTE,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_COMUNE.nextval, 
+      ?, 
+      ?,
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+  
+  <!-- Seleziona il record del comune  usando il codice del comune
+       e il progressivo della mansione a cui e' legato.
+       Si mette in Join con la PR_MANSIONE in modo che,
+       se nel frattempo la mansione a cui il record e' legato
+       e' stata eliminata, il record non venga piu' selezionato
+       (mansione inesistente). -->
+  <STATEMENT name="SELECT_TERRITORIO_COMUNE"
+  		query="SELECT
+					COM.STRDENOMINAZIONE ||' (' || TRIM(PROV.STRISTAT) || ')' AS COMUNE_DESC,
+					PD_COM.*
+				FROM 
+					PR_MANSIONE P_MAN,
+					PR_DIS_COMUNE PD_COM,
+					DE_COMUNE COM, DE_PROVINCIA PROV
+				WHERE  P_MAN.PRGMANSIONE = PD_COM.PRGMANSIONE
+					AND PD_COM.CODCOM    = COM.CODCOM
+					AND COM.CODPROVINCIA = PROV.CODPROVINCIA
+					AND PD_COM.PRGMANSIONE = ?
+					AND PD_COM.CODCOM = ? "/>
+
+  <STATEMENT name="SELECT_COMUNI_ZONA" query="
+    SELECT * 
+    FROM 
+      DE_COMUNE 
+    WHERE 
+      CODCPI = ?
+    "/>
+    
+  <STATEMENT name="INSERT_TERRITORIO_PROVINCIA" query="
+    INSERT INTO PR_DIS_PROVINCIA (
+      PRGDISPROVINCIA,
+      PRGMANSIONE,
+      CODPROVINCIA,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_PROVINCIA.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+  
+  <!-- Seleziona il record provincia usando il codice provincia
+       e il progressivo della mansione a cui e' legato.
+       Si mette in Join con la PR_MANSIONE in modo che,
+       se nel frattempo la mansione a cui la provincia e' legata
+       e' stata eliminata, la provincia non venga piu' selezionata
+       (mansione inesistente). -->
+  <STATEMENT name="SELECT_TERRITORIO_PROVINCIA" query="
+    SELECT
+      PD_PROV.*
+    FROM 
+      PR_MANSIONE P_MAN,
+      PR_DIS_PROVINCIA PD_PROV
+    WHERE 
+      PD_PROV.PRGMANSIONE = ?
+      AND PD_PROV.CODPROVINCIA= ?
+      AND P_MAN.PRGMANSIONE = PD_PROV.PRGMANSIONE
+    "/>
+   
+  <STATEMENT name="INSERT_TERRITORIO_REGIONE" query="
+    INSERT INTO PR_DIS_REGIONE (
+      PRGDISREGIONE,
+      PRGMANSIONE,
+      CODREGIONE,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_REGIONE.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+  
+  <!-- Seleziona il record regione usando il codice regione
+       e il progressivo della mansione a cui e' legato.
+       Si mette in Join con la PR_MANSIONE in modo che,
+       se nel frattempo la mansione a cui la regione e' legata
+       e' stata eliminata, la regione non venga piu' selezionata
+       (mansione inesistente). -->
+  <STATEMENT name="SELECT_TERRITORIO_REGIONE" query="
+    SELECT
+      PD_REGIO.*
+    FROM 
+      PR_MANSIONE P_MAN,
+      PR_DIS_REGIONE PD_REGIO
+    WHERE 
+      PD_REGIO.PRGMANSIONE = ?
+      AND PD_REGIO.CODREGIONE= ?
+      AND P_MAN.PRGMANSIONE = PD_REGIO.PRGMANSIONE
+    "/>
+
+  <STATEMENT name="INSERT_TERRITORIO_STATO" query="
+    INSERT INTO PR_DIS_STATO (
+      PRGDISSTATO,
+      PRGMANSIONE,
+      CODCOM,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_STATO.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>
+  
+  <!-- Seleziona il record dello stato usando il codice dello stato
+       e il progressivo della mansione a cui e' legato.
+       Si mette in Join con la PR_MANSIONE in modo che,
+       se nel frattempo lo stato a cui la regione e' legata
+       e' stata eliminata, lo stato non venga piu' selezionato
+       (mansione inesistente). -->
+  <STATEMENT name="SELECT_TERRITORIO_STATO" query="
+    SELECT
+      PD_STATO.*
+    FROM 
+      PR_MANSIONE P_MAN,
+      PR_DIS_STATO PD_STATO
+    WHERE 
+      PD_STATO.PRGMANSIONE = ?
+      AND PD_STATO.CODCOM = ?
+      AND P_MAN.PRGMANSIONE = PD_STATO.PRGMANSIONE
+    "/>
+    
+  <!-- Seleziona tutte le province con CODPROVINCIA < 200
+       in modo da escludere Istria ecc.
+       inserendo "(scaduto)" nella descrizione
+       dei record che alla data corrente sono scaduti. -->
+  <STATEMENT name="SELECT_PROVINCIE" query="
+    SELECT
+      CODPROVINCIA AS CODICE,
+      STRDENOMINAZIONE || 
+        DECODE (
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+      ) AS DESCRIZIONE
+    FROM 
+      DE_PROVINCIA
+    WHERE
+      CODPROVINCIA &lt; 200
+    ORDER BY 
+      STRDENOMINAZIONE
+    "/>
+
+  <!-- Seleziona tutte le regioni con CODREGIONE < 30
+       in moda da escludere Estero
+       inserendo "(scaduto)" nella descrizione
+       dei record che alla data corrente sono scaduti.
+       Non viene caricata la regione ESTERO (cod 99) -->
+  <STATEMENT name="SELECT_REGIONI" query="
+    SELECT
+      CODREGIONE AS CODICE,
+      STRDENOMINAZIONE || 
+        DECODE (
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+      ) AS DESCRIZIONE
+    FROM
+      DE_REGIONE
+    WHERE
+      CODREGIONE &lt; 30
+    ORDER BY 
+      STRDENOMINAZIONE    
+  "/>
+
+
+  <!-- Seleziona tutte le zone (per la combo) -->
+  <STATEMENT name="SELECT_ZONE"
+	query="SELECT
+				CODZONA AS CODICE,
+				STRDESCRIZIONE AS DESCRIZIONE
+			FROM DE_ZONA
+			ORDER BY DESCRIZIONE" />
+  
+  <!-- Seleziona tutte le zone che non hanno una lettera come carattere finale,
+       per ogni zona seleziona i comuni associati.
+       NB: Sono selezionate solo le zone dell'Emilia Romagna. -->
+  <!-- NON PIU' USATO
+  <STATEMENT name="LOAD_ZONE_COMUNI" query="
+    SELECT 
+      D_CPI.STRDESCRIZIONE AS DESC_ZONA,
+      D_CPI.CODZONA AS CODICE_CPI,
+      D_COM.STRDENOMINAZIONE AS DESC_COMUNE
+    FROM 
+      DE_ZONA D_CPI,
+	  DE_ASS_ZONA_COMUNE D_ASS_ZONA_COM,
+      DE_COMUNE D_COM
+    WHERE 
+	  D_COM.CODCOM = D_ASS_ZONA_COM.CODCOM
+      AND D_COM.CODCPI = D_CPI.CODZONA
+    ORDER BY
+      CODICE_CPI,
+      DESC_COMUNE
+  "/>
+  -->
+
+  <!-- Seleziona tutti i comuni di una zona data (input) -->
+   <STATEMENT name="SELECT_COMUNI_IN_ZONA"
+	query="SELECT
+				ZONA.CODZONA AS COD_XXX,
+				ZONA.STRDESCRIZIONE AS DESC_XXX,
+				COM.CODCOM AS COD_COMUNE,
+				COM.STRDENOMINAZIONE AS DESC_COMUNE
+			FROM 
+				DE_ZONA ZONA,
+				DE_ASS_ZONA_COMUNE ZONA2COM,
+				DE_COMUNE COM
+			WHERE zona.CODZONA=zona2com.CODZONA
+			AND COM.CODCOM = ZONA2COM.CODCOM
+			AND   ZONA.CODZONA = ?
+			ORDER BY DESC_COMUNE " />
+
+  <!-- Seleziona tutti i comuni di una zona data (input) -->
+  <STATEMENT name="SELECT_COMUNI_IN_PROV"
+	query="SELECT
+				PROV.CODPROVINCIA AS COD_XXX,
+				PROV.STRDENOMINAZIONE AS DESC_XXX,
+				COM.CODCOM AS COD_COMUNE,
+				COM.STRDENOMINAZIONE AS DESC_COMUNE
+			FROM 
+				DE_PROVINCIA PROV,
+				DE_COMUNE COM
+			WHERE COM.CODPROVINCIA = PROV.CODPROVINCIA
+			AND   PROV.CODPROVINCIA = ?
+			AND trunc(sysdate) between trunc(COM.DATINIZIOVAL) and trunc(COM.DATFINEVAL)
+			ORDER BY DESC_COMUNE " />
+
+
+<!-- SELECT PER CPI -->
+<STATEMENT
+        name="SELECT_CERCA_CPI_PRECISA"
+        query="SELECT c.codcpi, c.strdescrizione
+               FROM de_cpi c
+               WHERE c.strdescrizione=?
+                and SUBSTR(C.CODCPI, LENGTH(C.CODCPI), 1) &gt;= '0' 
+                AND SUBSTR(C.CODCPI, LENGTH(C.CODCPI), 1) &lt;= '9'
+                and SYSDATE &gt;= c.datinizioval
+                and SYSDATE &lt;= c.datfineval  "/>
+
+<STATEMENT
+        name="SELECT_CERCA_CPI_CODICE_PRECISA"
+        query="SELECT c.codcpi, c.strdescrizione
+               FROM de_cpi c
+               WHERE c.codcpi=?
+                and SUBSTR(C.CODCPI, LENGTH(C.CODCPI), 1) &gt;= '0' 
+                AND SUBSTR(C.CODCPI, LENGTH(C.CODCPI), 1) &lt;= '9'
+                and SYSDATE &gt;= c.datinizioval
+                and SYSDATE &lt;= c.datfineval  "/>
+
+<STATEMENT
+        name="SELECT_CERCA_CPI_APPROSSIMATA"
+        query="SELECT c.codcpi, c.strdescrizione
+               FROM de_cpi c
+               WHERE c.strdescrizione like ? || '%'
+               and SUBSTR(C.CODCPI, LENGTH(C.CODCPI), 1) &gt;= '0' 
+                AND SUBSTR(C.CODCPI, LENGTH(C.CODCPI), 1) &lt;= '9'
+               and SYSDATE &gt;= c.datinizioval
+               and SYSDATE &lt;= c.datfineval  
+               ORDER BY strdescrizione"/>
+
+<STATEMENT
+        name="SELECT_CERCA_CPI_CODICE_APPROSSIMATA"
+        query="SELECT c.codcpi, c.strdescrizione
+                FROM de_cpi c
+                WHERE c.codcpi like ? || '%'
+                and SUBSTR(C.CODCPI, LENGTH(C.CODCPI), 1) &gt;= '0' 
+                AND SUBSTR(C.CODCPI, LENGTH(C.CODCPI), 1) &lt;= '9'
+                and SYSDATE &gt;= c.datinizioval
+                and SYSDATE &lt;= c.datfineval 
+                ORDER BY strdescrizione "/>  
+
+<!-- SELECT PER CCNL -->
+<STATEMENT
+        name="SELECT_CERCA_CCNL_PRECISA"
+        query="SELECT c.codccnl, c.strdescrizione, t.strdescrizione as descpadre
+              FROM
+                de_contratto_collettivo c
+                left join de_contratto_collettivo t on t.codccnl = c.codpadre
+               WHERE 
+                UPPER(c.strdescrizione)=?
+                and SYSDATE &gt;= c.datinizioval
+                and SYSDATE &lt;= c.datfineval 
+                and c.codpadre != '0' 
+               ORDER by c.codccnl"/>
+
+<STATEMENT
+        name="SELECT_CERCA_CCNL_CODICE_PRECISA"
+        query="SELECT c.codccnl, c.strdescrizione, t.strdescrizione as descpadre
+              FROM
+                de_contratto_collettivo c
+                left join de_contratto_collettivo t on t.codccnl = c.codpadre
+               WHERE c.codcpi=?
+                and SYSDATE &gt;= c.datinizioval
+                and SYSDATE &lt;= c.datfineval 
+                and c.codpadre != '0' 
+              ORDER by c.codccnl"/>
+
+<STATEMENT
+        name="SELECT_CERCA_CCNL_APPROSSIMATA"
+        query="SELECT c.codccnl
+                    , c.strdescrizione
+					   || DECODE (
+				          SYSDATE, 
+				          GREATEST(SYSDATE, c.DATINIZIOVAL, c.DATFINEVAL),
+				          ' (scaduto)',
+				          LEAST(SYSDATE, c.DATINIZIOVAL, c.DATFINEVAL),
+				          ' (scaduto)', 
+				          ''
+				        ) as strdescrizione
+                    , t.strdescrizione as descpadre
+                    , c.NUMDURATAAPPRENDIST
+              FROM
+                de_contratto_collettivo c
+                left join de_contratto_collettivo t on t.codccnl = c.codpadre
+               WHERE 
+               UPPER(c.strdescrizione) like '%' || UPPER(?) || '%'
+               and c.codpadre != '0' 
+               ORDER by c.strdescrizione,c.codccnl"/>
+
+<STATEMENT
+        name="SELECT_CERCA_CCNL_CODICE_APPROSSIMATA"
+        query="SELECT c.codccnl
+                    , c.strdescrizione
+					   || DECODE (
+				          SYSDATE, 
+				          GREATEST(SYSDATE, c.DATINIZIOVAL, c.DATFINEVAL),
+				          ' (scaduto)',
+				          LEAST(SYSDATE, c.DATINIZIOVAL, c.DATFINEVAL),
+				          ' (scaduto)', 
+				          ''
+				        ) as strdescrizione
+                    , t.strdescrizione as descpadre
+              FROM
+                de_contratto_collettivo c
+                left join de_contratto_collettivo t on t.codccnl = c.codpadre
+             WHERE c.codccnl like ? || '%'
+                and c.codpadre != '0' 
+                ORDER by c.strdescrizione,c.codccnl"/>                 
+
+<!-- In questi statements vengono esclusi i CCNL scaduti: -->
+<!-- <STATEMENT
+        name="SELECT_CERCA_CCNL_APPROSSIMATA"
+        query="SELECT c.codccnl, c.strdescrizione, t.strdescrizione as descpadre, c.NUMDURATAAPPRENDIST
+              FROM
+                de_contratto_collettivo c
+                left join de_contratto_collettivo t on t.codccnl = c.codpadre
+               WHERE 
+               UPPER(c.strdescrizione) like '%' || UPPER(?) || '%'
+               and SYSDATE &gt;= c.datinizioval
+               and SYSDATE &lt;= c.datfineval 
+               and c.codpadre != '0' 
+               ORDER by c.strdescrizione,c.codccnl"/>
+
+<STATEMENT
+        name="SELECT_CERCA_CCNL_CODICE_APPROSSIMATA"
+        query="SELECT c.codccnl, c.strdescrizione, t.strdescrizione as descpadre
+              FROM
+                de_contratto_collettivo c
+                left join de_contratto_collettivo t on t.codccnl = c.codpadre
+             WHERE c.codccnl like ? || '%'
+                and SYSDATE &gt;= c.datinizioval
+                and SYSDATE &lt;= c.datfineval 
+                and c.codpadre != '0' 
+                ORDER by c.strdescrizione,c.codccnl"/>
+-->
+
+
+
+
+<STATEMENT name="SELECT_VISIB_TERRITORI" query="
+    (
+      SELECT
+        VT.prgVisibTerritorio  AS PRG,
+        'COMUNE DI ' || D_COM.STRDENOMINAZIONE AS DESCRIZIONE,
+        'COMUNE'                AS TIPO
+      FROM 
+        PR_VISIB_TERRITORIO VT,        
+        DE_COMUNE           D_COM
+      WHERE 
+        VT.cdnLavoratore = ? 
+        AND VT.codCom    = D_COM.CODCOM
+    )    
+    UNION ALL
+    (
+      SELECT
+        VP.prgVisibProvincia   AS PRG,
+        D_PROV.STRINTESTAZIONESTAMPA AS DESCRIZIONE,
+        'PROVINCIA'            AS TIPO
+      FROM 
+        PR_VISIB_PROVINCIA VP,
+        DE_PROVINCIA       D_PROV
+      WHERE 
+        VP.cdnLavoratore    = ? 
+        AND VP.codProvincia = D_PROV.CODPROVINCIA
+    )
+    ORDER BY
+      TIPO,
+      DESCRIZIONE
+  "/>
+
+<STATEMENT name="INSERT_PRESEL_VISIB_TERRITORIO" query="
+    INSERT INTO PR_VISIB_TERRITORIO (
+       PRGVISIBTERRITORIO, CDNLAVORATORE, CODCOM,
+       CDNUTINS, DTMINS, CDNUTMOD, 
+       DTMMOD) 
+    VALUES ( ?, ?, ?,
+        ?, SYSDATE, ?, 
+        SYSDATE)
+  "/>
+  
+<STATEMENT name="PR_VISIB_TERRITORIO_NEXTVAL" query="
+    SELECT
+      S_PR_VISIB_TERRITORIO.nextval AS DO_NEXTVAL
+    FROM
+      DUAL
+  "/>  
+
+<STATEMENT name="DELETE_PRESEL_VISIB_TERRITORIO" query="
+    DELETE FROM
+      PR_VISIB_TERRITORIO
+    WHERE
+      PRGVISIBTERRITORIO=?
+  "/>
+
+<STATEMENT name="INSERT_PRESEL_VISIB_PROVINCIA" query="
+    INSERT INTO PR_VISIB_PROVINCIA (
+       PRGVISIBPROVINCIA, CDNLAVORATORE, CODPROVINCIA,
+       CDNUTINS, DTMINS, CDNUTMOD, 
+       DTMMOD) 
+    VALUES ( ?, ?, ?,
+        ?, SYSDATE, ?, 
+        SYSDATE)
+  "/>
+  
+<STATEMENT name="PR_VISIB_PROVINCIA_NEXTVAL" query="
+    SELECT
+      S_PR_VISIB_PROVINCIA.nextval AS DO_NEXTVAL
+    FROM
+      DUAL
+  "/>  
+
+<STATEMENT name="DELETE_PRESEL_VISIB_PROVINCIA" query="
+    DELETE FROM
+      PR_VISIB_PROVINCIA
+    WHERE
+      PRGVISIBPROVINCIA=?
+  "/>  
+
+<STATEMENT name="SELECT_VISIB_TIPO_UTENTI" query="
+    SELECT
+      PR.PRGVISIBTIPOGRUPPO AS PRGVISIBTIPOGRUPPO,
+      TS.STRDENOMINAZIONE AS DENOMINAZIONE
+    FROM
+      PR_VISIB_TIPOGRUPPO PR,
+      TS_TIPO_GRUPPO TS
+    WHERE
+      PR.cdnLavoratore = ? AND
+      PR.cdnTipoGruppo = TS.cdnTipoGruppo
+  "/>   
+
+<STATEMENT name="SELECT_COMBO_VISIB_TIPO_UTENTI" query="
+    SELECT
+      TS.cdnTipoGruppo AS CODICE,
+      TS.STRDENOMINAZIONE AS DESCRIZIONE
+    FROM
+      TS_TIPO_GRUPPO TS
+    WHERE
+      TS.CODTIPO = 'E'
+  "/>
+
+<STATEMENT name="INSERT_PRESEL_VISIB_TIPO_UTENTI" query="
+    INSERT INTO PR_VISIB_TIPOGRUPPO (
+       PRGVISIBTIPOGRUPPO, CDNLAVORATORE, CDNTIPOGRUPPO,
+       CDNUTINS, DTMINS, CDNUTMOD, 
+       DTMMOD) 
+    VALUES ( ?, ?, ?,
+        ?, SYSDATE, ?, 
+        SYSDATE)
+  "/>
+  
+<STATEMENT name="PR_VISIB_TIPO_UTENTI_NEXTVAL" query="
+    SELECT
+      S_PR_VISIB_TIPOGRUPPO.nextval AS DO_NEXTVAL
+    FROM
+      DUAL
+  "/>  
+
+<STATEMENT name="DELETE_PRESEL_VISIB_TIPOUTENTI" query="
+    DELETE FROM
+      PR_VISIB_TIPOGRUPPO
+    WHERE
+      PRGVISIBTIPOGRUPPO=?
+  "/>  
+
+<!-- VISIBILITA' UTENTI SPECIFICI-->
+<STATEMENT name="SELECT_VISIB_UTENTI_SPECIFICI" query="
+    SELECT
+      PR.PRGVISIBGRUPPO AS PRGVISIBGRUPPO,
+      TS.STRDENOMINAZIONE AS DENOMINAZIONE,
+      TO_CHAR(PR.DATAUTORIZZAZIONE , 'DD/MM/YYYY') DATAUTORIZZAZIONE,
+      PR.STRAUTORIZZAZIONE AS STRAUTORIZZAZIONE
+    FROM
+      PR_VISIB_GRUPPO PR,
+      TS_GRUPPO TS
+    WHERE
+      PR.cdnLavoratore = ? AND
+      PR.cdnGruppo = TS.cdnGruppo
+  "/>   
+
+<STATEMENT name="SELECT_PRESEL_VISIB_UTENTE_SPECIFICO" query="
+    SELECT
+      PR.PRGVISIBGRUPPO    AS PRGVISIBGRUPPO,
+      PR.CDNGRUPPO         AS CDNGRUPPO,
+      TO_CHAR(PR.DATAUTORIZZAZIONE , 'DD/MM/YYYY') DATAUTORIZZAZIONE,
+      PR.STRAUTORIZZAZIONE AS STRAUTORIZZAZIONE
+    FROM
+      PR_VISIB_GRUPPO PR
+    WHERE
+      PR.PRGVISIBGRUPPO = ?
+  "/>     
+
+<STATEMENT name="SELECT_COMBO_VISIB_UTENTI_SPECIFICI" query="
+    SELECT
+      TS.cdnGruppo AS CODICE,
+      TS.STRDENOMINAZIONE AS DESCRIZIONE
+    FROM
+      TS_GRUPPO TS,
+      TS_TIPO_GRUPPO TG
+    WHERE
+      TS.CDNTIPOGRUPPO = TG.CDNTIPOGRUPPO AND
+      TG.CODTIPO = 'E'
+  "/>
+  
+
+<STATEMENT name="INSERT_PRESEL_VISIB_UTENTI_SPECIFICI" query="
+    INSERT INTO PR_VISIB_GRUPPO (
+       PRGVISIBGRUPPO, CDNLAVORATORE, CDNGRUPPO,
+       CDNUTINS, DATAUTORIZZAZIONE, STRAUTORIZZAZIONE, DTMINS, CDNUTMOD, 
+       DTMMOD) 
+    VALUES ( ?, ?, ?,
+        ?,TO_DATE(?,'DD/MM/YYYY'),?, SYSDATE, ?, 
+        SYSDATE)
+  "/>
+  
+<STATEMENT name="PR_VISIB_UTENTI_SPECIFICI_NEXTVAL" query="
+    SELECT
+      S_PR_VISIB_GRUPPO.nextval AS DO_NEXTVAL
+    FROM
+      DUAL
+  "/>  
+
+<STATEMENT name="DELETE_PRESEL_VISIB_UTENTI_SPECIFICI" query="
+    DELETE FROM
+      PR_VISIB_GRUPPO
+    WHERE
+      PRGVISIBGRUPPO=?
+  "/>
+
+<STATEMENT name="UPDATE_PRESEL_VISIB_UTENTE_SPECIFICO" query="
+  UPDATE PR_VISIB_GRUPPO SET
+      CDNGRUPPO = ?,
+      DATAUTORIZZAZIONE = TO_DATE(?,'DD/MM/YYYY'),
+      STRAUTORIZZAZIONE = ?,
+      CDNUTMOD = ?,
+      DTMMOD = SYSDATE
+    WHERE PRGVISIBGRUPPO = ?
+  "/>  
+
+
+
+<STATEMENT name="SELECT_ASS_MOV_X_ESPL_LAV" query="
+SELECT distinct
+  am.prgmovimento,
+  am.prgazienda,
+  am.cdnlavoratore,
+  decode(PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODCONTRATTOFORRP( am.PRGMOVIMENTO ),
+		'LT',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP( am.PRGMOVIMENTO ),
+			             'I', 'LP','LT'),
+		'LP',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP(am.PRGMOVIMENTO ),
+			             'I','LP','LT'),
+		'LTP',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP(am.PRGMOVIMENTO ),
+			             'I','LP','LT'),
+		PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODCONTRATTOFORRP( am.PRGMOVIMENTO ))as codcontratto,		
+  am.codmansione,
+  dm1.codmansione as codmansioneold,
+  dm1.strdescrizione as descmansioneold,
+  am.CODMONOMOVDICH,
+  pm.prgmansione,
+  an.strragionesociale,
+  an.STRCODICEFISCALE CODFISCALEAZIENDA,
+  an.STRPARTITAIVA, 
+  an.CODNATGIURIDICA,
+  AN_UNITA_AZIENDA.CODATECO,
+  AN_UNITA_AZIENDA.CODCOM,
+  AN_UNITA_AZIENDA.STRINDIRIZZO,
+  dm.strdescrizione,
+  TO_CHAR(am.datiniziomov,'DD/MM/YYYY') datiniziomov,
+  am.datiniziomov datainiziomovimento,
+  to_char(PG_ANAGRAFICA_PROFESSIONALE_RP.GetDataFineMovEffForRp(am.PRGMOVIMENTO), 'dd/mm/yyyy') datfinemov
+FROM 
+  AM_MOVIMENTO am,
+  dw_cp11 dw1,
+  de_mansione dm1,
+  AN_AZIENDA an,
+  AN_UNITA_AZIENDA,
+  DE_MANSIONE dm,
+  PR_MANSIONE pm,
+  de_contratto dc
+WHERE 
+  am.PRGMOVIMENTO not in (select mi.PRGMOVIMENTO from AM_MOVIMENTO_MISSIONE mi where mi.PRGMOVIMENTO = am.PRGMOVIMENTO) and
+  am.prgazienda=an.prgazienda    	and  
+  am.PRGUNITA=AN_UNITA_AZIENDA.PRGUNITA	  and  
+  an.PRGAZIENDA=AN_UNITA_AZIENDA.PRGAZIENDA and  
+  am.cdnlavoratore = pm.cdnlavoratore(+) and
+  am.codmansione =  dm.codmansione  and
+  am.codmansione = dw1.codmansionenew(+) and
+  dw1.codmansionedot_01 = dm1.codmansionedot(+) and
+  am.codtipomov = 'AVV' and
+  am.codmansione =  pm.codmansione(+)  and
+  am.CODCONTRATTO = dc.CODCONTRATTO and
+  nvl(dc.flgtirocini,'N') != 'S' and
+  am.CODSTATOATTO = 'PR' and
+  am.cdnlavoratore= ?
+  
+  union
+  
+  SELECT distinct
+  am.prgmovimento,
+  am.prgazienda,
+  am.cdnlavoratore,
+  decode(PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODCONTRATTOFORRP( am.PRGMOVIMENTO ),
+		'LT',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP( am.PRGMOVIMENTO ),
+			             'I', 'LP','LT'),
+		'LP',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP(am.PRGMOVIMENTO ),
+			             'I','LP','LT'),
+		'LTP',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP(am.PRGMOVIMENTO ),
+			             'I','LP','LT'),
+		PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODCONTRATTOFORRP( am.PRGMOVIMENTO ))as codcontratto,		
+  am.codmansione,
+  dm1.codmansione as codmansioneold,
+  dm1.strdescrizione as descmansioneold,
+  am.CODMONOMOVDICH,
+  pm.prgmansione,
+  an.strragionesociale,
+  an.STRCODICEFISCALE CODFISCALEAZIENDA,
+  an.STRPARTITAIVA, 
+  an.CODNATGIURIDICA,
+  AN_UNITA_AZIENDA.CODATECO,
+  AN_UNITA_AZIENDA.CODCOM,
+  AN_UNITA_AZIENDA.STRINDIRIZZO,
+  dm.strdescrizione,
+  TO_CHAR(am.datiniziomov,'DD/MM/YYYY') datiniziomov,
+  am.datiniziomov datainiziomovimento,
+  to_char(PG_ANAGRAFICA_PROFESSIONALE_RP.GetDataFineMovEffForRp(am.PRGMOVIMENTO), 'dd/mm/yyyy') datfinemov
+FROM 
+  AM_MOVIMENTO am,
+  dw_cp11 dw1,
+  de_mansione dm1,
+  AN_AZIENDA an,
+  AN_UNITA_AZIENDA,
+  DE_MANSIONE dm,
+  PR_MANSIONE pm,
+  de_contratto dc
+WHERE 
+  am.PRGMOVIMENTO not in (select mi.PRGMOVIMENTO from AM_MOVIMENTO_MISSIONE mi where mi.PRGMOVIMENTO = am.PRGMOVIMENTO) and
+  am.prgazienda=an.prgazienda    	and  
+  am.PRGUNITA=AN_UNITA_AZIENDA.PRGUNITA	  and  
+  an.PRGAZIENDA=AN_UNITA_AZIENDA.PRGAZIENDA and  
+  am.cdnlavoratore = pm.cdnlavoratore(+) and
+  am.codmansione =  dm.codmansione  and
+  am.codmansione = dw1.codmansionenew(+) and
+  dw1.codmansionedot_01 = dm1.codmansione(+) and
+  am.codtipomov = 'AVV' and
+  am.codmansione =  pm.codmansione(+)  and
+  am.CODCONTRATTO = dc.CODCONTRATTO and
+  nvl(dc.flgtirocini,'N') != 'S' and
+  am.CODSTATOATTO = 'PR' and
+  am.cdnlavoratore= ?
+  
+  union
+  
+select distinct
+mi.PRGMOVIMENTO, 
+mi.PRGAZIENDAUTILIZ, 
+mo.CDNLAVORATORE, 
+decode(PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODCONTRATTOFORRP( mo.PRGMOVIMENTO ),
+		'LT',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP( mo.PRGMOVIMENTO ),
+			             'I', 'LP','LT'),
+		'LP',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP(mo.PRGMOVIMENTO ),
+			             'I','LP','LT'),
+		'LTP',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP(mo.PRGMOVIMENTO ),
+			             'I','LP','LT'),
+		PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODCONTRATTOFORRP( mo.PRGMOVIMENTO ))as codcontratto,
+mi.CODMANSIONE,
+dm1.codmansione as codmansioneold,
+dm1.strdescrizione as descmansioneold,
+mo.CODMONOMOVDICH,
+pm.prgmansione,
+an.STRRAGIONESOCIALE,
+an.STRCODICEFISCALE CODFISCALEAZIENDA,
+an.STRPARTITAIVA, 
+an.CODNATGIURIDICA,
+AN_UNITA_AZIENDA.CODATECO,
+AN_UNITA_AZIENDA.CODCOM,
+AN_UNITA_AZIENDA.STRINDIRIZZO,
+dm.STRDESCRIZIONE,
+TO_CHAR(mi.DATINIZIOMIS,'DD/MM/YYYY') datiniziomov,
+mi.DATINIZIOMIS datainiziomovimento,
+TO_CHAR(mi.DATFINEMIS,'DD/MM/YYYY') datfinemov
+from AM_MOVIMENTO_MISSIONE mi, 
+AM_MOVIMENTO mo,
+dw_cp11 dw1,
+de_mansione dm1,
+DE_MANSIONE dm,
+AN_UNITA_AZIENDA,
+PR_MANSIONE pm,
+AN_AZIENDA an 
+where  mi.PRGMOVIMENTO = mo.PRGMOVIMENTO and
+mi.PRGAZIENDAUTILIZ = an.PRGAZIENDA and 
+mi.CODMANSIONE = dm.CODMANSIONE and
+mi.codmansione = dw1.codmansionenew(+) and
+dw1.codmansionedot_01 = dm1.codmansionedot(+) and
+mi.PRGUNITAUTILIZ=AN_UNITA_AZIENDA.PRGUNITA	  and  
+mi.PRGAZIENDAUTILIZ=AN_UNITA_AZIENDA.PRGAZIENDA and
+? = pm.CDNLAVORATORE (+)  and 
+mi.CODMANSIONE = pm.CODMANSIONE(+) and
+mo.CDNLAVORATORE = ?
+
+union
+
+select distinct
+mi.PRGMOVIMENTO, 
+mi.PRGAZIENDAUTILIZ, 
+mo.CDNLAVORATORE, 
+decode(PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODCONTRATTOFORRP( mo.PRGMOVIMENTO ),
+		'LT',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP( mo.PRGMOVIMENTO ),
+			             'I', 'LP','LT'),
+		'LP',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP(mo.PRGMOVIMENTO ),
+			             'I','LP','LT'),
+		'LTP',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP(mo.PRGMOVIMENTO ),
+			             'I','LP','LT'),
+		PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODCONTRATTOFORRP( mo.PRGMOVIMENTO ))as codcontratto,
+mi.CODMANSIONE,
+dm1.codmansione as codmansioneold,
+dm1.strdescrizione as descmansioneold,
+mo.CODMONOMOVDICH,
+pm.prgmansione,
+an.STRRAGIONESOCIALE,
+an.STRCODICEFISCALE CODFISCALEAZIENDA,
+an.STRPARTITAIVA, 
+an.CODNATGIURIDICA,
+AN_UNITA_AZIENDA.CODATECO,
+AN_UNITA_AZIENDA.CODCOM,
+AN_UNITA_AZIENDA.STRINDIRIZZO,
+dm.STRDESCRIZIONE,
+TO_CHAR(mi.DATINIZIOMIS,'DD/MM/YYYY') datiniziomov,
+mi.DATINIZIOMIS datainiziomovimento,
+TO_CHAR(mi.DATFINEMIS,'DD/MM/YYYY') datfinemov
+from AM_MOVIMENTO_MISSIONE mi, 
+AM_MOVIMENTO mo,
+dw_cp11 dw1,
+de_mansione dm1,
+DE_MANSIONE dm,
+AN_UNITA_AZIENDA,
+PR_MANSIONE pm,
+AN_AZIENDA an 
+where  mi.PRGMOVIMENTO = mo.PRGMOVIMENTO and
+mi.PRGAZIENDAUTILIZ = an.PRGAZIENDA and 
+mi.CODMANSIONE = dm.CODMANSIONE and
+mi.codmansione = dw1.codmansionenew(+) and
+dw1.codmansionedot_01 = dm1.codmansione(+) and
+mi.PRGUNITAUTILIZ=AN_UNITA_AZIENDA.PRGUNITA	  and  
+mi.PRGAZIENDAUTILIZ=AN_UNITA_AZIENDA.PRGAZIENDA and
+? = pm.CDNLAVORATORE (+)  and 
+mi.CODMANSIONE = pm.CODMANSIONE(+) and
+mo.CDNLAVORATORE = ?
+
+order by datainiziomovimento desc 
+ "/>
+
+
+<STATEMENT name="SELECT_ASS_MOV_X_ESPL_NON_LAV" query="
+SELECT distinct
+  am.prgmovimento,
+  am.prgazienda,
+  am.cdnlavoratore,
+  decode(PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODCONTRATTOFORRP( am.PRGMOVIMENTO ),
+		'LT',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP( am.PRGMOVIMENTO ),
+			             'I', 'LP','LT'),
+		'LP',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP(am.PRGMOVIMENTO ),
+			             'I','LP','LT'),
+		'LTP',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP(am.PRGMOVIMENTO ),
+			             'I','LP','LT'),
+		PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODCONTRATTOFORRP( am.PRGMOVIMENTO ))as codcontratto,		
+  am.codmansione,
+  dm1.codmansione as codmansioneold,
+  dm1.strdescrizione as descmansioneold,
+  am.CODMONOMOVDICH,
+  pm.prgmansione,
+  an.strragionesociale,
+  an.STRCODICEFISCALE CODFISCALEAZIENDA,
+  an.STRPARTITAIVA, 
+  an.CODNATGIURIDICA,
+  AN_UNITA_AZIENDA.CODATECO,
+  AN_UNITA_AZIENDA.CODCOM,
+  AN_UNITA_AZIENDA.STRINDIRIZZO,
+  dm.strdescrizione,
+  TO_CHAR(am.datiniziomov,'DD/MM/YYYY') datiniziomov,
+  am.datiniziomov datainiziomovimento,
+  to_char(PG_ANAGRAFICA_PROFESSIONALE_RP.GetDataFineMovEffForRp(am.PRGMOVIMENTO), 'dd/mm/yyyy') datfinemov
+FROM 
+  AM_MOVIMENTO am,
+  dw_cp11 dw1,
+  de_mansione dm1,
+  AN_AZIENDA an,
+  AN_UNITA_AZIENDA,
+  DE_MANSIONE dm,
+  PR_MANSIONE pm,
+  de_contratto dc
+WHERE 
+  am.prgazienda=an.prgazienda    	and  
+  am.PRGUNITA=AN_UNITA_AZIENDA.PRGUNITA	  and  
+  an.PRGAZIENDA=AN_UNITA_AZIENDA.PRGAZIENDA and  
+  am.cdnlavoratore = pm.cdnlavoratore(+) and
+  am.codmansione =  dm.codmansione  and
+  am.codmansione = dw1.codmansionenew(+) and
+  dw1.codmansionedot_01 = dm1.codmansionedot(+) and
+  am.codtipomov = 'AVV' and
+  am.codmansione =  pm.codmansione(+)  and
+  am.CODCONTRATTO = dc.CODCONTRATTO and
+  nvl(dc.flgtirocini,'N') = 'S' and
+  am.CODSTATOATTO = 'PR' and
+  am.cdnlavoratore=?  
+  
+  union
+  
+  SELECT distinct
+  am.prgmovimento,
+  am.prgazienda,
+  am.cdnlavoratore,
+  decode(PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODCONTRATTOFORRP( am.PRGMOVIMENTO ),
+		'LT',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP( am.PRGMOVIMENTO ),
+			             'I', 'LP','LT'),
+		'LP',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP(am.PRGMOVIMENTO ),
+			             'I','LP','LT'),
+		'LTP',decode (PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODMONOTEMPOFORRP(am.PRGMOVIMENTO ),
+			             'I','LP','LT'),
+		PG_ANAGRAFICA_PROFESSIONALE_RP.GETCODCONTRATTOFORRP( am.PRGMOVIMENTO ))as codcontratto,		
+  am.codmansione,
+  dm1.codmansione as codmansioneold,
+  dm1.strdescrizione as descmansioneold,
+  am.CODMONOMOVDICH,
+  pm.prgmansione,
+  an.strragionesociale,
+  an.STRCODICEFISCALE CODFISCALEAZIENDA,
+  an.STRPARTITAIVA, 
+  an.CODNATGIURIDICA,
+  AN_UNITA_AZIENDA.CODATECO,
+  AN_UNITA_AZIENDA.CODCOM,
+  AN_UNITA_AZIENDA.STRINDIRIZZO,
+  dm.strdescrizione,
+  TO_CHAR(am.datiniziomov,'DD/MM/YYYY') datiniziomov,
+  am.datiniziomov datainiziomovimento,
+  to_char(PG_ANAGRAFICA_PROFESSIONALE_RP.GetDataFineMovEffForRp(am.PRGMOVIMENTO), 'dd/mm/yyyy') datfinemov
+FROM 
+  AM_MOVIMENTO am,
+  dw_cp11 dw1,
+  de_mansione dm1,
+  AN_AZIENDA an,
+  AN_UNITA_AZIENDA,
+  DE_MANSIONE dm,
+  PR_MANSIONE pm,
+  de_contratto dc
+WHERE 
+  am.prgazienda=an.prgazienda    	and  
+  am.PRGUNITA=AN_UNITA_AZIENDA.PRGUNITA	  and  
+  an.PRGAZIENDA=AN_UNITA_AZIENDA.PRGAZIENDA and  
+  am.cdnlavoratore = pm.cdnlavoratore(+) and
+  am.codmansione =  dm.codmansione  and
+  am.codmansione = dw1.codmansionenew(+) and
+  dw1.codmansionedot_01 = dm1.codmansione(+) and
+  am.codtipomov = 'AVV' and
+  am.codmansione =  pm.codmansione(+)  and
+  am.CODCONTRATTO = dc.CODCONTRATTO and
+  nvl(dc.flgtirocini,'N') = 'S' and
+  am.CODSTATOATTO = 'PR' and
+  am.cdnlavoratore=?
+  
+  order by datainiziomovimento desc
+ "/>
+
+
+<STATEMENT name="SELECT_PRG_MANSIONE" query="
+SELECT 
+  pm.prgmansione
+FROM 
+  PR_MANSIONE pm
+WHERE 
+  pm.cdnlavoratore= ? and pm.codmansione= ?
+  "/>
+
+
+  <STATEMENT name="INSERT_ASS_ESP_MOVI" query="
+ INSERT INTO PR_ASS_ESP_MOVI (
+            PRGMOVIMENTO, 
+              PRGESPLAVORO) 
+    VALUES ( ? , ?)
+  "/>
+
+
+
+<STATEMENT name="SELECT_MANSIONI_MOVIMENTO" query="
+SELECT DISTINCT
+	  am.codmansione as codice,
+	  dm.strdescrizione as descrizione
+FROM 
+  AM_MOVIMENTO am,  
+  DE_MANSIONE dm
+WHERE 
+  am.codmansione =  dm.codmansione  and
+  am.cdnlavoratore= ?
+  "/>
+  
+<STATEMENT name="GETLAVCM" 
+	query=" SELECT I.CDNLAVORATORE AS ControllaCdn
+				   FROM AM_CM_ISCR I 
+				   INNER JOIN AM_DOCUMENTO_COLL COLL ON (I.PRGCMISCR = COLL.STRCHIAVETABELLA)
+				   INNER JOIN AM_DOCUMENTO DOC ON (COLL.PRGDOCUMENTO = DOC.PRGDOCUMENTO AND DOC.CODTIPODOCUMENTO = 'L68')
+				   WHERE DOC.CODSTATOATTO = 'PR' and i.datdatafine is null and DECRYPT(I.CDNLAVORATORE,?) = ? 
+				   and DOC.CDNLAVORATORE = ? "/>
+ 
+
+
+<STATEMENT name="ST_CONFIG_PR_MOBG" 
+	query=" select to_char(ts_config_loc.num) num, ts_generale.codprovinciasil
+				from ts_config_loc, de_tipo_config, ts_generale
+				where ts_generale.codprovinciasil = ts_config_loc.strcodrif
+				and de_tipo_config.codtipoconfig = ts_config_loc.codtipoconfig
+				and ts_config_loc.codtipoconfig = 'PR_MOBG'  "/>
+
+
+
+

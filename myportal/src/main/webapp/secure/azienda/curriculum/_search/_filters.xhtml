@@ -1,0 +1,103 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:eng="http://java.sun.com/jsf/composite/components">
+	<div class="col-md-12 m-t-20">
+		<h:form id="filtersForm">
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-group">
+						<p:outputLabel for="titolo" value="Titolo" styleClass="col-sm-3 control-label">
+						</p:outputLabel>
+						<div class="col-md-9 col-lg-9">
+							<p:inputText id="titolo" value="#{cercaCurriculumPfBean.curriculumSearchParams.titolo}"
+										 label="titolo"
+										 styleClass="form-control">
+							</p:inputText>
+							<p:message id="titoloMessage" for="titolo"></p:message>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="form-group">
+						<p:outputLabel for="lingue" value="Lingue" styleClass="col-sm-3 control-label">
+						</p:outputLabel>
+						<div class="col-md-9 col-lg-9">
+							<p:autoComplete id="lingue" value="#{cercaCurriculumPfBean.curriculumSearchParams.deLingua}"
+								forceSelection="true" var="lingua" itemLabel="#{lingua.denominazione}" label="Lingue" itemValue="#{lingua}"
+								emptyMessage="#{ui['shared.emptyAutoComplete']}"
+								completeMethod="#{cercaCurriculumPfBean.autoCompleteBean.completeLingua}" size="55" minQueryLength="2"
+								styleClass="form-control" cache="true" converter="deLinguaConverter" multiple="true">
+							</p:autoComplete>
+							<p:message id="lingueMessage" for="lingue"></p:message>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row m-t-20">
+				<div class="col-md-6">
+					<div class="form-group">
+						<p:outputLabel for="professione" value="Professione" styleClass="col-sm-3 control-label">
+						</p:outputLabel>
+						<div class="col-md-9 col-lg-9">
+							<p:inputText id="professione" value="#{cercaCurriculumPfBean.curriculumSearchParams.professione}"
+								forceSelection="true" var="lingua" itemLabel="#{lingua.denominazione}" label="Professione"
+								styleClass="form-control">
+							</p:inputText>
+							<p:message id="professioneMessage" for="professione"></p:message>
+						</div>
+					</div>
+
+				</div>
+				<div class="col-md-6">
+					<div class="form-group">
+						<p:outputLabel for="automunito" value="Automunito" styleClass="col-sm-2 control-label" />
+						<div class="col-md-3">
+							<p:selectBooleanCheckbox id="automunito" styleClass="form-control"
+								value="#{cercaCurriculumPfBean.curriculumSearchParams.automunito}" />
+							<p:message id="automunitoMessage" for="automunito" />
+						</div>
+
+						<p:outputLabel for="motomunito" value="Motomunito" styleClass="col-sm-2 control-label" />
+						<div class="col-md-3">
+							<p:selectBooleanCheckbox id="motomunito" styleClass="form-control"
+								value="#{cercaCurriculumPfBean.curriculumSearchParams.motomunito}" />
+							<p:message id="motomunitoMessage" for="motomunito" />
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="row m-t-20">
+				<div class="col-md-6">
+					<div class="form-group">
+						<p:outputLabel for="comuneDomicilio" value="Comune o stato di domicilio" styleClass="col-sm-3 control-label" />
+						<div class="col-md-9 col-lg-9">
+							<p:autoComplete id="comuneDomicilio" converter="deComuneConverter" forceSelection="true"
+								completeMethod="#{cercaCurriculumPfBean.autoCompleteBean.completeComune}"
+								itemLabel="#{comuneVar.denominazione}" itemValue="#{comuneVar}" filter="true" filterMatchMode="contains"
+								value="#{cercaCurriculumPfBean.curriculumSearchParams.comuneDomicilio}" var="comuneVar"
+								styleClass="form-control">
+							</p:autoComplete>
+							<p:message for="comuneDomicilio" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<div class="m-t-20 search-controls-section text-center">
+						<p:commandLink id="searchBtn" styleClass="btn btn-primary btn-search m-r-5"
+							onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+							actionListener="#{cercaCurriculumPfBean.search()}"
+							update=":curriculumResultsForm:curriculumResultsGroup @(.ui-datatable) @(.ui-message)"
+							oncomplete="MyPortal.disableLoadingButton(this); MyPortal.CurriculumSearch.doSearchComplete(args);">
+							<i class="fa fa-search" aria-hidden="true"></i> Cerca
+                        </p:commandLink>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</div>
+</ui:composition>
+

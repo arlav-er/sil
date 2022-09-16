@@ -1,0 +1,88 @@
+<%@ page contentType="text/html;charset=utf-8"%>
+<%@ include file="../global/noCaching.inc"%>
+<%@ include file="../global/getCommonObjects.inc" %>
+
+<%@ page import="com.engiweb.framework.base.*,
+                com.engiweb.framework.base.SourceBean,
+                 
+                com.engiweb.framework.security.*,
+                it.eng.afExt.utils.*, java.math.*,
+                java.lang.*,java.text.*,java.util.*, it.eng.sil.security.*,
+                it.eng.sil.util.*"
+%>
+
+<%@ taglib uri="aftags" prefix="af" %>
+
+<%@ page extends="com.engiweb.framework.dispatching.httpchannel.AbstractHttpJspPage" %>
+<%
+String prgRichiestaAz = serviceRequest.getAttribute("PRGRICHIESTAAZ").toString();
+String prgAzienda = serviceRequest.getAttribute("PRGAZIENDA").toString();
+String prgOrig = serviceRequest.getAttribute("PRGORIG").toString();
+String prgUnita = serviceRequest.getAttribute("PRGUNITA").toString();
+String _page = serviceRequest.getAttribute("PAGE").toString();
+
+int nroMansioni = 0;   
+String prgC1 = "";
+boolean viewPar = false;
+String prgTipoIncrocio = "";
+    
+String p_codCpi = user.getCodRif();
+String _cdnFunzione = serviceRequest.getAttribute("cdnFunzione").toString();
+
+PageAttribs attrGraduatorie = new PageAttribs(user, "CMStoricoGraduatoriePage");
+boolean gestCopia = false;
+
+// per ora imposto la page a quella della richiesta
+_page = "IdoTestataRichiestaPage";
+PageAttribs attributi = new PageAttribs(user, _page);
+
+ProfileDataFilter filter = new ProfileDataFilter(user, _page);
+if (!filter.canView()) {
+	response.sendRedirect("../../servlet/fv/AdapterHTTP?ACTION_NAME=accesso_negato_action");
+}
+
+%>
+<html>
+<head>
+  <link rel="stylesheet" href="../../css/stili.css" type="text/css">
+  <link rel="stylesheet" href="../../css/listdetail.css" type="text/css">
+  <title>Elenco Storico Rose</title>
+  <af:linkScript path="../../js/" />
+  <script language="Javascript" src="../../js/utili.js" type="text/javascript"></script>
+
+  <script language="Javascript" src="../../js/docAssocia.js"></script>
+  
+  <script language="Javascript">
+    window.top.menu.caricaMenuAzienda(<%=_cdnFunzione%>,<%=prgAzienda%>, <%=prgUnita%>);
+  </script>
+</head>     
+
+<body class="gestione" onload="rinfresca()">
+<%@ include file="InfoCorrRichiesta.inc" %>
+
+<af:list moduleName="CMElencoStoricoGraduatorieModule"/>
+
+<af:form name="form_match" action="AdapterHTTP" method="POST" dontValidate="true">
+<input name="PAGE" type="hidden" value="CMGestGraduatoriePage"/>
+<input name="PRGRICHIESTAAZ" type="hidden" value="<%=prgRichiestaAz%>"/>
+<input name="PRGAZIENDA" type="hidden" value="<%=prgAzienda%>"/>
+<input name="PRGUNITA" type="hidden" value="<%=prgUnita%>"/>
+<input name="CDNFUNZIONE" type="hidden" value="<%=_cdnFunzione%>"/>
+<input name="DAMATCH" type="hidden" value="1"/>
+<table class="main" align="center">
+
+<tr>
+  <td align="center">
+    <%
+  	String parGraduatoria = "PAGE=CMGestGraduatoriePage&cdnFunzione="+_cdnFunzione+"&prgAzienda="+prgAzienda+"&prgRichiestaAZ="
+			+prgRichiestaAz+"&prgUnita="+prgUnita+"&prgOrig="+prgRichiestaAz;
+	%>
+	<input type="button" name="tornaRichiesta" value="Torna alla lista" class="pulsante"
+            onClick="goTo('<%=parGraduatoria%>')">  
+  </td>
+</tr>
+
+</table>
+</af:form>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui">
+	<o:importConstants type="it.eng.myportal.utils.ConstantsSingleton.LivelloLinguaEnum" />
+	<div class="curriculum-info-paper-layer">
+		<div class="curriculum-sidebox">
+			<div class="row">
+				<div class="col-md-9">
+					<div class="user-info" style="margin-bottom: 0px;">
+						<ui:fragment
+							rendered="#{not empty curriculum.idCvDatiPersonali
+                                and not empty curriculum.foto}">
+							<div class="thumb">
+								<p:graphicImage cache="false" id="fotoCurriculum" value="#{curriculumVitaePfPhotoBean.image}">
+									<f:param name="paramId" value="#{curriculum.idCvDatiPersonali}" />
+								</p:graphicImage>
+							</div>
+						</ui:fragment>
+						<div class="user-body">
+							<h5>#{bean.getIntestatario()}</h5>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 text-right">
+					<h:link outcome="/secure/utente/curriculum/view_pf.xhtml" styleClass="btn btn-primary ui-button btn-grey">
+						<f:param name="id" value="#{curriculum.idCvDatiPersonali}" />
+						<f:param name="idAcCandidatura" value="#{bean.idAcCandidatura}" />
+						<f:param name="idVaDatiVacancy" value="#{bean.idVaDatiVacancy}" />
+                        Visualizza
+                        <i class="m-l-10 fa fa-eye" />
+					</h:link>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="datiPrincipali" class="curriculum-info-paper-layer">
+		<div class="curriculum-info-paper">
+			<div class="curriculum-info-paper-content">
+				<section class="section padd-box">
+					<div class="row">
+						<div class="col-sm-12 clear-mrg text-box">
+							<h2 class="title-lg text-upper">Dati Principali</h2>
+							<dl class="dl-horizontal clear-mrg">
+								<ui:fragment rendered="#{not empty curriculum.dtNascita}">
+									<dt class="text-upper">Data di nascita</dt>
+									<dd>
+										<span class="item-period">
+											<h:outputFormat value="#{curriculum.dtNascita}">
+												<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+											</h:outputFormat>
+										</span>
+									</dd>
+								</ui:fragment>
+								<ui:fragment rendered="#{not empty bean.getComuneDomicilio().denominazione}">
+									<dt class="text-upper">Comune di domicilio</dt>
+									<dd>
+										<span class="item-period">#{bean.getComuneDomicilio().denominazione}</span>
+									</dd>
+								</ui:fragment>
+
+								<ui:fragment rendered="#{not empty curriculum.email}">
+									<dt class="text-upper">Email</dt>
+									<dd>
+										<span class="item-period">#{curriculum.email}</span>
+									</dd>
+								</ui:fragment>
+								<ui:fragment rendered="#{not empty curriculum.tel2}">
+									<dt class="text-upper">Cellulare</dt>
+									<dd>
+										<span class="item-period">#{curriculum.tel2}</span>
+									</dd>
+								</ui:fragment>
+
+
+								<ui:fragment rendered="#{not empty altreInfo.flagAutomunito}">
+									<dt class="text-upper">Automunito</dt>
+									<dd>
+										<i class="fa #{altreInfo.flagAutomunito?'fa-check-circle':'fa-times'} " aria-hidden="true"></i>
+									</dd>
+								</ui:fragment>
+
+								<ui:fragment rendered="#{not empty altreInfo.flagMotomunito}">
+									<dt class="text-upper">Motomunito</dt>
+									<dd>
+										<i class="fa #{altreInfo.flagMotomunito?'fa-check-circle':'fa-times'} " aria-hidden="true"></i>
+									</dd>
+								</ui:fragment>
+
+								<ui:fragment rendered="#{not empty altreInfo.deTrasferta}">
+									<dt class="text-upper">Disponibilità trasferte</dt>
+									<dd>
+										<h:outputFormat value="#{altreInfo.deTrasferta.descrizione}" escape="false" />
+									</dd>
+								</ui:fragment>
+							</dl>
+						</div>
+					</div>
+				</section>
+			</div>
+		</div>
+	</div>
+	<ui:fragment rendered="#{not empty esperienze}">
+		<div id="esperienzeProfessionali" class="curriculum-info-paper-layer">
+			<div class="curriculum-info-paper">
+				<div class="curriculum-info-paper-content">
+					<section class="section padd-box">
+						<div class="row">
+							<div class="col-sm-12 clear-mrg text-box">
+								<h2 class="title-lg text-upper">Esperienze Professionali</h2>
+								<div class="timeline">
+									<ui:repeat value="#{esperienze}" var="esp">
+										<div class="timeline-item">
+											<h4 class="item-title">#{esp.deBpMansione.descrizione}</h4>
+											<span class="item-period">
+												<h:outputFormat value="#{esp.da}">
+													<f:convertDateTime pattern="#{ui['shared.dateFormat']}" />
+												</h:outputFormat>
+												>
+												<ui:fragment rendered="#{not empty esp.a}">
+													<h:outputFormat value="#{esp.a}">
+														<f:convertDateTime pattern="#{ui['shared.dateFormat']}" />
+													</h:outputFormat>
+												</ui:fragment>
+												<ui:fragment rendered="#{empty esp.a}">
+                                                In corso
+                                            </ui:fragment>
+											</span>
+											<ui:remove>
+												<ul>
+													<ui:fragment rendered="#{not empty esp.professione}">
+														<li>
+															<span class="text-muted small">Mansione svolta:</span>
+															#{esp.professione}
+														</li>
+													</ui:fragment>
+													<ui:fragment rendered="#{not empty esp.attivitaResponsabilita}">
+														<li>
+															<span class="text-muted small">Attività:</span>
+															#{esp.attivitaResponsabilita}
+														</li>
+													</ui:fragment>
+													<ui:fragment rendered="#{not empty esp.datoreLavoro}">
+														<li>
+															<span class="text-muted small">Datore di lavoro:</span>
+															#{esp.datoreLavoro}
+														</li>
+													</ui:fragment>
+													<ui:fragment rendered="#{not empty esp.deComLavoro}">
+														<li>
+															<span class="text-muted small">Luogo:</span>
+															#{esp.deComLavoro.denominazione}
+														</li>
+													</ui:fragment>
+													<ui:fragment rendered="#{not empty esp.sitoWebAziendale}">
+														<li>
+															<span class="text-muted small">Sito web azienda:</span>
+															#{esp.sitoWebAziendale}
+														</li>
+													</ui:fragment>
+													<ui:fragment rendered="#{not empty esp.deContrattoSil}">
+														<li>
+															<span class="text-muted small">Contratto:</span>
+															#{esp.deContrattoSil.descrizione}
+														</li>
+													</ui:fragment>
+												</ul>
+											</ui:remove>
+										</div>
+									</ui:repeat>
+								</div>
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+		</div>
+	</ui:fragment>
+
+	<ui:fragment rendered="#{not empty lingue}">
+		<div id="lingue" class="curriculum-info-paper-layer">
+			<div class="curriculum-info-paper">
+				<div class="curriculum-info-paper-content">
+					<section class="section padd-box">
+						<div class="row">
+							<div class="col-sm-12 clear-mrg text-box">
+								<h2 class="title-lg text-upper">Lingue</h2>
+								<hr />
+								<ui:repeat value="#{lingue}" var="lingua">
+									<div class="block-item">
+										<h4 class="block-item-title">#{lingua.deLingua.denominazione}</h4>
+										<div class="row">
+											<ui:fragment rendered="#{not empty lingua.deGradoLinSilLetto}">
+												<div class="col-md-4">
+													<div class="progress-bullets crt-animated" role="progressbar" aria-valuenow="97" aria-valuemin="0"
+														aria-valuemax="10">
+														<strong class="progress-title">
+															Letto:
+															<h:outputText title="#{lingua.deGradoLinSilLetto.descrizioneIdoLetto}"
+																value="#{lingua.deGradoLinSilLetto.codIdo}" />
+														</strong>
+														<span class="progress-bar-nar">
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.SCOLASTICO, lingua.deGradoLinSilLetto.descrizione)}"></span>
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.MEDIO, lingua.deGradoLinSilLetto.descrizione)}"></span>
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.BUONO, lingua.deGradoLinSilLetto.descrizione)}"></span>
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.OTTIMO, lingua.deGradoLinSilLetto.descrizione)}"></span>
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.TECNICO, lingua.deGradoLinSilLetto.descrizione)}"></span>
+														</span>
+													</div>
+												</div>
+											</ui:fragment>
+
+											<ui:fragment rendered="#{not empty lingua.deGradoLinSilParlato}">
+												<div class="col-md-4">
+													<div class="progress-bullets crt-animated" role="progressbar" aria-valuenow="97" aria-valuemin="0"
+														aria-valuemax="10">
+														<strong class="progress-title">
+															Parlato:
+															<h:outputText title="#{lingua.deGradoLinSilParlato.descrizioneIdoParlato}"
+																value="#{lingua.deGradoLinSilParlato.codIdo}" />
+														</strong>
+														<span class="progress-bar-nar">
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.SCOLASTICO, lingua.deGradoLinSilParlato.descrizione)}"></span>
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.MEDIO, lingua.deGradoLinSilParlato.descrizione)}"></span>
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.BUONO, lingua.deGradoLinSilParlato.descrizione)}"></span>
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.OTTIMO, lingua.deGradoLinSilParlato.descrizione)}"></span>
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.TECNICO, lingua.deGradoLinSilParlato.descrizione)}"></span>
+														</span>
+													</div>
+												</div>
+											</ui:fragment>
+											<ui:fragment rendered="#{not empty lingua.deGradoLinSilScritto}">
+												<div class="col-md-4">
+													<div class="progress-bullets crt-animated" role="progressbar" aria-valuenow="97" aria-valuemin="0"
+														aria-valuemax="10">
+														<strong class="progress-title">
+															Scritto:
+															<h:outputText title="#{lingua.deGradoLinSilScritto.descrizioneIdoScritto}"
+																value="#{lingua.deGradoLinSilScritto.codIdo}" />
+														</strong>
+														<span class="progress-bar-nar">
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.SCOLASTICO, lingua.deGradoLinSilScritto.descrizione)}"></span>
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.MEDIO, lingua.deGradoLinSilScritto.descrizione)}"></span>
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.BUONO, lingua.deGradoLinSilScritto.descrizione)}"></span>
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.OTTIMO, lingua.deGradoLinSilScritto.descrizione)}"></span>
+															<span
+																class="bullet #{bean.fillLinguaLevel(LivelloLinguaEnum.TECNICO, lingua.deGradoLinSilScritto.descrizione)}"></span>
+														</span>
+													</div>
+												</div>
+											</ui:fragment>
+											<ul>
+												<ui:fragment rendered="#{lingua.flagMadrelingua}">
+													<li>
+														<span class="text-muted small">MADRELINGUA: </span>
+														<i class="fa fa-check-circle" aria-hidden="true"></i>
+													</li>
+												</ui:fragment>
+
+												<ui:fragment rendered="#{not empty lingua.certificazione}">
+													<li>
+														<span class="text-muted small">Diplomi/Certificati: </span>
+														#{lingua.certificazione}
+													</li>
+												</ui:fragment>
+											</ul>
+										</div>
+									</div>
+								</ui:repeat>
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+		</div>
+	</ui:fragment>
+
+
+
+
+	<ui:fragment rendered="#{not empty istruzioni}">
+		<div id="istruzione" class="curriculum-info-paper-layer">
+			<div class="curriculum-info-paper">
+				<div class="curriculum-info-paper-content">
+					<section class="section padd-box">
+						<div class="row">
+							<div class="col-sm-12 clear-mrg text-box">
+								<h2 class="title-lg text-upper">Istruzione</h2>
+								<div class="timeline">
+									<ui:repeat value="#{istruzioni}" var="istruzione">
+										<div class="timeline-item">
+											<h4 class="item-title">
+												#{istruzione.deTitolo.descrizione}
+												<br />
+												<span class="item-period">#{istruzione.flgInCorso ? "In Corso": istruzione.numAnno}</span>
+											</h4>
+											<ui:remove>
+												<ul>
+													<li>
+														<span class="text-muted small">Area:</span>
+														#{istruzione.deAreaTitolo.descrizione}
+													</li>
+													<ui:fragment rendered="#{not empty istruzione.specifica}">
+														<li>
+															<span class="text-muted small">Descrizione titolo:</span>
+															#{istruzione.specifica}
+														</li>
+													</ui:fragment>
+													<ui:fragment rendered="#{not empty istruzione.votazione}">
+														<li>
+															<span class="text-muted small">Voto:</span>
+															#{istruzione.votazione}
+														</li>
+													</ui:fragment>
+													<ui:fragment rendered="#{not empty istruzione.tematicheTrattate}">
+														<li>
+															<span class="text-muted small">Principali tematiche trattate:</span>
+															<p class="item-description">#{istruzione.tematicheTrattate}</p>
+														</li>
+													</ui:fragment>
+													<ui:fragment rendered="#{not empty istruzione.nomeIstituto}">
+														<li>
+															<span class="text-muted small">Istituto:</span>
+															#{istruzione.nomeIstituto}
+														</li>
+													</ui:fragment>
+												</ul>
+											</ui:remove>
+										</div>
+									</ui:repeat>
+								</div>
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+		</div>
+	</ui:fragment>
+</ui:composition>
+

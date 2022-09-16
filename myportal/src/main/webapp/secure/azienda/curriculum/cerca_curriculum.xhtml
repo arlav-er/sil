@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/main.xhtml">
+
+	<ui:define name="title">
+		<h:outputText value="#{msg['azienda.cerca_curriculum.titolo']}" escape="false" />
+	</ui:define>
+
+<ui:define name="content">
+      <ui:param name="bean" value="#{aziendaCercaCurriculumBean}" />
+	  <h:outputStylesheet library="css" name="pagination_datatable.css" />
+	  
+	  <style type="text/css">
+			a.page-link{ text-decoration: none; }
+		</style>
+		
+		<br />
+		<h:outputText value="#{msg['azienda.cerca_curriculum.descrizione']}"
+			escape="false" />
+		<br />
+		
+		<h:form id="ricercaForm" class="widget_container ui-tabs ui-widget-content ui-corner-all">
+			<h:panelGrid columns="2" columnClasses="fifty, fifty">   
+				<cc:inputSuggestion id="titolo" styleClass="ninety" title="Titoli di studio"
+					label="Titolo di studio" showButton="true" suggestionPath="titoliStudio"
+					value="#{bean.parametriRicerca.descrizioneTitolo}" 
+					valueCod="#{bean.parametriRicerca.titoli}" >
+					<f:converter converterId="titoloSuggestionListConverter"
+						for="hidden" />
+				</cc:inputSuggestion>
+
+				<cc:inputSuggestion id="mansione" styleClass="ninety" title="Gruppo professionale"
+					label="Gruppo professionale" showButton="true" suggestionPath="mansioni"
+					value="#{bean.parametriRicerca.gruppoProf.descrizione}" 
+					valueCod="#{bean.parametriRicerca.gruppoProf.id}">
+					<f:validator validatorId="mansioneSuggestionValidator"
+						for="function" />
+				</cc:inputSuggestion>
+
+				<cc:inputToken label="Lingue" styleClass="ninety"
+					value="#{bean.parametriRicerca.lingue}">
+					<f:selectItems value="#{bean.lingue}" />
+				</cc:inputToken>
+
+				<cc:inputSuggestion label="Comune di domicilio"
+					styleClass="ninety" title="Comune di domicilio"
+					suggestionPath="comuni" valueCod="#{bean.parametriRicerca.comune.id}"
+					value="#{bean.parametriRicerca.comune.descrizione}">
+					<f:validator validatorId="comuneSuggestionValidator"
+						for="function" />
+				</cc:inputSuggestion>
+	
+				<cc:selectFlagCheckbox label="Disponibilità a trasferte"
+					value="#{bean.parametriRicerca.trasferte}" inline="true" />
+
+				<h:panelGroup>
+					<span class="boldText">
+						<h:outputText value="Munito di mezzo " /> <br />
+						<div style="float: left; padding-right: 5px;">
+							<cc:selectFlagCheckbox label="Auto" id="automunito"
+								value="#{bean.parametriRicerca.automunito}" inline="true" />
+						</div> 
+						<h:outputText value="   oppure " /> 
+						<cc:selectFlagCheckbox
+							label="Moto" id="motomunito" value="#{bean.parametriRicerca.motomunito}"
+							inline="true" />
+					</span>
+				</h:panelGroup>
+				<h:commandButton id="searchLink"
+					actionListener="#{bean.search()}"
+					styleClass="buttonStyle"
+					value="Cerca">
+					<f:ajax execute=":ricercaForm" render="@this :listaLavoratoriForm" 
+						onevent="onSearch"/>
+				</h:commandButton>
+				
+			</h:panelGrid>
+		</h:form>
+		<br />
+		
+		<cc:waiting id ="ricercaWaiting" hidden="true" waitMessage="Ricerca in corso..." />
+		
+		<h:form id="listaLavoratoriForm">
+			<cc:messages id="messages" />
+			
+			<div style="display: none;">
+				<h:inputHidden id="pageValue" value="#{bean.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{bean.changePage}" value="DUMMY FOR PAGINATION">
+					<f:ajax execute=":listaLavoratoriForm:pageValue" render=":listaLavoratoriForm:results" />
+				</h:commandButton>
+				<h:commandButton id="reloadResults" value="DUMMY NO ACTION FOR RELOAD">
+					<f:ajax execute="@this" render=":listaLavoratoriForm:results" />
+				</h:commandButton>
+			</div>
+			<h:button value="Torna alla homepage"
+				outcome="home"
+				styleClass="buttonStyle"
+				title="Torna alla homepage" />
+			<ui:fragment rendered="#{(bean.ricercaEseguita) and (empty bean.risultato)}">
+				<h2 class="nessun_elemento_trovato">Nessun lavoratore trovato</h2>
+			</ui:fragment>
+			
+			<ui:fragment rendered="#{(bean.ricercaEseguita) and (not empty bean.risultato)}">	
+				<script type="text/javascript">
+					$(function() {							
+					    $("#paginationBar").pagination({							    
+					    	pages: #{bean.paginationHandler.pages()},						       
+					        cssStyle: 'light-theme',
+					        prevText: 'Prec.',
+					        nextText: 'Succ.',
+					        onPageClick: function (pageNumber, event) {	       
+								document.getElementById('listaLavoratoriForm:pageValue').value = pageNumber;
+							  	document.getElementById('listaLavoratoriForm:pageCommand').click();		
+					            $(jq("listaLavoratoriForm:results")).hide();					            
+					            $(jq("listaLavoratoriForm:resultsLoader")).show();
+						    }
+					    });
+					});
+				</script>
+					
+				<div id="paginationBar" class="widget_container ui-tabs ui-widget-content ui-corner-all" />
+				<br />
+					
+				<cc:waiting id="resultsLoader" hidden="true" waitMessage="Caricamento..." />	
+					
+				<h:panelGroup layout="block" id="results" styleClass="dataTables_wrapper">
+					<table class="dataTable">
+						<tr>
+							<th class="ui-state-default">Curriculum</th>
+							<th class="ui-state-default">Comune domicilio</th>
+							<th class="ui-state-default">CV aggiornato al</th>
+							<th class="ui-state-default">Candidato ad una nostra offerta</th>
+							<th class="ui-state-default">Contattato in data</th>
+						</tr>
+						
+						<ui:repeat value="#{bean.risultato}" var="curriculum" varStatus="status">
+							<tr>
+								<td class="clickable-td">
+									<h:link rendered="#{utilsBean.regione != 8}" outcome="visualizza_curriculum"
+										title="Visualizza il curriculum: #{curriculum.descrizione}"
+										value="#{curriculum.descrizione} &nbsp;"
+										onclick="save_last_action(this,'Visualizza CV')">
+										<f:param name="id" value="#{curriculum.id}" />
+										<span class="ui-icon ui-icon-document fix_icon" />
+									</h:link>
+
+									<h:link rendered="#{utilsBean.regione == 8}" outcome="visualizza_curriculumIdo"
+											title="Visualizza il curriculum: #{curriculum.descrizione}"
+											value="#{curriculum.descrizione} &nbsp;"
+											onclick="save_last_action(this,'Visualizza CV')">
+										<f:param name="id" value="#{curriculum.id}" />
+										<span class="ui-icon ui-icon-document fix_icon" />
+									</h:link>
+								</td>
+							
+								<td> 
+									<h:outputText value="#{curriculum.comuneDomicilio}" />
+								</td>
+							
+								<td>
+									<h:outputText value="#{curriculum.dataModifica}">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+								</td>
+							
+								<td>
+									<ui:fragment
+										rendered="#{curriculum.idMsgMessaggio != null and curriculum.attivitaPrincipale != null}">
+										<div>
+											<div style="float: left; width: 80%; text-align: left;">
+												<h:link outcome="/secure/azienda/vacancies/visualizza">
+													<f:param name="id" value="#{curriculum.idVaDatiVacancy}" />
+													<h:outputText value="#{curriculum.attivitaPrincipale}"></h:outputText>
+												</h:link>
+											</div>
+											<div style="float: left;">
+												<h:link outcome="/secure/azienda/messaggi/index">
+													<f:param name="id" value="#{curriculum.idMsgMessaggio}" />
+													<f:param name="tab" value="contatti_ricevuti" />
+													<h:graphicImage value="/resources/images/candidatura.png" />
+												</h:link>
+											</div>
+											<div style="clear: both;"></div>
+										</div>
+									</ui:fragment>
+									<ui:fragment
+										rendered="#{curriculum.idMsgMessaggio == null or curriculum.attivitaPrincipale == null}">
+										NO
+									</ui:fragment>
+								</td>
+							
+								<td class="clickable-td">
+									<ui:fragment rendered="#{curriculum.idMsgMessaggioAz != null}">
+										<div>
+											<div style="float: left; width: 70%; text-align: left;">
+												<h:outputText value="#{curriculum.dataMessaggioAz}">
+													<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+												</h:outputText>
+											</div>
+											<div style="float: left;">
+												<h:link outcome="/secure/azienda/messaggi/index">
+													<f:param name="id" value="#{curriculum.idMsgMessaggioAz}" />
+													<f:param name="tab" value="contatti_inviati" />
+													<h:graphicImage value="/resources/images/candidatura.png" />
+												</h:link>
+											</div>
+											<div style="clear: both;">
+											</div>
+										</div>
+									</ui:fragment>
+									<ui:fragment rendered="#{curriculum.idMsgMessaggioAz == null}">
+										<a href="#" onclick="openContattoModal(#{curriculum.id});return false;"> 
+											<h:graphicImage value="/resources/images/no_contatto.png" />
+										</a>
+									</ui:fragment>
+								</td>	
+							</tr>
+						</ui:repeat>
+					</table>
+						
+					<script type="text/javascript">
+						disegnaBottoni();
+						$(jq("listaLavoratoriForm:resultsLoader")).hide();
+					</script>
+				</h:panelGroup>
+			</ui:fragment>
+				
+			<script type="text/javascript">		
+				disegnaBottoni();
+				$(jq("ricercaWaiting")).hide();
+			</script>
+		</h:form>
+
+		<cc:modalDialog id="contattaLavoratore" title="Messaggio di contatto di un lavoratore"
+			submitLabel="Invia messaggio" actionSubmit="#{aziendaCercaCurriculumBean.inviaPrimoContatto}"
+			renderAjax=":listaLavoratoriForm:results :messages comment"
+			eventAjax="modalContattoCallback" width="540" height="380">
+			<hr />
+			<h:panelGrid id="dati_cv_panel" columns="1" columnClasses="cv_col1">
+				<h:outputText styleClass="boldText"
+					value="Inserire nella sezione sottostante il testo che verrà inviato al 
+						titolare del CV interessato." />
+				<h:inputHidden
+					value="#{aziendaCercaCurriculumBean.primoContatto.idCvDatiPersonali}"
+					id="idCvDatiPersonali" />
+				<cc:inputTextarea
+					value="#{aziendaCercaCurriculumBean.primoContatto.messaggio}"
+					id="comment" label="Testo del messaggio" richTextMode="false"
+					required="true" maxlength="2000">
+				</cc:inputTextarea>
+			</h:panelGrid>
+		</cc:modalDialog>
+
+		<script type="text/javascript">
+			function onSearch(data) {
+				if (data.status == 'begin') {
+					$(jq("ricercaWaiting")).show();
+					$(jq("listaLavoratoriForm")).hide();
+				}
+			}
+		
+			function modalContattoCallback(data) {
+				if (data.status == 'success') {
+					disegnaBottoni();
+					//controlla se l'invio messaggio è andato a buon fine
+					var validationFailed = (data.responseText.indexOf('Messaggio inviato correttamente') == -1);
+					//chiudi solo se la Candidatura è andata a buon fine
+					if (validationFailed) {				
+						return 'leaveOpen';
+					}
+					else {
+						$(jq("listaLavoratoriForm:reloadResults")).click();
+						return 'close';
+					}
+				}
+				return 'leaveOpen';
+			}
+		
+			function openContattoModal(id) {
+				$(jq('contattaLavoratore:modal_form:comment:inputTextarea')).val('');
+				$(jq('contattaLavoratore:modal_form:idCvDatiPersonali')).val(id);
+				document.getElementById('contattaLavoratore').open();
+			}
+		</script>
+
+		<cc:messages id="messages" />	
+		
+</ui:define>	
+</ui:composition>

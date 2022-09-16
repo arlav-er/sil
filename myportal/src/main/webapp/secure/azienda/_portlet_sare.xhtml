@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/template_portlet.xhtml">
+
+	<ui:param name="portletCssClass" value="portletSARE" />
+
+	<ui:define name="portlet_title">
+		<h:outputText value="#{msg['azienda.portlet.sare.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="portlet_content">
+		<h:graphicImage url="/resources/images/sarelogo2.jpg" alt="SARE"
+			styleClass="title_icon" />
+		
+		<h:outputText 
+			value="#{txt['azienda.portlet.sare.descrizione']}" 
+			escape="false" 
+			rendered="#{not aziendaHomeBean.isProfilatoNuovoSare()}" />
+		<h:outputText 
+			value="#{txt['azienda.portlet.sare.descrizione_con_mysare']}" 
+			escape="false" 
+			rendered="#{aziendaHomeBean.isProfilatoNuovoSare()}" />
+		<h:outputText 
+			value="#{txt['azienda.portlet.sare.descrizione_con_mysare_tip']}" 
+			escape="false" 
+			rendered="#{aziendaHomeBean.isProfilatoNuovoSare() and sessionBean.connectedAzienda.confermatoSare and aziendaHomeBean.checkAbilitazioneVisibile('accediSare')}"/>
+		
+		<h:panelGroup layout="block"
+			rendered="#{not sessionBean.connectedAzienda.abilitatoSare}">
+			<ul>
+				<li><a href="#{sessionBean.getUrlMyAccount()}/secure/account/edit">Certifica ora il tuo
+						account e richiedi il tuo accesso a SARE.</a></li>
+			</ul>
+		</h:panelGroup>
+		<h:panelGroup layout="block" rendered="#{sessionBean.connectedAzienda.confermatoSare and aziendaHomeBean.checkAbilitazioneVisibile('accediSare')}">
+			
+			<h:panelGroup layout="block" rendered="#{aziendaHomeBean.isProfilatoNuovoSare()}">
+				<form id="accediNuovoSare" target="_blank" action="#{aziendaHomeBean.urlNuovoSARE}" method="post">
+					<button type="submit" class="buttonStyle float-left margin-right-5" alt="Servizi per CO" tabindex="0">Servizi per CO</button>				   				
+				</form>
+			</h:panelGroup>
+			
+			<form id="accediSare" target="_blank" action="#{aziendaHomeBean.urlSARE}" method="post">
+				<input type="hidden" value="#{aziendaHomeBean.tokenSARE}" id="t" name="t" />
+				<ui:fragment rendered="#{aziendaHomeBean.isProfilatoNuovoSare() and not utilsBean.isPAT()}">
+				<button type="submit" class="buttonStyle float-left" alt="Altri servizi" tabindex="0">Altri servizi</button>
+				</ui:fragment>
+				<ui:fragment rendered="#{not aziendaHomeBean.isProfilatoNuovoSare()}">
+				<button type="submit" class="buttonStyle float-left" alt="Accesso a SARE" tabindex="0">Accesso a SARE</button>
+				</ui:fragment>								
+			</form>
+						
+		</h:panelGroup>
+		
+		<h:panelGroup layout="block" rendered="#{sessionBean.connectedAzienda.confermatoSare and not aziendaHomeBean.checkAbilitazioneVisibile('accediSare')}">
+			<h:outputText value="#{txt['azienda.portlet.sare.notAccediSare']}" escape="false" />
+		</h:panelGroup>               
+		
+	</ui:define>
+
+</ui:composition>

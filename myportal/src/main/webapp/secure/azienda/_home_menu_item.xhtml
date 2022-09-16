@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<ul>
+		<li class="external-link-underline">
+			<h:link outcome="new_home" value="La mia scrivania"
+				styleClass="external-link" />
+		</li>
+		<li>
+			<a href="#{sessionBean.getUrlMyAccount()}/secure/account">Profilo</a>
+		</li>
+		<li>
+			<h:link outcome="portlets" value="Personalizza scrivania"
+				styleClass="external-link" />
+		</li>
+
+		<ui:fragment rendered="#{const['regione.cod'] != 18}">
+			<li class="messages_area">
+				<h:link outcome="messages" value="Messaggi"
+					styleClass="external-link" />
+				<b></b>
+			</li>
+		</ui:fragment>
+
+		<ui:fragment
+			rendered="#{sessionBean.checkAbilitazioneVisibile('ESP')}">
+			<li class="external-link-underline">
+				<h:link outcome="messages" value="Assistenza tecnica"
+					styleClass="external-link">
+					<f:param name="tema" value="assistenza_tecnica" />
+				</h:link>
+			</li>
+		</ui:fragment>
+
+		<h:form>
+			<p:remoteCommand actionListener="#{accountInfoBean.logout()}"
+				name="logout" onsuccess="casLogout('#{accountInfoBean.urlLogout}')"></p:remoteCommand>
+		</h:form>
+		<li>
+			<a href="#" onclick="doLogout()">Logout</a>
+		</li>
+	</ul>
+</ui:composition>

@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/template_portlet.xhtml">
+
+	<ui:param name="portletCssClass" value="portletOfferteLavoro" />
+
+	<ui:define name="portlet_title">
+		<h:outputText value="#{msg['cittadino.portlet.ricerca_lavoro.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="portlet_content" style="width:600px;">
+		<h:outputText value="#{txt['portlet_lavoro.descrizione']}" escape="false" />
+				
+		<h:panelGroup layout="block" >		
+			<br/>		
+	
+		<div id="mapPlace" style="display: none">
+			<div id="mappa_vacancy" class="mapPortlet"></div>
+			<script type="text/javascript">
+				$( window ).load(function() {
+						var maps={};
+						var center 	  = "#{utilsBean.mapCenter}".split(",")
+						var zoomLevel = "#{utilsBean.mapZoom}"
+						maps.lat = center[0];
+						maps.lng = center[1];
+						maps.zoom = zoomLevel;
+						maps.solr_params="q=*&amp;start=0&amp;rows=50000&amp;fl=id_va_dati_vacancy,descrizione,comune,longitudine,latitudine,flg_ido";
+						maps.solr_params+="&amp;sort=geodist(punto,"+maps.lat+","+maps.lng+") asc";
+						window.loadOpenStreetMap('mappa_vacancy', 'mapPlace', maps);
+				});
+			</script>	
+	   </div>
+	
+			<br/>		
+			<h:link styleClass="buttonStyle" title="Cerca una offerta di lavoro"
+				outcome="/secure/utente/offertelavoro/ricerca_new">
+						Cerca un'offerta di lavoro
+		</h:link>
+
+			<h:link styleClass="buttonStyle" id="lista_candidature_button"
+				style="float:right;"
+				outcome="/secure/utente/candidature/visualizza_lista.xhtml">
+			Elenco candidature
+		</h:link>
+		</h:panelGroup>
+		<h:form id="ricerca_lavoro">
+			<b><h:outputText rendered="#{not empty utenteHomeBean.ricerche}"
+					value="Ricerche salvate" /></b>
+			<h:dataTable id="ricerche_list" value="#{utenteHomeBean.ricerche}"
+				rendered="#{not empty utenteHomeBean.ricerche}"
+				columnClasses="ric_col1,ric_col2,ric_col3 notSortable,ric_col3"
+				var="ricerca">
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Nome" />
+					</f:facet>
+					<h:outputText value="#{ricerca.descrizione}" />
+				</h:column>
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Ultima effettuata" />
+					</f:facet>
+
+					<h:outputText value="#{ricerca.dtmMod}">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="date" />
+					</h:outputText>
+				</h:column>
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="NEW"
+							title="Sono presenti nuove offerte di lavoro" />
+					</f:facet>
+					<h:outputText value="#{ricerca.rowsNew}" />
+				</h:column>
+
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="" />
+					</f:facet>
+
+					<h:link styleClass="buttonStyle yellowButton"
+						outcome="/secure/utente/offertelavoro/ricerca_new" title="Cerca">
+						<f:param name="id" value="#{ricerca.id}" />
+						<span class="ui-icon ui-icon-search fix_icon"></span>
+					</h:link>
+					<h:commandLink styleClass="buttonStyle yellowButton"
+						title="Cancella"
+						onclick="return document.getElementById('portlet-#{portlet.id}:ricerca_delete').open({id: #{ricerca.id}},this);">
+						<span class="ui-icon ui-icon-trash fix_icon" />
+					</h:commandLink>
+				</h:column>
+			</h:dataTable>
+			<script type="text/javascript">//<![CDATA[
+				$(function() {
+					generateDataTable(jq('portlet-#{portlet.id}:ricerca_lavoro:ricerche_list'),{
+						"bJQueryUI": true,
+						"bFilter": false,
+						"bPaginate": false,
+						"bInfo": false,
+						"bLengthChange": false,
+						'aaSorting': [[ 1, 'desc' ]],
+						"aoColumns": [ 
+											null, 
+ 									    { 'sType': 'data-ora' },
+									   null,
+									   {"bSortable": false}
+						   			 ]
+					});
+			
+					$( ".buttonStyle" ).button();						
+				})
+				
+				
+				var openDelete = function(params) {
+					var itemId = params.id;
+					$('[id$="ricerca_delete\:modal_form\:id_delete"]').val(itemId);
+				};
+				
+				
+			//]]>
+			</script>
+		</h:form>
+
+		<cc:modalDialog id="ricerca_delete" title="Elimina" openF="openDelete"
+			message="Sei sicuro di voler eliminare l'elemento?"
+			actionSubmit="#{utenteHomeBean.deleteRicercaVacancy}"
+			submitLabel="Elimina"
+			renderAjax=":portlet-#{portlet.id}:ricerca_lavoro">
+			<h:inputHidden id="id_delete"></h:inputHidden>
+			<h:outputText value="#{cc.attrs.message}"></h:outputText>
+		</cc:modalDialog>
+
+	</ui:define>
+
+</ui:composition>

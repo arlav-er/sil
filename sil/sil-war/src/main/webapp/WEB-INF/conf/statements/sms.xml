@@ -1,0 +1,147 @@
+<STATEMENT
+        name="CARICA_PROVIDER_SMS"
+        query="SELECT prov.codprovidersms provider,
+				       param.codprovidersmsparametro parametro,
+				       param.strvaloreparametro valore
+				  FROM de_provider_sms prov, ts_sms_provider param
+				 WHERE prov.codprovidersms = param.codprovidersms
+				 and prov.FLGATTIVO='S'
+"/>
+
+
+<STATEMENT
+        name="NEXT_S_AG_CONTATTO"
+        query="SELECT s_ag_contatto.nextval key from dual"
+/>
+
+
+<STATEMENT
+        name="INSERT_AG_CONTATTO"
+        query="INSERT INTO AG_CONTATTO                                                                
+                      (PRGCONTATTO,                                                    
+                       CODCPICONTATTO,                                                 
+                       DATCONTATTO,                                                    
+                       STRORACONTATTO,                                                 
+					   PRGSPICONTATTO,                                                 
+					   TXTCONTATTO,                                                    
+					   STRIO,                                                          
+					   PRGTIPOCONTATTO,                                                
+					   CDNLAVORATORE,                                                  
+					   CDNUTINS,                                                       
+					   DTMINS,                                                         
+					   CDNUTMOD,                                                       
+					   DTMMOD,                                                         
+					   STRCELLSMSINVIO,                                                
+					   flginviatosms)                                                  
+			   VALUES (?,?,to_date(?,'dd/mm/yyyy'),?,?,?,?,?,?,?,sysdate,?,sysdate,?,?)"
+/>
+
+
+<STATEMENT
+        name="INSERT_AG_CONTATTO_BATCH_SMS"
+        query="INSERT INTO AG_CONTATTO                                                                
+                      (PRGCONTATTO,                                                    
+                       CODCPICONTATTO,                                                 
+                       DATCONTATTO,                                                    
+                       STRORACONTATTO,                                                 
+					   PRGSPICONTATTO,                                                 
+					   TXTCONTATTO,                                                    
+					   STRIO,                                                          
+					   PRGTIPOCONTATTO,                                                
+					   CDNLAVORATORE,                                                  
+					   CDNUTINS,                                                       
+					   DTMINS,                                                         
+					   CDNUTMOD,                                                       
+					   DTMMOD,                                                         
+					   STRCELLSMSINVIO,
+					   FLGINVIATOSMS,
+					   PRGMOTCONTATTO)                                                  
+			   VALUES (?,?,to_date(?,'dd/mm/yyyy'),?,?,?,?,?,?,?,sysdate,?,sysdate,?,?,?)"
+/>
+
+
+<STATEMENT
+        name="UPDATE_CONTATTO_SMS_INVIATO"
+        query="UPDATE ag_contatto
+				  SET flginviatosms = ?,
+				      NUMKLOCONTATTO = NUMKLOCONTATTO + 1 
+				WHERE prgcontatto = ?"
+/>
+
+
+<STATEMENT
+        name="GET_TESTO_SMS"
+        query="SELECT CODTIPOSMS,STR30MSG1,STR30MSG2,STR30MSG3,STR30MSG4,STRTEMPLATE FROM TS_SMS WHERE CODTIPOSMS= ? "
+/>
+
+<STATEMENT
+        name="GET_SPI"
+        query="SELECT ut.PRGSPI, 
+                      spi.STRCOGNOME, 
+                      spi.STRNOME,
+                      spi.STRCODICEFISCALE, 
+                      spi.STRSESSO, 
+                      spi.DATNASC,
+                      spi.STRSIGLAOPERATORE
+                 FROM AN_SPI spi, TS_UTENTE ut
+                WHERE ut.PRGSPI = spi.PRGSPI
+				  and ut.CDNUT =  ?"
+/>
+
+<STATEMENT 	name="GET_CONSENSO_SMS" 
+			query="	SELECT 	DECODE
+   						(trunc(SYSDATE-1), 
+   						GREATEST(TRUNC(SYSDATE-1), nvl(trunc(datinviosms),TRUNC(sysdate+1))), 
+   						'N',
+   						FLGINVIOSMS) AS FLGINVIOSMS
+					FROM  AN_LAVORATORE 
+					WHERE CDNLAVORATORE = ? " 
+/>
+
+<STATEMENT
+        name="INSERT_DO_DISPONIBILITA"
+        query="INSERT INTO DO_DISPONIBILITA                                                               
+                      (PRGRICHIESTAAZ, 
+                       CDNLAVORATORE, 
+                       CODDISPONIBILITAROSA, 
+   					   DATDISPONIBILITA,
+   					   CODSTATOLAVPREC,
+   					   CDNUTINS, 
+   					   DTMINS,
+   					   CDNUTMOD,
+   					   DTMMOD, 
+   					   NUMCONTANONRINTRACCIATO,
+   					   CODDISPONIBILITAROSAPREC)                                                  
+			   VALUES (?,?,?,sysdate,?,?,sysdate,?,sysdate,?,?)"
+/>
+
+<STATEMENT 	name="GET_ESITO_DISPO" 
+			query="	SELECT 	 
+	   						CODDISPONIBILITAROSA 
+					FROM   	DO_DISPONIBILITA
+					WHERE  	PRGRICHIESTAAZ = ?
+					AND	   	CDNLAVORATORE  = ?" 
+/>
+
+
+<STATEMENT
+        name="GET_TESTO_SMS_TEMPLATE"
+        query="SELECT CODTIPOSMS,STR30MSG1,STR30MSG2,STR30MSG3,STR30MSG4,STRTEMPLATE, MAX_LEN
+				FROM
+				    (
+				        SELECT CODTIPOSMS,STR30MSG1,STR30MSG2,STR30MSG3,STR30MSG4,STRTEMPLATE, 320 MAX_LEN 
+				        FROM
+				            ts_sms
+				        WHERE
+				            codservizio=?
+				        UNION
+				        SELECT CODTIPOSMS,STR30MSG1,STR30MSG2,STR30MSG3,STR30MSG4,STRTEMPLATE, 160 MAX_LEN 
+				        FROM
+				            ts_sms
+				        WHERE
+				            codtiposms = 'PROMAPPU'
+				        ORDER BY  MAX_LEN DESC
+				    )
+				WHERE
+				    ROWNUM = 1 "
+/>

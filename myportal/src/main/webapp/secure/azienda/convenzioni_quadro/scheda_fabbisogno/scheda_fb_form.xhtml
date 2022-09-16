@@ -1,0 +1,208 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components" template="../../../template/main_primefaces.xhtml">
+	<ui:param name="pagetitle" value="Scheda Fabbisogno" />
+	<ui:define name="content">
+		<div class="widget_container">
+			<h1>Inserimento/Modifica Scheda Fabbisogno</h1>
+			<h:form id="schedaFbForm">
+				 <p:messages id="messageAJ">
+					<p:ajaxStatus/>
+				</p:messages> 
+				 <!-- <p:messages id="messages" closable="true" autoUpdate="true"  />  -->
+				<!-- <p:growl globalOnly="true" autoUpdate="false"/> -->
+						
+				<p:panel id="panel-scheda">
+
+          <!-- enable focus component -->
+	       <p:focus context="panel-scheda" />	
+				<p:tabView id="schedaFbTabView">
+					<p:tab title="Riferimento Azienda">
+						<ui:include src="_fb_dati_azienda_tab.xhtml" />
+					</p:tab>
+
+					<p:tab title="Profilo">
+						<ui:include src="_fb_scheda_fb_tab.xhtml" />
+					</p:tab>
+
+					<p:tab title="Candidature">
+						<ui:include src="_fb_candidature_tab.xhtml" />
+					</p:tab>
+				</p:tabView>
+
+				<h:panelGroup layout="block" styleClass="margin-1em" rendered="#{fbSchedaFormBean.isEditSchedaMode()}">
+					<p:selectBooleanCheckbox id="flgConformitaInput" required="true"
+						requiredMessage="E' obbligatorio dichiarare la conformità(Riferimento Azienda)"
+						value="#{fbSchedaFormBean.fbSchedaFabbisogno.flgConformita}"
+						disabled="#{not empty fbSchedaFormBean.fbSchedaFabbisogno.id}">
+						<p:ajax event="change" process="@this" update="@this salvaBtn" />
+					</p:selectBooleanCheckbox>
+					<p:outputLabel
+						value="Dichiaro che la scheda fabbisogno è conforme a quanto presentato in fase di abilitazione al bando"
+						for="flgConformitaInput" style="margin-left: 1em;" />
+					<p:message for="flgConformitaInput" />
+				</h:panelGroup>
+
+				<div>
+					<p:commandButton id="salvaBtn" value="Salva" title="Salva" styleClass="margin-1em"
+						actionListener="#{fbSchedaFormBean.salva}" update="@form"
+						rendered="#{fbSchedaFormBean.isEditSchedaMode() and not fbSchedaFormBean.isPubblicaMode()}"
+						disabled="#{not fbSchedaFormBean.fbSchedaFabbisogno.flgConformita}" oncomplete="onSalvaComplete(args)">						
+					</p:commandButton>
+					
+
+					<p:commandButton id="chiudiBtn" value="Chiudi candidature" onclick="PF('chiudiSchedaDialogWV').show();"
+						styleClass="margin-1em" rendered="#{fbSchedaFormBean.isPubblicaMode() and fbSchedaFormBean.isEnteOspitante() and fbSchedaFormBean.isChiudiEnabled() }" title="Chiudi candidature" />
+
+					<p:commandButton value="Pubblica" title="Pubblica" styleClass="margin-1em" actionListener="#{fbSchedaFormBean.displayPubblicaDialog()}"
+						 oncomplete="onPubblicaComplete(args)" update="@form"
+						rendered="#{fbSchedaFormBean.isEditSchedaMode() and not empty fbSchedaFormBean.fbSchedaFabbisogno.id and not fbSchedaFormBean.isPubblicaMode()}" />
+
+					<p:commandButton value="Elimina" title="Elimina" styleClass="margin-1em"
+						onclick="PF('eliminaSchedaDialogWV').show();"
+						rendered="#{fbSchedaFormBean.isEditSchedaMode() and not empty fbSchedaFormBean.fbSchedaFabbisogno.id and not fbSchedaFormBean.isPubblicaMode()}" />
+
+					<p:button value="Torna alle schede" title="Torna alle schede" styleClass="margin-1em" outcome="scheda_fb_list"
+						rendered="#{fbSchedaFormBean.isEnteOspitante()}">
+						<f:param name="idFbChecklist" value="#{fbSchedaFormBean.fbSchedaFabbisogno.idFbChecklist}" />
+					</p:button>
+
+					<p:button value="Torna alle schede" title="Torna alle schede" styleClass="margin-1em" outcome="scheda_fb_search"
+						rendered="#{fbSchedaFormBean.isEnteAccreditato()}">
+					</p:button>
+
+					<p:button value="Torna alla homepage" title="Torna alla homepage" styleClass="margin-1em" outcome="home" />
+				</div>		
+				</p:panel>	
+			</h:form>
+		</div>
+
+		<p:dialog id="salvataggioAvvenutoDialog" widgetVar="salvataggioAvvenutoDialogWV" header="Salvataggio avvenuto"
+			modal="true" width="300"><br/>
+			<p>Scheda fabbisogno salvata con successo</p>
+			<div class="text-center" style="padding: 10px;">
+				<p:commandButton value="Ok" title="Ok" onclick="PF('salvataggioAvvenutoDialogWV').hide();" />
+			</div>
+		</p:dialog>
+
+		<p:dialog id="eliminaSchedaDialog" widgetVar="eliminaSchedaDialogWV" header="Elimina Scheda Fabbisogno" modal="true"
+			width="400">
+			<p>Confermi l’eliminazione della Scheda Fabbisogno?</p>
+			<div class="text-center">
+				<p:commandButton value="Conferma eliminazione" title="Conferma eliminazione"
+					actionListener="#{fbSchedaFormBean.elimina}" styleClass="margin-1em" update=":schedaFbForm"
+					oncomplete="PF('eliminaSchedaDialogWV').hide();" />
+				<p:commandButton value="Annulla" title="Annulla" onclick="PF('eliminaSchedaDialogWV').hide();" />
+			</div>
+		</p:dialog>
+
+		<p:dialog id="chiudiSchedaDialog" widgetVar="chiudiSchedaDialogWV" header="Conferma chiusura" modal="true" width="500">
+			<h:form id="chiudiSchedaDialogForm">
+				<p>Dopo la chiusura i Soggetti Promotori non potranno più inserire nuovi candidati alla scheda fabbisogno. Confermi l'operazione?</p>
+				<h:outputLabel value="Motivo della chiusura *" for="motivoChiusuraInput" styleClass="block-label" />
+				<p:inputTextarea id="motivoChiusuraInput" maxlength="2000" rows="4" requiredMessage="Il motivo della chiusura è obbligatorio"
+					value="#{fbSchedaFormBean.fbSchedaFabbisogno.motivoChiusura}" required="true" counter="chiudi" counterTemplate="{0} caratteri rimanenti.">
+					<p:ajax event="blur" update="chiudiMessage"/>
+					</p:inputTextarea>
+					<p:message for="motivoChiusuraInput" id="chiudiMessage"/>
+					<h:outputText id="chiudi">					
+					</h:outputText>					
+				<div class="text-center" style="padding: 10px;">
+					<p:commandButton value="Conferma chiusura" title="Conferma chiusura" actionListener="#{fbSchedaFormBean.chiudi}"
+						styleClass="margin-1em"   update=":schedaFbForm:schedaFbTabView:candidaturePanel" oncomplete="onCompliteChuidi()"/>
+					<p:commandButton value="Annulla" title="Annulla"  onclick="PF('chiudiSchedaDialogWV').hide();" />
+				</div>			
+			</h:form>
+		</p:dialog>
+
+
+
+		<p:dialog id="pubblicaSchedaDialog" widgetVar="pubblicaSchedaDialogWV" header="Pubblicazione scheda fabbisogno" modal="true"
+			width="400">
+			<p>Dopo la pubblicazione non sarà più possibile modificare la Scheda Fabbisogno. Confermi l'operazione?</p>
+			<div class="text-center">
+				<p:commandButton value="Conferma pubblicazione" title="Conferma pubblicazione"
+					actionListener="#{fbSchedaFormBean.pubblica}" styleClass="margin-1em"  update=":schedaFbForm"
+					oncomplete="onPubblicaCorrettamento(args)" />
+				<p:commandButton value="Annulla" title="Annulla" onclick="PF('pubblicaSchedaDialogWV').hide();" />
+			</div>
+		</p:dialog>
+		
+		<p:dialog id="pubblicaCorrettamenti" widgetVar="pubblicaCorrettamentiWV" modal="true" header="Scheda fabbisogno pubblicata" width="400"><br/>
+	  <p>Operazione eseguita con successo</p>
+	  <div class="text-center" style="padding: 10px;">
+	     <p:commandButton value="Ok" onclick="PF('pubblicaCorrettamentiWV').hide()"/>
+	  </div>
+	</p:dialog>
+	
+	
+	<p:dialog id="salvataggioIdoneoDialog" widgetVar="salvataggioIdoneoDialogWV" header="Salvataggio"
+			modal="true" width="300"><br/>
+			<p>Salvataggio esiti effettuato correttamente.</p>
+			<div class="text-center" style="padding: 10px;">
+				<p:commandButton value="Ok" title="Ok" onclick="PF('salvataggioIdoneoDialogWV').hide();"/>
+			</div>
+		</p:dialog>
+		
+		<p:dialog id="salvacandidaturaFlag" widgetVar="salvacandidaturaFlagWV" header="Gestione esiti Candidature" modal="true" width="500">
+			<h:form id="salvaDialogForm">
+				<p>Per la gestione dell’idoneità o non idoneità dei candidati è obbligatorio motivare la scelta. </p>
+				<h:outputLabel value="Descrizione gestione esiti *" for="motivoSalvaInput" styleClass="block-label" />
+				<p:inputTextarea id="motivoSalvaInput" maxlength="2000" rows="4" requiredMessage="La descrizione per la gestione esiti è un campo obbligatorio"
+					value="#{fbSchedaFormBean.fbSchedaFabbisogno.noteEsito}" required="true" counter="salva" counterTemplate="{0} caratteri rimanenti.">
+					<p:ajax event="blur" update="motivoSalvaInputMsg"/>
+					</p:inputTextarea>
+					<p:message for="motivoSalvaInput" id="motivoSalvaInputMsg"/>
+					<h:outputText id="salva"/>
+				<div class="text-center" style="padding: 10px;">
+					<p:commandButton value="Conferma" title="Conferma" actionListener="#{fbSchedaFormBean.salvaCandidaturaIdoneo}" 
+						styleClass="margin-1em"  oncomplete="onSalvaCompletes(args)" update=":schedaFbForm:schedaFbTabView:candidaturePanel"/>
+					<p:commandButton value="Annulla" title="Annulla"  onclick="PF('salvacandidaturaFlagWV').hide();" />
+				</div>			
+			</h:form>
+		</p:dialog>
+
+		<script>
+			function onSalvaComplete(args) {
+				if (args.success) {
+					PF('salvataggioAvvenutoDialogWV').show();
+				}
+			}
+			function onPubblicaComplete(args) {
+				if (args.success) {
+					PF('pubblicaSchedaDialogWV').show();
+					
+				}
+			}
+
+			function onPubblicaCorrettamento(args){
+				if (args.success) {
+					PF('pubblicaSchedaDialogWV').hide();
+					PF('pubblicaCorrettamentiWV').show();
+				} 
+				}      
+		    function scroll()
+		    {
+		    	//$(window).scrollTop(0);
+		    	//$("body").scrollTop(0);
+		        var grid = $("#schedaFbForm\\:messageAJ");       
+		        $('html, body').animate({
+		            scrollTop : grid.offset().top
+		        },40);                
+		    }
+
+		    function onCompliteChuidi(){		    	
+                  PF('chiudiSchedaDialogWV').hide(); 
+                  window.location.reload();
+			    } 
+
+		    function onSalvaCompletes(args) {
+				if (args.success) {
+					PF('salvacandidaturaFlagWV').hide();
+					PF('salvataggioIdoneoDialogWV').show();
+				}
+			}
+          
+		</script>
+	</ui:define>
+</ui:composition>

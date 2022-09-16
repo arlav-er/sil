@@ -1,0 +1,1964 @@
+<!-- STATEMENTS/COLLOCAMENTO_MIRATO2.XML  PROSPETTI-->	   		
+
+<STATEMENT 	name="GET_DATI_GENERALI_PROSP" 
+			query="select a.strcodicefiscale, a.strpartitaiva, a.strragionesociale,
+							u.codcom, pr.strdenominazione,
+                            r.strcognome || ' ' || r.strnome as referente,
+                            r.strtelefono, r.strfax, r.stremail,
+                            u.strindirizzo || ', ' || u.strcap || ' ' || d.strdenominazione as indProv,
+                            (select aziUn.STRINDIRIZZO || ', ' || aziUn.strcap || ' ' || dcom.strdenominazione
+	   						from an_azienda azi
+							inner join an_unita_azienda aziUn on (aziUn.PRGAZIENDA = azi.PRGAZIENDA)
+							inner join de_comune dcom on dcom.codcom = aziun.codcom
+							where aziUn.PRGAZIENDA =  p.prgazienda
+							and aziUn.Flgsede = 'S' and rownum = 1) as indLegale,                            
+                            att.strdescrizione as attivita, cc.strdescrizione as ccnl, cc.decoresett,
+							p.prgprospettoinf, p.prgazienda, p.prgunita, 
+							p.prgazreferente, p.numoreccnl, p.codprovincia,               
+							p.codmonostatoprospetto, p.codmonoprov, p.numannorifprospetto, 
+							to_char(p.datconsegnaprospetto, 'dd/mm/yyyy') as datconsegnaprospetto, 
+							p.numdipendentinazionale, p.codmonocategoria, 
+							p.numdipendentitot, p.numbasecomputo, p.numquotadisabili, 
+							p.numdisabilinom, p.numdisabilinum, p.numquotaart18, 
+							p.numart18nom, p.numart18num, 
+							to_char(p.datprimaassunzione, 'dd/mm/yyyy') as datprimaassunzione, 
+							to_char(p.datsecondaassunzione, 'dd/mm/yyyy') as datsecondaassunzione, 
+							p.numdisforza, p.numart18forza, 
+							p.flgesonero, p.numpercesonero, p.flggradualita, 
+							p.flgcompterritoriale, p.flgsospensione, p.numconvenzioni, 
+							p.strnote, p.cdnutins, p.dtmins, p.cdnutmod, p.dtmmod, p.numkloprospettoinf,
+							doc.codStatoAtto,
+							to_char(doc.DATPROTOCOLLO,'dd/mm/yyyy') as dataProt,
+							to_char(doc.DATINIZIO,'dd/mm/yyyy') as DatInizio,
+							to_char(doc.DATACQRIL,'dd/mm/yyyy') as DatAcqRil, 
+							to_char(doc.DATPROTOCOLLO,'DD/MM/YYYY hh24:mi') as dataOraProt, 
+							doc.NUMPROTOCOLLO as NUMPROTOCOLLO, doc.NUMANNOPROT as numAnnoProt, 
+							de_doc_tipo.strio striodoc, de_doc_tipo.codtipodocumento codtipodoc, 
+							de_doc_tipo.strdescrizione strtipodoc, de_doc_tipo.codambitodoc codambitodoc, 
+							de_doc_ambito.strdescrizione strambitodoc,
+							p.codComunicazione, p.codComunicazioneOrig, p.flgVerOperatore, p.codComunicazioneAnn,
+							p.NUMDISBATTISTONI, p.NUMBATTISTONIINFORZA, p.NUMART18BATTISTONI,
+							p.numtotlavconvdis, p.numtotlavconvart18,
+							p.NUMSCOPCENTNONVEDENTI,p.NUMSCOPMASSOFISIOTERAPISTI,p.NUMCENTNONVEDENTIFORZA,
+							p.NUMMASSOFISIOTERAPISTIFORZA,p.NUMCENTNONVEDENTIOBBLIGO, 
+							p.NUMMASSOFISIOTERAPISTIOBBLIGO,
+							p.flg15dipendenti, P.NUMBASECOMPUTOART18, P.NUMBASECOMPUTOART3,
+							p.FLGCAPOGRUPPO, p.STRCFAZCAPOGRUPPO, p.FLGCOMPETENZA, 
+							p.FLGCAPOGRUPPOESTERA, to_char(p.DATRIFQ3, 'dd/mm/yyyy') as datRifQ3            
+					from cm_prospetto_inf p 
+					inner join an_azienda a on a.prgazienda = p.prgazienda
+					inner join an_unita_azienda u on u.prgazienda = a.prgazienda and u.prgunita = p.prgunita
+					left join an_az_referente r on r.prgazienda = a.prgazienda 
+                    and r.prgunita = u.prgunita and r.prgazreferente = p.prgazreferente
+					inner join de_comune d on d.codcom = u.codcom
+					inner join de_provincia pr on pr.codprovincia = p.codprovincia
+			        inner join DE_ATTIVITA ATT on att.codateco = u.codateco
+			        LEFT JOIN de_contratto_collettivo cc on cc.codccnl = u.codccnl
+			        INNER JOIN AM_DOCUMENTO_COLL coll ON (p.PRGPROSPETTOINF = to_number(coll.STRCHIAVETABELLA)) 
+		 			INNER JOIN AM_DOCUMENTO doc ON (doc.PRGDOCUMENTO = coll.PRGDOCUMENTO)
+					inner join de_doc_tipo on (de_doc_tipo.codtipodocumento = doc.codtipodocumento) 
+					inner join de_doc_ambito on (de_doc_ambito.codambitodoc = de_doc_tipo.codambitodoc) 
+					where p.prgprospettoinf = ? and doc.codtipodocumento = 'PINF' " />	
+					      
+
+<STATEMENT 	name="GET_PROSPETTO" 
+			query="select a.strcodicefiscale, a.strpartitaiva, a.strragionesociale, a.codTipoAzienda,
+							u.codcom, pr.strdenominazione, pr.codregione,
+                            r.strcognome || ' ' || r.strnome as referente,
+                            r.strtelefono, r.strfax, r.stremail,
+                            (select aziUn.STRINDIRIZZO || ', ' || aziUn.strcap || ' ' || dcom.strdenominazione
+	   						from an_azienda azi
+							inner join an_unita_azienda aziUn on (aziUn.PRGAZIENDA = azi.PRGAZIENDA)
+							inner join de_comune dcom on dcom.codcom = aziun.codcom
+							where aziUn.PRGAZIENDA =  p.prgazienda 
+							and aziUn.Flgsede = 'S' and rownum = 1) as indLegale, 
+							p.prgprospettoinf, p.prgazienda, p.prgunita, 
+							p.prgazreferente, p.numoreccnl, p.codprovincia,               
+							p.codmonostatoprospetto, p.codmonoprov, p.numannorifprospetto, 
+							to_char(p.datconsegnaprospetto, 'dd/mm/yyyy') as datconsegnaprospetto, 
+							p.numdipendentinazionale, p.codmonocategoria, 
+							p.numdipendentitot, p.numbasecomputo, p.numquotadisabili, 
+							p.numdisabilinom, p.numdisabilinum, p.numquotaart18, 
+							p.numart18nom, p.numart18num, 
+							to_char(p.datprimaassunzione, 'dd/mm/yyyy') as datprimaassunzione, 
+							to_char(p.datsecondaassunzione, 'dd/mm/yyyy') as datsecondaassunzione, 
+							p.numdisforza, p.numart18forza, 
+							p.flgesonero, p.numpercesonero, p.flggradualita, 
+							p.flgcompterritoriale, p.flgsospensione, p.numconvenzioni, 
+							p.strnote, p.cdnutins, p.dtmins, p.cdnutmod, p.dtmmod, p.numkloprospettoinf,      
+							(select count(c.prgconv) 
+							from cm_convenzione c
+							where c.prgazienda = p.prgazienda and c.numannoconv = p.numannorifprospetto and
+							(c.datscadenza is null or c.datscadenza &lt;= to_date('31/12/'||c.numannoconv, 'dd/mm/yyyy'))) as convenzioniAzienda,
+							to_char(P.DATFINEESONERO, 'dd/mm/yyyy') as DATFINEESONERO,
+	          				P.FLGESONRICHPROROGA,
+				          	to_char(P.DATESONRICHPROROGA, 'dd/mm/yyyy') as DATESONRICHPROROGA,
+	        			  	to_char(P.DATCONCGRADUALITA, 'dd/mm/yyyy') as DATCONCGRADUALITA, 
+	        			  	to_char(P.DATCOMPTERRITORIALE, 'dd/mm/yyyy') as DATCOMPTERRITORIALE, 
+				          	P.NUMASSGRADUALITA,
+	        			  	to_char(P.DATSOSPENSIONE, 'dd/mm/yyyy') as DATSOSPENSIONE,
+	        			  	P.NUMQUOTADISGRAD,
+				          	P.NUMLAVINFORZAGRAD,
+				          	p.codComunicazione, p.codComunicazioneOrig,
+				          	p.NUMDISBATTISTONI, p.NUMBATTISTONIINFORZA, p.NUMART18BATTISTONI,
+				          	p.numtotlavconvdis, p.numtotlavconvart18,
+				          	p.NUMSCOPCENTNONVEDENTI,p.NUMSCOPMASSOFISIOTERAPISTI,p.NUMCENTNONVEDENTIFORZA,
+							p.NUMMASSOFISIOTERAPISTIFORZA,p.NUMCENTNONVEDENTIOBBLIGO, 
+							p.NUMMASSOFISIOTERAPISTIOBBLIGO, p.flg15dipendenti,          	
+				          	p.FLGSOSPENSIONEMOB, p.NUMPERCGRADUALITA,
+				          	p.CODMONOSTATOSOSP STATOSOSP, p.CODMONOCAUSALESOSP CAUSALESOSP, p.NUMLAVORATORISOSP,
+				          	p.NUMBASECOMPUTOART3, p.NUMBASECOMPUTOART18, p.FLGCAPOGRUPPO, p.STRCFAZCAPOGRUPPO, p.FLGCOMPETENZA,
+				          	p.FLGCAPOGRUPPOESTERA, to_char(p.DATRIFQ3, 'dd/mm/yyyy') as datRifQ3,
+				          	to_char(P.DATFINESOSPMBNAZIONALE, 'dd/mm/yyyy') as DATFINESOSPMBNAZIONALE,
+				          	P.FLGESONEROAUTOCERT, to_char(P.DATESONEROAUTOCERT, 'dd/mm/yyyy') as DATESONEROAUTOCERT, 
+				          	P.NUMLAV60XMILLE, P.NUMPERCESONEROAUTOCERT, P.NUMLAVESONEROAUTOCERT,
+				          	P.NUMTELELAVFT, P.NUMSOMMFT, P.NUMCONV12BIS14FT
+					from cm_prospetto_inf p 
+					inner join an_azienda a on a.prgazienda = p.prgazienda
+					inner join an_unita_azienda u on u.prgazienda = a.prgazienda and u.prgunita = p.prgunita
+					left join an_az_referente r on r.prgazienda = a.prgazienda 
+                    and r.prgunita = u.prgunita and r.prgazreferente = p.prgazreferente
+					inner join de_comune d on d.codcom = u.codcom
+					inner join de_provincia pr on pr.codprovincia = p.codprovincia
+					where p.prgprospettoinf = ? " />
+
+<STATEMENT 	name="UPD_PROSPETTI_DATIGEN" 
+			query="UPDATE cm_prospetto_inf
+			          SET FLGVEROPERATORE = ?, 
+			          	  PRGAZREFERENTE = ?,
+			          	  CODPROVINCIA = ?,
+			          	  NUMANNORIFPROSPETTO = ?,
+			          	  DATCONSEGNAPROSPETTO = TO_DATE(?, 'dd/mm/yyyy'),
+			          	  CODMONOCATEGORIA = ?,
+			          	  NUMDIPENDENTINAZIONALE = ?,
+			          	  NUMDIPENDENTITOT = ?,
+			          	  NUMORECCNL = to_number(?,'9999999.999'),  
+			          	  DATPRIMAASSUNZIONE = to_date(?, 'dd/mm/yyyy'),
+			          	  DATSECONDAASSUNZIONE = to_date(?, 'dd/mm/yyyy'),
+			          	  STRNOTE = ?,
+			          	  NUMKLOPROSPETTOINF = ?+1,
+			          	  CDNUTMOD = ?,
+			          	  DTMMOD = SYSDATE,
+						  NUMCENTNONVEDENTIOBBLIGO = ?,
+						  NUMMASSOFISIOTERAPISTIOBBLIGO = ?,
+			          	  FLGCAPOGRUPPO = ?, 
+			          	  STRCFAZCAPOGRUPPO = ?,
+			          	  NUMBASECOMPUTOART3 = ?,
+			          	  NUMBASECOMPUTOART18 = ?,
+			          	  FLGCAPOGRUPPOESTERA = ?
+					WHERE PRGPROSPETTOINF   = ? 
+					AND PRGAZIENDA = ? 
+					AND PRGUNITA = ? " />		
+										 	
+<STATEMENT 	name="CALCOLO_SOMME_TEMPI_PARZIALI_PROSP" 
+			query="{ call ? := PG_COLL_MIRATO_2.CALCOLOSOMMETEMPIPARZIALI(?) }" />
+										 		
+<STATEMENT  name="UPD_PROSP_PERS_NON_DIP"
+	query="UPDATE CM_PROSPETTO_INF
+	 	   SET NUMKLOPROSPETTOINF = NUMKLOPROSPETTOINF + 1,
+	 	   NUMSOMMFT = ?,
+	 	   NUMCONV12BIS14FT = ?,
+	 	   CDNUTMOD = ?,  
+	 	   DTMMOD = SYSDATE
+           WHERE PRGPROSPETTOINF = ?"/>		
+           
+<STATEMENT  name="UPD_PROSP_PERS_DIP"
+	query="UPDATE CM_PROSPETTO_INF
+	 	   SET NUMKLOPROSPETTOINF = NUMKLOPROSPETTOINF + 1,
+	 	   NUMCENTNONVEDENTIFORZA = ?,
+	 	   NUMMASSOFISIOTERAPISTIFORZA = ?,
+	 	   NUMTELELAVFT = ?,
+	 	   CDNUTMOD = ?,  
+	 	   DTMMOD = SYSDATE
+           WHERE PRGPROSPETTOINF = ?"/>	
+
+<STATEMENT name="CHECK_EXIST_PROSPETTO"
+           query="select p.prgprospettoinf
+					from cm_prospetto_inf p 
+					where p.numannorifprospetto = ?
+					and p.codprovincia = ?
+					and p.prgazienda = ?
+					and p.prgunita = ? 
+					and p.CODMONOSTATOPROSPETTO = 'A' "/>
+              
+<STATEMENT name="SELECT_PRGPROSPETTOINF_SEQUENCE"
+           query="SELECT
+               s_cm_prospetto_inf.nextval AS do_nextval
+              FROM DUAL"/>
+					
+<STATEMENT name="INS_PROSPETTI_DATIGEN" 
+		   query=" INSERT INTO cm_prospetto_inf 
+			              (PRGPROSPETTOINF,
+			              FLGVEROPERATORE,
+			              PRGAZIENDA,
+			              PRGUNITA,
+			              CODPROVINCIA,
+			          	  NUMANNORIFPROSPETTO,
+			          	  DATCONSEGNAPROSPETTO,
+			          	  CODMONOSTATOPROSPETTO,
+			          	  CODMONOPROV,
+			          	  CODMONOCATEGORIA,
+			          	  NUMDIPENDENTINAZIONALE,
+			          	  NUMDIPENDENTITOT,
+			          	  NUMORECCNL, 
+			          	  DATPRIMAASSUNZIONE,
+			          	  DATSECONDAASSUNZIONE,
+			          	  STRNOTE,
+			          	  CODCOMUNICAZIONE,
+			          	  CODCOMUNICAZIONEORIG,
+			          	  CDNUTINS,
+			          	  DTMINS,
+			          	  CDNUTMOD,
+			          	  DTMMOD,
+			          	  NUMCENTNONVEDENTIFORZA,
+			          	  NUMMASSOFISIOTERAPISTIFORZA,
+						  NUMCENTNONVEDENTIOBBLIGO,
+						  NUMMASSOFISIOTERAPISTIOBBLIGO,
+						  FLGCAPOGRUPPO, STRCFAZCAPOGRUPPO, FLGCOMPETENZA, NUMBASECOMPUTOART3, NUMBASECOMPUTOART18,
+						  FLGCAPOGRUPPOESTERA
+			          	  ) 
+			          	  VALUES 
+			          	  (?,?,?,?,?,?, 
+			          	  to_date(?,'dd/mm/yyyy'),
+			          	  ?,?,?,?,?,to_number(?,'9999999.999'), 
+			          	  to_date(?,'dd/mm/yyyy'),
+			          	  to_date(?,'dd/mm/yyyy'),
+			          	  ?,?,?,
+			          	  ?,SYSDATE,?,SYSDATE,?,?,?,?,
+			          	  ?, ?, ?, ?, ?,
+			          	  ?) " />				
+
+			          	  
+<STATEMENT name="GET_PROSP_REFERENTI_AZIENDA"
+          query="  SELECT 
+                  PRGAZREFERENTE, 
+                  PRGAZIENDA, 
+                  PRGUNITA, 
+                  STRCOGNOME, 
+                  STRNOME, 
+                  STRCOGNOME || ' ' || STRNOME as strReferente,
+                  de_ruolo_az.strdescrizione as descrizione, 
+                  STRTELEFONO, 
+                  STRFAX, 
+                  STREMAIL, 
+                  CDNUTINS, 
+                  DTMINS, 
+                  CDNUTMOD, 
+                  DTMMOD
+              FROM 
+                 AN_AZ_REFERENTE, de_ruolo_az
+              WHERE 
+                PRGAZIENDA= ? and PRGUNITA= ? and AN_AZ_REFERENTE.CODRUOLOAZ= de_ruolo_az.CODRUOLOAZ "/>			          	  		  			      
+
+
+<STATEMENT name="GET_ESCLUSIONI_PROSP"
+           query="select count(p.prgparttimeprospetto) as checkPartTime,
+           			count(interm.prgintermittenti) as checkIntermittenti,
+                    CASE 
+					WHEN ceil(nvl(sum((p.numlavoratori*p.decorelavorate)/p.decoretotali),0)) - (nvl(sum((p.numlavoratori*p.decorelavorate)/p.decoretotali),0)) &lt; 0.5
+					THEN 
+					     nvl(sum(p.numlavoratori), 0) - ceil(nvl(sum((p.numlavoratori*p.decorelavorate)/p.decoretotali),0))
+					ELSE
+					     nvl(sum(p.numlavoratori), 0) - floor(nvl(sum((p.numlavoratori*p.decorelavorate)/p.decoretotali),0))
+					END as numpt,
+					CASE 
+					WHEN ceil(nvl(sum((interm.numlavoratori*interm.decoresettlavorate)/interm.decoresettcontratto),0)) - (nvl(sum((interm.numlavoratori*interm.decoresettlavorate)/interm.decoresettcontratto),0)) &lt; 0.5
+					THEN 
+					     nvl(sum(interm.numlavoratori),0) - ceil(nvl(sum((interm.numlavoratori*interm.decoresettlavorate)/interm.decoresettcontratto),0))
+					ELSE
+					     nvl(sum(interm.numlavoratori),0) - floor(nvl(sum((interm.numlavoratori*interm.decoresettlavorate)/interm.decoresettcontratto),0))
+					END as numinterm,
+           		    e.prgprospettoinf, 
+					e.numdirigenti, e.numapprendisti,
+					e.numcfl, e.numparttime,								
+					e.numcigs,    
+					e.numtdmeno9mesi, 
+					e.numtemporaneo, 
+					e.numreinserimento, 
+					e.numdomicilio, 
+					e.numsoci, 
+					e.numdisabili, 
+					e.numprotette, 
+					e.numaltri,
+					e.numlavacquisiti,
+					e.numpersonalenonamm_c3,
+					e.numpersonalenonamm_c4,
+					e.numpersonaleviaggiante,
+					e.numlsustabili,
+					e.numlavoratoriopestero,
+					e.numlavoratoriedilizia,
+					e.numlavemersinero,
+					e.numintermittenti,
+					e.numtdmeno6mesi, e.numsomministr, e.numsottosuolo,
+					e.numImpiantiFune, 
+					e.numSettoreAutotrasp, 
+					e.numMontaggi, 
+					e.numContrInserimento, 
+					e.numInail60x1000				
+					from cm_esclusione_prospetto e
+					left join cm_parttime_prospetto p on p.prgprospettoinf = e.prgprospettoinf
+					left join cm_intermittenti_prospetto interm on interm.prgprospettoinf = e.prgprospettoinf
+					where e.prgprospettoinf = ?
+					group by e.prgprospettoinf, 
+					e.numdirigenti, e.numapprendisti,
+					e.numcfl, e.numparttime, e.numcigs,    
+					e.numtdmeno9mesi, e.numtemporaneo, e.numreinserimento, 
+					e.numdomicilio, e.numsoci, e.numdisabili, e.numprotette, e.numaltri,
+					e.numlavacquisiti, e.numpersonalenonamm_c3, e.numpersonalenonamm_c4, 
+					e.numpersonaleviaggiante, e.numlsustabili, e.numlavoratoriopestero, 
+					e.numlavoratoriedilizia, e.numlavemersinero, e.numintermittenti,
+					e.numtdmeno6mesi, e.numsomministr, e.numsottosuolo,
+					e.numImpiantiFune, e.numSettoreAutotrasp, e.numMontaggi, e.numContrInserimento, e.numInail60x1000
+					 "/>
+					
+					
+<STATEMENT name="GET_PARTTIME_PROPOR_PROSP"
+           query="select count(p.prgparttimeprospetto) as checkPartTime,
+                    CASE 
+					WHEN ceil(nvl(sum((p.numlavoratori*p.decorelavorate)/p.decoretotali),0)) - (nvl(sum((p.numlavoratori*p.decorelavorate)/p.decoretotali),0)) &lt; 0.5
+					THEN 
+					     nvl(sum(p.numlavoratori), 0) - ceil(nvl(sum((p.numlavoratori*p.decorelavorate)/p.decoretotali),0))
+					ELSE
+					     nvl(sum(p.numlavoratori), 0) - floor(nvl(sum((p.numlavoratori*p.decorelavorate)/p.decoretotali),0))
+					END as numpt
+					from cm_parttime_prospetto p
+					where p.prgprospettoinf = ? "/>
+					
+
+<STATEMENT name="GET_INTERM_PROPOR_PROSP"
+           query="select count(interm.prgintermittenti) as checkIntermittenti,
+                    CASE 
+					WHEN ceil(nvl(sum((interm.numlavoratori*interm.decoresettlavorate)/interm.decoresettcontratto),0)) - (nvl(sum((interm.numlavoratori*interm.decoresettlavorate)/interm.decoresettcontratto),0)) &lt; 0.5
+					THEN 
+					     nvl(sum(interm.numlavoratori),0) - ceil(nvl(sum((interm.numlavoratori*interm.decoresettlavorate)/interm.decoresettcontratto),0))
+					ELSE
+					     nvl(sum(interm.numlavoratori),0) - floor(nvl(sum((interm.numlavoratori*interm.decoresettlavorate)/interm.decoresettcontratto),0))
+					END as numinterm
+					from cm_intermittenti_prospetto interm
+					where interm.prgprospettoinf = ? "/>
+
+<STATEMENT name="INSERT_ESCL_PERS_DIP_PROSP" 
+		   query=" INSERT INTO cm_esclusione_prospetto
+			              	(PRGPROSPETTOINF,
+			               	NUMDISABILI, 
+							NUMPROTETTE, 
+						    NUMPARTTIME,
+						    NUMINTERMITTENTI
+			          	  ) 
+			          	  VALUES 
+			          	  (?,?,?,?,?) " />											
+
+<STATEMENT 	name="UPDATE_ESCL_PERS_DIP_PROSP" 
+			query="UPDATE cm_esclusione_prospetto
+			          SET NUMDISABILI = ?, 
+						  NUMPROTETTE = ?,
+						  NUMPARTTIME = ?,
+						  NUMINTERMITTENTI = ?
+					WHERE PRGPROSPETTOINF = ? " />					
+
+<STATEMENT name="INSERT_ESCLUSIONI_PROSP" 
+		   query=" INSERT INTO cm_esclusione_prospetto
+							(PRGPROSPETTOINF,
+         					NUMDIRIGENTI, 
+         					NUMAPPRENDISTI,
+						   	NUMCFL, 
+						   	NUMCIGS,    
+							NUMTDMENO9MESI, 
+							NUMTEMPORANEO, 
+							NUMREINSERIMENTO, 
+							NUMDOMICILIO, 
+							NUMSOCI,  
+						    NUMALTRI,
+						    NUMLAVACQUISITI,
+						    NUMPERSONALENONAMM_C3,
+						    NUMPERSONALENONAMM_C4,
+						    NUMPERSONALEVIAGGIANTE,
+						    NUMLSUSTABILI,
+						    NUMLAVORATORIOPESTERO,
+						    NUMLAVORATORIEDILIZIA,
+						    NUMLAVEMERSINERO,  
+						    NUMTDMENO6MESI, 
+						    NUMSOMMINISTR, 
+						    NUMSOTTOSUOLO,
+						    NUMIMPIANTIFUNE,
+							NUMSETTOREAUTOTRASP,
+							NUMMONTAGGI,
+							NUMCONTRINSERIMENTO,
+							NUMINAIL60X1000
+			          	  ) 
+			          	  VALUES 
+			          	  (?,?,?,?,?,?,?,?,?,?,
+			          	  ?,?,?,?,?,?,?,?,?,?,?,?,
+			          	  ?,?,?,?,?) " />
+			          	  
+<STATEMENT name="COOP_INSERT_ESCLUSIONI_PROSP" 
+		   query=" INSERT INTO cm_esclusione_prospetto
+							(PRGPROSPETTOINF,
+         					NUMDIRIGENTI, 
+         					NUMAPPRENDISTI,
+						   	NUMCFL, 
+						   	NUMPARTTIME,
+						   	NUMCIGS,    
+							NUMTDMENO9MESI, 
+							NUMTEMPORANEO, 
+							NUMREINSERIMENTO, 
+							NUMDOMICILIO, 
+							NUMSOCI, 
+							NUMDISABILI,
+							NUMPROTETTE, 
+						    NUMALTRI,
+						    NUMLAVACQUISITI,
+						    NUMPERSONALENONAMM_C3,
+						    NUMPERSONALENONAMM_C4,
+						    NUMPERSONALEVIAGGIANTE,
+						    NUMLSUSTABILI,
+						    NUMLAVORATORIOPESTERO,
+						    NUMLAVORATORIEDILIZIA,
+						    NUMLAVEMERSINERO,  
+						    NUMINTERMITTENTI,
+						    NUMTDMENO6MESI, 
+						    NUMSOMMINISTR, 
+						    NUMSOTTOSUOLO,
+						    NUMIMPIANTIFUNE,
+							NUMSETTOREAUTOTRASP,
+							NUMMONTAGGI,
+							NUMCONTRINSERIMENTO,
+							NUMINAIL60X1000
+			          	  ) 
+			          	  VALUES 
+			          	  (?,?,?,?,?,?,?,?,?,?,?,?,?,?,
+			          	  ?,?,?,?,?,?,?,?,?,?,?,?,
+			          	  ?,?,?,?,?) " />											
+
+<STATEMENT 	name="UPDATE_ESCLUSIONI_PROSP" 
+			query="UPDATE cm_esclusione_prospetto
+			          SET NUMDIRIGENTI = ?, 
+			              NUMAPPRENDISTI = ?,
+					      NUMCFL = ?, 
+					      NUMCIGS = ?,    
+						  NUMTDMENO9MESI = ?, 
+						  NUMTEMPORANEO = ?,
+						  NUMREINSERIMENTO = ?,
+						  NUMDOMICILIO = ?,
+						  NUMSOCI = ?,
+						  NUMALTRI = ?,
+						  NUMLAVACQUISITI = ?,
+						  NUMPERSONALENONAMM_C3 = ?,
+						  NUMPERSONALENONAMM_C4 = ?,
+						  NUMPERSONALEVIAGGIANTE = ?,
+						  NUMLSUSTABILI = ?,
+						  NUMLAVORATORIOPESTERO = ?,
+						  NUMLAVORATORIEDILIZIA = ?,
+						  NUMLAVEMERSINERO = ?,
+						  NUMTDMENO6MESI = ?,
+						  NUMSOMMINISTR = ?,
+						  NUMSOTTOSUOLO = ?,
+						  NUMIMPIANTIFUNE = ?,
+						  NUMSETTOREAUTOTRASP = ?,
+						  NUMMONTAGGI = ?,
+						  NUMCONTRINSERIMENTO = ?,
+						  NUMINAIL60X1000 = ?
+					WHERE PRGPROSPETTOINF = ? " />		 		
+
+<STATEMENT name="DELETE_ALL_PARTTIME_PROSP" 
+			query="DELETE FROM cm_parttime_prospetto			          
+					WHERE PRGPROSPETTOINF = ? " />				
+
+<STATEMENT name="GET_LISTA_PARTTIME_PROSP"
+           query="select p.prgparttimeprospetto, p.prgprospettoinf,
+					p.numlavoratori, p.decorelavorate, p.decoretotali
+					from cm_parttime_prospetto p
+					where p.prgprospettoinf = ? "/>	
+
+<STATEMENT name="GET_PARTTIME_PROSP"
+           query="select p.prgparttimeprospetto, p.prgprospettoinf, e.numparttime,
+					p.numlavoratori, p.decorelavorate, p.decoretotali
+					from cm_parttime_prospetto p
+         		 	inner join cm_esclusione_prospetto e on e.prgprospettoinf = p.prgprospettoinf          
+					where p.prgparttimeprospetto = ? and p.prgprospettoinf = ? "/>									          	  
+
+<STATEMENT name="INS_ESCLUSIONE_PT" 
+		   query=" INSERT INTO cm_esclusione_prospetto
+			              (PRGPROSPETTOINF			             
+			          	  ) 
+			          	  VALUES 
+			          	  (?) " />		
+
+<STATEMENT name="INSERT_PARTTIME_PROSP" 
+		   query=" INSERT INTO cm_parttime_prospetto
+			              (PRGPARTTIMEPROSPETTO,
+			               PRGPROSPETTOINF,
+			               NUMLAVORATORI, 
+			               DECORELAVORATE,
+					       DECORETOTALI
+			          	  ) 
+			          	  VALUES 
+			          	  (s_cm_parttime_prospetto.nextval,
+			          	   ?,?,to_number(?,'9999999.999'),to_number(?,'9999999.999')) " />											
+
+<STATEMENT 	name="UPDATE_PARTTIME_PROSP" 
+			query="UPDATE cm_parttime_prospetto
+			          SET NUMLAVORATORI = ?, 
+			              DECORELAVORATE = to_number(?,'9999999.999'), 
+					      DECORETOTALI = to_number(?,'9999999.999')
+					WHERE PRGPARTTIMEPROSPETTO = ? AND 
+					      PRGPROSPETTOINF = ? " />		 					
+
+<STATEMENT 	name="DELETE_PARTTIME_PROSP" 
+			query="DELETE FROM cm_parttime_prospetto			          
+					WHERE PRGPARTTIMEPROSPETTO = ? AND   
+					      PRGPROSPETTOINF = ? " />				
+
+<STATEMENT name="NUM_PARTTIME_PROSP"
+           query="select 
+					CASE 
+					WHEN ceil(nvl(sum((p.numlavoratori*p.decorelavorate)/p.decoretotali),0)) - (nvl(sum((p.numlavoratori*p.decorelavorate)/p.decoretotali),0)) &lt; 0.5
+					THEN 
+					     nvl(sum(p.numlavoratori),0) - ceil(nvl(sum((p.numlavoratori*p.decorelavorate)/p.decoretotali),0))
+					ELSE
+					     nvl(sum(p.numlavoratori), 0) - floor(nvl(sum((p.numlavoratori*p.decorelavorate)/p.decoretotali),0))
+					END as numpt
+					from cm_parttime_prospetto p
+					where p.prgprospettoinf = ? "/>	
+					      
+<STATEMENT 	name="CALCOLA_PARTTIME_PROSP" 
+			query="UPDATE cm_esclusione_prospetto
+			          SET NUMPARTTIME = ? 		          					
+					WHERE PRGPROSPETTOINF = ? " />		  
+										      
+<STATEMENT 	name="GET_LISTA_LAV_L68_PROSP" 
+			query="select p.prgazienda, p.prgunita,
+       				r.prglavriserva, 
+       				r.prgprospettoinf,
+					r.strcognomelav ||' '|| r.strnomelav as lavoratore,
+					r.strcodicefiscalelav,
+					r.cdnlavoratore,
+					decode(r.cdnlavoratore, null, '0','1') as viewBtn,
+					r.CODMONOCATEGORIA,
+					CASE 
+					    WHEN r.CODMONOCATEGORIA = 'A'  
+						     THEN 'Altra categoria protetta' 
+					    WHEN r.CODMONOCATEGORIA = 'D'    
+					      THEN 'Disabile'    
+					    END as categoria,
+					r.codmonotipo,
+					CASE 
+					    WHEN r.codmonotipo = 'M'  
+						     THEN 'Nominativa' 
+					    WHEN r.codmonotipo = 'R'    
+					      THEN 'Numerica'    
+					    END as tipo,
+					r.codmansione,
+					m.strdescrizione as descrMansione,
+					to_char(r.datiniziorapp, 'dd/mm/yyyy') as datiniziorapp,
+					to_char(r.datfinerapp, 'dd/mm/yyyy') as datfinerapp, 
+					r.deccopertura, 
+					CASE    
+					    WHEN r.FLGBATTISTONI = 'S'    
+					      THEN 'SI'
+					    ELSE
+					        'NO'      
+					 END as FLGBATTISTONI
+					,
+					r.codcontratto,
+					c.strdescrizione as descrContratto,
+					r.flgconvenzione,
+					CASE    
+					    WHEN r.flgconvenzione = 'S'    
+					      THEN 'SI'
+					    ELSE
+					        'NO'      
+					    END as convenzione  
+					from cm_pi_lav_riserva r
+          			inner join cm_prospetto_inf p on p.prgprospettoinf = r.prgprospettoinf
+					left join de_contratto c on c.codcontratto = r.codcontratto
+					left join de_mansione m on m.codmansione = r.codmansione
+					where r.prgprospettoinf = ?	
+					order by r.datiniziorapp" />	
+											      			      
+<STATEMENT 	name="GET_LAV_L68_PROSP" 
+			query="select r.prglavriserva, r.prgprospettoinf, 
+					r.cdnlavoratore, r.strcodicefiscalelav, 
+					r.strcognomelav, r.strnomelav,
+					r.codmonocategoria, r.codmonotipo, 
+					r.codmansione, 
+					to_char(r.datiniziorapp, 'dd/mm/yyyy') as datiniziorapp, 
+					to_char(r.datfinerapp, 'dd/mm/yyyy') as datfinerapp, 
+					r.codcontratto, 
+					r.decorelavorate, r.decoretotali, 
+					r.flgconvenzione, r.strnote,
+					r.numklolavriserva, 
+					r.deccopertura, r.cdnutins, 
+					r.dtmins, r.cdnutmod, 
+					r.dtmmod,			     	
+					r.FLGBATTISTONI,
+					r.flgdisplim, r.NUMPERCDISABILITA, r.codAssProtetta,
+					c.strdescrizione as descrContratto,
+					m.strdescrizione as descrMansione,
+					man_p.STRDESCRIZIONE as descrTipoMansione
+					from cm_pi_lav_riserva r
+					left join de_contratto c on c.codcontratto = r.codcontratto
+					left join de_mansione m on m.codmansione = r.codmansione
+					left join de_mansione man_p on man_p.codMansione=substr(m.codMansione, 0, 5) || '00'					
+					where r.prglavriserva = ? and r.prgprospettoinf = ?	" />
+					
+
+<STATEMENT 	name="GET_TIPO_AZIENDA" 
+			query="select codmonocategoria as cat_azienda 
+			       from CM_PROSPETTO_INF where
+				   prgprospettoinf = ?	" />
+
+<STATEMENT 	name="DELETE_LAV_L68_PROSP" 
+			query="DELETE FROM cm_pi_lav_riserva          
+					WHERE prglavriserva = ? AND   
+					      PRGPROSPETTOINF = ? " />						
+
+
+<STATEMENT name="INSERT_LAV_L68_PROSP" 
+		   query=" INSERT INTO CM_PI_LAV_RISERVA
+			              (PRGLAVRISERVA,
+			              PRGPROSPETTOINF,
+			              CDNLAVORATORE,
+			              STRCODICEFISCALELAV,
+			              STRNOMELAV,
+			              STRCOGNOMELAV,
+			              DECORELAVORATE,
+			              DECORETOTALI,
+			              FLGCONVENZIONE,
+			              DATINIZIORAPP,
+			              DATFINERAPP,
+			              CODMONOCATEGORIA,
+			              CODMONOTIPO,
+			              CODMANSIONE,
+			              CODCONTRATTO,
+			              STRNOTE,
+			              DECCOPERTURA,
+			              CDNUTINS,
+			          	  DTMINS,
+			          	  CDNUTMOD,
+			          	  DTMMOD,
+			          	  FLGBATTISTONI,
+			          	  flgdisplim, NUMPERCDISABILITA, CODASSPROTETTA
+			          	  ) 
+			          	  VALUES 
+			          	  (s_cm_pi_lav_riserva.nextval,
+			          	  ?,?,
+			          	  upper(?),upper(?),upper(?),
+			          	  to_number(?, '9999999.999'),to_number(?, '9999999.999'),?,   
+			          	  to_date(?, 'dd/mm/yyyy'), to_date(?, 'dd/mm/yyyy'),
+			          	  ?,?,?,?,?,to_number(?, '9999999.999'),
+			          	  ?,sysdate,?,sysdate,?,?,to_number(?),?) " />		
+
+<STATEMENT 	name="UPDATE_LAV_L68_PROSP" 
+			query="UPDATE CM_PI_LAV_RISERVA
+			          SET NUMKLOLAVRISERVA = ?+1,
+			          	  CDNLAVORATORE = ?,
+			              STRCODICEFISCALELAV = upper(?),
+			              STRNOMELAV = upper(?),
+			              STRCOGNOMELAV = upper(?),
+			              DECORELAVORATE = to_number(?, '9999999.999'),
+			              DECORETOTALI = to_number(?, '9999999.999'),
+			              FLGCONVENZIONE = ?,
+			              DATINIZIORAPP = to_date(?, 'dd/mm/yyyy'),
+			              DATFINERAPP = to_date(?, 'dd/mm/yyyy'),
+			              CODMONOCATEGORIA = ?,
+			              CODMONOTIPO = ?,
+			              CODMANSIONE = ?,
+			              CODCONTRATTO = ?,
+			              STRNOTE = ?,
+			              DECCOPERTURA = to_number(?, '9999999.999'),
+			              CDNUTMOD = ?,
+			          	  DTMMOD = sysdate,
+			          	  FLGBATTISTONI = ?,
+			          	  flgdisplim = ?,
+			          	  NUMPERCDISABILITA = to_number(?),
+			          	  CODASSPROTETTA = ?
+					WHERE PRGLAVRISERVA = ? 
+					AND PRGPROSPETTOINF = ? " />		
+
+<!--  -->					
+<STATEMENT 	name="GET_LISTA_POSTI_PROSP" 
+			query=" SELECT MD.PRGMANSIONIDISP, MD.PRGPROSPETTOINF, 
+					MD.CODMANSIONE, MD.NUMPOSTI, MD.CODMONOCATEGORIA,
+					MD.CODMONOTIPO,	M.STRDESCRIZIONE AS DESCRMANSIONE,
+					com.STRDENOMINAZIONE as COMUNE,
+					md.CODCOMDISP,
+					CASE 
+					    WHEN MD.CODMONOTIPO = 'M'  
+						     THEN 'Nominativa' 
+					    WHEN MD.CODMONOTIPO = 'R'    
+					      THEN 'Numerica'    
+					    END as DESCRCODMONOTIPO,
+					CASE 
+					    WHEN MD.CODMONOCATEGORIA = 'A'  
+						     THEN 'Altra categoria protetta' 
+					    WHEN MD.CODMONOCATEGORIA = 'D'    
+					      THEN 'Disabile'    
+					    END as CATEGORIA
+					FROM CM_PI_MANSIONE_DISP MD
+					INNER JOIN DE_MANSIONE M ON M.CODMANSIONE = MD.CODMANSIONE 					
+					left join de_comune com on com.CODCOM = md.CODCOMDISP					
+					WHERE MD.PRGPROSPETTOINF = ? " /> 	  				
+
+<!--  -->	
+<STATEMENT 	name="GET_POSTI_PROSP" 
+			query=" SELECT MD.PRGMANSIONIDISP, MD.PRGPROSPETTOINF, 
+					MD.CODMANSIONE, MD.NUMPOSTI, MD.CODMONOCATEGORIA,
+					MD.CODMONOTIPO,	M.STRDESCRIZIONE AS DESCRMANSIONE,
+					man_p.STRDESCRIZIONE as descrTipoMansione,
+					md.cdnutins, md.dtmins, md.cdnutmod, md.dtmmod,
+					md.NUMKLOMANSIONIDISP,
+					MD.STRNOTE,
+					com.STRDENOMINAZIONE as comune,
+				    md.CODCOMDISP,
+				    MD.flgmezzipubblici, MD.flgturninotturni, MD.flgbarriere, 
+				    MD.strdescrcompiti, MD.strcapacita
+					FROM CM_PI_MANSIONE_DISP MD
+					INNER JOIN DE_MANSIONE M ON M.CODMANSIONE = MD.CODMANSIONE 
+					inner join de_mansione man_p on man_p.codmansione=substr(m.codMansione, 0, 5) || '00'
+					left join de_comune com on com.CODCOM = md.CODCOMDISP
+					WHERE MD.PRGMANSIONIDISP = ? AND MD.PRGPROSPETTOINF = ? " /> 
+			          	  
+<STATEMENT 	name="DELETE_POSTI_PROSP" 
+			query="DELETE FROM CM_PI_MANSIONE_DISP          
+					WHERE PRGMANSIONIDISP = ? AND   
+					      PRGPROSPETTOINF = ? " />	
+
+<!--  -->					      
+<STATEMENT name="INSERT_POSTI_PROSP" 
+		   query=" INSERT INTO CM_PI_MANSIONE_DISP
+			              (PRGMANSIONIDISP,
+			              PRGPROSPETTOINF,			              
+			              NUMPOSTI,			              
+			              CODMONOCATEGORIA,		
+			              CODMONOTIPO, 	              
+			              CODMANSIONE,			              
+			              STRNOTE,
+			              CDNUTINS,
+			          	  DTMINS,
+			          	  CDNUTMOD,
+			          	  DTMMOD,
+			          	  CODCOMDISP, 
+			          	  flgmezzipubblici, flgturninotturni, flgbarriere, strdescrcompiti, strcapacita
+			          	  ) 
+			          	  VALUES 
+			          	  (s_cm_pi_mansione_disp.nextval,
+			          	  ?, to_number(?),?,?,?,?,
+			          	  ?,sysdate,?,sysdate,?,?,?,?,?,?) " />			
+
+<!--  -->
+<STATEMENT 	name="UPDATE_POSTI_PROSP" 
+			query="UPDATE CM_PI_MANSIONE_DISP
+			          SET NUMKLOMANSIONIDISP = ?+1,			          
+      	  			      NUMPOSTI = to_number(?),			              
+			              CODMONOCATEGORIA = ?,
+			              CODMONOTIPO = ?, 
+			              CODMANSIONE = ?,			              
+			              STRNOTE = ?,
+			              CDNUTMOD = ?,
+			          	  DTMMOD = sysdate,
+			          	  CODCOMDISP = ?,
+			          	  flgmezzipubblici = ?,
+			          	  flgturninotturni = ?,
+			          	  flgbarriere = ?,
+			          	  strdescrcompiti = ?,
+			          	  strcapacita = ?
+					WHERE PRGMANSIONIDISP = ? 
+					AND PRGPROSPETTOINF = ? " />	
+					
+					
+<STATEMENT 	name="GET_LISTA_COMPENSAZIONE_PROSP" 
+			query=" select c.prgcompensaz, c.prgprospettoinf,
+					c.codprovincia, c.strsede,
+					c.codmonoeccdiff,
+					CASE 
+					    WHEN c.codmonoeccdiff = 'E'  
+						  THEN 'Eccedenza' 
+					    WHEN c.codmonoeccdiff = 'D'    
+					      THEN 'Riduzione'    
+					END as eccDiff,
+					CASE 
+					    WHEN c.codmonocategoria = 'A'  
+						  THEN 'Altre categorie protette' 
+					    WHEN c.codmonocategoria = 'D'    
+					      THEN 'Disabili'    
+					END as CATEGORIA,    
+					c.codmonocategoria,
+					c.numinteressati,
+					c.strCfAzCapoGruppo,
+					p.strdenominazione as descrProvincia
+					from cm_pi_compensazione c          
+					inner join de_provincia p on c.codprovincia=p.codprovincia 
+          			inner join cm_prospetto_inf pi on pi.prgprospettoinf = c.prgprospettoinf
+					where c.prgprospettoinf = ? " /> 									          	  
+
+<STATEMENT 	name="UPDATE_AUTORIZ_PROSP" 
+			query="UPDATE cm_prospetto_inf
+			          SET NUMKLOPROSPETTOINF = ?+1,
+			              FLGESONERO = ?,
+			              NUMPERCESONERO = to_number(?),
+			              FLGGRADUALITA = ?,
+			              FLGCOMPTERRITORIALE = ?,
+			              FLGSOSPENSIONE = ?,			              
+			              DATFINEESONERO = to_date(?, 'dd/mm/yyyy'),
+			              FLGESONRICHPROROGA = ?,
+			              DATESONRICHPROROGA = to_date(?, 'dd/mm/yyyy'),
+			              DATSOSPENSIONE = to_date(?, 'dd/mm/yyyy'),
+			              DATCONCGRADUALITA = to_date(?, 'dd/mm/yyyy'), 
+			              DATCOMPTERRITORIALE = to_date(?, 'dd/mm/yyyy'), 
+			              CDNUTMOD = ?,
+			          	  DTMMOD = SYSDATE,
+			          	  flg15dipendenti = ?,
+			          	  FLGSOSPENSIONEMOB = ?,
+			          	  NUMPERCGRADUALITA = to_number(?),
+			          	  CODMONOSTATOSOSP = ?,
+			          	  CODMONOCAUSALESOSP = ?,
+			          	  NUMLAVORATORISOSP = to_number(?),
+			          	  DATFINESOSPMBNAZIONALE = to_date(?, 'dd/mm/yyyy'),
+			          	  FLGESONEROAUTOCERT = ?, DATESONEROAUTOCERT = to_date(?, 'dd/mm/yyyy'), NUMLAV60XMILLE = to_number(?),
+			          	  NUMPERCESONEROAUTOCERT = to_number(?), NUMLAVESONEROAUTOCERT = to_number(?)
+					WHERE PRGPROSPETTOINF   = ? " />
+			          	  				      			  
+<STATEMENT 	name="DELETE_COMPENSAZIONE_PROSP" 
+			query="DELETE FROM CM_PI_COMPENSAZIONE          
+					WHERE PRGCOMPENSAZ = ? AND   
+					      PRGPROSPETTOINF = ? " />	
+	
+<STATEMENT name="INSERT_COMPENSAZIONE_PROSP" 
+		   query=" INSERT INTO CM_PI_COMPENSAZIONE
+			              (PRGCOMPENSAZ,
+			              PRGPROSPETTOINF,			              
+			              CODPROVINCIA,
+			              CODMONOECCDIFF,
+			              CODMONOCATEGORIA,
+			              NUMINTERESSATI,
+			              STRCFAZCAPOGRUPPO
+			          	  ) 
+			          	  VALUES 
+			          	  (s_cm_pi_compensazione.nextval,
+			          	  ?,?,?,?,to_number(?),?) " />		
+			          	 		          	  
+<STATEMENT 	name="CALCOLO_SCOPERTURA_PROSP" 
+			query="{ call ? := PG_COLL_MIRATO.CALCOLOSCOPERTURA(?,?) }" />			
+
+<STATEMENT 	name="UPDATE_RIEPILOGO_PROSP" 
+			query="UPDATE cm_prospetto_inf
+			          SET NUMKLOPROSPETTOINF = ?+1,
+			              NUMBASECOMPUTO = ?,
+			              NUMQUOTADISABILI = ?,
+			              NUMDISABILINOM = ?,
+			              NUMDISABILINUM = ?,
+			              NUMDISFORZA = ?,
+			              NUMQUOTAART18 = ?,
+			              NUMART18NOM = ?,
+			              NUMART18NUM = ?,
+			              NUMART18FORZA = ?,
+			              NUMCONVENZIONI = ?,
+			          	  CDNUTMOD = ?,
+			          	  DTMMOD = SYSDATE
+					WHERE PRGPROSPETTOINF = ? " />			
+
+<STATEMENT 	name="GET_LISTA_MOV_DISP_PROSP" 
+			query="SELECT 
+		          MOV.prgMovimento PRG, 
+		          1 as CHECKMOV,   
+		          MOV.prgMovimento||'-M' as PRG_CHECK,                   
+		          LAV.cdnLavoratore CDNLAVORATORE,            
+		          LAV.strCodiceFiscale CODFISCLAV,
+		          LAV.strNome nome,
+		          LAV.strCognome cognome,
+		          LAV.strCognome || ' ' || LAV.strNome COGNOMENOMELAV,  
+		          AZ.strRagioneSociale RAGSOCAZ,  
+		          UAZ.strIndirizzo || ', ' || COM.strDenominazione || '(' || RTRIM(PROV.strIstat) || ')' IndirAzienda,  
+		          (select codmonotiporagg from 
+		          (select deisc.codmonotiporagg, isc.cdnlavoratore 
+		          from am_cm_iscr isc, de_cm_tipo_iscr deisc, am_documento_coll coll, am_documento doc 
+		          where isc.CODCMTIPOISCR = deisc.CODCMTIPOISCR 
+		          and isc.datdatafine is null
+		          and isc.PRGCMISCR = coll.STRCHIAVETABELLA 
+		             and coll.PRGDOCUMENTO = doc.PRGDOCUMENTO 
+		             and doc.cdnLavoratore = LAV.cdnLavoratore
+		             and doc.CODTIPODOCUMENTO = 'L68' 
+		             and doc.CODSTATOATTO = 'PR' 
+		             order by deisc.codmonotiporagg desc)
+		          where DECRYPT(cdnlavoratore,?) = MOV.cdnLavoratore and rownum = 1) as CODMONOCATEGORIA,           
+		          MOV.CODTIPOASS CODMONOTIPO,  
+		          MAN.STRDESCRIZIONE descrMansione,
+		          case
+		                when CON.CODCONTRATTO = 'LT' /*Tempo determinato*/
+		                     then decode(MOV.CODMONOTEMPO,'D',CON.STRDESCRIZIONE,'I','Lavoro dipendente TI')
+		                when CON.CODCONTRATTO = 'LP' /*Tempo indeterminato*/                        
+		                     then decode(MOV.CODMONOTEMPO,'D','Lavoro dipendente TD','I',CON.STRDESCRIZIONE)
+		                when CON.CODCONTRATTO not in ('LP','LT')
+		                     then CON.STRDESCRIZIONE
+		              END
+		              AS descrContratto,
+		          TMOV.strDescrizione DESCRMOV, 
+		          TO_CHAR(MOV.datInizioMov, 'DD/MM/YYYY') datInizio,            
+		          MOV.numconvenzione,
+		          (select count(lr.prglavriserva) 
+		          from cm_pi_lav_riserva lr
+		          inner join cm_prospetto_inf pi on pi.prgprospettoinf = lr.prgprospettoinf
+		          where lr.cdnlavoratore = MOV.cdnLavoratore
+		          and lr.datiniziorapp = MOV.datInizioMov 
+		          and pi.prgprospettoinf =? 
+		          ) as checkLavRiserva
+		          FROM AM_MOVIMENTO MOV   
+		          inner join AN_LAVORATORE LAV on (LAV.cdnLavoratore = MOV.cdnLavoratore)
+		          inner join AN_UNITA_AZIENDA UAZ on (UAZ.prgAzienda = MOV.prgAzienda AND UAZ.prgUnita = MOV.prgUnita)
+		          inner join AN_AZIENDA AZ on (AZ.prgAzienda = UAZ.prgAzienda)
+		          inner join DE_MANSIONE MAN on (MAN.Codmansione = MOV.Codmansione)
+		          inner join DE_TIPO_CONTRATTO TCON on (TCON.CODTIPOCONTRATTO = MOV.CODTIPOCONTRATTO)
+		          inner join DE_CONTRATTO CON on (CON.CODCONTRATTO = TCON.CODCONTRATTO)
+		          inner join DE_MV_TIPO_MOV TMOV on (TMOV.codTipoMov = MOV.codTipoMov)
+		          left join DE_COMUNE COM on (COM.codCom = uaz.CODCOM)
+		          left join DE_PROVINCIA PROV on (PROV.codProvincia = COM.codProvincia)
+					WHERE MOV.prgAzienda = ? 
+					AND to_char(MOV.datInizioMov, 'YYYY') &lt;= ?
+					AND (to_char(MOV.Datfinemoveffettiva, 'YYYY') &gt;= ? OR MOV.Datfinemoveffettiva is null)
+					AND MOV.codTipoMov IN ('PRO', 'TRA', 'AVV')  
+					AND MOV.codStatoAtto = 'PR'
+					AND 
+					((MOV.codTipoAss IN ('NU2', 'NOH')) OR
+					 (MOV.codTipoAss NOT IN ('NU2', 'NOH')
+					 AND PG_COLL_MIRATO.checkHistoryCM(MOV.cdnLavoratore,?) = 1))
+				   union all 
+					select 
+					cm.PRGNULLAOSTA PRG, 
+					0 as checkMov,
+					cm.PRGNULLAOSTA||'-N' as PRG_CHECK,	
+					an.cdnlavoratore CDNLAVORATORE, 
+					an.STRCODICEFISCALE CODFISCLAV, 
+					an.STRNOME nome,
+					an.STRCOGNOME cognome,
+					an.strcognome || ' ' || an.strnome as COGNOMENOMELAV,
+					azi.strRagioneSociale RAGSOCAZ,  
+					aziUn.strIndirizzo || ', ' || COM.strDenominazione || '(' || RTRIM(PROV.strIstat) || ')' IndirAzienda,  
+					cm.CODMONOCATEGORIA,
+					cm.CODMONOTIPO,
+					de_mansione.strdescrizione as descrMansione,
+					'' as descrContratto,
+					'Nulla Osta' as descrMov,
+					to_char(cm.DATINIZIO,'dd/mm/yyyy') as datInizio,
+					'0' as numConvenzione,
+					(select count(lr.prglavriserva) 
+					from cm_pi_lav_riserva lr
+					inner join cm_prospetto_inf pi on pi.prgprospettoinf = lr.prgprospettoinf
+					where lr.cdnlavoratore = an.cdnLavoratore
+					and lr.datiniziorapp = cm.DATINIZIO
+					and pi.prgprospettoinf = ?) as checkLavRiserva
+					from cm_nulla_osta cm
+					inner join an_lavoratore an on (an.CDNLAVORATORE = cm.CDNLAVORATORE)
+					inner join an_azienda azi on (azi.PRGAZIENDA = cm.PRGAZIENDA)
+					inner join an_unita_azienda aziUn on (aziUn.PRGAZIENDA = cm.PRGAZIENDA and aziUn.PRGUNITA = cm.PRGUNITA)
+					left join DE_COMUNE COM on com.codcom = aziUn.Codcom
+					left join DE_PROVINCIA PROV on prov.codprovincia = com.codprovincia
+					left outer join de_mansione  on (de_mansione.CODMANSIONE = cm.CODMANSIONE)
+					inner join am_documento_coll docc on docc.strchiavetabella = cm.prgnullaosta
+					inner join am_documento doc on doc.prgdocumento = docc.prgdocumento
+					where cm.prgazienda = ? 
+					and doc.CODTIPODOCUMENTO = 'NULOST'
+					and doc.CODSTATOATTO != 'AN'
+					AND to_char(cm.datinizio, 'YYYY') &lt;= ?
+					AND (to_char(cm.datfine, 'YYYY') &gt;= ? OR cm.datfine is null)
+					ORDER BY COGNOMENOMELAV, datInizio DESC" />
+
+<STATEMENT 	name="OLD_GET_LISTA_MOV_DISP_PROSP" 
+			query="SELECT 
+					MOV.prgMovimento PRGMOV,  
+					MOV.prgMovimentoPrec PRGMOVIMENTOPREC,  
+					MOV.prgMovimentoSucc PRGMOVIMENTOSUCC,  
+					LAV.cdnLavoratore CDNLAVORATORE,  
+					AZ.prgAzienda PRGAZ,  
+					UAZ.prgUnita PRGUAZ,  
+					TO_CHAR(MOV.datComunicaz, 'DD/MM/YYYY') DatComunicaz,  
+					TO_CHAR(MOV.datInizioMov, 'DD/MM/YYYY') DATAMOV,  
+					SUBSTR(MOV.codTipoMov, 1, 1 ) codTipoMov,  					
+					MOV.CODTIPOASS CODTIPOASS,  		
+					MOV.CODMONOTIPOFINE CODMONOTIPOFINE,  MOV.codMonoTempo CODMONOTEMPO,  
+					MOV.CODSTATOATTO,  
+					MOV.CODMOTANNULLAMENTO,  
+					TO_CHAR(MOV.DATFINEMOVEFFETTIVA, 'DD/MM/YYYY') DATFINEMOVEFFETTIVA,  
+					TO_CHAR(MOV.DATFINEMOVEFFETTIVA, 'DD/MM/YYYY') DATFINEMOVEFFETTIVAVIS,  
+					MOV.DECRETRIBUZIONEMEN, MOV.DECRETRIBUZIONEMENSANATA, MOV.DECRETRIBUZIONEANN,		
+					TMOV.strDescrizione DESCRMOV,  
+					LAV.strCognome || ' ' || LAV.strNome COGNOMENOMELAV,  
+					LAV.strCodiceFiscale CODFISCLAV,  
+					AZ.strRagioneSociale RAGSOCAZ,  
+					UAZ.strIndirizzo || ', ' || COM.strDenominazione || '(' || RTRIM(PROV.strIstat) || ')' IndirAzienda,  
+					COM.strDenominazione COMAZ,  PROV.strDenominazione PROVAZ , DE_MV_TIPO_ASS.CODMONOTIPO CODMONOTIPOASS,
+					MOV.codMansione, MAN.STRDESCRIZIONE descrMansione,
+					MOV.codContratto, CON.STRDESCRIZIONE descrContratto,
+					(select deisc.codmonotiporagg
+			        from am_cm_iscr isc 
+			        inner join de_cm_tipo_iscr deisc on deisc.codcmtipoiscr = isc.codcmtipoiscr
+			        where DECRYPT(isc.cdnlavoratore,?) = LAV.cdnLavoratore
+			        and isc.datdatafine is null) as checkIscrCM,
+			        MOV.numconvenzione,
+			        (select count(lr.prglavriserva) 
+			        from cm_pi_lav_riserva lr
+              		inner join cm_prospetto_inf pi on pi.prgprospettoinf = lr.prgprospettoinf
+			        where lr.cdnlavoratore = LAV.cdnLavoratore
+			        and lr.datiniziorapp = MOV.datInizioMov 
+              		and pi.prgprospettoinf = ? 
+              		) as checkLavRiserva 
+					FROM AM_MOVIMENTO MOV,  
+					DE_MV_TIPO_MOV TMOV,  
+					AN_UNITA_AZIENDA UAZ,  
+					AN_AZIENDA AZ,  
+					AN_LAVORATORE LAV, 
+					DE_COMUNE COM, DE_PROVINCIA PROV , 
+					DE_MV_TIPO_ASS,
+					DE_MANSIONE MAN,
+					DE_CONTRATTO CON   
+					WHERE MOV.codTipoMov = TMOV.codTipoMov     
+					AND MOV.CODTIPOASS = DE_MV_TIPO_ASS.CODTIPOASS 
+					AND uaz.CODCOM = COM.codCom (+) 
+					AND COM.codProvincia = PROV.codProvincia (+) 
+					AND MOV.prgAzienda = ?   
+					AND MOV.prgUnita = ?
+					AND to_char(MOV.datInizioMov, 'YYYY') &lt;= ?
+          			AND (to_char(MOV.Datfinemoveffettiva, 'YYYY') &gt;= ?
+         			OR MOV.Datfinemoveffettiva is null)
+					AND MOV.codTipoMov IN ('PRO', 'TRA', 'AVV')  
+					AND MOV.codTipoAss IN ('NU2', 'NOH')
+					AND MOV.codStatoAtto = 'PR' 
+					AND MOV.cdnLavoratore = LAV.cdnLavoratore  
+					AND MOV.prgAzienda = AZ.prgAzienda      
+					AND MOV.prgAzienda = UAZ.prgAzienda     
+					AND MOV.prgUnita = UAZ.prgUnita      
+					AND UAZ.codCom = COM.codCom     
+					AND COM.codProvincia = PROV.codProvincia   
+					AND MAN.Codmansione = MOV.Codmansione
+					AND CON.CODCONTRATTO = MOV.Codcontratto   
+					ORDER BY MOV.datInizioMov DESC, decode(MOV.codTipoMov, 'AVV', 1, 'PRO', 2,  'TRA', 3) DESC, codTipoMov, COGNOMENOMELAV, RAGSOCAZ, IndirAzienda " /> 									          	  
+
+<STATEMENT name="CM_INSERT_LAV_MOVIMENTI" 
+			query="{ call ? := PG_COLL_MIRATO.INSLAVMOVIMENTIDISP(?,?,?,?,?) }" />	
+			
+<STATEMENT name="CM_INSERT_LAV_NULLAOSTA" 
+			query="{ call ? := PG_COLL_MIRATO.INSLAVNULLAOSTA(?,?,?,?) }" />				
+
+<STATEMENT name="CALCOLO_VERIFICA_PROSP" 
+			query="{ call ? := PG_COLL_MIRATO.VERIFICAPROSPETTO(?) }" />		
+			
+<STATEMENT name="CALCOLO_STORICIZZA_PROSP" 
+			query="{ call ? := PG_COLL_MIRATO.STORICIZZAPROSPETTO(?,?) }" />						
+			
+<STATEMENT name="GENERA_COPIA_PROSP" 
+			query="{ call ? := PG_COLL_MIRATO.GENERACOPIAPROSPETTO(?,?,?,?,?) }" />		
+
+<STATEMENT 	name="UPDATE_ANNULLA_PROSP" 
+			query="UPDATE cm_prospetto_inf
+			          SET CODMONOSTATOPROSPETTO = 'N', 
+			              NUMKLOPROSPETTOINF = ?+1,			              
+			          	  CDNUTMOD = ?,
+			          	  DTMMOD = SYSDATE
+					WHERE PRGPROSPETTOINF = ? " />			
+					
+<STATEMENT
+        name="SELECT_AZIENDA_PROSPETTO"
+        query=" select azi.STRCODICEFISCALE as codFiscAzi,azi.STRRAGIONESOCIALE as ragSoc, 
+	   				   azi.STRPARTITAIVA as PIva,aziUn.STRINDIRIZZO as indirizzo
+	   			from an_azienda azi
+				inner join an_unita_azienda aziUn on (aziUn.PRGAZIENDA = azi.PRGAZIENDA)
+				where aziUn.PRGAZIENDA = ? and aziUn.PRGUNITA = ? "/>													
+
+<STATEMENT  name="GET_TUTTE_ISCRIZIONI_CM_LAV_PROTOCOLLATE"
+        query="SELECT I.PRGCMISCR,
+        	    TO_CHAR(I.DATDATAINIZIO,'DD/MM/YYYY') DATINIZIO, 
+                TO_CHAR(I.DATDATAFINE,'DD/MM/YYYY') DATFINE,
+                TIS.CODMONOTIPORAGG,
+                I.CODMOTIVOFINEATTO,
+                I.FLGAUTOMATICO,
+                I.CODCMTIPOISCR,
+                NVL(TIS.FLGESCLUDIDAAUTCM, 'N') FLGESCLUDIDAAUTCM
+		 	   	FROM AM_CM_ISCR I, DE_CM_TIPO_ISCR TIS 
+               	WHERE I.CODCMTIPOISCR = TIS.CODCMTIPOISCR
+                AND DECRYPT(I.CDNLAVORATORE, ?) = ?  
+		 		AND I.CODSTATOATTO = 'PR' 
+		 		ORDER BY I.PRGCMISCR desc "/>
+				
+<STATEMENT  name="UPD_CM_ISCR_CHIUSURA"
+	query="UPDATE AM_CM_ISCR SET DATDATAFINE = 
+    	(CASE
+        	WHEN TO_DATE(?,'DD/MM/YYYY') &lt; TRUNC(DATDATAINIZIO) THEN DATDATAINIZIO
+        	ELSE TO_DATE(?,'DD/MM/YYYY')
+         END
+        ),
+        CODMOTIVOFINEATTO = ?,
+        FLGAUTOMATICO = 'S',
+		CDNUTMOD = ?,
+        DTMMOD = SYSDATE, 
+        NUMKLOCMISCR = NUMKLOCMISCR + 1 
+        WHERE PRGCMISCR = ?"/>
+
+<STATEMENT  name="UPD_CM_ISCR_RIAPERTURA"
+	query="UPDATE AM_CM_ISCR 
+		SET DATDATAFINE = null,
+        CODMOTIVOFINEATTO = null,
+        FLGAUTOMATICO = 'N',
+		CDNUTMOD = ?,
+        DTMMOD = SYSDATE, 
+        NUMKLOCMISCR = NUMKLOCMISCR + 1 
+        WHERE PRGCMISCR = ?"/>
+        
+<STATEMENT  name="UPD_TS_CONFIG_TAB_CM"
+	query="UPDATE TS_CONFIG_TAB 
+	 	   SET FLGABILITA = ? 
+           WHERE CDNCONFIGTAB = ?"/>
+           
+<!-- RIEPILOGO PROSPETTI NUOVA GESTIONE -->
+
+
+<STATEMENT  name="SELECT_RIEPILOGO_PROSPETTO"
+        query="SELECT A.STRCODICEFISCALE, A.STRPARTITAIVA, A.STRRAGIONESOCIALE,
+						U.CODCOM, PR.STRDENOMINAZIONE,
+						(SELECT NVL(AZIUN.FLGSEDE, 'N')
+   						FROM AN_AZIENDA AZI
+						INNER JOIN AN_UNITA_AZIENDA AZIUN ON (AZIUN.PRGAZIENDA = AZI.PRGAZIENDA)
+						WHERE AZIUN.PRGAZIENDA =  P.PRGAZIENDA
+						AND AZIUN.FLGSEDE = 'S' AND ROWNUM = 1) AS FLGSEDE,
+                        R.STRCOGNOME || ' ' || R.STRNOME AS REFERENTE,
+                        R.STRTELEFONO, R.STRFAX, R.STREMAIL,
+                        (SELECT AZIUN.STRINDIRIZZO || ', ' || AZIUN.STRCAP || ' ' || DCOM.STRDENOMINAZIONE
+   						FROM AN_AZIENDA AZI
+						INNER JOIN AN_UNITA_AZIENDA AZIUN ON (AZIUN.PRGAZIENDA = AZI.PRGAZIENDA)
+						INNER JOIN DE_COMUNE DCOM ON DCOM.CODCOM = AZIUN.CODCOM
+						WHERE AZIUN.PRGAZIENDA =  P.PRGAZIENDA
+						AND AZIUN.FLGSEDE = 'S' AND ROWNUM = 1) AS INDLEGALE,
+				(CASE
+					WHEN TRUNC(P.DTMINS) &lt; TO_DATE('01/01/2012', 'DD/MM/YYYY') THEN
+						(SELECT   (NVL(E.NUMDIRIGENTI,0) + NVL(E.NUMAPPRENDISTI,0) + NVL(E.NUMCFL,0) + NVL(E.NUMPARTTIME,0) +
+				         NVL(E.NUMCIGS,0) + NVL(E.NUMTDMENO9MESI,0) + NVL(E.NUMTEMPORANEO,0) + NVL(E.NUMREINSERIMENTO,0) +
+				         NVL(E.NUMDOMICILIO,0) + NVL(E.NUMSOCI,0) + NVL(E.NUMDISABILI,0) + NVL(E.NUMPROTETTE,0) +
+				         NVL(E.NUMALTRI,0) + NVL(E.NUMLAVACQUISITI,0) + NVL(E.NUMPERSONALENONAMM_C3,0) + NVL(E.NUMPERSONALENONAMM_C4,0)
+				         + NVL(E.NUMPERSONALEVIAGGIANTE,0) + NVL(E.NUMLSUSTABILI,0) + NVL(E.NUMLAVORATORIOPESTERO,0) 
+				         + NVL(E.NUMLAVORATORIEDILIZIA,0) + NVL(E.NUMLAVEMERSINERO,0) + NVL(E.NUMINTERMITTENTI,0)) AS TOTALEESCLUSIONE
+						FROM CM_ESCLUSIONE_PROSPETTO E 
+						WHERE E.PRGPROSPETTOINF = P.PRGPROSPETTOINF)
+					ELSE
+						(SELECT   (NVL(E.NUMDIRIGENTI,0) + NVL(E.NUMAPPRENDISTI,0) + NVL(E.NUMCFL,0) + NVL(E.NUMPARTTIME,0) +
+						         NVL(E.NUMCIGS,0) + NVL(E.NUMTDMENO9MESI,0) + NVL(E.NUMREINSERIMENTO,0) +
+						         NVL(E.NUMDOMICILIO,0) + NVL(E.NUMSOCI,0) + NVL(E.NUMDISABILI,0) +  
+						         (CASE 
+				          		 WHEN 
+					          		(CASE 
+					          			WHEN CEIL((1 * NVL(P.NUMDIPENDENTITOT,0))/100) - (1 * NVL(P.NUMDIPENDENTITOT,0)/100) &gt;= 0.5 THEN
+					          				FLOOR((1 * NVL(P.NUMDIPENDENTITOT,0))/100)
+					          			ELSE CEIL((1 * NVL(P.NUMDIPENDENTITOT,0))/100)
+					          		END) &lt;= NVL(E.NUMPROTETTE,0) THEN (CASE 
+														          			WHEN CEIL((1 * NVL(P.NUMDIPENDENTITOT,0))/100) - (1 * NVL(P.NUMDIPENDENTITOT,0)/100) &gt;= 0.5 THEN
+														          				FLOOR((1 * NVL(P.NUMDIPENDENTITOT,0))/100)
+														          			ELSE CEIL((1 * NVL(P.NUMDIPENDENTITOT,0))/100)
+														          	    END)
+				            	 ELSE NVL(E.NUMPROTETTE,0)
+					      		 END)
+						         +
+						         NVL(E.NUMALTRI,0) + NVL(E.NUMLAVACQUISITI,0) + NVL(E.NUMPERSONALENONAMM_C3,0) + NVL(E.NUMPERSONALENONAMM_C4,0)
+						         + NVL(E.NUMPERSONALEVIAGGIANTE,0) + NVL(E.NUMLSUSTABILI,0) + NVL(E.NUMLAVORATORIOPESTERO,0) 
+						         + NVL(E.NUMLAVORATORIEDILIZIA,0) + NVL(E.NUMLAVEMERSINERO,0) + NVL(E.NUMINTERMITTENTI,0)
+						         + NVL(E.NUMTDMENO6MESI,0) + NVL(E.NUMSOMMINISTR,0) + NVL(E.NUMSOTTOSUOLO,0)
+						         + NVL(P.NUMMASSOFISIOTERAPISTIFORZA,0) + NVL(P.NUMCENTNONVEDENTIFORZA,0) + NVL(P.NUMTELELAVFT,0)
+						         + NVL(E.numImpiantiFune,0)
+						         + NVL(E.numSettoreAutotrasp,0)
+						         + NVL(E.numMontaggi,0)
+						         + NVL(E.numContrInserimento,0)
+						         + NVL(E.numInail60x1000,0)	 
+							     + (select nvl(sum(PI_DETT_PT_DISABILE.numLavoratori),0)
+									   from PI_DETT_PT_DISABILE
+									   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+									   and PI_DETT_PT_DISABILE.codTipoPTDisabile in ('D', 'C', 'M'))
+								 + (CASE
+									WHEN 
+									 (
+									  (select nvl(sum(PI_DETT_PT_DISABILE.decCopertura),0)
+									   from PI_DETT_PT_DISABILE
+									   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+									   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'T') - 
+									   (select FLOOR(nvl(sum(PI_DETT_PT_DISABILE.decCopertura),0))
+									   from PI_DETT_PT_DISABILE
+									   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+									   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'T')
+									  ) &gt; 0.5 THEN (select CEIL(nvl(sum(PI_DETT_PT_DISABILE.decCopertura),0))
+															   from PI_DETT_PT_DISABILE
+															   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+															   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'T')
+									ELSE 
+										(select FLOOR(nvl(sum(PI_DETT_PT_DISABILE.decCopertura),0))
+												   from PI_DETT_PT_DISABILE
+												   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+												   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'T')
+								   END)
+								 ) AS TOTALEESCLUSIONE
+						FROM CM_ESCLUSIONE_PROSPETTO E 
+						WHERE E.PRGPROSPETTOINF = P.PRGPROSPETTOINF)
+				END) AS TOTALEESCLUSIONE,
+				(SELECT   (NVL(E.NUMDIRIGENTI,0) + NVL(E.NUMAPPRENDISTI,0) + NVL(E.NUMCFL,0) + NVL(E.NUMPARTTIME,0) +
+				         NVL(E.NUMCIGS,0) + NVL(E.NUMTDMENO9MESI,0) + NVL(E.NUMREINSERIMENTO,0) +
+				         NVL(E.NUMDOMICILIO,0) + NVL(E.NUMSOCI,0) + NVL(E.NUMDISABILI,0) + 
+				         (CASE 
+		          		 WHEN 
+			          		(CASE 
+			          			WHEN CEIL((1 * NVL(P.NUMDIPENDENTITOT,0))/100) - (1 * NVL(P.NUMDIPENDENTITOT,0)/100) &gt;= 0.5 THEN
+			          				FLOOR((1 * NVL(P.NUMDIPENDENTITOT,0))/100)
+			          			ELSE CEIL((1 * NVL(P.NUMDIPENDENTITOT,0))/100)
+			          		END) &lt;= NVL(E.NUMPROTETTE,0) THEN (CASE 
+												          			WHEN CEIL((1 * NVL(P.NUMDIPENDENTITOT,0))/100) - (1 * NVL(P.NUMDIPENDENTITOT,0)/100) &gt;= 0.5 THEN
+												          				FLOOR((1 * NVL(P.NUMDIPENDENTITOT,0))/100)
+												          			ELSE CEIL((1 * NVL(P.NUMDIPENDENTITOT,0))/100)
+												          	    END)
+		            	 ELSE NVL(E.NUMPROTETTE,0)
+			      		 END)
+				         +
+				         NVL(E.NUMLAVACQUISITI,0) + NVL(E.NUMPERSONALENONAMM_C3,0) + NVL(E.NUMPERSONALENONAMM_C4,0)
+				         + NVL(E.NUMLSUSTABILI,0) + NVL(E.NUMLAVORATORIOPESTERO,0) 
+				         + NVL(E.NUMLAVEMERSINERO,0) + NVL(E.NUMINTERMITTENTI,0)
+				         + NVL(E.NUMTDMENO6MESI,0) + NVL(E.NUMSOMMINISTR,0)
+				         + NVL(P.NUMMASSOFISIOTERAPISTIFORZA,0) + NVL(P.NUMCENTNONVEDENTIFORZA,0) + NVL(P.NUMTELELAVFT,0)
+				         + NVL(E.numContrInserimento,0)
+				         + (select nvl(sum(PI_DETT_PT_DISABILE.numLavoratori),0)
+							   from PI_DETT_PT_DISABILE
+							   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+							   and PI_DETT_PT_DISABILE.codTipoPTDisabile in ('D', 'C', 'M'))
+						 + (CASE
+							WHEN 
+							 (
+							  (select nvl(sum(PI_DETT_PT_DISABILE.decCopertura),0)
+							   from PI_DETT_PT_DISABILE
+							   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+							   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'T') - 
+							   (select FLOOR(nvl(sum(PI_DETT_PT_DISABILE.decCopertura),0))
+							   from PI_DETT_PT_DISABILE
+							   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+							   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'T')
+							  ) &gt; 0.5 THEN (select CEIL(nvl(sum(PI_DETT_PT_DISABILE.decCopertura),0))
+													   from PI_DETT_PT_DISABILE
+													   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+													   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'T')
+							ELSE 
+								(select FLOOR(nvl(sum(PI_DETT_PT_DISABILE.decCopertura),0))
+										   from PI_DETT_PT_DISABILE
+										   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+										   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'T')
+						   END)
+				         ) AS TOTALEESCLUSIONEART18
+				FROM CM_ESCLUSIONE_PROSPETTO E 
+				WHERE E.PRGPROSPETTOINF = P.PRGPROSPETTOINF) AS TOTALEESCLUSIONEART18,									
+					     (SELECT TO_CHAR(MIN(CD.DATSCADENZA), 'DD/MM/YYYY')  
+					      FROM CM_CONV_DETTAGLIO CD        
+					      INNER JOIN DE_CONV_STATO_ASS CSA ON CSA.CODSTATO = CD.CODSTATO        
+					      WHERE CSA.FLGSCOPERTURA = 'S'     					      
+					      AND TRUNC(CD.DATSCADENZA) &gt;= decode(p.datprospetto, null, TRUNC(SYSDATE), p.datprospetto)
+					      AND CD.PRGCONV IN (SELECT C.PRGCONV
+                          FROM CM_CONVENZIONE C
+                          WHERE C.CODSTATORICHIESTA = 'DE'
+                          AND C.PRGAZIENDA = P.PRGAZIENDA
+                          and to_char(trunc(c.datconvenzione,'YYYY'), 'YYYY') &lt;= P.NUMANNORIFPROSPETTO
+                          and (to_char(trunc(c.datscadenza,'YYYY'), 'YYYY') &gt;= P.NUMANNORIFPROSPETTO
+                          or c.datscadenza is null)
+                          and c.CODPROVINCIA = P.CODPROVINCIA
+                          ))
+				        AS DATAPROXASSCONV,					
+              	P.PRGPROSPETTOINF,  P.PRGAZIENDA, 
+              	P.PRGUNITA, P.PRGAZREFERENTE, 
+              	P.NUMORECCNL,P.CODPROVINCIA, 
+              	P.CODMONOSTATOPROSPETTO, P.CODMONOPROV, 
+              	P.NUMANNORIFPROSPETTO,  
+              	TO_CHAR(P.DATCONSEGNAPROSPETTO, 'DD/MM/YYYY') AS DATCONSEGNAPROSPETTO, 
+              	TO_CHAR(P.DATRIFINFORZA, 'DD/MM/YYYY') AS DATRIFINFORZA,
+              	TO_CHAR(P.DATPROSPETTO, 'DD/MM/YYYY') AS DATPROSPETTO,
+              	P.NUMDIPENDENTINAZIONALE, 
+              	P.CODMONOCATEGORIA, P.NUMDIPENDENTITOT, 
+              	P.NUMBASECOMPUTO, P.NUMBASECOMPUTOART18PROV AS NUMBASECOMPUTOART18, P.NUMBASECOMPUTOART3PROV AS NUMBASECOMPUTOART3,
+              	P.NUMBASECOMPUTOART3 AS NUMBASECOMPUTOART3NAZ, P.NUMBASECOMPUTOART18 AS NUMBASECOMPUTOART18NAZ,
+              	P.NUMQUOTADISABILI, 
+              	P.NUMDISABILINOM,  P.NUMDISABILINUM, 
+              	P.NUMQUOTAART18, P.NUMART18NOM,  P.NUMART18NUM, 
+	            TO_CHAR(P.DATPRIMAASSUNZIONE, 'DD/MM/YYYY') AS DATPRIMAASSUNZIONE, 
+				TO_CHAR(P.DATSECONDAASSUNZIONE, 'DD/MM/YYYY') AS DATSECONDAASSUNZIONE, 
+	         	P.NUMDISFORZA, P.NUMDISFORZARIFNOMI, 
+	          	P.NUMDISFORZANOMI, P.NUMDISFORZARIFNUME, 
+	          	P.NUMDISFORZANUME, P.NUMART18FORZA, 
+	          	P.NUMART18FORZARIFNOMI, P.NUMART18FORZANOMI, 
+	          	P.NUMART18FORZARIFNUME, P.NUMART18FORZANUME, 
+	          	P.FLGESONERO, P.NUMPERCESONERO, 
+	          	P.FLGGRADUALITA, P.FLGCOMPTERRITORIALE, 
+	          	P.FLGSOSPENSIONE, P.NUMCONVENZIONI, 
+	          	P.NUMLAVORATORICONV, P.NUMDISCONVNUME, 
+	          	P.NUMDISCONVNOMI, P.NUMART18CONVNUME, 
+	          	P.NUMART18CONVNOMI, P.NUMDISCOMPTERRNOMI, 
+	          	P.NUMDISCOMPTERRNUME, P.NUMART18COMPTERRNOMI, 
+	         	P.NUMART18COMPTERRNUME, P.NUMDISESONNOMI, 
+	          	P.NUMDISESONNUME, P.STRNOTE, 
+	          	P.CDNUTINS, P.DTMINS, P.CDNUTMOD, P.DTMMOD, 
+	          	P.NUMKLOPROSPETTOINF,
+	          	to_char(P.DATFINEESONERO, 'dd/mm/yyyy') as DATFINEESONERO,
+  				P.FLGESONRICHPROROGA,
+	          	to_char(P.DATESONRICHPROROGA, 'dd/mm/yyyy') as DATESONRICHPROROGA,
+			  	to_char(P.DATCONCGRADUALITA, 'dd/mm/yyyy') as DATCONCGRADUALITA,
+	          	P.NUMASSGRADUALITA,
+			  	to_char(P.DATSOSPENSIONE, 'dd/mm/yyyy') as DATSOSPENSIONE,
+			  	P.NUMQUOTADISGRAD,
+	          	P.NUMLAVINFORZAGRAD, doc.CODSTATOATTO,
+				to_char(doc.DATPROTOCOLLO,'DD/MM/YYYY hh24:mi') as dataOraProt,
+				doc.NUMPROTOCOLLO as NUMPROTOCOLLO, doc.NUMANNOPROT as numAnnoProt,
+				P.codComunicazione, P.codComunicazioneOrig , 
+        		p.numdisbattistoni, p.numbattistoniinforza, p.numart18battistoni,
+        		p.numtotlavconvart18, p.numtotlavconvdis,        		
+        		p.NUMSCOPCENTNONVEDENTI,
+				p.NUMSCOPMASSOFISIOTERAPISTI,
+				p.FLGCOMPETENZA, P.FLGESONEROAUTOCERT,
+				(SELECT ESCL.NUMTDMENO9MESI FROM CM_ESCLUSIONE_PROSPETTO ESCL 
+				WHERE ESCL.PRGPROSPETTOINF = P.PRGPROSPETTOINF) AS NUMTDMENO9MESI,
+				(select count(lr.prglavriserva)
+				  from cm_pi_lav_riserva lr
+				  where lr.prgprospettoinf = P.PRGPROSPETTOINF
+				  and lr.codmonocategoria = 'D' and nvl(lr.codassprotetta,'A') not in ('M', 'N', 'H', 'I')) as NUMLAVCOMPUTABILI,
+				((NVL(P.NUMCENTNONVEDENTIFORZA,0)) + (NVL(P.NUMMASSOFISIOTERAPISTIFORZA,0)) + 
+				(SELECT NVL(ESCL.NUMDISABILI,0)
+				FROM CM_ESCLUSIONE_PROSPETTO ESCL 
+				WHERE ESCL.PRGPROSPETTOINF = P.PRGPROSPETTOINF) +
+				 (select nvl(sum(PI_DETT_PT_DISABILE.numLavoratori),0)
+				   from PI_DETT_PT_DISABILE
+				   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+				   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'C') +
+				  (select nvl(sum(PI_DETT_PT_DISABILE.numLavoratori),0)
+				   from PI_DETT_PT_DISABILE
+				   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+				   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'M') +
+				  (select nvl(sum(PI_DETT_PT_DISABILE.numLavoratori),0)
+				   from PI_DETT_PT_DISABILE
+				   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+				   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'D')
+				) as NUMTOTALEDISESCLUSIONI,
+				(select count(lr.prglavriserva)
+				  from cm_pi_lav_riserva lr
+				  where lr.prgprospettoinf = P.PRGPROSPETTOINF
+				  and lr.codmonocategoria = 'D' and nvl(lr.codassprotetta,'A') = 'D') as NUMLAVCOMPUTABILICENTR,
+				((NVL(P.NUMCENTNONVEDENTIFORZA,0)) + 
+				 (select nvl(sum(PI_DETT_PT_DISABILE.numLavoratori),0)
+				   from PI_DETT_PT_DISABILE
+				   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+				   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'C')
+				) as NUMCENTRNONVEDENTI,
+				(select count(lr.prglavriserva)
+				  from cm_pi_lav_riserva lr
+				  where lr.prgprospettoinf = P.PRGPROSPETTOINF
+				  and lr.codmonocategoria = 'D' and nvl(lr.codassprotetta,'A') in ('E', 'O')) as NUMLAVCOMPUTABILIMASSO,
+				((NVL(P.NUMMASSOFISIOTERAPISTIFORZA,0)) + 
+				 (select nvl(sum(PI_DETT_PT_DISABILE.numLavoratori),0)
+				   from PI_DETT_PT_DISABILE
+				   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+				   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'M')
+				) as NUMMASSONONVEDENTI,
+				(select count(lr.prglavriserva)
+				  from cm_pi_lav_riserva lr
+				  where lr.prgprospettoinf = P.PRGPROSPETTOINF
+				  and lr.codmonocategoria = 'D' and nvl(lr.codassprotetta,'A') in ('M', 'N')) as NUMLAVCOMPUTABILISOMM,
+				((NVL(P.NUMSOMMFT,0)) + 
+				 (select nvl(sum(PI_DETT_PT_DISABILE.numLavoratori),0)
+				   from PI_DETT_PT_DISABILE
+				   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+				   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'S')
+				) as NUMSOMMINISTRATI,
+				(select count(lr.prglavriserva)
+				  from cm_pi_lav_riserva lr
+				  where lr.prgprospettoinf = P.PRGPROSPETTOINF
+				  and lr.codmonocategoria = 'D' and nvl(lr.codassprotetta,'A') in ('H', 'I')) as NUMLAVCOMPUTABILICONV,
+				((NVL(P.NUMCONV12BIS14FT,0)) + 
+				 (select nvl(sum(PI_DETT_PT_DISABILE.numLavoratori),0)
+				   from PI_DETT_PT_DISABILE
+				   where PI_DETT_PT_DISABILE.prgprospettoinf = P.PRGPROSPETTOINF
+				   and PI_DETT_PT_DISABILE.codTipoPTDisabile = 'V')
+				) as NUMDISCONVENZIONE
+				FROM CM_PROSPETTO_INF P 
+				INNER JOIN AN_AZIENDA A ON A.PRGAZIENDA = P.PRGAZIENDA
+				INNER JOIN AN_UNITA_AZIENDA U ON U.PRGAZIENDA = A.PRGAZIENDA AND U.PRGUNITA = P.PRGUNITA
+				LEFT JOIN AN_AZ_REFERENTE R ON R.PRGAZIENDA = A.PRGAZIENDA 
+	            AND R.PRGUNITA = U.PRGUNITA AND R.PRGAZREFERENTE = P.PRGAZREFERENTE
+				INNER JOIN DE_COMUNE D ON D.CODCOM = U.CODCOM
+				INNER JOIN DE_PROVINCIA PR ON PR.CODPROVINCIA = P.CODPROVINCIA
+				INNER JOIN AM_DOCUMENTO_COLL coll ON (p.PRGPROSPETTOINF = to_number(coll.STRCHIAVETABELLA)) 
+				INNER JOIN AM_DOCUMENTO doc ON (doc.PRGDOCUMENTO = coll.PRGDOCUMENTO) 
+				WHERE P.PRGPROSPETTOINF = ? and doc.CODTIPODOCUMENTO = 'PINF' "/>
+
+<STATEMENT 	name="RICALCOLO_RIEPILOGO_PROSP" 
+			query="{ call ? := PG_COLL_MIRATO_2.RICALCOLORIEPILOGOPROSP(?,?) }" />	
+			        
+<STATEMENT  name="UPDATE_DETT_RIEPILOGO_PROSP"
+	query="UPDATE   CM_PROSPETTO_INF
+	 	   SET NUMKLOPROSPETTOINF = ?+1,
+	 	   NUMDISFORZARIFNOMI = to_number(?,'9999.99'),
+	 	   NUMDISFORZARIFNUME = to_number(?,'9999.99'),
+	 	   NUMART18FORZARIFNOMI = to_number(?,'9999.99'),
+	 	   NUMART18FORZARIFNUME = to_number(?,'9999.99'),
+	 	   DATRIFINFORZA = to_date(?, 'dd/mm/yyyy'),
+	 	   DATPROSPETTO = to_date(?, 'dd/mm/yyyy'),
+	 	   DATCONSEGNAPROSPETTO = to_date(?, 'dd/mm/yyyy'),
+	 	   NUMQUOTADISGRAD = ?,
+	 	   NUMLAVINFORZAGRAD = ?,
+	 	   NUMASSGRADUALITA = ?,
+	 	   CDNUTMOD = ?,  
+	 	   DTMMOD = SYSDATE,
+	 	   NUMDISBATTISTONI = to_number(?,'9999.99'),
+		   NUMBATTISTONIINFORZA = to_number(?,'9999.99'),
+		   NUMART18BATTISTONI = to_number(?,'9999.99') ,
+		   numtotlavconvart18 = to_number(?,'9999.99'),
+		   numtotlavconvdis = to_number(?,'9999.99'),
+		   
+		   NUMSCOPCENTNONVEDENTI = to_number(?,'9999.99'),
+		   NUMSCOPMASSOFISIOTERAPISTI = to_number(?,'9999.99')
+		   
+		   
+           WHERE PRGPROSPETTOINF = ?"/>	           		
+
+<STATEMENT 	name="CONTROLLA_PROSPETTO" 
+			query="{ call ? := PG_COLL_MIRATO_2.CONTROLLAPROSPETTO(?,?,?) }" />			
+
+<STATEMENT 	name="VERIFICA_PROSPETTO" 
+			query="{ call ? := PG_COLL_MIRATO_2.VERIFICAPROSPETTO(?,?,?,?,?,?,?,?,?,?,?,?,?,?) }" />			
+			
+<STATEMENT  name="STORICIZZA_RIEPILOGO_PROSP"
+	query="UPDATE CM_PROSPETTO_INF
+	 	   SET NUMKLOPROSPETTOINF = ?+1,
+	 	   CODMONOSTATOPROSPETTO = ?,
+	 	   CDNUTMOD = ?,  
+	 	   DTMMOD = SYSDATE
+           WHERE PRGPROSPETTOINF = ?"/>						
+           
+           
+<STATEMENT  name="ANNULLA_RIEPILOGO_PROSP"
+	query="UPDATE CM_PROSPETTO_INF
+	 	   SET NUMKLOPROSPETTOINF = ?+1,
+	 	   CODMONOSTATOPROSPETTO = 'N', 
+	 	   CDNUTMOD = ?,  
+	 	   DTMMOD = SYSDATE
+           WHERE PRGPROSPETTOINF = ?"/>		     
+           
+<STATEMENT 	name="GENERA_COPIA_RIEPILOGO_PROSP" 
+			query="{ call ? := PG_COLL_MIRATO_2.GENERACOPIAPROSPETTO(?,?,?,?,?,?,?) }" />		
+			
+
+<STATEMENT name="CM_AGG_LAV_MOV_DISP" 
+			query="{ call ? := PG_COLL_MIRATO.AGGLAVMOVDISPNEW(?,?,?,?,?) }" />
+ 
+<STATEMENT name="GET_PROSPETTO_FROM_MOVIMENTO" 
+			query="{ call ? := PG_COLL_MIRATO_2.GETPROSPETTOFROMMOVIMENTO(?,?,?,?,?) }" />
+			
+<STATEMENT 	name="STORICIZZA_PROSPETTO_SARE" 
+			query="{ call ? := PG_COLL_MIRATO_2.STORICIZZA_PROSPETTO_SARE(?,?,?) }" />											
+
+<STATEMENT 	name="GET_PERC_INVALIDITA_L68" 
+			query="{ call ? := PG_COLL_MIRATO_2.GET_PERC_INVALIDITA_L68(?,?,?,?) }" />		
+			
+			
+<STATEMENT
+        name="GetInfoDeDoc_Prospetti"
+        query="SELECT 
+	        		de_doc_tipo.strio striodoc,
+	        		de_doc_tipo.codtipodocumento codtipodoc, 
+	        		de_doc_tipo.strdescrizione strtipodoc,
+	        		de_doc_tipo.codambitodoc codambitodoc,
+	        		de_doc_ambito.strdescrizione strambitodoc 	
+				from de_doc_tipo, de_doc_ambito	  
+				where de_doc_tipo.codambitodoc = de_doc_ambito.codambitodoc
+				and de_doc_tipo.CODTIPODOCUMENTO = 'PINF'"/>
+
+<STATEMENT name="SELECT_PRG_DOC_PROSPETTI"
+            query="SELECT am_documento.PRGDOCUMENTO, 
+            			  am_documento.CODSTATOATTO,
+            			  to_char(am_documento.DATINIZIO, 'DD/MM/YYYY') AS DATINIZIO, 
+            			  to_char(am_documento.DATACQRIL, 'DD/MM/YYYY') AS DATACQRIL,   
+            			  am_documento.NUMKLODOCUMENTO,
+						  de_doc_tipo.strio striodoc,
+	        			  de_doc_tipo.codtipodocumento codtipodoc, 
+	        			  de_doc_tipo.strdescrizione strtipodoc,
+	        			  de_doc_tipo.codambitodoc codambitodoc,
+	        			  de_doc_ambito.strdescrizione strambitodoc
+	        		from am_documento, am_documento_coll, de_doc_tipo, de_doc_ambito	  
+					where am_documento.PRGDOCUMENTO = am_documento_coll.PRGDOCUMENTO
+						  and de_doc_tipo.codtipodocumento = am_documento.codtipodocumento
+						  and de_doc_tipo.codambitodoc = de_doc_ambito.codambitodoc
+						  and am_documento.CODTIPODOCUMENTO = 'PINF'
+						  and am_documento_coll.STRCHIAVETABELLA = ?" />
+
+
+<STATEMENT
+        name="UPDATE_PROSPETTI_DOC"
+        query="UPDATE am_documento SET 
+                  	  CODSTATOATTO=?,
+                  	  CDNUTMOD=?, 
+                      DTMMOD=SYSDATE, 
+                      NUMKLODOCUMENTO=?
+                   where am_documento.PRGDOCUMENTO=?"/>       
+                   
+                   
+                   
+<STATEMENT NAME="ST_GetConfig_NonVedenti_MassoFisioterapista"
+		QUERY="select nvl( (select to_char(ts_config_loc.num) num from ts_config_loc 
+			   			    where strcodrif=(select ts_generale.codprovinciasil from ts_generale) and codtipoconfig='CM_NV_MF') , 0) as num, 
+			   		 (select ts_generale.codprovinciasil from ts_generale) as codprovinciasil
+ 			   from dual"/>      
+                   
+                   
+<STATEMENT NAME="ST_GetConfig_LeggeBattistoni"
+		QUERY="select nvl( (select to_char(ts_config_loc.num) num from ts_config_loc 
+			   			    where strcodrif=(select ts_generale.codprovinciasil from ts_generale) and codtipoconfig='LEG_BAT') , 0) as num, 
+			   		 (select ts_generale.codprovinciasil from ts_generale) as codprovinciasil
+ 			   from dual"/>  
+                   
+                   
+                   
+<STATEMENT NAME="ST_CMRiepilogoNazionale"
+	QUERY="select
+			a.prgazienda,
+ 			u.prgunita,
+ 		    t.prgprospettoinf,
+ 			t.numlavoratoribc,
+ 			t.numbasecomputoart18 numlavoratoribc18,
+ 			t.numbasecomputoart3 numlavoratoribc3,
+ 			t.numquotarisdisabili,
+ 			t.numquotariscatprot,
+ 			t.numsospensioni,
+ 			t.numesoneri,
+ 			t.numdisabiliforza,
+ 			t.numcatprotforza,
+ 			t.numcatprotdisabiliforza,
+ 			t.numscoperturadis,
+ 			t.numscoperturacatprot,
+ 			t.strnote, t.FLGSOSPENSIONE,
+ 			t.numQuotaEsuberiArt18,
+ 			to_char(p.datRifQ3, 'dd/mm/yyyy') as datRifQ3
+		    from cm_riepilogonazionale t
+   			inner join cm_prospetto_inf p  on p.prgprospettoinf = t.prgprospettoinf   
+  			inner join an_azienda a on a.prgazienda = p.prgazienda
+			inner join an_unita_azienda u on u.prgazienda = a.prgazienda and u.prgunita = p.prgunita
+            where t.prgprospettoinf = ? " />  
+
+
+<STATEMENT NAME="ST_CMRiepilogoProvinciale"
+		QUERY=" select a.prgazienda,
+       u.prgunita,
+       f.strdenominazione,
+       t.prgriepilogoprov,
+       t.numlavoratoribc,
+       t.numsospensioni,
+       t.numdisabiliforza,
+       t.numcatprotforza,
+       t.numcatprotdisabiliforza,
+       t.numquotarisdisabili,
+       t.numquotariscatprot,
+       t.numesoneri,
+       t.numscoperturadis,
+       t.numscoperturacatprot,
+       t.numcompcatprot,
+       t.numcompdisabili,
+       t.prgprospettoinf,
+       t.codprovincia,
+       t.codmonoeccdiffdisabili,
+       t.codmonoeccdiffcatprot, 
+       t.NUMLAVORATORIBCART18 numlavoratoribc18, t.NUMLAVORATORIBCART3 numlavoratoribc3, t.FLGSOSPENSIONE,
+       to_char(p.datRifQ3, 'dd/mm/yyyy') as datRifQ3
+  from cm_riepilogoprovinciale t
+ inner join cm_prospetto_inf p on p.prgprospettoinf = t.prgprospettoinf 
+ inner join de_provincia f on f.codprovincia = t.codprovincia
+ inner join an_azienda a on a.prgazienda = p.prgazienda
+ inner join an_unita_azienda u on u.prgazienda = a.prgazienda  and u.prgunita = p.prgunita                              
+ where t.prgprospettoinf = ? 
+ order by  f.strdenominazione ASC "/>  
+                   
+<STATEMENT NAME="ST_CMRiepilogoProvincialeAp"
+		QUERY=" select a.prgazienda,
+       					u.prgunita,      
+       					t.prgprospettoinf,
+       					to_char(t.datRifQ3, 'dd/mm/yyyy') as datRifQ3
+  				from cm_prospetto_inf t 					
+ 				inner join an_azienda a on a.prgazienda = t.prgazienda
+ 				inner join an_unita_azienda u on u.prgazienda = a.prgazienda  and u.prgunita = t.prgunita                              
+ 				where t.prgprospettoinf =  ? "/>
+ 			
+<STATEMENT NAME="GET_LISTA_PUBBLICA_SELEZIONE_PROSP" 
+		QUERY=" select de_regione.strdenominazione DESCREGIONE, t.PRGASSPUBSELEZIONE,
+				t.prgprospettoinf, t.NUMSALDODISABILI, t.NUMSALDOEXART18       
+  				from cm_assunz_pb_selezione t				
+ 				inner join de_regione on (t.CODREGIONE = de_regione.CODREGIONE)                              
+ 				where t.prgprospettoinf =  ? "/>
+ 	
+<STATEMENT name="CM_INSERT_ASSUNZ_PB_SELEZIONE" 
+		   query=" INSERT INTO CM_ASSUNZ_PB_SELEZIONE
+			              (PRGASSPUBSELEZIONE,
+			              PRGPROSPETTOINF,
+			              CODREGIONE,
+			              NUMSALDODISABILI,
+			              NUMSALDOEXART18,
+			              STRNOTE,
+			              CDNUTINS,
+			          	  DTMINS,
+			          	  CDNUTMOD,
+			          	  DTMMOD
+			          	  ) 
+			          	  VALUES 
+			          	  (s_cm_assunz_pb_selezione.nextval,
+			          	  ?, ?,
+			          	  to_number(?), to_number(?), ?,
+			          	  ?,sysdate,?,sysdate) "
+/>
+
+<STATEMENT name="DELETE_PB_SELEZIONE_PROSP" 
+			query="DELETE FROM CM_ASSUNZ_PB_SELEZIONE          
+					WHERE PRGASSPUBSELEZIONE = ? " />
+
+<STATEMENT NAME="GET_DATI_PB_SELEZIONE_PROSP" 
+		QUERY=" select t.PRGASSPUBSELEZIONE, t.prgprospettoinf, 
+		        t.NUMSALDODISABILI, t.NUMSALDOEXART18, t.CODREGIONE, 
+		        t.NUMKLOASSPBSELEZIONE, t.strNote      
+  				from cm_assunz_pb_selezione t                       
+ 				where t.PRGASSPUBSELEZIONE =  ? "/>
+ 				
+ <STATEMENT name="UPD_PROSPETTI_PB_SELEZIONE" 
+			query="UPDATE cm_assunz_pb_selezione
+			          SET CODREGIONE = ?, 
+			          	  NUMSALDODISABILI = to_number(?),
+			          	  NUMSALDOEXART18 = to_number(?),
+			          	  STRNOTE = ?,
+			          	  NUMKLOASSPBSELEZIONE = to_number(?) + 1,
+			          	  CDNUTMOD = ?,
+			          	  DTMMOD = SYSDATE 
+					WHERE PRGASSPUBSELEZIONE   = ? " />
+					
+<STATEMENT  name="GET_DESCR_TIPO_DISABILE"
+        query="SELECT CODTIPOPTDISABILE codice, STRDESCRIZIONE descrizione
+  				FROM DE_PI_TIPO_PT_DISABILE
+   				WHERE CODTIPOPTDISABILE = ?"/>					
+										
+<STATEMENT name="GET_LISTA_TEMPIPARZIALI_PROSP"
+           query="select p.prgdettptdisabile, p.prgprospettoinf,
+                    p.numlavoratori, p.decorariosettsvolto, p.decorariosettcontrattuale
+                    from pi_dett_pt_disabile p
+                    where p.prgprospettoinf = ? 
+                    and codtipoptdisabile = ?"/>
+				
+<STATEMENT name="GET_TEMPIPARZIALI_PROSP"
+           query="select p.numlavoratori, p.decorariosettsvolto, p.decorariosettcontrattuale
+					from pi_dett_pt_disabile p
+         		 	where p.prgdettptdisabile = ? "/>	
+         		 	
+         		 	
+<STATEMENT name="GET_DUPLICATE_TP"
+           query="select p.prgdettptdisabile
+					from pi_dett_pt_disabile p
+         		 	where p.prgprospettoinf = ? 
+         		 	and p.codTipoPTDisabile = ? 
+         		 	and p.decorariosettsvolto = to_number(?,'9999999.999') 
+         		 	and p.decorariosettcontrattuale = to_number(?,'9999999.999')"/>	
+         		 	
+<STATEMENT name="SELECT_PRGDETTPTDISABILE_SEQUENCE"
+           query="SELECT s_pi_dett_pt_disabile.nextval AS do_nextval FROM DUAL"/>         		 	
+					      
+<STATEMENT name="INSERT_TEMPOPARZIALE_PROSP" 
+		   query=" INSERT INTO pi_dett_pt_disabile
+			              (PRGDETTPTDISABILE,
+			               PRGPROSPETTOINF,
+			               CODTIPOPTDISABILE,
+			               NUMLAVORATORI, 
+			               DECORARIOSETTSVOLTO,
+					       DECORARIOSETTCONTRATTUALE,
+					       FLGOLTRE50,
+					       DECCOPERTURA
+			          	  ) 
+			          	  VALUES 
+			          	  (?, ?, ?, ?, to_number(?,'9999999.999'),to_number(?,'9999999.999'), NULL, 0) " />
+			          	  
+<STATEMENT 	name="UPDATE_TEMPOPARZIALE_PROSP" 
+			query="UPDATE pi_dett_pt_disabile
+			          SET NUMLAVORATORI = ?, 
+			              DECORARIOSETTSVOLTO = to_number(?,'9999999.999'), 
+					      DECORARIOSETTCONTRATTUALE = to_number(?,'9999999.999'),
+					      FLGOLTRE50 = NULL,
+					      DECCOPERTURA = 0,
+					      NUMKLOPIDETTPT = NUMKLOPIDETTPT + 1
+					WHERE PRGDETTPTDISABILE = ? " />  
+					
+<STATEMENT name="GET_FLGOLTRE50_DECCOPERTURA_TP_PROSP"
+           query="select
+					CASE WHEN (p.decorariosettsvolto/p.decorariosettcontrattuale) &lt;= 0.5 THEN 'N' ELSE 'S' END as flgOltre50,            
+					round(((p.numlavoratori*p.decorariosettsvolto)/p.decorariosettcontrattuale),2) as decCopertura            
+           			from pi_dett_pt_disabile p
+         		 	where p.prgdettptdisabile = ? "/>
+         		 	
+<STATEMENT 	name="UPDATE_FLGOLTRE50_DECCOPERTURA_TP_PROSP" 
+			query="UPDATE pi_dett_pt_disabile
+			          SET FLGOLTRE50 = ?,
+					      DECCOPERTURA = to_number(?,'9999999.999'),
+					      NUMKLOPIDETTPT = NUMKLOPIDETTPT + 1
+					WHERE PRGDETTPTDISABILE = ? " />
+
+<STATEMENT name="DELETE_TEMPO_PARZIALE_PROSP" 
+			query="DELETE FROM pi_dett_pt_disabile			          
+					WHERE prgdettptdisabile = ? " />
+									
+<STATEMENT name="DELETE_ALL_INTERMITTENTI_PROSP" 
+			query="DELETE FROM cm_intermittenti_prospetto			          
+					WHERE PRGPROSPETTOINF = ? " />
+					
+<STATEMENT name="GET_LISTA_INTERMITTENTI_PROSP"
+           query="select p.prgintermittenti, p.prgprospettoinf,
+					p.numlavoratori, p.decoresettlavorate, p.decoresettcontratto
+					from cm_intermittenti_prospetto p
+					where p.prgprospettoinf = ? "/>
+
+<STATEMENT name="GET_INTERMITTENTI_PROSP"
+           query="select p.prgintermittenti, p.prgprospettoinf, e.numintermittenti,
+					p.numlavoratori, p.decoresettlavorate, p.decoresettcontratto,
+					p.numklointermittenti
+					from cm_intermittenti_prospetto p
+         		 	inner join cm_esclusione_prospetto e on e.prgprospettoinf = p.prgprospettoinf          
+					where p.prgintermittenti = ? "/>
+
+<STATEMENT 	name="DELETE_INTERMITTENTI_PROSP" 
+			query="DELETE FROM cm_intermittenti_prospetto			          
+					WHERE PRGINTERMITTENTI = ? " />
+				
+<STATEMENT name="NUM_INTERMITTENTI_PROSP"
+           query="select 
+					CASE 
+					WHEN ceil(nvl(sum((p.numlavoratori*p.decoresettlavorate)/p.decoresettcontratto),0)) - (nvl(sum((p.numlavoratori*p.decoresettlavorate)/p.decoresettcontratto),0)) &lt; 0.5
+					THEN 
+					     nvl(sum(p.numlavoratori),0) - ceil(nvl(sum((p.numlavoratori*p.decoresettlavorate)/p.decoresettcontratto),0))
+					ELSE
+					     nvl(sum(p.numlavoratori),0) - floor(nvl(sum((p.numlavoratori*p.decoresettlavorate)/p.decoresettcontratto),0))
+					END as numinterm
+					from cm_intermittenti_prospetto p
+					where p.prgprospettoinf = ? "/>	
+					      
+<STATEMENT 	name="CALCOLA_INTERMITTENTI_PROSP" 
+			query="UPDATE cm_esclusione_prospetto
+			          SET NUMINTERMITTENTI = ? 		          					
+					WHERE PRGPROSPETTOINF = ? " />
+					
+<STATEMENT name="INSERT_INTERMITTENTI_PROSP" 
+		   query=" INSERT INTO cm_intermittenti_prospetto
+			              (PRGINTERMITTENTI,
+			               PRGPROSPETTOINF,
+			               NUMLAVORATORI, 
+			               DECORESETTLAVORATE,
+					       DECORESETTCONTRATTO,
+					       CDNUTINS, CDNUTMOD, DTMINS, DTMMOD
+			          	  ) 
+			          	  VALUES 
+			          	  (s_cm_intermittenti_prospetto.nextval,
+			          	   ?,?,to_number(?,'9999999.999'),to_number(?,'9999999.999'),
+			          	   ?, ?, sysdate, sysdate) " />
+			          	  
+<STATEMENT 	name="UPDATE_INTERMITTENTI_PROSP" 
+			query="UPDATE cm_intermittenti_prospetto
+			          SET NUMLAVORATORI = ?, 
+			              DECORESETTLAVORATE = to_number(?,'9999999.999'), 
+					      DECORESETTCONTRATTO = to_number(?,'9999999.999'),
+					      CDNUTMOD = ?,
+					      DTMMOD = SYSDATE,
+					      NUMKLOINTERMITTENTI = to_number(?) + 1
+					WHERE PRGINTERMITTENTI = ? " />
+					
+					
+<STATEMENT 	name="ST_GetConfig_Etichette_PI" 
+			query="select to_char(ts_config_loc.num) num, ts_generale.codprovinciasil
+				from ts_config_loc, de_tipo_config, ts_generale
+				where ts_generale.codprovinciasil = ts_config_loc.strcodrif
+				and de_tipo_config.codtipoconfig = ts_config_loc.codtipoconfig
+				and trunc(sysdate) between trunc(de_tipo_config.datinizioval) 
+				and TRUNC(DE_TIPO_CONFIG.DATFINEVAL)
+				and ts_config_loc.codtipoconfig = 'PI_ETICH'	
+				" />
+
+<STATEMENT  name="GET_MOTIVO_CAUSALE_SOSPENSIONE"
+        query="SELECT codsospensione codice, strdescrizione descrizione
+  FROM de_causale_sospensione
+   WHERE datinizioval &lt;= trunc(SYSDATE) AND nvl(datfineval, to_date('31/12/2100','dd/mm/yyyy'))  &gt;= trunc(SYSDATE)
+ORDER BY strdescrizione"/>
+
+
+<STATEMENT  name="CHECK_PROSPETTI_ENTRO_2011"
+        query="SELECT 
+        			CASE 
+	        			WHEN TRUNC(DTMINS) &gt;= TO_DATE('01/01/2012', 'DD/MM/YYYY')
+	        				THEN 'FALSE'
+	        			ELSE 'TRUE'
+        			END AS PROSPETTO2011 
+  			   FROM CM_PROSPETTO_INF
+  		 	   WHERE PRGPROSPETTOINF = ? "/>
+  		 	   
+<STATEMENT name="GET_RISULTATO_ULTIMA_COPIA_PROSP_UTENTE"
+            query="SELECT MAX(PRGPICOPIECORSOANNO) PRGPICOPIECORSOANNO
+            		FROM CM_PI_COPIE_CORSO_ANNO
+            		WHERE CDNUTINS = ?"/>
+
+         
+<STATEMENT name="DELETE_RISULTATO_DETT_VECCHIA_COPIA_PROSP"
+            query="DELETE CM_PI_RISULTATO_COPIE
+                   WHERE PRGPICOPIECORSOANNO = ?
+"/>
+
+
+<STATEMENT name="DELETE_RISULTATO_VECCHIA_COPIA_PROSP"
+            query="DELETE FROM CM_PI_COPIE_CORSO_ANNO
+                   WHERE PRGPICOPIECORSOANNO = ?
+"/>
+
+
+<STATEMENT name="INSERT_NUOVA_COPIA_MASSIVA_PROSPETTI"
+    query="INSERT INTO CM_PI_COPIE_CORSO_ANNO (PRGPICOPIECORSOANNO, NUMRECORD, DTMINS, CDNUTINS, NUMANNOXCOPIA, NUMANNORIF, CODMONOCATEGORIA) 
+    		VALUES (?, ?, SYSDATE, ?, ?, ?, ?)"/>
+
+
+<STATEMENT name="SET_RESULT_DETTAGLIO_COPIA_PROSPETTO"
+            query="INSERT INTO CM_PI_RISULTATO_COPIE (PRGRISULTATO, PRGPICOPIECORSOANNO, PRGPROSPETTOINF, PRGPROSPETTONEW, 
+            		CODRISULTATO, STRDESCRIZIONE, DTMINS, CDNUTINS) 
+            		VALUES (?,?,?,?,?,?, SYSDATE,?)"/>
+            		
+            		
+<STATEMENT name="GET_INFO_COPIA_MASSIVA_PROSPETTI"
+            query="SELECT PRGPICOPIECORSOANNO, NUMRECORD, 
+            		TO_CHAR(DTMINS, 'DD/MM/YYYY')DTMINS, CDNUTINS, 
+            		NUMANNOXCOPIA, NUMANNORIF, CODMONOCATEGORIA
+            		FROM CM_PI_COPIE_CORSO_ANNO
+            		WHERE PRGPICOPIECORSOANNO = ?"/>
+            		
+
+<STATEMENT name="GET_DATI_COPIA_MASSIVA_PROSPETTI"
+            query="SELECT DETT.PRGRISULTATO, DETT.PRGPICOPIECORSOANNO, 
+            		DETT.PRGPROSPETTOINF, DETT.PRGPROSPETTONEW,
+            		TO_CHAR(DETT.DTMINS, 'DD/MM/YYYY') DTMINS, DETT.CDNUTINS,
+            		CASE
+            			WHEN PRGPROSPETTONEW IS NULL
+	        				THEN 0
+	        			ELSE 1
+        			END AS VALIDATO, DETT.CODRISULTATO, DETT.STRDESCRIZIONE,
+        			PROVPROSP.STRDENOMINAZIONE PROVINCIAPROSPETTO,
+        			AZ.STRRAGIONESOCIALE RAGSOCAZ,
+        			AZ.STRCODICEFISCALE CODFISCAZ,
+        			UAZ.STRINDIRIZZO || ' ' || COM.STRDENOMINAZIONE || ' (' || NVL(DPAZ.STRTARGA, ' ') || ')' INDIRIZZOAZ,
+        			(CASE 
+						WHEN PROSP.codmonocategoria = 'A' THEN 'A - piu&#39;&#39; di 50 dipendenti'
+						WHEN PROSP.codmonocategoria = 'B' THEN 'B - da 36 a 50 dipendenti'
+						WHEN PROSP.codmonocategoria = 'C' THEN 'C - da 15 a 35 dipendenti'
+						ELSE ' '
+					END) FASCIA,
+					(CASE 
+						WHEN AZ.flgobbligol68 = 'S' then 'Si'
+		   				WHEN az.flgobbligol68 = 'N' then 'No'
+						ELSE ' '
+					END) OBBLIGOL68
+            		FROM CM_PI_RISULTATO_COPIE DETT 
+            		INNER JOIN CM_PROSPETTO_INF PROSP ON (DETT.PRGPROSPETTOINF = PROSP.PRGPROSPETTOINF)
+            		INNER JOIN DE_PROVINCIA PROVPROSP ON (PROSP.CODPROVINCIA = PROVPROSP.CODPROVINCIA)
+            		INNER JOIN AN_AZIENDA AZ ON (PROSP.PRGAZIENDA = AZ.PRGAZIENDA)
+            		INNER JOIN AN_UNITA_AZIENDA UAZ ON (UAZ.PRGAZIENDA = AZ.PRGAZIENDA AND UAZ.PRGUNITA = PROSP.PRGUNITA)
+            		INNER JOIN DE_COMUNE COM ON (UAZ.CODCOM = COM.CODCOM)
+                	LEFT JOIN DE_PROVINCIA DPAZ ON(DPAZ.CODPROVINCIA = COM.CODPROVINCIA)
+            		WHERE DETT.PRGPICOPIECORSOANNO = ?
+            		ORDER BY DETT.PRGRISULTATO"/>
+            		
+<STATEMENT name="GetMapProvinciaRegione" query="
+	
+	select codprovincia, codregione
+	from de_provincia
+
+"/>
+
+<STATEMENT name="GetTipoAziendaByProspetto" query="
+	
+	select codTipoAzienda
+	from an_azienda az
+	inner join cm_prospetto_inf pr on az.prgazienda = pr.prgazienda
+	where prgprospettoinf = ?
+	
+"/>
+
+<STATEMENT name="ExistsCompensazioneByCategoriaByEccDiffAndCf" query="
+	
+	SELECT MAX(1) AS ESISTE
+	FROM cm_pi_compensazione
+	WHERE codmonocategoria                = ?
+	AND codmonoeccdiff                    = ?
+	AND strCfAzCapoGruppo is not null
+	AND prgprospettoinf                   = ?
+	
+"/>
+
+<STATEMENT name="ExistsCompensazioneByCategoriaAndErAndCf" query="
+	
+	select MAX(1) AS ESISTE
+	from cm_pi_compensazione
+	where codmonocategoria = ?
+	  and codmonoeccdiff = ?
+	  AND lower(nvl(strCfAzCapoGruppo,'-')) = lower(nvl(?,'-'))
+	  and prgprospettoinf = ?
+	
+"/>
+
+<STATEMENT name="ExistsCompensazioneByCategoriaNoCf" query="
+	select MAX(1) AS ESISTE
+	from cm_pi_compensazione
+	where codmonocategoria = ?
+	  and codmonoeccdiff = ?
+	  and prgprospettoinf = ? and strCfAzCapoGruppo is null
+"/>
+
+<STATEMENT name="GetCodRegioneByCodProvincia" query="
+	
+	select codRegione
+	from de_provincia
+	where codProvincia = ?
+	
+"/>
+
+<STATEMENT name="SELECT_TIPO_ASSUNZIONE_PROTETTA" query="
+    SELECT
+      CODASSPROTETTA AS CODICE,
+      CODASSPROTETTA || ' - ' || STRDESCRIZIONE || 
+      DECODE (
+        SYSDATE, 
+        GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+        ' (scaduto)',
+        LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+        ' (scaduto)', 
+        ''
+       ) AS DESCRIZIONE
+    FROM DE_PI_ASS_PROTETTA
+    ORDER BY STRDESCRIZIONE
+ "/>
+ 
+ <STATEMENT name="GET_TOTALI_PARTTIME_PROSPETTO"
+           query="select p.codtipoptdisabile, sum(p.numlavoratori) totale
+                    from pi_dett_pt_disabile p
+                    where p.prgprospettoinf = ? 
+                    group by p.codtipoptdisabile"/>
+                    
+ <STATEMENT name="GET_TOTALI_PARTTIME_OLTRE50_PROSPETTO"
+           query="select p.codtipoptdisabile, sum(p.numlavoratori) totale
+                    from pi_dett_pt_disabile p
+                    where p.prgprospettoinf = ? and nvl(p.flgoltre50, 'N') = 'S'
+                    group by p.codtipoptdisabile"/>
+                    
+ <STATEMENT name="GET_TOTALI_PARTTIME_RIPROPORZ_PROSPETTO"
+           query="select p.codtipoptdisabile, sum(p.decCopertura) totale
+                    from pi_dett_pt_disabile p
+                    where p.prgprospettoinf = ? and nvl(p.flgoltre50, 'N') = 'N'
+                    group by p.codtipoptdisabile"/>
+                    
+<STATEMENT
+	name="GET_INFO_TARGA_PROVINCIA_REGIONE"
+	query="select dep.strtarga, dep.codregione
+			from TS_GENERALE tsg 
+			join DE_PROVINCIA dep on tsg.codprovinciasil = dep.codprovincia"/>
+			
+<STATEMENT
+	name="GET_INFO_TARGA_PROVINCIA_REGIONE_IDO"
+	query="select dep.strtarga, dep.codregione
+			from do_richiesta_az raz
+			inner join de_cpi on (raz.codcpi = de_cpi.codcpi)
+			left join de_comune on (de_cpi.codcom = de_comune.codcom)
+			left join de_provincia dep on (de_comune.codprovincia = dep.codprovincia)
+			where raz.prgrichiestaaz = ?"/>

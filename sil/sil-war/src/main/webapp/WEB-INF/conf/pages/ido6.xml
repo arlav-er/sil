@@ -1,0 +1,520 @@
+<!-- PUBBLICAZIONI -->
+<PAGE distributed="false" name="IdoPubbRicercaPage" scope="REQUEST">
+	<MODULES>
+  </MODULES>
+	<DEPENDENCIES>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="IdoListaPubbPage" scope="REQUEST">
+	<MODULES>
+		<MODULE  name="M_DynRicercaPubb"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="IdoListaPubbPage" target="M_DynRicercaPubb">
+			<CONDITIONS/>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="IdoPubbReportPage" scope="REQUEST">
+	<MODULES>
+  </MODULES>
+	<DEPENDENCIES>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="IdoPubbAzReportPage" scope="REQUEST">
+	<MODULES>
+  </MODULES>
+	<DEPENDENCIES>
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- Prima Pagina di ricerca pubblicazioni per giornali: data e lista giornali-->
+<!-- INVOCA ReportPubblicazioneGior.jsp-->
+<PAGE distributed="false" name="IdoPubbGiorReportPage" scope="REQUEST">
+	<MODULES>
+    <MODULE name="M_IdoListaGiornali"/>
+  </MODULES>
+	<DEPENDENCIES>
+    <DEPENDENCE source="IdoPubbGiorReportPage" target="M_IdoListaGiornali">
+      <CONDITIONS/>
+    </DEPENDENCE>  
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- Pagina che visualizza la lista di liste-->
+<!-- INVOCA ReportPubblicazioneGior.jsp-->
+
+<!-- andrea 11/12/04 credo che questa page non venga usata, quanto meno non esiste un publisher associato -->
+<PAGE distributed="false" name="IdoListaPubbGiorInsPage" scope="REQUEST">
+	<MODULES>
+		<MODULE  name="M_InsertListaPubb"/>
+	</MODULES>
+	<DEPENDENCIES>
+    	<DEPENDENCE source="IdoListaPubbGiorInsPage" target="M_InsertListaPubb"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Pagina che visualizza la lista di liste-->
+<!-- INVOCA ReportPubblicazioneGior.jsp-->
+<!-- andrea 11/12/04 spostato inserimento nuova lista in IdoListaPubbGiorListaPage -->
+<PAGE distributed="false" name="IdoListaPubbGiorPage" scope="REQUEST">
+	<MODULES>
+	<!--
+		<MODULE  name="M_InsertListaPubb"/>
+	-->
+		<MODULE  name="M_DeleteListaPubb"/>
+		<MODULE  name="M_DynRicercaGiorPubb"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<!-- Insert -->
+		<!--
+	    <DEPENDENCE source="IdoListaPubbGiorPage" target="M_InsertListaPubb">
+	      <CONDITIONS>	        
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="INSERISCI"/> 
+	      </CONDITIONS>
+	    </DEPENDENCE>
+	   -->
+	    <!--
+	    <DEPENDENCE source="M_InsertListaPubb" target="M_DynRicercaGiorPubb"/>
+	    -->
+	 	<!-- Delete -->
+	    <DEPENDENCE source="IdoListaPubbGiorPage" target="M_DeleteListaPubb">
+	      <CONDITIONS>	        
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CANCELLA"/>
+	      </CONDITIONS>
+	    </DEPENDENCE>
+	    <!--
+	    <DEPENDENCE source="M_DeleteListaPubb" target="M_DynRicercaGiorPubb"/>
+	    -->
+	    <!-- Lista -->
+	    <!--
+		<DEPENDENCE source="IdoListaPubbGiorPage" target="M_DynRicercaGiorPubb">
+			<CONDITIONS>				
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+			</CONDITIONS>	
+		</DEPENDENCE>
+		-->
+		<!--
+		<DEPENDENCE source="IdoListaPubbGiorPage" target="M_DynRicercaGiorPubb">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_DynRicercaGiorPubb"/>
+			</CONDITIONS>	
+		</DEPENDENCE>
+		-->
+		<!-- andrea 11/12/04 aggiunta unica chiamata al modulo di ricerca eliminanto tutte le condizioni precedenti-->
+		<DEPENDENCE source="IdoListaPubbGiorPage" target="M_DynRicercaGiorPubb"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Pagina che visualizza la lista per ogni giornale-->
+<!-- INVOCA ListaPubblicazioneGiornale.jsp-->
+<!-- andrea 11/12/04  -->
+<PAGE distributed="false" name="IdoListaPubbGiorListaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE  name="M_DynRicercaListaGiorPubb"/>
+		<MODULE  name="M_AssociaPubb"/>
+		<MODULE  name="M_DisassociaPubb"/>
+		<MODULE  name="M_DecodificaGiornale"/>
+		<MODULE  name="M_InsertListaPubb"/>
+		<MODULE  name="M_GetGiorPubb"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="IdoListaPubbGiorListaPage" target="M_InsertListaPubb">
+	      <CONDITIONS>	        
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="INSERISCI"/> 
+	      </CONDITIONS>
+	    </DEPENDENCE>
+	    <DEPENDENCE source="IdoListaPubbGiorListaPage" target="M_AssociaPubb">
+	      <CONDITIONS>
+	        <PARAMETER name="ASSOCIA" scope="SERVICE_REQUEST" value="S"/> 
+	      </CONDITIONS>
+	    </DEPENDENCE>
+	    <DEPENDENCE source="IdoListaPubbGiorListaPage" target="M_DisassociaPubb">
+	      <CONDITIONS>
+	        <PARAMETER name="DISASSOCIA" scope="SERVICE_REQUEST" value="S"/> 
+	      </CONDITIONS>
+	    </DEPENDENCE>
+		<DEPENDENCE source="IdoListaPubbGiorListaPage" target="M_DecodificaGiornale"/>			
+		<DEPENDENCE source="IdoListaPubbGiorListaPage" target="M_DynRicercaListaGiorPubb"/>	
+		<DEPENDENCE source="M_InsertListaPubb" target="M_GetGiorPubb">	      
+	      <CONSEQUENCES>
+	      	<PARAMETER name="PRGELENCOGIORNALE" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_InsertListaPubb.PRGELENCOGIORNALE"/>
+	      </CONSEQUENCES>
+	    </DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Pagina che ricerca le pubblicazioni da associare (quelle con le checkbox)-->
+<!-- INVOCA RicercaAssociaPubblicazione.jsp-->
+<PAGE distributed="false" name="IdoRicercaAssociaPubbPage" scope="REQUEST">
+	<MODULES>
+		<MODULE  name="M_DecodificaGiornale"/>    
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="IdoRicercaAssociaPubbPage" target="M_DecodificaGiornale">
+			<CONDITIONS/>
+			<CONSEQUENCES/>
+		</DEPENDENCE>    
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Pagina che visualizza le pubblicazioni con checkbox-->
+<!-- INVOCA AssociaPubblicazione.jsp-->
+<PAGE distributed="false" name="IdoAssociaPubbPage" scope="REQUEST">
+	<MODULES>
+		<MODULE  name="M_IdoListaDaPubblicare"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="IdoAssociaPubbPage" target="M_IdoListaDaPubblicare">
+			<CONDITIONS/>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Pagina che aggiunge una nuova lista di liste-->
+<!-- INVOCA NuovaListaPubblicazione.jsp-->
+<PAGE distributed="false" name="IdoNuovaListaPubbPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_IdoListaGiornali"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="IdoNuovaListaPubbPage" target="M_IdoListaGiornali">
+			<CONDITIONS/>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- ESCLUSIONE DA ROSA -->
+
+<PAGE distributed="false" name="EscludiDaRosaPage" scope="REQUEST">
+ <MODULES>
+    <MODULE keep="false" name="NEW_DETTAGLIO_AGENDA" />
+    <MODULE keep="false" name="M_GET_NOMINATIVO" />
+    <MODULE keep="false" name="M_ESCL_MASSIVA" />
+    <MODULE keep="false" name="M_ESCLUDI" />
+  </MODULES>
+	<DEPENDENCIES>
+	<DEPENDENCE source="EscludiDaRosaPage" target="NEW_DETTAGLIO_AGENDA"/>
+    <DEPENDENCE source="EscludiDaRosaPage" target="M_ESCLUDI">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_ESCLUDI" type="RELATIVE"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="EscludiDaRosaPage" target="M_ESCL_MASSIVA">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_ESCL_MASSIVA" type="RELATIVE"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="EscludiDaRosaPage" target="M_GET_NOMINATIVO">
+      <CONDITIONS>
+        <PARAMETER name="MASSIVA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" type="RELATIVE"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- ESCLUSIONE DA ROSA -->
+
+<!-- GESTIONE DISPONIBILITA ROSA -->
+
+<PAGE distributed="false" name="DispInsRosaPage" scope="REQUEST">
+	<MODULES>
+    <MODULE keep="false" name="M_GET_TIPI_DISP" />
+    <MODULE keep="false" name="M_GET_DISPONIBILITA" />
+    <MODULE keep="false" name="M_GET_PRGORIGINALE" />
+    <MODULE keep="false" name="M_INSERT_DISP_ROSA" />
+    <MODULE keep="false" name="M_UPDATE_DISP_ROSA" />
+    <MODULE keep="false" name="M_UPDATE_VALIDITA_LAV" />
+    <MODULE keep="false" name="M_INSERT_CONTATTO_AUTO" />    
+    <!-- Modulo per ricavare il prgazienda -->
+    <MODULE keep="false" name="M_GetTestataRichiesta"/>
+    <MODULE keep="false" name="COMBO_SPI_SCAD"/>
+    <MODULE keep="false" name="M_GetPrgSpiUt"/>    
+    <MODULE keep="false" name="M_Load_DispL68"/>    
+  </MODULES>
+	<DEPENDENCIES>
+    <DEPENDENCE source="DispInsRosaPage" target="COMBO_SPI_SCAD" />
+    <DEPENDENCE source="DispInsRosaPage" target="M_GetPrgSpiUt" />    
+    <DEPENDENCE source="DispInsRosaPage" target="M_GET_TIPI_DISP" />
+    <DEPENDENCE source="DispInsRosaPage" target="M_GetTestataRichiesta"/>
+    <DEPENDENCE source="DispInsRosaPage" target="M_GET_PRGORIGINALE"/>
+    <DEPENDENCE source="DispInsRosaPage" target="M_Load_DispL68" />
+    
+    <DEPENDENCE source="DispInsRosaPage" target="M_INSERT_DISP_ROSA">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_INSERT_DISP_ROSA" type="RELATIVE"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="DispInsRosaPage" target="M_UPDATE_DISP_ROSA">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_UPDATE_DISP_ROSA" type="RELATIVE"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="DispInsRosaPage" target="M_INSERT_CONTATTO_AUTO">
+      <CONDITIONS>
+        <PARAMETER name="CREAUTCONT" scope="SERVICE_REQUEST" value="AUT" type="RELATIVE"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="M_UPDATE_DISP_ROSA" target="M_UPDATE_VALIDITA_LAV">
+      <CONDITIONS>
+        <PARAMETER name="VALIDITA" scope="SERVICE_REQUEST" type="RELATIVE" value="SI"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="M_INSERT_DISP_ROSA" target="M_UPDATE_VALIDITA_LAV">
+      <CONDITIONS>
+        <PARAMETER name="VALIDITA" scope="SERVICE_REQUEST" type="RELATIVE" value="SI"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="DispInsRosaPage" target="M_GET_DISPONIBILITA">
+      <CONDITIONS/>
+    </DEPENDENCE>
+  </DEPENDENCIES>
+  
+</PAGE>
+
+<!-- GESTIONE DISPONIBILITA ROSA -->
+
+<PAGE distributed="false" name="IdoDettaglioPuggGiornalePage" scope="REQUEST">
+ <MODULES>
+    <MODULE keep="false" name="M_UPDATE_PUBB_GIORNALE" />
+    <MODULE keep="false" name="M_DETTAGLIO_PUBB_GIORNALE" />    
+  </MODULES>
+	<DEPENDENCIES>	
+	    <DEPENDENCE source="IdoDettaglioPuggGiornalePage" target="M_UPDATE_PUBB_GIORNALE">
+	      <CONDITIONS>
+	        <PARAMETER name="Salva" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	      </CONDITIONS>
+	    </DEPENDENCE>    
+	    <DEPENDENCE source="IdoDettaglioPuggGiornalePage" target="M_DETTAGLIO_PUBB_GIORNALE"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- GESTIONE GRADUATORIA ANNUALE -->
+
+<PAGE distributed="false" name="CMRicercaGradAnnualePage" scope="REQUEST">
+  <MODULES>
+ <!--   <MODULE keep="false" name="M_GradAnnuale"/> -->
+    <MODULE keep="false" name="M_GetTipoGrad"/>
+    <MODULE name="CM_GET_PROVINCIA_ISCR" />		
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="CMRicercaGradAnnualePage" target="M_GetTipoGrad"/>
+  	<DEPENDENCE source="CMRicercaGradAnnualePage" target="CM_GET_PROVINCIA_ISCR"/>
+  <!--  <DEPENDENCE source="CMRicercaGradAnnualePage" target="M_GradAnnuale"/> -->
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CMListaGradAnnualePage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="M_ListaGradAnnuale"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="CMListaGradAnnualePage" target="M_ListaGradAnnuale">
+    	<CONDITIONS>
+	        <!-- <PARAMETER name="cerca" scope="SERVICE_REQUEST" value="AF_DEFINED"/> -->
+	      </CONDITIONS>
+    </DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CMNewGradAnnualePage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="M_NewGradAnnualeModule"/>   
+    <MODULE keep="false" name="CM_GET_PROVINCIA_ISCR" />	
+  </MODULES>
+  <DEPENDENCIES>
+	<DEPENDENCE source="CMNewGradAnnualePage" target="CM_GET_PROVINCIA_ISCR"/>
+    <DEPENDENCE source="CMInsertGradAnnualePage" target="M_NewGradAnnualeModule">
+    	<CONDITIONS>
+	    	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" type="RELATIVE"/>
+	    </CONDITIONS>
+    </DEPENDENCE>   
+    
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CMTmpGradAnnualePage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="M_TmpGradAnnualeModule"/>   
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="CMTmpGradAnnualePage" target="M_TmpGradAnnualeModule">
+    	<CONDITIONS>
+	    	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_TmpGradAnnualeModule" type="RELATIVE"/>
+	    </CONDITIONS>
+    </DEPENDENCE>   
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CMInsertGradAnnualePage" scope="REQUEST">
+  <MODULES>
+  	<MODULE keep="false" name="M_GetTestataGraduatoriaAnnuale"/>   
+    <MODULE keep="false" name="M_InsertGradAnnualeModule"/>
+    <MODULE keep="false" name="M_RigeneraGradAnnualeModule"/>
+    <MODULE keep="false" name="M_ListaNominativiGradAnnualeModule"/>
+    <MODULE keep="false" name="M_NewGradAnnualeModule"/>
+    <MODULE keep="false" name="M_StoricizzaGradAnnualeModule"/>
+    <MODULE keep="false" name="M_AnnullaGradAnnualeModule"/>    
+    <MODULE keep="false" name="CM_GET_PROVINCIA_ISCR" />
+  </MODULES>
+  <DEPENDENCIES> 
+	<DEPENDENCE source="CMInsertGradAnnualePage" target="CM_GET_PROVINCIA_ISCR"/>
+  	<!-- annulla graduatoria -->
+  	<DEPENDENCE source="CMInsertGradAnnualePage" target="M_AnnullaGradAnnualeModule">
+    	<CONDITIONS>
+	    	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_AnnullaGradAnnualeModule" type="RELATIVE"/>
+	    </CONDITIONS>
+    </DEPENDENCE>
+  	<DEPENDENCE source="M_AnnullaGradAnnualeModule" target="M_ListaNominativiGradAnnualeModule">
+    	<CONDITIONS>
+	    	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_AnnullaGradAnnualeModule" type="RELATIVE"/>
+	    </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_AnnullaGradAnnualeModule" target="M_GetTestataGraduatoriaAnnuale">
+   		 <CONDITIONS>
+	    	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_AnnullaGradAnnualeModule" type="RELATIVE"/>
+	    </CONDITIONS>
+    </DEPENDENCE> 
+  	<!-- storicizzazione della graduatoria -->
+  	<DEPENDENCE source="CMInsertGradAnnualePage" target="M_StoricizzaGradAnnualeModule">
+    	<CONDITIONS>
+	    	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_StoricizzaGradAnnualeModule" type="RELATIVE"/>
+	    </CONDITIONS>
+    </DEPENDENCE>
+  	<DEPENDENCE source="M_StoricizzaGradAnnualeModule" target="M_ListaNominativiGradAnnualeModule">
+    	<CONDITIONS>
+	    	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_StoricizzaGradAnnualeModule" type="RELATIVE"/>
+	    </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_StoricizzaGradAnnualeModule" target="M_GetTestataGraduatoriaAnnuale">
+   		 <CONDITIONS>
+	    	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_StoricizzaGradAnnualeModule" type="RELATIVE"/>
+	    </CONDITIONS>
+    </DEPENDENCE> 
+    <!-- rigenerazione della graduatoria --> 
+    <DEPENDENCE source="CMInsertGradAnnualePage" target="M_RigeneraGradAnnualeModule">
+    	<CONDITIONS>
+	    	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_RigeneraGradAnnualeModule" type="RELATIVE"/>
+	    </CONDITIONS>
+    </DEPENDENCE>    
+    <DEPENDENCE source="M_RigeneraGradAnnualeModule" target="M_ListaNominativiGradAnnualeModule">
+    	<CONDITIONS>
+    		<PARAMETER name="M_RigeneraGradAnnualeModule.ERROR" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+    	</CONDITIONS>
+    	<CONSEQUENCES>
+	    	<PARAMETER name="PRGGRADUATORIA" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_RigeneraGradAnnualeModule.PRGGRADUATORIA"/>
+	    </CONSEQUENCES>	    	  
+    </DEPENDENCE>
+    <DEPENDENCE source="M_RigeneraGradAnnualeModule" target="M_GetTestataGraduatoriaAnnuale">
+   		 <CONDITIONS>
+    		<PARAMETER name="M_RigeneraGradAnnualeModule.ERROR" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+    	</CONDITIONS>
+    	<CONSEQUENCES>
+	    	<PARAMETER name="PRGGRADUATORIA" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_RigeneraGradAnnualeModule.PRGGRADUATORIA"/>
+	    </CONSEQUENCES>	 
+    </DEPENDENCE>
+    <!-- se ci sono errori nella rigenerazione della graduatoria -->
+    <DEPENDENCE source="M_RigeneraGradAnnualeModule" target="M_ListaNominativiGradAnnualeModule">
+    	<CONDITIONS>
+    		<PARAMETER name="M_RigeneraGradAnnualeModule.ERROR" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+    	</CONDITIONS>  
+    </DEPENDENCE>
+    <DEPENDENCE source="M_RigeneraGradAnnualeModule" target="M_GetTestataGraduatoriaAnnuale">
+    	<CONDITIONS>
+    		<PARAMETER name="M_RigeneraGradAnnualeModule.ERROR" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+    	</CONDITIONS>  
+    </DEPENDENCE>
+    <!--inserimento della graduatoria -->
+    <DEPENDENCE source="CMInsertGradAnnualePage" target="M_InsertGradAnnualeModule">
+    	<CONDITIONS>
+	    	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_InsertGradAnnualeModule" type="RELATIVE"/>
+	    </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_InsertGradAnnualeModule" target="M_ListaNominativiGradAnnualeModule">
+    	<CONDITIONS>
+    		<PARAMETER name="M_InsertGradAnnualeModule.ERROR" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+    	</CONDITIONS>
+    	<CONSEQUENCES>
+	    	<PARAMETER name="PRGGRADUATORIA" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_INSERTGRADANNUALEMODULE.PRGGRADUATORIA"/>
+	    </CONSEQUENCES>	    	  
+    </DEPENDENCE>
+    <DEPENDENCE source="M_InsertGradAnnualeModule" target="M_GetTestataGraduatoriaAnnuale">
+   		 <CONDITIONS>
+    		<PARAMETER name="M_InsertGradAnnualeModule.ERROR" scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/>
+    	</CONDITIONS>
+    	<CONSEQUENCES>
+	    	<PARAMETER name="PRGGRADUATORIA" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_INSERTGRADANNUALEMODULE.PRGGRADUATORIA"/>
+	    </CONSEQUENCES>	 
+    </DEPENDENCE>
+    <DEPENDENCE source="M_InsertGradAnnualeModule" target="M_NewGradAnnualeModule">
+    	<CONDITIONS>
+    		<PARAMETER name="M_InsertGradAnnualeModule.ERROR" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+    	</CONDITIONS>  
+    </DEPENDENCE>
+    <DEPENDENCE source="CMInsertGradAnnualePage" target="M_ListaNominativiGradAnnualeModule">
+    	<CONDITIONS>
+	    	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_ListaNominativiGradAnnualeModule" type="RELATIVE"/>
+	    </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="CMInsertGradAnnualePage" target="M_GetTestataGraduatoriaAnnuale">
+   		 <CONDITIONS>
+	    	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_ListaNominativiGradAnnualeModule" type="RELATIVE"/>
+	    </CONDITIONS>
+    </DEPENDENCE>    
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CMDettaglioPunteggioGradAnnLavoratorePage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_GetLavoratoreAnag" />
+    	<MODULE name="CMDettaglioPunteggioGradAnnLavoratoreModule" />
+    	<MODULE name="CMDettaglioDatiPunteggioGradAnnModule" />     	
+	</MODULES>
+	<DEPENDENCIES>	   
+    	<DEPENDENCE source="CMDettaglioPunteggioGradAnnLavoratorePage" target="M_GetLavoratoreAnag"/>	  
+	    <DEPENDENCE source="CMDettaglioPunteggioGradAnnLavoratorePage" target="CMDettaglioPunteggioGradAnnLavoratoreModule" />
+	    <DEPENDENCE source="CMDettaglioPunteggioGradAnnLavoratorePage" target="CMDettaglioDatiPunteggioGradAnnModule" />
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CMModificaNotaGradAnnPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="CMModificaNotaGradAnnModule" />
+    	<MODULE name="M_GetTestataGraduatoriaAnnuale" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMModificaNotaGradAnnPage" target="M_GetTestataGraduatoriaAnnuale">
+			<CONDITIONS>
+	    		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_GetTestataGraduatoriaAnnuale" type="RELATIVE"/>
+	    	</CONDITIONS>
+	    </DEPENDENCE>
+		<DEPENDENCE source="CMModificaNotaGradAnnPage" target="CMModificaNotaGradAnnModule">
+			<CONDITIONS>
+	    		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMModificaNotaGradAnnModule" type="RELATIVE"/>
+	    	</CONDITIONS>
+	    </DEPENDENCE>
+	    <DEPENDENCE source="CMModificaNotaGradAnnModule" target="M_GetTestataGraduatoriaAnnuale"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="IdoPunteggiLavPage" scope="REQUEST">
+  <MODULES>
+  		<MODULE keep="false" name="M_Config_PunteggiDidIsee"/>
+        <MODULE keep="false" name="M_PunteggiDidIseeAdesione"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="IdoPunteggiLavPage" target="M_Config_PunteggiDidIsee"/>
+  	<DEPENDENCE source="M_Config_PunteggiDidIsee" target="M_PunteggiDidIseeAdesione"/>
+  </DEPENDENCIES>
+</PAGE>

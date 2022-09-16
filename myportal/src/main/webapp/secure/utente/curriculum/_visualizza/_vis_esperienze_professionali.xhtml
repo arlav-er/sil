@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+	<ui:fragment
+		rendered="#{not empty visCvBean.cvVisualizzaDTO.listaCvEsperienzeProfessionaliDTO}">
+
+		<h3 class="esperienze_professionali_titolo headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+			<span class="esperienze_professionali_brake_titolo ui-icon ui-icon-triangle-1-e"></span>
+			<a href="#">Esperienze professionali</a>
+		</h3>
+		<div
+			class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+			<h:outputText value="Nessun elemento inserito"
+				rendered="#{empty visCvBean.cvVisualizzaDTO.listaCvEsperienzeProfessionaliDTO}" />
+			<ui:repeat
+				value="#{visCvBean.cvVisualizzaDTO.listaCvEsperienzeProfessionaliDTO}"
+				rendered="#{not empty visCvBean.cvVisualizzaDTO.listaCvEsperienzeProfessionaliDTO}"
+				var="esperienza_professionale" varStatus="status">
+				<h:panelGroup layout="block" style="width:100%">
+					<h:panelGrid id="esperienza_professionale_panel" columns="2"
+						columnClasses="visualizza_left,visualizza_right">
+						<h:outputLabel for="da" value="Dal"
+							rendered="#{not empty esperienza_professionale.da}" />
+						<h:outputText id="da" value="#{esperienza_professionale.da}"
+							rendered="#{not empty esperienza_professionale.da}">
+							<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+						</h:outputText>
+
+						<h:outputLabel for="a" value="Al" />
+						<h:outputText id="a" value="#{esperienza_professionale.a}"
+							rendered="#{not empty esperienza_professionale.a and not esperienza_professionale.inCorso}">
+							<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+						</h:outputText>
+						<h:outputText id="a_in_corso" value="In corso"
+							rendered="#{esperienza_professionale.inCorso}">
+						</h:outputText>
+
+						<h:outputLabel for="datore_lavoro" value="Datore di lavoro"
+							rendered="#{not empty esperienza_professionale.datoreLavoro}" />
+						<h:outputText id="datore_lavoro"
+							value="#{esperienza_professionale.datoreLavoro}"
+							rendered="#{not empty esperienza_professionale.datoreLavoro}" />
+
+						<h:outputLabel for="attivita_datore_lavoro"
+							value="Attività del datore di lavoro"
+							rendered="#{not empty esperienza_professionale.strAteco}" />
+						<h:outputText id="attivita_datore_lavoro"
+							value="#{esperienza_professionale.strAteco}"
+							rendered="#{not empty esperienza_professionale.strAteco}" />
+
+						<h:outputLabel for="mansione" value="Gruppo professionale"
+							rendered="#{not empty esperienza_professionale.strMansione}" />
+						<ui:fragment>
+							<h:outputText id="mansione"
+								value="#{esperienza_professionale.strMansione}"
+								rendered="#{not empty esperienza_professionale.strMansione}" />
+							<div tabindex="#{status.index+100}" title="?"
+								onclick="resolveCod('#{esperienza_professionale.codMansione}',this);return false;"
+								onkeypress="if(event.keyCode==13) resolveCod('#{esperienza_professionale.codMansione}',this);"
+								class="buttonStyle mansioneInfo">?</div>
+						</ui:fragment>
+						
+						<h:outputLabel for="qualifica_svolta"
+							value="Qualifica svolta"
+							rendered="#{not empty esperienza_professionale.qualificaSvolta.descrizione}" />
+						
+						<h:outputText id="qualifica_svolta"
+							value="#{esperienza_professionale.qualificaSvolta.descrizione}"
+							rendered="#{not empty esperienza_professionale.qualificaSvolta.descrizione}" />
+
+						<h:outputLabel for="tipo_contratto" value="Tipologia di contratto"
+							rendered="#{not empty esperienza_professionale.deContratto.descrizione}" /> 
+						<h:outputText id="tipo_contratto"
+							value="#{esperienza_professionale.deContratto.descrizione}"
+							rendered="#{not empty esperienza_professionale.deContratto.descrizione}" />
+
+						<h:outputLabel for="attivita_responsabilita" value="Attività"
+							rendered="#{not empty esperienza_professionale.attivitaResponsabilita}" />
+						<h:outputText id="attivita_responsabilita"
+							value="#{esperienza_professionale.attivitaResponsabilita}"
+							rendered="#{not empty esperienza_professionale.attivitaResponsabilita}" />
+							
+						<br />
+					</h:panelGrid>
+				</h:panelGroup>
+			</ui:repeat>
+		</div>
+		<div id="mansioneInfoDialog" style="display: none;">
+			<div id="mansioneInfoContent" />
+		</div>
+		<script type="text/javascript">
+		
+		function closeResolverInfoDiv(){
+			$(resolvInfoDiv).hide();
+			
+		}
+		function inizializeResolver(elem){
+			json_url="#{request.contextPath}/secure/rest/resolve/mansioneInfo";
+			/*
+			resolvInfoDiv=$(document.createElement('div')).css('display','none');
+			resolvInfoDivContent=$(document.createElement('div'));
+			resolvInfoDivCloser=$(document.createElement('div')).css('text-align','right')
+			.append(
+					$(document.createElement('div')).attr('tabindex',0).append('X').addClass('buttonStyle').button()
+					.click(closeResolverInfoDiv).keypress(closeResolverInfoDiv)
+					 );
+			resolvInfoDiv.append(resolvInfoDivContent).append(resolvInfoDivCloser);
+			//jqMasterDiv=jq("#{form_id}:tipologieContratto");
+			$(elem).after(resolvInfoDiv);
+			*/
+			}
+		
+		var isResolver2init=true;
+		function resolveCod(cod,elem) { 
+			try {
+				if(isResolver2init){
+					//inizializzo il componente
+					inizializeResolver(elem);
+					isResolver2init=false;
+					}
+			} catch(e) {
+				//console.log('error:'+e);
+				inizializeResolver(elem);
+				isResolver2init=false;
+			}
+			settings={
+				    my:        "right top",
+				    at:        "right bottom",
+				    of:        $(elem),
+				    offset:		"0 0",
+				    collision: "none none"
+				};
+			$('#mansioneInfoDialog').dialog('close');
+			$.getJSON(json_url, ({term: cod,}),
+					function(data, textStatus, jqXHR) {
+							$('#mansioneInfoDialog').dialog({
+								title: data.titolo,
+								close: function(event, ui){
+									//console.log('event CLOSE');
+									//console.log('$(elem):'+JSON.stringify($(elem).html()));
+									$(elem).focus();
+									//console.log('event:'+JSON.stringify(event));
+								 }
+								 });
+							$('#mansioneInfoContent').text(data.descrizione);
+							$('#mansioneInfoDialog').dialog('open');
+							//console.log('data:'+JSON.stringify(data));
+							//$(resolvInfoDivContent).text(data.descrizione);
+							//$(resolvInfoDiv).show();
+							//$(resolvInfoDiv).position(settings);
+							//$(resolvInfoDivCloser).position(settings);
+						  });
+		}
+		
+/*
+			function mansioneInfoResolver(codSel) {
+				//codSel=$(jqCod2resolve).val();
+				if(codSel){
+					$.getJSON(json_url, {term: codSel,},
+						function(data, textStatus, jqXHR) {
+								console.log('data:'+JSON.stringify(data));
+								$(resolvInfoDiv).text(data.descrizione);
+								$(resolvInfoDiv).toggle();
+							  });
+					}
+			    }
+		    */
+
+			$(function() {
+				disegnaBottoni();
+				$( "#mansioneInfoDialog" ).dialog({
+					autoOpen: false,
+					modal: true
+					});
+			});
+		    </script>
+	</ui:fragment>
+</ui:composition>

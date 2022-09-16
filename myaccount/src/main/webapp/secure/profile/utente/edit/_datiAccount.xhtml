@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:fragment rendered="#{empty utenteEditBean.socialNetwork}">
+		<div class="form-group">
+			<p:outputLabel value="#{ui['shared.email']}" styleClass="col-sm-4 control-label text-muted" />
+			<div class="col-md-8">
+				<p:inputText id="email" value="#{utenteEditBean.utenteInfo.pfPrincipal.email}" required="true" styleClass="form-control" label="Email">
+					<f:validator validatorId="noPECEmailValidator" />
+					<f:validator validatorId="uniqueEmailValidator">
+					</f:validator>
+					<f:attribute name="skipValue" value="#{utenteEditBean.oldEmail}"></f:attribute>
+					<o:validator validatorId="javax.faces.RegularExpression" pattern="#{validation['pattern.email']}"
+						message="#{validation['message.email']}" />
+					<p:ajax event="blur" update="emailMessage"></p:ajax>
+				</p:inputText>
+				<p:message id="emailMessage" for="email"></p:message>
+				<span class="help-block m-b-none">#{ui['regCit.emailDesc']}</span>
+			</div>
+		</div>
+	</ui:fragment>
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.username']}" styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">#{utenteEditBean.utenteInfo.pfPrincipal.username}</div>
+	</div>
+	
+	<ui:fragment rendered="#{not empty utenteEditBean.socialNetwork}">
+		<div class="form-group">
+			<p:outputLabel value="#{ui['shared.identityProvider']}" styleClass="col-md-4 control-label text-muted" />
+			<div class="col-md-8">#{utenteEditBean.socialNetwork.codTipoProvider}</div>
+		</div>
+	</ui:fragment>
+
+	<ui:fragment rendered="#{empty utenteEditBean.socialNetwork}">
+		<div class="form-group">
+			<p:outputLabel value="#{ui['shared.password']}" styleClass="col-sm-4 control-label text-muted" />
+			<div class="col-sm-4">
+				<p:commandLink value="#{ui['prof.changePassword']}" update=":changePasswordDlg" oncomplete="PF('changePasswordDlgWV').show()"></p:commandLink>
+			</div>
+		</div>
+	
+		<div class="form-group">
+			<p:outputLabel value="#{ui['shared.secretQuestion']}" for="secretQuestion" styleClass="col-md-4 control-label text-muted" />
+			<div class="col-md-8">
+				<p:inputText id="secretQuestion" value="#{utenteEditBean.utenteInfo.pfPrincipal.domanda}" required="true"
+					label="#{ui['shared.secretQuestion']}" maxlength="255" styleClass="form-control" />
+				<p:message id="secretQuestionMessage" for="secretQuestion"></p:message>
+			</div>
+		</div>
+	
+		<div class="form-group">
+			<p:outputLabel value="#{ui['shared.answer']}" for="answer" styleClass="col-md-4 control-label text-muted" />
+			<div class="col-md-8">
+				<p:inputText id="answer" value="#{utenteEditBean.utenteInfo.pfPrincipal.risposta}" required="true" maxlength="255"
+					styleClass="form-control" label="#{ui['shared.answer']}" />
+				<p:message id="answerMessage" for="answer"></p:message>
+			</div>
+		</div>
+	</ui:fragment>
+
+</ui:composition>

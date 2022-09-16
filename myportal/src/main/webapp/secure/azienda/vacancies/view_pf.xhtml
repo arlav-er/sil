@@ -1,0 +1,118 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" template="/WEB-INF/templates/#{utilsBean.bootstrapTemplate}/main.xhtml"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<ui:param name="pagetitle" value="Vacancy" />
+
+	<ui:define name="content">
+
+		<h:outputScript library="commons" name="js/vendor/linkify.min.js" />
+		<h:outputScript library="commons" name="js/vendor/linkify-jquery.min.js" />
+		<h:outputStylesheet library="css" name="leaflet.css" />
+		<h:outputScript library="commons" name="js/vendor/leaflet.js" />
+		<h:outputScript library="commons" name="js/timeago.js" />
+		<h:outputScript library="commons" name="js/azienda/vacancy/vacancy.view.js" />
+		<div id="job-#{vacancyViewBean.vacancy.idVaDatiVacancy}" class="job container-fluid page-title">
+			<div class="row green-banner">
+				<div class="container main-container">
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+						<h2 class="titoloViewPf">#{vacancyViewBean.vacancy.attivitaPrincipale}</h2>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+						<ui:remove>
+							<p:button styleClass="btn btn-primary ui-button" href="#{vacancyViewBean.getBackTo()}"
+								rendered="#{not empty vacancyViewBean.backTo}" value="Torna indietro"
+								onclick="buttonToDisable = MyPortal.enableLoadingButton(this)" />
+						</ui:remove>
+						<h:link rendered="#{vacancyViewBean.renderedModifica()}" styleClass="vacancy-action pull-right "
+							outcome="/secure/azienda/vacancies/edit_pf.xhtml" title="Modifica" style="display:inline-block">
+							<f:param name="id" value="#{vacancyViewBean.vacancy.idVaDatiVacancy}" />
+							<i class="fa fa-pencil"></i> Modifica
+                        </h:link>
+                        <h:panelGroup id="archiviaVacancyBtn">
+	                        <ui:fragment rendered="#{vacancyViewBean.isArchiviaRendered()}">
+		                        <p:commandLink styleClass="vacancy-action pull-right " 
+		                             onclick="$('#archiviaVacancyView-modal').modal('show')" title="Archivia" style="display:inline-block"> 
+		    						<f:param name="id" value="#{vacancyViewBean.vacancy.idVaDatiVacancy}" />
+									<i class="fa fa-archive"></i> Archivia
+								</p:commandLink>
+	                        </ui:fragment>
+                        </h:panelGroup>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="container">
+			<hr />
+			<div class="job-detail">
+				<div class="content-area">
+					<div class="col-md-8 left-sec">
+						<div class="heading-dft">
+							<h2 style="display: inline-block">Offerta di Lavoro</h2>
+							<ui:fragment rendered="#{not empty vacancyViewBean.vacancy}">
+								<div class="row">
+									<div class="col-md-12">
+										<span> #{vacancyViewBean.vacancy.attivitaDescrizioneEstesa} </span>
+									</div>
+								</div>
+							</ui:fragment>
+						</div>
+						<ui:include src="_view/_jobInfo.xhtml" />
+
+
+						<ui:include src="_view/_ulteriori.xhtml" />
+
+
+						<ui:include src="_view/_sintesi.xhtml" />
+
+						<ui:fragment rendered="#{vacancyViewBean.poi != null}">
+							<ui:include src="_view/_map.xhtml" />
+						</ui:fragment>
+
+						<ui:fragment rendered="#{sessionBean.isProvincia() or sessionBean.isAzienda()}">
+							<ui:include src="_view/_gestioneAnnuncio.xhtml" />
+						</ui:fragment>
+
+						<ui:fragment rendered="#{sessionBean.isProvincia()}">
+							<ui:include src="_view/_gestioneRedazione.xhtml" />
+						</ui:fragment>
+						
+					</div>
+
+					<div class="col-md-4 right-sec">
+
+						<ui:include src="_view/_companyInfo.xhtml" />
+
+						<ui:include src="_view/_jobOverview.xhtml" />
+						
+					</div>
+				</div>
+			</div>
+			<p:button styleClass="btn btn-primary ui-button m-t-10" href="#{vacancyViewBean.getBackTo()}" 
+					value="Torna indietro"/>
+		</div>
+		<ui:fragment rendered="#{not vacancyViewBean.isExpiredVacancy() and not empty vacancyViewBean.vaContatto.mail}">
+			<ui:include src="_view/_contattaDatoreLavoro.xhtml" />
+		</ui:fragment>
+		<ui:include src="_view/_confermaCandidatura.xhtml" />
+		<ui:include src="_view/_no_candidatura.xhtml" />
+		<ui:include src="_view/_no_candidaturaMyPortal.xhtml" />
+		<ui:include src="_view/_archiviaVacancyView.xhtml" />
+		<script class="loadScript">
+			$(function () {
+				MyPortal.VacancyView.expiredVacancy = #{vacancyViewBean.isExpiredVacancy()};
+				MyPortal.VacancyView.vacancyURL = "#{utils.getVacancyURL(vacancyViewBean.vacancy.idVaDatiVacancy)}";
+				MyPortal.VacancyView.centerPositionLat = "#{vacancyViewBean.getCenterPositionLat()}" ? "#{vacancyViewBean.getCenterPositionLat()}" : 46.0730767;
+				MyPortal.VacancyView.centerPositionLng = "#{vacancyViewBean.getCenterPositionLng()}" ? "#{vacancyViewBean.getCenterPositionLng()}" : 11.1174803;
+				MyPortal.VacancyView.markerIcon = "#{resource['images:marker-icon-2x.png']}";
+				MyPortal.VacancyView.markerTitle = "#{vacancyViewBean.markerTitle}";
+				MyPortal.VacancyView.mapZoom = "#{vacancyViewBean.mapZoom}"
+				MyPortal.activeTab('servizi-senza-login');
+				MyPortal.VacancyView.init();
+			});
+        </script>
+	</ui:define>
+</ui:composition>
+

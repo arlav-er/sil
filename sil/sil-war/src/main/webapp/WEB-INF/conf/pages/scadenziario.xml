@@ -1,0 +1,574 @@
+<!-- Giovanni Landi -->
+<!-- Gestione Scadenziario -->
+<PAGE distributed="false" name="ScadRicercaPage" scope="REQUEST">
+	<MODULES>
+	<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+    <MODULE keep="false" name="COMBO_SERVIZIO"/>
+    <MODULE keep="false" name="COMBO_SPI_SCAD"/>
+    <MODULE keep="false" name="COMBO_TIPO_CONTATTO_AG"/>
+    <MODULE keep="false" name="COMBO_MOTIVO_CONTATTO_AG"/>
+    <MODULE keep="false" name="COMBO_EFFETTO_CONTATTO_AG"/>
+    <MODULE keep="false" name="COMBO_VALIDITA_SCAD"/>
+    <MODULE name="M_GetCpiPoloProvinciale"/> 
+    <MODULE keep="false" name="M_LISTSTATOLAV"/>
+    <MODULE keep="false" name="M_GetCodificaTipoPatto"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="ScadRicercaPage" target="M_CONFIG_UMB_NGE_AZ"/>
+	<DEPENDENCE source="ScadRicercaPage" target="COMBO_SERVIZIO"/>
+    <DEPENDENCE source="ScadRicercaPage" target="COMBO_SPI_SCAD"/>
+    <DEPENDENCE source="ScadRicercaPage" target="COMBO_TIPO_CONTATTO_AG"/>
+    <DEPENDENCE source="ScadRicercaPage" target="COMBO_MOTIVO_CONTATTO_AG"/>
+    <DEPENDENCE source="ScadRicercaPage" target="COMBO_EFFETTO_CONTATTO_AG"/>
+    <DEPENDENCE source="ScadRicercaPage" target="COMBO_VALIDITA_SCAD"/>
+    <DEPENDENCE source="ScadRicercaPage" target="M_GetCpiPoloProvinciale"/> 
+    <DEPENDENCE source="ScadRicercaPage" target="M_LISTSTATOLAV"/> 
+    <DEPENDENCE source="ScadRicercaPage" target="M_GetCodificaTipoPatto"/>
+   </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ScadListaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="M_GetTipiScadenze"/>
+    <MODULE keep="false" name="M_ListScadenze"/>
+    <MODULE keep="false" name="COMBO_MOTIVO_CONTATTO_AG_DETTAGLIO"/>
+    <MODULE keep="false" name="M_GetValidita_SCAD"/>
+    <MODULE keep="false" name="M_CpiPoloProv"/>
+    <MODULE keep="false" name="M_GetValiditaCurr"/>
+    <MODULE keep="false" name="M_GetCodificaTipoPatto"/>
+   	
+   </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ScadListaPage" target="M_GetTipiScadenze"/>
+    <DEPENDENCE source="ScadListaPage" target="M_ListScadenze"/>
+    
+    <DEPENDENCE source="ScadListaPage" target="COMBO_MOTIVO_CONTATTO_AG_DETTAGLIO">
+      <CONDITIONS>
+        <PARAMETER name="MOTIVO_CONTATTO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="ScadListaPage" target="M_GetValidita_SCAD">
+      <CONDITIONS>
+        <PARAMETER name="CODTIPOVALIDITA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE> 
+    
+    <DEPENDENCE source="ScadListaPage" target="M_GetValiditaCurr">
+      <CONDITIONS>
+        <PARAMETER name="statoValCV" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="ScadListaPage" target="M_CpiPoloProv">
+      <CONDITIONS>
+        <PARAMETER name="codCPI" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="ScadListaPage" target="M_GetCodificaTipoPatto">
+      <CONDITIONS>
+        <PARAMETER name="TIPOLOGIAPATTO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+   
+    </DEPENDENCIES>
+    
+</PAGE>
+
+<PAGE distributed="false" name="ScadContattoPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="COMBO_SPI_SCAD"/>
+    <MODULE keep="false" name="COMBO_TIPO_CONTATTO_AG"/>
+    <MODULE keep="false" name="COMBO_MOTIVO_CONTATTO_AG"/>
+    <MODULE keep="false" name="COMBO_EFFETTO_CONTATTO_AG"/>
+    <MODULE keep="false" name="MSPI_UTENTE"/>
+    <MODULE keep="false" name="M_GetUnitaAzienda"/>
+    <MODULE keep="false" name="M_GetLavoratoreRecapiti"/>
+    <MODULE keep="false" name="M_GetContattiLavoratore"/>
+    <MODULE keep="false" name="MSalvaContatto"/>
+  </MODULES>
+  
+  <DEPENDENCIES>
+
+    <DEPENDENCE source="ScadContattoPage" target="MSalvaContatto">
+      <CONDITIONS>
+        <PARAMETER name="SALVACONTATTO" scope="SERVICE_REQUEST" value="ok"/>
+			</CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="ScadContattoPage" target="COMBO_SPI_SCAD"/>
+    <DEPENDENCE source="ScadContattoPage" target="COMBO_TIPO_CONTATTO_AG"/>
+    <DEPENDENCE source="ScadContattoPage" target="COMBO_MOTIVO_CONTATTO_AG"/>
+    <DEPENDENCE source="ScadContattoPage" target="COMBO_EFFETTO_CONTATTO_AG"/>
+    <DEPENDENCE source="ScadContattoPage" target="MSPI_UTENTE"/>
+    
+    <DEPENDENCE source="ScadContattoPage" target="M_GetUnitaAzienda">
+      <CONDITIONS>
+        <!-- <PARAMETER name="RECUPERAINFO" scope="SERVICE_REQUEST" value="AZIENDA"/> -->
+        <PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        <PARAMETER name="PRGUNITA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="ScadContattoPage" target="M_GetLavoratoreRecapiti">
+      <CONDITIONS>
+        <!-- <PARAMETER name="RECUPERAINFO" scope="SERVICE_REQUEST" value="LAVORATORE"/> -->
+        <PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="ScadContattoPage" target="M_GetContattiLavoratore"/>
+    
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ScadSalvaContattoPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="MVerificaDataNL"/>
+  </MODULES>
+   <DEPENDENCIES>
+    <DEPENDENCE source="ScadSalvaContattoPage" target="MVerificaDataNL"/>
+   </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DettaglioContattoPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="COMBO_SPI"/>
+    <MODULE keep="false" name="COMBO_TIPO_CONTATTO_AG"/>
+    <MODULE keep="false" name="COMBO_MOTIVO_CONTATTO_AG"/>
+    <MODULE keep="false" name="COMBO_EFFETTO_CONTATTO_AG"/>
+    <MODULE keep="false" name="MDettContatto"/>
+  </MODULES>
+   <DEPENDENCIES>
+    <DEPENDENCE source="DettaglioContattoPage" target="COMBO_SPI"/>
+    <DEPENDENCE source="DettaglioContattoPage" target="COMBO_TIPO_CONTATTO_AG"/>
+    <DEPENDENCE source="DettaglioContattoPage" target="COMBO_MOTIVO_CONTATTO_AG"/>
+    <DEPENDENCE source="DettaglioContattoPage" target="COMBO_EFFETTO_CONTATTO_AG"/>
+    <DEPENDENCE source="DettaglioContattoPage" target="MDettContatto"/>
+   </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ScadAppuntamentoPage" scope="REQUEST">
+</PAGE>
+
+<PAGE distributed="false" name="SOScadAppuntamentoPage" scope="REQUEST">
+</PAGE>
+
+<!--Page Appuntamenti profilo Lavoratore -->
+<PAGE distributed="false" name="SOScadSlotPrenotabiliPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="M_SOGetSlotPrenotabili"/>
+		<MODULE keep="false" name="M_ScadGetServizio"/>
+		<MODULE name="M_GetCpiPoloProvinciale"/>
+		<MODULE keep="false" name="M_FILTROCPILAV"/>
+		<MODULE keep="false" name="M_FILTROCPIAZI"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="SOScadSlotPrenotabiliPage" target="M_CONFIG_UMB_NGE_AZ"/>
+    	<DEPENDENCE source="SOScadSlotPrenotabiliPage" target="M_GetCpiPoloProvinciale"/>
+    	<DEPENDENCE source="SOScadSlotPrenotabiliPage" target="M_SOGetSlotPrenotabili"/>
+    	<DEPENDENCE source="SOScadSlotPrenotabiliPage" target="M_ScadGetServizio"/>
+    	<DEPENDENCE source="SOScadSlotPrenotabiliPage" target="M_FILTROCPILAV">
+    		<CONDITIONS>
+        		<PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        	</CONDITIONS>
+        </DEPENDENCE>
+        <DEPENDENCE source="SOScadSlotPrenotabiliPage" target="M_FILTROCPIAZI">
+        	<CONDITIONS>
+        		<PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        		<PARAMETER name="PRGUNITA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        	</CONDITIONS>
+        </DEPENDENCE>
+     </DEPENDENCIES> 
+</PAGE>
+
+<PAGE distributed="false" name="ScadSlotPrenotaRecuperoDatiPage" scope="REQUEST">
+</PAGE>
+
+<PAGE distributed="false" name="SOScadSlotPrenotaRecuperoDatiPage" scope="REQUEST">
+</PAGE>
+
+<PAGE distributed="false" name="SOScadAppuntamentoRecuperoDatiPage" scope="REQUEST">
+</PAGE>
+
+
+<PAGE distributed="false" name="ScadAppuntamentoRecuperoDatiPage" scope="REQUEST">
+</PAGE>
+
+
+<PAGE distributed="false" name="ScadSlotPrenotabiliPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+    <MODULE keep="false" name="M_GetSlotPrenotabili"/>
+    <MODULE keep="false" name="COMBO_SERVIZIO_SCAD"/>
+    <MODULE keep="false" name="COMBO_SPI_SCAD"/>
+    <MODULE keep="false" name="COMBO_SERVIZIO_PATRONATO_SCAD"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="ScadSlotPrenotabiliPage" target="M_CONFIG_UMB_NGE_AZ"/>
+    <DEPENDENCE source="ScadSlotPrenotabiliPage" target="COMBO_SPI_SCAD"/>
+    <DEPENDENCE source="ScadSlotPrenotabiliPage" target="M_GetSlotPrenotabili"/>
+    <DEPENDENCE source="ScadSlotPrenotabiliPage" target="COMBO_SERVIZIO_SCAD"/>
+    <DEPENDENCE source="ScadSlotPrenotabiliPage" target="COMBO_SERVIZIO_PATRONATO_SCAD"/>
+ </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ScadAppuntamentiInseritiPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="M_GetAppuntamentiLavoratore"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ScadAppuntamentiInseritiPage" target="M_GetAppuntamentiLavoratore"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="SOScadAppuntamentiInseritiPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="M_SOGetAppuntamentiLavoratore"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="SOScadAppuntamentiInseritiPage" target="M_SOGetAppuntamentiLavoratore"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ScadSalvaAppuntamentoPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="MIns_AppDaSlot"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ScadSalvaAppuntamentoPage" target="MIns_AppDaSlot"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="SOScadSalvaAppuntamentoPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="MIns_AppDaSlot"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="SOScadSalvaAppuntamentoPage" target="MIns_AppDaSlot"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DettaglioAppuntamentoPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+    <MODULE keep="false" name="COMBO_SERVIZIO"/>
+    <MODULE keep="false" name="COMBO_SPI"/>
+    <MODULE keep="false" name="COMBO_AMBIENTE"/>
+    <MODULE keep="false" name="SELECT_DETTAGLIO_AGENDA_MOD"/>
+    <MODULE keep="false" name="LISTA_LAVORATORI_APPUNTAMENTO_SCAD"/>
+    <MODULE keep="false" name="LISTA_AZIENDE_APPUNTAMENTO_SCAD"/>
+   	<MODULE keep="false" name="COMBO_EFFETTO_APPUNTAMENTO"/>
+   	<MODULE keep="false" name="COMBO_ESITO_APPUNTAMENTO"/>
+    <MODULE keep="false" name="COMBO_STATO_APPUNTAMENTO"/>
+	<MODULE keep="false" name="MSalvaAppuntamentoFromLav"/>
+	<MODULE keep="false" name="MAllineaSlot"/>
+	<MODULE keep="false" name="MIncongruenze"/>
+	<MODULE keep="false" name="M_getInfoLavoratorePerCig"/>
+	<MODULE keep="false" name="M_getInfoPerInvioSmsCig"/>
+	<MODULE keep="false" name="COMBO_TIPO_SMS"/>
+	<MODULE keep="false" name="M_inviaSmsCig"/>
+	<MODULE keep="false" name="M_InvioEsitoAppuntamentoANPAL" />
+	<MODULE keep="false" name="GetAppUltimoInvioAnpal" />
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="DettaglioAppuntamentoPage" target="M_CONFIG_UMB_NGE_AZ"/>
+  	<DEPENDENCE source="DettaglioAppuntamentoPage" target="M_inviaSmsCig">
+  		<CONDITIONS>
+	    	<PARAMETER name="INVIASMS" scope="SERVICE_REQUEST" value="1"/>
+	    </CONDITIONS>
+	    <CONSEQUENCES>
+	    	<PARAMETER name="TEXTSMS" type="RELATIVE" scope="SERVICE_REQUEST" value="TEXTSMS"/>
+	    	<PARAMETER name="STRCELL" type="RELATIVE" scope="SERVICE_REQUEST" value="STRCELL"/>
+	    	<PARAMETER name="CDNLAVORATORE" type="RELATIVE" scope="SERVICE_REQUEST" value="CDNLAVORATORE"/>
+	    </CONSEQUENCES>
+  	</DEPENDENCE>
+  	
+  	<DEPENDENCE source="DettaglioAppuntamentoPage" target="M_getInfoLavoratorePerCig">
+	  	<CONDITIONS>
+	    	<PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    </CONDITIONS>
+	    <CONSEQUENCES>
+	    	<PARAMETER name="CDNLAVORATORE" type="RELATIVE" scope="SERVICE_REQUEST" value="CDNLAVORATORE"/>
+	    </CONSEQUENCES>
+  	</DEPENDENCE>
+  	
+  	<DEPENDENCE source="M_getInfoLavoratorePerCig" target="M_getInfoPerInvioSmsCig">
+	  	<CONDITIONS>
+	    	<PARAMETER name="M_GETINFOLAVORATOREPERCIG.ROWS.ROW.ESISTECIG" scope="SERVICE_RESPONSE" value="AF_DEFINED"/>
+	    </CONDITIONS>
+  	</DEPENDENCE>
+  	
+  	<DEPENDENCE source="DettaglioAppuntamentoPage" target="COMBO_SERVIZIO"/>
+    <DEPENDENCE source="DettaglioAppuntamentoPage" target="COMBO_SPI"/>
+    <DEPENDENCE source="DettaglioAppuntamentoPage" target="COMBO_AMBIENTE"/>    
+    <DEPENDENCE source="DettaglioAppuntamentoPage" target="MSalvaAppuntamentoFromLav">
+      <CONDITIONS>
+        <PARAMETER name="aggiornaFromLav" scope="SERVICE_REQUEST" value="1"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+	<DEPENDENCE source="MSalvaAppuntamentoFromLav" target="MIncongruenze">
+    	<CONDITIONS>
+        	<PARAMETER name="aggiornaFromLav" scope="SERVICE_REQUEST" value="1"/>
+      	</CONDITIONS>
+		<CONSEQUENCES>
+			<PARAMETER name="PRGAPPUNTAMENTO" type="RELATIVE" scope="SERVICE_RESPONSE" value="MSalvaAppuntamentoFromLav.PRGAPPUNTAMENTO" />
+			<PARAMETER name="CODCPI" type="RELATIVE" scope="SERVICE_RESPONSE" value="MSalvaAppuntamentoFromLav.CODCPI" />
+		</CONSEQUENCES>
+	</DEPENDENCE>
+	<DEPENDENCE source="MSalvaAppuntamentoFromLav" target="MAllineaSlot">
+		<CONDITIONS>
+			<PARAMETER name="aggiornaFromLav" scope="SERVICE_REQUEST" value="1"/>			
+		</CONDITIONS>
+		<CONSEQUENCES>
+			<PARAMETER name="PRGAPPUNTAMENTO" type="RELATIVE" scope="SERVICE_RESPONSE" value="MSalvaAppuntamentoFromLav.PRGAPPUNTAMENTO" />
+			<PARAMETER name="CODCPI" type="RELATIVE" scope="SERVICE_RESPONSE" value="MSalvaAppuntamentoFromLav.CODCPI" />
+		</CONSEQUENCES>
+	</DEPENDENCE>
+    <DEPENDENCE source="MSalvaAppuntamentoFromLav" target="SELECT_DETTAGLIO_AGENDA_MOD">
+      <CONDITIONS>
+        <PARAMETER name="aggiornaFromLav" scope="SERVICE_REQUEST" value="1"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="DettaglioAppuntamentoPage" target="SELECT_DETTAGLIO_AGENDA_MOD"/>
+	<DEPENDENCE source="SELECT_DETTAGLIO_AGENDA_MOD" target="MIncongruenze">
+	  <CONDITIONS>
+		<PARAMETER name="aggiornaFromLav" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+	  </CONDITIONS>
+	  <CONSEQUENCES>
+		<PARAMETER name="CODCPI" type="RELATIVE" scope="SERVICE_RESPONSE" value="SELECT_DETTAGLIO_AGENDA_MOD.ROWS.ROW.CODCPI" />
+	  </CONSEQUENCES>
+	</DEPENDENCE>
+	<DEPENDENCE source="SELECT_DETTAGLIO_AGENDA_MOD" target="MIncongruenze">
+	  <CONDITIONS>
+		<PARAMETER name="aggiornaFromLav" scope="SERVICE_REQUEST" value="0" />
+	  </CONDITIONS>
+	  <CONSEQUENCES>
+		<PARAMETER name="CODCPI" type="RELATIVE" scope="SERVICE_RESPONSE" value="SELECT_DETTAGLIO_AGENDA_MOD.ROWS.ROW.CODCPI" />
+	  </CONSEQUENCES>
+	</DEPENDENCE>
+    <DEPENDENCE source="DettaglioAppuntamentoPage" target="LISTA_LAVORATORI_APPUNTAMENTO_SCAD"/>
+    <DEPENDENCE source="DettaglioAppuntamentoPage" target="LISTA_AZIENDE_APPUNTAMENTO_SCAD"/>
+	<DEPENDENCE source="DettaglioAppuntamentoPage" target="COMBO_EFFETTO_APPUNTAMENTO"/>
+	<DEPENDENCE source="DettaglioAppuntamentoPage" target="COMBO_ESITO_APPUNTAMENTO"/>
+    <DEPENDENCE source="DettaglioAppuntamentoPage" target="COMBO_STATO_APPUNTAMENTO"/>
+    <DEPENDENCE source="DettaglioAppuntamentoPage" target="COMBO_TIPO_SMS"/>
+    <DEPENDENCE source="DettaglioAppuntamentoPage" target="M_InvioEsitoAppuntamentoANPAL">
+		<CONDITIONS>
+			<PARAMETER name="ANPAL" scope="SERVICE_REQUEST" value="INVIOANPAL" />
+		</CONDITIONS>
+		<CONSEQUENCES />
+	</DEPENDENCE>
+	<DEPENDENCE source="M_InvioEsitoAppuntamentoANPAL" target="DettaglioAppuntamentoPage" />
+	<DEPENDENCE source="DettaglioAppuntamentoPage" target="GetAppUltimoInvioAnpal" />
+  </DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="SODettaglioAppuntamentoPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+  	<MODULE keep="false" name="COMBO_SERVIZIO"/>
+    <MODULE keep="false" name="COMBO_SPI"/>
+    <MODULE keep="false" name="COMBO_AMBIENTE"/>
+    <MODULE keep="false" name="SELECT_DETTAGLIO_AGENDA_MOD"/>
+    <MODULE name="M_ELENCOCPI"/>
+    <MODULE keep="false" name="LISTA_AZIENDE_APPUNTAMENTO_SCAD"/>
+   	<MODULE keep="false" name="COMBO_EFFETTO_APPUNTAMENTO"/>
+   	<MODULE keep="false" name="COMBO_ESITO_APPUNTAMENTO"/>
+    <MODULE keep="false" name="COMBO_STATO_APPUNTAMENTO"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="SODettaglioAppuntamentoPage" target="M_CONFIG_UMB_NGE_AZ"/>
+   	<DEPENDENCE source="SODettaglioAppuntamentoPage" target="COMBO_SERVIZIO"/>
+    <DEPENDENCE source="SODettaglioAppuntamentoPage" target="COMBO_SPI"/>
+    <DEPENDENCE source="SODettaglioAppuntamentoPage" target="COMBO_AMBIENTE"/>
+    <DEPENDENCE source="SODettaglioAppuntamentoPage" target="SELECT_DETTAGLIO_AGENDA_MOD"/>
+    <DEPENDENCE source="SODettaglioAppuntamentoPage" target="M_ELENCOCPI" />
+    <DEPENDENCE source="SODettaglioAppuntamentoPage" target="LISTA_AZIENDE_APPUNTAMENTO_SCAD"/>
+	<DEPENDENCE source="SODettaglioAppuntamentoPage" target="COMBO_EFFETTO_APPUNTAMENTO"/>
+	<DEPENDENCE source="SODettaglioAppuntamentoPage" target="COMBO_ESITO_APPUNTAMENTO"/>
+    <DEPENDENCE source="SODettaglioAppuntamentoPage" target="COMBO_STATO_APPUNTAMENTO"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="ScadTestataAziendaPage" scope="REQUEST">
+	<MODULES>
+    <MODULE name="M_GetTestataAzienda" />
+    <MODULE name="M_GetUnitaAzienda" />
+    <MODULE name="M_GetStatiAzienda" />
+	</MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ScadTestataAziendaPage" target="M_GetTestataAzienda"/>
+    <DEPENDENCE source="ScadTestataAziendaPage" target="M_GetUnitaAzienda"/>
+    <DEPENDENCE source="ScadTestataAziendaPage" target="M_GetStatiAzienda"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ScadOrganizzativePage" scope="REQUEST">
+</PAGE>
+
+<PAGE distributed="false" name="ScadAmministrativePage" scope="REQUEST">
+</PAGE>
+
+<PAGE distributed="false" name="ScadColloquiPage" scope="REQUEST">
+	<MODULES>
+    <MODULE keep="false" name="M_ListaColloquiLav"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ScadColloquiPage" target="M_ListaColloquiLav"/>    
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ScadenzeLavoratorePage" scope="REQUEST">
+	<MODULES>
+    <MODULE keep="false" name="M_ListaScadLavRicontattare"/>
+    <MODULE keep="false" name="M_ListaScadValiditaSchedaLav"/>
+    <MODULE keep="false" name="M_ListaScadPermessoSoggLav"/>
+    <MODULE keep="false" name="M_ListaScadAzioniConcordLav"/>
+    <MODULE keep="false" name="M_ListaScadPrimoCollLav"/>
+    <MODULE keep="false" name="M_ListaScadStipulaPattoLav"/>
+    <MODULE keep="false" name="M_ListaScadenzaPattoLav"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ScadenzeLavoratorePage" target="M_ListaScadLavRicontattare"/>
+    <DEPENDENCE source="ScadenzeLavoratorePage" target="M_ListaScadValiditaSchedaLav"/>
+    <DEPENDENCE source="ScadenzeLavoratorePage" target="M_ListaScadPermessoSoggLav"/>
+    <DEPENDENCE source="ScadenzeLavoratorePage" target="M_ListaScadAzioniConcordLav"/>
+    <DEPENDENCE source="ScadenzeLavoratorePage" target="M_ListaScadPrimoCollLav"/>
+    <DEPENDENCE source="ScadenzeLavoratorePage" target="M_ListaScadStipulaPattoLav"/>
+    <DEPENDENCE source="ScadenzeLavoratorePage" target="M_ListaScadenzaPattoLav"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!-- Verifiche lavoratore? -->
+
+<PAGE distributed="false" name="VerLavoratoriPage" scope="REQUEST">
+</PAGE>
+
+<PAGE distributed="false" name="VerificheLavoratorePage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="M_ListaVerAppStatoOccVariato"/>
+    <MODULE keep="false" name="M_ListaVerNonDispTerritorio"/>
+    <MODULE keep="false" name="M_ListaVerEsclusiRosa"/>
+    <MODULE keep="false" name="M_ListaVerProntoIncNoMans"/>   
+    <MODULE keep="false" name="M_CL_LIST_INVII_CANDIDATURE"/> 
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="VerificheLavoratorePage" target="M_ListaVerAppStatoOccVariato"/>
+    <DEPENDENCE source="VerificheLavoratorePage" target="M_ListaVerNonDispTerritorio"/>
+    <DEPENDENCE source="VerificheLavoratorePage" target="M_ListaVerEsclusiRosa"/>
+	<DEPENDENCE source="VerificheLavoratorePage" target="M_ListaVerProntoIncNoMans"/>
+	<DEPENDENCE source="VerificheLavoratorePage" target="M_CL_LIST_INVII_CANDIDATURE">
+		<CONDITIONS>
+			<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		</CONDITIONS>
+	</DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="SCADFiltriVerificheLavoratorePage" scope="REQUEST">
+	<MODULES>
+	    <MODULE name="M_ELENCOCPI" />
+        <MODULE keep="false" name="M_ListStatoLav"/> <!-- da presel -->
+        <MODULE name="M_CL_COMBO_AMBITO_DIFFUSIONE"/>
+	</MODULES>
+    <DEPENDENCIES>	
+	    <DEPENDENCE source="SCADFiltriVerificheLavoratorePage" target="M_ELENCOCPI"/>
+	    <DEPENDENCE source="SCADFiltriVerificheLavoratorePage" target="M_ListStatoLav"/>
+	    <DEPENDENCE source="SCADFiltriVerificheLavoratorePage" target="M_CL_COMBO_AMBITO_DIFFUSIONE">
+	    </DEPENDENCE>
+    </DEPENDENCIES>	
+</PAGE>
+
+<PAGE distributed="false" name="SCADVerificheListaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="M_GetTipiScadenze"/>
+    <MODULE keep="false" name="M_ListScadenze"/>
+    <MODULE keep="false" name="COMBO_MOTIVO_CONTATTO_AG_DETTAGLIO"/>
+    <MODULE keep="false" name="M_GetValidita_SCAD"/>
+  </MODULES>
+  <DEPENDENCIES>
+
+
+    <DEPENDENCE source="SCADVerificheListaPage" target="COMBO_MOTIVO_CONTATTO_AG_DETTAGLIO">
+      <CONDITIONS>
+        <PARAMETER name="MOTIVO_CONTATTO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="SCADVerificheListaPage" target="M_GetValidita_SCAD">
+      <CONDITIONS>
+        <PARAMETER name="CODTIPOVALIDITA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="SCADVerificheListaPage" target="M_GetTipiScadenze"/>
+    <DEPENDENCE source="SCADVerificheListaPage" target="M_ListScadenze">
+    <CONDITIONS>
+        <PARAMETER name="ISCPI" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>    
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!-- evidenze  -->
+<!-- ricordarsi di cancellare il codice xml della vecchia pagina dai file coop -->
+<PAGE name="ListaGeneraleEvidenzePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="ListaGeneraleEvidenze"/>
+		<MODULE name="MSalvaEvidenza"/>
+		<MODULE name="MCancEvidenza"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaGeneraleEvidenzePage" target="MSalvaEvidenza">
+      		<CONDITIONS>
+        		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="SEV"/>
+      		</CONDITIONS>
+    	</DEPENDENCE>
+    	<DEPENDENCE source="MSalvaEvidenza" target="ListaGeneraleEvidenze"/>
+    	<!-- Canc. Evidenza -->
+    	<DEPENDENCE source="ListaGeneraleEvidenzePage" target="MCancEvidenza">
+      		<CONDITIONS>
+        		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CEV"/>
+      		</CONDITIONS>
+    	</DEPENDENCE>
+    	<DEPENDENCE source="MCancEvidenza" target="ListaGeneraleEvidenze"/>
+    	<!-- Lista Evidenze -->
+		<DEPENDENCE source="ListaGeneraleEvidenzePage" target="ListaGeneraleEvidenze">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ListaGeneraleEvidenzePage" target="ListaGeneraleEvidenze">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="LISTAGENERALEEVIDENZE"/>
+			</CONDITIONS>
+		</DEPENDENCE>		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="RicercaGeneraleEvidenzePage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MTipiEvidenze"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaGeneraleEvidenzePage" target="MTipiEvidenze"/>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="DettaglioEvidenzaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="MTipiEvidenze"/>
+		<MODULE name="MDettEvidenza"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DettaglioEvidenzaPage" target="MTipiEvidenze"/>
+		<DEPENDENCE source="DettaglioEvidenzaPage" target="MDettEvidenza"/>
+	</DEPENDENCIES>
+</PAGE>

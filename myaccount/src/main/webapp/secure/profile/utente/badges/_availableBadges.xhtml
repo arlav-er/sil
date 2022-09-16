@@ -1,0 +1,48 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:pretty="http://ocpsoft.com/prettyfaces">
+	<div class="row">
+
+		<h:panelGroup id="availableBadgesGroup" layout="block">
+			<div class="#{not empty badgesBean.suggestedBadgesList?'col-md-12':'col-md-11 col-md-offset-1'}"
+				style="margin-top: 50px;">
+				<div class="row row-lines-v">
+					<h:form>
+						<ui:repeat value="#{badgesBean.visibleGpBadges}" var="badge" varStatus="status">
+							<div
+								class="col-sm-4 animated fadeIn mix all #{badgesBean.isBadgeAchieved(badge.deBadge)?'achieved':''} #{badgesBean.isBadgeIncomplete(badge.deBadge)?'incomplete':''} #{badgesBean.isBadgeAbsent(badge.deBadge)?'absent':''}"
+								data-my-order="#{status.index}">
+								<div class="badgebox badgebox-style2 #{badgesBean.isBadgeAchieved(badge.deBadge) ? 'checked' : 'unchecked'}">
+									<div class="badgebox-thumbnail fa #{badge.deBadge.imageClass}">
+										<img src="#{resource['commons:images/gamification/'.concat(badge.deBadge.imageSource)]}" width="70"
+											height="70" alt="" />
+									</div>
+									<div class="badgebox-aside">
+										<h3 class="badgebox-title" data-toggle="tooltip" data-placement="top" title="#{badge.titolo}">#{badge.titolo}</h3>
+										<div class="badgebox-text" data-toggle="tooltip" data-placement="bottom" title="#{badge.descrizione}">
+											<p>#{badge.descrizione}</p>
+										</div>
+										<div class="badgebox-foot clearfix">
+											<ui:fragment rendered="#{badgesBean.isBadgeIncomplete(badge.deBadge)}">
+												<div class="progress">
+													<div class="progress-bar" data-transitiongoal="#{badge.valueAsPercentage}"></div>
+												</div>
+											</ui:fragment>
+											<p:commandLink styleClass="btn btn-default btn-xs pull-right" style="outline: none;" update=":badgeViewGroup"
+												oncomplete="$('#badgeView').modal('show')" process="@this">
+												<i class="fa fa-info" aria-hidden="true"></i>
+												<f:setPropertyActionListener value="#{badge}" target="#{badgesBean.selectedBadge}"></f:setPropertyActionListener>
+											</p:commandLink>
+										</div>
+									</div>
+								</div>
+							</div>
+						</ui:repeat>
+					</h:form>
+				</div>
+			</div>
+		</h:panelGroup>
+
+		<div class="clearfix"></div>
+	</div>
+</ui:composition>

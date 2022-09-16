@@ -1,0 +1,105 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+				xmlns:o="http://omnifaces.org/ui" xmlns:eng="http://java.sun.com/jsf/composite/components">
+
+	<div class="col-md-12">
+		<div class="form-group">
+			<p:outputLabel value="Lingua" for="autocompleteLingue" styleClass="col-sm-1 control-label" style="margin-left: 15px" />
+			<div class="col-md-7 col-lg-7" style="margin-left: 22px">
+				<p:autoComplete id="autocompleteLingue" value="#{vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.deLingua}" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+								converter="deLinguaConverter" forceSelection="true" required="true" var="deLingua"
+								itemLabel="#{deLingua.denominazione}" label="#{ui['lingue.selectLingua']}" itemValue="#{deLingua}"
+								completeMethod="#{autoCompleteBean.completeLingua}" emptyMessage="#{ui['shared.emptyAutoComplete']}"
+								requiredMessage="La lingua è obbligatoria" styleClass="form-control" cache="true"/>
+				<p:message id="lingueMessage" for="autocompleteLingue"></p:message>
+			</div>
+
+			<h:panelGroup id="chk_madrelingua">
+				<div id="col-md-6 col-lg-6">
+					<p:selectBooleanCheckbox value="#{vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.flagMadrelingua}" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+											 widgetVar="madreLinguaWV" rendered="true" id="madrelingua">
+						<p:ajax listener="#{vacancyFormPfBean.vaLingueSection.handleChangeMadreLingua}"
+								update="vaLivelloLettura vaLivelloScrittura vaLivelloEspressione renderMadrelivelloLettura renderMadrelivelloScrittura renderMadrelivelloEspressione " event="change" process="@this" />
+					</p:selectBooleanCheckbox>
+					<h:outputLabel id="madrelingua_label" for="madrelingua" styleClass="col-sm-2">
+						<h:outputText value="Madrelingua" />
+					</h:outputLabel>
+				</div>
+			</h:panelGroup>
+		</div>
+	</div>
+
+	<div class="col-md-12" style="margin-top: 30px; margin-bottom: 30px">
+		<div class="form-group">
+			<p:outputLabel id="renderMadrelivelloLettura"  for="vaLivelloLettura" value="#{vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.flagMadrelingua ? 'Madrelingua' : 'Letto'}" style="margin-left: 15px;" styleClass="col-sm-1 control-label">
+			</p:outputLabel>
+			<div class="col-md-3 col-lg-2" style="margin-left: 22px">
+				<p:selectOneMenu id="vaLivelloLettura"
+								 disabled="#{vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.flagMadrelingua or vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}" styleClass="form-control"
+								 forceSelection="true" converter="deGradoLinSilConverter"
+								 requiredMessage="Il livello di conoscenza lettura è obbligatorio"
+								 required="#{!vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.flagMadrelingua}" style="width: 100%;"
+								 value="#{vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.deGradoSilLetto}">
+					<f:selectItem itemLabel="" itemValue="" />
+					<f:selectItems var="deLivelloLettura" value="#{decodificheBean.getGradoLingueSilByCodIdoNotNull()}"
+								   itemLabel="#{deLivelloLettura.codIdo}" itemValue="#{deLivelloLettura}" itemDescription="#{deLivelloLettura.descrizioneIdoLetto}"/>
+				</p:selectOneMenu>
+				<p:message id="valivelloLetturaMessage" for="vaLivelloLettura"></p:message>
+			</div>
+
+			<p:outputLabel id="renderMadrelivelloScrittura" for="vaLivelloScrittura" value="#{vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.flagMadrelingua ? 'Madrelingua' : 'Scritto'}" styleClass="col-sm-1 control-label" style="margin-left: 15px;">
+			</p:outputLabel>
+			<div class="col-md-3 col-lg-2" style="margin-left: 22px">
+				<p:selectOneMenu id="vaLivelloScrittura"
+								 disabled="#{vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.flagMadrelingua or vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}" styleClass="form-control"
+								 forceSelection="true" required="#{!vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.flagMadrelingua}"
+								 converter="deGradoLinSilConverter" requiredMessage="Il livello di conoscenza scrittura è obbligatorio"
+								 style="width: 100%;" value="#{vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.deGradoSilScritto}">
+					<f:selectItem itemLabel="" itemValue="" />
+					<f:selectItems var="deLivelloScrittura" value="#{decodificheBean.getGradoLingueSilByCodIdoNotNull()}"
+								   itemLabel="#{deLivelloScrittura.codIdo}" itemValue="#{deLivelloScrittura}" itemDescription="#{deLivelloScrittura.descrizioneIdoScritto}"/>
+				</p:selectOneMenu>
+				<p:message id="livelloScritturaMessage" for="vaLivelloScrittura"></p:message>
+			</div>
+			<p:outputLabel id="renderMadrelivelloEspressione" for="vaLivelloEspressione" value="#{vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.flagMadrelingua ? 'Madrelingua' : 'Parlato'}" styleClass="col-sm-1 control-label" style="margin-left: 15px;">
+			</p:outputLabel>
+			<div class="col-md-3 col-lg-2" style="margin-left: 22px;">
+				<p:selectOneMenu id="vaLivelloEspressione"
+								 disabled="#{vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.flagMadrelingua or vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}" styleClass="form-control"
+								 forceSelection="true" required="#{!vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.flagMadrelingua}"
+								 converter="deGradoLinSilConverter" requiredMessage="Il livello di conoscenza parlato è obbligatorio"
+								 style="width: 100%;" value="#{vacancyFormPfBean.vaLingueSection.vaLinguaAttiva.deGradoSilParlato}">
+					<f:selectItem itemLabel="" itemValue="" />
+					<f:selectItems var="vaLivelloEspressione" value="#{decodificheBean.getGradoLingueSilByCodIdoNotNull()}"
+								   itemLabel="#{vaLivelloEspressione.codIdo}" itemValue="#{vaLivelloEspressione}" itemDescription="#{vaLivelloEspressione.descrizioneIdoParlato}"/>
+				</p:selectOneMenu>
+				<p:message id="valivelloEspressioneMessage" for="vaLivelloEspressione"></p:message>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="text-center">
+		<p:defaultCommand target="syncOneLingue"></p:defaultCommand>
+		<p:commandLink id="syncOneLingue" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+					   actionListener="#{vacancyFormPfBean.vaLingueSection.sync()}"
+					   styleClass="btn btn-primary ui-button baby-btn uk-margin-top"
+					   onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+					   oncomplete="MyPortal.Vacancy.syncArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+					   update="@(.ui-message)" process="@this, syncForm">
+			#{ui['shared.save']}
+		</p:commandLink>
+
+		<p:commandLink id="annulla" styleClass="btn btn-primary ui-button baby-btn uk-margin-top uk-margin-left" disabled="#{vacancyFormPfBean.isArchivedNoModify() or vacancyFormPfBean.isCheckModifyPubbWithHasCandid()}"
+					   onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+					   oncomplete="MyPortal.Vacancy.cancelArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+					   process="@this">
+			Annulla
+			<p:ajax update="syncForm, :lingueForm:articles"
+					listener="#{vacancyFormPfBean.vaLingueSection.cancelEditLingue()}" resetValues="true" />
+		</p:commandLink>
+
+		<p:remoteCommand name="updateArticles" update=":lingueForm:articles" process="@this"></p:remoteCommand>
+	</div>
+
+</ui:composition>

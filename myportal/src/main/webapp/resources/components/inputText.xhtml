@@ -1,0 +1,187 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:composite="http://java.sun.com/jsf/composite">
+
+
+	<!--  Attributi da definire nell'interfaccia -->
+	<composite:interface>
+		<composite:attribute name="autocomplete"
+			default="#{cc.resourceBundleMap.autocomplete}" />
+		<composite:attribute name="label" />
+		<composite:attribute name="subLabel" shortDescription="Una sotto label da mostrare tra la label ed il campo di input."/>
+		<composite:attribute name="value" required="true" />
+		<composite:attribute name="disabled" />
+		<composite:attribute name="disableAjax" default="false" />
+		<composite:attribute name="disableLabel" default="false" />
+		
+		<composite:attribute name="underLabel" shortDescription="Una label da mostrare sotto il campo di input."/>
+		
+		<composite:attribute name="editingMode" default="true"
+			type="java.lang.Boolean"
+			shortDescription="visualizzato come input (true -> default) oppure come testo" />
+		<composite:attribute name="readonly" type="java.lang.Boolean"
+			default="false" />
+		<composite:attribute name="onchange" />
+		<composite:attribute name="required" default="false" />
+		<composite:attribute name="requiredLabel" default=" *" />
+		<composite:attribute name="requiredMessage"
+			default="#{cc.resourceBundleMap.requiredMessage}" />
+		<composite:attribute name="converterMessage"
+			default="#{cc.resourceBundleMap.converterMessage}" />
+		<composite:attribute name="maxlength"
+			default="#{const['inputText.maxLength']}" />
+		<composite:attribute name="size" default="#{const['inputText.size']}" />
+		<composite:attribute name="style" />
+		<composite:attribute name="styleClass" default="inner-shadow" />
+		<composite:attribute name="escape" type="java.lang.Boolean"
+			default="true" />
+		<composite:attribute name="execute" default=""
+			shortDescription="Id dei componenti da inviare in fase di validazione." />
+		<composite:attribute name="datePattern" default="dd/MM/yyyy" />
+		<composite:attribute name="erroreSotto" default="false" />
+		<composite:attribute name="title" />
+		<composite:attribute name="layout" default="block" />
+
+		<composite:attribute name="type" default="input"
+			shortDescription="Seleziona il tipo di input. Il tipo può essere 'input' di default" />
+		<!-- Attributi definito per gestire(in base al target), i vari Validatori, Convertitori, etc.  -->
+
+		<composite:attribute name="minDateFree" default="true" type="java.lang.Boolean"
+			shortDescription="Nel caso di data, indica se è possibile impostare date antecedenti a quella corrente" />
+
+		<composite:attribute name="helpMessage"
+			shortDescription="Un suggerimento fornito all'utente quando seleziona il campo di input." />
+
+		<composite:attribute name="helpPosition" default="right"
+			shortDescription="I valori ammessi sono: top, bottom, left, right"></composite:attribute>
+
+		<composite:editableValueHolder name="function" targets="inputText" />
+
+	</composite:interface>
+
+	<!--  Interfaccia implementata -->
+	<composite:implementation>
+		<f:loadBundle basename="conf.const" var="const" />
+		
+		<span id="#{cc.clientId}" layout="#{cc.attrs.layout}">
+			
+			<!--  Label -->
+			<h:outputLabel id="label_input" for="inputText"
+				rendered="#{not empty cc.attrs.label and not cc.attrs.disableLabel and cc.attrs.editingMode}">
+				<h:outputText value="#{cc.attrs.label}" />
+				<h:outputText value="#{cc.attrs.requiredLabel}"
+					rendered="#{cc.attrs.required and cc.attrs.editingMode}" />
+			</h:outputLabel>
+			
+			<h:panelGroup id="sublabel_input" layout="#{cc.attrs.layout}" rendered="#{cc.attrs.editingMode}">
+				<h:outputText value="#{cc.attrs.subLabel}">
+					<c:if test="#{cc.attrs.type == 'date' or cc.attrs.type == 'dataNascita'}">
+					<f:convertDateTime type="date" pattern="#{cc.attrs.datePattern}"/>
+					</c:if>
+				</h:outputText>
+			</h:panelGroup>
+			
+			<!--  Campo Input -->
+			<h:panelGroup id="inputblock" layout="#{cc.attrs.layout}"
+				styleClass="input100 #{(cc.attrs.type == 'date' or cc.attrs.type == 'dataNascita') ? 'fixInput' : ''}"
+				rendered="#{cc.attrs.editingMode}">
+				<h:inputText id="inputText"
+					styleClass="#{cc.attrs.styleClass} #{cc.attrs.disabled?'ui-state-disabled':''}"
+					style="#{cc.attrs.style}" value="#{cc.attrs.value}"
+					autocomplete="#{cc.attrs.autocomplete}" size="#{cc.attrs.size}"
+					maxlength="#{cc.attrs.maxlength}" onchange="#{cc.attrs.onchange}"
+					readonly="#{cc.attrs.readonly}" disabled="#{cc.attrs.disabled}"
+					required="#{cc.attrs.required}" title="#{cc.attrs.title}"
+					rendered="#{(not cc.attrs.readonly) and cc.attrs.editingMode}"
+					requiredMessage="#{cc.attrs.requiredMessage}"
+					converterMessage="#{cc.attrs.converterMessage}">
+					<c:if
+						test="#{cc.attrs.type == 'date' or cc.attrs.type == 'dataNascita'}">
+						<f:convertDateTime type="date" pattern="#{cc.attrs.datePattern}"
+							for="function" />
+					</c:if>
+					<c:if
+						test="#{cc.attrs.type != 'date' and cc.attrs.type != 'dataNascita' }">
+						<f:converter converterId="textareaConverter" for="inputText" />
+					</c:if>
+					<f:ajax execute="inputText #{cc.attrs.execute}"
+						onevent="document.getElementById('#{cc.clientId}').onevent"
+						event="blur" disabled="#{cc.attrs.disableAjax}" render="effect" />
+				</h:inputText>
+				
+				<h:panelGroup id="underlabel" layout="#{cc.attrs.layout}">
+					<h:outputText value="#{cc.attrs.underLabel}" style="color:red;">
+						<c:if test="#{cc.attrs.type == 'date' or cc.attrs.type == 'dataNascita'}">
+							<f:convertDateTime type="date" pattern="#{cc.attrs.datePattern}"/>
+						</c:if>
+					</h:outputText>
+				</h:panelGroup>
+
+				<h:outputText value="&lt;br /&gt;" escape="false"
+					rendered="#{cc.attrs.erroreSotto}" />
+				
+				<!--  Gestione messaggio -->
+				<h:panelGroup id="effect" class="toggler" style="display:none;"
+					rendered="#{cc.attrs.editingMode}">
+					<h:message id="message" for="inputText"
+						errorClass="ui-state-error ui-corner-all"
+						infoClass="ui-state-highlight ui-corner-all">
+					</h:message>
+					<script type="text/javascript">
+					//<![CDATA[
+						$(function() {
+							setTimeout(function() {
+							me = document.getElementById("#{cc.clientId}");
+							if (me) {
+								if (!me.menuOpen && !me.dateSelected) { 							
+									runEffectError(jq('#{cc.clientId}:effect'));
+								}
+								me.dateSelected = false;
+							}
+							},500);
+						});
+					//]]> 
+					</script>
+				</h:panelGroup>
+				
+				<script type="text/javascript">myportal.inputText.init('#{cc.clientId}','#{cc.attrs.type}',
+						'#{StringEscapeUtils.escapeEcmaScript(cc.attrs.helpMessage)}','#{cc.attrs.helpPosition}', #{cc.attrs.minDateFree});</script>
+			</h:panelGroup>
+
+			<h:outputLabel id="label_output" for="outputText"
+				rendered="#{not cc.attrs.disableLabel and not cc.attrs.editingMode}">
+				<h:outputText value="#{cc.attrs.label}" />
+			</h:outputLabel>
+			
+			<h:panelGroup id="sublabel_ouput" layout="#{cc.attrs.layout}" rendered="#{not cc.attrs.editingMode}">
+				<h:outputText value="#{cc.attrs.subLabel}">
+					<c:if test="#{cc.attrs.type == 'date' or cc.attrs.type == 'dataNascita'}">
+						<f:convertDateTime type="date" pattern="#{cc.attrs.datePattern}"/>
+					</c:if>
+				</h:outputText>
+			</h:panelGroup>
+			
+			<h:panelGroup id="outputblock" layout="#{cc.attrs.layout}" style="width:100%"
+				rendered="#{not cc.attrs.editingMode}">
+				<h:outputText id="outputText" styleClass="inputTextOutput"
+					style="#{cc.attrs.style}" escape="#{cc.attrs.escape}"
+					value="#{cc.attrs.value}">
+					<c:if test="#{cc.attrs.type == 'date' or cc.attrs.type == 'dataNascita'}">
+						<f:convertDateTime type="date" pattern="#{cc.attrs.datePattern}"
+							for="function" />
+					</c:if>
+				</h:outputText>
+			</h:panelGroup>
+
+			<h:panelGroup id="help" layout="#{cc.attrs.layout}" class="field-help"
+				rendered="#{cc.attrs.helpMessage != null}" >
+				<p>#{cc.attrs.helpMessage}</p>
+			</h:panelGroup>
+	
+		</span>
+	</composite:implementation>
+
+</ui:composition>

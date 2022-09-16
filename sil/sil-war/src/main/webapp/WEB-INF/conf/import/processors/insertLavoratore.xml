@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<!DOCTYPE CONFIG [
+                  <!ELEMENT CONFIG (INSERT*)>
+                  <!ELEMENT INSERT (KEY, COLUMN*)>
+                  <!ELEMENT KEY EMPTY>
+                  <!ELEMENT COLUMN EMPTY>
+
+                  <!ATTLIST INSERT name ID #REQUIRED
+                                   table CDATA #REQUIRED
+                                   errorLevel (ERROR|WARNING) "ERROR"
+                                   specifyUser (true|false) "false">
+                  <!ATTLIST KEY name CDATA #REQUIRED 
+                                format (number|char) "char"
+                                type (record|new) "new"
+                                data CDATA #REQUIRED>
+                  <!ATTLIST COLUMN name CDATA #REQUIRED
+                                   format (number|char|date|flag) "char"
+                                   nullable (true|false) "true"
+                                   type (record|absolute) "record"
+                                   data CDATA #REQUIRED
+                                   description CDATA #IMPLIED>
+]>
+<!--Descrive al processor InsertData la struttra della tabella AN_LAVORATORE per potervi inserire
+i dati e dove trovarli nella Map del record.-->
+<CONFIG>
+<INSERT name="INSERT_LAVORATORE" table="AN_LAVORATORE" specifyUser="true">
+    <KEY name="CDNLAVORATORE" format="number" data="CDNLAVORATORE"/>
+    <COLUMN name="STRCODICEFISCALE" nullable="false" data="STRCODICEFISCALE" description="Codice fiscale del lavoratore"/>
+    <COLUMN name="STRCOGNOME" nullable="false" data="STRCOGNOME" description="Cognome del lavoratore"/>
+    <COLUMN name="STRNOME" nullable="false" data="STRNOME" description="Nome del lavoratore"/> 
+    <COLUMN name="STRSESSO" nullable="false" data="STRSESSO" description="Sesso del lavoratore"/> 
+    <COLUMN name="DATNASC" format="date" nullable="false" data="DATNASC" description="Data di nascita del lavoratore"/> 
+    <COLUMN name="CODCOMNAS" nullable="false" data="CODCOMNASC" description="Comune di nascita del lavoratore"/> 
+    <COLUMN name="CODCITTADINANZA" nullable="false" data="CODCITTADINANZA" description="Cittadinanza del lavoratore"/> 
+    <COLUMN name="CODCITTADINANZA2" type="absolute" data="null" description="Cittadinanza secondaria del lavoratore"/>  
+    <COLUMN name="CODSTATOCIVILE" type="absolute" data="null" description="Stato civile del lavoratore"/>  
+    <COLUMN name="FLGMILITE" type="absolute" data="null" description="Flag milite del lavoratore"/> 
+    <COLUMN name="CODCOMRES" data="CODCOMDOM" description="Comune di residenza del lavoratore"/> 
+    <COLUMN name="NUMFIGLI" format="number" type="absolute" data="null" description="Numero figli del lavoratore"/> 
+    <COLUMN name="STRINDIRIZZORES" data="STRINDIRIZZODOM" description="Indirizzo residenza del lavoratore"/> 
+    <COLUMN name="STRLOCALITARES" type="absolute" data="null" description="Località di residenza del lavoratore"/> 
+    <COLUMN name="STRCAPRES" data="STRCAPDOM" description="Cap della residenza del lavoratore"/> 
+    <COLUMN name="CODCOMDOM" data="CODCOMDOM" description="Comune di domicilio del lavoratore"/> 
+    <COLUMN name="STRINDIRIZZODOM" data="STRINDIRIZZODOM" description="Indirizzo domicilio del lavoratore"/> 
+    <COLUMN name="STRLOCALITADOM" type="absolute" data="null" description="Località di domicilio del lavoratore"/> 
+    <COLUMN name="STRCAPDOM" data="STRCAPDOM" description="Cap del domicilio del lavoratore"/> 
+    <COLUMN name="CODCOMREC" type="absolute" data="null" description="Comune di recapito del lavoratore"/> 
+    <COLUMN name="STRINDIRIZZOREC" type="absolute" data="null" description="Indirizzo recapito del lavoratore"/> 
+    <COLUMN name="STRLOCALITAREC" type="absolute" data="null" description="Località di recapito del lavoratore"/> 
+    <COLUMN name="STRCAPREC" type="absolute" data="null" description="Cap del recapito del lavoratore"/> 
+    <COLUMN name="STRTELRES" type="absolute" data="null" description="Telefono della residenza del lavoratore"/>   
+    <COLUMN name="STRTELDOM" type="absolute" data="null" description="Telefono del domicilio del lavoratore"/> 
+    <COLUMN name="STRTELALTRO" type="absolute" data="null" description="Altro telefono del lavoratore"/> 
+    <COLUMN name="STRCELL" type="absolute" data="null" description="Cellulare del lavoratore"/> 
+    <COLUMN name="STREMAIL" type="absolute" data="null" description="E-mail del lavoratore"/> 
+    <COLUMN name="STRFAX" type="absolute" data="null" description="Fax del lavoratore"/> 
+    <COLUMN name="STRNOTE" type="absolute" data="null" description="Note sul lavoratore"/>    
+</INSERT>
+<!--Configurazione per inserimento titolo di studio del lavoratore-->
+<INSERT name="INSERT_TITOLO_STUDIO" table="PR_STUDIO" specifyUser="true">
+    <KEY name="PRGSTUDIO" format="number" data="PRGSTUDIO"/>
+    <COLUMN name="CDNLAVORATORE" format="number" nullable="false" data="CDNLAVORATORE" description="Progressivo del lavoratore"/>
+    <COLUMN name="CODTITOLO" nullable="false" data="CODTIPOTITOLO" description="Titolo di studio del lavoratore"/>
+    <COLUMN name="CODTIPOTITOLO" nullable="false" data="CODTIPOTITOLOGENERICO" description="Tipo del titolo di studio del lavoratore"/>    
+    <COLUMN name="CODMONOSTATO" type="absolute" nullable="false" data="C" description="Stato del titolo di studio del lavoratore"/>    
+</INSERT>
+<!-- //Davide 29/05/2007: NUOVA gestione introdotta con il tracciato UNICO > in validazione inseriamo anche le info sui lav. extracomunitari -->
+<INSERT name="INSERT_INFO_EXTRACOM" table="AM_EX_PERM_SOGG" specifyUser="true">
+    <KEY name="PRGPERMSOGG" data="PRGPERMSOGG" type="new"/>
+    <COLUMN name="CDNLAVORATORE"      data="CDNLAVORATORE"       description="Progressivo del lavoratore" format="number" nullable="false"/>
+    <COLUMN name="CODSTATUS"          data="CODTIPODOCEX"        description="TIPO DOC LAV. EXTRACOM."/>
+    <COLUMN name="STRNUMDOCUMENTO"    data="STRNUMDOCEX"         description="NUM DOC LAV. EXTRACOM."/>
+    <COLUMN name="CODMOTIVORIL"       data="CODMOTIVOPERMSOGGEX" description="MOTIVO PERM. SOGG. LAV. EXTR"/>
+    <COLUMN name="DATSCADENZA"     format="date"  nullable="true"  data="DATSCADENZA"       description="DATA FINE PERM. SOGG. LAV. EXTR"/>
+    <COLUMN name="CODQUESTURA"        data="QUESTURALAV"        description="QUESTURA LAV EXTRACOM."/>
+</INSERT>
+</CONFIG>
+
+
+
+
+
+

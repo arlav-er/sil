@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<f:loadBundle basename="conf.const" var="const" />
+	<h:panelGroup rendered="#{const['regione.cod'] == 22}">
+		<f:loadBundle basename="messages.message_trento" var="msg" />
+	</h:panelGroup>
+	<h:panelGroup rendered="#{const['regione.cod'] == 10}">
+		<f:loadBundle basename="messages.message_trento" var="msg" />
+	</h:panelGroup>
+	
+	<h:panelGroup rendered="#{const['regione.cod'] != 22 and const['regione.cod'] != 10}">
+		<f:loadBundle basename="messages.message" var="msg" />
+	</h:panelGroup>
+
+	<div id="contatti_tabs" class="widget_container">
+		<ul>
+			<li>
+				<h:link id="contatti_ricevuti_link"
+					title="#{msg['utente.messaggi.contatti_ricevuti.titolo']}"
+					outcome="_contatti_ricevuti">
+					<f:param name="redo_by_session" value="#{param.redo_by_session}" />
+					<h:outputText value="#{msg['utente.messaggi.contatti_ricevuti.titolo']}"
+						escape="false" />
+					<h:outputText styleClass="boldText"
+							value=" (#{contattiBean.nuoviMsgRicevuti})"
+							rendered="#{contattiBean.nuoviMsgRicevuti > 0}" />
+				</h:link>
+			</li>
+			<li>
+				<h:link id="contatti_inviati_link"
+					title="#{msg['utente.messaggi.contatti_inviati.titolo']}"
+					outcome="_contatti_inviati">
+					<f:param name="redo_by_session" value="#{param.redo_by_session}" />
+					<h:outputText value="#{msg['utente.messaggi.contatti_inviati.titolo']}"
+						escape="false" />
+					<h:outputText styleClass="boldText"
+							value=" (#{contattiBean.nuoviMsgInviati})"
+							rendered="#{contattiBean.nuoviMsgInviati > 0}" />
+				</h:link>
+			</li>
+		</ul>
+	</div>
+
+	<script type="text/javascript">
+	//<![CDATA[
+		$(function() {				
+			$('#contatti_tabs').tabs({ajaxOptions: {
+		        error: function(xhr, status, index, anchor) {
+		            $(anchor.hash).html("Impossibile caricare il contenuto della tab.");
+		        },
+		        data: {},
+		        success: function(data, textStatus) {
+		        },
+		      },
+		      show: function(event,ui) {
+		      	$(ui.panel).html('<img src="${request.contextPath}/resources/images/ajax-loader-squares.gif" alt="Caricamento dati..."/><br/><b>Caricamento dati...</b>');										
+			  }
+		    });
+		});
+	//]]>
+	</script>
+</ui:composition>

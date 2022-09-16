@@ -1,0 +1,260 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<!--  Attributi da definire nell'interfaccia -->
+	<composite:interface>
+		<composite:attribute name="data" />
+		<composite:attribute name="old" />
+		<composite:attribute name="new" />
+		<composite:attribute name="bean" />
+		<composite:attribute name="editing" />
+		<composite:attribute name="required" />
+	</composite:interface>
+
+	<composite:implementation>
+		<fieldset>
+			<legend>Referente SARE dell'azienda</legend>
+			<h:panelGrid columns="2">
+				<cc:inputText id="mittente_sare" label="Mittente SARE"
+					subLabel="#{cc.attrs.old.mittenteSare}"
+					underLabel="#{cc.attrs.new.mittenteSare}"
+					editingMode="#{cc.attrs.editing}"
+					value="#{cc.attrs.data.mittenteSare}"
+					required="#{cc.attrs.required}" maxlength="13">
+					<f:validateLength minimum="1" maximum="16" for="function" />
+					<f:validator validatorId="mittenteSareValidator" for="function" />
+					<f:validator validatorId="numberLetterValidator" for="function" />
+				</cc:inputText>
+				<cc:inputText id="referente_sare"
+					label="Referente SARE dell'azienda"
+					subLabel="#{cc.attrs.old.referenteSare}"
+					underLabel="#{cc.attrs.new.referenteSare}"
+					editingMode="#{cc.attrs.editing}"
+					value="#{cc.attrs.data.referenteSare}"
+					required="#{cc.attrs.required}" maxlength="50" />
+				<cc:inputText id="telefono_referente_sare"
+					editingMode="#{cc.attrs.editing}"
+					subLabel="#{cc.attrs.old.telefonoReferente}"
+					underLabel="#{cc.attrs.new.telefonoReferente}"
+					label="Telefono Referente SARE"
+					value="#{cc.attrs.data.telefonoReferente}"
+					required="#{cc.attrs.required}" maxlength="50" />
+				<cc:inputText id="email_referente_sare"
+					editingMode="#{cc.attrs.editing}"
+					subLabel="#{cc.attrs.old.emailReferente}"
+					underLabel="#{cc.attrs.new.emailReferente}"
+					label="Indirizzo E-mail Referente SARE"
+					required="#{cc.attrs.required}"
+					value="#{cc.attrs.data.emailReferente}" maxlength="50">
+					<f:validator validatorId="emailValidator" for="function" />
+				</cc:inputText>
+			</h:panelGrid>
+			<h:panelGrid columns="1">
+				<cc:selectOneRadio layout="pageDirection"
+					disabled="#{not cc.attrs.editing}" label="Tipo richiedente"
+					id="tipo_richiedente" required="#{cc.attrs.required}"
+					buttonset="false" style="width:100%"
+					value="#{cc.attrs.data.tipoAbilitato.id}"
+					subLabel="#{cc.attrs.old.tipoAbilitato.descrizione}"
+					underLabel="#{cc.attrs.new.tipoAbilitato.descrizione}"
+					valueDescription="#{cc.attrs.data.tipoAbilitato.descrizione}"
+					valueChangeListener="#{cc.attrs.bean.changeTipoRichiedente}"
+					requiredMessage="Indica il tipo di richiedente">
+					<f:selectItems value="#{cc.attrs.bean.tipiRichiedente}" />
+					<f:ajax event="click" execute="tipo_richiedente"
+						render=":#{cc.clientId}:tipo_delegato :#{cc.clientId}:soggetto_panel :#{cc.clientId}:agenzia_panel" />
+				</cc:selectOneRadio>
+				<cc:selectOneMenu label="Tipo delegato" id="tipo_delegato"
+					subLabel="#{cc.attrs.old.tipoDelegato.descrizione}"
+					underLabel="#{cc.attrs.new.tipoDelegato.descrizione}"
+					style="width:300px" required="#{cc.attrs.bean.editTipoDelegato}"
+					disabled="#{not cc.attrs.bean.editTipoDelegato or not cc.attrs.editing}"
+					value="#{cc.attrs.data.tipoDelegato.id}"
+					requiredMessage="Indica il tipo di delegato">
+					<f:selectItems value="#{cc.attrs.bean.tipiDelegato}" />
+				</cc:selectOneMenu>
+			</h:panelGrid>
+			<cc:selectOneRadio label="Software utilizzato"
+				subLabel="#{cc.attrs.old.softwareSAREUtilizzato}"
+				underLabel="#{cc.attrs.new.softwareSAREUtilizzato}"
+				id="software_utilizzato" required="#{cc.attrs.required}"
+				disabled="#{not cc.attrs.editing}"
+				value="#{cc.attrs.data.softwareSAREUtilizzato}"
+				requiredMessage="Indica il software utilizzato" style="width:250px">
+				<f:selectItems value="#{cc.attrs.bean.softwareSAREUtilizzati}" />
+			</cc:selectOneRadio>
+		</fieldset>
+		<fieldset>
+			<fieldset>
+				<legend>Ulteriori dati aziendali</legend>
+				<h:panelGrid columns="1">
+					<cc:inputText id="partita_iva" label="Partita IVA"
+						subLabel="#{cc.attrs.old.partitaIva}"
+						underLabel="#{cc.attrs.new.partitaIva}"
+						editingMode="#{cc.attrs.editing}" required="#{cc.attrs.required}"
+						value="#{cc.attrs.data.partitaIva}" maxlength="11" />
+				</h:panelGrid>
+			</fieldset>
+			<fieldset>
+				<legend>Indirizzo sede legale</legend>
+				<h:panelGrid columns="1">
+					<cc:inputText value="#{cc.attrs.data.sedeLegale.indirizzo}"
+						subLabel="#{cc.attrs.old.sedeLegale.indirizzo}"
+						underLabel="#{cc.attrs.new.sedeLegale.indirizzo}"
+						editingMode="#{cc.attrs.editing}" required="#{cc.attrs.required}"
+						maxlength="80" label="Indirizzo" size="80" />
+				</h:panelGrid>
+				<h:panelGrid columns="2" columnClasses="width30">
+					<cc:inputText value="#{cc.attrs.data.sedeLegale.cap}"
+						subLabel="#{cc.attrs.old.sedeLegale.cap}"
+						underLabel="#{cc.attrs.new.sedeLegale.cap}"
+						editingMode="#{cc.attrs.editing}" required="#{cc.attrs.required}"
+						size="10" maxlength="5" label="CAP">
+						<f:validator validatorId="capValidator" for="function" />
+					</cc:inputText>
+					<cc:inputSuggestion id="comune_sede_legale" label="Comune"
+						size="55" subLabel="#{cc.attrs.old.sedeLegale.comune.descrizione}"
+						underLabel="#{cc.attrs.new.sedeLegale.comune.descrizione}"
+						required="#{cc.attrs.required}" editingMode="#{cc.attrs.editing}"
+						value="#{cc.attrs.data.sedeLegale.comune.descrizione}"
+						valueCod="#{cc.attrs.data.sedeLegale.comune.id}"
+						suggestionPath="comuni">
+						<f:validator validatorId="comuneSuggestionValidator"
+							for="function" />
+					</cc:inputSuggestion>
+				</h:panelGrid>
+				<h:panelGrid columns="2" columnClasses="width30">
+					<cc:inputText value="#{cc.attrs.data.sedeLegale.telefono}"
+						subLabel="#{cc.attrs.old.sedeLegale.telefono}"
+						underLabel="#{cc.attrs.new.sedeLegale.telefono}"
+						editingMode="#{cc.attrs.editing}" required="#{cc.attrs.required}"
+						maxlength="50" label="Telefono">
+						<f:validator validatorId="numeroTelefonicoValidator"
+							for="function" />
+					</cc:inputText>
+					<cc:inputText value="#{cc.attrs.data.sedeLegale.fax}"
+						subLabel="#{cc.attrs.old.sedeLegale.fax}"
+						underLabel="#{cc.attrs.new.sedeLegale.fax}"
+						editingMode="#{cc.attrs.editing}" required="#{cc.attrs.required}"
+						maxlength="50" label="Fax">
+						<f:validator validatorId="numeroTelefonicoValidator"
+							for="function" />
+					</cc:inputText>
+				</h:panelGrid>
+			</fieldset>
+		</fieldset>
+
+		<h:panelGroup id="agenzia_panel">
+			<f:subview id="agenzia"
+				rendered="#{cc.attrs.bean.showAgenziaSomministrazioneSection}">
+				<fieldset>
+					<legend>Dati agenzia di somministrazione</legend>
+					<h:panelGrid columns="1">
+						<cc:selectFlagCheckbox id="agenzia_estera"
+							subLabel="#{cc.attrs.old.agenzia.estera}"
+							underLabel="#{cc.attrs.new.agenzia.estera}"
+							disabled="#{not editing}" value="#{cc.attrs.data.agenzia.estera}"
+							label="Agenzia estera" />
+					</h:panelGrid>
+					<h:panelGrid columns="2" columnClasses="width50">
+						<cc:inputText id="numero_provvedimento"
+							editingMode="#{cc.attrs.editing}"
+							subLabel="#{cc.attrs.old.agenzia.numeroProvvedimento}"
+							underLabel="#{cc.attrs.new.agenzia.numeroProvvedimento}"
+							label="Numero provvedimento"
+							required="#{cc.attrs.bean.editAgenziaSomministrazione}"
+							value="#{cc.attrs.data.agenzia.numeroProvvedimento}"
+							maxlength="30" />
+						<cc:inputText id="data_provvedimento" type="date"
+							subLabel="#{cc.attrs.old.agenzia.dataProvvedimento}"
+							underLabel="#{cc.attrs.new.agenzia.dataProvvedimento}"
+							label="Data provvedimento"
+							required="#{cc.attrs.bean.editAgenziaSomministrazione}"
+							editingMode="#{cc.attrs.editing}"
+							value="#{cc.attrs.data.agenzia.dataProvvedimento}" />
+					</h:panelGrid>
+					<h:panelGrid columns="1">
+						<cc:inputSuggestion id="comune_iscrizione" size="55"
+							label="Comune di iscrizione"
+							subLabel="#{cc.attrs.old.agenzia.comune.descrizione}"
+							underLabel="#{cc.attrs.new.agenzia.comune.descrizione}"
+							editingMode="#{cc.attrs.editing}"
+							value="#{cc.attrs.data.agenzia.comune.descrizione}"
+							required="#{cc.attrs.bean.editAgenziaSomministrazione}"
+							valueCod="#{cc.attrs.data.agenzia.comune.id}"
+							suggestionPath="comuni">
+							<f:validator validatorId="comuneSuggestionValidator"
+								for="function" />
+						</cc:inputSuggestion>
+					</h:panelGrid>
+					<h:panelGrid columns="2" columnClasses="width50">
+						<cc:inputText id="numero_iscrizione"
+							editingMode="#{cc.attrs.editing}"
+							subLabel="#{cc.attrs.old.agenzia.numeroIscrizione}"
+							underLabel="#{cc.attrs.new.agenzia.numeroIscrizione}"
+							label="Numero iscrizione Albo"
+							required="#{cc.attrs.bean.editAgenziaSomministrazione}"
+							value="#{cc.attrs.data.agenzia.numeroIscrizione}" maxlength="30" />
+						<cc:inputText id="data_iscrizione" label="Data iscrizione"
+							subLabel="#{cc.attrs.old.agenzia.dataIscrizione}"
+							underLabel="#{cc.attrs.new.agenzia.dataIscrizione}" type="date"
+							required="#{cc.attrs.bean.editAgenziaSomministrazione}"
+							editingMode="#{cc.attrs.editing}"
+							value="#{cc.attrs.data.agenzia.dataIscrizione}" />
+					</h:panelGrid>
+				</fieldset>
+			</f:subview>
+		</h:panelGroup>
+
+		<h:panelGroup id="soggetto_panel">
+			<f:subview id="soggetto"
+				rendered="#{cc.attrs.bean.showDatiSoggettoAbilitatoSection}">
+				<fieldset>
+					<legend>Dati soggetto abilitato</legend>
+					<h:panelGrid columns="1">
+						<cc:inputText id="ordine_iscrizione"
+							subLabel="#{cc.attrs.old.soggettoAbilitato.ordineIscrizione}"
+							underLabel="#{cc.attrs.new.soggettoAbilitato.ordineIscrizione}"
+							label="Iscrizione all'Ordine Provinciale dei "
+							required="#{cc.attrs.bean.editSoggettoAbilitato}"
+							editingMode="#{cc.attrs.editing}"
+							value="#{cc.attrs.data.soggettoAbilitato.ordineIscrizione}"
+							maxlength="80" />
+						<cc:inputSuggestion id="luogo_iscrizione" size="55"
+							subLabel="#{cc.attrs.old.soggettoAbilitato.luogoIscrizione.descrizione}"
+							underLabel="#{cc.attrs.new.soggettoAbilitato.luogoIscrizione.descrizione}"
+							label="Comune di iscrizione"
+							required="#{cc.attrs.bean.editSoggettoAbilitato}"
+							editingMode="#{cc.attrs.editing}"
+							value="#{cc.attrs.data.soggettoAbilitato.luogoIscrizione.descrizione}"
+							valueCod="#{cc.attrs.data.soggettoAbilitato.luogoIscrizione.id}"
+							suggestionPath="comuni">
+							<f:validator validatorId="comuneSuggestionValidator"
+								for="function" />
+						</cc:inputSuggestion>
+						<cc:inputText id="numero_iscrizione" label="Numero iscrizione"
+							subLabel="#{cc.attrs.old.soggettoAbilitato.numeroIscrizione}"
+							underLabel="#{cc.attrs.new.soggettoAbilitato.numeroIscrizione}"
+							required="#{cc.attrs.bean.editSoggettoAbilitato}"
+							editingMode="#{cc.attrs.editing}"
+							value="#{cc.attrs.data.soggettoAbilitato.numeroIscrizione}"
+							maxlength="30" />
+						<cc:inputText id="data_iscrizione" label="Data iscrizione"
+							subLabel="#{cc.attrs.old.soggettoAbilitato.dataIscrizione}"
+							underLabel="#{cc.attrs.new.soggettoAbilitato.dataIscrizione}"
+							type="date" required="#{cc.attrs.bean.editSoggettoAbilitato}"
+							editingMode="#{cc.attrs.editing}"
+							value="#{cc.attrs.data.soggettoAbilitato.dataIscrizione}" />
+					</h:panelGrid>
+				</fieldset>
+			</f:subview>
+		</h:panelGroup>
+
+	</composite:implementation>
+
+</ui:composition>

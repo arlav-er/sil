@@ -1,0 +1,48 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui">
+
+	<ui:repeat var="esperienzaProf" value="#{curriculumVitaePfBean.cvEsperienzeProfSection.esperienzeList}">
+		<article id="#{esperienzaProf.idCvEsperienzeProf}" class="media" tabindex="0">
+			<span class="pull-left"> <span class="fa-stack fa-lg"> <i class="fa fa-circle fa-stack-2x"
+					aria-hidden="true"></i> <i class="fa fa-building-o fa-stack-1x text-white" aria-hidden="true"></i>
+			</span>
+			</span>
+			<div class="media-body">
+				<div class="pull-right text-center text-muted article-controls-container">					
+					<div class="article-controls hidden">
+						<p:commandLink
+							actionListener="#{curriculumVitaePfBean.cvEsperienzeProfSection.editEsperienzaProf(esperienzaProf)}"
+							update=":esperienzeProfForm:syncForm"
+							oncomplete="MyPortal.Curriculum.callEditArticleComplete(args, xhr, status, this.source)"
+							styleClass="article-control" process="@this">Modifica</p:commandLink>
+ 
+						<a data-toggle="confirm" class="article-control">Cancella</a>
+						<p:commandLink name="removeArticle"
+							actionListener="#{curriculumVitaePfBean.cvEsperienzeProfSection.removeEsperienzaProf(esperienzaProf)}"
+							oncomplete="MyPortal.Curriculum.syncArticleComplete(args, xhr, status);" update=":esperienzeProfForm:articles"
+							process="@this" styleClass="remove-article hidden"></p:commandLink>
+					</div>
+					<br /> <small class="not-article-controls label bg-light">#{esperienzaProf.deContratto.descrizione}</small>
+				</div>
+				<span class="h4 title">#{esperienzaProf.deBpMansione.descrizione} | </span> 
+				<span class="h5"> #{esperienzaProf.datoreLavoro} | </span>
+				<h:outputFormat value="#{esperienzaProf.da}">
+					<f:convertDateTime type="date" pattern="MMMM yyyy" />
+				</h:outputFormat>
+				-
+				<ui:fragment rendered="#{esperienzaProf.flgInCorso}">
+						  In Corso
+						</ui:fragment>
+				<ui:fragment rendered="#{not esperienzaProf.flgInCorso}">
+					<h:outputFormat value="#{esperienzaProf.a}">
+						<f:convertDateTime type="date" pattern="MMMM yyyy" />
+					</h:outputFormat>
+				</ui:fragment>
+				<ui:fragment rendered="#{esperienzaProf.deComLavoro != null }">
+					<small class="block">(#{esperienzaProf.deComLavoro.denominazione})</small>
+				</ui:fragment>
+			</div>
+		</article>
+	</ui:repeat>
+</ui:composition>

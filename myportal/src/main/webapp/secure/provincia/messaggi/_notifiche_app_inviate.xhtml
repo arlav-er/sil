@@ -1,0 +1,343 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<ui:param name="beanNotifica" value="#{appNotificaBean}" />
+
+	<script type="text/javascript">
+		function getFiltroProvinciaExtraParams() {
+			var extraParams = [['filter','#{beanNotifica.filtroCodProvincia}']];
+			return extraParams;
+		}
+	</script>
+		
+	<cc:messages id="notificheAppInviateMessages" />
+
+	<div class="widget_container ui-tabs ui-widget-content ui-corner-all">
+		<h:form id="ricercaForm">
+			<h:panelGrid columns="3" columnClasses="width30,width30,width40">
+				<cc:inputSuggestion
+					editingMode="true"
+					value="#{beanNotifica.filtriRicerca.emailDestinatario}"
+					valueCod="#{beanNotifica.filtriRicerca.idPfPrincipalDestinatario}"
+					suggestionPath="usersApp"
+					label="Destinatario"
+					title="Destinatario"
+					filter="#{beanNotifica.filtroCodProvincia}"
+					extraParamF="getFiltroProvinciaExtraParams">
+						<f:attribute name="codFiltroProvincia" value="#{beanNotifica.filtroCodProvincia}" />
+						<f:validator validatorId="emailValidator" for="function" />
+						<f:validator validatorId="usersAppSuggestionValidator" for="function" />						
+				</cc:inputSuggestion>
+
+				<cc:selectOneMenu id="stato" value="#{beanNotifica.filtriRicerca.codStato}" label="Stato">
+					<f:selectItems value="#{beanNotifica.listaStatiNotifica}" />
+				</cc:selectOneMenu>
+				
+				<h:panelGroup>
+					<h:selectBooleanCheckbox value="#{beanNotifica.filtriRicerca.escludiNotificheBatch}" id="escludiBatch"/>
+					<h:outputLabel value="Escludi Notifiche Batch"/>
+				</h:panelGroup>
+				
+				<cc:inputText id="data_ricerca_da" type="date" value="#{beanNotifica.filtriRicerca.dtaDa}" label="Data dal"/>
+				<cc:inputText id="data_ricerca_a" type="date" value="#{beanNotifica.filtriRicerca.dtaA}"  label="Data al">
+					<f:attribute name="data_da_id" value="ricercaForm:data_ricerca_da:inputText" />
+					<f:validator validatorId="twoDatesEqualOrLessValidator" for="function" />
+				</cc:inputText>
+				
+				<h:panelGrid columns="2" columnClasses="width20,width80">
+					<h:commandLink id="searchButton" styleClass="searchButton" value="Cerca" action="#{beanNotifica.search}">
+						<f:ajax immediate="true" execute="@form" render=":ricercaForm :notificheAppInviateForm :notificheAppInviateDetailForm :notificheAppInviateMessages"/>
+					</h:commandLink>
+					
+					<h:panelGroup>
+						<h:commandLink styleClass="newAlertButton" value="Invia una nuova notifica"
+							action="#{beanNotifica.showInsertPanel}">
+								<f:ajax execute="@this" render=":notificheAppInviateDetailForm :notificheAppInviateForm" 
+									onevent="onShowDetail"/>
+						</h:commandLink>
+					</h:panelGroup>
+				</h:panelGrid>
+			</h:panelGrid>
+		</h:form>
+	</div>
+		
+	<h:form id="notificheAppInviateForm">
+
+		<ui:fragment rendered="#{beanNotifica.ricercaEseguita and empty beanNotifica.list and not beanNotifica.editing}">
+			<h3 class="nessun_elemento_trovato">Non è stata inviata alcuna notifica</h3>
+		</ui:fragment>
+		
+		<ui:fragment rendered="#{not empty beanNotifica.list}">
+			<div style="display: none;">
+				<h:inputHidden id="pageValue" value="#{beanNotifica.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{beanNotifica.changePage}" value="DUMMY FOR PAGINATION">
+					<f:ajax execute=":notificheAppInviateForm:pageValue" 
+						render=":notificheAppInviateForm:tabella :notificheAppInviateDetailForm" />
+				</h:commandButton>
+			</div>
+			
+			<script type="text/javascript">				
+				$(jq("notificheAppInviateForm:paginationBar")).pagination({							    
+					pages: #{beanNotifica.paginationHandler.pages()},						       
+					cssStyle: 'light-theme',
+					prevText: 'Prec.',
+					nextText: 'Succ.',
+					onPageClick: function (pageNumber, event) {
+						document.getElementById("notificheAppInviateForm:pageValue").value = pageNumber;
+						document.getElementById("notificheAppInviateForm:pageCommand").click();
+						$(jq("notificheAppInviateDetailForm")).hide();
+						$(jq("notificheAppInviateForm:tabella")).hide();					            
+						$(jq("notificheAppInviateForm:paginationLoader")).show();
+						$(jq("notificheAppInviateForm:paginationLoader")).fadeIn();
+					}
+				});
+			</script>
+			
+			<h:panelGroup layout="block" id="paginationBar" 
+				styleClass="widget_container ui-tabs ui-widget-content ui-corner-all" />
+			<br />
+			
+			<cc:waiting id="paginationLoader" hidden="true" waitMessage="Caricamento..." />	
+			
+			<h:panelGroup layout="block" id="tabella" class="dataTables_wrapper">
+				<table class="dataTable">
+					<tr>
+						<th class="ui-state-default"></th>
+						<th class="ui-state-default">Destinatario</th>
+						<th class="ui-state-default">Titolo</th>
+						<th class="ui-state-default">Sottotitolo</th>
+						<th class="ui-state-default">Data</th>
+					</tr>
+					
+					<ui:repeat value="#{beanNotifica.list}" var="notifica" varStatus="status">
+						<tr>
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{beanNotifica.view}">
+									<span class="ui-icon #{notifica.failed?'ui-icon-alert':(notifica.clicked?'ui-icon-mail-open':'ui-icon-mail-closed')}" />
+									<f:param name="id" value="#{notifica.id}" />
+									<f:ajax execute="@this" onevent="onShowDetail"
+										render=":notificheAppInviateDetailForm :notificheAppInviateForm:tabella" />
+								</h:commandLink>
+							</td>
+						
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{beanNotifica.view}">
+									<h:outputText value="#{notifica.email!=null?notifica.email:'Broadcast'} &nbsp;"
+										styleClass="" />
+									<f:param name="id" value="#{notifica.id}" />
+									<f:ajax execute="@this" onevent="onShowDetail"
+										render=":notificheAppInviateDetailForm :notificheAppInviateForm:tabella" />
+								</h:commandLink>
+							</td>
+						
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{beanNotifica.view}">
+									<h:outputText value="#{notifica.titolo} &nbsp;"
+										styleClass="" />
+									<f:param name="id" value="#{notifica.id}" />
+									<f:ajax execute="@this" onevent="onShowDetail"
+										render=":notificheAppInviateDetailForm :notificheAppInviateForm:tabella" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{beanNotifica.view}">
+									<h:outputText value="#{notifica.sottotitolo} &nbsp;"
+										styleClass="" />
+									<f:param name="id" value="#{notifica.id}" />
+									<f:ajax execute="@this" onevent="onShowDetail"
+										render=":notificheAppInviateDetailForm :notificheAppInviateForm:tabella" />
+								</h:commandLink>
+							</td>
+
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{beanNotifica.view}">
+									<h:outputText value="#{empty notifica.dtmIns ? '&nbsp;' : notifica.dtmIns}"
+										styleClass="">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+									<f:param name="id" value="#{notifica.id}" />
+									<f:ajax execute="@this" onevent="onShowDetail"
+										render=":notificheAppInviateDetailForm :notificheAppInviateForm:tabella" />
+								</h:commandLink>
+							</td>
+						</tr>
+					</ui:repeat>
+				</table>
+				<script type="text/javascript">
+					$(jq("notificheAppInviateForm:paginationLoader")).hide();
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+		</ui:fragment>
+	</h:form>
+	<br />
+	
+	<cc:waiting id="notificheAppInviateDetailLoader" waitMessage="Caricamento..." hidden="true" />
+	<cc:waiting id="notificheAppInviateInsertLoader" waitMessage="Invio notifica in corso..." hidden="true" />
+
+	<h:form id="notificheAppInviateDetailForm">
+		<h:panelGroup layout="block" id="detail" styleClass="insertPanel" 
+			rendered="#{beanNotifica.showPanel}">
+			<h:panelGrid id="view_form" columns="2" cellspacing="10">
+				<h:panelGroup />
+
+				<cc:inputText value="#{beanNotifica.data.titolo}"
+					id="titolo"
+					label="Titolo" required="true"
+					editingMode="#{beanNotifica.editing}" maxlength="255" />
+
+				<cc:inputText type="date"
+					value="#{beanNotifica.data.dtmIns}" label="Data invio"
+					editingMode="false" />
+				
+				<cc:inputText value="#{beanNotifica.data.sottotitolo}"
+					label="Sottotitolo" required="true"
+					editingMode="#{beanNotifica.editing}" maxlength="255" />        		 
+				
+				<h:panelGroup />
+
+				<cc:inputText value="Broadcast"
+					label="Destinatario" required="false"
+					rendered="#{beanNotifica.data.isBroadcast and not beanNotifica.editing}"
+					editingMode="false"/>
+	
+				<cc:inputSuggestion label="Destinatario"
+					id="destinatario"
+					required="false"
+					rendered="#{not beanNotifica.data.isBroadcast or beanNotifica.editing}"
+					editingMode="#{beanNotifica.editing}"
+					value="#{beanNotifica.data.email}"
+					valueCod="#{beanNotifica.data.idPfPrincipalDest}"
+					suggestionPath="usersApp"
+					filter="#{beanNotifica.filtroCodProvincia}"
+					extraParamF="getFiltroProvinciaExtraParams">>
+						<f:attribute name="codFiltroProvincia" value="#{beanNotifica.filtroCodProvincia}" />
+					<f:validator validatorId="emailValidator" for="function" />
+					<f:validator validatorId="usersAppSuggestionValidator" for="function" />
+				</cc:inputSuggestion>
+
+				<h:panelGroup />
+					
+				<cc:inputTextarea style="width:81%" maxlength="2000"
+					label="Messaggio della notifica" required="true" richTextMode="false"
+					value="#{beanNotifica.data.messaggio}"
+					editingMode="#{beanNotifica.editing}" />
+					
+				<h:panelGroup rendered="#{not beanNotifica.editing}"/>
+
+				<cc:inputText
+					value="#{beanNotifica.data.stato.descrizione}" label="Stato"
+					editingMode="false" rendered="#{not beanNotifica.editing and not beanNotifica.data.isBroadcast}"/>				
+
+				<cc:inputText
+					value="Inviate: #{beanNotifica.data.numSend} (Lette: #{beanNotifica.data.numRead}) - Fallite: #{beanNotifica.data.numFail} - Schedulate: #{beanNotifica.data.numDelay}" label="Stato"
+					editingMode="false" rendered="#{not beanNotifica.editing and beanNotifica.data.isBroadcast}"/>				
+			</h:panelGrid>
+
+			<div id="buttons">
+				<!--  bottone di invio della notifica nascosto -->
+				<h:commandLink style="display:none" id="hiddenInsertButton"
+					action="#{beanNotifica.save}" value="Invia notifica DUMMY">
+					<f:ajax execute="@form" onevent="onInsert" render=":ricercaForm :notificheAppInviateForm :notificheAppInviateDetailForm :notificheAppInviateMessages"/>
+				</h:commandLink>
+
+				<!--  bottone per apertura modale di conferma -->
+				<h:commandLink styleClass="marginButton commentButton" rendered="#{beanNotifica.editing}" value="Invia notifica">
+					<f:ajax onevent="onOpenInsert"/>
+				</h:commandLink>
+				
+				<h:commandLink
+					styleClass="marginButton closeButton #{beanNotifica.editing ? 'secondButton' : ''}"
+					action="#{beanNotifica.dontedit}" value="Chiudi"
+					immediate="true" id="closeButton">
+					<f:ajax execute="@this" render=":notificheAppInviateDetailForm"
+						onevent="onHideDetail"/>
+				</h:commandLink>
+			</div>
+			
+			<div id="insertDialog" class="modal_dialog" title="Invio notifiche">
+				<h:outputText id="insertConfirmMsg" value="Vuoi davvero inviare la notifica?" />
+					
+				<br />
+				<br />
+				<!--  bottone di conferma -->					
+				<h:commandLink styleClass="marginButton commentButton" value="Invia notifica">
+					<f:ajax execute="@this" render=":notificheAppInviateDetailForm" 
+						onevent="onConfirmInsert"/>
+				</h:commandLink>
+			</div>
+			
+		</h:panelGroup>
+		
+		<script type="text/javascript">
+			disegnaBottoni();
+			
+			$( document ).ready(function() {
+				$('#insertDialog').dialog({
+					autoOpen: false,
+					modal: true,
+					close: function( event, ui ) {
+						disegnaBottoni();
+					}
+				});
+			});
+			
+		</script>
+	</h:form>
+
+	<script type="text/javascript">
+		function onHideDetail(data) {
+			if (data.status == 'begin') {
+				$(jq("notificheAppInviateDetailForm")).slideUp("slow");
+			}
+		}
+	
+		function onShowDetail(data) {
+			if (data.status == 'begin') {
+				$(jq("notificheAppInviateDetailForm")).hide();
+				$(jq("notificheAppInviateDetailLoader")).show();
+			} else if (data.status == 'success') {
+				$(jq("notificheAppInviateDetailLoader")).hide();
+				PrimeFaces.scrollTo("notificheAppInviateDetailForm");
+			}
+		}
+		
+		function onOpenInsert(data) {
+			/* console.log("onOpenInsert"); */			
+			if (data.status == "begin") {
+				var dest = document.getElementById("notificheAppInviateDetailForm:destinatario:inputText").value;
+				var tmp = document.getElementById("notificheAppInviateDetailForm:insertConfirmMsg");
+
+				if (dest=='') tmp.innerHTML = "Sei davvero sicuro di voler inviare la notifica a tutti gli utilizzatori dell'App?";
+				else tmp.innerHTML = "Sei davvero sicuro di voler inviare la notifica a " + dest + "?";					
+				
+				$('#insertDialog').dialog('open');
+				$(jq("notificheAppInviateDetailForm:titolo:inputText")).focus();
+			}
+		}
+		
+		function onConfirmInsert(data) {
+			/* console.log("onConfirmInsert"); */
+			if (data.status == "begin") {				
+				$(jq("notificheAppInviateDetailForm:hiddenInsertButton")).click();
+				$('#insertDialog').dialog('close');
+			}
+		}
+
+		function onInsert(data) {
+			/* console.log("onInsert"); */
+			if (data.status == 'begin') {
+				$(jq("notificheAppInviateDetailForm")).hide();
+				$(jq("notificheAppInviateInsertLoader")).show();
+			} else if (data.status == 'success') {
+				$(jq("notificheAppInviateInsertLoader")).hide();
+			}
+		}
+	</script>
+</ui:composition>

@@ -1,0 +1,116 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+				xmlns:o="http://omnifaces.org/ui" xmlns:eng="http://java.sun.com/jsf/composite/components">
+
+	<div class="col-md-12">
+		<div class="form-group">
+			<p:outputLabel value="Lingua" for="autocompleteLingue" styleClass="col-sm-1 control-label" style="margin-left: 15px"/>
+			<div class="col-md-7 col-lg-7" style="margin-left: 22px">
+				<p:autoComplete id="autocompleteLingue" value="#{curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.deLingua}"
+								converter="deLinguaConverter" forceSelection="true" required="true" var="deLingua"
+								itemLabel="#{deLingua.denominazione}" label="#{ui['lingue.selectLingua']}" itemValue="#{deLingua}"
+								completeMethod="#{autoCompleteBean.completeLingua}" emptyMessage="#{ui['shared.emptyAutoComplete']}"
+								requiredMessage="La lingua è obbligatoria" styleClass="form-control" cache="true" />
+				<p:message id="lingueMessage" for="autocompleteLingue"></p:message>
+			</div>
+
+			<h:panelGroup id="chk_madrelingua">
+				<div id="col-md-6 col-lg-6">
+					<p:selectBooleanCheckbox value="#{curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.flagMadrelingua}"
+											 widgetVar="madreLinguaWV" rendered="true" id="madrelingua">
+						<p:ajax listener="#{curriculumVitaePfBean.cvLinguePfSection.handleChangeMadreLingua}"
+								update="livelloLettura livelloScrittura livelloEspressione renderMadrelivelloLettura renderMadrelivelloScrittura renderMadrelivelloEspressione " event="change" process="@this" />
+					</p:selectBooleanCheckbox>
+					<h:outputLabel id="madrelingua_label" for="madrelingua" styleClass="col-sm-2">
+						<h:outputText value="Madrelingua" />
+					</h:outputLabel>
+				</div>
+			</h:panelGroup>
+		</div>
+	</div>
+
+	<div class="col-md-12" style="margin-top: 30px">
+		<div class="form-group">
+			<p:outputLabel id="renderMadrelivelloLettura"  for="livelloLettura" value="#{curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.flagMadrelingua ? 'Madrelingua' : 'Letto'}" style="margin-left: 15px;" styleClass="col-sm-1 control-label">
+			</p:outputLabel>
+			<div class="col-md-3 col-lg-2" style="margin-left: 22px">
+				<p:selectOneMenu id="livelloLettura"
+								 disabled="#{curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.flagMadrelingua}" styleClass="form-control"
+								 forceSelection="true" converter="deGradoLinSilConverter"
+								 requiredMessage="Il livello di conoscenza lettura è obbligatorio"
+								 required="#{!curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.flagMadrelingua}" style="width: 100%;"
+								 value="#{curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.deGradoLinSilLetto}">
+					<f:selectItem itemLabel="" itemValue="" />
+					<f:selectItems var="deLivelloLettura" value="#{decodificheBean.getGradoLingueSilByCodIdoNotNull()}"
+								   itemLabel="#{deLivelloLettura.codIdo}" itemValue="#{deLivelloLetura}" itemDescription="#{deLivelloLettura.descrizioneIdoLetto}"/>
+				</p:selectOneMenu>
+				<p:message id="livelloLetturaMessage" for="livelloLettura"></p:message>
+			</div>
+
+			<p:outputLabel id="renderMadrelivelloScrittura" for="livelloScrittura" value="#{curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.flagMadrelingua ? 'Madrelingua' : 'Scritto'}" styleClass="col-sm-1 control-label" style="margin-left: 15px;">
+			</p:outputLabel>
+			<div class="col-md-3 col-lg-2" style="margin-left: 22px">
+				<p:selectOneMenu id="livelloScrittura"
+								 disabled="#{curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.flagMadrelingua}" styleClass="form-control"
+								 forceSelection="true" required="#{!curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.flagMadrelingua}"
+								 converter="deGradoLinSilConverter" requiredMessage="Il livello di conoscenza scrittura è obbligatorio"
+								 style="width: 100%;" value="#{curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.deGradoLinSilScritto}">
+					<f:selectItem itemLabel="" itemValue="" />
+					<f:selectItems var="deLivelloScrittura" value="#{decodificheBean.getGradoLingueSilByCodIdoNotNull()}"
+								   itemLabel="#{deLivelloScrittura.codIdo}" itemValue="#{deLivelloScrittura}" itemDescription="#{deLivelloScrittura.descrizioneIdoScritto}" />
+				</p:selectOneMenu>
+				<p:message id="livelloScritturaMessage" for="livelloScrittura"></p:message>
+			</div>
+			<p:outputLabel id="renderMadrelivelloEspressione" for="livelloEspressione" value="#{curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.flagMadrelingua ? 'Madrelingua' : 'Parlato'}" styleClass="col-sm-1 control-label" style="margin-left: 15px;">
+			</p:outputLabel>
+			<div class="col-md-3 col-lg-2" style="margin-left: 22px">
+				<p:selectOneMenu id="livelloEspressione"
+								 disabled="#{curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.flagMadrelingua}" styleClass="form-control"
+								 forceSelection="true" required="#{!curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.flagMadrelingua}"
+								 converter="deGradoLinSilConverter" requiredMessage="Il livello di conoscenza parlato è obbligatorio"
+								 style="width: 100%;" value="#{curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.deGradoLinSilParlato}">
+					<f:selectItem itemLabel="" itemValue="" />
+					<f:selectItems var="livelloEspressione" value="#{decodificheBean.getGradoLingueSilByCodIdoNotNull()}"
+								   itemLabel="#{livelloEspressione.codIdo}" itemValue="#{livelloEspressione}" itemDescription="#{livelloEspressione.descrizioneIdoParlato}"/>
+				</p:selectOneMenu>
+				<p:message id="livelloEspressioneMessage" for="livelloEspressione"></p:message>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-12" style="margin-top: 30px">
+		<div class="form-group">
+			<p:outputLabel for="diplomiCertificati" value="Diplomi /certificati" styleClass="col-sm-1 control-label" style="margin-left: 15px;">
+			</p:outputLabel>
+			<div class="col-md-9 col-lg-9" style="margin-left: 22px">
+				<p:inputTextarea id="diplomiCertificati" required="false" styleClass="form-control compact-textarea"
+								 autoResize="false" richTextMode="false" label="Diplomi/Certificati" maxlength="2000"
+								 counter="diplomiCertificatiCount" counterTemplate="{0} caratteri rimanenti"
+								 value="#{curriculumVitaePfBean.cvLinguePfSection.cvLinguaAttiva.certificazione}">
+				</p:inputTextarea>
+				<br />
+				<h:outputText id="diplomiCertificatiCount" />
+			</div>
+		</div>
+	</div>
+	<div class="text-center">
+		<p:defaultCommand target="syncOneLingue"></p:defaultCommand>
+		<p:commandLink id="syncOneLingue" styleClass="btn btn-primary ui-button baby-btn uk-margin-top"
+					   onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+					   oncomplete="MyPortal.Curriculum.syncArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+					   update="@(.ui-message)" actionListener="#{curriculumVitaePfBean.cvLinguePfSection.sync()}" process="@this, syncForm">
+			#{ui['shared.save']}
+		</p:commandLink>
+
+		<p:commandLink id="annulla" styleClass="btn btn-primary ui-button baby-btn uk-margin-top uk-margin-left"
+					   onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+					   oncomplete="MyPortal.Curriculum.cancelArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+					   process="@this">
+			Annulla
+			<p:ajax update="syncForm, :lingueForm:articles"
+					listener="#{curriculumVitaePfBean.cvLinguePfSection.cancelEditLingue()}" resetValues="true" />
+		</p:commandLink>
+
+		<p:remoteCommand name="updateArticles" update=":lingueForm:articles" process="@this"></p:remoteCommand>
+	</div>
+</ui:composition>

@@ -1,0 +1,450 @@
+<!-- PUBBLICAZIONE-->
+<STATEMENT name="SELECT_LISTA_GIORNALI"
+           query="SELECT CODGIORNALE AS CODICE, 
+                    STRDESCRIZIONE ||
+                    DECODE(
+                       SYSDATE, 
+                       GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                       ' (scaduto)',
+                       LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                       ' (scaduto)', 
+                       ''
+                    ) AS DESCRIZIONE            
+                  FROM DE_GIORNALE_PUBB"/>
+
+<STATEMENT name="DELETE_ASSOCIAZIONE_PUBB"
+          query="DELETE FROM DO_DETTAGLIOPUB_GIORNALI 
+                  WHERE PRGELENCOGIORNALE=?
+                  AND PRGRICHIESTAAZ=?"/>
+
+<STATEMENT name="SELECT_DUPLICATI_LISTA_PUBB"
+          query="SELECT CODGIORNALE, DATINIZIOSETT, 
+                 DATFINESETTIMANA FROM DO_ELENCOPUBB_GIORNALI
+                 WHERE CODGIORNALE=?
+                 AND DATINIZIOSETT=to_date(?,'dd/mm/yyyy')
+                 AND DATFINESETTIMANA=to_date(?,'dd/mm/yyyy')"/>
+
+<STATEMENT name="INSERT_LISTA_PUBB"
+          query="INSERT INTO DO_ELENCOPUBB_GIORNALI (
+                   PRGELENCOGIORNALE, CODGIORNALE, DATINIZIOSETT, 
+                   DATFINESETTIMANA, CDNUTINS, DTMINS, 
+                   CDNUTMOD, DTMMOD) 
+                VALUES (  ?, ?, to_date(?,'dd/mm/yyyy'),
+                    to_date(?,'dd/mm/yyyy'), ?, SYSDATE,
+                    ?, SYSDATE)"/>
+
+<STATEMENT name="DELETE_LISTA_PUBB"
+          query="DELETE FROM DO_ELENCOPUBB_GIORNALI 
+                 WHERE CODGIORNALE=?
+                 AND DATINIZIOSETT=to_date(?,'dd/mm/yyyy')
+                 AND DATFINESETTIMANA=to_date(?,'dd/mm/yyyy')"/>          
+
+<STATEMENT name="SELECT_DECOD_GIORNALE"
+          query="SELECT STRDESCRIZIONE 
+                 FROM DE_GIORNALE_PUBB
+                 WHERE CODGIORNALE=?"/>          
+
+<!-- ESCLUDI DA ROSA -->
+<STATEMENT name="GET_NOMINATIVO_LAVORATORE"
+           query="Select AN_LAVORATORE.cdnLavoratore, AN_LAVORATORE.STRCOGNOME, 
+                  AN_LAVORATORE.strNome, DO_ROSA.PRGTIPOROSA, DO_ROSA.PRGROSA,
+                  DO_NOMINATIVO.NumkloNominativo, DO_NOMINATIVO.STRMOTIVOCANC, DO_NOMINATIVO.CODTIPOCANC
+                  from DO_NOMINATIVO 
+                  inner join AN_LAVORATORE on AN_LAVORATORE.cdnLavoratore=DO_NOMINATIVO.CDNLAVORATORE
+                  inner join DO_ROSA on DO_Nominativo.PRGROSA=DO_ROSA.PRGROSA
+                  where DO_NOMINATIVO.PRGNOMINATIVO=?"/>
+ 
+<STATEMENT name="ESCLUDI_DA_ROSA"
+           query="Update DO_NOMINATIVO 
+                  SET STRMOTIVOCANC=?,
+                  CDNUTCANC=?,
+                  NUMKLONOMINATIVO=?,
+                  CODTIPOCANC='M',
+                  DTMCANC=SYSDATE
+                  WHERE PRGNOMINATIVO=?"/>           
+<!-- ESCLUDI DA ROSA -->
+
+
+<!-- GESTIONE DISPONIBILITA ROSA -->
+
+<STATEMENT
+        name="ST_TIPI_DISP"
+        query="select CODDISPONIBILITAROSA CODICE, STRDESCRIZIONE ||
+                    DECODE(SYSDATE,
+                       GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                       ' (scaduto)',
+                       LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                       ' (scaduto)',
+                       ''
+                    ) AS DESCRIZIONE
+               from DE_DISPONIBILITA_ROSA" />
+
+<!-- Indipendentemente dalla copia che gestisce la disponibilita, come progressivo va preso quello della richiesta
+     originale (numStorico=0)-->
+<STATEMENT name="ST_GET_PRG_RICH_ORIGINALE"
+           query="SELECT to_char(RICH2.PRGRICHIESTAAZ) as PRGORIGINALE 
+                  FROM DO_RICHIESTA_AZ RICH1
+                       INNER JOIN DO_RICHIESTA_AZ RICH2 ON (rich1.NUMANNO=rich2.NUMANNO and rich1.NUMRICHIESTA=rich2.NUMRICHIESTA and rich2.NUMSTORICO=0)
+                  WHERE
+                    RICH1.PRGRICHIESTAAZ=?"
+/>
+<STATEMENT
+        name="ST_GETDISPOBILITA"
+        query="select DO_DISPONIBILITA.CODDISPONIBILITAROSA,DO_DISPONIBILITA.NUMCONTANONRINTRACCIATO,to_char(DO_DISPONIBILITA.DATDISPONIBILITA,'DD/MM/YYYY') DATDISPONIBILITA,
+               DO_DISPONIBILITA.CDNUTINS,DO_DISPONIBILITA.DTMINS,DO_DISPONIBILITA.CDNUTMOD,DO_DISPONIBILITA.DTMMOD,
+               to_char(do_disponibilita.PRGRICHIESTAAZ) AS PRGORIGINALE
+               from DO_DISPONIBILITA
+                    inner join do_richiesta_az on (do_disponibilita.PRGRICHIESTAAZ=do_richiesta_az.PRGRICHIESTAAZ)
+               where 
+                    DO_DISPONIBILITA.PRGRICHIESTAAZ=(SELECT RICH2.PRGRICHIESTAAZ
+                                                     FROM DO_RICHIESTA_AZ RICH1
+                                                     INNER JOIN DO_RICHIESTA_AZ RICH2 ON (rich1.NUMANNO=rich2.NUMANNO and rich1.NUMRICHIESTA=rich2.NUMRICHIESTA and rich2.NUMSTORICO=0)
+                                                     WHERE RICH1.PRGRICHIESTAAZ=?)
+                    AND DO_DISPONIBILITA.CDNLAVORATORE=?" />
+
+
+<STATEMENT name="ST_GET_PRGORIGINALE"
+           query="SELECT RICH2.PRGRICHIESTAAZ
+                  FROM DO_RICHIESTA_AZ RICH1
+                       INNER JOIN DO_RICHIESTA_AZ RICH2 ON (rich1.NUMANNO=rich2.NUMANNO and rich1.NUMRICHIESTA=rich2.NUMRICHIESTA and rich2.NUMSTORICO=0)
+                   WHERE RICH1.PRGRICHIESTAAZ=?"
+/>
+<STATEMENT name="ST_INSERT_DISP_ROSA"
+           query="Insert into DO_DISPONIBILITA
+                  (DATDISPONIBILITA, CODDISPONIBILITAROSA,NUMCONTANONRINTRACCIATO,CDNUTINS,DTMINS,
+                  CDNUTMOD,DTMMOD,PRGRICHIESTAAZ,CDNLAVORATORE)
+                  values(to_date(?,'DD/MM/YYYY'),?,?,?,SYSDATE,?,SYSDATE,?,?)"/>
+
+<STATEMENT name="ST_UPDATE_DISP_ROSA"
+           query="UPDATE DO_DISPONIBILITA 
+                  SET DATDISPONIBILITA=to_date(?,'DD/MM/YYYY'),
+                  CODDISPONIBILITAROSA=?,
+				          NUMCONTANONRINTRACCIATO=?,                  
+                  CDNUTMOD=?,
+                  DTMMOD=SYSDATE
+                  WHERE DO_DISPONIBILITA.PRGRICHIESTAAZ=?
+                  AND DO_DISPONIBILITA.CDNLAVORATORE=?"/>
+
+<STATEMENT name="ST_UPDATE_VALIDITA_LAV"
+           query="UPDATE PR_VALIDITA 
+                  SET CODSTATOLAV='INA',
+                  CDNUTMOD=?,
+                  DTMMOD=SYSDATE,
+                  NUMKLOVALIDITA=NUMKLOVALIDITA+1
+                  WHERE CDNLAVORATORE=? 
+                  AND (DATINIZIOCURR&lt;=SYSDATE AND DATFINECURR&gt;=SYSDATE)"/>
+                  
+<STATEMENT name="ST_INSERT_CONT_AUTO"
+           query="INSERT INTO AG_CONTATTO (
+                     PRGCONTATTO, CODCPICONTATTO, DATCONTATTO, 
+                     STRORACONTATTO, PRGSPICONTATTO, TXTCONTATTO, 
+                     FLGRICONTATTARE, STRIO, DATENTROIL, 
+                     PRGMOTCONTATTO, PRGTIPOCONTATTO, PRGEFFETTOCONTATTO, 
+                     CDNLAVORATORE, PRGAZIENDA, PRGUNITA, 
+                     CDNUTINS, DTMINS, 
+                     CDNUTMOD, DTMMOD, CODDISPONIBILITAROSA) 
+                  VALUES ( S_AG_CONTATTO.nextval , ?, to_date(?,'DD/MM/YYYY'),
+                      ?, ?, 'Rich. ' || ? || '/' || ? || ' - Rosa ' || ?,
+                      null, 'O', null,
+                      6, 1, 4,
+                      ?, null, null,
+                      ?, SYSDATE,
+                      ?, SYSDATE, ?)
+"/>
+<!-- GESTIONE DISPONIBILITA ROSA -->
+<STATEMENT name="GET_DETTAGLIO_PUBB_GIORNALE"
+           query="
+	SELECT eg.prgelencogiornale, 
+		ri.numrichiesta, 
+		ri.prgrichiestaaz,
+		ri.numanno AS anno, 
+		az.strragionesociale, 
+		uaz.strindirizzo,
+		TO_CHAR (datpubblicazione, 'dd/mm/yyyy') datpubblicazione,
+		TO_CHAR (datscadenzapubblicazione, 'dd/mm/yyyy' ) datscadenzapubblicazione,
+		dg.numPriorita,
+		az.prgazienda,
+		uaz.prgunita
+	FROM do_elencopubb_giornali eg,
+		do_richiesta_az ri,
+		an_azienda az,
+		do_dettagliopub_giornali dg,
+		an_unita_azienda uaz
+	WHERE eg.prgelencogiornale = dg.prgelencogiornale
+		AND ri.numstorico = 0
+		AND dg.prgrichiestaaz = ri.prgrichiestaaz
+		AND ri.prgazienda = az.prgazienda
+		AND ri.prgazienda = uaz.prgazienda
+		AND ri.prgunita = uaz.prgunita
+		AND dg.prgrichiestaaz = ?
+		AND dg.prgelencogiornale = ?
+"/>           
+
+<STATEMENT name="UPDATE_DETTAGLIO_PUBB_GIORNALE"
+           query="
+    update do_dettagliopub_giornali set numPriorita = ?
+    where prgrichiestaaz = ? and prgelencogiornale = ?
+"/>           
+<STATEMENT name="DO_ELENCOPUBB_GIORNALI_NEXTVAL"
+           query="
+    select S_DO_ELENCOPUBB_GIORNALI.nextval from dual
+"/>           
+<STATEMENT name="GET_PUBB_GIORNALE"
+           query="
+    select prgElencoGiornale,
+    	codGiornale, 
+    	to_char(datInizioSett,'dd/mm/yyyy') datInizioSett, 
+    	to_char(datFineSettimana,'dd/mm/yyyy') datFineSettimana
+    from do_elencopubb_giornali where prgElencoGiornale = ?
+"/>           
+
+<STATEMENT name="UPDATE_GRADO_DISPO_L68"
+           query="UPDATE PR_DISPO_L68
+                  SET CODGRADOOCC = 'SOS',                  
+                  numklodispol68 = numklodispol68 +1,
+                  CDNUTMOD=?,
+                  DTMMOD=SYSDATE
+                  WHERE CDNLAVORATORE = ?"/>
+
+
+<!-- GESTIONE GRADUATORIA ANNUALE -->
+
+<STATEMENT name="GET_TIPO_GRAD_ANNUALE"
+           query="select codStatoGrad as codice, strDescrizione as DESCRIZIONE 
+                  from DE_CM_STATO_GRAD order by strDescrizione"
+/>                    
+
+<STATEMENT name="CM_LISTA_NOMINATIVI_GRAD_ANNUALE"
+           query="select l.cdnLavoratore,     
+					nom.numordine,
+					l.strcodicefiscale as codFisc, 
+					l.strcognome || ' ' || l.strnome as strCognomeNome,
+					to_char(l.datnasc, 'dd/mm/yyyy') as datNasc,
+					decode(l.STRINDIRIZZODOM,null,' ',Initcap(l.STRINDIRIZZODOM) || ' ') || Initcap(dom.STRDENOMINAZIONE) || ' (' || pr.STRTARGA || ')' as Domicilio,
+					nom.numpunteggio,
+					nom.numreddito,
+					nom.numpersone,
+					(select decode(isc.DATANZIANITA68, null, ' ', to_char(isc.DATANZIANITA68,'dd/mm/yyyy'))
+                  	|| '&lt;BR&gt;' || 
+                  	to_char(isc.DATDATAINIZIO,'dd/mm/yyyy') 
+			           from am_cm_iscr isc
+			           inner join de_cm_tipo_iscr tisc on tisc.codcmtipoiscr = isc.codcmtipoiscr
+			           where tisc.codmonotiporagg = g.codmonotipograd
+			           and isc.codstatoatto = 'PR'
+			           and isc.cdnlavoratore = encrypt(nom.cdnlavoratore, ?)
+			           and decode(isc.DATANZIANITA68,null,isc.datdatainizio,'',isc.datdatainizio,isc.DATANZIANITA68) &lt;= g.datriferimento
+			           and (isc.datdatafine is null OR trunc(isc.datdatafine) &gt; trunc(g.datriferimento))   
+			           and rownum = 1    
+			          ) 					
+					as dataCM,
+					nom.strnota,
+					nom.prggradnominativo,
+					nom.prggraduatoria
+					from cm_grad_nominativo nom
+		          inner join cm_graduatoria g on g.prggraduatoria = nom.prggraduatoria
+		          inner join an_lavoratore l on l.cdnlavoratore = nom.cdnlavoratore                    
+		          inner join de_comune dom on (l.CODCOMDOM=dom.CODCOM) 
+		          inner join de_provincia pr on (dom.CODPROVINCIA=pr.CODPROVINCIA)           
+		          where nom.prggraduatoria = ?
+				  order by numordine "
+/>  
+
+<STATEMENT name="CMListaPunteggioGradAnnLavoratore"
+          query="select 
+				CASE
+				WHEN cp.strdescrizione like '%carico%'
+				   THEN ' - '  || p.decpunteggio
+				WHEN cp.strdescrizione like '%reddito%'
+				   THEN ' + '  || p.decpunteggio   
+				WHEN cp.strdescrizione like '%anzianit%'
+				   THEN
+				   		case 
+				             when n.datanzianita68 &lt; to_date('30/04/1988','dd/mm/yyyy')
+				              then ' - '  || p.decpunteggio  
+				             when n.datanzianita68 &gt; to_date('30/04/1988','dd/mm/yyyy')
+				              then ' + '  || p.decpunteggio  
+				        end  				   				    		
+				WHEN cp.strdescrizione like '%invalidit%'
+				   THEN ' - '  || p.decpunteggio       
+				WHEN cp.strdescrizione like '%locomozione%'
+				   THEN ' - '  || p.decpunteggio  
+				WHEN cp.strdescrizione like '%patente%'
+				   THEN 
+				        case 
+				             when n.flgpatente = 'N'
+				              then ' - '  || p.decpunteggio 
+				             when n.flgpatente = 'S'
+				              then ' + '  || p.decpunteggio  
+				        end   
+				ELSE '' || p.decpunteggio  
+				END as punteggio, 
+				cp.strdescrizione as desc_punteggio			         
+				 from cm_punteggio_anno p
+				 inner join ts_config_punteggio cp on cp.prgconfigpunteggio = p.prgconfigpunteggio
+				 inner join cm_grad_nominativo n on n.prggradnominativo= p.prggradnominativo	
+				 where p.PRGGRADNOMINATIVO = ? 
+				 order by cp.prgconfigpunteggio "/>	
+
+<STATEMENT name="STORICIZZA_GRAD_ANNUALE"
+          query="UPDATE CM_GRADUATORIA 
+          		 SET CODSTATOGRAD = '4', 
+           	     NUMKLOGRADUATORIA = ? + 1,
+           	     CDNUTMOD = ?,
+           	     DTMMOD =  SYSDATE 
+           	     WHERE PRGGRADUATORIA = ?"
+/>
+
+<STATEMENT name="MODIFICA_NOTA_GRAD_ANNUALE"
+          query="UPDATE CM_GRADUATORIA 
+          		 SET STRNOTA = ?,
+          		 NUMKLOGRADUATORIA = ? + 1,
+           	     CDNUTMOD = ?,
+           	     DTMMOD =  SYSDATE 
+           	     WHERE PRGGRADUATORIA = ?"
+/>
+
+<STATEMENT name="CM_LAV_GRAD_ANNUALE"
+           query="select nom.cdnLavoratore, nom.prgGradnominativo, to_char(g.datriferimento, 'dd/mm/yyyy') as datriferimento 
+				  from cm_grad_nominativo nom				  
+				  inner join cm_graduatoria g on g.prggraduatoria = nom.prggraduatoria
+				  where nom.prggraduatoria = ?"
+/>  
+
+<STATEMENT name="CM_INSERT_GRAD_ANNUALE"
+           query="{ call ? := PG_COLL_MIRATO.CMCreaGraduatoriaAnnuale(?,?,?,?,?,?,?,?,?,?) }"
+/>
+
+<STATEMENT name="CM_CALC_PUNTEGGIO_ANNUALE"
+           query="{ call ? := PG_COLL_MIRATO.CMCalcPunteggioGradAnnuale(?,?,?,?,?) }"
+/>
+
+<STATEMENT name="CM_CALC_POSIZIONE_ANNUALE"
+           query="{ call ? := PG_COLL_MIRATO.CMCalcPosizioneGradAnnuale(?,?) }"
+/>
+
+<STATEMENT name="CM_GET_DATI_ISCR_GRAD_ANNUALE"
+          query="select to_char(ci.datdatainizio, 'dd/mm/yyyy') as datdatainizio,
+					ci.cdnlavoratore, 
+					decode(ci.datanzianita68, null, to_char(ci.datdatainizio, 'dd/mm/yyyy'), to_char(ci.datanzianita68, 'dd/mm/yyyy')) as datanzianita68, 
+					to_char(ci.datsospensione, 'dd/mm/yyyy') as datsospensione, 
+          			ci.nummesisospesterni, 
+          			deisc.codmonotiporagg
+					from am_cm_iscr ci
+					inner join de_cm_tipo_iscr deisc on deisc.codcmtipoiscr = ci.codcmtipoiscr					
+    				WHERE ci.codstatoatto = 'PR'
+    				and deisc.codmonotiporagg = (select g.codmonotipograd from cm_graduatoria g where g.prggraduatoria = ?)  
+					and ci.cdnlavoratore = ENCRYPT(?,?) 
+					and ci.datdatafine is null"
+/>
+
+<STATEMENT name="UPDATE_MESI_ANZ_NOMINATIVO"
+           query="update cm_grad_nominativo
+		         set NUMKLOGRADNOMINATIVO = NUMKLOGRADNOMINATIVO+1,
+		         NUMMESIANZ = ?		        
+		         where prggradnominativo = ? 
+		         and prggraduatoria = ?"
+/>
+
+<STATEMENT name="GET_TESTATA_GRAD_ANNUALE"
+           query="SELECT G.PRGGRADUATORIA,
+					G.PRGGRADUATORIAPREC,
+					G.NUMANNO,
+					G.CODSTATOGRAD,
+					G.CODMONOTIPOGRAD,
+					G.STRNOTA,
+					G.CDNUTINS,
+					TO_CHAR(G.DTMINS,'dd/mm/yyyy') DTMINS,
+					G.CDNUTMOD,
+					TO_CHAR(G.DTMMOD,'dd/mm/yyyy') DTMMOD,	
+					to_char(G.DATRIFERIMENTO, 'dd/mm/yyyy') as DATRIFERIMENTO,	
+					G.NUMANNOREDDITO,
+					S.STRDESCRIZIONE AS STATOGRAD,
+					PR.STRDENOMINAZIONE as PROVINCIA_ISCR,
+					G.NUMKLOGRADUATORIA
+					FROM CM_GRADUATORIA G		
+					INNER JOIN DE_CM_STATO_GRAD S ON S.CODSTATOGRAD = G.CODSTATOGRAD
+					INNER JOIN DE_PROVINCIA PR ON PR.CODPROVINCIA = G.CODPROVINCIA
+					WHERE G.PRGGRADUATORIA = ?"
+/>
+
+<STATEMENT name="CM_RIGENERA_GRAD_ANNUALE"
+           query="{ call ? := PG_COLL_MIRATO.CMRigeneraGradAnnuale(?,?,?,?) }"
+/>
+
+<STATEMENT name="CM_ANNULLA_GRAD_ANNUALE"
+           query="{ call ? := PG_COLL_MIRATO.CMAnnullaGradAnnuale(?,?) }"
+/> 
+
+<STATEMENT name="ANNULLA_GRAD_ANNUALE"
+          query="UPDATE CM_GRADUATORIA 
+          		 SET CODSTATOGRAD = '3' , 
+           	     NUMKLOGRADUATORIA = ? + 1,
+           	     CDNUTMOD = ?,
+           	     DTMMOD =  SYSDATE 
+           	     WHERE PRGGRADUATORIA = ?"
+/>
+
+<STATEMENT name="CMDatiPunteggioLavoratoreGradAnn"
+          query="select g.codmonotipograd, to_char(n.datanzianita68, 'DD/MM/YYYY') as datanzianita68, 
+          		   n.nummesianz,
+			       n.codcmtipoiscr, n.numpercinvalidita,
+			       decode(n.numpersone, null, '', n.numpersone || ' del ' || to_char(n.datdichcarico, 'DD/MM/YYYY'))
+			        as carico, 
+			       n.numreddito, to_char(n.dtmins, 'DD/MM/YYYY hh24:mi') as dataPunteggio,
+			       dc.strdescrizione as descrTipoIscr,
+			       decode(n.flgpatente, null, 'Patente assente', 'N', 'Patente assente', 'S', 'Patente presente' ) as flgpatente,
+		           (select dg.strdescrizione from de_grado_capacita dg where dg.codgradocapacita = n.codgradocapacitaloc) as codgradocapacitaloc 
+				   from cm_grad_nominativo n
+				   inner join cm_graduatoria g on g.prggraduatoria = n.prggraduatoria
+			       left join de_cm_tipo_iscr dc on dc.codcmtipoiscr = n.codcmtipoiscr
+				   where n.prggradnominativo = ?"/>	   
+			                 		       		 
+<STATEMENT name="SELECT_MOD_PUNT_DID_ISEE_ADESIONE"
+		query="SELECT
+			    raz.prgrichiestaaz,
+			    n.prgnominativo,
+			    n.codmonodid    AS cod_mono_did,
+			    n.codmonoisee   AS cod_mono_isee,
+			    decode(r.prgtiporosa, 3, '0', '1') AS viewAggiornabtn,
+			    n.flgprofessionalita,  n.flgfamdec, n.numcaricofam
+			FROM
+			    do_richiesta_az    raz
+			    INNER JOIN do_incrocio        inc ON inc.prgrichiestaaz = raz.prgrichiestaaz
+			    INNER JOIN do_rosa            r ON r.prgincrocio = inc.prgincrocio
+			    INNER JOIN do_nominativo      n ON n.prgrosa = r.prgrosa
+			    INNER JOIN de_tipo_incrocio   dti ON dti.prgtipoincrocio = inc.prgtipoincrocio
+			    INNER JOIN de_tipo_rosa       tr ON tr.prgtiporosa = r.prgtiporosa
+			WHERE
+			   raz.prgrichiestaaz = ?
+			   AND  n.cdnlavoratore = ?
+			   AND  r.prgrosa = ?"
+/>
+
+<STATEMENT name="AS_UPDATE_PUNTEGGI_ADESIONE"
+           query="{ call ? := PG_INCROCIO.ASUpdateAdesioneLavoratore(?, ?, ?, ?, ?, ?, ?, ?) }"
+/>	
+
+<STATEMENT name="AS_CONFIG_PUNTEGGI"
+ query="SELECT
+    ts_config_loc.strvalore as STRVALORECONFIG,
+    ts_config_loc.num as NUMVALORECONFIG
+FROM
+    ts_config_loc
+    INNER JOIN de_tipo_config ON ( ts_config_loc.codtipoconfig = de_tipo_config.codtipoconfig )
+WHERE
+    ts_config_loc.strcodrif = (
+        SELECT
+            ts_generale.codprovinciasil
+        FROM
+            ts_generale
+        WHERE
+            prggenerale = 1
+    )
+    AND de_tipo_config.codtipoconfig = 'ASATTRIB'
+    AND trunc(sysdate) BETWEEN trunc(de_tipo_config.datinizioval) AND trunc(de_tipo_config.datfineval)"
+ />
+ 
+ <STATEMENT name="GET_DATI_RICHIESTA_IDO_ORIG"
+ query="SELECT NVL(NUMRICHIESTAORIG, NUMRICHIESTA) NUMRICHIESTAORIG 
+ 		FROM DO_RICHIESTA_AZ WHERE NUMANNO = ? AND NUMRICHIESTA = ? AND NUMSTORICO = 0"
+ />

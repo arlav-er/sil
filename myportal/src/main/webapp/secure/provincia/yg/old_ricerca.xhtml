@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+<h:head>
+
+</h:head>
+
+<f:metadata>
+	<f:event listener="#{ygRicercaAdesioneBean.checkViewPage()}"	type="preRenderView" />
+</f:metadata>
+
+<h:body>
+
+<ui:composition template="../../template/main.xhtml">
+	
+	<f:loadBundle basename="conf.const" var="const" />
+	
+	<ui:define name="title">
+	
+		<h:outputText value="#{txt['provincia.yg.ricerca_adesioni.titolo']}" escape="false" />
+		
+	</ui:define>
+	
+	<ui:define name="content">
+			
+		<h:outputText value="#{txt['provincia.yg.ricerca_adesioni.descrizione']}" escape="false" />
+		
+		<div class="widget_container ui-tabs ui-widget-content ui-corner-all">
+		
+			<h:form id="form_ricerca">
+			
+				<h:panelGroup id="panel" layout="block">
+				
+					<h:panelGrid columns="2">
+						
+						<cc:inputText 
+							id="nome" 
+							label="Nome" 
+							title="Nome del lavoratore"
+							required="false" 
+							value="#{ygRicercaAdesioneBean.parametriRicerca.nome}"/>
+						
+						<cc:inputText 
+							id="cognome" 
+							label="Cognome"
+							title="Cognome del lavoratore" 
+							required="false"
+							value="#{ygRicercaAdesioneBean.parametriRicerca.cognome}" />
+						
+						<cc:inputText 
+							id="codice_fiscale" 
+							label="Codice fiscale"
+							title="Codice fiscale del lavoratore" 
+							required="false"
+							value="#{ygRicercaAdesioneBean.parametriRicerca.codiceFiscale}" />
+						
+						<cc:inputText 
+							id="email" 
+							label="Indirizzo email"
+							title="Indirizzo email del lavoratore" 
+							required="false"
+							value="#{ygRicercaAdesioneBean.parametriRicerca.email}" />
+						
+						<cc:inputText 
+							id="data_adesione_da"
+							type="date" 
+							value="#{ygRicercaAdesioneBean.parametriRicerca.dataAdesioneDa}"
+							label="Data adesione dal" />
+						
+						<cc:inputText 
+							id="data_adesione_a"
+							type="date" 
+							value="#{ygRicercaAdesioneBean.parametriRicerca.dataAdesioneA}"
+							label="Data adesione al">
+							<f:attribute name="data_da_id" value="form_ricerca:data_adesione_da:inputText" />
+							<f:validator validatorId="twoDatesEqualOrLessValidator" for="function" />
+						</cc:inputText>
+						
+						<cc:selectOneRadio 
+							style="width:18em" 
+							id="tipo_ricerca"
+							value="#{ygRicercaAdesioneBean.parametriRicerca.tipoRicerca}" 
+							label="Tipo di ricerca"
+							requiredMessage="Tipo di ricerca obbligatorio">
+							<f:selectItems value="#{ygRicercaAdesioneBean.tipiRicerca}" />
+						</cc:selectOneRadio>                 
+						
+						<cc:selectOneRadio 
+							style="width:18em" 
+							id="tipo_adesione"
+							value="#{ygRicercaAdesioneBean.parametriRicerca.tipoAdesione}" 
+							label="Tipo Adesione"
+							requiredMessage="Tipo Adesione obbligatorio">
+							<f:selectItems value="#{ygRicercaAdesioneBean.tipiAdesione}" />
+						</cc:selectOneRadio>
+						
+						<cc:selectOneRadio 
+							style="width:18em"  
+							id="stato_presa_carico"
+							value="#{ygRicercaAdesioneBean.parametriRicerca.statoPresaCarico}" 
+							label="Stato di presa in carico"
+							requiredMessage="Stato di presa in carico obbligatorio">
+							<f:selectItems value="#{ygRicercaAdesioneBean.statiPresaCarico}" />
+						</cc:selectOneRadio>
+						
+					</h:panelGrid>
+					
+				</h:panelGroup>
+				
+				<h:commandLink 
+					id="search_button" 
+					value="Cerca"
+					styleClass="searchButton some-margin-top some-margin-bottom" 
+					action="#{ygRicercaAdesioneBean.search}">
+				</h:commandLink>
+				
+			</h:form>
+			
+			<h:form id="table_form">
+				
+				<cc:waiting id="waiting"  hidden="true" waitMessage="Ricerca in corso..." activatorId="form_ricerca:search_button" />
+				
+				<h:panelGrid 
+					styleClass="widget_container ui-tabs ui-widget-content ui-corner-all" 
+					rendered="#{ygRicercaAdesioneBean.risultatoRicerca != null and empty ygRicercaAdesioneBean.risultatoRicerca}">
+					
+					<div class="nessun_elemento_trovato">
+						<h:outputText value="Nessuna adesione trovata" rendered="#{empty ygRicercaAdesioneBean.risultatoRicerca}" />
+					</div>
+					
+				</h:panelGrid>
+				
+				<h:panelGrid 
+					styleClass="widget_container ui-tabs ui-widget-content ui-corner-all" 
+					rendered="#{ygRicercaAdesioneBean.risultatoRicerca != null and not empty ygRicercaAdesioneBean.risultatoRicerca}">
+										
+					<h:panelGroup 
+						id="result_panel"
+						rendered="#{not empty ygRicercaAdesioneBean.risultatoRicerca}">
+						
+						<h:dataTable 
+							id="adesione_list"
+							value="#{ygRicercaAdesioneBean.risultatoRicerca}" 
+							var="adesione">
+							
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="Codice fiscale" />
+								</f:facet>
+								<h:outputText value="#{adesione.codiceFiscale}" />
+							</h:column>
+							
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="cognome" />
+								</f:facet>
+								<h:outputText value="#{adesione.cognome}" />
+							</h:column>
+							
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="nome" />
+								</f:facet>
+								<h:outputText value="#{adesione.nome}" />
+							</h:column>
+							
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="email" />
+								</f:facet>
+								<h:outputText value="#{adesione.email}" />
+							</h:column>
+							
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="data adesione" />
+								</f:facet>
+								<h:outputText value="#{adesione.dtAdesione}">
+									<f:convertDateTime type="date" pattern="dd/MM/yyyy"/>
+								</h:outputText>
+							</h:column>
+							
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="preso in carico" />
+								</f:facet>
+								<cc:selectOneRadio									
+									value="#{adesione.modificaFlgPresoInCarico}" 
+									valueDescription="#{adesione.modificaFlgPresoInCarico == 'true' ? 'SI' : 'NO'}" 
+									buttonset="true">
+									<f:selectItem itemLabel="SI" itemValue="true"/>
+									<f:selectItem itemLabel="NO" itemValue="false"/>
+								</cc:selectOneRadio>
+							</h:column>
+							
+							<h:column>
+								<f:facet name="header">
+									<h:outputText value="data appuntamento" />
+								</f:facet>
+								<cc:inputText 									
+									type="date" 
+									value="#{adesione.modificaDtPresoInCarico}"  />
+							</h:column>
+							
+						</h:dataTable>      
+						
+					</h:panelGroup>
+					
+					<h:commandLink 
+						tabindex="0" 
+						id="update_abilitazioni"
+						styleClass="buttonStyle some-margin-top some-margin-bottom" 
+						value="Salva"
+						action="#{ygRicercaAdesioneBean.save}">
+					</h:commandLink>
+					
+				</h:panelGrid>
+								
+			</h:form>
+			
+		</div>
+		
+		<script>
+
+		function disegnaTabella() {
+			
+			generateDataTable(
+				$('#table_form\\:adesione_list'),
+				{
+					"bFilter" : true,
+					"bInfo" : true,
+					"bLengthChange" : true,
+					"bPaginate" : true,
+					'fnDrawCallback': drawCallback,
+					'bStateSave': true, 
+					"oLanguage": {                   
+						"oPaginate" : {
+							"sNext" : "Prossimi",
+							"sPrevious": "Precedenti"
+						}
+					}
+				}
+			);
+		}
+
+		function drawCallback() {
+
+			disegnaTabella();
+			//disegnaBottoni();
+			
+		}
+		
+		$(function() {
+			drawCallback();
+		});
+		
+		</script>
+		
+		<cc:messages id="abilitazione_messages" />
+		
+	</ui:define>
+	
+</ui:composition>
+
+</h:body>
+
+</html>

@@ -1,0 +1,835 @@
+
+	<!--
+		***************************************************************************
+		Computi
+		***************************************************************************
+	-->
+
+<PAGE distributed="false" name="CMComputoRicPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ComboTipiComputo" />
+		<MODULE name="M_ComboStatoAtto" />
+		<MODULE name="CM_GET_PROVINCIA_ISCR" />	
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMComputoRicPage" target="M_ComboTipiComputo" />
+		<DEPENDENCE source="CMComputoRicPage" target="M_ComboStatoAtto" />
+		<DEPENDENCE source="CMComputoRicPage" target="CM_GET_PROVINCIA_ISCR" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CMComputiListaPage" scope="REQUEST">
+	<MODULES>
+
+		<MODULE name="M_List_Rich_Computi" />
+		<MODULE name="M_List_Rich_Computi_config_Provv" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMComputiListaPage" target="M_List_Rich_Computi" />
+		<DEPENDENCE source="CMComputiListaPage" target="M_List_Rich_Computi_config_Provv" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CMComputoDettPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ComboTipiComputo" />
+		<MODULE name="M_ComboStatoAtto" />
+		<MODULE name="M_GetProtocollazione" />
+		<MODULE name="M_Insert_Computo" />
+		<MODULE name="M_Load_Computo" />
+		<MODULE name="M_Save_Computo" />
+		<MODULE name="M_Load_Doc_Computo" />
+		<MODULE name="M_List_Movimenti" />
+		<MODULE name="SalvaRichCompDoc" />
+		<MODULE name="M_Load_Mov_Collegato" />
+		<MODULE name="M_ESISTE_PROVVEDIMENTO" />
+		<MODULE name="M_Stato_Documento_Provv" />
+		<MODULE name="CM_GET_PROVINCIA_ISCR" />	
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMComputoDettPage" target="M_ComboTipiComputo" />
+		<DEPENDENCE source="CMComputoDettPage" target="M_ComboStatoAtto" />
+		<DEPENDENCE source="CMComputoDettPage" target="M_GetProtocollazione" />
+		<DEPENDENCE source="CMComputoDettPage" target="M_Load_Computo" />
+		<DEPENDENCE source="CMComputoDettPage" target="M_Load_Doc_Computo" />
+		<DEPENDENCE source="CMComputoDettPage" target="M_ESISTE_PROVVEDIMENTO" />
+		<DEPENDENCE source="CMComputoDettPage" target="M_Stato_Documento_Provv" />
+		<DEPENDENCE source="CMComputoDettPage" target="CM_GET_PROVINCIA_ISCR" />
+		<DEPENDENCE source="CMComputoDettPage" target="M_List_Movimenti">
+			<CONDITIONS>
+				<PARAMETER name="movimenti" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="CMComputoDettPage" target="M_Insert_Computo">
+			<CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_Insert_Computo" target="M_Load_Computo">
+			<CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="PRGRICHCOMPUTO" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_Insert_Computo.ROWS.ROW.DO_NEXTVAL" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_Insert_Computo" target="M_Load_Doc_Computo">
+			<CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="PRGRICHCOMPUTO" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_Insert_Computo.ROWS.ROW.DO_NEXTVAL" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="CMComputoDettPage" target="M_Save_Computo">
+			<CONDITIONS>
+				<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_Save_Computo" target="M_Load_Computo">
+			<CONDITIONS>
+				<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	
+		<DEPENDENCE source="CMComputoDettPage" target="SalvaRichCompDoc">
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDoc" type="RELATIVE" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="SalvaRichCompDoc" target="M_Load_Doc_Computo">
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDoc" type="RELATIVE" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_Load_Computo" target="M_Load_Mov_Collegato">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="PRGMOVIMENTO" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_Load_Computo.ROWS.ROW.PRGMOVIMENTO" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+		<!--
+			<DEPENDENCE source="M_Save_Computo" target="M_Load_Doc_Computo">
+			<CONDITIONS> <PARAMETER name="aggiornamento" scope="SERVICE_REQUEST"
+			value="AF_DEFINED"/> </CONDITIONS> </DEPENDENCE>
+		-->
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="ProvvedimentoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_Load_Provvedimento" />
+		<MODULE name="M_GetProtocollazione" />
+		<MODULE name="M_Insert_Provvedimento" />
+		<MODULE name="M_Save_Provvedimento" />
+		<MODULE name="M_Load_Doc_Provvedimento" />
+		<MODULE name="SalvaRichProvDoc" />
+		<MODULE name="M_ComboStatoAtto" />
+
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ProvvedimentoPage" target="M_Load_Provvedimento" />
+		<DEPENDENCE source="ProvvedimentoPage" target="M_GetProtocollazione" />
+		<DEPENDENCE source="ProvvedimentoPage" target="M_Load_Doc_Provvedimento" />
+		<DEPENDENCE source="ProvvedimentoPage" target="M_ComboStatoAtto"/>
+		
+		<DEPENDENCE source="ProvvedimentoPage" target="M_Insert_Provvedimento">
+			<CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+
+		<DEPENDENCE source="M_Insert_Provvedimento" target="M_Load_Provvedimento">
+			<CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		<!--  	<CONSEQUENCES>
+				<PARAMETER name="PRGRICHCOMPUTO" scope="SERVICE_RESPONSE"
+					value="AF_DEFINED" />
+			</CONSEQUENCES>-->
+			
+		</DEPENDENCE>
+		<DEPENDENCE source="M_Insert_Provvedimento" target="M_Load_Doc_Provvedimento">
+			<CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+
+		<DEPENDENCE source="ProvvedimentoPage" target="M_Save_Provvedimento">
+			<CONDITIONS>
+				<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_Save_Provvedimento" target="M_Load_Provvedimento">
+			<CONDITIONS>
+				<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="ProvvedimentoPage" target="SalvaRichProvDoc">
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDoc" type="RELATIVE" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="SalvaRichProvDoc" target="M_Load_Doc_Provvedimento">
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDoc" type="RELATIVE" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+	</DEPENDENCIES>
+</PAGE>
+
+
+
+
+
+
+	<!--
+		***************************************************************************
+		CM reddito lavoratori
+		***************************************************************************
+	-->
+
+
+<PAGE distributed="false" name="CMRedditoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ListRedditi" />
+		<MODULE name="M_Controllo_CM" />
+		<MODULE name="M_inserisci_reddito" />
+		<MODULE name="M_DelReddito" />
+		<MODULE name="M_Load_Reddito" />
+		<MODULE name="M_SaveReddito" />
+		<MODULE name="M_Load_anni" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMRedditoPage" target="M_Load_anni" />
+		<DEPENDENCE source="CMRedditoPage" target="M_Controllo_CM" />
+		<DEPENDENCE source="CMRedditoPage" target="M_Load_Reddito">
+			<CONDITIONS>
+				<PARAMETER name="prgLavReddito" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_Load_Reddito" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="CMRedditoPage" target="M_inserisci_reddito">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_inserisci_reddito" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_inserisci_reddito" target="M_Load_anni">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_inserisci_reddito" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="CMRedditoPage" target="M_DelReddito">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_DelReddito" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_DelReddito" target="M_Load_anni">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_DelReddito" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="CMRedditoPage" target="M_SaveReddito">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_SaveReddito" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_SaveReddito" target="M_Load_anni">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_SaveReddito" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="CMRedditoPage" target="M_ListRedditi" />
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!--
+		***************************************************************************
+		Programmi
+		***************************************************************************
+	-->
+
+
+<PAGE distributed="false" name="RicercaListaProgrammiPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_Combo_Stato_Programma" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaListaProgrammiPage" target="M_Combo_Stato_Programma" />
+	</DEPENDENCIES>
+</PAGE>
+
+
+
+<PAGE distributed="false" name="ListaProgrammiPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="ProgrammiListModule" />
+		<MODULE name="M_del_Programmi" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaProgrammiPage" target="ProgrammiListModule" />
+		
+		<DEPENDENCE source="ListaProgrammiPage" target="M_del_Programmi">
+  	         <CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_del_Programmi" />
+			</CONDITIONS>
+	     </DEPENDENCE>
+		 <DEPENDENCE source="M_del_Programmi" target="ProgrammiListModule"/>
+		
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- pagina di dettaglio di un Programma -->
+<PAGE distributed="false" name="ProgrammiPage" scope="REQUEST">
+  <MODULES>
+  
+    <MODULE name="M_Load_Programmi" />		
+	 <MODULE name="M_Insert_Programmi" />
+	 <MODULE name="M_Combo_Stato_Programma" />		
+	<MODULE name="M_SaveProgrammi" />  
+
+  </MODULES>
+  <DEPENDENCIES>   
+  
+        <DEPENDENCE source="ProgrammiPage" target="M_Combo_Stato_Programma"/>
+  	    <DEPENDENCE source="ProgrammiPage" target="M_Load_Programmi"/>
+	   
+	     <DEPENDENCE source="ProgrammiPage" target="M_Insert_Programmi">
+		   <CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST"	value="AF_DEFINED" />
+			</CONDITIONS>
+        </DEPENDENCE>
+  
+		
+		<DEPENDENCE source="M_Insert_Programmi" target="M_Load_Programmi">
+		    <CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>    	
+	        <CONSEQUENCES>
+	            	<PARAMETER name="prgprogrammaq" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_Insert_Programmi.ROWS.ROW.DO_NEXTVAL"/>
+	        </CONSEQUENCES>
+	    </DEPENDENCE>	
+		
+		
+	
+		<DEPENDENCE source="ProgrammiPage" target="M_SaveProgrammi">
+			<CONDITIONS>
+				<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+  
+   	    <DEPENDENCE source="M_SaveProgrammi" target="M_Load_Programmi">
+   	       <CONDITIONS>
+				<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+	    </DEPENDENCE>
+
+  </DEPENDENCIES>
+</PAGE> 
+
+<PAGE distributed="false" name="RicercaProgrammaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_Combo_Stato_Programma" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaProgrammaPage" target="M_Combo_Stato_Programma" />
+	</DEPENDENCIES>
+</PAGE>
+
+
+
+<PAGE distributed="false" name="ProgrammiRicercaListaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetListaProgrammi" />	
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="ProgrammiRicercaListaPage" target="M_GetListaProgrammi"/>	
+	</DEPENDENCIES>
+</PAGE>
+
+
+  <PAGE distributed="false" name="ProgrammaRicercaRefreshPage" scope="REQUEST">
+    <MODULES/>
+  </PAGE>
+
+
+
+<!--   ***************************************************************************
+	   Corsi
+	   *************************************************************************** 	-->
+
+
+<PAGE distributed="false" name="ListaCorsiPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="CorsiListModule" />
+		<MODULE name="M_DelCorso" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaCorsiPage" target="CorsiListModule" />
+		
+		<DEPENDENCE source="ListaCorsiPage" target="M_DelCorso">
+  	         <CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_DelCorso" />
+			</CONDITIONS>
+	     </DEPENDENCE>
+	     
+		 <DEPENDENCE source="M_DelCorso" target="CorsiListModule"/>
+		  
+	 </DEPENDENCIES>
+</PAGE>
+
+
+<!-- pagina di dettaglio di un Corso -->
+<PAGE distributed="false" name="CorsiPage" scope="REQUEST">
+  <MODULES>
+  
+    <MODULE name="M_Load_Corsi" />		
+	 <MODULE name="M_Insert_Corsi" />
+	 <!-- <MODULE name="M_Combo_Esito_Corso" />  -->		
+	<MODULE name="M_SaveCorsi" />  
+
+  </MODULES>
+  <DEPENDENCIES>   
+  
+     <!--<DEPENDENCE source="CorsiPage" target="M_Combo_Esito_Corso"/> -->
+  	    <DEPENDENCE source="CorsiPage" target="M_Load_Corsi"/>
+	   
+	     <DEPENDENCE source="CorsiPage" target="M_Insert_Corsi">
+		   <CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST"	value="AF_DEFINED" />
+			</CONDITIONS>
+        </DEPENDENCE>
+        		
+		<DEPENDENCE source="M_Insert_Corsi" target="M_Load_Corsi">
+		    <CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>    	
+	        <CONSEQUENCES>
+	            	<PARAMETER name="prgcorso" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_Insert_Corsi.ROWS.ROW.DO_NEXTVAL"/>
+	        </CONSEQUENCES>
+	    </DEPENDENCE>	
+	    
+		<DEPENDENCE source="CorsiPage" target="M_SaveCorsi">
+			<CONDITIONS>
+				<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+  
+   	    <DEPENDENCE source="M_SaveCorsi" target="M_Load_Corsi">
+   	       <CONDITIONS>
+				<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+	    </DEPENDENCE>
+
+  </DEPENDENCIES>
+</PAGE> 
+
+
+
+
+<!--   ***************************************************************************
+	   Iscrizione al Corso
+	   *************************************************************************** 	-->
+
+
+<PAGE distributed="false" name="ListaIscrittiCorsiPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="IscrittiCorsiListModule" />
+		<MODULE name="M_DelIscrittoCorso" />
+		<MODULE name="M_Count_IscriCorso" />
+	</MODULES>
+	<DEPENDENCIES>
+		  <DEPENDENCE source="ListaIscrittiCorsiPage" target="IscrittiCorsiListModule" />
+		  <DEPENDENCE source="ListaIscrittiCorsiPage" target="M_DelIscrittoCorso">
+  	         <CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_DelIscrittoCorso" />
+			</CONDITIONS>
+	      </DEPENDENCE>
+	      <DEPENDENCE source="ListaIscrittiCorsiPage" target="M_Count_IscriCorso" />
+		  <DEPENDENCE source="M_DelIscrittoCorso" target="IscrittiCorsiListModule"/>  	
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- pagina di dettaglio di un iscrizione al Corso -->
+<PAGE distributed="false" name="IscrittiCorsiPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_Load_IscrittiCorsi" />		
+	<MODULE name="M_Insert_IscrittiCorsi" />
+	<MODULE name="M_Combo_Esito_Corso" />  		
+	<MODULE name="M_SaveIscrittiCorsi" />  
+	<MODULE name="M_Load_Can_Ins" />	
+	<MODULE name="M_List_Scelta_Multipla_Iscr" />
+	<MODULE name="M_Count_IscriCorso" />
+  </MODULES>
+  <DEPENDENCIES>   
+  
+        <DEPENDENCE source="IscrittiCorsiPage" target="M_Combo_Esito_Corso"/> 
+  	    <DEPENDENCE source="IscrittiCorsiPage" target="M_Load_IscrittiCorsi"/>
+  	    <DEPENDENCE source="IscrittiCorsiPage" target="M_List_Scelta_Multipla_Iscr"/>
+  	    
+  	     <DEPENDENCE source="IscrittiCorsiPage" target="M_Load_Can_Ins">
+         <CONSEQUENCES>
+	            	<PARAMETER name="codice" type="RELATIVE" scope="SERVICE_REQUEST" value="codice"/>	            
+	        </CONSEQUENCES>
+	     </DEPENDENCE>
+	   
+	     <DEPENDENCE source="IscrittiCorsiPage" target="M_Insert_IscrittiCorsi">
+		   <CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST"	value="AF_DEFINED" />
+			</CONDITIONS>
+        </DEPENDENCE>
+        	
+        		
+	<!-- 	<DEPENDENCE source="M_Insert_IscrittiCorsi" target="M_Load_IscrittiCorsi">
+		    <CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>  			      
+	    </DEPENDENCE>   -->
+	    
+	    
+	    <DEPENDENCE source="M_Insert_IscrittiCorsi" target="M_List_Scelta_Multipla_Iscr">
+		    <CONDITIONS>
+				<PARAMETER name="inserisciNew" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>  			      
+	    </DEPENDENCE>	
+	    
+		<DEPENDENCE source="M_List_Scelta_Multipla_Iscr" target="M_Count_IscriCorso"/>
+	    
+	    
+	    
+		<DEPENDENCE source="IscrittiCorsiPage" target="M_SaveIscrittiCorsi">
+			<CONDITIONS>
+				<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST"	value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+  
+   	    <DEPENDENCE source="M_SaveIscrittiCorsi" target="M_Load_IscrittiCorsi">
+   	       <CONDITIONS>
+				<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST"	value="AF_DEFINED" />
+			</CONDITIONS>
+	    </DEPENDENCE>
+
+  </DEPENDENCIES>
+</PAGE> 
+
+<!-- *************************************************************************** 
+                        		SAP
+     *************************************************************************** -->
+
+<PAGE distributed="false" name="SAPRicercaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ComboStatoSAP" />	
+	</MODULES>	
+	<DEPENDENCIES>
+	    <DEPENDENCE source="SAPRicercaPage" target="M_ComboStatoSAP"/>	
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="SAPListaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_DynamicListaSAP" />	
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="SAPListaPage" target="M_DynamicListaSAP"/>	
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="SAPNotificheLavPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ListaNotificheSAPLav" />	
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="SAPNotificheLavPage" target="M_ListaNotificheSAPLav"/>	
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="SAPErroriPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ErroriSAPLav" />	
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="SAPErroriPage" target="M_ErroriSAPLav"/>	
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DomandeNeetPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_DynRicercaDomandeNeet" />
+		<MODULE keep="false" name="MODULE_CHECK_NEET_ATTIVA"/>
+		<MODULE keep="false" name="M_SalvaDichiarazioneNeet"/>
+		<MODULE keep="false" name="M_StoricizzaDomandaNeet" />
+		<MODULE keep="false" name="M_DeleteDomandaNeet" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DomandeNeetPage" target="M_DynRicercaDomandeNeet">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONENEET" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+			</CONDITIONS>	
+		</DEPENDENCE>
+		<DEPENDENCE source="DomandeNeetPage" target="MODULE_CHECK_NEET_ATTIVA">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONENEET" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="DomandeNeetPage" target="M_SalvaDichiarazioneNeet">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONENEET" scope="SERVICE_REQUEST" value="SALVA"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="DomandeNeetPage" target="M_DeleteDomandaNeet">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONENEET" scope="SERVICE_REQUEST" value="CANCELLA"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="DomandeNeetPage" target="M_StoricizzaDomandaNeet">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONENEET" scope="SERVICE_REQUEST" value="STORICIZZA"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_SalvaDichiarazioneNeet" target="M_DynRicercaDomandeNeet"/>
+		<DEPENDENCE source="M_SalvaDichiarazioneNeet" target="MODULE_CHECK_NEET_ATTIVA"/>
+		
+		<DEPENDENCE source="M_StoricizzaDomandaNeet" target="M_DynRicercaDomandeNeet"/>
+		<DEPENDENCE source="M_StoricizzaDomandaNeet" target="MODULE_CHECK_NEET_ATTIVA"/>
+		
+		<DEPENDENCE source="M_DeleteDomandaNeet" target="M_DynRicercaDomandeNeet"/>
+		<DEPENDENCE source="M_DeleteDomandaNeet" target="MODULE_CHECK_NEET_ATTIVA"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DettaglioDichiarazioneNeetPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_DettaglioDomandaNeet" />
+		<MODULE keep="false" name="M_Get_Info_Lavoratore"/>
+		<MODULE keep="false" name="M_GetDomandeDichiarazioneNeet"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DettaglioDichiarazioneNeetPage" target="M_Get_Info_Lavoratore" />
+		<DEPENDENCE source="DettaglioDichiarazioneNeetPage" target="M_GetDomandeDichiarazioneNeet" />
+		<DEPENDENCE source="DettaglioDichiarazioneNeetPage" target="M_DettaglioDomandaNeet">
+			<CONDITIONS>
+				<PARAMETER name="PRGLAVORATORENEET" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- *************************************************************************** 
+                        		NUOVO RA
+     *************************************************************************** -->
+     
+     
+<PAGE distribuited="false" name="NuovoRAPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_TIPO_EVENTO" />
+		<MODULE name="M_TIPO_COMUNICAZIONE" />
+		<MODULE name="M_MOTIVO_COMUNICAZIONE" />
+		<MODULE name="M_STATO_DOMANDA_RA" />
+		<MODULE name="M_GenericComboSiNo" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="NuovoRAPage" target="M_TIPO_EVENTO"/>
+		<DEPENDENCE source="NuovoRAPage" target="M_TIPO_COMUNICAZIONE"/>
+		<DEPENDENCE source="NuovoRAPage" target="M_MOTIVO_COMUNICAZIONE"/>
+		<DEPENDENCE source="NuovoRAPage" target="M_STATO_DOMANDA_RA"/>
+		<DEPENDENCE source="NuovoRAPage" target="M_GenericComboSiNo"/>
+	</DEPENDENCIES>	
+</PAGE>
+
+<PAGE distribuited="false" name="ListaNRAPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ListaNRA" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaNRAPage" target="M_ListaNRA"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distribuited="false" name="DettaglioNRAPage" scope="REQUEST">
+	<MODULES>
+		 <MODULE keep="false" name="M_GetDettaglioNRA" />
+		 <MODULE name="M_MOTIVO_COMUNICAZIONE" />
+		 <MODULE name="M_TIPO_COMUNICAZIONE" />
+		 <MODULE name="M_TIPO_EVENTO" />
+		 <MODULE name="M_GET_RESIDENZAINPS_NUOVA"/>
+		 <MODULE name="M_GET_RESIDENZAINPS_SUC"/>
+		 <MODULE name="M_CODICE_REIEZIONE"/>
+		 <MODULE name="M_AGGIORNA_NUOVA_RA"/>
+		 <MODULE name="M_AGGIORNA_SUC_RA"/>
+		 <MODULE name="M_VARIAZIONE_RESIDENZA_RA" />
+		 <MODULE name="M_INVIA_NUOVA_RA"/>
+		 <MODULE name="M_INVIA_SUC_RA"/>
+		 <MODULE name="M_AGGIORNA_FLAG_INVIO"/>
+		 <MODULE name="M_AGGIORNA_FLAG_VARIAZIONE_RESIDENZA"/>
+		 <MODULE name="M_AGGIORNA_RESIDENZA"/>
+		 <MODULE name="M_AGGIORNA_MSN_RA"/>
+		 <MODULE name="M_STATO_DOMANDA_RA"/>
+		 <MODULE name="M_GenericComboSiNo" />
+	</MODULES>
+	<DEPENDENCIES>
+		<!-- VARIAZIONE RESIDENZA -->
+		<DEPENDENCE source="DettaglioNRAPage" target="M_AGGIORNA_RESIDENZA" >
+			<CONDITIONS>
+				<PARAMETER name="variazioneResidenza" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_AGGIORNA_RESIDENZA" target="M_VARIAZIONE_RESIDENZA_RA" />
+			
+		<!-- AGGIORNA DATI NUOVA RICHIESTA -->
+		<DEPENDENCE source="DettaglioNRAPage" target="M_AGGIORNA_NUOVA_RA" >
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDati_nuova" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_AGGIORNA_NUOVA_RA" target="M_AGGIORNA_MSN_RA" >
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDati_nuova" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<!-- AGGIORNA DATI RICHIESTA SUC-->
+		<DEPENDENCE source="DettaglioNRAPage" target="M_AGGIORNA_SUC_RA" >
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDati_suc" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_AGGIORNA_SUC_RA" target="M_AGGIORNA_MSN_RA" >
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDati_suc" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<!-- INVIO NUOVA RICHIESTA -->
+		<DEPENDENCE source="DettaglioNRAPage" target="M_AGGIORNA_NUOVA_RA" >
+			<CONDITIONS>
+				<PARAMETER name="invia_nuova" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_AGGIORNA_NUOVA_RA" target="M_INVIA_NUOVA_RA">
+			<CONDITIONS>
+				<PARAMETER name="invia_nuova" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_INVIA_NUOVA_RA" target="M_AGGIORNA_FLAG_INVIO">
+			<CONDITIONS>
+				<PARAMETER name="M_INVIA_NUOVA_RA.invio_corretto" scope="SERVICE_RESPONSE" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE> 
+		
+		<!-- INVIO RICHIESTA SUC -->
+		<DEPENDENCE source="DettaglioNRAPage" target="M_AGGIORNA_SUC_RA" >
+			<CONDITIONS>
+				<PARAMETER name="invia_suc" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_AGGIORNA_SUC_RA" target="M_INVIA_SUC_RA">
+			<CONDITIONS>
+				<PARAMETER name="invia_suc" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_INVIA_SUC_RA" target="M_AGGIORNA_FLAG_INVIO">
+			<CONDITIONS>
+				<PARAMETER name="M_INVIA_SUC_RA.invio_corretto" scope="SERVICE_RESPONSE" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_VARIAZIONE_RESIDENZA_RA" target="M_AGGIORNA_FLAG_VARIAZIONE_RESIDENZA">
+			<CONDITIONS>
+				<PARAMETER name="M_VARIAZIONE_RESIDENZA_RA.invio_corretto" scope="SERVICE_RESPONSE" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<!-- DETTAGLIO PAGINA -->
+		<DEPENDENCE source="DettaglioNRAPage" target="M_GetDettaglioNRA" />   
+		<DEPENDENCE source="DettaglioNRAPage" target="M_MOTIVO_COMUNICAZIONE"/>
+		<DEPENDENCE source="DettaglioNRAPage" target="M_TIPO_COMUNICAZIONE"/>
+		<DEPENDENCE source="DettaglioNRAPage" target="M_TIPO_EVENTO"/>
+		<DEPENDENCE source="DettaglioNRAPage" target="M_CODICE_REIEZIONE"/>
+		<DEPENDENCE source="DettaglioNRAPage" target="M_STATO_DOMANDA_RA"/>
+		<DEPENDENCE source="DettaglioNRAPage" target="M_GenericComboSiNo"/>
+		
+		<!-- RESIDENZA INPS -->
+		<DEPENDENCE source="M_GetDettaglioNRA" target="M_GET_RESIDENZAINPS_NUOVA">
+			<CONDITIONS>
+				<PARAMETER name="M_GetDettaglioNRA.NUOVORA.ROWS.ROW.CODMONOTIPODOMANDA" type="RELATIVE" scope="SERVICE_RESPONSE" value="N"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_GetDettaglioNRA" target="M_GET_RESIDENZAINPS_SUC">
+			<CONDITIONS>
+				<PARAMETER name="M_GetDettaglioNRA.NUOVORA.ROWS.ROW.CODMONOTIPODOMANDA" type="RELATIVE" scope="SERVICE_RESPONSE" value="S"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="IDDOMANDAWEB" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GetDettaglioNRA.NUOVORA.ROWS.ROW.IDDOMANDAWEB" />
+				<PARAMETER name="IDDOMANDAINTRANET" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GetDettaglioNRA.NUOVORA.ROWS.ROW.IDDOMANDAINTRANET" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="SAPRicercaNotifichePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ComboMotivoNotifica" />	
+	</MODULES>	
+	<DEPENDENCIES>
+	    <DEPENDENCE source="SAPRicercaNotifichePage" target="M_ComboMotivoNotifica"/>	
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="NotificheSAPListaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_DynamicListaNotificheSAP" />
+		<MODULE name="M_GetMotivoNotifica" />
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="NotificheSAPListaPage" target="M_DynamicListaNotificheSAP"/>
+	    <DEPENDENCE source="NotificheSAPListaPage" target="M_GetMotivoNotifica">
+	    	<CONDITIONS>
+				<PARAMETER name="CODMOTIVOMODIFICA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+	    </DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>

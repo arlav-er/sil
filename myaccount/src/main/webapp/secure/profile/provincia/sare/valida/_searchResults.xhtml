@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	xmlns:pretty="http://ocpsoft.com/prettyfaces">
+
+	<p:dataTable id="usersTable" var="aziendaInfo" value="#{validaUtentiSareBean.lazyDataModel}" paginator="true" rows="10"
+		paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+		rowsPerPageTemplate="5,10,15" lazy="true" widgetVar="usersTableWV" styleClass="default-data-table"
+		emptyMessage="#{ui['shared.noResults']}">
+
+		<p:column sortBy="#{aziendaInfo.ragioneSociale}" headerText="Dati azienda" width="40%">
+			<ul>
+				<li>#{aziendaInfo.ragioneSociale}</li>
+				<li>CF: #{aziendaInfo.codiceFiscale}</li>
+				<li>PIVA: #{aziendaInfo.partitaIva}</li>
+				<li>Tel. ref: #{aziendaInfo.telefonoReferente}</li>
+				<li>E-mail ref: #{aziendaInfo.emailReferente}</li>
+			</ul>
+		</p:column>
+
+		<p:column headerText="Abilitata" styleClass="text-center" width="10%">
+			<h:outputText value="#{validaUtentiSareBean.getFlgAbilitatoAzienda(aziendaInfo.idPfPrincipal)}" escape="false" />
+			
+		</p:column>
+		
+		<p:column headerText="Valida" styleClass="text-center" width="10%" >
+			<p:selectBooleanCheckbox value="#{aziendaInfo.flagValida}" />
+		</p:column>
+
+		<p:column headerText="Dati profilo" styleClass="text-center" width="10%">
+			<pretty:urlbuffer var="provinciaViewAziendaURL" mappingId="provinciaViewAzienda">
+				<f:param id="aziendaViewId" value="#{aziendaInfo.idPfPrincipal}"></f:param>
+			</pretty:urlbuffer>
+			<a href="#{provinciaViewAziendaURL}" target="_blank" class="ui-button btn btn-primary small"> <i class="fa fa-eye"></i>
+			</a>
+		</p:column>
+	</p:dataTable>
+</ui:composition>

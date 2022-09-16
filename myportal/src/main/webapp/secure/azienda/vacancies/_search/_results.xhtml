@@ -1,0 +1,45 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui">
+	<o:importConstants type="it.eng.myportal.helpers.VacancyRedazioneSortEnum" />
+	<h:form id="vacancyResultsForm">
+		<h:panelGroup id="vacancyResultsGroup">
+			<div class="col-md-12 m-t-20">
+				<div class="col-md-12 search-results jobs-items">
+
+					<p:dataTable value="#{ricercaRedazioneBean.ricercaVacancyModel}"
+								  id="listaAnnunciTable" var="listRedazione" paginator="true" lazy="true"
+								  emptyMessage="Nessuna offerta trovata" paginatorAlwaysVisible="false"
+								  first="#{ricercaRedazioneBean.dataGridFirstPage}"
+								  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+								  currentPageReportTemplate="{currentPage} di {totalPages} ({totalRecords})"
+								  rows="20" selectionMode="single" selection="#{ricercaRedazioneBean.vacancySelected}" rowKey="#{listRedazione.idVaDatiVacancy}" >
+						<p:ajax event="rowSelect" process="@this" listener="#{ricercaRedazioneBean.onRowSelect}" />
+						<p:ajax event="page" listener="#{ricercaRedazioneBean.onDataGridPageChange}"
+								oncomplete="MyPortal.VacancyView.pageVacancyChangeEvent();" />
+						<p:column headerText="Riferimento (Num ric./Anno - Provenienza)" sortBy="#{VacancyRedazioneSortEnum.RIFERIMENTO}" >
+							<h:outputText value="#{listRedazione.riferimento}" >
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Data pubblicazione" sortBy="#{VacancyRedazioneSortEnum.DATA_PUBBLICAZIONE}">
+							<h:outputText value="#{listRedazione.dtPubblicazione}">
+								<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Azienda" >
+							<h:outputText value="#{listRedazione.nomeAzienda}" />
+						</p:column>
+						<p:column headerText="Stato annuncio" sortBy="#{VacancyRedazioneSortEnum.STATO_ANNUNCIO}">
+							<h:outputText value="#{listRedazione.codStatoVacancyEnum.descrizione}" />
+						</p:column>
+					</p:dataTable>
+				</div>
+				<br />
+				<p:button styleClass="btn btn-primary ui-button" href="#{ricercaRedazioneBean.backTo}" style="margin-top: 20px"
+						  rendered="#{not empty ricercaRedazioneBean.backTo}" value="Torna alla scrivania"
+						  onclick="buttonToDisable = MyPortal.enableLoadingButton(this)" />
+			</div>
+		</h:panelGroup>
+	</h:form>
+</ui:composition>
+

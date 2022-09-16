@@ -1,0 +1,868 @@
+<!-- DETTAGLIO MATCHING ROSA -->
+<PAGE distributed="false" name="DettMatchRosaPage" scope="REQUEST">
+	<MODULES>
+    <MODULE keep="false" name="M_GET_DATI_LAV" /> <!-- RECUPERO PESI DEL LAV. -->
+    <MODULE keep="false" name="M_GET_DATI_STUDI_LAV" /> <!-- RECUPERO TITOLI DI STUDIO DEL LAV. -->
+    <MODULE keep="false" name="M_GET_DATI_INFORM" /> <!-- RECUPERO DATI DELLA RICHIESTA INFORMATICA-->
+    <MODULE keep="false" name="M_GET_DATI_INFORMRIC" /><!-- RECUPERO DATI DEL LAV. INFORMATICA -->
+    <MODULE keep="false" name="M_GET_DATI_STUDI" />
+    <MODULE keep="false" name="M_GET_LINGUA_LAV" />
+    <MODULE keep="false" name="M_GET_LINGUA_RIC" />
+    <MODULE keep="false" name="M_GET_MANSIONE_LAV" />
+    <MODULE keep="false" name="M_GET_MANSIONE_RIC" />
+    <MODULE keep="false" name="M_GETLAVORATOREABILITAZIONI" />
+    <MODULE keep="false" name="MLISTMOBGEOMANSIONI" />
+    <MODULE keep="false" name="M_GETTESTATARICHIESTA" />
+    <MODULE keep="false" name="M_ListAbilRich" />    
+  </MODULES>
+	<DEPENDENCIES>
+    <DEPENDENCE source="DettMatchRosaPage" target="M_GET_DATI_LAV" />
+    <DEPENDENCE source="DettMatchRosaPage" target="M_GET_DATI_STUDI_LAV" />
+    <DEPENDENCE source="DettMatchRosaPage" target="M_GET_DATI_INFORMRIC" />
+    <DEPENDENCE source="DettMatchRosaPage" target="M_GET_DATI_INFORM" />
+    <DEPENDENCE source="DettMatchRosaPage" target="M_GET_DATI_STUDI" />
+    <DEPENDENCE source="DettMatchRosaPage" target="M_GET_LINGUA_LAV" />
+    <DEPENDENCE source="DettMatchRosaPage" target="M_GET_LINGUA_RIC" />
+    <DEPENDENCE source="DettMatchRosaPage" target="M_GET_MANSIONE_LAV" />
+    <DEPENDENCE source="DettMatchRosaPage" target="M_GET_MANSIONE_RIC" />
+    <DEPENDENCE source="DettMatchRosaPage" target="M_GETLAVORATOREABILITAZIONI" />
+    <DEPENDENCE source="DettMatchRosaPage" target="MLISTMOBGEOMANSIONI" />
+    <DEPENDENCE source="DettMatchRosaPage" target="M_GETTESTATARICHIESTA" />    
+    <DEPENDENCE source="DettMatchRosaPage" target="M_ListAbilRich" />    
+  </DEPENDENCIES>
+</PAGE>   
+<!-- DETTAGLIO MATCHING ROSA -->
+
+
+<PAGE distributed="false" name="MatchviewParPesatoPage" scope="REQUEST">
+	<MODULES>
+    <MODULE keep="false" name="M_Get_Par_Incrocio" /> 
+  </MODULES>
+	<DEPENDENCIES>
+    <DEPENDENCE source="MatchviewParPesatoPage" target="M_Get_Par_Incrocio" />
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!-- ***************************************************************************
+     Gestione del modello di stampa per la lettera di convocazione del lavoratore
+-->
+<PAGE distributed="false" name="GestioneModelloStampaPage" scope="REQUEST">
+	<MODULES>
+    <MODULE keep="false" name="M_GetModello" /> 
+    <MODULE keep="false" name="M_DelModello" /> 
+  </MODULES>
+	<DEPENDENCIES>
+    <DEPENDENCE source="GestioneModelloStampaPage" target="M_DelModello">
+			<CONDITIONS>
+					<PARAMETER name="cancella" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+
+    <DEPENDENCE source="GestioneModelloStampaPage" target="M_GetModello" />
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="GestioneModStampaDettaglioPage" scope="REQUEST">
+	<MODULES>
+    <MODULE keep="false" name="M_GetSpecificoModello" /> 
+    <MODULE keep="false" name="M_GetTipoModello" /> 
+    <MODULE keep="false" name="M_GetOggettoModello" /> 
+    <MODULE keep="false" name="M_SalvaModello" /> 
+    <MODULE keep="false" name="M_InserisciModello" /> 
+    <MODULE keep="false" name="M_GetModelloNext" /> 
+  </MODULES>
+	<DEPENDENCIES>
+  
+    <DEPENDENCE source="GestioneModStampaDettaglioPage" target="M_GetModelloNext">
+			<CONDITIONS>
+					<PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+    
+    <DEPENDENCE source="M_GetModelloNext" target="M_InserisciModello">
+			<CONDITIONS>
+					<PARAMETER  type="RELATIVE" name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+			<CONSEQUENCES>
+					<PARAMETER type="RELATIVE" name="prgModelloStampa" scope="SERVICE_RESPONSE" value="M_GETMODELLONEXT.ROWS.ROW.PRGMODELLOSTAMPA"/>
+      </CONSEQUENCES>
+		</DEPENDENCE>
+
+    <DEPENDENCE source="M_InserisciModello" target="M_GetSpecificoModello">
+			<CONDITIONS/>
+			<CONSEQUENCES>
+					<PARAMETER type="RELATIVE" name="prgModelloStampa" scope="SERVICE_RESPONSE" value="M_GETMODELLONEXT.ROWS.ROW.PRGMODELLOSTAMPA"/>
+      </CONSEQUENCES>
+		</DEPENDENCE>
+
+    <DEPENDENCE source="GestioneModStampaDettaglioPage" target="M_SalvaModello">
+			<CONDITIONS>
+					<PARAMETER name="salva" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+
+    <DEPENDENCE source="GestioneModStampaDettaglioPage" target="M_GetSpecificoModello">
+			<CONDITIONS>
+					<PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+					<PARAMETER name="nuovo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+    <DEPENDENCE source="GestioneModStampaDettaglioPage" target="M_GetTipoModello" />
+    <DEPENDENCE source="GestioneModStampaDettaglioPage" target="M_GetOggettoModello" />
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- gestione graduatorie Art 16 -->
+<PAGE distributed="false" name="ASGestGraduatoriePage" scope="REQUEST">
+  <MODULES>
+  	<MODULE keep="false" name="M_Config_AsOnline"/>
+    <MODULE keep="false" name="MInfoRichiesta"/>
+    <MODULE keep="false" name="MInfoRichMansioni"/>
+    <MODULE keep="false" name="ASMatchStatoRichOrig"/>
+    <MODULE keep="false" name="ASElencoGraduatorieModule" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ASGestGraduatoriePage" target="M_Config_AsOnline"/>
+    <DEPENDENCE source="ASGestGraduatoriePage" target="MInfoRichiesta"/>
+    <DEPENDENCE source="ASGestGraduatoriePage" target="MInfoRichMansioni"/>
+    <DEPENDENCE source="ASGestGraduatoriePage" target="ASMatchStatoRichOrig"/>
+    <DEPENDENCE source="ASGestGraduatoriePage" target="ASElencoGraduatorieModule"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ASMatchDettGraduatoriaPage" scope="REQUEST">
+  <MODULES>    
+    <MODULE keep="false" name="M_Config_AsOnline"/>
+    <MODULE keep="false" name="ASDettaglioGraduatoria"/>    
+    <MODULE keep="false" name="ASCandidatiGraduatoria"/>    
+    <MODULE keep="false" name="ASMatchStatoRichOrig"/>
+    <MODULE keep="false" name="ASDelFisicaLavDaGraduatoria"/>
+    <MODULE keep="false" name="ASSetDefinitivaGraduatoria"/>    
+    <MODULE keep="false" name="ASRiapriGraduatoria"/>
+    <MODULE keep="false" name="COMBO_ALTERNATIVA"/>   
+    <MODULE keep="false" name="AS_NUM_MAX_CANDIDATI"/>  
+    <MODULE keep="false" name="ASCheckCandidatiAvviatiGraduatoria"/> 
+    <MODULE keep="false" name="ASCalcolaPunteggioModule"/> 
+    <MODULE keep="false" name="ASCalcolaPosizioneModule"/>
+    <MODULE keep="false" name="MBUpdateTipoRosaModule"/>
+    <MODULE keep="false" name="M_ASUpdatePunteggiRichiestaAdesione"/>
+    <MODULE keep="false" name="M_GetElaborazioneIstOnline"/>
+    <MODULE keep="false" name="M_GetElabIstOnline"/>
+  </MODULES>
+  <DEPENDENCIES>   
+  	<DEPENDENCE source="ASMatchDettGraduatoriaPage" target="M_Config_AsOnline"/>
+  	<DEPENDENCE source="ASMatchDettGraduatoriaPage" target="M_GetElaborazioneIstOnline"/>
+  	<DEPENDENCE source="ASMatchDettGraduatoriaPage" target="M_GetElabIstOnline"/>
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="MBUpdateTipoRosaModule">
+      <CONDITIONS>       
+          <PARAMETER name="DAMATCH" scope="SERVICE_REQUEST" value="9"/>
+          <PARAMETER name="PRGTIPOROSA" scope="SERVICE_REQUEST" value="1"/>
+	      <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASCandidatiGraduatoria"/>
+      </CONDITIONS>
+    </DEPENDENCE>     
+    <!-- Dettaglio Graduatoria -->    
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="COMBO_ALTERNATIVA">
+      <CONDITIONS>       
+	      <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASCandidatiGraduatoria"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="ASDettaglioGraduatoria">
+      <CONDITIONS>       
+	      <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASCandidatiGraduatoria"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    <!-- Calcola posizione -->
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="ASCalcolaPosizioneModule">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASCandidatiGraduatoria"/>
+        <PARAMETER name="CALC_POSIZIONE" scope="SERVICE_REQUEST" value="ASCalcolaPosizioneModule"/>
+      </CONDITIONS>
+    </DEPENDENCE> 
+    <!-- Elenco Candidati Graduatoria -->
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="ASCandidatiGraduatoria">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASCandidatiGraduatoria"/>
+      </CONDITIONS>
+    </DEPENDENCE>   
+    <!-- Cancellazione fisica del lavoratore dalla graduatoria-->
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="ASDelFisicaLavDaGraduatoria">
+    	<CONDITIONS>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASDelFisicaLavDaGraduatoria"/>
+    	</CONDITIONS>
+    </DEPENDENCE> 
+    <DEPENDENCE source="ASDelFisicaLavDaGraduatoria" target="ASDettaglioGraduatoria"/>
+    <DEPENDENCE source="ASDelFisicaLavDaGraduatoria" target="ASCandidatiGraduatoria"/>
+    <!-- Rende definitiva la graduatoria -->
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="ASSetDefinitivaGraduatoria">
+    	<CONDITIONS>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASSetDefinitivaGraduatoria"/>
+    	</CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="COMBO_ALTERNATIVA">
+      <CONDITIONS>       
+	      <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASSetDefinitivaGraduatoria"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="ASSetDefinitivaGraduatoria" target="ASDettaglioGraduatoria"/>
+    <DEPENDENCE source="ASSetDefinitivaGraduatoria" target="ASCandidatiGraduatoria"/>    
+    <!-- Riapre una graduatoria (crea una grezza da copia della graduatoria definitiva ) -->
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="ASRiapriGraduatoria">
+    	<CONDITIONS>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASRiapriGraduatoria"/>
+    	</CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="ASRiapriGraduatoria" target="ASDettaglioGraduatoria">
+    	<CONDITIONS/>
+		<CONSEQUENCES>
+			<PARAMETER type="RELATIVE" name="PRGROSA" scope="SERVICE_RESPONSE" value="ASRIAPRIGRADUATORIA.ROW.PRGROSA"/>
+			<PARAMETER type="RELATIVE" name="PRGINCROCIO" scope="SERVICE_RESPONSE" value="ASRIAPRIGRADUATORIA.ROW.PRGINCROCIO"/>
+    	</CONSEQUENCES>
+	</DEPENDENCE>
+    <DEPENDENCE source="ASRiapriGraduatoria" target="ASCandidatiGraduatoria">
+    	<CONDITIONS/>
+		<CONSEQUENCES>
+			<PARAMETER type="RELATIVE" name="PRGROSA" scope="SERVICE_RESPONSE" value="ASRIAPRIGRADUATORIA.ROW.PRGROSA"/>
+			<PARAMETER type="RELATIVE" name="PRGINCROCIO" scope="SERVICE_RESPONSE" value="ASRIAPRIGRADUATORIA.ROW.PRGINCROCIO"/>
+    	</CONSEQUENCES>
+	</DEPENDENCE>	
+	<!-- calcolo punteggio -->
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="ASCalcolaPunteggioModule">
+    	<CONDITIONS>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASCalcolaPunteggioModule"/>
+    	</CONDITIONS>
+    </DEPENDENCE> 
+    <DEPENDENCE source="ASCalcolaPunteggioModule" target="ASDettaglioGraduatoria"/>
+    <DEPENDENCE source="ASCalcolaPunteggioModule" target="ASCandidatiGraduatoria"/> 
+    <!-- calcolo posizione -->
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="ASCalcolaPosizioneModule">
+    	<CONDITIONS>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASCalcolaPosizioneModule"/>
+    	</CONDITIONS>
+    </DEPENDENCE> 
+    <!-- aggiorna modalita  punteggio -->
+	<DEPENDENCE source="ASMatchDettGraduatoriaPage" target="M_ASUpdatePunteggiRichiestaAdesione">
+        	<CONDITIONS>
+          		<PARAMETER name="MODULE_PUNTEGGI" scope="SERVICE_REQUEST" value="M_ASUpdatePunteggiRichiestaAdesione"/>
+        	</CONDITIONS>
+        	<CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_ASUpdatePunteggiRichiestaAdesione" target="ASCalcolaPunteggioModule"/>
+    <DEPENDENCE source="ASCalcolaPosizioneModule" target="ASDettaglioGraduatoria"/>
+    <DEPENDENCE source="ASCalcolaPosizioneModule" target="ASCandidatiGraduatoria"/> 
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="AS_NUM_MAX_CANDIDATI"/>       
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="ASMatchStatoRichOrig"/>
+    <DEPENDENCE source="ASMatchDettGraduatoriaPage" target="ASCheckCandidatiAvviatiGraduatoria"/>    
+  </DEPENDENCIES>  
+</PAGE>
+
+<!--ASListaAdesioniViewPage-->
+<PAGE name="ASListaAdesioniViewPage" scope="REQUEST">
+	<MODULES>    	
+    	<MODULE name="M_GetASListaAdesioniLavoratoreView" />    	
+	</MODULES>
+	<DEPENDENCIES>	       	
+	    <DEPENDENCE source="ASListaAdesioniViewPage" target="M_GetASListaAdesioniLavoratoreView" />
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ASAvviaGraduatoriaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="ASDettaglioGraduatoria"/>
+    <MODULE keep="false" name="ASAvviaCandidatiGraduatoria"/>    
+  </MODULES>
+  <DEPENDENCIES>    
+  	<DEPENDENCE source="ASAvviaGraduatoriaPage" target="ASDettaglioGraduatoria"/>
+    <DEPENDENCE source="ASAvviaGraduatoriaPage" target="ASAvviaCandidatiGraduatoria">
+		<CONDITIONS>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASAvviaCandidatiGraduatoria"/>    	
+	    </CONDITIONS>			
+	</DEPENDENCE>
+  </DEPENDENCIES>  
+</PAGE>
+
+<PAGE distributed="false" name="ASAvviaPrimiGraduatoriaPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE keep="false" name="ASDettaglioGraduatoria"/>
+    <MODULE keep="false" name="ASAvviaPrimiCandidatiGraduatoria"/>    
+  </MODULES>
+  <DEPENDENCIES> 
+    <DEPENDENCE source="ASAvviaPrimiGraduatoriaPage" target="ASDettaglioGraduatoria"/>   
+    <DEPENDENCE source="ASAvviaPrimiGraduatoriaPage" target="ASAvviaPrimiCandidatiGraduatoria">
+		<CONDITIONS>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASAvviaPrimiCandidatiGraduatoria"/>    	
+	    </CONDITIONS>			
+	</DEPENDENCE>	
+  </DEPENDENCIES>  
+</PAGE>
+
+<!-- ASDettaglioPunteggioLavoratorePage -->
+<PAGE name="ASDettaglioPunteggioLavoratorePage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_GetLavoratoreAnag" />
+     	<MODULE name="ASDettaglioPunteggioLavoratoreModule" />    	
+ 	</MODULES>
+	<DEPENDENCIES>	   
+    <DEPENDENCE source="ASDettaglioPunteggioLavoratorePage" target="M_GetLavoratoreAnag"/>
+    <DEPENDENCE source="ASDettaglioPunteggioLavoratorePage" target="ASDettaglioPunteggioLavoratoreModule"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<!--ASDettaglioDatiLSUPage-->
+<PAGE name="ASDettaglioDatiLSUPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MatchStatoRichOrig"/>
+    	<MODULE name="M_GetLavoratoreAnag" />
+    	<MODULE name="ASDettaglioDatiLSUModule" />    	
+    	<MODULE name="ASSalvaDatiLSUModule" />    	
+	</MODULES>
+	<DEPENDENCIES>	   
+	    <DEPENDENCE source="ASDettaglioDatiLSUPage" target="ASSalvaDatiLSUModule">
+			<CONDITIONS>
+	       		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASSalvaDatiLSUModule"/>    	
+	    	</CONDITIONS>			
+		</DEPENDENCE>	
+    	<DEPENDENCE source="ASDettaglioDatiLSUPage" target="M_GetLavoratoreAnag"/>	 
+    	<DEPENDENCE source="ASDettaglioDatiLSUPage" target="MatchStatoRichOrig"/> 
+	    <DEPENDENCE source="ASDettaglioDatiLSUPage" target="ASDettaglioDatiLSUModule" />
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ASGestRiapriGraduatoriePage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="MInfoRichiesta"/>
+    <MODULE keep="false" name="MInfoRichMansioni"/>
+    <MODULE keep="false" name="MatchStatoRichOrig"/>
+    <MODULE keep="false" name="ASGestRiapriGraduatorieModule" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ASGestRiapriGraduatoriePage" target="MInfoRichiesta"/>
+    <DEPENDENCE source="ASGestRiapriGraduatoriePage" target="MInfoRichMansioni"/>
+    <DEPENDENCE source="ASGestRiapriGraduatoriePage" target="MatchStatoRichOrig"/>
+    <DEPENDENCE source="ASGestRiapriGraduatoriePage" target="ASGestRiapriGraduatorieModule"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- gestione storico graduatorie Art 16 -->
+<PAGE distributed="false" name="ASStoricoGraduatoriePage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="MInfoRichiesta"/>
+    <MODULE keep="false" name="MInfoRichMansioni"/>
+    <MODULE keep="false" name="MatchStatoRichOrig"/>
+    <MODULE keep="false" name="ASElencoStoricoGraduatorieModule" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ASStoricoGraduatoriePage" target="MInfoRichiesta"/>
+    <DEPENDENCE source="ASStoricoGraduatoriePage" target="MInfoRichMansioni"/>
+    <DEPENDENCE source="ASStoricoGraduatoriePage" target="MatchStatoRichOrig"/>
+    <DEPENDENCE source="ASStoricoGraduatoriePage" target="ASElencoStoricoGraduatorieModule"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="ASStoricoDettGraduatoriaPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE keep="false" name="M_Config_AsOnline"/>
+    <MODULE keep="false" name="ASDettaglioGraduatoria"/>    
+    <MODULE keep="false" name="ASStoricoCandidatiGraduatoria"/>    
+    <MODULE keep="false" name="ASMatchStatoRichOrig"/>    
+  </MODULES>
+  <DEPENDENCIES>    
+ 	 <DEPENDENCE source="ASStoricoDettGraduatoriaPage" target="M_Config_AsOnline"/>    
+    <DEPENDENCE source="ASStoricoDettGraduatoriaPage" target="ASMatchStatoRichOrig"/>    
+    <DEPENDENCE source="ASStoricoDettGraduatoriaPage" target="ASDettaglioGraduatoria">
+      <CONDITIONS>       
+	      <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASStoricoCandidatiGraduatoria"/>
+      </CONDITIONS>
+    </DEPENDENCE>    
+    <!-- Elenco Candidati Graduatoria -->
+    <DEPENDENCE source="ASStoricoDettGraduatoriaPage" target="ASStoricoCandidatiGraduatoria">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASStoricoCandidatiGraduatoria"/>
+      </CONDITIONS>
+    </DEPENDENCE>          
+  </DEPENDENCIES>  
+</PAGE>
+
+<PAGE distributed="false" name="ASGestApprovaGraduatoriePage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="MInfoRichiesta"/>
+    <MODULE keep="false" name="MInfoRichMansioni"/>
+    <MODULE keep="false" name="MatchStatoRichOrig"/>
+    <MODULE keep="false" name="ASGestApprovaGraduatorieModule" />
+    <MODULE keep="false" name="ASSalvaApprovaGradModule" />
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="ASGestApprovaGraduatoriePage" target="ASSalvaApprovaGradModule">
+		<CONDITIONS>
+       		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="ASSalvaApprovaGradModule"/>    	
+    	</CONDITIONS>			
+	</DEPENDENCE>
+    <DEPENDENCE source="ASGestApprovaGraduatoriePage" target="MInfoRichiesta"/>
+    <DEPENDENCE source="ASGestApprovaGraduatoriePage" target="MInfoRichMansioni"/>
+    <DEPENDENCE source="ASGestApprovaGraduatoriePage" target="MatchStatoRichOrig"/>
+    <DEPENDENCE source="ASGestApprovaGraduatoriePage" target="ASGestApprovaGraduatorieModule"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- gestione graduatorie collocamento mirato -->
+<PAGE distributed="false" name="CMGestGraduatoriePage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="MInfoRichiesta"/>
+    <MODULE keep="false" name="MInfoRichMansioni"/>
+    <MODULE keep="false" name="CMMatchStatoRichOrig"/>
+    <MODULE keep="false" name="CMElencoGraduatorieModule" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="CMGestGraduatoriePage" target="MInfoRichiesta"/>
+    <DEPENDENCE source="CMGestGraduatoriePage" target="MInfoRichMansioni"/>
+    <DEPENDENCE source="CMGestGraduatoriePage" target="CMMatchStatoRichOrig"/>
+    <DEPENDENCE source="CMGestGraduatoriePage" target="CMElencoGraduatorieModule"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CMMatchDettGraduatoriaPage" scope="REQUEST">
+  <MODULES>    
+    <MODULE keep="false" name="CMDettaglioGraduatoria"/>    
+    <MODULE keep="false" name="CMCandidatiGraduatoria"/>    
+    <MODULE keep="false" name="CMMatchStatoRichOrig"/>
+    <MODULE keep="false" name="CMDelFisicaLavDaGraduatoria"/>
+    <MODULE keep="false" name="CMCancLavDaGraduatoria"/>    
+    <MODULE keep="false" name="CMSetDefinitivaGraduatoria"/>    
+    <MODULE keep="false" name="CMRiapriGraduatoria"/>
+    <MODULE keep="false" name="COMBO_ALTERNATIVA"/>   
+    <MODULE keep="false" name="CM_NUM_MAX_CANDIDATI"/>  
+    <MODULE keep="false" name="CMCheckCandidatiAvviatiGraduatoria"/> 
+    <MODULE keep="false" name="CMCalcolaPunteggioModule"/> 
+    <MODULE keep="false" name="CMCalcolaPunteggioPresuntoModule"/> 
+    <MODULE keep="false" name="CMCalcolaPosizioneModule"/>    
+    <MODULE keep="false" name="M_GetConfigGraduatoria_cm" />
+    <MODULE name="CMAssociaLavoratoriArt1Module" />
+    <MODULE name="M_GetInfoRegione" />
+  </MODULES>
+  <DEPENDENCIES>          
+  	
+  	<!-- Dettaglio Graduatoria -->    
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="COMBO_ALTERNATIVA">
+      <CONDITIONS>       
+	      <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMCandidatiGraduatoria"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CMDettaglioGraduatoria">
+      <CONDITIONS>       
+	      <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMCandidatiGraduatoria"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    <!-- Calcola punteggio presunto -->
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CMCalcolaPunteggioPresuntoModule">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMCandidatiGraduatoria"/>
+        <PARAMETER name="CALC_POSIZIONE" scope="SERVICE_REQUEST" value="CMCalcolaPosizioneModule"/>
+      </CONDITIONS>
+    </DEPENDENCE>       
+    <!-- Calcola posizione -->
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CMCalcolaPosizioneModule">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMCandidatiGraduatoria"/>
+        <PARAMETER name="CALC_POSIZIONE" scope="SERVICE_REQUEST" value="CMCalcolaPosizioneModule"/>
+      </CONDITIONS>
+    </DEPENDENCE>     
+    <!-- Elenco Candidati Graduatoria -->
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CMCandidatiGraduatoria">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMCandidatiGraduatoria"/>
+      </CONDITIONS>
+    </DEPENDENCE>   
+    <!-- Cancellazione fisica del lavoratore dalla graduatoria-->
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CMDelFisicaLavDaGraduatoria">
+    	<CONDITIONS>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMDelFisicaLavDaGraduatoria"/>
+    	</CONDITIONS>
+    </DEPENDENCE> 
+    <DEPENDENCE source="CMDelFisicaLavDaGraduatoria" target="CMDettaglioGraduatoria"/>
+    <DEPENDENCE source="CMDelFisicaLavDaGraduatoria" target="CMCandidatiGraduatoria"/>
+    <!-- Cancellazione fisica del lavoratore dalla graduatoria-->
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CMCancLavDaGraduatoria">
+    	<CONDITIONS>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMCancLavDaGraduatoria"/>
+    	</CONDITIONS>
+    </DEPENDENCE> 
+    <DEPENDENCE source="CMCancLavDaGraduatoria" target="CMDettaglioGraduatoria"/>
+    <DEPENDENCE source="CMCancLavDaGraduatoria" target="CMCandidatiGraduatoria"/>    
+    <!-- Rende definitiva la graduatoria -->
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CMSetDefinitivaGraduatoria">
+    	<CONDITIONS>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMSetDefinitivaGraduatoria"/>
+    	</CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="COMBO_ALTERNATIVA">
+      <CONDITIONS>       
+	      <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMSetDefinitivaGraduatoria"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="CMSetDefinitivaGraduatoria" target="CMDettaglioGraduatoria"/>
+    <DEPENDENCE source="CMSetDefinitivaGraduatoria" target="CMCandidatiGraduatoria"/>    
+    <!-- Riapre una graduatoria (crea una grezza da copia della graduatoria definitiva ) -->
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CMRiapriGraduatoria">
+    	<CONDITIONS>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMRiapriGraduatoria"/>
+    	</CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="CMRiapriGraduatoria" target="CMDettaglioGraduatoria">
+    	<CONDITIONS/>
+		<CONSEQUENCES>
+			<PARAMETER type="RELATIVE" name="PRGROSA" scope="SERVICE_RESPONSE" value="CMRIAPRIGRADUATORIA.ROW.PRGROSA"/>
+			<PARAMETER type="RELATIVE" name="PRGINCROCIO" scope="SERVICE_RESPONSE" value="CMRIAPRIGRADUATORIA.ROW.PRGINCROCIO"/>
+    	</CONSEQUENCES>
+	</DEPENDENCE>
+    <DEPENDENCE source="CMRiapriGraduatoria" target="CMCandidatiGraduatoria">
+    	<CONDITIONS/>
+		<CONSEQUENCES>
+			<PARAMETER type="RELATIVE" name="PRGROSA" scope="SERVICE_RESPONSE" value="CMRIAPRIGRADUATORIA.ROW.PRGROSA"/>
+			<PARAMETER type="RELATIVE" name="PRGINCROCIO" scope="SERVICE_RESPONSE" value="CMRIAPRIGRADUATORIA.ROW.PRGINCROCIO"/>
+    	</CONSEQUENCES>
+	</DEPENDENCE>	
+	<!-- calcolo punteggio -->
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CMCalcolaPunteggioModule">
+    	<CONDITIONS>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMCalcolaPunteggioModule"/>
+    	</CONDITIONS>
+    </DEPENDENCE> 
+    <DEPENDENCE source="CMCalcolaPunteggioModule" target="CMDettaglioGraduatoria"/>
+    <DEPENDENCE source="CMCalcolaPunteggioModule" target="CMCandidatiGraduatoria"/> 
+    <!-- calcolo posizione -->
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CMCalcolaPosizioneModule">
+    	<CONDITIONS>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMCalcolaPosizioneModule"/>
+    	</CONDITIONS>
+    </DEPENDENCE> 
+    <DEPENDENCE source="CMCalcolaPosizioneModule" target="CMDettaglioGraduatoria"/>
+    <DEPENDENCE source="CMCalcolaPosizioneModule" target="CMCandidatiGraduatoria"/> 
+    <!-- agg. lavoratori art.1 -->
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CMAssociaLavoratoriArt1Module">	 
+     	<CONDITIONS>
+    		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMAssociaLavoratoriArt1Module"/>
+  		</CONDITIONS>
+	</DEPENDENCE>
+	<DEPENDENCE source="CMAssociaLavoratoriArt1Module" target="CMDettaglioGraduatoria"/>
+    <DEPENDENCE source="CMAssociaLavoratoriArt1Module" target="CMCandidatiGraduatoria"/>  
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CM_NUM_MAX_CANDIDATI"/>       
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CMMatchStatoRichOrig"/>
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="CMCheckCandidatiAvviatiGraduatoria"/>    
+     <!-- Mette la conf grad nella response -->    
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="M_GetConfigGraduatoria_cm"/> 
+    <DEPENDENCE source="CMMatchDettGraduatoriaPage" target="M_GetInfoRegione"/>
+  </DEPENDENCIES>  
+</PAGE>
+
+<PAGE name="CMListaAdesioniViewPage" scope="REQUEST">
+	<MODULES>    	
+    	<MODULE name="M_GetCMListaAdesioniLavoratoreView" />    	
+	</MODULES>
+	<DEPENDENCIES>	       	
+	    <DEPENDENCE source="CMListaAdesioniViewPage" target="M_GetCMListaAdesioniLavoratoreView" />
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CMDettaglioPunteggioLavoratorePage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_GetLavoratoreAnag" />
+    	<MODULE name="CMDettaglioPunteggioLavoratoreModule" />    	
+	</MODULES>
+	<DEPENDENCIES>	   
+    	<DEPENDENCE source="CMDettaglioPunteggioLavoratorePage" target="M_GetLavoratoreAnag"/>	  
+	    <DEPENDENCE source="CMDettaglioPunteggioLavoratorePage" target="CMDettaglioPunteggioLavoratoreModule" />
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CMGestApprovaGraduatoriePage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="MInfoRichiesta"/>
+    <MODULE keep="false" name="MInfoRichMansioni"/>
+    <MODULE keep="false" name="MatchStatoRichOrig"/>
+    <MODULE keep="false" name="CMGestApprovaGraduatorieModule" />
+    <MODULE keep="false" name="CMSalvaApprovaGradModule" />
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="CMGestApprovaGraduatoriePage" target="CMSalvaApprovaGradModule">
+		<CONDITIONS>
+       		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMSalvaApprovaGradModule"/>    	
+    	</CONDITIONS>			
+	</DEPENDENCE>
+    <DEPENDENCE source="CMGestApprovaGraduatoriePage" target="MInfoRichiesta"/>
+    <DEPENDENCE source="CMGestApprovaGraduatoriePage" target="MInfoRichMansioni"/>
+    <DEPENDENCE source="CMGestApprovaGraduatoriePage" target="MatchStatoRichOrig"/>
+    <DEPENDENCE source="CMGestApprovaGraduatoriePage" target="CMGestApprovaGraduatorieModule"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CMGestRiapriGraduatoriePage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="MInfoRichiesta"/>
+    <MODULE keep="false" name="MInfoRichMansioni"/>
+    <MODULE keep="false" name="MatchStatoRichOrig"/>
+    <MODULE keep="false" name="CMGestRiapriGraduatorieModule" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="CMGestRiapriGraduatoriePage" target="MInfoRichiesta"/>
+    <DEPENDENCE source="CMGestRiapriGraduatoriePage" target="MInfoRichMansioni"/>
+    <DEPENDENCE source="CMGestRiapriGraduatoriePage" target="MatchStatoRichOrig"/>
+    <DEPENDENCE source="CMGestRiapriGraduatoriePage" target="CMGestRiapriGraduatorieModule"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- gestione storico graduatorie Art 16 -->
+<PAGE distributed="false" name="CMStoricoGraduatoriePage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="MInfoRichiesta"/>
+    <MODULE keep="false" name="MInfoRichMansioni"/>
+    <MODULE keep="false" name="MatchStatoRichOrig"/>
+    <MODULE keep="false" name="CMElencoStoricoGraduatorieModule" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="CMStoricoGraduatoriePage" target="MInfoRichiesta"/>
+    <DEPENDENCE source="CMStoricoGraduatoriePage" target="MInfoRichMansioni"/>
+    <DEPENDENCE source="CMStoricoGraduatoriePage" target="MatchStatoRichOrig"/>
+    <DEPENDENCE source="CMStoricoGraduatoriePage" target="CMElencoStoricoGraduatorieModule"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="CMStoricoDettGraduatoriaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="CMDettaglioGraduatoria"/>    
+    <MODULE keep="false" name="CMStoricoCandidatiGraduatoria"/>    
+    <MODULE keep="false" name="CMMatchStatoRichOrig"/>    
+  </MODULES>
+  <DEPENDENCIES>    
+    <DEPENDENCE source="CMStoricoDettGraduatoriaPage" target="CMMatchStatoRichOrig"/>    
+    <DEPENDENCE source="CMStoricoDettGraduatoriaPage" target="CMDettaglioGraduatoria">
+      <CONDITIONS>       
+	      <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMStoricoCandidatiGraduatoria"/>
+      </CONDITIONS>
+    </DEPENDENCE>    
+    <!-- Elenco Candidati Graduatoria -->
+    <DEPENDENCE source="CMStoricoDettGraduatoriaPage" target="CMStoricoCandidatiGraduatoria">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMStoricoCandidatiGraduatoria"/>
+      </CONDITIONS>
+    </DEPENDENCE>          
+  </DEPENDENCIES>  
+</PAGE>
+
+<PAGE name="CMMatchLavoratoriArt1Page" scope="REQUEST">
+	<MODULES>    	
+    	<MODULE name="CMMatchLavoratoriArt1Module" />
+    	<MODULE name="M_StrTipoLista" /> 	    	   	    	
+	</MODULES>
+	<DEPENDENCIES>	       	
+	    <DEPENDENCE source="CMMatchLavoratoriArt1Page" target="CMMatchLavoratoriArt1Module" />
+	    <DEPENDENCE source="CMMatchLavoratoriArt1Page" target="M_StrTipoLista" />
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CMCancLavoratoreGradPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_GetLavoratoreAnag" />
+    	<MODULE name="CMDettaglioCancLavoratoreModule" />    	
+    	<MODULE name="CMListaMotiviCancGradModule" />  
+	</MODULES>
+	<DEPENDENCIES>	   
+    	<DEPENDENCE source="CMCancLavoratoreGradPage" target="M_GetLavoratoreAnag"/>	  
+	    <DEPENDENCE source="CMCancLavoratoreGradPage" target="CMDettaglioCancLavoratoreModule" />
+	    <DEPENDENCE source="CMCancLavoratoreGradPage" target="CMListaMotiviCancGradModule" />
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CMListaLavCancellatiPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="MInfoRichiesta"/>
+    <MODULE keep="false" name="MatchStatoRichOrig"/>
+    <MODULE keep="false" name="MInfoRichMansioni"/>
+    <MODULE keep="false" name="CMListaLavCancellatiReintegraModule" />
+    <MODULE keep="false" name="CMListaLavCancellatiModule" />
+    <MODULE keep="false" name="M_CMReintegraInGraduatoria"/>
+    <MODULE keep="false" name="CMCalcolaPunteggioPresuntoModule"/> 
+    <MODULE keep="false" name="CMCalcolaPosizioneModule"/>    
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="CMListaLavCancellatiPage" target="M_CMReintegraInGraduatoria">
+      <CONDITIONS>
+        <PARAMETER name="reintegra" scope="SERVICE_REQUEST" value="true"/>
+      </CONDITIONS>
+  	</DEPENDENCE>
+    <DEPENDENCE source="CMListaLavCancellatiPage" target="CMCalcolaPunteggioPresuntoModule">
+      <CONDITIONS>
+        <PARAMETER name="reintegra" scope="SERVICE_REQUEST" value="true"/>
+      </CONDITIONS>
+  	</DEPENDENCE>
+    <DEPENDENCE source="CMListaLavCancellatiPage" target="CMCalcolaPosizioneModule">
+      <CONDITIONS>
+        <PARAMETER name="reintegra" scope="SERVICE_REQUEST" value="true"/>
+      </CONDITIONS>
+  	</DEPENDENCE>
+    <DEPENDENCE source="CMListaLavCancellatiPage" target="MInfoRichiesta"/>
+    <DEPENDENCE source="CMListaLavCancellatiPage" target="MatchStatoRichOrig"/>
+    <DEPENDENCE source="CMGestRiapriGraduatoriePage" target="MInfoRichMansioni"/>
+    <DEPENDENCE source="CMListaLavCancellatiPage" target="CMListaLavCancellatiModule"/>
+    <DEPENDENCE source="CMListaLavCancellatiPage" target="CMListaLavCancellatiReintegraModule">
+      <CONDITIONS>
+        <PARAMETER name="grezza" scope="SERVICE_REQUEST" value="true"/>
+      </CONDITIONS>
+  	</DEPENDENCE>
+   </DEPENDENCIES>
+</PAGE>
+
+
+<PAGE name="CMDettaglioPunteggioPresLavoratorePage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_GetLavoratoreAnag" />
+    	<MODULE name="CMDettaglioPunteggioPresLavoratoreModule" />    	
+    	<MODULE name="GetCMPunteggioPresuntoModule" /> 
+    	<MODULE name="CM_GET_DE_TIPO_ISCR" />
+    	<MODULE name="CHECK_VERSIONE_GRADUATORIA" />       	
+	</MODULES>
+	<DEPENDENCIES>	   
+    	<DEPENDENCE source="CMDettaglioPunteggioPresLavoratorePage" target="M_GetLavoratoreAnag"/>	  
+	    <DEPENDENCE source="CMDettaglioPunteggioPresLavoratorePage" target="CMDettaglioPunteggioPresLavoratoreModule" />
+	    <DEPENDENCE source="CMDettaglioPunteggioPresLavoratorePage" target="GetCMPunteggioPresuntoModule" />
+	    <DEPENDENCE source="CMDettaglioPunteggioPresLavoratorePage" target="CM_GET_DE_TIPO_ISCR" />
+	    <DEPENDENCE source="CMDettaglioPunteggioPresLavoratorePage" target="CHECK_VERSIONE_GRADUATORIA" />
+  </DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="CMQualificatoPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="MInfoRichiesta"/>
+    <MODULE keep="false" name="MInfoRichMansioni"/>
+    <MODULE keep="false" name="MatchStatoRichOrig"/>
+    <MODULE keep="false" name="CMGestQualificatoModule" />
+    <MODULE keep="false" name="CM_GET_DE_QUALIFICATO" />    
+    <MODULE keep="false" name="CMSalvaQualificatoModule" />
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="CMQualificatoPage" target="CMSalvaQualificatoModule">
+		<CONDITIONS>
+       		<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CMSalvaQualificatoModule"/>    	
+    	</CONDITIONS>			
+	</DEPENDENCE>
+    <DEPENDENCE source="CMQualificatoPage" target="MInfoRichiesta"/>
+    <DEPENDENCE source="CMQualificatoPage" target="MInfoRichMansioni"/>
+    <DEPENDENCE source="CMQualificatoPage" target="MatchStatoRichOrig"/>
+    <DEPENDENCE source="CMQualificatoPage" target="CMGestQualificatoModule"/>
+    <DEPENDENCE source="CMQualificatoPage" target="CM_GET_DE_QUALIFICATO"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!-- INIZIO Gestione Formazione Professionale nell'alternativa della Richiesta-->
+<PAGE distributed="false" name="IdoCorsiPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE keep="false" name="M_GetTestataRichiesta" />
+    <MODULE keep="false" name="M_GetCorsiRichiesta"/>
+    <MODULE keep="false" name="M_GetDettaglioFormProf"/>
+    <MODULE keep="false" name="M_InsertFormProf"/>
+    <MODULE keep="false" name="M_SaveFormProf"/>
+    <MODULE keep="false" name="M_DeleteFormProf"/>
+  </MODULES>
+  <DEPENDENCIES>
+  
+    <DEPENDENCE source="IdoCorsiPage" target="M_GetTestataRichiesta"/>
+    <DEPENDENCE source="IdoCorsiPage" target="M_GetCorsiRichiesta"/>
+
+    <DEPENDENCE source="IdoCorsiPage" target="M_GetDettaglioFormProf">
+      <CONDITIONS>
+        <PARAMETER name="SELDETTAGLIO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE> 
+    
+	<DEPENDENCE source="IdoCorsiPage" target="M_InsertFormProf">
+	  <CONDITIONS>
+        <PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+	</DEPENDENCE>  
+	
+	<DEPENDENCE source="IdoCorsiPage" target="M_SaveFormProf">
+      <CONDITIONS>
+        <PARAMETER name="salva" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+	</DEPENDENCE>
+	
+	<DEPENDENCE source="IdoCorsiPage" target="M_DeleteFormProf">
+      <CONDITIONS>
+        <PARAMETER name="CANCELLA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_InsertFormProf" target="M_GetCorsiRichiesta"/>
+    <DEPENDENCE source="M_SaveFormProf" target="M_GetCorsiRichiesta"/>
+    <DEPENDENCE source="M_DeleteFormProf" target="M_GetCorsiRichiesta"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<PAGE name="RicercaCorsiPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_CercaCorsiCODCORSO" />
+		<MODULE name="M_CercaCorsiDESCORSO" />
+	</MODULES>
+	<DEPENDENCIES>
+
+
+		<DEPENDENCE source="RicercaCorsiPage" target="M_CercaCorsiCODCORSO">
+			<CONDITIONS>
+				<PARAMETER name="codCorso" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="RicercaCorsiPage" target="M_CercaCorsiDESCORSO">
+			<CONDITIONS>
+				<PARAMETER name="strTitolo" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+
+
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE name="RicercaCorsiAvanzataPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetDescCorsi" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaCorsiPageAvanzataPage" target="M_GetDescCorsi">
+			<CONDITIONS>
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- FINE Gestione Formazione Professionale nell'alternativa della Richiesta-->
+
+<PAGE distributed="false" name="ASEscludiDaRosaPage" scope="REQUEST">
+ <MODULES>
+    <MODULE keep="false" name="M_GET_NOMINATIVO" />
+    <MODULE keep="false" name="M_ASESCLUDI" />
+  </MODULES>
+   <DEPENDENCIES>
+    <DEPENDENCE source="ASEscludiDaRosaPage" target="M_GET_NOMINATIVO">
+    	<CONDITIONS>
+        <PARAMETER name="PRGNOMINATIVO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+	<DEPENDENCE source="ASEscludiDaRosaPage" target="M_ASESCLUDI">
+      <CONDITIONS>
+        <PARAMETER name="salva" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+	<DEPENDENCE source="M_ASESCLUDI" target="M_GET_NOMINATIVO" />
+  </DEPENDENCIES>
+</PAGE>

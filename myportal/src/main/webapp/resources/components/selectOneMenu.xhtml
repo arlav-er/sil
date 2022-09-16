@@ -1,0 +1,103 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:composite="http://java.sun.com/jsf/composite">
+
+	<composite:interface>
+		<composite:attribute name="label" />
+		<composite:attribute name="value" required="true" />
+		<composite:attribute name="valueDescription" required="false"
+			shortDescription="Inserire questo valore se il componenete può essere visualizzato in textMode.TODO eliminare questo attributo" />
+		<composite:attribute name="disabled" type="java.lang.Boolean"
+			default="false" />
+		<composite:attribute name="disableAjax" type="java.lang.Boolean"
+			default="true" />
+		<composite:attribute name="disableLabel" type="java.lang.Boolean"
+			default="false" />
+		<composite:attribute name="subLabel"
+			shortDescription="Sotto-etichetta da applicare al menu." />
+		<composite:attribute name="underLabel"
+			shortDescription="Sotto-sotto-etichetta da applicare al menu." />	
+			
+		<composite:attribute name="disableInput" type="java.lang.Boolean"
+			default="false" shortDescription="Disabilita l'inserimento manuale degli elementi nella comboBox permettendo solo di scegliere quelli nella lista" />
+		<composite:attribute name="editingMode" default="true"
+			type="java.lang.Boolean"
+			shortDescription="visualizzato come select oppure come testo" />
+		<composite:attribute name="readonly" type="java.lang.Boolean" />
+		<composite:attribute name="onchange" />
+		<composite:attribute name="required" default="false" />
+		<composite:attribute name="requiredMessage"
+			default="Campo obbligatorio" />
+		<composite:attribute name="style" />
+		<composite:attribute name="styleClass" default="inner-shadow" />
+		<composite:attribute name="title" />
+		<composite:editableValueHolder name="function" targets="combobox" />		
+		<composite:clientBehavior name="change" event="change" targets="combobox"/>
+	</composite:interface>
+
+	<composite:implementation>
+		<div id="#{cc.clientId}" style="#{cc.attrs.style}">
+
+			<h:outputLabel id="label" for="combobox"
+				rendered="#{not cc.attrs.disableLabel}">
+				<h:outputText value="#{cc.attrs.label}" />
+				<h:outputText value=" *"
+					rendered="#{not empty cc.attrs.label and cc.attrs.required and cc.attrs.editingMode}" />
+			</h:outputLabel>
+			
+			<h:panelGroup id="sublabel" layout="block">
+				<h:outputText value="#{cc.attrs.subLabel}">					
+				</h:outputText> 
+			</h:panelGroup>
+
+			<h:panelGroup id="inputblock" layout="block"
+				styleClass="selectOneMenuBlock" rendered="#{cc.attrs.editingMode}">
+				
+				<h:selectOneMenu id="combobox" styleClass="selectOneMenu #{cc.attrs.styleClass}"
+					value="#{cc.attrs.value}"
+					onchange="#{cc.attrs.onchange}" readonly="#{cc.attrs.readonly}"
+					disabled="#{cc.attrs.disabled}" required="#{cc.attrs.required}"
+					title="#{cc.attrs.title}"
+					requiredMessage="#{cc.attrs.requiredMessage}">
+					<composite:insertChildren />
+				</h:selectOneMenu>
+				
+				<h:panelGroup id="underlabel" layout="block">
+					<h:outputText value="#{cc.attrs.underLabel}" style="color:red;" />
+				</h:panelGroup>
+
+				<h:panelGroup id="effect" class="toggler" style="display:none;">
+					<h:message id="message" for="combobox"
+						errorClass="ui-state-error ui-corner-all" />
+					<script type="text/javascript">
+						$(function() {
+							runEffectError(jq('#{cc.clientId}:effect'));
+						}); 
+					</script>
+				</h:panelGroup>
+
+				<script type="text/javascript">
+					myportal.selectOneMenu.init({
+					ccid:'#{cc.clientId}',
+					styleClass: '#{cc.attrs.styleClass}',
+					/*style: '#{cc.attrs.style}',*/
+					disabled:#{cc.attrs.disabled},
+					disableInput:#{cc.attrs.disableInput},
+					selectOneMenuExtra:{
+						not:'in use',
+						}
+					});
+				</script>
+			</h:panelGroup>
+
+			<h:panelGroup id="outputblock" layout="block" style="width:100%"
+				rendered="#{not cc.attrs.editingMode}">
+				<h:outputText id="outputText" styleClass="inputTextOutput"
+					value="#{cc.attrs.valueDescription}" />
+			</h:panelGroup>
+
+		</div>
+	</composite:implementation>
+</ui:composition>

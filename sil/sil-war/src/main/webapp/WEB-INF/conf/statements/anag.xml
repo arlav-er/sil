@@ -1,0 +1,1474 @@
+﻿   <STATEMENT
+        name="GET_AN_LAVORATORE_ANAG"
+        query="SELECT AN.CDNLAVORATORE CDNLAVORATORE, 
+                      AN.STRCODICEFISCALE STRCODICEFISCALE, 
+                      AN.STRCOGNOME STRCOGNOME, 
+                      AN.STRNOME STRNOME, 
+                      AN.STRSESSO STRSESSO, TO_CHAR(AN.DATNASC, 'DD/MM/YYYY') DATNASC,
+                      AN.CODCOMNAS CODCOMNAS, COM1.STRDENOMINAZIONE || ' (' || rtrim(p.strIstat) || ') ' as STRCOMNAS,
+                      AN.CODCITTADINANZA CODCITTADINANZA, CIT1.STRDESCRIZIONE STRCITTADINANZA, CIT1.STRNAZIONE STRNAZIONE,
+                      AN.CODCITTADINANZA2 CODCITTADINANZA2, CIT2.STRDESCRIZIONE STRCITTADINANZA2, CIT2.STRNAZIONE STRNAZIONE2,
+                      AN.CODSTATOCIVILE CODSTATOCIVILE, AN.STREMAIL STREMAIL, 
+                      AN.FLGMILITE,
+                      AN.NUMFIGLI NUMFIGLI, 
+                      AN.STRNOTE STRNOTE, 
+                      AN.CDNUTINS CDNUTINS, 
+                      AN.FLGCFOK FLGCFOK,
+                      TO_CHAR(AN.DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS, 
+                      AN.CDNUTMOD, TO_CHAR(AN.DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD, AN.NUMKLOLAVORATORE NUMKLOLAVORATORE,
+					  AN.CODCOMRES as CODCOM, AN.STRINDIRIZZORES, AN.STRCAPRES,
+					  AN.CODCOMDOM as CODCOMDOM, AN.STRINDIRIZZODOM, AN.STRCAPDOM, CIT1.FLGCEE, 
+					  AN.STRTELRES STRTELRES, AN.STRTELDOM STRTELDOM, AN.STRTELALTRO STRTELALTRO, AN.STRCELL STRCELL
+               FROM AN_LAVORATORE AN 
+               INNER JOIN DE_COMUNE COM1 ON AN.CODCOMNAS=COM1.CODCOM
+               LEFT JOIN de_provincia p on com1.codprovincia=p.codprovincia 
+               INNER JOIN DE_CITTADINANZA CIT1 ON AN.CODCITTADINANZA=CIT1.CODCITTADINANZA
+               LEFT JOIN DE_CITTADINANZA CIT2 ON AN.CODCITTADINANZA2=CIT2.CODCITTADINANZA
+               WHERE AN.cdnLavoratore = ?"/>
+
+	<STATEMENT
+        name="GET_CPI_AN_LAVORATORE"
+        query="SELECT DECODE (ai.codmonotipocpi,'C',cpi.codcpi,'E',cpi.codcpi,'T', cpio.codcpi) AS cpicomp,
+        	   ai.codcpitit, ai.codcpiorig, ai.codmonotipocpi,
+			DECODE (ai.codmonotipocpi,'C',cpi.codcpimin,'E',cpi.codcpimin,'T', cpio.codcpimin) AS cpicompmin 
+			    FROM an_lavoratore l INNER JOIN an_lav_storia_inf ai ON (l.cdnlavoratore=ai.cdnlavoratore AND ai.datfine IS NULL)
+         		LEFT JOIN de_cpi cpi ON (ai.codcpitit = cpi.codcpi)
+         		LEFT JOIN de_cpi cpio ON (ai.codcpiorig = cpio.codcpi)
+   				WHERE l.cdnlavoratore = ?"/>
+
+   <STATEMENT
+        name="GET_AN_LAVORATORE_INDIRIZZI"
+        query="SELECT AN.CDNLAVORATORE CDNLAVORATORE, 
+                 AN.CODCOMRES CODCOMRES, COM2.STRDENOMINAZIONE as STRCOMRES, rtrim(p2.strIstat) as provRes , STRINDIRIZZORES STRINDIRIZZORES, 
+                 AN.STRLOCALITARES STRLOCALITARES, AN.STRCAPRES STRCAPRES, 
+                 AN.CODCOMDOM CODCOMDOM, COM3.STRDENOMINAZIONE as STRCOMDOM, rtrim(p3.strIstat) as provDom,
+                 AN.STRINDIRIZZODOM STRINDIRIZZODOM, AN.STRLOCALITADOM STRLOCALITADOM, AN.STRCAPDOM STRCAPDOM,
+                 AN.CDNUTINS CDNUTINS, 
+                 TO_CHAR(AN.DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS, 
+                 AN.CDNUTMOD, TO_CHAR(AN.DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD, AN.NUMKLOLAVORATORE NUMKLOLAVORATORE,
+                 AN_SINF.CODCPITIT as CODCPITIT, AN_SINF.CODMONOTIPOCPI AS CODMONOTIPOCPI,
+				 AN_SINF.CODCPIORIG AS CODCPIORIG,
+                 DE.STRDESCRIZIONE as STRDESCRIZIONE,
+                 AN_SINF.NumKloLavStoriaInf as NumKloLavStoriaInf,
+                 AN_SINF.flgStampaTrasf, 
+                 AN_SINF.flgStampaDoc, 
+                 AN.STRTELRES STRTELRES, AN.STRTELDOM STRTELDOM, AN.STRTELALTRO STRTELALTRO, AN.STRCELL STRCELL, 
+                 AN.STREMAIL STREMAIL, AN.STRFAX STRFAX,                 
+                 AN.FLGINVIOSMS FLGINVIOSMS,
+                 TO_CHAR(AN.DATINVIOSMS, 'DD/MM/YYYY') DATINVIOSMS,                
+				 DEORIG.STRDESCRIZIONE as STRDESCRIZIONEORIG,
+				 AN_SINF.PRGLAVSTORIAINF,
+				 dcmR.strdenominazione as descMontanaR,
+				 dcmD.strdenominazione as descMontanaD
+               FROM                
+               AN_LAVORATORE AN 
+               LEFT JOIN DE_COMUNE COM2 ON AN.CODCOMRES=COM2.CODCOM
+               left join de_com_montana dcmR on COM2.codcommontana = dcmR.codcommontana
+               left join de_provincia p2 on com2.codprovincia=p2.codprovincia
+               LEFT JOIN DE_COMUNE COM3 ON AN.CODCOMDOM=COM3.CODCOM
+               left join de_com_montana dcmD on COM3.codcommontana = dcmD.codcommontana
+               left join de_provincia p3 on com3.codprovincia=p3.codprovincia
+               left join AN_LAV_STORIA_INF AN_SINF ON ( AN.cdnLavoratore = AN_SINF.cdnLavoratore AND AN_SINF.datFine is null )
+               left join DE_CPI DE ON ( DE.codcpi = AN_SINF.CODCPITIT )
+			   left join DE_CPI DEORIG ON ( DEORIG.codcpi = AN_SINF.CODCPIORIG )
+               WHERE AN.cdnLavoratore = ? "/>
+
+  
+<STATEMENT
+        name="GET_AN_LAVORATORE_RECAPITI"
+        query="SELECT AN.CDNLAVORATORE CDNLAVORATORE, 
+                an.strIndirizzoRec, an.strLocalitaRec,
+                an.strCapRec, an.codComRec, com.strDenominazione as strComRec, rtrim(p.strIstat) as provRec,
+               AN.STRTELRES STRTELRES, AN.STRTELDOM STRTELDOM, AN.STRTELALTRO STRTELALTRO, AN.STRCELL STRCELL, 
+              AN.STREMAIL STREMAIL, AN.STRFAX STRFAX,  
+              AN.CDNUTINS CDNUTINS, 
+              TO_CHAR(AN.DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS, 
+               AN.CDNUTMOD, TO_CHAR(AN.DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD, AN.NUMKLOLAVORATORE NUMKLOLAVORATORE
+               FROM AN_LAVORATORE AN 
+              LEFT JOIN DE_COMUNE COM ON AN.CODCOMREC=COM.CODCOM
+              left join de_provincia p on com.codprovincia=p.codprovincia
+               WHERE AN.cdnLavoratore = ? "/>
+
+ <STATEMENT
+        name="SAVE_AN_LAVORATOREANAG"
+        query="UPDATE AN_LAVORATORE
+               SET STRCODICEFISCALE=UPPER(?), 
+                   STRCOGNOME=UPPER(?), 
+                   STRNOME=UPPER(?), 
+                   STRSESSO=?, 
+                   DATNASC=TO_DATE(?,'DD/MM/YYYY'), 
+                   CODCOMNAS=?, 
+                   NUMFIGLI=?, 
+                   CODCITTADINANZA=?, 
+                   CODCITTADINANZA2=?, 
+                   CODSTATOCIVILE=?, 
+                   FLGMILITE=?,
+                   STRNOTE=?, 
+                   FLGCFOK=?,
+                   CDNUTMOD=?, 
+                   DTMMOD=SYSDATE, 
+                   NUMKLOLAVORATORE= ?
+               WHERE CDNLAVORATORE=?"/>
+
+<STATEMENT
+        name="SAVE_AN_LAVORATOREINDIRIZZI"
+        query="UPDATE AN_LAVORATORE
+               SET CODCOMRES=?, 
+                   STRINDIRIZZORES=?, 
+                   STRLOCALITARES=?, 
+                   STRCAPRES=?, 
+                   CODCOMDOM=?, 
+                   STRINDIRIZZODOM=?, 
+                   STRLOCALITADOM=?, 
+                   STRCAPDOM=?, 
+                   CDNUTMOD=?, 
+                   DTMMOD=SYSDATE, 
+                   NUMKLOLAVORATORE= ?,
+                   STRTELRES=?, STRTELDOM=?, STRTELALTRO=?, 
+                   STRCELL=?, STREMAIL=?, STRFAX=?,
+                   FLGINVIOSMS=?,DATINVIOSMS=TO_DATE(?,'DD/MM/YYYY')
+                WHERE CDNLAVORATORE=?" />
+
+<STATEMENT
+        name="SAVE_AN_LAVORATOREINDIRIZZI_DOM_UGUALE_RES"
+        query="UPDATE AN_LAVORATORE
+               SET CODCOMDOM = ?, 
+                   STRINDIRIZZODOM = ?, 
+                   STRLOCALITADOM = ?, 
+                   STRCAPDOM = ?, 
+                   CDNUTMOD = ?, 
+                   DTMMOD = SYSDATE,
+                   NUMKLOLAVORATORE = TO_NUMBER(?) + 1
+                WHERE CDNLAVORATORE = ?" />
+
+<STATEMENT
+        name="SAVE_AN_LAV_STORIA_INF"
+        query="UPDATE AN_LAV_STORIA_INF
+               SET CODCPITIT=?, 
+                   CDNUTMOD=?, 
+                   DTMMOD=SYSDATE, 
+                   NUMKLOLAVSTORIAINF= ?
+                WHERE CDNLAVORATORE=? AND
+                      DATFINE is null"  />                
+
+
+<STATEMENT
+        name="SAVE_AN_LAV_STORIA_INF_INSERT"
+        query="UPDATE AN_LAV_STORIA_INF
+               SET CODCPITIT=?, 
+                   CDNUTMOD=?, 
+                   CODMONOTIPOCPI = ?,
+                   CODCPIORIG = ?,
+                   DTMMOD=SYSDATE, 
+                   NUMKLOLAVSTORIAINF= ?
+                WHERE CDNLAVORATORE=? AND
+                      DATFINE is null"  />                      
+
+<STATEMENT
+        name = "SELECT_CODPROVINCE"
+        query = "select deCpiOrig.codprovincia as codProvOrig, deCpiUser.codprovincia as codProvUser 
+				from de_cpi deCpiOrig, de_cpi deCpiUser 
+				where deCpiUser.codcpi = ? and deCpiOrig.codcpi = ?" />
+
+<STATEMENT
+        name = "SELECT_REGIONE"
+        query = "Select De_REGIONE.CODREGIONE, de_regione.STRDENOMINAZIONE, de_provincia.CODPROVINCIA
+                 from de_provincia inner join de_cpi on (de_provincia.CODPROVINCIA = de_cpi.CODPROVINCIA)
+	                    inner join de_regione on (de_regione.CODREGIONE = de_provincia.CODREGIONE)
+                 where de_cpi.CODCPI = ?" />
+                 
+<STATEMENT
+        name = "SELECT_REGIONE_DA_COM"
+        query = "Select De_REGIONE.CODREGIONE, de_regione.STRDENOMINAZIONE
+				 from de_comune inner join de_provincia on (de_provincia.CODPROVINCIA = de_comune.CODPROVINCIA)
+						inner join de_regione on (de_regione.CODREGIONE = de_provincia.CODREGIONE)
+				 where de_comune.codcom = ?" />
+                 
+<STATEMENT
+        name="SELECT_AN_LAV_STORIA_INF"
+        query="SELECT PRGLAVSTORIAINF, NUMKLOLAVSTORIAINF, CODMONOTIPOCPI, CODCPITIT, CODCPIORIG, CODCPIORIGPREC,
+        			CDNLAVORATORE, TO_CHAR(DATINIZIO, 'DD/MM/YYYY') as DATINIZIO, CODCOMDOM, STRCODICEFISCALEOLD,
+                    CDNUTMODSCHEDAANAGPROF, TO_CHAR(DTMMODSCHEDAANAGPROF, 'DD/MM/YYYY') as DTMMODSCHEDAANAGPROF,
+                    CODMONOTIPOORIG, TO_CHAR(DATTRASFERIMENTO, 'DD/MM/YYYY') as DATTRASFERIMENTO,
+                    TO_CHAR(DATDICHIARAZIONE, 'DD/MM/YYYY') as DATDICHIARAZIONE, FLG181, TO_CHAR(DATANZIANITADISOC, 'DD/MM/YYYY') as DATANZIANITADISOC,
+                    NUMANZIANITAPREC297, NUMMESISOSP, FLGCESSATO, CODMOTIVOCESSATO,
+                    CODSTATOOCCUPAZORIG,
+                    CODLAVFLAG,
+                    CODSTATOOCCUPAZDERIVATODAPRO,
+                    STRCHIAVETABELLAPROLABOR,
+                    TO_CHAR(DATCHIAVETABELLAPROLABOR, 'DD/MM/YYYY') as DATCHIAVETABELLAPROLABOR,
+                    STRNOMETABELLAPROLABOR,
+                    TO_CHAR(DATFINE, 'DD/MM/YYYY') as DATFINE,
+                    STRNOTE,
+                    CDNUTINS,
+                    TO_CHAR(DTMINS, 'DD/MM/YYYY') as DTMINS,
+                    CDNUTMOD,
+                    TO_CHAR(DTMMOD, 'DD/MM/YYYY') as DTMMOD,
+                    CODMONOCALCOLOANZIANITAPREC297,
+                    TO_CHAR(DATCALCOLOANZIANITA, 'DD/MM/YYYY') as DATCALCOLOANZIANITA,
+                    TO_CHAR(DATCALCOLOMESISOSP, 'DD/MM/YYYY') as DATCALCOLOMESISOSP,
+                    FLGSTAMPATRASF, FLGSTAMPADOC
+              FROM AN_LAV_STORIA_INF
+              WHERE CDNLAVORATORE=? AND
+                    DATFINE is null"  />                      
+
+<STATEMENT
+        name="SAVE_AN_LAVORATORERECAPITI"
+        query="UPDATE AN_LAVORATORE
+               SET strIndirizzoRec=?,
+                   strLocalitaRec=?,
+                   strCapRec=?,
+                   codComRec=?, 
+                   CDNUTMOD=?, 
+                   DTMMOD=SYSDATE, 
+                   NUMKLOLAVORATORE = ?
+                WHERE CDNLAVORATORE =?" />
+<!-- STRTELRES=?, STRTELDOM=?, STRTELALTRO=?, STRCELL=?, STREMAIL=?, STRFAX=?,-->
+<STATEMENT
+        name="SAVE_AN_LAVORATORERECAPITIREC_UGUALE_DOM"
+        query="UPDATE AN_LAVORATORE
+               SET strIndirizzoRec = ?,
+                   strLocalitaRec = ?,
+                   strCapRec = ?,
+                   codComRec = ?,
+                   CDNUTMOD = ?, 
+                   DTMMOD = SYSDATE, 
+                   NUMKLOLAVORATORE = TO_NUMBER(?) + 1
+                WHERE CDNLAVORATORE = ? " />
+
+<STATEMENT
+        name="INSERT_AN_LAVORATORE"
+        query="INSERT INTO AN_LAVORATORE
+                  (cdnLavoratore,
+                  strCodiceFiscale,
+                  strCognome,
+                  strNome,
+                  strSesso,
+                  datNasc,
+                  codComNas,
+                  codCittadinanza,
+                  codCittadinanza2,
+                  codstatoCivile,
+                  flgMilite,
+                  codComRes,
+                  numFigli,
+                  strNote,
+                  FLGCFOK,
+                  cdnUtins, dtmins,
+                  cdnUtmod, dtmmod, numklolavoratore)
+                  VALUES 
+                  ( ?,
+                    UPPER(?), UPPER(?), UPPER(?), ?, 
+                   TO_DATE(?,'DD/MM/YYYY'), 
+                   ?, ?, ?, 
+                   ?, ?,
+                   ?, ?, ?, ?, 
+                   ?, SYSDATE, 
+                   ?, SYSDATE, null 
+                   )"/>
+<STATEMENT
+        name="DELETE_AN_LAVORATORE"
+        query="DELETE FROM AN_LAVORATORE
+               WHERE cdnlavoratore=?"/>
+
+<STATEMENT
+        name="SELECT_AN_LAVORATORE"
+        query="SELECT CDNLAVORATORE, NUMKLOLAVORATORE, STRCELL, STREMAIL
+               FROM AN_LAVORATORE
+               WHERE UPPER(STRCODICEFISCALE)=UPPER(?)"/>               
+
+
+<STATEMENT
+        name="SELECT_CODIFICA_COMUNI"
+        query="SELECT c.codcom, c.strdenominazione, p.stristat FROM de_comune c
+               INNER JOIN de_provincia p ON c.codprovincia=p.codprovincia
+               where SYSDATE &gt;= c.datinizioval
+               and SYSDATE &lt;= c.datfineval  "/>
+
+<STATEMENT
+        name="SELECT_CERCA_COMUNE_PRECISA"
+        query="SELECT 
+                c.codcom,
+                c.strdenominazione||    
+                 DECODE (SYSDATE, GREATEST(SYSDATE, C.DATINIZIOVAL, C.DATFINEVAL),
+                                              ' (Comune o Stato non più esistente)',  LEAST(SYSDATE, c.DATINIZIOVAL, c.DATFINEVAL),
+                                              ' (Comune o Stato non più esistente)', '') AS strdenominazione,
+                p.stristat,
+                c.strcap,
+                nvl(c.codcpi,
+                '-1') as codcpi
+              FROM 
+                de_comune c    INNER JOIN de_provincia p ON c.codprovincia=p.codprovincia
+              WHERE 
+                c.strdenominazione=upper(?)
+                 AND substr(codcom,1,1) &lt;&gt; 'Z'"/>
+
+<STATEMENT
+        name="SELECT_CERCA_COMUNE_APPROSSIMATA"
+        query="SELECT c.codcom, c.strdenominazione||    
+                 DECODE (SYSDATE, GREATEST(SYSDATE, C.DATINIZIOVAL, C.DATFINEVAL),
+                                              ' (Comune non più esistente)',  LEAST(SYSDATE, c.DATINIZIOVAL, c.DATFINEVAL),
+                                              ' (Comune non più esistente)', '') AS strdenominazione,
+                p.stristat, 
+                c.strcap, 
+                nvl(c.codcpi, '-1') as codcpi
+               FROM de_comune c
+               INNER JOIN de_provincia p ON c.codprovincia=p.codprovincia
+               WHERE c.strdenominazione like upper(?) || '%' 
+                 AND substr(codcom,1,1) &lt;&gt; 'Z'"/>
+
+<STATEMENT
+        name="SELECT_CERCA_COMUNE_CODICE_APPROSSIMATA"
+        query="SELECT c.codcom, c.strdenominazione||    
+                 DECODE (SYSDATE, GREATEST(SYSDATE, C.DATINIZIOVAL, C.DATFINEVAL),
+                                              ' (Comune non più esistente)',  LEAST(SYSDATE, c.DATINIZIOVAL, c.DATFINEVAL),
+                                              ' (Comune non più esistente)', '') AS strdenominazione, 
+                p.stristat, 
+                c.strcap, 
+                nvl(c.codcpi, '-1') as codcpi
+                FROM de_comune c
+                INNER JOIN de_provincia p ON c.codprovincia=p.codprovincia
+                WHERE c.codcom like upper(?) || '%' 
+                 AND substr(codcom,1,1) &lt;&gt; 'Z'"/>
+
+<STATEMENT
+        name="SELECT_CERCA_STATO_PRECISA"
+        query="SELECT c.codcom, c.strdenominazione ||    
+                 DECODE (SYSDATE, GREATEST(SYSDATE, C.DATINIZIOVAL, C.DATFINEVAL),
+                                              ' (Stato non più esistente)',  LEAST(SYSDATE, c.DATINIZIOVAL, c.DATFINEVAL),
+                                              ' (Stato non più esistente)', '') AS strdenominazione
+               FROM de_comune c
+               WHERE c.strdenominazione=upper(?)
+                     and substr(codcom,1,1) = 'Z'" />
+
+<STATEMENT
+        name="SELECT_CERCA_STATO_APPROSSIMATA"
+        query="SELECT c.codcom, c.strdenominazione || 
+                 DECODE (SYSDATE, GREATEST(SYSDATE, C.DATINIZIOVAL, C.DATFINEVAL),
+                                              ' (Stato non più esistente)',  LEAST(SYSDATE, c.DATINIZIOVAL, c.DATFINEVAL),
+                                              ' (Stato non più esistente)', '') AS strdenominazione
+               FROM de_comune c
+               WHERE c.strdenominazione like upper(?) || '%'
+                    and substr(codcom,1,1) = 'Z'  "/>
+                    
+
+<STATEMENT
+		name="GET_ACCOUNT_LAVORATORE"
+		query="select distinct ts_utente.cdnlavoratore as lav
+			   from ts_utente
+			   inner join an_lavoratore on (ts_utente.cdnlavoratore=an_lavoratore.cdnlavoratore)
+			   where an_lavoratore.cdnlavoratore=?"/> 
+
+<STATEMENT
+        name="SELECT_CERCA_CITTADINANZA"
+        query="SELECT * FROM DE_CITTADINANZA
+                WHERE upper(strnazione) like upper(?) || '%' 
+               and SYSDATE &gt;= datinizioval
+               and SYSDATE &lt;= datfineval  
+               order by STRDESCRIZIONE" />
+
+<STATEMENT
+        name="SELECT_GET_STATI_CIVILI"
+        query="SELECT  CODSTATOCIVILE as CODICE, 
+                       STRDESCRIZIONE AS DESCRIZIONE, 
+                       DATINIZIOVAL, DATFINEVAL
+                FROM DE_STATO_CIVILE
+                WHERE SYSDATE &gt;= datinizioval
+                  and SYSDATE &lt;= datfineval  "/>
+
+
+<STATEMENT
+        name="GET_AN_NEW_LAVORATORE"
+        query=" SELECT s_an_lavoratore.nextval cdnLavoratore from dual"/>       
+
+<STATEMENT
+        name="INSERT_DATA_COMUNE"
+        query="select de_comune.codcom,de_comune.strdenominazione,
+                to_char(to_date(mod(to_number(substr(?,10,2)),40) || '/' || 
+                to_number(decode(substr(?,9,1),
+                                       'A','01',
+                                       'B','02',
+                                       'C','03',
+                                       'D','04',
+                                       'E','05',
+                                       'H','06',
+                                       'L','07',
+                                       'M','08',
+                                       'P','09',
+                                       'R','10',
+                                       'S','11',
+                                       'T','12')) ||
+	   		  '/' || to_number(substr(?,7,2)),'dd/mm/yy'),'dd/mm/yy') data,
+              case 
+                      when to_number(substr(?,10,2))&lt;40 then 'M'
+                      when to_number(substr(?,10,2))&gt;40 then 'F'
+              end
+          sesso
+          from de_comune 
+          where de_comune.codcom= substr(?,12,4)"/>
+
+<!-- Statement per l'inserimento dei dati generali ed indirizzi del lavoratore -->
+<STATEMENT
+        name="INSERT_AN_LAVORATOREANAGIND"
+        query="INSERT INTO AN_LAVORATORE
+                  (cdnLavoratore,
+                  strCodiceFiscale,
+                  strCognome,
+                  strNome,
+                  strSesso,
+                  datNasc,
+                  codComNas,
+                  codCittadinanza,
+                  codCittadinanza2,
+                  codstatoCivile,
+                  flgMilite,
+                  numFigli,
+                  strNote,
+                  FLGCFOK,
+                  cdnUtins, dtmins,
+                  cdnUtmod, dtmmod,
+                  CODCOMRES,
+                  STRINDIRIZZORES, 
+                  STRLOCALITARES, 
+                  STRCAPRES, 
+                  CODCOMDOM, 
+                  STRINDIRIZZODOM, 
+                  STRLOCALITADOM, 
+                  STRCAPDOM,
+                  STRTELRES, STRTELDOM, STRTELALTRO, 
+                  STRCELL, STREMAIL, STRFAX)
+                  VALUES 
+                  (?, UPPER(?),UPPER(?), UPPER(?), ?, 
+                   TO_DATE(?,'DD/MM/YYYY'), 
+                   ?, ?, ?, 
+                   ?, ?,
+                   ?, ?, ?, 
+                   ?, SYSDATE, 
+                   ?, SYSDATE, 
+                   ?, ?, ?, ?, ?, ?, ?, ?,
+                   ?,?,?,?,?,?)"/> 
+<!-- fine -->
+<!--
+<STATEMENT
+        name="TRA_UPDATE_CPI_LAV"
+        query="UPDATE AN_LAV_STORIA_INF
+        		SET CODCPITIT = ?,
+        			CODMONOTIPOCPI = ?,
+                    CDNUTMOD=?, 
+                    DTMMOD=SYSDATE,         			
+        			NUMKLOLAVSTORIAINF = TO_NUMBER(?) + 1
+        		WHERE CDNLAVORATORE = TO_NUMBER(?)
+       		  AND DATFINE IS NULL"/> 
+-->
+<STATEMENT
+        name="GET_DESCR_CPI"
+        query="SELECT c.CODCPI, 
+        			  c.STRDESCRIZIONE DESCRCPI, 
+        			  c.CODCOM CODCOMCPI, 
+        			  c.CODPROVINCIA CODPROVCPI,
+        			  trim(p.strIstat) siglaProvCpi,
+        			  p.CODREGIONE CODREGCPI
+        		FROM DE_CPI c
+				inner join de_provincia p on (c.codprovincia=p.codprovincia)
+        		WHERE c.CODCPI = ?"/> 
+        		
+<STATEMENT
+        name="GET_DESCR_COD_COM"
+        query="SELECT COM1.STRDENOMINAZIONE || ' (' || rtrim(p.strIstat) || ') ' as STRCOM
+		FROM DE_COMUNE COM1
+		inner join de_provincia p on com1.codprovincia=p.codprovincia
+		WHERE COM1.CODCOM = ?"/>
+        		
+<STATEMENT
+        name="LIST_CODCOM_CPIUSER"
+        query="SELECT CODCOM
+        		FROM DE_COMUNE
+        		WHERE CODCPI = ?"/> 
+
+<STATEMENT name="GET_STATO_RA"
+	query="select codStatoRa as codice,
+                  strDescrizione as descrizione
+           from de_stato_ra
+           order by strDescrizione"/>
+           
+<STATEMENT name="GET_STATO_RA_FLGGESTIONE_S"
+	query="select codStatoRa as codice,
+                  strDescrizione as descrizione
+           from de_stato_ra
+           where flgGestione = 'S'
+           order by strDescrizione"/>
+           
+<STATEMENT name="GET_MOT_VERIFICA_RA"
+	query="select codVerifica as codice,
+                  strDescrizione as descrizione
+           from de_verifica_ra
+           order by strDescrizione"/>           
+           
+<STATEMENT name="GET_DETT_RA"
+	query="SELECT ra.CDNLAVORATORE, ra.CDNUTINS, ra.CDNUTMOD, 
+				to_char(ra.DTMINS, 'dd/mm/yyyy hh24:mi') AS DTMINS,
+	   			to_char(ra.DTMMOD, 'dd/mm/yyyy hh24:mi') AS DTMMOD,
+	   			ra.CODSTATORA, ra.PRGRAFILE, filera.strNomefileXml nomeFileRa, 
+				to_char(ra.DATORACONTROLLO, 'dd/mm/yyyy hh24:mi') AS DATORACONTROLLO,
+		 		ra.CODVERIFICA, ra.FLGESTRAIDATI, ra.CODPROVENIENZA, 
+		 		to_char(ra.DATDOMANDA, 'dd/mm/yyyy') AS DATDOMANDA,
+		 		ra.STRCODENTEAUTONOMO, ra.STRENTEAUTONOMO,
+		 		ra.STRMATRICOLAINPS, ra.STRCFAZIENDA, ra.STRRAGSOCAZIENDA,
+		 		to_char(ra.DATACESSATTIVITA, 'dd/mm/yyyy') AS DATACESSATTIVITA,  
+		 		ra.STRNUMDELIBERA, ra.NUMANNODELIBERA, 
+		 		to_char(ra.DATESITODELIBERA, 'dd/mm/yyyy') AS DATESITODELIBERA,
+		 		to_char(ra.DATINIZIOPRESTAZIONE, 'dd/mm/yyyy') AS DATINIZIOPRESTAZIONE,
+		 		to_char(ra.DATFINEPRESTAZIONE, 'dd/mm/yyyy') AS DATFINEPRESTAZIONE,
+		 		ra.NUMDURATAPRESTAZIONE, ra.STRTIPOPRESTAZIONE, 
+		 		ra.STRCODICEFISCALE, ra.STRCOGNOME, ra.STRNOME, 
+		 		to_char(ra.DATNASCITA, 'dd/mm/yyyy') AS DATNASCITA,
+		 		ra.STRCOMUNENASC as STRCOMNASCITA,
+		 		ra.STRINDIRIZZO, ra.STRCOMUNE, ra.STRCAP, 
+		 		ra.STRTELBENEFICIARIO, ra.STREMAILBENEFICIARIO,
+	 			ra.STRIBANNAZIONE, ra.STRIBANCONTROLLO, ra.STRCINLAVORATORE, 
+	 			ra.STRABILAVORATORE, ra.STRCABLAVORATORE, ra.STRCCLAVORATORE,
+	 			ra.DECIMPORTOLORDOGIORNALIERO, ra.DECIMPORTOLORDOCOMPLESSIVO, 
+	 			to_char(ra.DATRIFERIMENTO, 'dd/mm/yyyy') AS DATRIFERIMENTO 
+			FROM AM_REDDITO_ATTIVAZIONE ra
+			inner join AM_RA_FILE filera on filera.prgRaFile = ra.prgRaFile 
+		   	WHERE PRGREDDITOATTIVAZIONE = ?" /> 
+		   	
+<STATEMENT name="UPDATE_DETTAGLIO_RA"
+	query="Update AM_REDDITO_ATTIVAZIONE
+				SET codStatoRa = ?,
+					codprovenienza = 'M',
+					codVerifica = ?,
+					flgEstraiDati = ?,
+					strCodEnteAutonomo = ?,
+					strEnteAutonomo = ?,
+					strNumDelibera = ?,
+					datEsitoDelibera = to_date(?,'DD/MM/YYYY'),
+					numAnnoDelibera = TO_NUMBER(?),
+					strIbanNazione = ?,
+					strIbanControllo = ?,
+					strCinLavoratore = ?,
+					strAbiLavoratore = ?,
+					strCabLavoratore = ?,
+					strCCLavoratore = ?,
+					decImportoLordoGiornaliero = to_number(?, '99999999999999999999.999'),
+					decImportoLordoComplessivo = to_number(?, '99999999999999999999.999'),
+					numKloRa = numKloRa + 1,
+					cdnUtMod = ?,
+					DtmMod = sysdate
+				where prgRedditoAttivazione = ?" />		   		   	
+     
+<STATEMENT
+        name="GET_DATA_DID"
+        query="SELECT TO_CHAR(DD.DATDICHIARAZIONE, 'DD/MM/YYYY') DATDICHIARAZIONE
+        		FROM AM_DICH_DISPONIBILITA DD,
+        			 AM_ELENCO_ANAGRAFICO EA 
+        		WHERE EA.PRGELENCOANAGRAFICO = DD.PRGELENCOANAGRAFICO
+				  AND EA.DATCAN IS NULL
+				  AND DD.DATFINE IS NULL
+				  AND CDNLAVORATORE = TO_NUMBER(?)"/>     
+     		        		  
+<STATEMENT
+        name="GET_DETT_TRASF_LAV"
+        query="SELECT
+				TO_CHAR(AN_LAV_STORIA_INF.PRGLAVSTORIAINF) PRGLAVSTORIAINF, 
+				TO_CHAR(AN_LAV_STORIA_INF.CDNLAVORATORE) CDNLAVORATORE, 
+				TO_CHAR(AN_LAV_STORIA_INF.DATINIZIO, 'DD/MM/YYYY') DATINIZIO,
+				CODCPITIT codCPI, 
+				CODMONOTIPOCPI, 
+				AN_LAV_STORIA_INF.CODCOMDOM codComdom, 
+				STRCODICEFISCALEOLD, 
+				LAV.STRCODICEFISCALE as STRCODICEFISCALE,
+				LAV.STRCOGNOME as STRCOGNOME,
+				LAV.STRNOME as STRNOME,
+				TO_CHAR(LAV.DATNASC, 'DD/MM/YYYY') DATNASC,
+				LAV.CODCOMNAS as CODCOMNAS,
+				COMNAS.STRDENOMINAZIONE ||' (' ||PRONAS.STRTARGA||')' as STRCOMNAS,
+				TO_CHAR(CDNUTMODSCHEDAANAGPROF) CDNUTMODSCHEDAANAGPROF,
+				TO_CHAR(DTMMODSCHEDAANAGPROF, 'DD/MM/YYYY') DTMMODSCHEDAANAGPROF, 
+				CODMONOTIPOORIG, 
+				TO_CHAR(AN_LAV_STORIA_INF.DATTRASFERIMENTO, 'DD/MM/YYYY') DATTRASFERIMENTO,
+				CODCPIORIG, 
+				TO_CHAR(AN_LAV_STORIA_INF.DATDICHIARAZIONE, 'DD/MM/YYYY') DATDICHIARAZIONE,
+				FLG181, 
+				TO_CHAR(AN_LAV_STORIA_INF.DATANZIANITADISOC, 'DD/MM/YYYY') datAnzianitaDisoc,
+				TO_CHAR(AN_LAV_STORIA_INF.NUMANZIANITAPREC297) NUMANZIANITAPREC297, 
+				TO_CHAR(AN_LAV_STORIA_INF.NUMMESISOSP) NUMMESISOSP, 
+				FLGCESSATO, 
+				CODMOTIVOCESSATO, 
+				CODSTATOOCCUPAZORIG, 
+				CODLAVFLAG, 
+				CODSTATOOCCUPAZDERIVATODAPRO, 
+				STRCHIAVETABELLAPROLABOR,
+				TO_CHAR(DATCHIAVETABELLAPROLABOR, 'DD/MM/YYYY') DATCHIAVETABELLAPROLABOR,
+				STRNOMETABELLAPROLABOR, 
+				TO_CHAR(AN_LAV_STORIA_INF.DATFINE, 'DD/MM/YYYY') DATFINE,
+				AN_LAV_STORIA_INF.STRNOTE, 
+				TO_CHAR(AN_LAV_STORIA_INF.CDNUTINS) CDNUTINS,
+				TO_CHAR(AN_LAV_STORIA_INF.DTMINS, 'DD/MM/YYYY') DTMINS,
+				TO_CHAR(AN_LAV_STORIA_INF.CDNUTMOD) CDNUTMOD,
+				TO_CHAR(AN_LAV_STORIA_INF.DTMMOD, 'DD/MM/YYYY') DTMMOD,
+				TO_CHAR(NUMKLOLAVSTORIAINF) NUMKLOLAVSTORIAINF,
+				AN_LAV_STORIA_INF.CODMONOCALCOLOANZIANITAPREC297, 
+				TO_CHAR(AN_LAV_STORIA_INF.DATCALCOLOANZIANITA, 'DD/MM/YYYY') DATCALCOLOANZIANITA,
+				TO_CHAR(AN_LAV_STORIA_INF.DATCALCOLOMESISOSP, 'DD/MM/YYYY') DATCALCOLOMESISOSP,
+				DE_CPI.STRDESCRIZIONE strCPI,
+				DE_CPI.CODCOM CODCOMCPITIT,
+				DE_CPI.CODPROVINCIA CODPROVCPITIT,
+				DE_STATO_OCCUPAZ.CODSTATOOCCUPAZRAGG CODSTATOOCCRAGG,
+				COMDOM.STRDENOMINAZIONE strComdom,
+				COMDOM.STRCAP strCapDom,
+				STOCC.CODSTATOOCCUPAZ CODSTATOOCCUPAZ,
+				DE_CPIORIG.STRDESCRIZIONE DESCRCPIORIG,
+				LAV.STRINDIRIZZODOM STRINDIRIZZODOM,
+				LAV.STRLOCALITADOM STRLOCALITADOM,
+				LAV.NUMKLOLAVORATORE NUMKLOLAVORATORE,
+				AN_LAV_STORIA_INF.FLGSTAMPATRASF,
+				AN_LAV_STORIA_INF.FLGSTAMPADOC
+				FROM AN_LAV_STORIA_INF,
+					 DE_CPI,
+					 DE_STATO_OCCUPAZ,
+					 DE_COMUNE COMNAS,
+					 DE_PROVINCIA PRONAS,
+					 DE_COMUNE COMDOM,
+					 AM_STATO_OCCUPAZ STOCC,
+					 DE_CPI DE_CPIORIG,
+					 AN_LAVORATORE LAV
+				WHERE AN_LAV_STORIA_INF.CDNLAVORATORE = TO_NUMBER(?)
+				  AND AN_LAV_STORIA_INF.CODCPITIT = DE_CPI.CODCPI (+)
+				  AND LAV.CDNLAVORATORE = AN_LAV_STORIA_INF.CDNLAVORATORE
+				  AND AN_LAV_STORIA_INF.CODCPIORIG = DE_CPIORIG.CODCPI (+)
+				  AND STOCC.CODSTATOOCCUPAZ = DE_STATO_OCCUPAZ.CODSTATOOCCUPAZ (+)
+				  AND STOCC.CDNLAVORATORE (+) = AN_LAV_STORIA_INF.CDNLAVORATORE
+				  AND STOCC.DATFINE IS NULL
+				  AND LAV.CODCOMNAS = COMNAS.CODCOM (+)
+				  AND COMNAS.CODPROVINCIA = PRONAS.CODPROVINCIA (+)
+				  AND AN_LAV_STORIA_INF.CODCOMDOM = COMDOM.CODCOM (+)
+				  AND AN_LAV_STORIA_INF.DATFINE IS NULL
+"/>
+
+<STATEMENT
+        name="GET_KLOELENCOANAG_PER_TRASF_LAV"
+        query="SELECT
+				TO_CHAR(EA.PRGELENCOANAGRAFICO) PRGELENCOANAGRAFICO, 
+				EA.NUMKLOELENCOANAG NUMKLOELENCOANAG 
+			   FROM AM_ELENCO_ANAGRAFICO EA  
+			   WHERE EA.CDNLAVORATORE = TO_NUMBER(?)
+				     AND EA.DATCAN IS NULL	     
+"/>
+
+<STATEMENT
+        name="GET_KLOPATTO_PER_TRASF_LAV"
+        query="SELECT
+				TO_CHAR(PL.PRGPATTOLAVORATORE) PRGPATTOLAVORATORE, 
+				PL.NUMKLOPATTOLAVORATORE NUMKLOPATTOLAVORATORE 
+			   FROM AM_PATTO_LAVORATORE PL  
+			   WHERE PL.CDNLAVORATORE = TO_NUMBER(?)
+				     AND PL.DATFINE IS NULL	     
+"/>
+
+<STATEMENT
+        name="INSERT_AN_LAV_S"
+        query="INSERT INTO AN_LAV_STORIA_INF (
+				PRGLAVSTORIAINF, CDNLAVORATORE, DATINIZIO, CODCPITIT,
+				CODMONOTIPOCPI, CODCOMDOM, STRCODICEFISCALEOLD, CDNUTMODSCHEDAANAGPROF,
+				DTMMODSCHEDAANAGPROF, CODMONOTIPOORIG, DATTRASFERIMENTO, CODCPIORIG,
+				DATDICHIARAZIONE, FLG181, DATANZIANITADISOC, NUMANZIANITAPREC297,
+				NUMMESISOSP, CODSTATOOCCUPAZORIG, STRNOTE, CDNUTINS,
+				DTMINS, CDNUTMOD, DTMMOD, CODMONOCALCOLOANZIANITAPREC297,
+				DATCALCOLOANZIANITA, DATCALCOLOMESISOSP, flgStampaTrasf, flgStampaDoc
+        	   ) VALUES (
+        		S_AN_LAV_STORIA_INF.NEXTVAL, TO_NUMBER(?), TO_DATE(?, 'DD/MM/YYYY'), ?,
+        		?, ?, (SELECT STRCODICEFISCALE FROM AN_LAVORATORE WHERE CDNLAVORATORE = TO_NUMBER(?)), TO_NUMBER(?),
+        		SYSDATE, ?, TO_DATE(?, 'DD/MM/YYYY'), ?,
+        		TO_DATE(?, 'DD/MM/YYYY'), ?, TO_DATE(?, 'DD/MM/YYYY'), TO_NUMBER(?),
+        		TO_NUMBER(?), ?, ?, TO_NUMBER(?),
+        		SYSDATE, TO_NUMBER(?), SYSDATE, ?,
+        		TO_DATE(?, 'DD/MM/YYYY'), TO_DATE(?, 'DD/MM/YYYY'), ?, ?
+        	   )"/>
+
+<STATEMENT
+        name="FIND_PATTO_APERTO"
+        query="SELECT PRGPATTOLAVORATORE FROM AM_PATTO_LAVORATORE 
+        		WHERE CDNLAVORATORE = TO_NUMBER(?)
+        		  AND DATFINE IS NULL"/>
+        		  
+<STATEMENT
+        name="UPDATE_AM_EL_ANAG"
+        query="UPDATE AM_ELENCO_ANAGRAFICO SET
+        		DATCAN = (TO_DATE(?, 'DD/MM/YYYY') - 1),
+        		CODTIPOCAN = 'TD',
+        		CDNUTMOD = ?,
+        		DTMMOD = SYSDATE,
+        		NUMKLOELENCOANAG = TO_NUMBER(?)
+        	   WHERE PRGELENCOANAGRAFICO = TO_NUMBER(?)"/>
+<STATEMENT
+        name="UPDATE_LAV_DIDINPS"
+        query="UPDATE AM_DID_INPS
+               SET CDNLAVORATORE=?,
+               NUMKLODIDINPS=(?+1)
+               WHERE STRCODICEFISCALELAV=? AND PRGDIDINPS = ? AND CDNLAVORATORE IS NULL"/>  		  
+<STATEMENT
+        name="INSERT_AM_EL_ANAG"
+        query="INSERT INTO AM_ELENCO_ANAGRAFICO (
+				PRGELENCOANAGRAFICO, CDNLAVORATORE, DATINIZIO,
+				CDNUTINS, DTMINS, CDNUTMOD, DTMMOD
+        	   ) VALUES (
+        		?, TO_NUMBER(?), TO_DATE(?, 'DD/MM/YYYY'),
+        		?, SYSDATE, ?, SYSDATE
+        	   )"/>  
+        	   
+<STATEMENT
+        name="UPDATE_AM_PATTO_LAV"
+        query="UPDATE AM_PATTO_LAVORATORE SET
+        		DATFINE = 
+				(CASE
+					WHEN (TO_DATE(?, 'DD/MM/YYYY') - 1) &lt; TRUNC(DATSTIPULA) THEN DATSTIPULA
+					ELSE (TO_DATE(?, 'DD/MM/YYYY') - 1)
+				END),
+        		CODMOTIVOFINEATTO = 'TD',
+        		CDNUTMOD = ?,
+        		DTMMOD = SYSDATE,
+        		NUMKLOPATTOLAVORATORE = TO_NUMBER(?)
+        	   WHERE PRGPATTOLAVORATORE = TO_NUMBER(?)"/>    
+
+<STATEMENT
+        name="UPDATE_DOM_LAV"
+        query="UPDATE AN_LAVORATORE
+               SET STRINDIRIZZODOM = ?,
+                   STRLOCALITADOM = ?,
+                   CODCOMDOM = ?,
+                   STRCAPDOM = ?,   
+                   CDNUTMOD = TO_NUMBER(?), 
+                   DTMMOD = SYSDATE, 
+                   NUMKLOLAVORATORE = TO_NUMBER(?)
+                WHERE CDNLAVORATORE = TO_NUMBER(?)" />   	         		  
+
+
+
+<STATEMENT
+        name="GET_DATI_TS_GENERALE"
+        query="select TS_GENERALE.PRGGENERALE, TS_GENERALE.CODPROVINCIASIL, 
+                      TS_GENERALE.CODTIPOFILEESTREPORT , TS_GENERALE.NUMKMDISTANZA, 
+                      TS_GENERALE.FLGPROTOCOLLOAUT, TS_GENERALE.NUMGGCOLLOQUIOOR, 
+                      TS_GENERALE.NUMGGSTIPULAPATTO, TS_GENERALE.NUMGGSCADPATTO,    
+                      TS_GENERALE.DATPORTING, TS_GENERALE.FLGBATCHANZPREC297,
+                      TS_GENERALE.DATINIZIOVAL, TS_GENERALE.DATFINEVAL,
+                      TS_GENERALE.NUMGGPRIMARITARDOMOV
+               FROM TS_GENERALE" />       
+
+<!-- STATEMENTS PER LA MODIFICA DEL PERMESSO DI SOGGIORNO CON L'ACQUISIZIONE DELLA CITTADINANZA UE-->               
+<STATEMENT
+        name="GET_FLAG_CITTADINANZA_CEE"
+        query="select nvl(decitt.FLGCEE,'N') FLGCEE
+				FROM de_cittadinanza decitt
+				WHERE decitt.codCittadinanza = ?" />               
+
+<STATEMENT
+        name="GET_PERM_SOGG_LAV"
+        query="select am_ex.prgPermSogg, am_ex.numKloPermSogg
+				from AM_EX_PERM_SOGG am_ex
+				where am_ex.cdnLavoratore = ?
+					  and am_ex.datfine is null" />       
+					  
+					  
+<STATEMENT
+        name="UPDATE_AM_EX_PERM"
+        query="Update AM_EX_PERM_SOGG
+				SET datFine = to_date(?,'DD/MM/YYYY'),
+					numKloPermSogg = numKloPermSogg + 1,
+					cdnUtMod = ?,
+					DtmMod = sysdate
+				where prgPermSogg = ?" />
+				
+				
+<STATEMENT
+        name="UPDATE_AM_EX_PERM_CONCORRENZA"
+        query="Update AM_EX_PERM_SOGG
+				SET datFine = to_date(?,'DD/MM/YYYY'),
+					numKloPermSogg = ?,
+					cdnUtMod = ?,
+					DtmMod = sysdate
+				where prgPermSogg = ?" />	
+
+				          		  
+<STATEMENT name="GET_AM_ELENCO_ANAGRAFICO_NEXTVAL" query="
+	select s_AM_ELENCO_ANAGRAFICO.nextval as do_nextval from dual
+"/>				
+<STATEMENT name="UPDATE_DICH_DISP" query="
+	update am_dich_disponibilita 
+	set prgelencoanagrafico = ?, numklodichdisp = ?, dtmmod = sysdate, cdnutmod = ?
+	where prgdichdisponibilita = ?
+"/>
+<STATEMENT name="GET_INFO_STAMPA_TRASF" query="
+	SELECT PRGLAVSTORIAINF, NUMKLOLAVSTORIAINF, FLGSTAMPATRASF, FLGSTAMPADOC
+	FROM AN_LAV_STORIA_INF 
+	WHERE CDNLAVORATORE = ?
+		AND DATFINE IS NULL
+"/>
+<STATEMENT name="UPDATE_TRASF_STAMPA_TRASF" query="
+	UPDATE AN_LAV_STORIA_INF SET NUMKLOLAVSTORIAINF  = ?, FLGSTAMPATRASF = ?, cdnutmod = ?, dtmmod = sysdate
+	WHERE PRGLAVSTORIAINF = ?
+"/>
+
+<STATEMENT name="UPDATE_TRASF_STAMPA_DOC" query="
+	UPDATE AN_LAV_STORIA_INF SET NUMKLOLAVSTORIAINF  = ?, FLGSTAMPADOC = ?, cdnutmod = ?, dtmmod = sysdate
+	WHERE PRGLAVSTORIAINF = ?
+"/>
+
+<!-- Restituisce un elenco di informazini storiche sui trasferimenti del lavoratore -->
+<STATEMENT name="GET_STORICO_TRASFERIMENTI" 
+          query="SELECT AN_LAV_STORIA_INF.PRGLAVSTORIAINF,
+                       DE_COMUNE.STRDENOMINAZIONE DOMICILIO,
+					   CPI.STRDESCRIZIONE  CPITITOLARE,
+					   decode(AN_LAV_STORIA_INF.CODMONOTIPOCPI,
+					          	'C',AN_LAV_STORIA_INF.CODCPIORIG,
+					          	'E',AN_LAV_STORIA_INF.CODCPIORIG,
+                              	'T', AN_LAV_STORIA_INF.CODCPITIT,
+							  	'CODCPI NON PERVENUTO'
+							 	) CODCPIORIG,
+					   CPI2.STRDESCRIZIONE CPIORIGINE,
+					   AN_LAV_STORIA_INF.CODMONOTIPOCPI,
+					   decode(AN_LAV_STORIA_INF.CODMONOTIPOCPI,
+					          'C',CPI.STRDESCRIZIONE,
+					          'E',CPI.STRDESCRIZIONE,
+                              'T', CPI2.STRDESCRIZIONE,
+							  'CPI COMPETENTE NON PERVENUTO'
+							 ) CPICOMPETENTE,
+					   CASE
+							WHEN AN_LAV_STORIA_INF.CODMONOTIPOORIG = 'V'
+    	 					     THEN CPI3.STRDESCRIZIONE
+    	 					ELSE
+					   			decode(AN_LAV_STORIA_INF.CODMONOTIPOCPI,
+					          	'C',CPI2.STRDESCRIZIONE,
+					          	'E',CPI2.STRDESCRIZIONE,
+                              	'T', CPI.STRDESCRIZIONE,
+							  	'CPI TITOLOARE NON PERVENUTO'
+							 	) 
+					   END AS CPIPRECEDENTE,
+					   DATTRASFERIMENTO,AN_LAV_STORIA_INF.DTMINS,
+				       to_char(AN_LAV_STORIA_INF.DATINIZIO,'DD/MM/YYYY') DATINIZIO,
+				       nvl(to_char(AN_LAV_STORIA_INF.DATFINE,'DD/MM/YYYY'),'oggi') DATFINE
+				  FROM AN_LAV_STORIA_INF, DE_COMUNE, DE_CPI CPI, DE_CPI CPI2, DE_CPI CPI3
+				 WHERE AN_LAV_STORIA_INF.CODCOMDOM = DE_COMUNE.CODCOM
+				   AND AN_LAV_STORIA_INF.CODCPITIT = CPI.CODCPI
+				   AND AN_LAV_STORIA_INF.CODCPIORIG = CPI2.CODCPI
+				   AND AN_LAV_STORIA_INF.CODCPIORIGPREC = CPI3.CODCPI(+)
+				   AND NOT AN_LAV_STORIA_INF.DATTRASFERIMENTO IS NULL
+				   AND AN_LAV_STORIA_INF.cdnlavoratore = ?				   
+				 ORDER BY AN_LAV_STORIA_INF.DATTRASFERIMENTO DESC,
+				          NVL(AN_LAV_STORIA_INF.DATFINE,SYSDATE) DESC,
+						  AN_LAV_STORIA_INF.DTMINS DESC"/>
+
+
+<!-- Dettaglio di un trasferimento del lavoratore -->
+<STATEMENT name="GET_DETTAGLIO_TRASFERIMENTI" 
+          query="SELECT distinct DE_COMUNE.STRDENOMINAZIONE COMUNEDOM,
+                        CASE
+							WHEN AN_LAV_STORIA_INF.CODMONOTIPOORIG = 'V'
+    	 					     THEN CPI3.STRDESCRIZIONE
+    	 					ELSE
+					   			CPI.STRDESCRIZIONE
+					    END AS CPITITOLARE,                        
+                       	CPI2.STRDESCRIZIONE CPIORIGINE,
+                        AN_LAV_STORIA_INF.CODCPITIT,
+                        AN_LAV_STORIA_INF.CODCPIORIG,
+						AN_LAV_STORIA_INF.CODMONOTIPOCPI,
+                        TO_CHAR(AN_LAV_STORIA_INF.DATINIZIO,'DD/MM/YYYY') DATINIZIO, TO_CHAR(AN_LAV_STORIA_INF.DATTRASFERIMENTO, 'DD/MM/YYYY') DATTRASFERIMENTO,
+                        TO_CHAR(AN_LAV_STORIA_INF.DATFINE,'DD/MM/YYYY') DATFINE,
+                        AN_LAV_STORIA_INF.STRNOTE,
+                        TO_CHAR(AN_LAV_STORIA_INF.DATANZIANITADISOC,'DD/MM/YYYY') DATANZIANITADISOC,
+                        AN_LAV_STORIA_INF.NUMMESISOSP,
+		                pg_utils.trunc_desc( DECODE( DE_STATO_OCCUPAZ_RAGG.CODSTATOOCCUPAZRAGG,
+		                                             DE_STATO_OCCUPAZ.CODSTATOOCCUPAZ, DE_STATO_OCCUPAZ_RAGG.STRDESCRIZIONE,
+		                                             (DE_STATO_OCCUPAZ_RAGG.STRDESCRIZIONE || ': ' || DE_STATO_OCCUPAZ.STRDESCRIZIONE) 
+		                                            ),
+		                                      55, '...') STATOOCCUPAZ,
+                        AN_LAV_STORIA_INF.CDNUTINS,
+                        AN_LAV_STORIA_INF.CDNUTMOD,
+                        TO_CHAR(AN_LAV_STORIA_INF.DTMINS,'DD/MM/YYYY hh24:mi ') DTMINS,
+                        TO_CHAR(AN_LAV_STORIA_INF.DTMMOD,'DD/MM/YYYY hh24:mi ') DTMMOD
+                      FROM AN_LAV_STORIA_INF, DE_COMUNE, DE_CPI CPI, DE_CPI CPI2, DE_CPI CPI3, DE_STATO_OCCUPAZ, DE_STATO_OCCUPAZ_RAGG
+                     WHERE AN_LAV_STORIA_INF.CODCOMDOM = DE_COMUNE.CODCOM
+                       AND AN_LAV_STORIA_INF.CODCPITIT = CPI.CODCPI
+                       AND AN_LAV_STORIA_INF.CODCPIORIG = CPI2.CODCPI
+                       AND AN_LAV_STORIA_INF.CODCPIORIGPREC = CPI3.CODCPI(+)
+					   AND AN_LAV_STORIA_INF.CODSTATOOCCUPAZORIG = DE_STATO_OCCUPAZ.CODSTATOOCCUPAZ(+)
+					   AND DE_STATO_OCCUPAZ.CODSTATOOCCUPAZRAGG  = DE_STATO_OCCUPAZ_RAGG.CODSTATOOCCUPAZRAGG(+)
+                       AND AN_LAV_STORIA_INF.PRGLAVSTORIAINF = ?"/>
+						
+<STATEMENT name="GET_DETTAGLIO_TRASFERIMENTI_PROTOCOLLO"
+          query="select am_documento.NUMPROTOCOLLO numProt,
+						am_documento.NUMANNOPROT,
+						to_char(am_documento.DATPROTOCOLLO, 'DD/MM/YYYY') dataProt,
+						to_char(am_documento.DATPROTOCOLLO, 'HH24:MI') oraProt
+				   from am_documento,am_documento_coll
+				  where am_documento.prgdocumento=am_documento_coll.prgdocumento
+					and am_documento.codtipodocumento= 'TRCPI'
+					and am_documento.cdnlavoratore =  ?
+					and am_documento_coll.strchiavetabella = to_char(?)"/>
+					
+<STATEMENT name="CHECK_PRGDOCUMENTOTRASF"
+          query="select am_d_coll.prgdocumentocoll 
+          		from am_documento am_d, am_documento_coll am_d_coll
+				where am_d.codtipodocumento = 'TRDOC' 
+				and am_d.cdnlavoratore = ? 
+				and am_d_coll.prgdocumento = am_d.prgdocumento 
+				and am_d_coll.strchiavetabella = to_char(?)"/>					
+					
+<STATEMENT name="AggiornaCpi"
+          	query="update an_lav_storia_inf set codcpitit = ?, dtmmod = sysdate, cdnutmod = ?, numklolavstoriainf = numklolavstoriainf + 1
+			where prglavstoriainf = ?" />
+			
+<STATEMENT name="AggiornaUtModAnLav"
+          	query="update an_lavoratore set dtmmod = sysdate, cdnutmod = ?, numklolavoratore = numklolavoratore + 1
+			where cdnlavoratore = ?" />
+<!-- FINE -->
+
+<STATEMENT name="SELECT_AN_LAVORATORE_X_IR"
+           query="
+SELECT lav.cdnlavoratore, lav.strcodicefiscale, lav.strcognome, lav.strnome,
+       TO_CHAR (lav.datnasc, 'dd/mm/yyyy') AS datnasc, lav.codcomnas,
+       inf.codcpitit, inf.codcpiorig, inf.codmonotipocpi,
+       DECODE (inf.codmonotipocpi,
+               'T', inf.codcpiorig,
+               inf.codcpitit
+              ) AS codcpicomp,
+       to_char(inf.datInizio, 'dd/mm/yyyy') as datInizioStoriaAperta
+  FROM an_lavoratore lav, an_lav_storia_inf inf
+ WHERE lav.cdnlavoratore = inf.cdnlavoratore
+   AND inf.datfine IS NULL
+   AND lav.cdnlavoratore = ?
+" />
+
+
+<STATEMENT 	name="COUNT_AMALTRAISCR" 
+			query="select count(*) as num_iscr
+					from am_altra_iscr
+					where cdnlavoratore = ?"/>
+					
+<STATEMENT 	name="INSERT_AN_LAVORATORE_ACCORPA" 
+			query="INSERT INTO AN_LAVORATORE_ACCORPA (
+   						  PRGLAVORATOREACCORPA, CDNLAVORATORE, CDNLAVORATOREACCORPATO, 
+   						  STRCODICEFISCALE, STRCODICEFISCALEACCORPATO, CDNUTINS, DTMINS) 
+				   VALUES (S_AN_LAVORATORE_ACCORPA.NEXTVAL,? ,? ,? ,? ,? ,SYSDATE)"/>
+				   
+<STATEMENT name="UPDATE_CI_LAVORATORE"
+        query="UPDATE CI_LAVORATORE
+				SET STRCODICEFISCALE = ? ,
+					NUMKLOLAVORATORE = NUMKLOLAVORATORE + 1,
+					CDNUTMOD = ?,
+					DTMMOD = SYSDATE
+				where STRCODICEFISCALE = ?" />
+				
+<STATEMENT name="GET_ACCORDO_ISCR"
+		   query="select ac.codaccordo
+				  from am_altra_iscr iscr, ci_accordo ac
+				  where iscr.prgaccordo = ac.prgaccordo and iscr.cdnlavoratore = ?" />
+				  
+<STATEMENT name="GET_PRGLAVORATOREACCORPA"
+		   query="SELECT max(PRGLAVORATOREACCORPA) PRGLAVORATOREACCORPA 
+				  FROM AN_LAVORATORE_ACCORPA
+				  WHERE CDNLAVORATORE=? and STRCODICEFISCALE= ? and STRCODICEFISCALEACCORPATO = ? " />
+				  
+<STATEMENT name="GET_PRGACCORDO_ISCR"
+		   query="select prgaccordo
+				  from am_altra_iscr
+				  where cdnlavoratore = ? and prgaccordo is not null " />
+				  
+<STATEMENT 	name="INSERT_CI_ACCORDO_ACCORPA" 
+			query="INSERT INTO CI_ACCORDO_ACCORPA (
+   							   PRGACCORDOACCORPA, PRGLAVORATOREACCORPA, PRGACCORDO) 
+				   VALUES (S_CI_ACCORDO_ACCORPA.NEXTVAL,? ,? ) "/>	
+				   
+<STATEMENT name="GET_DENOMINAZIONE_COMUNE_BY_CODICE" query="
+ SELECT STRDENOMINAZIONE
+ FROM DE_COMUNE
+ WHERE lower(CODCOM) = lower(?) 
+"/>	
+
+<STATEMENT name="GET_DENOMINAZIONE_CITTADINANZA_BY_CODICE" query="
+	SELECT strdescrizione
+	 FROM De_Cittadinanza d
+	 WHERE lower(d.codcittadinanza) = lower(?) 
+"/>		
+
+<STATEMENT name="GET_INFO_PROVINCIA_SIL" query="
+	select d.codprovincia, d.strdenominazione, t.codRegioneSIL codRegione 
+	from ts_generale t 
+	inner join de_provincia d on t.codprovinciasil = d.codprovincia
+"/>	
+
+<STATEMENT name="GET_INFO_PROVINCIA_LAV_SIL" query="
+	select com.codProvincia, com.strdenominazione, prov.codRegione
+	from de_cpi cpi
+	inner join de_comune com on com.codCom = cpi.codCom
+	inner join de_provincia prov on prov.codProvincia = com.codProvincia
+	where cpi.codCpi in
+	(SELECT inf.codcpitit 
+	  FROM an_lavoratore lav
+	  inner join an_lav_storia_inf inf on lav.cdnlavoratore = inf.cdnlavoratore
+	  WHERE inf.datfine IS NULL
+	  AND lav.cdnlavoratore = ?)
+"/>	   
+
+<STATEMENT name="GET_MAIL_LAVORATORE_SIL" query="select l.stremail from an_lavoratore l where l.cdnlavoratore = ?
+"/>	
+
+<STATEMENT
+        name="GET_DE_STATO_OCCUPAZ_RAGG_O"
+        query="Select codStatoOccupazragg, strDescrizione
+				from de_stato_occupaz_ragg
+				where codStatoOccupazragg = 'O'"/>
+	   		  
+<STATEMENT name="GET_DESC_ERRORE_YG" 
+		   query="SELECT CODERRORE, STRDESCRIZIONE FROM DE_SAP_YG_ERRORE WHERE CODERRORE = ?"/>	
+
+<STATEMENT name="UPDATE_DATI_INVIO_SAP" 
+		   query="update AN_YG_DATI_INVIO 
+				    set DATAULTIMOAGG = sysdate,
+				    IDSAP = ?,
+				    CDNUTMOD = ?,
+				    DTMMOD = sysdate
+				    where CDNLAVORATORE = ?"/>			   
+				    
+<STATEMENT name="UPDATE_TS_ESTRAZIONE_SAP" 
+		   query="update ts_estrazione_sap 
+				    set CODMINSAP = ?				    
+				    where CDNLAVORATORE = ? 
+				    and CODMINSAP IS NULL"/>					    				    
+		   
+		   
+<STATEMENT name="CHECK_INVIO_SAP" 
+		   query="SELECT COUNT(1) AS CHECKSAP FROM AN_YG_DATI_INVIO WHERE CDNLAVORATORE = ? AND IDSAP IS NOT NULL"/>			   
+
+
+<STATEMENT
+    name="SELECT_EXIST_SAP_LAVORATORE"
+    query=" select PRGSPLAV,
+                   NUMKLOSAP,
+                   CDNLAVORATORE,
+    			   CODMINSAP,
+    			   TO_CHAR(DATINIZIOVAL, 'DD/MM/YYYY') AS DATINIZIOVAL,
+    			   TO_CHAR(DATFINEVAL, 'DD/MM/YYYY') AS DATFINEVAL,
+    			   TO_CHAR(DATAINVIOMIN, 'DD/MM/YYYY') AS DATINVIOMIN,
+    			   CODSTATO
+            from SP_LAVORATORE
+            where CDNLAVORATORE = ? and DATFINEVAL IS NULL" />		
+            
+<STATEMENT name="UPDATE_SP_LAVORATORE_INVIO_SAP" 
+		   query="update SP_LAVORATORE 
+				    set DATAINVIOMIN = sysdate,
+				    NUMKLOSAP = NUMKLOSAP+1,				    
+				    CDNUTMOD = ?,
+				    DTMMOD = sysdate,
+				    DATFINEVAL = sysdate
+				    where CDNLAVORATORE = ?
+				    and DATFINEVAL is null"/>
+				    				    
+<STATEMENT name="UPDATE_TS_TRACCIAMENTO_SAP" 
+		   query="update ts_tracciamento_sap 
+				    set CODMINSAP = ?,
+				    CODTIPOVARIAZIONE = ?,
+				    DATINVIOMIN = sysdate,
+				    DATESITOMIN = sysdate,
+				    STRMSGERRORE = ?,
+				    STRESITOMIN = ?							   
+				    where CDNLAVORATORE = ? 
+				    and CODMINSAP IS NULL
+				    and CODERRESTRAZIONE = '00'"/>		
+
+<STATEMENT name="INSERT_TS_TRACCIAMENTO_SAP" 
+		   query="INSERT INTO TS_TRACCIAMENTO_SAP 
+		   		(PRGESTRAZIONESAP,
+				  CDNLAVORATORE,
+				  DTMESTRAZIONE,
+				  STRXMLINVIATO,
+				  CODERRESTRAZIONE,
+				  DATINVIOMIN,
+				  CODMINSAP,
+				  DATESITOMIN,
+				  STRMSGERRORE,
+				  STRESITOMIN,
+				  CODTIPOVARIAZIONE) 
+		   		 values 
+				(S_TS_TRACCIAMENTO_SAP.nextval, 
+				?, 
+				sysdate, 
+				?, 
+				?, 
+				sysdate, 
+				?,
+				?,
+				?,
+				?,
+				?)" />
+
+<STATEMENT name="GET_TS_TRACCIAMENTO_SAP_NEXTVAL" 
+		   query="SELECT S_TS_TRACCIAMENTO_SAP.nextval as CHIAVE from dual"/>	
+		   
+<STATEMENT name="INSERT_TS_TRACCIAMENTO_SAP_FOR_BATCH" 
+		   query="INSERT INTO TS_TRACCIAMENTO_SAP 
+		   		(PRGESTRAZIONESAP,
+				  CDNLAVORATORE,
+				  DTMESTRAZIONE,
+				  STRXMLINVIATO,
+				  CODERRESTRAZIONE,
+				  DATINVIOMIN,
+				  CODMINSAP,
+				  DATESITOMIN,
+				  STRMSGERRORE,
+				  STRESITOMIN,
+				  CODTIPOVARIAZIONE) 
+		   		 values 
+				(?, 
+				?, 
+				sysdate, 
+				?, 
+				?, 
+				sysdate, 
+				?,
+				?,
+				?,
+				?,
+				?)" />				
+<STATEMENT name="CHECK_EXISTS_SAP_IF_UPD_CF_LAV" 
+		   query="SELECT COUNT(1) AS CHECKSAPCF 
+		   			FROM SP_LAVORATORE 
+		   			WHERE CDNLAVORATORE = ? 
+		   			AND CODMINSAP IS NOT NULL
+		   			AND CODSTATO IN ('01','04')
+		   			and DATFINEVAL is null"/>
+		   			
+<STATEMENT name="GET_BONUSOCCUPAZIONALE_STMT"
+	query="SELECT LAV.CDNLAVORATORE, NOTIFICA.PRGSPNOTIFICAPN, NOTIFICA.CDNUTINS, NOTIFICA.CDNUTMOD,
+	   NOTIFICA.STRCODICEFISCALE, NOTIFICA.IDENTIFICATIVOSAP, NOTIFICA.STRNOTE,
+	   to_char(NOTIFICA.DATADESIONE, 'dd/mm/yyyy') AS DATADESIONE,
+	   to_char(NOTIFICA.DATRICEZIONE, 'dd/mm/yyyy') AS DATRICEZIONE,
+	   to_char(NOTIFICA.DTMINS, 'dd/mm/yyyy hh24:Mi') AS DTMINS,
+	   to_char(NOTIFICA.DTMMOD, 'dd/mm/yyyy hh24:Mi') AS DTMMOD, NUMKLOSPNOTIFICAPN, 
+	   NOTIFICA.FLGPRESOINCARICO, NOTIFICA.CODPROVINCIA
+	    FROM SP_NOTIFICA_PN NOTIFICA
+	    LEFT JOIN AN_LAVORATORE LAV ON (NOTIFICA.STRCODICEFISCALE = LAV.STRCODICEFISCALE)
+	    WHERE NOTIFICA.PRGSPNOTIFICAPN = ?
+" />
+
+<STATEMENT name="GET_POLITICHE_BONUSOCCUPAZIONALE_STMT"
+	query="SELECT POL.PRGSPPOLITICANAZIONALE, POL.CODTIPOATTIVITA, POL.CDNUTINS, POL.CDNUTMOD,
+	   POL.CODTIPOLOGIADURATA, POL.NUMDURATA, POL.STRDESCRIZIONE, POL.STRDENOMINAZIONE,
+	   to_char(POL.DATPROPOSTA, 'dd/mm/yyyy') AS DATPROPOSTA,
+	   to_char(POL.DATINIZIO, 'dd/mm/yyyy') AS DATINIZIO, to_char(POL.DATFINE, 'dd/mm/yyyy') AS DATFINE,
+	   to_char(POL.DTMINS, 'dd/mm/yyyy hh24:Mi') AS DTMINS,
+	   to_char(POL.DTMMOD, 'dd/mm/yyyy hh24:Mi') AS DTMMOD,
+	   POL.CODPROGETTO, POL.STRCODENTEPROMOTORE, POL.NUMKLOSPPOLITICANAZ
+	    FROM SP_POLITICA_NAZIONALE POL
+	    WHERE POL.PRGSPNOTIFICAPN = ?
+" />
+
+<STATEMENT name="UPDATE_BONUSOCCUPAZIONALE_STMT"
+	query="UPDATE SP_NOTIFICA_PN 
+		SET FLGPRESOINCARICO = ?, STRNOTE = ?, DTMMOD = SYSDATE,
+		CDNUTMOD = ?, NUMKLOSPNOTIFICAPN = TO_NUMBER(?) + 1, CODPROVINCIA = ?
+		WHERE PRGSPNOTIFICAPN = ?
+" />
+
+<STATEMENT name="SELECT_CPI_COMUNE_DID_ON_LINE" 
+	query="SELECT DE_COMUNE.CODCPI, DE_COMUNE.CODPROVINCIA, TS_GENERALE.CODPROVINCIASIL, PROV.CODCPICAPOLUOGO, DE_CPI.CODPROVINCIA PROVINCIACPI
+			FROM DE_COMUNE, TS_GENERALE, DE_PROVINCIA PROV, DE_CPI
+			WHERE TS_GENERALE.CODPROVINCIASIL = PROV.CODPROVINCIA AND DE_COMUNE.CODCPI = DE_CPI.CODCPI AND DE_COMUNE.CODCOM = ? 
+"/>
+
+<STATEMENT name="SELECT_PROVINCIA_COMUNE_DOMICILIO_LAVORATORE" 
+	query="SELECT DE_COMUNE.CODCPI, DE_COMUNE.CODPROVINCIA, TS_GENERALE.CODPROVINCIASIL, PROV.CODCPICAPOLUOGO
+			FROM AN_LAVORATORE, DE_COMUNE, TS_GENERALE, DE_PROVINCIA PROV
+			WHERE AN_LAVORATORE.CODCOMDOM = DE_COMUNE.CODCOM
+			AND TS_GENERALE.CODPROVINCIASIL = PROV.CODPROVINCIA
+			AND AN_LAVORATORE.CDNLAVORATORE = ? 
+"/>
+
+<STATEMENT
+        name="SAVE_AN_LAV_STORIA_INF_INSERT_DID"
+        query="UPDATE AN_LAV_STORIA_INF
+               SET CODCPITIT=?, 
+                   CDNUTMOD=?, 
+                   CODMONOTIPOCPI = ?,
+                   CODCPIORIG = ?,
+                   CODCPIORIGPREC = ?,
+                   STRNOTE = ?,
+                   DTMMOD=SYSDATE, 
+                   NUMKLOLAVSTORIAINF= ?
+                WHERE CDNLAVORATORE=? AND
+                      DATFINE is null" />
+
+<STATEMENT
+    name="INSERT_AN_LAV_STORIA_INF_INSERT_DID"
+    query="INSERT INTO AN_LAV_STORIA_INF (
+                    PRGLAVSTORIAINF, CDNLAVORATORE, CODCPITIT, CODMONOTIPOCPI, CODCOMDOM,
+                    CDNUTMODSCHEDAANAGPROF, DTMMODSCHEDAANAGPROF, DATINIZIO, CODCPIORIG, CODCPIORIGPREC, STRNOTE,
+                    CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)
+            values (S_AN_LAV_STORIA_INF.NEXTVAL, ?, ?, ?, ?,
+                    ?, SYSDATE, TO_DATE(?, 'DD/MM/YYYY'), ?, ?, ?,
+                    ?, SYSDATE, ?, SYSDATE)" />
+                      
+<STATEMENT
+        name="SAVE_NOTE_DID_GESTIONE_SAP"
+        query="update am_dich_disponibilita 
+				set strnote = ?, numklodichdisp = ?, dtmmod = sysdate, cdnutmod = ?
+				where prgdichdisponibilita = ?" />
+
+<STATEMENT name="LISTA_NUCLEOFAMILIARE"
+	query="	SELECT 	nf.PRGNUCLEOFAMILIARE,
+					nf.STRCODICEFISCALE,
+					nf.STRCOGNOME,
+					nf.STRNOME,
+					co.STRDENOMINAZIONE,
+					to_char(nf.DATNASCITA,'DD/MM/YYYY') as DATNASCITA,
+					ss.STRDESCRIZIONE as SERVIZIO,
+					gp.STRDESCRIZIONE as GRADO
+			FROM AN_NUCLEO_FAMILIARE nf 
+			inner join DE_GRADO_PARENTELA gp on ( nf.CODGRADO = gp.CODGRADO )
+			inner join DE_SERVIZIO_SOC ss on ( nf.CODSERVIZIO = ss.CODSERVIZIO )
+			inner join DE_COMUNE co on ( nf.CODCOMNAS = co.CODCOM )
+			WHERE CDNLAVORATORE = ?"
+/>
+			
+			
+<STATEMENT name="LOAD_NUCLEOFAMILIARE"
+	query="	SELECT	nf.STRCODICEFISCALE,
+					nf.STRCOGNOME,
+					nf.STRNOME,
+					nf.CODCOMNAS,
+					co.STRDENOMINAZIONE as STRDENOMINAZIONE,
+					to_char(nf.DATNASCITA,'DD/MM/YYYY') as DATNASCITA,
+					nf.CODSERVIZIO,
+					nf.CODGRADO,
+					nf.FLGPATTO,
+					nf.FLGREQUISITOLAVORO,
+					nf.STRPARTITAIVA,
+					nf.STRNOTE,
+					nf.DTMMOD,
+					nf.DTMINS,
+					nf.CDNUTINS,
+					nf.CDNUTMOD
+			FROM AN_NUCLEO_FAMILIARE nf 
+			inner join DE_COMUNE co on ( nf.CODCOMNAS = co.CODCOM )
+			WHERE PRGNUCLEOFAMILIARE = ?"
+/>
+			
+<STATEMENT name="COMBO_GRADO"
+	query="	SELECT	CODGRADO as codice,
+					STRDESCRIZIONE as descrizione
+			FROM DE_GRADO_PARENTELA"
+/>
+
+<STATEMENT name="COMBO_SERVIZIO"
+	query="	SELECT	CODSERVIZIO as codice,
+					STRDESCRIZIONE as descrizione
+			FROM DE_SERVIZIO_SOC
+			WHERE FLGVISIBILE = 'S'"
+/>
+
+<STATEMENT name="INSERT_NUCLEOFAMILIARE"
+	query="	INSERT INTO AN_NUCLEO_FAMILIARE (
+			PRGNUCLEOFAMILIARE,
+			CDNLAVORATORE,
+			STRCODICEFISCALE,
+			STRCOGNOME,
+			STRNOME,
+			CODCOMNAS,
+			DATNASCITA,
+			CODSERVIZIO,
+			CODGRADO,
+			FLGPATTO,
+			FLGREQUISITOLAVORO,
+			STRPARTITAIVA,
+			STRNOTE,
+			CDNUTINS, 
+   			DTMINS, 
+   			CDNUTMOD, 
+   			DTMMOD)
+			VALUES	(?,?,?,?,?,?,TO_DATE(?,'DD/MM/YYYY'),?,?,?,?,?,? , ?, SYSDATE , ? , SYSDATE)"
+/>
+
+<STATEMENT name="UPDATE_NUCLEOFAMILIARE"
+	query="	UPDATE AN_NUCLEO_FAMILIARE SET
+				STRCODICEFISCALE = ?,
+				STRCOGNOME = ?,
+				STRNOME = ?,
+				CODCOMNAS = ?,
+				DATNASCITA = TO_DATE(?,'DD/MM/YYYY'),
+				CODSERVIZIO = ?,
+				CODGRADO = ?,
+				FLGPATTO = ?,
+				FLGREQUISITOLAVORO = ?,
+				STRPARTITAIVA = ?,
+				STRNOTE = ?,
+				CDNUTMOD = ?,
+				DTMMOD = SYSDATE,
+				NUMKLNUCLEOFAM = TO_NUMBER(?) + 1
+				WHERE PRGNUCLEOFAMILIARE = ?" />
+
+<STATEMENT name="SELECT_PRGNUCLEOFAMILIARE_SEQUENCE"
+	query="SELECT S_AN_NUCLEO_FAMILIARE.nextval AS DO_NEXTVAL
+      		   FROM DUAL" />
+
+<STATEMENT name="SELECT_NUMKLNUCLEOFAMILIARE"
+	query="SELECT PRGNUCLEOFAMILIARE, NUMKLNUCLEOFAM
+                from AN_NUCLEO_FAMILIARE
+                where PRGNUCLEOFAMILIARE = ?" />
+
+<STATEMENT name="DELETE_NUCLEOFAMILIARE"
+	query="	DELETE FROM AN_NUCLEO_FAMILIARE 
+			WHERE PRGNUCLEOFAMILIARE = ? " />
+			
+<STATEMENT name="GET_BONUSOCCUPAZIONALE_LAVORATORE_STMT"
+	query="SELECT NOTIFICA.PRGSPNOTIFICAPN, NOTIFICA.CDNUTINS, NOTIFICA.CDNUTMOD,
+	   NOTIFICA.STRCODICEFISCALE, NOTIFICA.IDENTIFICATIVOSAP, NOTIFICA.STRNOTE,
+	   to_char(NOTIFICA.DATADESIONE, 'dd/mm/yyyy') AS DATADESIONE,
+	   to_char(NOTIFICA.DATRICEZIONE, 'dd/mm/yyyy hh24:mi') AS DATRICEZIONE,
+	   to_char(NOTIFICA.DTMINS, 'dd/mm/yyyy hh24:Mi') AS DTMINS,
+	   to_char(NOTIFICA.DTMMOD, 'dd/mm/yyyy hh24:Mi') AS DTMMOD, NUMKLOSPNOTIFICAPN, 
+	   NOTIFICA.FLGPRESOINCARICO, NOTIFICA.CODPROVINCIA, DE_PROVINCIA.STRDENOMINAZIONE DESCPROVINCIA
+	    FROM SP_NOTIFICA_PN NOTIFICA
+	    LEFT JOIN DE_PROVINCIA ON (NOTIFICA.CODPROVINCIA = DE_PROVINCIA.CODPROVINCIA)
+	    WHERE UPPER(NOTIFICA.STRCODICEFISCALE) = (SELECT UPPER(LAV.STRCODICEFISCALE) FROM AN_LAVORATORE LAV WHERE LAV.CDNLAVORATORE = ?)
+	    ORDER BY NOTIFICA.DATRICEZIONE DESC
+" />
+
+<STATEMENT name="GET_DIDINPS_LAVORATORE_STMT"
+    query="SELECT 
+    DID.CDNLAVORATORE, DID.PRGDIDINPS, DID.STRCOMUNICAZIONE, DID.STRCODICEFISCALELAV, TO_CHAR(DID.DATDICHIARAZIONE, 'DD/MM/YYYY') AS DATDICHIARAZIONE,
+    TO_CHAR(DID.DATRICEZIONE, 'DD/MM/YYYY HH24:MI') AS DATRICEZIONE,
+    DECODE(DID.CODMONOTIPOOPERAZIONE, 'D', 'Cancellazione','I', 'Inserimento','U','Modifica', DID.CODMONOTIPOOPERAZIONE) AS CODMONOTIPOOPERAZIONE
+    FROM AM_DID_INPS DID
+    WHERE UPPER(DID.STRCODICEFISCALELAV) = (SELECT UPPER(LAV.STRCODICEFISCALE) FROM AN_LAVORATORE LAV WHERE LAV.CDNLAVORATORE = ?)
+    ORDER BY DID.DATRICEZIONE DESC" />
+    
+<STATEMENT name="GET_NOTIFICHE_SAP_LAVORATORE_STMT"
+        query="select notifica.prgSpNotifica, notifica.codMinSap,
+        			to_char(notifica.datNotifica,'dd/mm/yyyy hh24:mi') as dataNotifica,	
+        			mot_noti.strdescrizione as descMotNotifica
+        from sp_notifica notifica
+        inner join mn_yg_motivo_modifica mot_noti on notifica.codMotivo = mot_noti.codMotivoModifica
+        where notifica.codMinSap in (select sl.codminsap from sp_lavoratore sl where sl.cdnlavoratore = ?)
+        order by notifica.datnotifica desc" />
+        
+<STATEMENT name="GET_REGISTRO_INVII_SAP_LAVORATORE_STMT"
+	query="select SP_LAVORATORE.CODMINSAP, 
+    			DE_STATO_SAP.CODSTATO, 
+    			DE_STATO_SAP.STRDESCRIZIONE descStato, 
+			    to_char(DATAINVIOMIN,'dd/mm/yyyy hh24:mi') AS DATAINVIOMIN,
+			    to_char(SP_LAVORATORE.DATINIZIOVAL,'dd/mm/yyyy hh24:mi') AS DATINIZIOVAL, 
+			    to_char(SP_LAVORATORE.DATFINEVAL,'dd/mm/yyyy hh24:mi') AS DATFINEVAL,
+			    to_char(SP_LAVORATORE.DTMINS,'dd/mm/yyyy hh24:mi') AS DTMINS,
+			    to_char(SP_LAVORATORE.DTMMOD,'dd/mm/yyyy hh24:mi') AS DTMMOD,
+			    SP_LAVORATORE.cdnutins, SP_LAVORATORE.cdnutmod, 
+			    SP_LAVORATORE.CODENTETIT || ' - ' || mn_st_cpi.STRDENOMINAZIONE AS enteTitolare,
+			    ts_utente.strcognome || ' ' || ts_utente.strnome AS utenteInvio
+               from SP_LAVORATORE
+               inner join ts_utente on (SP_LAVORATORE.cdnutins = ts_utente.cdnut)
+               LEFT JOIN DE_STATO_SAP ON (SP_LAVORATORE.CODSTATO = DE_STATO_SAP.CODSTATO)
+               left join mn_st_cpi on (SP_LAVORATORE.CODENTETIT = mn_st_cpi.CODCPIMIN)
+               WHERE SP_LAVORATORE.CDNLAVORATORE = ?
+               order by SP_LAVORATORE.prgsplav desc " />
+               
+<STATEMENT 	name="INSERT_TS_INVIO_AUT_SAP" 
+			query="INSERT INTO TS_INVIO_AUT_SAP (
+   						  prginvioautsap, cdnlavoratore, strcodicefiscale, datselezione) 
+				   VALUES (S_TS_INVIO_AUT_SAP.NEXTVAL, ?, upper(?), SYSDATE)"/>
+				   
+<STATEMENT 	name="COUNT_TS_INVIO_AUT_SAP" 
+			query="select prginvioautsap
+					from TS_INVIO_AUT_SAP
+					where cdnlavoratore = ? and flginviosap is null and datinvio is null"/>
+					
+<STATEMENT name="SELECT_CPI_COMUNE_IMPORTA_SAP" 
+	query="SELECT DE_COMUNE.CODCPI, DE_COMUNE.CODPROVINCIA, TS_GENERALE.CODPROVINCIASIL, PROV.CODCPICAPOLUOGO, PROVGEN.CODCPICAPOLUOGO CODCPICAPOLUOGOGEN,
+			DE_CPI.CODPROVINCIA PROVINCIACPI
+			FROM DE_COMUNE, TS_GENERALE, DE_PROVINCIA PROV, DE_CPI, DE_PROVINCIA PROVGEN
+			WHERE DE_COMUNE.CODPROVINCIA = PROV.CODPROVINCIA AND TS_GENERALE.CODPROVINCIASIL = PROVGEN.CODPROVINCIA
+			AND DE_COMUNE.CODCPI = DE_CPI.CODCPI AND DE_COMUNE.CODCOM = upper(?) 
+"/>
+
+<STATEMENT name="UPDATE_TS_TRACCIAMENTO_SAP_TRACCIATO" 
+		   query="update ts_tracciamento_sap 
+				    set STRXMLINVIATO = ?
+				    where PRGESTRAZIONESAP = ?"/>
+					    
+<STATEMENT name="UPDATE_TS_TRACCIAMENTO_SAP_TRACCIATO_CODVARIAZIONE" 
+		   query="update ts_tracciamento_sap 
+				    set STRXMLINVIATO = ?,
+				    CODTIPOVARIAZIONE = ?
+				    where PRGESTRAZIONESAP = ?"/>
+				    
+<STATEMENT name="UPDATE_TS_TRACCIAMENTO_SAP_CURR" 
+		   query="update ts_tracciamento_sap 
+				    set CODMINSAP = ?,
+				    CODTIPOVARIAZIONE = ?,
+				    DATINVIOMIN = sysdate,
+				    DATESITOMIN = sysdate,
+				    STRMSGERRORE = ?,
+				    STRESITOMIN = ?							   
+				    where PRGESTRAZIONESAP = ?"/>
+			    
+<STATEMENT
+        name="GET_AN_LAVORATORE_ANAG_SIFER"
+        query="SELECT AN.CDNLAVORATORE CDNLAVORATORE, NASCITAISTAT.CODISTAT CODNASCISTAT, RESISTAT.CODISTAT CODRESISTAT, DOMISTAT.CODISTAT CODDOMISTAT,
+                      AN.STRCODICEFISCALE STRCODICEFISCALE, 
+                      AN.STRCOGNOME STRCOGNOME, 
+                      AN.STRNOME STRNOME, 
+                      AN.STRSESSO STRSESSO, TO_CHAR(AN.DATNASC, 'DD/MM/YYYY') DATNASC,
+                      AN.CODCOMNAS CODCOMNAS, COM1.STRDENOMINAZIONE || ' (' || rtrim(p.strIstat) || ') ' as STRCOMNAS,
+                      AN.CODCITTADINANZA CODCITTADINANZA, CIT1.STRDESCRIZIONE STRCITTADINANZA, CIT1.STRNAZIONE STRNAZIONE,
+                      AN.CODCITTADINANZA2 CODCITTADINANZA2, CIT2.STRDESCRIZIONE STRCITTADINANZA2, CIT2.STRNAZIONE STRNAZIONE2,
+                      AN.CODSTATOCIVILE CODSTATOCIVILE, AN.STREMAIL STREMAIL, 
+                      AN.FLGMILITE,
+                      AN.NUMFIGLI NUMFIGLI, 
+                      AN.STRNOTE STRNOTE, 
+                      AN.CDNUTINS CDNUTINS, 
+                      AN.FLGCFOK FLGCFOK,
+                      TO_CHAR(AN.DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS, 
+                      AN.CDNUTMOD, TO_CHAR(AN.DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD, AN.NUMKLOLAVORATORE NUMKLOLAVORATORE,
+					  AN.CODCOMRES as CODCOM, AN.STRINDIRIZZORES, AN.STRCAPRES,
+					  AN.CODCOMDOM as CODCOMDOM, AN.STRINDIRIZZODOM, AN.STRCAPDOM, CIT1.FLGCEE, 
+					  AN.STRTELRES STRTELRES, AN.STRTELDOM STRTELDOM, AN.STRTELALTRO STRTELALTRO, AN.STRCELL STRCELL
+               FROM AN_LAVORATORE AN 
+               INNER JOIN DE_COMUNE COM1 ON AN.CODCOMNAS=COM1.CODCOM
+               LEFT JOIN MA_COMUNE_ISTAT NASCITAISTAT ON (AN.CODCOMNAS = NASCITAISTAT.CODCOMUNE AND 
+               											   TRUNC(AN.DATNASC) BETWEEN TRUNC(NASCITAISTAT.DATINIZIOVAL) AND TRUNC(NVL(NASCITAISTAT.DATFINEVAL, SYSDATE)))
+               LEFT JOIN MA_COMUNE_ISTAT RESISTAT ON (AN.CODCOMRES = RESISTAT.CODCOMUNE AND 
+               										   TRUNC(NVL(RESISTAT.DATFINEVAL, SYSDATE)) &gt;= TRUNC(SYSDATE))
+               LEFT JOIN MA_COMUNE_ISTAT DOMISTAT ON (AN.CODCOMDOM = DOMISTAT.CODCOMUNE AND 
+               										   TRUNC(NVL(DOMISTAT.DATFINEVAL, SYSDATE)) &gt;= TRUNC(SYSDATE))
+               LEFT JOIN de_provincia p on com1.codprovincia=p.codprovincia 
+               INNER JOIN DE_CITTADINANZA CIT1 ON AN.CODCITTADINANZA=CIT1.CODCITTADINANZA
+               LEFT JOIN DE_CITTADINANZA CIT2 ON AN.CODCITTADINANZA2=CIT2.CODCITTADINANZA
+               WHERE AN.cdnLavoratore = ?"/>
+
+<STATEMENT name="GET_PARTECIPANTE"
+    query="SELECT
+                    an.cdnlavoratore, an.strcodicefiscale,
+                    an.strcognome,
+                    nvl(an.flgcfok, 'N') AS flgcfok,
+                    an.strnome strnome, 
+                    an.strsesso strsesso,
+                    to_char(an.datnasc, 'dd/mm/yyyy') AS datnasc,
+                    an.codcomnas,
+                    an.codcittadinanza,
+                    an.codcittadinanza2,
+                    an.strcell,
+                    an.stremail,
+                    an.codcomres,
+                    an.strindirizzores,
+                    an.strcapres,
+                    an.strtelres,
+                    an.codcomdom,
+                    an.strindirizzodom,
+                    an.strcapdom,
+                    an.strteldom, an.strtelaltro, to_char(an.dtmmod, 'dd/mm/yyyy') AS dtmmod
+           FROM
+                    an_lavoratore an
+           WHERE
+                    an.cdnlavoratore = ?"/>
+
+<!-- <STATEMENT name="SELECT_DATA_SAP2" 
+	query=" select trunc(sysdate) - trunc(datsap2) as datediff from ts_generale"/> -->

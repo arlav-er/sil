@@ -1,0 +1,1463 @@
+<!-- CLIC LAVORO -->
+				       
+<STATEMENT
+        name="CL_GET_CDN_LAVORATORE"
+        query="SELECT an.cdnlavoratore
+		       FROM an_lavoratore an 		       
+		       WHERE an.strcodicefiscale = ?" />				       
+
+<STATEMENT
+        name="CL_GET_DATIANAGRAFICI"
+        query="SELECT substr(trim(an.STRCODICEFISCALE),0,16) codicefiscale, substr(trim(an.STRCOGNOME),0,50) cognome, 
+               substr(trim(an.STRNOME),0,50) nome, substr(an.STRSESSO,0,1) sesso, to_char(AN.DATNASC, 'YYYY-MM-DD') datanascita, 
+        	   substr(an.CODCOMNAS,0,4) idcomune, substr(an.CODCITTADINANZA,0,3) idcittadinanza 
+		       FROM an_lavoratore an 		       
+		       WHERE an.cdnlavoratore = ?" />		       				       	       
+
+<STATEMENT
+        name="CL_GET_DATIANAGRAFICI_DES"
+        query="SELECT substr(trim(an.STRCODICEFISCALE),0,16) codicefiscale, substr(trim(an.STRCOGNOME),0,50) cognome, 
+               substr(trim(an.STRNOME),0,50) nome, substr(an.STRSESSO,0,1) sesso, to_char(AN.DATNASC, 'DD/MM/YYYY') datanascita, 
+        	   substr(an.CODCOMNAS,0,4) idcomune, substr(an.CODCITTADINANZA,0,3) idcittadinanza, cit.strdescrizione cittadinanza 
+		       FROM an_lavoratore an 		       
+		       inner join de_cittadinanza cit on an.CODCITTADINANZA = cit.codcittadinanza
+		       WHERE an.cdnlavoratore = ?" />	
+		       
+<STATEMENT
+        name="CL_GET_DOMICILIO"
+        query="SELECT substr(an.CODCOMDOM,0,4) idcomune, substr(an.STRCAPDOM,0,5) cap
+		       FROM an_lavoratore an 		       
+		       WHERE an.cdnlavoratore = ?" />		       				       	       
+		       
+<STATEMENT
+        name="CL_GET_RECAPITI"
+        query="SELECT substr(an.STRINDIRIZZODOM,0,100) indirizzo, substr(an.STRTELDOM,0,15) telefono, 
+        	   substr(an.STRCELL,0,15) cellulare, substr(an.STRFAX,0,15) fax, substr(trim(an.STREMAIL),0,256) email 
+		       FROM an_lavoratore an		       
+		       WHERE an.cdnlavoratore = ?" />		       				       	       
+		       
+
+<STATEMENT
+        name="CL_GET_ESPERIENZA_LAV"
+        query="SELECT distinct esp_lav.codrapportolav tipoesperienza, 
+        			SUBSTR((select distinct DE_MANS2.CODMANSIONEDOT 
+        					from DE_MANSIONE DE_MANS2 
+        						 left join PR_MANSIONE MANS2 on (DE_MANS2.CODMANSIONE = MANS2.CODMANSIONE) 
+        					where DE_MANS2.CODMANSIONE = MANS.CODMANSIONE 
+        						  and MANS.FLGESPERIENZA = 'S' 
+        						  and MANS2.FLGDISPONIBILE in ('P','S') 
+               					  and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_MANS2.DATINIZIOVAL and DE_MANS2.DATFINEVAL),0,11) qualificasvolta, 
+               (case  when (select distinct DE_MANS2.CODMANSIONEDOT 
+               				  from DE_MANSIONE DE_MANS2 
+               				  left join PR_MANSIONE MANS2 on (DE_MANS2.CODMANSIONE = MANS2.CODMANSIONE) 
+ 			   				  where DE_MANS2.CODMANSIONE = MANS.CODMANSIONE 
+ 			   				  	and MANS2.FLGDISPONIBILE in ('P','S') 
+ 			   				  	and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_MANS2.DATINIZIOVAL and DE_MANS2.DATFINEVAL) is not null 
+		   			  then SUBSTR(DE_MANS.STRDESCRIZIONE,0,250) 
+		   			  else '' 
+		   	   end) descrqualificasvolta, 
+		   	   substr(esp_lav.strdesattivita,0,250) principalimansioni, 
+		   	   substr(esp_lav.strragsocialeazienda,0,100) nomedatore, 
+               decode(esp_lav.numannoinizio, null, '',
+               		  esp_lav.numannoinizio || '-' || 
+               		  to_char(decode(esp_lav.nummeseinizio, 1 , '0' || to_char(esp_lav.nummeseinizio), 
+               		  										2 , '0' || to_char(esp_lav.nummeseinizio),
+			   												3 , '0' || to_char(esp_lav.nummeseinizio), 
+			   												4 , '0' || to_char(esp_lav.nummeseinizio), 
+			   												5 , '0' || to_char(esp_lav.nummeseinizio),
+			   												6 , '0' || to_char(esp_lav.nummeseinizio), 
+			   												7 , '0'||to_char(esp_lav.nummeseinizio), 
+			   												8 , '0'||to_char(esp_lav.nummeseinizio),
+			   												9 , '0'||to_char(esp_lav.nummeseinizio), 
+			   												10, to_char(esp_lav.nummeseinizio), 
+			   												11, to_char(esp_lav.nummeseinizio), 
+			   												12, to_char(esp_lav.nummeseinizio), '01'))) || '-01' datainizio, 
+			   decode(esp_lav.numannofine, null, '', 
+			   		  esp_lav.numannofine || 
+			   		  to_char(decode(esp_lav.nummesefine, 1 , '-0'||to_char(esp_lav.nummesefine)||'-31', 
+			   		  									  2 , '-0'||to_char(esp_lav.nummesefine)||'-28',
+			   											  3 , '-0'||to_char(esp_lav.nummesefine)||'-31', 
+			   											  4 , '-0'||to_char(esp_lav.nummesefine)||'-30', 
+			   											  5 , '-0'||to_char(esp_lav.nummesefine)||'-31',
+			   											  6 , '-0'||to_char(esp_lav.nummesefine)||'-30', 
+			   											  7 , '-0'||to_char(esp_lav.nummesefine)||'-31', 
+			   											  8 , '-0'||to_char(esp_lav.nummesefine)||'-31',
+			   											  9 , '-0'||to_char(esp_lav.nummesefine)||'-30', 
+			   											 10 , '-'||to_char(esp_lav.nummesefine)||'-31', 
+			   											 11 , '-'||to_char(esp_lav.nummesefine)||'-30', 
+			   											 12, '-'||to_char(esp_lav.nummesefine)||'-31', 
+			   											 decode(''||esp_lav.numannofine, null,'', '-12-31')))) 
+			   datafine,
+			   (case  
+			   		when esp_lav.strindirizzoazienda is not null and ESP_LAV.CODCOMAZIENDA is not null then
+			   			substr(esp_lav.strindirizzoazienda || ' ' || comAzd.strdenominazione,0,100)
+			   		when esp_lav.strindirizzoazienda is not null and ESP_LAV.CODCOMAZIENDA is null then
+			   			substr(esp_lav.strindirizzoazienda,0,100)
+			   		when esp_lav.strindirizzoazienda is null and ESP_LAV.CODCOMAZIENDA is not null then
+			   			substr(comAzd.strdenominazione,0,100)
+			   		else null
+			   end) indirizzodatore,
+			   DE_CONTR.codcontratto tiporapporto, ESP_LAV.codarea areaesperienza,
+			   ESP_LAV.codateco codateco, ESP_LAV.codmvcessazione codmvcessazione, ESP_LAV.strmotcessazione altrocessazione, 
+			   ESP_LAV.strpartitaivaazienda pivadatorelavoro, ESP_LAV.strcodfiscaleazienda cfdatorelavoro, 
+			   ESP_LAV.codcomazienda codcomunedatore,
+                    SUBSTR((select distinct DE_MANS2.CODMANSIONE 
+                            from DE_MANSIONE DE_MANS2 
+                                 left join PR_MANSIONE MANS2 on (DE_MANS2.CODMANSIONE = MANS2.CODMANSIONE) 
+                            where DE_MANS2.CODMANSIONE = MANS.CODMANSIONE 
+                                  and MANS.FLGESPERIENZA = 'S' 
+                                  and MANS2.FLGDISPONIBILE in ('P','S') 
+                                     and to_date(?, 'dd/mm/yyyy') between DE_MANS2.DATINIZIOVAL and DE_MANS2.DATFINEVAL),0,11) codmansione
+		       from PR_ESP_LAVORO ESP_LAV 
+			       left join PR_MANSIONE MANS on (ESP_LAV.PRGMANSIONE = MANS.PRGMANSIONE) and MANS.FLGESPERIENZA = 'S'
+	           	   left join De_Mansione de_mans on (mans.codmansione = de_mans.codmansione) and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_MANS.DATINIZIOVAL and DE_MANS.DATFINEVAL		       
+	               left join DE_CONTRATTO DE_CONTR on (DE_CONTR.CODCONTRATTO = ESP_LAV.CODCONTRATTO)
+	               left join DE_TIPO_CONTRATTO DE_tipo_contr on (DE_tipo_CONTR.CODCONTRATTO = DE_CONTR.CODCONTRATTO AND DE_TIPO_CONTR.FLGMIN = 'S')	       
+				   left join DE_COMUNE COMAZD on (COMAZD.CODCOM = ESP_LAV.CODCOMAZIENDA)
+		       WHERE mans.cdnlavoratore = ?
+	           		and nvl(ESP_LAV.FLGCOMPLETATO,'S') &lt;&gt; 'N'
+	           		/* and ESP_LAV.CODMVCESSAZIONE is null */
+	           		/* AND ESP_LAV.CODRAPPORTOLAV is not null*/
+		       " />		       
+
+<STATEMENT
+        name="CL_GET_ESPERIENZA_LAV_DES"
+        query="SELECT distinct esp_lav.codrapportolav tipoesperienza,
+        			raplav.strdescrizione tipoesperienzadesc, 
+        			SUBSTR((select distinct DE_MANS2.CODMANSIONEDOT 
+        					from DE_MANSIONE DE_MANS2 
+        						 left join PR_MANSIONE MANS2 on (DE_MANS2.CODMANSIONE = MANS2.CODMANSIONE) 
+        					where DE_MANS2.CODMANSIONE = MANS.CODMANSIONE 
+        						  and MANS.FLGESPERIENZA = 'S' 
+        						  and MANS2.FLGDISPONIBILE in ('P','S') 
+               					  and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_MANS2.DATINIZIOVAL and DE_MANS2.DATFINEVAL),0,11) qualificasvolta, 
+               (case  when (select distinct DE_MANS2.CODMANSIONEDOT 
+               				  from DE_MANSIONE DE_MANS2 
+               				  left join PR_MANSIONE MANS2 on (DE_MANS2.CODMANSIONE = MANS2.CODMANSIONE) 
+ 			   				  where DE_MANS2.CODMANSIONE = MANS.CODMANSIONE 
+ 			   				  	and MANS2.FLGDISPONIBILE in ('P','S') 
+ 			   				  	and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_MANS2.DATINIZIOVAL and DE_MANS2.DATFINEVAL) is not null 
+		   			  then SUBSTR(DE_MANS.STRDESCRIZIONE,0,250) 
+		   			  else '' 
+		   	   end) descrqualificasvolta, 
+		   	   substr(esp_lav.strdesattivita,0,250) principalimansioni, 
+		   	   substr(esp_lav.strragsocialeazienda,0,100) nomedatore, 
+               decode(esp_lav.numannoinizio, null, '',
+               		  '01' || '/' || 
+               		  to_char(decode(esp_lav.nummeseinizio, 1 , '0' || to_char(esp_lav.nummeseinizio), 
+               		  										2 , '0' || to_char(esp_lav.nummeseinizio),
+			   												3 , '0' || to_char(esp_lav.nummeseinizio), 
+			   												4 , '0' || to_char(esp_lav.nummeseinizio), 
+			   												5 , '0' || to_char(esp_lav.nummeseinizio),
+			   												6 , '0' || to_char(esp_lav.nummeseinizio), 
+			   												7 , '0'||to_char(esp_lav.nummeseinizio), 
+			   												8 , '0'||to_char(esp_lav.nummeseinizio),
+			   												9 , '0'||to_char(esp_lav.nummeseinizio), 
+			   												10, to_char(esp_lav.nummeseinizio), 
+			   												11, to_char(esp_lav.nummeseinizio), 
+			   												12, to_char(esp_lav.nummeseinizio), '01')) || '/' || esp_lav.numannoinizio) datainizio, 
+			   decode(esp_lav.numannofine, null, '', 
+			   		  to_char(decode(esp_lav.nummesefine, 1 , '31/0'||to_char(esp_lav.nummesefine), 
+			   		  									  2 , '28/0'||to_char(esp_lav.nummesefine),
+			   											  3 , '31/0'||to_char(esp_lav.nummesefine), 
+			   											  4 , '30/0'||to_char(esp_lav.nummesefine), 
+			   											  5 , '31/0'||to_char(esp_lav.nummesefine),
+			   											  6 , '30/0'||to_char(esp_lav.nummesefine), 
+			   											  7 , '31/0'||to_char(esp_lav.nummesefine), 
+			   											  8 , '31/0'||to_char(esp_lav.nummesefine),
+			   											  9 , '30/0'||to_char(esp_lav.nummesefine), 
+			   											 10 , '31/'||to_char(esp_lav.nummesefine), 
+			   											 11 , '30/'||to_char(esp_lav.nummesefine), 
+			   											 12, '31/'||to_char(esp_lav.nummesefine), 
+			   											 decode(''||esp_lav.numannofine, null,'', '31/12'))) || '/' || esp_lav.numannofine )
+			   datafine, 
+			   substr(esp_lav.strindirizzoazienda || ' ' || comAzd.strdenominazione,0,100) indirizzodatore, 
+			   comAzd.strdenominazione comunedatore, Esp_Lav.Strcodfiscaleazienda, 
+			    De_Contr.Strdescrizione as tipoRapporto, De_Area.Strdescrizione as areaLavoro,
+         		De_Attivita.Codatecodot , substr(De_Attivita.Strdescrizione, 0, 250) descrAteco, Cess.Strdescrizione motivocessazione,  Esp_Lav.Strmotcessazione,
+         		nvl(DE_CONTR.flgTirocini, 'N') flgTirocini
+		       from PR_ESP_LAVORO ESP_LAV 
+			       left join PR_MANSIONE MANS on (ESP_LAV.PRGMANSIONE = MANS.PRGMANSIONE) and MANS.FLGESPERIENZA = 'S'
+	           	   left join De_Mansione de_mans on (mans.codmansione = de_mans.codmansione) and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_MANS.DATINIZIOVAL and DE_MANS.DATFINEVAL		       
+	               left join DE_CONTRATTO DE_CONTR on (DE_CONTR.CODCONTRATTO = ESP_LAV.CODCONTRATTO)
+	               left join DE_TIPO_CONTRATTO DE_tipo_contr on (DE_tipo_CONTR.CODCONTRATTO = DE_CONTR.CODCONTRATTO and DE_TIPO_CONTR.FLGMIN = 'S') 		       
+				   left join DE_COMUNE COMAZD on (COMAZD.CODCOM = ESP_LAV.CODCOMAZIENDA)
+				   left join de_rapporto_lav raplav on raplav.codrapportolav = esp_lav.codrapportolav
+				   left join de_area on de_area.codarea = Esp_Lav.Codarea
+           		   left join De_Attivita on De_Attivita.Codateco = Esp_Lav.Codateco 
+            	   left join De_Mv_Cessazione cess on Cess.Codmvcessazione = Esp_Lav.Codmvcessazione
+		       WHERE mans.cdnlavoratore = ?
+	           		and nvl(ESP_LAV.FLGCOMPLETATO,'S') &lt;&gt; 'N'
+		       " />
+		       
+<STATEMENT
+        name="CL_GET_ESPERIENZA_LAV_DES_DEFAULT"
+        query="SELECT distinct esp_lav.codrapportolav tipoesperienza, 
+        			SUBSTR((select distinct DE_MANS2.CODMANSIONEDOT 
+        					from DE_MANSIONE DE_MANS2 
+        						 left join PR_MANSIONE MANS2 on (DE_MANS2.CODMANSIONE = MANS2.CODMANSIONE) 
+        					where DE_MANS2.CODMANSIONE = MANS.CODMANSIONE 
+        						  and MANS.FLGESPERIENZA = 'S' 
+        						  and MANS2.FLGDISPONIBILE in ('P','S') 
+               					  and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_MANS2.DATINIZIOVAL and DE_MANS2.DATFINEVAL),0,11) qualificasvolta, 
+               (case  when (select distinct DE_MANS2.CODMANSIONEDOT 
+               				  from DE_MANSIONE DE_MANS2 
+               				  left join PR_MANSIONE MANS2 on (DE_MANS2.CODMANSIONE = MANS2.CODMANSIONE) 
+ 			   				  where DE_MANS2.CODMANSIONE = MANS.CODMANSIONE 
+ 			   				  	and MANS2.FLGDISPONIBILE in ('P','S') 
+ 			   				  	and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_MANS2.DATINIZIOVAL and DE_MANS2.DATFINEVAL) is not null 
+		   			  then SUBSTR(DE_MANS.STRDESCRIZIONE,0,250) 
+		   			  else '' 
+		   	   end) descrqualificasvolta, 
+		   	   substr(esp_lav.strdesattivita,0,250) principalimansioni, 
+		   	   substr(esp_lav.strragsocialeazienda,0,100) nomedatore, 
+               decode(esp_lav.numannoinizio, null, '',
+               		  esp_lav.numannoinizio || '-' || 
+               		  to_char(decode(esp_lav.nummeseinizio, 1 , '0' || to_char(esp_lav.nummeseinizio), 
+               		  										2 , '0' || to_char(esp_lav.nummeseinizio),
+			   												3 , '0' || to_char(esp_lav.nummeseinizio), 
+			   												4 , '0' || to_char(esp_lav.nummeseinizio), 
+			   												5 , '0' || to_char(esp_lav.nummeseinizio),
+			   												6 , '0' || to_char(esp_lav.nummeseinizio), 
+			   												7 , '0'||to_char(esp_lav.nummeseinizio), 
+			   												8 , '0'||to_char(esp_lav.nummeseinizio),
+			   												9 , '0'||to_char(esp_lav.nummeseinizio), 
+			   												10, to_char(esp_lav.nummeseinizio), 
+			   												11, to_char(esp_lav.nummeseinizio), 
+			   												12, to_char(esp_lav.nummeseinizio), '01')) || '-01') datainizio, 
+			   decode(esp_lav.numannofine, null, '', 
+			   		  esp_lav.numannofine || 
+			   		  to_char(decode(esp_lav.nummesefine, 1 , '-0'||to_char(esp_lav.nummesefine)||'-31', 
+			   		  									  2 , '-0'||to_char(esp_lav.nummesefine)||'-28',
+			   											  3 , '-0'||to_char(esp_lav.nummesefine)||'-31', 
+			   											  4 , '-0'||to_char(esp_lav.nummesefine)||'-30', 
+			   											  5 , '-0'||to_char(esp_lav.nummesefine)||'-31',
+			   											  6 , '-0'||to_char(esp_lav.nummesefine)||'-30', 
+			   											  7 , '-0'||to_char(esp_lav.nummesefine)||'-31', 
+			   											  8 , '-0'||to_char(esp_lav.nummesefine)||'-31',
+			   											  9 , '-0'||to_char(esp_lav.nummesefine)||'-30', 
+			   											 10 , '-'||to_char(esp_lav.nummesefine)||'-31', 
+			   											 11 , '-'||to_char(esp_lav.nummesefine)||'-30', 
+			   											 12, '-'||to_char(esp_lav.nummesefine)||'-31', 
+			   											 decode(''||esp_lav.numannofine, null,'', '-12-31')))) 
+			   datafine, 
+			   substr(esp_lav.strindirizzoazienda || ' ' || comAzd.strdenominazione,0,100) indirizzodatore
+		       from PR_ESP_LAVORO ESP_LAV 
+			       left join PR_MANSIONE MANS on (ESP_LAV.PRGMANSIONE = MANS.PRGMANSIONE) and MANS.FLGESPERIENZA = 'S'
+	           	   left join De_Mansione de_mans on (mans.codmansione = de_mans.codmansione) and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_MANS.DATINIZIOVAL and DE_MANS.DATFINEVAL		       
+	               left join DE_CONTRATTO DE_CONTR on (DE_CONTR.CODCONTRATTO = ESP_LAV.CODCONTRATTO)
+	               left join DE_TIPO_CONTRATTO DE_tipo_contr on (DE_tipo_CONTR.CODCONTRATTO = DE_CONTR.CODCONTRATTO)  and DE_TIPO_CONTR.FLGMIN = 'S' 		       
+				   left join DE_COMUNE COMAZD on (COMAZD.CODCOM = ESP_LAV.CODCOMAZIENDA)
+		       WHERE mans.cdnlavoratore = ?
+	           		and nvl(ESP_LAV.FLGCOMPLETATO,'S') &lt;&gt; 'N'
+	           		/* and ESP_LAV.CODMVCESSAZIONE is null */
+	           		and DE_TIPO_CONTR.FLGMIN = 'S' 
+	           		/* AND ESP_LAV.CODRAPPORTOLAV is not null*/
+		       " />
+				       
+<STATEMENT
+        name="CL_GET_ISTRUZIONI"
+        query="SELECT (case 
+				when 
+				 SUBSTR(ST.CODTIPOTITOLO,1,2) in ('81', '83') then SUBSTR(ST.CODTIPOTITOLO,1,2)
+				else SUBSTR(ST.CODTIPOTITOLO, 1, 1) || '0' 
+				end) titolostudio, substr(titolo.strdescrizione,0,100) descrizioneistruzione,				
+				(case when st.stresimi is NULL 
+				then substr(st.strvoto,0,30)
+				else substr(st.strvoto,0,15) || '/' || substr(st.stresimi,0,14) 
+				end)  votazione, 
+				st.strspecifica specifica, st.codmonostato stato, st.numanno annoistr, st.stristscolastico nomeistituto, st.codcom codcomistituto, titolo1.CODTITOLO codtitolo
+		       From pr_Studio st 
+		       left join De_titolo titolo on (st.codtipotitolo = titolo.codtitolo and TITOLO.FLGMIN = 'S'
+		       			and to_date(?, &apos;dd/mm/yyyy&apos;) between TITOLO.DATINIZIOVAL and TITOLO.DATFINEVAL)
+		       left join De_titolo titolo1 on (st.codtitolo = titolo1.codtitolo
+		       			and to_date(?, &apos;dd/mm/yyyy&apos;) between TITOLO1.DATINIZIOVAL and TITOLO1.DATFINEVAL) 		
+		       WHERE st.cdnlavoratore = ?" />		       
+
+<STATEMENT
+        name="CL_GET_FORMAZIONE"
+        query="SELECT substr(dc.Strdescrizione,0,100) titolocorso, 
+        			  substr(cr.codcomente,0,4) idsede, 
+               		  substr(Decode(Cr.Nummesi, null, CR.NUMORE,  Cr.Nummesi),0,4) as durata, 
+               		  Decode(Cr.Nummesi, null, Decode(Cr.numore,null,null,'O'),  'M') as idtipologiadurata, 
+               		  substr(TIPO_CR.CODCL,0,1) idattestazione,
+               		  '' idqualifica, 
+               		  '' descrqualifica,
+               		  cr.codcorso as codice, cr.numanno as annoform, cr.strdescrizione as descrizione,
+               		  cr.strcontenuto as contenuto, cr.strente as sede, 
+               		  DECODE(cr.flgcompletato,'S','SI','N','NO','') as completato,
+               		  cr.codtipocertificato as idattestazionesil,
+               		  cr.cdnambitodisciplinare
+		       From pr_corso cr 
+		       		left join de_corso dc on (cr.codcorso = dc.codcorso)
+		       		left join de_tipo_corso tipo_cr on (CR.CODTIPOCERTIFICATO = TIPO_CR.CODTIPOCERTIFICATO)	
+		       										and TO_DATE(?, &apos;dd/mm/yyyy&apos;) between TIPO_CR.DATINIZIOVAL and TIPO_CR.DATFINEVAL	
+		       WHERE cr.cdnlavoratore = ?
+		       		 and sysdate between dc.datinizioval and dc.datfineval
+		      		 and nvl(cr.FLGCOMPLETATO,'S') &lt;&gt; 'N'" />		   
+		          
+<STATEMENT
+        name="CL_GET_LINGUE"
+        query="select SUBSTR(LI.CODLINGUA,0,3) IDLINGUA,
+	           SUBSTR((select COD_CONOSCENZA from Ma_GRADO_CONSC_LIN where LI.CDNGRADOLETTO = CDNGRADO),0,2) IDLIVELLOLETTO,
+	           substr((select COD_CONOSCENZA from Ma_GRADO_CONSC_LIN where LI.CDNGRADOSCRITTO = CDNGRADO),0,2) IDLIVELLOSCRITTO,
+	           SUBSTR((select COD_CONOSCENZA from Ma_GRADO_CONSC_LIN where LI.CDNGRADOPARLATO = CDNGRADO),0,2) IDLIVELLOPARLATO,
+	           TO_CHAR(li.CDNGRADOLETTO) IDLIVELLOLETTOSIL,
+	           TO_CHAR(li.CDNGRADOSCRITTO) IDLIVELLOSCRITTOSIL,
+	           TO_CHAR(li.CDNGRADOPARLATO) IDLIVELLOPARLATOSIL,
+	           DECODE(li.FLGCERTIFICATO,'S','SI','N','NO','') CERTIFICATA,
+	           li.CODMODLINGUA, li.STRMODLINGUA ALTRAMODLINGUA
+		       From pr_Lingua li 
+		       join de_lingua del on del.codlingua = li.codlingua	
+		       WHERE li.cdnlavoratore = ? AND del.DATINIZIOVAL &lt; SYSDATE AND del.DATFINEVAL &gt; SYSDATE " />		   
+		          
+<STATEMENT
+        name="CL_GET_CONOSC_INFORM"
+        query="select distinct TIPOINFO.STRDESCRIZIONE TIPOCONOSCENZA, 
+        			  /*mnci.des_conoscenza DETTCONOSCENZA*/
+        			  Dettinfo.strdescrizione
+		       from PR_INFO INFO 
+		       left join DE_tipo_INFO tipoINFO on (INFO.CODtipoINFO = tipoINFO.CODtipoINFO)
+		       			 						and to_date(?, &apos;dd/mm/yyyy&apos;) between tipoINFO.DATINIZIOVAL and tipoINFO.DATFINEVAL
+           	   Left Join De_Dett_Info Dettinfo On (Info.Coddettinfo = Dettinfo.Coddettinfo)
+                   /*Join Ma_Consc_Inf Mci On (Dettinfo.Coddettinfo = Mci.Coddettinfo)
+                   join mn_consc_inf mnci on (mci.cod_conoscenza = mnci.cod_conoscenza)*/
+		       Where Info.Cdnlavoratore = ?
+		       order by TIPOCONOSCENZA" />
+		       		       
+<STATEMENT
+        name="CL_GET_CONOSC_INFORM_SPEC"
+        query="select distinct INFO.STRDESCINFO SPECIFICHE         
+		       from PR_INFO INFO 
+		       WHERE info.cdnlavoratore = ?" />
+		       		       
+<STATEMENT
+        name="CL_GET_ALBI"
+        query="select SUBSTR(MA_AB.CODABILITAZIONE,0,4) IDALBO
+               from PR_ABILITAZIONE AB 
+               inner join MA_ABILITAZIONE MA_AB on MA_AB.CODABILITAZIONEGEN = AB.CODABILITAZIONEGEN
+               inner join DE_ABILITAZIONE_GEN DE_AB on DE_AB.CODABILITAZIONEGEN = MA_AB.CODABILITAZIONEGEN               
+		       WHERE ab.cdnlavoratore = ?
+		         and DE_AB.CODTIPOABILITAZIONEGEN = 'AL' 
+		         and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_AB.DATINIZIOVAL and DE_AB.DATFINEVAL
+		         and MA_AB.codabilitazione is not null
+		       " />	
+		       	
+<STATEMENT
+        name="CL_GET_PATENTI"
+        query="SELECT distinct SUBSTR(ma_AB.CODABILITAZIONE,0,2) idpatenteguida
+		       from PR_ABILITAZIONE AB 
+		       left join MA_ABILITAZIONE MA_AB on MA_AB.CODABILITAZIONEGEN = AB.CODABILITAZIONEGEN
+               left join DE_ABILITAZIONE_GEN DE_AB on DE_AB.CODABILITAZIONEGEN = MA_AB.CODABILITAZIONEGEN	
+               and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_AB.DATINIZIOVAL and DE_AB.DATFINEVAL	
+		       WHERE ab.cdnlavoratore = ? AND MA_AB.CODABILITAZIONE is not null
+		       and DE_AB.CODTIPOABILITAZIONEGEN = 'PG'
+		       " />	
+		       
+<STATEMENT
+        name="CL_GET_PATENTINO"
+        query="SELECT distinct SUBSTR(ma_AB.CODABILITAZIONE,0,2) idpatentino
+		       from PR_ABILITAZIONE AB 
+		       left join MA_ABILITAZIONE MA_AB on MA_AB.CODABILITAZIONEGEN = AB.CODABILITAZIONEGEN
+               left join DE_ABILITAZIONE_GEN DE_AB on DE_AB.CODABILITAZIONEGEN = MA_AB.CODABILITAZIONEGEN	
+               and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_AB.DATINIZIOVAL and DE_AB.DATFINEVAL	
+		       WHERE ab.cdnlavoratore = ? AND MA_AB.CODABILITAZIONE is not null
+		       and DE_AB.CODTIPOABILITAZIONEGEN = 'PT'
+		       " />	
+		       	       
+<STATEMENT
+        name="CL_GET_DIS_CONTRATTO_MANSIONI"
+        query="SELECT distinct mans.prgmansione prgmansione 
+		       From Pr_Mansione mans 
+		       inner Join De_Mansione De_Mans On (Mans.Codmansione = De_Mans.Codmansione) 	
+		       		and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL
+ 		       WHERE mans.cdnlavoratore = ?
+ 		       and nvl(MANS.FLGDISPONIBILE,'S') in ('P','S')
+ 		       AND de_mans.CODMANSIONEDOT is not null
+ 		        " />		       
+				       
+<STATEMENT
+        name="CL_GET_PROF_DESID"
+        query="SELECT distinct substr(nvl(DE_MANS.CODMANSIONEDOT,''),0,11) IDPROFESSIONE, 
+        					   substr(De_Mans.Strdescrizione,0,250) descrprofessione, 
+               				   substr(Mans.Strnote,0,300) descrizioneprofessione, 
+               				  DECODE(MANS.FLGESPERIENZA,'S','SI','N','NO','') esperienzasettore, DE_MANS.codmansione
+		       From Pr_Mansione mans 
+		       inner Join De_Mansione De_Mans On (Mans.Codmansione = De_Mans.Codmansione) 	
+		       						and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL	       
+		       WHERE mans.cdnlavoratore = ?
+ 		       and mans.prgmansione = ?
+ 		       and nvl(MANS.FLGDISPONIBILE,'S') in ('P','S')
+ 		       AND de_mans.CODMANSIONEDOT is not null" />	
+ 		       
+
+<STATEMENT
+        name="CL_GET_TRASFERTE"
+        query="SELECT distinct 
+               		DECODE((select MOBIL.CODTRASFERTA from PR_MOBIL_GEOGR MOBIL where MOBIL.PRGMANSIONE = MANS.PRGMANSIONE 
+               		and nvl(MOBIL.CODTRASFERTA,'0') &lt;&gt; '1' and rownum = 1), null,'','SI') trasferte
+		       From Pr_Mansione mans 
+		       inner Join De_Mansione De_Mans On (Mans.Codmansione = De_Mans.Codmansione) 	
+		       						and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL	       
+		       WHERE mans.cdnlavoratore = ?
+ 		       and mans.prgmansione = ?
+ 		       and nvl(MANS.FLGDISPONIBILE,'S') in ('P','S')
+ 		       AND de_mans.CODMANSIONEDOT is not null" />	
+
+<STATEMENT name="CL_GET_MANSIONE_DESCRIZIONEESPERIENZA"
+			query="
+	Select Substr( Decode(Esp.Nummeseinizio,Null,'',
+    		To_Char(To_Date(Esp.Nummeseinizio,'MM'),'fmMonth','NLS_DATE_LANGUAGE = ITALIAN') || ' ') ||
+            Esp.Numannoinizio 
+            || Decode(Esp.Numannofine,Null,'',
+            decode(esp.nummesefine,null,' - ', ' - ' || To_Char(To_Date(Esp.Nummesefine,'MM'),'fmMonth','NLS_DATE_LANGUAGE = ITALIAN') || ' ') || ESP.NUMANNOFINE) || '. ' || ESP.STRDESATTIVITA,0,300) descrizioneesperienza
+   From Pr_Esp_Lavoro Esp 
+   inner join PR_MANSIONE M on M.PRGMANSIONE = ESP.PRGMANSIONE 
+   Where Esp.Prgmansione = ?
+     and M.FLGESPERIENZA = 'S' 
+     order by esp.numannofine desc" />
+				       				       
+<STATEMENT 
+		   name="CL_GET_PROF_DESID_ORARIO" 
+           query="
+           		select distinct  
+			      decode(deo.codmonoorario,
+			      'T','FT',
+			      'P','PT',
+			      null) idmodalitalavorativa
+		       From pr_dis_orario orario 
+		       inner Join Pr_Mansione mans On (orario.prgmansione = mans.prgmansione) 
+           inner join de_orario deo on deo.codorario = orario.codorario
+ 		       WHERE mans.cdnlavoratore = ?
+ 		       and mans.prgmansione = ?" />
+ 		       
+<STATEMENT 
+		   name="CL_GET_PROF_DESID_ORARIO_SIL" 
+           query="
+           		select distinct orario.codorario idmodalitalavorativasil
+		       From pr_dis_orario orario 
+		       inner Join Pr_Mansione mans On (orario.prgmansione = mans.prgmansione) 
+           inner join de_orario deo on deo.codorario = orario.codorario
+ 		       WHERE mans.cdnlavoratore = ?
+ 		       and mans.prgmansione = ?" />
+
+<STATEMENT 
+		   name="CL_GET_PROF_DESID_TIPI_CONTRATTO" 
+           query="
+           		select distinct ma_rapporto_lav.codrapportolav idtipologiacontratto
+		       From pr_dis_contratto contratto 
+		       inner Join Pr_Mansione mans On (contratto.prgmansione = mans.prgmansione) 
+           	   inner join de_tipo_contratto dec on (dec.codcontratto = contratto.codcontratto)
+           	   inner join ma_rapporto_lav on (dec.codtipocontratto = ma_rapporto_lav.codtipocontratto)
+ 		       WHERE mans.cdnlavoratore = ?
+ 		       and mans.prgmansione = ? and ma_rapporto_lav.codrapportolav is not null" />
+ 		       
+<STATEMENT 
+		   name="CL_GET_PROF_DESID_TIPI_CONTRATTO_SIL" 
+           query="
+           		select distinct contratto.codcontratto idtipologiacontrattosil
+		       From pr_dis_contratto contratto 
+		       inner Join Pr_Mansione mans On (contratto.prgmansione = mans.prgmansione) 
+           	   inner join de_contratto dec on (dec.codcontratto = contratto.codcontratto)
+ 		       WHERE mans.cdnlavoratore = ?
+ 		       and mans.prgmansione = ?" />
+ 		       	       
+<STATEMENT
+        name="CL_GET_PROF_DESID_MEZZI_TRASPORTO"
+        query="select distinct DECODE((select distinct 'SI' mezzitrasporto
+			   from PR_MOBIL_GEOGR MOBIL 
+			   inner join PR_MANSIONE MANS on (MOBIL.PRGMANSIONE = MANS.PRGMANSIONE)
+		       where mans.cdnlavoratore = ?
+ 		       and mans.prgmansione = ?
+ 		       and (MOBIL.FLGDISPMOTO = 'S' or MOBIL.FLGDISPAUTO = 'S')), null,'','SI') mezzitrasporto
+			   from dual
+ 		       " />	
+ 		       	       
+<STATEMENT
+        name="CL_GET_PROF_DESID_DISP_TERRIT"
+        query="select distinct DECODE((select distinct '01' 
+        		from PR_DIS_REGIONE REG 
+        		inner join PR_MANSIONE MANS on (REG.PRGMANSIONE = MANS.PRGMANSIONE)
+		       where mans.cdnlavoratore = ?
+		       and MANS.PRGMANSIONE = ?), null,'00','01') disponibilitaterritoriale
+			   from dual
+ 		       " />	
+ 		       	        		       	       
+<STATEMENT
+        name="CL_GET_DATI_SISTEMA_CANDIDATURA_AMBITO_DIFF"
+        query="select distinct SUBSTR(CL_AD.CODAMBITODIFFUSIONE,0,2) AMBITODIFFUSIONE
+		       from DE_CPI CPI 
+		       inner join cl_candidatura cl on (CL.CODCPI = CPI.CODCPI)
+		       inner join CL_AMBITO_CANDIDATURA cl_ad on (CL_AD.PRGCANDIDATURA = CL.PRGCANDIDATURA)
+               where  cpi.CODCPI = ?
+               and cl.cdnlavoratore = ?
+		       and to_date(?, &apos;dd/mm/yyyy&apos;) between cpi.DATINIZIOVAL and cpi.DATFINEVAL
+               " />	
+                
+<STATEMENT
+        name="CL_GET_DATI_SISTEMA_CANDIDATURA_AMBITO_DIFF_TEST"
+        query="select '01' AMBITODIFFUSIONE
+		       from DE_CPI CPI 
+		       inner join cl_candidatura cl on (CL.CODCPI = CPI.CODCPI)
+               where  cpi.CODCPI = ?
+               and cl.cdnlavoratore = ?
+		       and to_date(?, &apos;dd/mm/yyyy&apos;) between cpi.DATINIZIOVAL and cpi.DATFINEVAL
+               " />	
+                
+<STATEMENT
+        name="CL_GET_DATI_SISTEMA_CANDIDATURA"
+        query="select to_char(CL.DATINVIO, 'yyyy-mm-dd')||'T'||to_char(SYSDATE,'hh24:mi:ss') DATAINSERIMENTO, TO_CHAR(TO_DATE(?,'DD/MM/YYYY'),'yyyy-mm-dd') DATASCADENZA, 
+               SUBSTR(CPI.CODINTERMEDIARIOCL,0,11) IDINTERMEDIARIO, '' CODICEFISCALEINTERMEDIARIO, SUBSTR(CPI.STRDESCRIZIONE,0,200) DENOMINAZIONEINTERMEDIARIO, 
+               SUBSTR(CPI.STRINDIRIZZO,0,100) INDIRIZZO, SUBSTR(CPI.CODCOM,0,4) IDCOMUNE, SUBSTR(CPI.STRCAP,0,5) CAP, SUBSTR(CPI.STRTELRIFCL,0,15) TELEFONO, 
+               SUBSTR(CPI.STRFAX,0,15) FAX, SUBSTR(trim(nvl(CPI.STREMAILRIFCL,CPI.STREMAIL)),0,256) email, 'SI' VISIBILITA, CL.CODTIPOCOMUNICAZIONECL tipocandidatura, 
+               '' MOTIVOCHIUSURA, SUBSTR(CL.CODCANDIDATURA,0,25) codicecandidatura /*, 'NO' percettore*/
+		       from DE_CPI CPI inner join cl_candidatura cl on (CL.CODCPI = CPI.CODCPI)
+               where  cpi.CODCPI = ?
+               and cl.cdnlavoratore = ?
+		       and to_date(?, &apos;dd/mm/yyyy&apos;) between cpi.DATINIZIOVAL and cpi.DATFINEVAL
+		       and CL.DATINVIO between CL.DATINVIO and CL.DATSCADENZA
+		       and rownum = 1
+               " />	
+		       
+<STATEMENT
+        name="CL_GET_ALTRE_INFORMAZIONI_3"
+        query="select '3' listespeciali  
+			   from am_cm_iscr t
+			   WHERE (SYSDATE &gt;= t.datdatainizio AND SYSDATE &lt;= t.datdatafine)
+		  	   OR t.datdatafine IS NULL
+			   and T.CODSTATOATTO = 'PR' 
+			   and DECRYPT(t.CDNLAVORATORE, ?) = ?" />	
+        
+<STATEMENT
+        name="CL_GET_ALTRE_INFORMAZIONI_2"
+        query="select '2' listespeciali 
+        	   from am_mobilita_iscr t 
+			   where (sysdate &gt;= T.DATINIZIO and sysdate &lt;= T.DATFINE)
+			   and T.CODTIPOMOB = 'LC'
+			   and T.CDNLAVORATORE = ?" />	
+        
+<STATEMENT
+        name="CL_GET_ALTRE_INFORMAZIONI_1"
+        query="select '1' listespeciali 
+               from am_mobilita_iscr t 
+			   WHERE (SYSDATE &gt;= t.datinizio AND SYSDATE &lt;= t.datfine)
+			   and T.CODTIPOMOB = 'LB'
+			   and T.CDNLAVORATORE = ?" />	
+        		       	       
+<STATEMENT
+	name="CL_GET_TESTCASES"
+	query="Select distinct strcodicefiscale, lav.cdnlavoratore cdnlavoratore
+		   From An_Lavoratore lav inner join pr_mansione mans on LAV.CDNLAVORATORE = MANS.CDNLAVORATORE
+		   Where lav.Cdnlavoratore &gt;= ? And
+		   lav.cdnlavoratore &lt;= ?" />
+		   
+<STATEMENT
+        name="CL_ESISTE_CV_VALIDO"
+        query="SELECT MAX (1) AS esiste
+ 			   FROM pr_validita val
+ 			   WHERE val.cdnlavoratore = ?
+ 		       AND val.codstatolav = 'COM'
+       		   AND val.codtipovalidita = 'DL'
+       		   AND SYSDATE BETWEEN val.datiniziocurr AND val.datfinecurr" />
+       
+<STATEMENT
+        name="CL_ESISTE_CV_VALIDO_PERIODO_CANDIDATURA"
+        query="SELECT MAX (1) AS esiste
+  			   FROM pr_validita val
+ 			   WHERE val.cdnlavoratore = ?
+		       AND val.codstatolav = 'COM'
+		       AND val.codtipovalidita = 'DL'
+		       AND  to_date(?,'dd/mm/yyyy') &gt;= val.datiniziocurr
+		       AND  to_date(?,'dd/mm/yyyy') &lt;= val.datfinecurr" />
+       
+<STATEMENT
+        name="CL_ESISTE_CV_VALIDO_PERIODO_CANDIDATURA_MASSIVO"
+        query="SELECT MAX (1) AS esiste
+  			   FROM pr_validita val
+ 			   WHERE val.cdnlavoratore = ?
+		       AND val.codstatolav = 'COM'
+		       AND val.codtipovalidita = 'DL'
+		       AND  to_date(?,'dd/mm/yyyy') &gt;= val.datiniziocurr
+		       AND  to_date(?,'dd/mm/yyyy') &lt;= val.datfinecurr"
+		      />     
+     
+       
+ <STATEMENT
+        name="CL_LIST_INVII_CANDIDATURE"
+        query="SELECT c.prgcandidatura,
+       c.cdnlavoratore,
+       c.codtipocomunicazionecl,
+       c.codcpi,
+       TO_CHAR (c.datinvio, 'dd/MM/yyyy') AS data_invio,
+       TO_CHAR (c.datscadenza, 'dd/MM/yyyy') AS data_scad_cand,
+       c.codcandidatura,
+       c.codstatoinviocl,
+       st.strdescrizione AS desc_stato_invio,
+       c.numklocandidatura,
+       c.cdnutins,
+       c.dtmins,
+       c.cdnutmod,
+       c.dtmmod,
+       c.strmessaggio
+  FROM    cl_candidatura c
+       INNER JOIN
+          de_stato_invio_cl st
+       ON c.codstatoinviocl = st.codstatoinviocl
+ WHERE c.cdnlavoratore = ?
+       and c.codtipocomunicazionecl = ? " />
+ 
+ <STATEMENT
+        name="CL_GET_CANDIDATURA"
+        query="SELECT c.prgcandidatura,
+       c.cdnlavoratore,
+       c.codtipocomunicazionecl,
+       c.codcpi,
+       TO_CHAR (c.datinvio, 'dd/MM/yyyy') AS data_invio,
+       TO_CHAR (c.datscadenza, 'dd/MM/yyyy') AS data_scad_cand,
+       c.codcandidatura,
+       c.codstatoinviocl,
+       st.strdescrizione AS desc_stato_invio,
+       c.numklocandidatura,
+       c.cdnutins,
+       c.dtmins,
+       c.cdnutmod,
+       c.dtmmod, c.strtitolo titolo
+  FROM cl_candidatura c INNER JOIN
+          de_stato_invio_cl st
+       ON c.codstatoinviocl = st.codstatoinviocl
+ WHERE c.prgcandidatura = ?" />
+
+ 
+  <STATEMENT
+        name="CL_GET_AMBITO_CANDIDATURA"
+        query="SELECT c.prgambitocandidatura,
+       c.prgcandidatura,
+       c.codambitodiffusione,
+       c.numkloambitocandidat,
+       c.cdnutins,
+       c.dtmins,
+       c.cdnutmod,
+       c.dtmmod
+  FROM cl_ambito_candidatura c
+ WHERE c.prgcandidatura = ?" />
+ 
+ <STATEMENT
+        name="CL_COMBO_AMBITO_DIFFUSIONE"
+        query="SELECT d.codambitodiffusione AS codice, d.strdescrizione AS descrizione
+  FROM de_ambito_diffusione d
+ WHERE SYSDATE BETWEEN d.datinizioval AND d.datfineval" />
+ 
+       
+
+<STATEMENT
+        name="CL_ESISTE_CANDIDATURA_VALIDA"
+        query="SELECT MAX (1) AS esiste
+  FROM cl_candidatura c
+ WHERE c.cdnlavoratore = ? 
+  AND c.codtipocomunicazionecl = ?
+  AND c.datscadenza &gt;= SYSDATE" />
+       
+
+<STATEMENT
+        name="CL_UPDATE_CANDIDATURA"
+        query="UPDATE cl_candidatura
+   SET txttracciatoxml = ?,
+   	   cdnlavoratore = ?,
+       codtipocomunicazionecl = ?,
+       codcpi = ?,
+       datinvio = TO_DATE (?,              'DD/MM/YYYY'),
+       datscadenza            =  TO_DATE(?,'DD/MM/YYYY'),
+       codcandidatura         = ?,
+       codstatoinviocl        = ?,
+       numklocandidatura      = numklocandidatura+1,
+       cdnutmod               = ?,
+       dtmmod                 = SYSDATE,
+       strtitolo			  = ?
+where  prgcandidatura         = ?" />
+       
+<STATEMENT
+        name="CL_INSERT_CANDIDATURA"
+        query="INSERT INTO cl_candidatura (prgcandidatura,
+                            cdnlavoratore,
+                            codtipocomunicazionecl,
+                            codcpi,
+                            datinvio,
+                            datscadenza,
+                            codcandidatura,
+                            codstatoinviocl,
+                            cdnutins,
+                            dtmins,
+                            cdnutmod,
+                            dtmmod,
+                            txttracciatoxml, strtitolo)
+     VALUES (?,
+             ?,
+             ?,
+             ?,
+             TO_DATE (?,'DD/MM/YYYY')/* DATINVIO */,
+			 TO_DATE(?,'DD/MM/YYYY') /* DATSCADENZA */,
+			 ?,
+			 ?,
+			 ?,
+			 SYSDATE/* DTMINS */,
+			 ?,
+			 SYSDATE/* DTMMOD */ ,
+			 ?, ?)" />
+
+<STATEMENT
+        name="CL_INSERT_AMBITO_CANDIDATURA"
+        query="INSERT INTO cl_ambito_candidatura (prgambitocandidatura,
+                                   prgcandidatura,
+                                   codambitodiffusione,
+                                   cdnutins,
+                                   dtmins,
+                                   cdnutmod,
+                                   dtmmod)
+     VALUES (?,
+             ?,
+             ?,
+             ?,
+             SYSDATE,
+             ?,
+             SYSDATE)" />
+             
+<STATEMENT
+        name="CL_DELETE_AMBITO_CANDIDATURA"
+        query="DELETE FROM cl_ambito_candidatura
+      WHERE prgcandidatura = ?" />
+
+<STATEMENT
+        name="CL_NEXTVAL_CANDIDATURA"
+        query="SELECT s_cl_candidatura.NEXTVAL as DO_NEXTVAL FROM DUAL" />
+        
+ <STATEMENT name="CL_INSERT_MANSIONE_CANDIDATURA" query="
+    INSERT INTO PR_MANSIONE(
+      PRGMANSIONE,
+      CDNLAVORATORE,
+      CODMANSIONE,
+      FLGESPERIENZA,
+      FLGDISPONIBILE,
+      FLGDISPFORMAZIONE,
+      FLGESPFORM,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+     ) VALUES (
+      s_pr_mansione.nextval,
+      ?, ?, 
+      ?, ?, ?, ?, 
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>        
+    
+<STATEMENT name="CL_SEARCH_PRGMANSIONE_CANDIDATURA" query="
+ 	select max(MANS.PRGMANSIONE) PRGMANSIONE
+	from PR_MANSIONE MANS 
+	where mans.CDNLAVORATORE =  ? 
+  "/>   
+    
+<STATEMENT name="CL_SEARCH_MANSIONE_CANDIDATURA" query="
+ 	select DE_MANS.CODMANSIONE CODMANSIONE, DE_MANS.CODMANSIONEDOT CODMANSIONEDOT, DE_MANS.STRDESCRIZIONE STRDESCRIZIONE
+	from DE_MANSIONE DE_MANS 
+	where DE_MANS.CODMANSIONE not in (select MANS.CODMANSIONE from PR_MANSIONE MANS where MANS.CDNLAVORATORE =  ?  
+	and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_MANS.DATINIZIOVAL and DE_MANS.DATFINEVAL)
+	and rownum = 1
+    "/>   
+         
+    
+<STATEMENT
+        name="CL_INSERT_ESP_LAVORO_CANDIDATURA"
+        query="INSERT INTO PR_ESP_LAVORO
+                  (PRGESPLAVORO, PRGMANSIONE, CODCONTRATTO, 
+                   STRDESATTIVITA, NUMMESEINIZIO, NUMANNOINIZIO, NUMMESEFINE, NUMANNOFINE, NUMMESI,  
+                   STRRAGSOCIALEAZIENDA, STRINDIRIZZOAZIENDA, 
+                   CDNUTINS, DTMINS, 
+                   CDNUTMOD, DTMMOD)
+                  VALUES 
+                  ( s_pr_esp_lavoro.nextval, ?, ?,
+                    ?, ?, ?, ?, ?, ?, 
+                    ?, ?, 
+                    ?, SYSDATE, 
+                    ?, SYSDATE 
+                   )" />
+                   
+ <STATEMENT name="CL_INSERT_CONTRATTO_IN_MANSIONE" query="
+    INSERT INTO PR_DIS_CONTRATTO (
+      PRGDISCONTRATTO,
+      PRGMANSIONE,
+      CODCONTRATTO,
+      CDNUTINS,
+      DTMINS,
+      CDNUTMOD,
+      DTMMOD
+    ) VALUES (
+      S_PR_DIS_CONTRATTO.nextval, 
+      ?, 
+      ?,
+      ?,
+      SYSDATE,
+      ?,
+      SYSDATE
+    )
+    "/>                    
+
+<STATEMENT name="CHECK_TIPO_ESPERIENZA_CONTRATTO" query="SELECT DISTINCT SUBSTR(NVL(ESP_LAV.CODRAPPORTOLAV,''),0,7) tipoesperienza
+							FROM PR_ESP_LAVORO ESP_LAV
+							LEFT JOIN PR_MANSIONE MANS
+							ON (ESP_LAV.PRGMANSIONE = MANS.PRGMANSIONE)
+							AND MANS.FLGESPERIENZA  = 'S'
+							LEFT JOIN De_Mansione de_mans
+							ON (mans.codmansione = de_mans.codmansione)
+							AND to_date(sysdate, 'dd/mm/yyyy') BETWEEN DE_MANS.DATINIZIOVAL AND DE_MANS.DATFINEVAL
+							LEFT JOIN DE_CONTRATTO DE_CONTR
+							ON (DE_CONTR.CODCONTRATTO = ESP_LAV.CODCONTRATTO)
+							LEFT JOIN DE_TIPO_CONTRATTO DE_tipo_contr
+							ON (DE_tipo_CONTR.CODCONTRATTO = DE_CONTR.CODCONTRATTO)
+							AND DE_TIPO_CONTR.FLGMIN       = 'S'
+							LEFT JOIN DE_COMUNE COMAZD
+							ON (COMAZD.CODCOM                   = ESP_LAV.CODCOMAZIENDA)
+							WHERE mans.cdnlavoratore            = ?
+							AND NVL(ESP_LAV.FLGCOMPLETATO,'S') &lt;&gt; 'N'
+							AND ESP_LAV.CODMVCESSAZIONE        IS NULL
+							AND DE_TIPO_CONTR.FLGMIN            = 'S'
+							AND ESP_LAV.CODRAPPORTOLAV is not null"/> 
+							   
+<STATEMENT name="CHECK_TIPO_ESPERIENZA" query="SELECT DISTINCT SUBSTR(NVL(ESP_LAV.CODRAPPORTOLAV,''),0,7) tipoesperienza
+							FROM PR_ESP_LAVORO ESP_LAV
+							LEFT JOIN PR_MANSIONE MANS
+							ON (ESP_LAV.PRGMANSIONE = MANS.PRGMANSIONE)
+							AND MANS.FLGESPERIENZA  = 'S'
+							LEFT JOIN De_Mansione de_mans
+							ON (mans.codmansione = de_mans.codmansione)
+							AND to_date(sysdate, 'dd/mm/yyyy') BETWEEN DE_MANS.DATINIZIOVAL AND DE_MANS.DATFINEVAL
+							LEFT JOIN DE_CONTRATTO DE_CONTR
+							ON (DE_CONTR.CODCONTRATTO = ESP_LAV.CODCONTRATTO)
+							LEFT JOIN DE_TIPO_CONTRATTO DE_tipo_contr
+							ON (DE_tipo_CONTR.CODCONTRATTO = DE_CONTR.CODCONTRATTO)
+							AND DE_TIPO_CONTR.FLGMIN       = 'S'
+							LEFT JOIN DE_COMUNE COMAZD
+							ON (COMAZD.CODCOM                   = ESP_LAV.CODCOMAZIENDA)
+							WHERE mans.cdnlavoratore            = ?
+							AND NVL(ESP_LAV.FLGCOMPLETATO,'S') &lt;&gt; 'N'
+							AND ESP_LAV.CODMVCESSAZIONE        IS NULL
+							AND DE_TIPO_CONTR.FLGMIN            = 'S'
+							"/>    							   
+
+<!-- 12/09/2012 datascadenza deve essere sysdate+60 non sysdate! -->  							
+<STATEMENT
+        name="CL_GET_DATI_SISTEMA_CANDIDATURA_PREINVIO"
+        query="select to_char(sysdate, 'yyyy-mm-dd')||'T'||to_char(SYSDATE,'hh24:mi:ss') DATAINSERIMENTO, TO_CHAR(TO_DATE(?,'DD/MM/YYYY'),'yyyy-mm-dd') DATASCADENZA, 
+               SUBSTR(CPI.CODINTERMEDIARIOCL,0,11) IDINTERMEDIARIO, '' CODICEFISCALEINTERMEDIARIO, SUBSTR(CPI.STRDESCRIZIONE,0,200) DENOMINAZIONEINTERMEDIARIO, 
+               SUBSTR(CPI.STRINDIRIZZO,0,100) INDIRIZZO, SUBSTR(CPI.CODCOM,0,4) IDCOMUNE, SUBSTR(CPI.STRCAP,0,5) CAP, SUBSTR(CPI.STRTELRIFCL,0,15) TELEFONO, 
+               SUBSTR(CPI.STRFAX,0,15) FAX, SUBSTR(trim(nvl(CPI.STREMAILRIFCL,CPI.STREMAIL)),0,256) email, 'SI' VISIBILITA, '01' tipocandidatura, 
+               '' MOTIVOCHIUSURA, ? codicecandidatura /*, 'NO' percettore */ 
+                  from DE_CPI CPI
+                 where cpi.CODCPI = ?
+                   and to_date(?, 'dd/mm/yyyy')  between cpi.DATINIZIOVAL and cpi.DATFINEVAL         
+               " />    
+
+<STATEMENT
+        name="CL_CONTROLLO_PROFESSIONE_DESIDERATA"
+        query="SELECT distinct substr(nvl(DE_MANS.CODMANSIONEDOT,''),0,11) IDPROFESSIONE, 
+               substr(De_Mans.Strdescrizione,0,250) descrprofessione              
+	           From Pr_Mansione mans 
+	           inner Join De_Mansione De_Mans On (Mans.Codmansione = De_Mans.Codmansione)   
+	           and to_date(?, 'dd/mm/yyyy') between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL         
+	           WHERE 
+	            mans.cdnlavoratore = ?
+	            and MANS.FLGDISPONIBILE in ('P','S')
+	            AND de_mans.CODMANSIONEDOT is not null" />       
+	            
+<STATEMENT
+        name="CL_GET_LINGUE_DES"
+        query="select SUBSTR(LI.CODLINGUA,0,3) IDLINGUA,
+        	   de.strdenominazione as strLingua,
+	           SUBSTR((select COD_CONOSCENZA from Ma_GRADO_CONSC_LIN where LI.CDNGRADOLETTO = CDNGRADO),0,2) IDLIVELLOLETTO,
+	           SUBSTR((select COD_CONOSCENZA from Ma_GRADO_CONSC_LIN where LI.CDNGRADOSCRITTO = CDNGRADO),0,2) IDLIVELLOSCRITTO,
+	           substr((select COD_CONOSCENZA from Ma_GRADO_CONSC_LIN where LI.CDNGRADOPARLATO = CDNGRADO),0,2) idlivelloparlato,
+	           (Select Strdescrizione FROM De_Grado_Lin WHERE LI.CDNGRADOLETTO = CDNGRADO) silGradoLetto,
+               (Select Strdescrizione FROM De_Grado_Lin WHERE LI.CDNGRADOSCRITTO = CDNGRADO) silGradoscritto,
+               (Select Strdescrizione FROM De_Grado_Lin WHERE LI.CDNGRADOPARLATO = CDNGRADO) silGradoparlato,
+               DECODE(Li.Flgcertificato,'S','SI','N','NO','') as CERTIFICATO,
+               dml.Strdescrizione AS MODALITA, Li.Strmodlingua AS ALTRAMODALITA
+		       From pr_Lingua li 
+		       inner join de_lingua de on (de.codlingua = li.codlingua )
+           	   left join De_Mod_Lingua DML on (Dml.Codmodlingua =  Li.Codmodlingua)
+		       WHERE li.cdnlavoratore = ? " />		                  
+		       
+<STATEMENT
+        name="CL_GET_ALBI_DES"
+        query="select DISTINCT SUBSTR(MA_AB.CODABILITAZIONE,0,4) IDALBO, AB.Codabilitazionegen idalbosil, 
+        			de_ab.strdescrizione as descrizione, AB.strnote
+               	from PR_ABILITAZIONE AB 
+				left join MA_ABILITAZIONE MA_AB on MA_AB.CODABILITAZIONEGEN = AB.CODABILITAZIONEGEN
+				left join de_abilitazione_gen de_ab on MA_AB.codabilitazionegen = de_ab.codabilitazionegen               	
+					and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_AB.DATINIZIOVAL and DE_AB.DATFINEVAL               	
+		       	WHERE ab.cdnlavoratore = ?
+		         	and DE_AB.CODTIPOABILITAZIONEGEN = 'AL' " />			       
+    
+<STATEMENT
+        name="CL_GET_ALBI_DES_DEFAULT"
+        query="select SUBSTR(MA_AB.CODABILITAZIONE,0,4) IDALBO,
+        			de_ab.strdescrizione as descrizione
+               	from PR_ABILITAZIONE AB 
+				inner join MA_ABILITAZIONE MA_AB on MA_AB.CODABILITAZIONEGEN = AB.CODABILITAZIONEGEN
+				inner join de_abilitazione_gen de_ab on MA_AB.codabilitazionegen = de_ab.codabilitazionegen               	
+					and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_AB.DATINIZIOVAL and DE_AB.DATFINEVAL               	
+		       	WHERE ab.cdnlavoratore = ?
+		         	and DE_AB.CODTIPOABILITAZIONEGEN = 'AL'
+					and MA_AB.codabilitazione is not null	 " />        
+		         	
+<STATEMENT
+        name="CL_GET_PATENTI_DES"
+        query="select DISTINCT SUBSTR(MA_AB.CODABILITAZIONE,0,4) IDALBO, AB.Codabilitazionegen idalbosil, 
+        			de_ab.strdescrizione as descrizione, AB.strnote
+               	from PR_ABILITAZIONE AB 
+				left join MA_ABILITAZIONE MA_AB on MA_AB.CODABILITAZIONEGEN = AB.CODABILITAZIONEGEN
+				left join de_abilitazione_gen de_ab on MA_AB.codabilitazionegen = de_ab.codabilitazionegen               	
+					and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_AB.DATINIZIOVAL and DE_AB.DATFINEVAL               	
+		       	WHERE ab.cdnlavoratore = ?
+		         	and DE_AB.CODTIPOABILITAZIONEGEN = 'PG'" />	            
+
+<STATEMENT
+        name="CL_GET_PATENTI_DES_DEFAULT"
+        query="SELECT distinct SUBSTR(ma_AB.CODABILITAZIONE,0,2) idpatenteguida,
+        	   mn_ab.des_desabilitazione as descrizione
+		       from PR_ABILITAZIONE AB 
+		       left join MA_ABILITAZIONE MA_AB on MA_AB.CODABILITAZIONEGEN = AB.CODABILITAZIONEGEN
+               left join DE_ABILITAZIONE_GEN DE_AB on DE_AB.CODABILITAZIONEGEN = MA_AB.CODABILITAZIONEGEN	
+               			and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_AB.DATINIZIOVAL and DE_AB.DATFINEVAL
+               left join MN_ABILITAZIONE MN_AB on mn_ab.cod_abilitazione = ma_ab.codabilitazione	
+		       WHERE ab.cdnlavoratore = ?
+		       and DE_AB.CODTIPOABILITAZIONEGEN = 'PG'
+		       and MA_AB.codabilitazione is not null
+		       order by idpatenteguida" />	 
+		         	     
+<STATEMENT
+        name="CL_GET_PATENTINO_DES"
+        query="select DISTINCT SUBSTR(MA_AB.CODABILITAZIONE,0,4) IDALBO, AB.Codabilitazionegen idalbosil, 
+        			de_ab.strdescrizione as descrizione, AB.strnote
+               	from PR_ABILITAZIONE AB 
+				left join MA_ABILITAZIONE MA_AB on MA_AB.CODABILITAZIONEGEN = AB.CODABILITAZIONEGEN
+				left join de_abilitazione_gen de_ab on MA_AB.codabilitazionegen = de_ab.codabilitazionegen               	
+					and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_AB.DATINIZIOVAL and DE_AB.DATFINEVAL               	
+		       	WHERE ab.cdnlavoratore = ?
+		         	and DE_AB.CODTIPOABILITAZIONEGEN = 'PT'" />			       
+
+<STATEMENT
+        name="CL_GET_PATENTINO_DES_DEFAULT"
+        query="SELECT distinct SUBSTR(ma_AB.CODABILITAZIONE,0,2) idpatentino,
+        					   mn_ab.des_desabilitazione as descrizione
+		       from PR_ABILITAZIONE AB 
+		       left join MA_ABILITAZIONE MA_AB on MA_AB.CODABILITAZIONEGEN = AB.CODABILITAZIONEGEN
+               left join DE_ABILITAZIONE_GEN DE_AB on DE_AB.CODABILITAZIONEGEN = MA_AB.CODABILITAZIONEGEN	
+               			and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_AB.DATINIZIOVAL and DE_AB.DATFINEVAL
+               left join MN_ABILITAZIONE MN_AB on mn_ab.cod_abilitazione = ma_ab.codabilitazione	
+		       WHERE ab.cdnlavoratore = ?
+		       and DE_AB.CODTIPOABILITAZIONEGEN = 'PT'
+		       and MA_AB.codabilitazione is not null
+		       order by idpatentino" />	
+		         			       
+<STATEMENT
+        name="CL_GET_DIS_CONTRATTO_MANSIONI_DES"
+        query="SELECT distinct mans.prgmansione prgmansione,
+        		de_mans.STRDESCRIZIONE as descrizione
+		       From Pr_Mansione mans inner Join De_Mansione De_Mans On (Mans.Codmansione = De_Mans.Codmansione) 	
+		       	and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL
+ 		       WHERE mans.cdnlavoratore = ?
+ 		       	and nvl(MANS.FLGDISPONIBILE,'S') in ('P','S')
+ 		       	AND de_mans.CODMANSIONEDOT is not null " />
+ 		       			       
+<STATEMENT
+        name="CL_GET_PROF_DESID_DES"
+        query="SELECT distinct substr(nvl(DE_MANS.CODMANSIONEDOT,''),0,11) IDPROFESSIONE, 
+        					   de_mans.STRDESCRIZIONE as DESCRIZIONE,
+        					   substr(De_Mans.Strdescrizione,0,250) descrprofessione, 
+               				   substr(Mans.Strnote,0,300) descrizioneprofessione, 
+               				   /*
+               				   DECODE((select MANS.FLGESPERIENZA 
+               				   		   from PR_ESP_LAVORO ESP 
+               				   		   inner join PR_MANSIONE M on M.PRGMANSIONE = ESP.PRGMANSIONE 
+               				   		   where ESP.PRGMANSIONE = MANS.PRGMANSIONE and M.FLGESPERIENZA = 'S' and rownum = 1),
+               				   		  'S','SI','')*/
+               				  DECODE(MANS.FLGESPERIENZA,'S','SI','N','NO','') esperienzasettore, 
+               				  Substr((Select Substr( Decode(Esp.Nummeseinizio,Null,'',
+                                                     To_Char(To_Date(Esp.Nummeseinizio,'MM'),'fmMonth','NLS_DATE_LANGUAGE = ITALIAN') || ' ') ||
+						                             Esp.Numannoinizio 
+						                             || Decode(Esp.Numannofine,Null,'',
+                                                        decode(esp.nummesefine,null,' - ', ' - ' || To_Char(To_Date(Esp.Nummesefine,'MM'),'fmMonth','NLS_DATE_LANGUAGE = ITALIAN') || ' ') || ESP.NUMANNOFINE) || '. ' || ESP.STRDESATTIVITA,0,300)
+					               From Pr_Esp_Lavoro Esp 
+					               inner join PR_MANSIONE M on M.PRGMANSIONE = ESP.PRGMANSIONE 
+					               Where Esp.Prgmansione = Mans.Prgmansione 
+					                 and M.FLGESPERIENZA = 'S' 
+					                 And Esp.Prgesplavoro = (Select Max(Esp2.Prgesplavoro) 
+					                                         From Pr_Esp_Lavoro Esp2 
+					                                         Where Esp2.Prgmansione = Esp.Prgmansione)),0,250) Descrizioneesperienza, 
+               DECODE((select MOBIL.CODTRASFERTA from PR_MOBIL_GEOGR MOBIL where MOBIL.PRGMANSIONE = MANS.PRGMANSIONE 
+               and nvl(MOBIL.CODTRASFERTA,'0') &lt;&gt; '1' and rownum = 1), null,'','SI') trasferte
+		       From Pr_Mansione mans 
+		       inner Join De_Mansione De_Mans On (Mans.Codmansione = De_Mans.Codmansione) 	
+		       						and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL	       
+		       WHERE mans.cdnlavoratore = ?
+ 		       and mans.prgmansione = ?
+ 		       and nvl(MANS.FLGDISPONIBILE,'S') in ('P','S')
+ 		       AND de_mans.CODMANSIONEDOT is not null" /> 		       			       
+ 		       
+<STATEMENT 
+		   name="CL_GET_PROF_DESID_ORARIO_DES" 
+           query="select distinct  
+			      decode(deo.codmonoorario,
+			      'T','Full Time',
+			      'P','Part Time',
+			      null) idmodalitalavorativa
+		       From pr_dis_orario orario 
+		       inner Join Pr_Mansione mans On (orario.prgmansione = mans.prgmansione) 
+           inner join de_orario deo on deo.codorario = orario.codorario
+ 		       WHERE mans.cdnlavoratore = ?
+ 		       and mans.prgmansione = ?" />	 	
+ 		       
+ <STATEMENT 
+		   name="CL_GET_PROF_DESID_ORARIO_DES_SIL" 
+           query="select distinct orario.codorario idmodalitalavorativasil, Deo.Strdescrizione idmodalitalavorativa
+		       From pr_dis_orario orario 
+		       inner Join Pr_Mansione mans On (orario.prgmansione = mans.prgmansione) 
+           inner join de_orario deo on deo.codorario = orario.codorario
+ 		       WHERE mans.cdnlavoratore = ?
+ 		       and mans.prgmansione = ?" />	       
+
+<!-- CL_GET_PROF_DESID_TIPI_CONTRATTO_DES rimossa su indicazione di Novella il 12/11/2012 -->
+  		       
+<STATEMENT name="CL_GET_CPI_CAPOLUOGO" query="
+	
+	select de_provincia.codcpicapoluogo
+	from ts_generale, de_provincia
+	where ts_generale.codprovinciasil = de_provincia.codprovincia
+	
+"/>
+
+<STATEMENT name="CL_CHECK_CITTADINANZA_VALIDA" query="
+	
+	select max(1) as esiste
+	from an_lavoratore lav
+	inner join de_cittadinanza citt on lav.codcittadinanza = citt.codcittadinanza
+	where trunc(sysdate) between trunc(citt.datinizioval) and trunc(citt.datfineval)
+	  and lav.cdnlavoratore = ?
+	
+"/>
+
+<STATEMENT
+        name="CL_COMBO_STATO_INVIO"
+        query="SELECT d.codstatoinviocl AS codice, 
+        	d.STRDESCRIZIONE ||
+             DECODE(SYSDATE, GREATEST(SYSDATE, d.DATFINEVAL),' (scaduto)',
+                             LEAST(SYSDATE, d.DATINIZIOVAL), ' (scaduto)', 
+                             ''
+                    ) AS descrizione
+ 		 FROM de_stato_invio_cl d
+"/>
+
+<STATEMENT
+        name="CL_GET_ABILITAZIONI_AGGIUNTIVE_ALBI"
+        query="SELECT DE_AB.CODABILITAZIONEGEN idalbosil,
+        	   ma_AB.CODABILITAZIONE idalbo, AB.strnote notealbo
+		       from PR_ABILITAZIONE AB 
+		       left join MA_ABILITAZIONE MA_AB on MA_AB.CODABILITAZIONEGEN = AB.CODABILITAZIONEGEN
+               left join DE_ABILITAZIONE_GEN DE_AB on DE_AB.CODABILITAZIONEGEN = MA_AB.CODABILITAZIONEGEN		
+		       WHERE ab.cdnlavoratore = ?
+		       and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_AB.DATINIZIOVAL and DE_AB.DATFINEVAL
+		       and DE_AB.CODTIPOABILITAZIONEGEN = 'AL'
+		       " />
+		       
+<STATEMENT
+        name="CL_GET_ABILITAZIONI_AGGIUNTIVE_PATENTI"
+        query="SELECT DE_AB.CODABILITAZIONEGEN idpatenteguidasil,
+        	   ma_AB.CODABILITAZIONE idpatenteguida, AB.strnote notepatenti
+		       from PR_ABILITAZIONE AB 
+		       left join MA_ABILITAZIONE MA_AB on MA_AB.CODABILITAZIONEGEN = AB.CODABILITAZIONEGEN
+               left join DE_ABILITAZIONE_GEN DE_AB on DE_AB.CODABILITAZIONEGEN = MA_AB.CODABILITAZIONEGEN		
+		       WHERE ab.cdnlavoratore = ?
+		       and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_AB.DATINIZIOVAL and DE_AB.DATFINEVAL
+		       and DE_AB.CODTIPOABILITAZIONEGEN = 'PG'
+		       " />
+
+<STATEMENT
+        name="CL_GET_ABILITAZIONI_AGGIUNTIVE_PATENTINO"
+        query="SELECT DE_AB.CODABILITAZIONEGEN idpatentinosil,
+        	   ma_AB.CODABILITAZIONE idpatentino, AB.strnote notepatentini
+		       from PR_ABILITAZIONE AB 
+		       left join MA_ABILITAZIONE MA_AB on MA_AB.CODABILITAZIONEGEN = AB.CODABILITAZIONEGEN
+               left join DE_ABILITAZIONE_GEN DE_AB on DE_AB.CODABILITAZIONEGEN = MA_AB.CODABILITAZIONEGEN	
+		       WHERE ab.cdnlavoratore = ?
+		       and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_AB.DATINIZIOVAL and DE_AB.DATFINEVAL
+		       and DE_AB.CODTIPOABILITAZIONEGEN = 'PT'
+		       " />
+		       
+<STATEMENT
+        name="CL_GET_DISPONIBILITA_TURNI"
+        query="SELECT distinct turni.codturno turno
+		       From pr_mansione
+		       inner join pr_dis_turno turni on (pr_mansione.prgmansione = turni.prgmansione)
+		       inner join De_Mansione De_Mans On (pr_mansione.Codmansione = De_Mans.Codmansione
+		       						and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL)
+		       WHERE pr_mansione.prgmansione = ?" />
+		       
+		       
+<STATEMENT
+        name="CL_GET_DISPONIBILITA_TERRITORIO_COMUNI"
+        query="SELECT distinct territorio.codcom codcomdisp,
+        		territorio.strnote notedispcomune
+		       From pr_mansione
+		       inner join pr_dis_comune territorio on (pr_mansione.prgmansione = territorio.prgmansione)
+		       inner join De_Mansione De_Mans On (pr_mansione.Codmansione = De_Mans.Codmansione
+		       						and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL)
+		       WHERE pr_mansione.prgmansione = ?" />
+		       
+<STATEMENT
+        name="CL_GET_DISPONIBILITA_TERRITORIO_PROVINCE"
+        query="SELECT distinct territorio.codprovincia codprovinciadisp
+		       From pr_mansione
+		       inner join pr_dis_provincia territorio on (pr_mansione.prgmansione = territorio.prgmansione)
+		       inner join De_Mansione De_Mans On (pr_mansione.Codmansione = De_Mans.Codmansione
+		       						and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL)
+		       WHERE pr_mansione.prgmansione = ?" />
+		       
+<STATEMENT
+        name="CL_GET_DISPONIBILITA_TERRITORIO_REGIONE"
+        query="SELECT distinct territorio.codregione codregionedisp
+		       From pr_mansione
+		       inner join pr_dis_regione territorio on (pr_mansione.prgmansione = territorio.prgmansione)
+		       inner join De_Mansione De_Mans On (pr_mansione.Codmansione = De_Mans.Codmansione
+		       						and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL)
+		       WHERE pr_mansione.prgmansione = ?" />
+		       
+<STATEMENT
+        name="CL_GET_DISPONIBILITA_TERRITORIO_STATO"
+        query="SELECT distinct territorio.codcom codstatodisp
+		       From pr_mansione
+		       inner join pr_dis_stato territorio on (pr_mansione.prgmansione = territorio.prgmansione)
+		       inner join De_Mansione De_Mans On (pr_mansione.Codmansione = De_Mans.Codmansione
+		       						and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL)
+		       WHERE pr_mansione.prgmansione = ?" />
+		       
+<STATEMENT
+        name="CL_GET_DISPONIBILITA_MOBILITA_MANSIONE"
+        query="SELECT distinct DECODE(territorio.flgdispauto,'S','SI','N','NO','') dispauto,
+        	    DECODE(territorio.flgdispmoto,'S','SI','N','NO','') dispmoto, 
+        	    DECODE(territorio.flgmezzipub,'S','SI','N','NO','') dispmezzipubblici,
+        	    DECODE(territorio.flgpendolarismo,'S','SI','N','NO','') pendolare,
+        	    territorio.numoreperc percorrenza,
+        	    DECODE(territorio.flgmobsett,'S','SI','N','NO','') mobsettimanale,
+        	    territorio.codtrasferta tipotrasferta,
+        	    territorio.strnote notedisponibilita
+		       From pr_mansione
+		       inner join pr_mobil_geogr territorio on (pr_mansione.prgmansione = territorio.prgmansione)
+		       inner join De_Mansione De_Mans On (pr_mansione.Codmansione = De_Mans.Codmansione
+		       						and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL)
+		       WHERE pr_mansione.prgmansione = ?" />
+		       
+<STATEMENT
+        name="CL_GET_ABILITAZIONI_AGGIUNTIVE_DATI_GENERALI"
+        query="select distinct cl.strtitolo titolo, 'S' opz_tipo_decodifiche
+		       from cl_candidatura cl
+               where cl.cdnlavoratore = ?
+		       and cl.DATINVIO between cl.DATINVIO and cl.DATSCADENZA
+		       and rownum = 1
+		       " />
+		       
+<STATEMENT
+        name="CL_GET_ABILITAZIONI_AGGIUNTIVE_ANNOTAZIONI"
+        query="select tab.limitazionicv, tab.notecv, tab.competenze
+        		from (
+        		select txtnotadisponibilita limitazionicv,
+        	  	txtnotacv notecv , txtnotecurriculum competenze
+		       from pr_nota_lav
+               where cdnlavoratore = ?
+		       order by dtmins desc) tab
+		       where rownum = 1
+		       " />
+		       
+<STATEMENT
+        name="CL_GET_ESPERIENZA_LAV_BLEN"
+        query="SELECT distinct esp_lav.codrapportolav tipoesperienza, 
+        			SUBSTR((select distinct DE_MANS2.CODMANSIONEDOT 
+        					from DE_MANSIONE DE_MANS2 
+        						 left join PR_MANSIONE MANS2 on (DE_MANS2.CODMANSIONE = MANS2.CODMANSIONE) 
+        					where DE_MANS2.CODMANSIONE = MANS.CODMANSIONE 
+        						  and MANS.FLGESPERIENZA = 'S' 
+        						  and MANS2.FLGDISPONIBILE in ('P','S') 
+               					  and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_MANS2.DATINIZIOVAL and DE_MANS2.DATFINEVAL),0,11) qualificasvolta, 
+               (case  when (select distinct DE_MANS2.CODMANSIONEDOT 
+               				  from DE_MANSIONE DE_MANS2 
+               				  left join PR_MANSIONE MANS2 on (DE_MANS2.CODMANSIONE = MANS2.CODMANSIONE) 
+ 			   				  where DE_MANS2.CODMANSIONE = MANS.CODMANSIONE 
+ 			   				  	and MANS2.FLGDISPONIBILE in ('P','S') 
+ 			   				  	and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_MANS2.DATINIZIOVAL and DE_MANS2.DATFINEVAL) is not null 
+		   			  then SUBSTR(DE_MANS.STRDESCRIZIONE,0,250) 
+		   			  else '' 
+		   	   end) descrqualificasvolta, 
+		   	   substr(esp_lav.strdesattivita,0,250) principalimansioni, 
+		   	   substr(esp_lav.strragsocialeazienda,0,100) nomedatore, 
+               decode(esp_lav.numannoinizio, null, '',
+               		  esp_lav.numannoinizio || '-' || 
+               		  to_char(decode(esp_lav.nummeseinizio, 1 , '0' || to_char(esp_lav.nummeseinizio), 
+               		  										2 , '0' || to_char(esp_lav.nummeseinizio),
+			   												3 , '0' || to_char(esp_lav.nummeseinizio), 
+			   												4 , '0' || to_char(esp_lav.nummeseinizio), 
+			   												5 , '0' || to_char(esp_lav.nummeseinizio),
+			   												6 , '0' || to_char(esp_lav.nummeseinizio), 
+			   												7 , '0'||to_char(esp_lav.nummeseinizio), 
+			   												8 , '0'||to_char(esp_lav.nummeseinizio),
+			   												9 , '0'||to_char(esp_lav.nummeseinizio), 
+			   												10, to_char(esp_lav.nummeseinizio), 
+			   												11, to_char(esp_lav.nummeseinizio), 
+			   												12, to_char(esp_lav.nummeseinizio), '01')) || '-01') datainizio, 
+			   decode(esp_lav.numannofine, null, '', 
+			   		  esp_lav.numannofine || 
+			   		  to_char(decode(esp_lav.nummesefine, 1 , '-0'||to_char(esp_lav.nummesefine)||'-31', 
+			   		  									  2 , '-0'||to_char(esp_lav.nummesefine)||'-28',
+			   											  3 , '-0'||to_char(esp_lav.nummesefine)||'-31', 
+			   											  4 , '-0'||to_char(esp_lav.nummesefine)||'-30', 
+			   											  5 , '-0'||to_char(esp_lav.nummesefine)||'-31',
+			   											  6 , '-0'||to_char(esp_lav.nummesefine)||'-30', 
+			   											  7 , '-0'||to_char(esp_lav.nummesefine)||'-31', 
+			   											  8 , '-0'||to_char(esp_lav.nummesefine)||'-31',
+			   											  9 , '-0'||to_char(esp_lav.nummesefine)||'-30', 
+			   											 10 , '-'||to_char(esp_lav.nummesefine)||'-31', 
+			   											 11 , '-'||to_char(esp_lav.nummesefine)||'-30', 
+			   											 12, '-'||to_char(esp_lav.nummesefine)||'-31', 
+			   											 decode(''||esp_lav.numannofine, null,'', '-12-31')))) 
+			   datafine, 
+			   substr(esp_lav.strindirizzoazienda || ' ' || comAzd.strdenominazione,0,100) indirizzodatore
+		       from PR_ESP_LAVORO ESP_LAV 
+			       left join PR_MANSIONE MANS on (ESP_LAV.PRGMANSIONE = MANS.PRGMANSIONE) and MANS.FLGESPERIENZA = 'S'
+	           	   left join De_Mansione de_mans on (mans.codmansione = de_mans.codmansione) and to_date(?, &apos;dd/mm/yyyy&apos;) between DE_MANS.DATINIZIOVAL and DE_MANS.DATFINEVAL		       
+	               left join DE_CONTRATTO DE_CONTR on (DE_CONTR.CODCONTRATTO = ESP_LAV.CODCONTRATTO)
+	               left join DE_TIPO_CONTRATTO DE_tipo_contr on (DE_tipo_CONTR.CODCONTRATTO = DE_CONTR.CODCONTRATTO)  and DE_TIPO_CONTR.FLGMIN = 'S' 		       
+				   left join DE_COMUNE COMAZD on (COMAZD.CODCOM = ESP_LAV.CODCOMAZIENDA)
+		       WHERE mans.cdnlavoratore = ?
+	           		and nvl(ESP_LAV.FLGCOMPLETATO,'S') &lt;&gt; 'N'
+	           		/* and ESP_LAV.CODMVCESSAZIONE is null */
+	           		and DE_TIPO_CONTR.FLGMIN = 'S' 
+	           		/* AND ESP_LAV.CODRAPPORTOLAV is not null*/
+		       " />
+		       
+<STATEMENT
+        name="CL_GET_ISTRUZIONI_BLEN"
+        query="SELECT (case 
+				when 
+				 SUBSTR(ST.CODTIPOTITOLO,1,2) in ('81', '83') then SUBSTR(ST.CODTIPOTITOLO,1,2)
+				else SUBSTR(ST.CODTIPOTITOLO, 1, 1) || '0' 
+				end) titolostudio, substr(titolo.strdescrizione,0,100) descrizioneistruzione,				
+				(case when st.stresimi is NULL 
+				then substr(st.strvoto,0,30)
+				else substr(st.strvoto,0,15) || '/' || substr(st.stresimi,0,14) 
+				end)  votazione         
+		       From pr_Studio st 
+		       left join De_titolo titolo on (st.codtipotitolo = titolo.codtitolo and TITOLO.FLGMIN = 'S'
+		       			and to_date(?, &apos;dd/mm/yyyy&apos;) between TITOLO.DATINIZIOVAL and TITOLO.DATFINEVAL) 		
+		       WHERE st.cdnlavoratore = ?" />
+		       
+<STATEMENT
+        name="CL_GET_FORMAZIONE_BLEN"
+        query="SELECT substr(dc.Strdescrizione,0,100) titolocorso, 
+        			  substr(cr.codcomente,0,4) idsede, 
+               		  substr(Decode(Cr.Nummesi, null, CR.NUMORE,  Cr.Nummesi),0,4) as durata, 
+               		  Decode(Cr.Nummesi, null, Decode(Cr.numore,null,null,'O'),  'M') as idtipologiadurata, 
+               		  substr(TIPO_CR.CODCL,0,1) idattestazione,
+               		  '' idqualifica, 
+               		  '' descrqualifica
+		       From pr_corso cr 
+		       		left join de_corso dc on (cr.codcorso = dc.codcorso)
+		       		left join de_tipo_corso tipo_cr on (CR.CODTIPOCERTIFICATO = TIPO_CR.CODTIPOCERTIFICATO)	
+		       										and TO_DATE(?, &apos;dd/mm/yyyy&apos;) between TIPO_CR.DATINIZIOVAL and TIPO_CR.DATFINEVAL	
+		       WHERE cr.cdnlavoratore = ?
+		       		 and sysdate between dc.datinizioval and dc.datfineval
+		      		 and nvl(cr.FLGCOMPLETATO,'S') &lt;&gt; 'N'" />
+		      		 
+<STATEMENT
+        name="CL_GET_LINGUE_BLEN"
+        query="select SUBSTR(LI.CODLINGUA,0,3) IDLINGUA,
+	           SUBSTR((select COD_CONOSCENZA from Ma_GRADO_CONSC_LIN where LI.CDNGRADOLETTO = CDNGRADO),0,2) IDLIVELLOLETTO,
+	           substr((select COD_CONOSCENZA from Ma_GRADO_CONSC_LIN where LI.CDNGRADOSCRITTO = CDNGRADO),0,2) IDLIVELLOSCRITTO,
+	           SUBSTR((select COD_CONOSCENZA from Ma_GRADO_CONSC_LIN where LI.CDNGRADOPARLATO = CDNGRADO),0,2) IDLIVELLOPARLATO
+		       From pr_Lingua li 
+		       join de_lingua del on del.codlingua = li.codlingua	
+		       WHERE li.cdnlavoratore = ? AND del.DATINIZIOVAL &lt; SYSDATE AND del.DATFINEVAL &gt; SYSDATE " />
+		       
+<STATEMENT
+        name="CL_GET_ISTRUZIONI_DES"
+        query="SELECT (case 
+				when 
+				 SUBSTR(ST.CODTIPOTITOLO,1,2) in ('81', '83') then SUBSTR(ST.CODTIPOTITOLO,1,2)
+				else SUBSTR(ST.CODTIPOTITOLO, 1, 1) || '0' 
+				end) titolostudio, substr(titolo.strdescrizione,0,100) descrizioneistruzione,				
+				(case when st.stresimi is NULL 
+				then substr(st.strvoto,0,30)
+				else substr(st.strvoto,0,15) || '/' || substr(st.stresimi,0,14) 
+				end)  votazione, 
+				st.strspecifica specifica, st.codmonostato stato,De_Titolo_Italiano.Strdescrizione descrStato, 
+				st.stristscolastico nomeistituto, De_Comune.strdenominazione comistituto, st.codcom codcomistituto, st.numanno as annoistr         
+		       From pr_Studio st 
+		       left join De_titolo titolo on (st.codtipotitolo = titolo.codtitolo and TITOLO.FLGMIN = 'S'
+		       			and to_date(?, &apos;dd/mm/yyyy&apos;) between TITOLO.DATINIZIOVAL and TITOLO.DATFINEVAL) 		
+		       left join De_titolo_italiano on (st.codmonostato = De_Titolo_Italiano.Codmonostato)
+		       left join De_Comune on (st.codcom = De_Comune.codcom)
+		       WHERE st.cdnlavoratore = ?" />	
+
+<STATEMENT  name="CL_GET_FORMAZIONE_DES"
+        query="SELECT substr(dc.Strdescrizione,0,100) titolocorso, 
+        			  substr(cr.codcomente,0,4) idsede, 
+               		  substr(Decode(Cr.Nummesi, null, CR.NUMORE,  Cr.Nummesi),0,4) as durata, 
+               		  Decode(Cr.Nummesi, null, Decode(Cr.numore,null,null,'O'),  'M') as idtipologiadurata, 
+               		  substr(TIPO_CR.CODCL,0,1) idattestazione,
+               		  '' idqualifica, 
+               		  '' descrqualifica,
+               		  cr.codcorso as codice, to_char(cr.numanno) as annoform, cr.strdescrizione as descrizione,
+               		  cr.strcontenuto as contenuto, cr.strente as sede, 
+               		  DECODE(cr.flgcompletato,'S','SI','N','NO','') as completato,
+               		  cr.codtipocertificato as idattestazionesil,
+               		  to_char(cr.cdnambitodisciplinare) cdnambitodisciplinare
+		       From pr_corso cr 
+		       		left join de_corso dc on (cr.codcorso = dc.codcorso)
+		       		left join de_tipo_corso tipo_cr on (CR.CODTIPOCERTIFICATO = TIPO_CR.CODTIPOCERTIFICATO)	
+		       										and TO_DATE(?, &apos;dd/mm/yyyy&apos;) between TIPO_CR.DATINIZIOVAL and TIPO_CR.DATFINEVAL	
+		       WHERE cr.cdnlavoratore = ?
+		       		 and sysdate between dc.datinizioval and dc.datfineval
+		      		 and nvl(cr.FLGCOMPLETATO,'S') &lt;&gt; 'N'" />		
+		      		 
+<STATEMENT  name="CL_GET_PROF_DESID_TIPI_CONTRATTO_DES"
+	query="select distinct contratto.codcontratto idtipologiacontrattosil, de_contratto.Strdescrizione as descrizione
+		       From pr_dis_contratto contratto 
+		       inner Join Pr_Mansione mans On (contratto.prgmansione = mans.prgmansione) 
+               inner join de_contratto on (de_contratto.codcontratto = Contratto.Codcontratto)
+ 		       WHERE mans.cdnlavoratore = ?
+ 		       and mans.prgmansione = ?" />	
+ 		       
+ <STATEMENT
+        name="CL_GET_DISPONIBILITA_TURNI_DES"
+        query="SELECT distinct turni.codturno, de_turno.strdescrizione as turno
+		       From pr_mansione
+		       inner join pr_dis_turno turni on (pr_mansione.prgmansione = turni.prgmansione)
+		       inner join De_Mansione De_Mans On (pr_mansione.Codmansione = De_Mans.Codmansione
+		       						and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL)
+		       	inner join de_turno on (de_turno.codturno = 	Turni.Codturno)			 
+		       WHERE pr_mansione.prgmansione = ?" />
+		       
+<STATEMENT
+        name="CL_GET_DISPONIBILITA_TERRITORIO_COMUNI_DES"
+        query="SELECT distinct territorio.codcom codcomdisp,de_com.strdenominazione, 
+                territorio.strnote 
+               From pr_mansione
+               inner join pr_dis_comune territorio on (pr_mansione.prgmansione = territorio.prgmansione)
+               inner join  DE_COMUNE DE_COM on (de_com.CODCOM = territorio.codcom)
+               inner join De_Mansione De_Mans On (pr_mansione.Codmansione = De_Mans.Codmansione
+                                       and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL)
+               WHERE pr_mansione.prgmansione = ?" />
+
+<STATEMENT
+        name="CL_GET_DISPONIBILITA_TERRITORIO_PROVINCE_DES"
+        query="SELECT distinct territorio.codprovincia codprovinciadisp,  De_Prov.Strdenominazione
+               From pr_mansione
+               inner join pr_dis_provincia territorio on (pr_mansione.prgmansione = territorio.prgmansione)
+               inner join de_provincia de_prov on (de_prov.codprovincia = territorio.codprovincia)
+               inner join De_Mansione De_Mans On (pr_mansione.Codmansione = De_Mans.Codmansione
+                                       and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL)
+               WHERE pr_mansione.prgmansione = ?" />
+
+<STATEMENT
+        name="CL_GET_DISPONIBILITA_TERRITORIO_REGIONE_DES"
+        query="SELECT distinct territorio.codregione codregionedisp, Reg.Strdenominazione
+               From pr_mansione
+               inner join pr_dis_regione territorio on (pr_mansione.prgmansione = territorio.prgmansione)
+                inner join de_regione reg on ( reg.codregione =territorio.codregione)
+               inner join De_Mansione De_Mans On (pr_mansione.Codmansione = De_Mans.Codmansione
+                                       and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL)
+               WHERE pr_mansione.prgmansione = ?" />
+
+<STATEMENT
+        name="CL_GET_DISPONIBILITA_TERRITORIO_STATO_DES"
+        query="SELECT distinct territorio.codcom codstatodisp, Com.Strdenominazione
+               From pr_mansione
+               inner join pr_dis_stato territorio on (pr_mansione.prgmansione = territorio.prgmansione)
+                left join de_comune com on (com.codcom = territorio.codcom and Com.Codprovincia in ('254','255'))
+               inner join De_Mansione De_Mans On (pr_mansione.Codmansione = De_Mans.Codmansione
+                                       and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL)
+               WHERE pr_mansione.prgmansione = ?" />
+
+<STATEMENT
+        name="CL_GET_DISPONIBILITA_MOBILITA_MANSIONE_DES"
+        query="SELECT distinct DECODE(territorio.flgdispauto,'S','SI','N','NO','') dispauto,
+DECODE(territorio.flgdispmoto,'S','SI','N','NO','') dispmoto,
+DECODE(territorio.flgmezzipub,'S','SI','N','NO','') dispmezzipubblici,
+DECODE(territorio.flgpendolarismo,'S','SI','N','NO','') pendolare,
+                to_char(territorio.numoreperc) percorrenza,
+                DECODE(territorio.flgmobsett,'S','SI','N','NO','') mobsettimanale,
+                Trasf.Strdescrizione tipotrasferta,
+                territorio.strnote notedisponibilita
+               From pr_mansione
+               inner join pr_mobil_geogr territorio on (pr_mansione.prgmansione = territorio.prgmansione)
+               inner join De_Mansione De_Mans On (pr_mansione.Codmansione = De_Mans.Codmansione
+                                       and to_date(?, &apos;dd/mm/yyyy&apos;) between De_Mans.DATINIZIOVAL and De_Mans.DATFINEVAL)
+               left join de_trasferta trasf on (Trasf.Codtrasferta = territorio.codtrasferta)
+               WHERE pr_mansione.prgmansione = ?" /> 
+               
+<STATEMENT
+        name="SELECT_TMP_INVIO_MASSIVO_CV"
+        query="SELECT tmp.cdnlavoratore cdnlavoratore,
+        		      tmp.strcodicefiscale codicefiscale,
+        		      tmp.prgpattolavoratore prgpattolavoratore,
+        		      tmp.stato stato,
+        		      tmp.codesito codesito,
+        		      tmp.stresito descresito
+		       From TMP_INVIO_MASSIVO_CV tmp
+ 		      where 
+                 codesito is null AND stato in ('P','A','S') and rownum &lt;= ? " />
+                 
+<STATEMENT
+        name="UPDATE_TMP_INVIO_MASSIVO_CV"
+        query="update TMP_INVIO_MASSIVO_CV 
+         SET 
+            codesito = ?,
+            stresito = ?,
+            dtmelaborazione = sysdate
+         where  cdnlavoratore = ? 
+               " />           
+ 		       	
+ 		       	
+<STATEMENT name="SELECT_COUNT_TMP_INVIO_MASSIVO_CV" query="SELECT to_char(COUNT(*)) NUMTOT FROM TMP_INVIO_MASSIVO_CV  where 
+                 codesito is null AND stato in ('P','A','S')
+                  " />
+
+<STATEMENT name="SELECT_COUNT_CL_CANDIDATURA"
+	query="select to_char(count(*)) numcandidatura
+     from CL_CANDIDATURA cand
+     where cand.CDNLAVORATORE = ?
+     and cand.CODTIPOCOMUNICAZIONECL = '01'
+   " />
+   
+<STATEMENT name="UPDATE_CL_CANDIDATURA_MASSIVO"
+	query="UPDATE cl_candidatura
+        SET 
+         codstatoinviocl        = ?,
+         numklocandidatura      = numklocandidatura+1,
+         strmessaggio           = ?
+       where  prgcandidatura         = ?" />
+
+<STATEMENT name="SELECT_OPERAZIONE_INVIO_MASSIVO_INCORSO"
+	query="select count(*) as num 
+	       from tmp_operazioni_massive where stroperazione = 'INVIO_MASSIVO_CV' and datfineesecuzione is null " />
+
+<STATEMENT name="INSERT_TMP_OPERAZIONI_MASSIVE"
+	query="INSERT into TMP_OPERAZIONI_MASSIVE (stroperazione, numelaborazione, datinizioesecuzione)
+         values('INVIO_MASSIVO_CV' , ?, to_date(?, 'dd/mm/yyyy hh24:mi:ss')) 
+               " />
+
+<STATEMENT name="UPDATE_TMP_OPERAZIONI_MASSIVE"
+	query="UPDATE TMP_OPERAZIONI_MASSIVE
+	        SET 
+          DATFINEESECUZIONE  = sysdate
+          where stroperazione = 'INVIO_MASSIVO_CV' and datinizioesecuzione = to_date(?, 'dd/mm/yyyy hh24:mi:ss')" />

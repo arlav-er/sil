@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="../../template/main.xhtml"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<ui:define name="content">
+		<ui:param name="bean" value="#{ricercaOfferteLavoroBean}"></ui:param>
+		<h:outputScript library="js" name="tab_utils.js"></h:outputScript>
+
+		<ui:include src="filtri_ricerca.xhtml" />
+
+		<h:form id="form_lista_offerte">
+			<h:panelGroup id="lista_offerte">
+				<h:outputText value="Nessun elemento trovato"
+					rendered="#{empty bean.offerteLavoro}" />
+
+				<h:dataTable id="ricerca_vacancy_table"
+					rendered="#{not empty bean.offerteLavoro}"
+					columnClasses=", , , , , notSortable customcenter"
+					value="#{bean.offerteLavoro}" var="element">
+					<h:column>
+						<f:facet name="header">Descrizione</f:facet>
+						<h:outputText value="#{element.descrizione}"></h:outputText>
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">Datore di lavoro</f:facet>
+						<h:link styleClass="buttonStyle" immediate="true"
+							outcome="/secure/azienda/vetrina/view_new.xhtml"
+							rendered="#{element.idSvAzienda != null}"
+							title="Visualizza la vetrina dell'azienda">
+							<span class="ui-icon ui-icon-contact fix_icon"></span>
+							<f:param name="id" value="#{element.idSvAzienda}"></f:param>
+						</h:link>
+					&nbsp;
+					<h:outputText value="#{element.datoreLavoro}"></h:outputText>
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">Luogo di lavoro</f:facet>
+						<a class="buttonStyle" href="#"
+							title="Visualizza il luogo di lavoro sulla mappa"
+							onclick="showMap('#{element.indirizzoLavoro}, #{element.strComLavoro}');">
+							<span class="ui-icon ui-icon-home fix_icon"></span>
+						</a>
+						&nbsp; 
+						<h:outputText
+							value="#{element.strComLavoro} - #{element.indirizzoLavoro}">
+						</h:outputText>
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">Gruppo professionale</f:facet>
+						<h:outputText value="#{element.strMansione}"></h:outputText>
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">Tipo di contratto</f:facet>
+						<h:outputText value="#{element.strTipoContratto}"></h:outputText>
+					</h:column>
+
+					<h:column>
+						<h:link styleClass="buttonStyle" immediate="true"
+							outcome="/secure/azienda/vacancies/visualizza.xhtml"
+							title="Visualizza l'offerta di lavoro in dettaglio">
+							<span class="ui-icon ui-icon-search fix_icon"></span>
+							<f:param name="id" value="#{element.idVaDatiVacancy}"></f:param>
+						</h:link>
+
+						<h:link styleClass="buttonStyleDisabled" disabled="true"
+							rendered="#{element.hasCandidatura}"
+							title="Ti sei già candidato a quest'offerta">
+							<span class="ui-icon ui-icon-check fix_icon"></span>
+						</h:link>
+						<h:commandLink styleClass="buttonStyle"
+							rendered="#{not element.hasCandidatura}"
+							action="#{bean.viewDatiAziendaVacancy}"
+							title="Candidati per quest'offerta di lavoro">
+							<span class="ui-icon ui-icon-check fix_icon"></span>
+							<f:ajax execute="@this" render=":id:content_vacancy_dialog"
+								onevent="openVacancy"></f:ajax>
+							<f:param name="id" value="#{element.idVaDatiVacancy}"></f:param>
+						</h:commandLink>
+					</h:column>
+					
+				</h:dataTable>
+				<script type="text/javascript">
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+
+			<script type="text/javascript">
+				$(function() {
+					generateDataTable("[id$=table]",
+							{"bPaginate": true,
+							"bInfo" : true,
+							"bLengthChange" : true});
+					
+					disegnaBottoni();
+
+					//il pannello loader parte nascosto
+					$( "[id$=loader_lista_offerte]" ).css('display', 'none');
+				});
+			</script>
+		</h:form>
+
+		<h:panelGroup layout="block" id="loader_lista_offerte"
+			styleClass="loadingPanel">
+			<h:outputLabel styleClass="centeredItem">Caricamento dei risultati in corso...</h:outputLabel>
+			<h:graphicImage styleClass="centeredItem"
+				value="../../../resources/images/ajax-loader.gif" alt="ajax loader" />
+		</h:panelGroup>
+
+		<cc:modalVacancyDialog id="id" dto="#{bean.vaDatiAziendaVacancyDTO}"
+			renderAjax=":form_lista_offerte" bean="#{bean}"
+			candidatura="#{bean.candidatura}"></cc:modalVacancyDialog>
+
+		<!-- modale per la visualizzazione della mappa -->
+		<!-- FIXME passargli l'indirizzo -->
+		<cc:modalMapDialog id_prefix="ricerca_vacancy"
+			title="Visualizza il luogo di lavoro">
+		</cc:modalMapDialog>
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,190 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui"
+	xmlns:pretty="http://ocpsoft.com/prettyfaces">
+
+	<h:panelGroup id="navMenu">
+		<div class="user-info">
+			<div class="profile-information">
+				<div class="col-md-2">
+					<h:form id="profileEditForm" enctype="multipart/form-data">
+						<h:panelGroup id="userProfilePic">
+
+							<h:panelGroup
+								rendered="#{not empty curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.idCvDatiPersonali and empty curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.foto}">
+								<div class="thumb">
+									<div class="hover-image-container">
+										<h:graphicImage library="commons" styleClass="hover-image" style="width: 100%" name="images/profilePic.jpg"></h:graphicImage>
+										<div class="hover-image-content">
+											<label class="btn ui-button " for="profileEditForm:fotoUpload_input" title="Dimensione massima file 5MB"
+												data-toggle="tooltip" data-placement="right" data-container="body" aria-hidden="true">
+												<i class="fa fa-upload"></i>
+											</label>
+										</div>
+									</div>
+								</div>
+							</h:panelGroup>
+
+							<h:panelGroup
+								rendered="#{not empty curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.idCvDatiPersonali and not empty curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.foto}">
+								<div class="thumb">
+									<div class="hover-image-container">
+										<p:graphicImage cache="false" id="fotoCurriculum" styleClass="hover-image" style="width: 100%"
+											value="#{curriculumVitaePfPhotoBean.image}">
+											<f:param name="paramId"
+												value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.idCvDatiPersonali}" />
+										</p:graphicImage>
+										<div class="hover-image-content">
+											<p:commandLink process="@this"
+												actionListener="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.removeFotoProfilePic}"
+												update="userProfilePic" styleClass="btn">
+												<i class="fa fa-times"></i>
+											</p:commandLink>
+										</div>
+									</div>
+								</div>
+							</h:panelGroup>
+						</h:panelGroup>
+
+						<div class="user-image-btn">
+
+							<p:fileUpload id="fotoUpload" value="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.file}"
+								styleClass="advancedHiddenFileUpload" widgetVar="uploadFileWV" auto="true" multiple="false" process="@this"
+								allowTypes="/(\.|\/)(jpe?g|png)$/"
+								fileUploadListener="#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.handleFileFotoUpload}"
+								update="userProfilePic :profileEditForm:fotoCurriculum" sizeLimit="#{ui['fileFoto.size']}"
+								invalidSizeMessage="#{ui['file.invalidSizeMessage']}" invalidFileMessage="#{ui['file.invalidFileMessage']}"
+								messageTemplate=".">
+							</p:fileUpload>
+
+						</div>
+					</h:form>
+				</div>
+			</div>
+
+
+			<div class="user-body">
+				<h5>#{sessionBean.titleDescription}</h5>
+				Creato il
+				<h:outputText value="#{curriculumVitaePfBean.cvDatiPersonali.dtmIns}">
+					<f:convertDateTime pattern="dd.MM.yyyy" />
+				</h:outputText>
+			</div>
+		</div>
+		<div id="editUserUploadMessages"></div>
+
+		<div class="profile-progress">
+			<div class="progress-item">
+				<div class="progress-head">
+					<p class="progress-on">Il tuo Curriculum</p>
+				</div>
+				<div class="progress-body">
+					<div class="progress" style="margin-bottom: 0px">
+						<div class="progress-bar animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+					</div>
+					<p class="progress-to">0%</p>
+				</div>
+			</div>
+		</div>
+		<ui:remove>
+		<ui:fragment rendered="#{not empty curriculumVitaePfBean.cvDatiPersonali.dtmIns}">
+			<div class="anteprima">
+				<a
+					href="#{request.contextPath}/faces/secure/utente/curriculum/view_pf.xhtml?id=#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.idCvDatiPersonali}"
+					target="_blank">
+					Anteprima
+				</a>
+			</div>
+		</ui:fragment>
+		</ui:remove>
+		<ui:fragment rendered="#{not empty curriculumVitaePfBean.cvDatiPersonali.dtmIns}">
+			<ul class="options-menu">
+				<li>
+					<a onclick="$('#copyCurriculum-modal').modal('show')">
+						<i class="fa fa-files-o"></i>
+						Copia
+					</a>
+				</li>
+				<li>
+					<p:commandLink
+						onclick="MyPortal.fetchStampa('#{request.contextPath}/secure/rest/services/getCurriculumUtente?curriculumId='+#{curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.idCvDatiPersonali});return false;">
+						<i class="fa fa-print"></i>
+                         Stampa
+                     </p:commandLink>
+				</li>
+				<li>
+					<a onclick="$('#deleteCurriculum-modal').modal('show')">
+						<i class="fa fa-trash"></i>
+						Elimina
+					</a>
+				</li>
+			</ul>
+		</ui:fragment>
+		<div class="curriculum-menu">
+			<ul>
+				<li>
+					<i class="fa fa-home"></i>
+					<a href="datiPrincipali" class="datiPrincipali navYuri" title="Naviga a dati principali">Dati Principali</a>
+				</li>
+
+				<ui:fragment
+					rendered="#{not empty curriculumVitaePfBean.cvDatiPrincipaliPfSection.cvDatiPersonali.idCvDatiPersonali}">
+					<li>
+						<i class="fa fa-building-o"></i>
+						<a href="esperienze" class="esperienze navYuri" title="Naviga a Esperienze">Esperienze</a>
+					</li>
+
+					<li>
+						<i class="fa fa-graduation-cap"></i>
+						<a href="istruzioni" class="istruzioni navYuri" title="Naviga ai Istruzione">Istruzione</a>
+					</li>
+
+					<li>
+						<i class="fa fa-leanpub"></i>
+						<a href="formazione" class="formazione navYuri" title="Naviga alla formazione professionale">Formazione</a>
+					</li>
+
+					<li>
+						<i class="fa fa-language"></i>
+						<a href="lingue" class="lingue navYuri" title="Naviga a Lingue">Lingue</a>
+					</li>
+
+					<li>
+						<i class="fa fa-windows"></i>
+						<a href="competenzeDigitali" class="competenzeDigitali navYuri" title="Naviga a competenze digitali">Competenze
+							digitali</a>
+					</li>
+
+					<li>
+						<i class="fa fa-car"></i>
+						<a href="abilitazioni" class="abilitazioni navYuri" title="Naviga a Lingue">Abilitazioni</a>
+					</li>
+
+
+					<li>
+						<i class="fa fa-id-card-o"></i>
+						<a href="competenzeTrasversali" class="competenzeTrasversali navYuri" title="Naviga a Altre Competenze">Altre
+							Competenze</a>
+					</li>
+
+					<li>
+						<i class="fa fa-suitcase"></i>
+						<a href="professioniDesiderate" class="professioniDesiderate navYuri" title="Professioni Desiderate">Professioni
+							Desiderate</a>
+					</li>
+
+					<li>
+						<i class="fa fa-info-circle"></i>
+						<a href="altreInfo" class="altreInfo navYuri" title="Naviga a Altre informazioni">Altre informazioni</a>
+					</li>
+				</ui:fragment>
+			</ul>
+
+			<br />
+			<p:button styleClass="btn btn-primary ui-button btn-addon btn-sm baby-btn" href="#{curriculumVitaePfBean.backTo}"
+				rendered="#{not empty curriculumVitaePfBean.backTo}" value="Torna alla scrivania"
+				onclick="buttonToDisable = MyPortal.enableLoadingButton(this)" />
+		</div>
+
+	</h:panelGroup>
+</ui:composition>

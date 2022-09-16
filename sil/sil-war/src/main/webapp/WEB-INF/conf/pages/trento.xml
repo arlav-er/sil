@@ -1,0 +1,904 @@
+<PAGE distributed="false" name="RicercaConservazioneLSUPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ElencoCPI" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaConservazioneLSUPage" target="M_ElencoCPI">
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ListaConservazioneLSUPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ListConservazioneLSU" />
+		<MODULE keep="false" name="M_DescCPI" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaConservazioneLSUPage" target="M_ListConservazioneLSU">
+		</DEPENDENCE>
+		<DEPENDENCE source="ListaConservazioneLSUPage" target="M_DescCPI">
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="MobilitaApprovazioneRicercaPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE name="M_GetConfig_Mobilita" />
+    <MODULE name="M_ELENCOCPI" />
+    <MODULE name="M_MO_STATO" />
+    <MODULE name="M_TIPO_LISTA_SOSPESA" />
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="MobilitaApprovazioneRicercaPage" target="M_GetConfig_Mobilita"/>
+  	<DEPENDENCE source="MobilitaApprovazioneRicercaPage" target="M_MO_STATO"/>
+    <DEPENDENCE source="MobilitaApprovazioneRicercaPage" target="M_ELENCOCPI"/>
+    <DEPENDENCE source="MobilitaApprovazioneRicercaPage" target="M_TIPO_LISTA_SOSPESA"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ProvincialePage" scope="REQUEST"/>
+
+
+<PAGE name="MobilitaApprovazioneRisultRicercaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MobilitaRicercaApprovazione" />
+    <MODULE name="M_GetConfig_Mobilita" />
+    <MODULE name="M_MobGetRegioni" />
+    <MODULE name="M_MobGetProvince" />
+    <MODULE name="M_ApprovazioneIscrizioneSospese" />
+    <MODULE name="M_DescCPI" />
+    <MODULE name="M_TIPO_LISTA_SOSPESA" />
+    <MODULE name="M_MO_STATO" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="MobilitaApprovazioneRisultRicercaPage" target="M_GetConfig_Mobilita"/>
+    <DEPENDENCE source="MobilitaApprovazioneRisultRicercaPage" target="M_TIPO_LISTA_SOSPESA"/>
+    <DEPENDENCE source="MobilitaApprovazioneRisultRicercaPage" target="M_MO_STATO"/>
+    <DEPENDENCE source="MobilitaApprovazioneRisultRicercaPage" target="M_MobGetRegioni"/>
+    <DEPENDENCE source="MobilitaApprovazioneRisultRicercaPage" target="M_MobGetProvince"/>
+    <DEPENDENCE source="MobilitaApprovazioneRisultRicercaPage" target="M_DescCPI">
+		<CONDITIONS>
+        	<PARAMETER name="CODCPI" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+    	</CONDITIONS>
+	</DEPENDENCE>
+    <DEPENDENCE source="MobilitaApprovazioneRisultRicercaPage" target="M_MobilitaRicercaApprovazione">
+    	<CONDITIONS>
+    		<PARAMETER name="OP_APPROVAZIONE" scope="SERVICE_REQUEST" value="false"/>
+		</CONDITIONS>
+	</DEPENDENCE>
+	<DEPENDENCE source="MobilitaApprovazioneRisultRicercaPage" target="M_MobilitaRicercaApprovazione">
+    	<CONDITIONS>
+    		<PARAMETER name="OP_APPROVAZIONE" scope="SERVICE_REQUEST" value="true"/>
+    		<PARAMETER name="MESSAGE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		</CONDITIONS>
+	</DEPENDENCE>
+    <DEPENDENCE source="MobilitaApprovazioneRisultRicercaPage" target="M_ApprovazioneIscrizioneSospese">
+    	<CONDITIONS>
+			<PARAMETER name="MESSAGE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+			<PARAMETER name="OP_APPROVAZIONE" scope="SERVICE_REQUEST" value="true"/>
+		</CONDITIONS>
+	</DEPENDENCE>
+    <DEPENDENCE source="M_ApprovazioneIscrizioneSospese" target="M_MobilitaRicercaApprovazione"/>
+  </DEPENDENCIES>  
+</PAGE>
+
+<PAGE name="MobilitaRiapriPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MobilitaGetTipoFine"/>
+    <MODULE name="M_GetSpecifMobilita"/>
+    <MODULE name="M_GetDeMbTipo" />
+    <MODULE name="M_GetStatoMob" />
+    <MODULE name="M_RiapriMobilitaIscr"/>
+    <MODULE name="M_MobMotivoScorrimento"/>
+    <MODULE name="M_MobGetProvince"/>
+   	<MODULE name="M_MobGetRegioni"/>
+   	<MODULE name="ComboTipoGrado"/>
+   	<MODULE name="M_GetConfig_Mobilita"/>
+   	<MODULE name="M_MotivoRiaperturaMob"/>
+  </MODULES>
+  
+  <DEPENDENCIES>
+  	<DEPENDENCE source="MobilitaRiapriPage" target="M_GetConfig_Mobilita"/>
+  	<DEPENDENCE source="MobilitaRiapriPage" target="M_MotivoRiaperturaMob"/>
+    
+  	<DEPENDENCE source="MobilitaRiapriPage" target="M_GetSpecifMobilita">
+      <CONDITIONS>
+          <PARAMETER name="prgMobilitaIscr" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+  	</DEPENDENCE>
+  
+  	<DEPENDENCE source="MobilitaRiapriPage" target="M_MobMotivoScorrimento"/>
+  	
+  	<DEPENDENCE source="MobilitaRiapriPage" target="M_MobGetProvince"/>
+  	<DEPENDENCE source="MobilitaRiapriPage" target="M_MobGetRegioni"/>
+  	<DEPENDENCE source="MobilitaRiapriPage" target="ComboTipoGrado"/>
+  
+    <DEPENDENCE source="M_GetSpecifMobilita" target="M_GetDeMbTipo"/>
+    
+    <DEPENDENCE source="M_GetSpecifMobilita" target="M_GetStatoMob" />
+
+    <DEPENDENCE source="M_GetDeMbTipo" target="M_MobilitaGetTipoFine"/>
+    
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_RiapriMobilitaIscr">
+        <CONDITIONS>
+            <PARAMETER name="save" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_RiapriMobilitaIscr">
+        <CONDITIONS>
+            <PARAMETER name="CONTINUA_AGGIORNAMENTO_MOB" scope="SERVICE_REQUEST" value="true"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+ 
+  </DEPENDENCIES>
+</PAGE>
+
+<!--
+Alessandro Pegoraro 05/05/2010 page per l'update Forzata dei 
+dati di un movimento  
+-->
+<PAGE name="ForzaModMovPage" scope="REQUEST">
+    <MODULES>   
+     	<MODULE name="ComboTipoMovimento" /> 
+     	<MODULE name="ComboStatoAtto" /> 
+        <MODULE name="M_GetForzaturaAbil" /> 
+    </MODULES>
+    <DEPENDENCIES>
+      <DEPENDENCE source="ForzaModMovPage" target="ComboTipoMovimento"/>
+     <DEPENDENCE source="ForzaModMovPage" target="ComboStatoAtto"/>
+     <DEPENDENCE source="ForzaModMovPage" target="M_GetForzaturaAbil"/>
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="ListaForzaModMovPage" scope="REQUEST">
+    <MODULES>
+        <MODULE name="M_ListaForzaModMov"/>
+   </MODULES>
+    <DEPENDENCIES>
+    <DEPENDENCE source="ListaForzaModMovPage" target="M_ListaForzaModMov"/>
+    </DEPENDENCIES>
+</PAGE>
+ <PAGE name="ModificaMovForzataPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="GetMovimento" />
+    <MODULE name="M_UpdateMovimentoForz" />      
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ModificaMovForzataPage" target="M_UpdateMovimentoForz">
+        <CONDITIONS>
+            <PARAMETER name="AGGIORNA_MOV" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>  
+    </DEPENDENCE>    
+    
+    <DEPENDENCE source="ModificaMovForzataPage" target="GetMovimento"/>    
+  </DEPENDENCIES>
+</PAGE> 
+
+<!-- IMPORTAZIONE RA DA UN FILE XML -->
+<PAGE name="ImportaRedditiAttivazionePage" scope="REQUEST">
+    <MODULES>
+      <MODULE name="M_ImportaFileRA"/>
+    </MODULES>
+    <DEPENDENCIES>
+      <DEPENDENCE source="ImportaRedditiAttivazionePage" target="M_ImportaFileRA">
+        <CONDITIONS>
+          <PARAMETER name="IMPORTA" scope="SERVICE_REQUEST" value="true"/>
+        </CONDITIONS>
+      </DEPENDENCE>
+    </DEPENDENCIES>
+</PAGE>
+
+<!-- ESPORTAZIONE AUTORIZZATI RA DA UN FILE -->
+<PAGE name="EsportaAutorizzatiPage" scope="REQUEST">
+    <MODULES>
+    	<MODULE name="M_GetFileDaAutorizzare"/>
+    	<MODULE name="M_AssociaDeliberaAFile"/>
+    </MODULES>
+    <DEPENDENCIES>
+    	<DEPENDENCE source="EsportaAutorizzatiPage" target="M_GetFileDaAutorizzare"/>
+    	
+    	<DEPENDENCE source="EsportaAutorizzatiPage" target="M_AssociaDeliberaAFile">
+    		<CONDITIONS>
+          		<PARAMETER name="OPERAZIONE" scope="SERVICE_REQUEST" value="ASSOCIA"/>
+        	</CONDITIONS>	
+    	</DEPENDENCE>
+    	
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="RicercaTDAPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_StatiVoucher" />
+		<MODULE keep="false" name="M_AzioniModelloVoucher" />
+		<MODULE keep="false" name="M_EntiVoucher" />
+		<MODULE keep="false" name="M_CaricaEnteCollegato" />
+		<MODULE keep="false" name="M_SediEnteCollegato" />
+		<MODULE keep="false" name="M_SediEntiVoucher" />
+		<MODULE keep="false" name="M_ELENCOCPI" />
+		<MODULE keep="false" name="M_GET_MOTIVO_ANNULL_VOUCHER" />
+		<MODULE keep="false" name="M_GETSTATOPAGAMENTO" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaTDAPage" target="M_StatiVoucher">
+		</DEPENDENCE>
+		<DEPENDENCE source="RicercaTDAPage" target="M_AzioniModelloVoucher">
+		</DEPENDENCE>
+		<DEPENDENCE source="RicercaTDAPage" target="M_EntiVoucher">
+		</DEPENDENCE>
+		<DEPENDENCE source="RicercaTDAPage" target="M_SediEntiVoucher">
+		</DEPENDENCE>
+		<DEPENDENCE source="RicercaTDAPage" target="M_CaricaEnteCollegato">
+		</DEPENDENCE>
+		<DEPENDENCE source="RicercaTDAPage" target="M_ELENCOCPI">
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CaricaEnteCollegato" target="M_SediEnteCollegato">
+			<CONSEQUENCES>
+		    	<PARAMETER name="CFENTE" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_CaricaEnteCollegato.CFENTE"/>
+		    </CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="RicercaTDAPage" target="M_GET_MOTIVO_ANNULL_VOUCHER">
+		</DEPENDENCE>
+		<DEPENDENCE source="RicercaTDAPage" target="M_GETSTATOPAGAMENTO">
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ListaTDAPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ListaTDA" />
+		<MODULE keep="false" name="M_AttivaTDA" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaTDAPage" target="M_ListaTDA">
+			<CONDITIONS>
+          		<PARAMETER name="ATTIVATDA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ListaTDAPage" target="M_AttivaTDA">
+    		<CONDITIONS>
+          		<PARAMETER name="ATTIVATDA" scope="SERVICE_REQUEST" value="S"/>
+        	</CONDITIONS>	
+    	</DEPENDENCE>
+    	
+    	<DEPENDENCE source="M_AttivaTDA" target="M_ListaTDA">
+		</DEPENDENCE>
+		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="TDAMainPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetTipoRisultatoTDA" />
+		<MODULE keep="false" name="M_DettaglioVoucher" />
+		<MODULE keep="false" name="M_ConcludiTDA" />
+		<MODULE keep="false" name="M_AggiornaPagamentiTDA" />
+		<MODULE keep="false" name="M_AggiornaIbanTDA" />
+		<MODULE keep="false" name="M_RiapriTDA" />
+		<MODULE keep="false" name="M_GetStatiPagamentiVoucher" />
+		<MODULE keep="false" name="M_GetMaxGGRiapriTDA" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="TDAMainPage" target="M_GetTipoRisultatoTDA">
+		</DEPENDENCE>
+		<DEPENDENCE source="TDAMainPage" target="M_GetStatiPagamentiVoucher">
+		</DEPENDENCE>
+	
+		<DEPENDENCE source="TDAMainPage" target="M_DettaglioVoucher">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONETDA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="TDAMainPage" target="M_ConcludiTDA">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONETDA" scope="SERVICE_REQUEST" value="CHIUSURA"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="TDAMainPage" target="M_AggiornaPagamentiTDA">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONETDA" scope="SERVICE_REQUEST" value="AGGIORNAPAGAMENTI"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="TDAMainPage" target="M_RiapriTDA">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONETDA" scope="SERVICE_REQUEST" value="RIAPRI"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="TDAMainPage" target="M_AggiornaIbanTDA">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONETDA" scope="SERVICE_REQUEST" value="AGGIORNAIBAN"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="TDAMainPage" target="M_GetMaxGGRiapriTDA">
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_ConcludiTDA" target="M_DettaglioVoucher"/>
+		<DEPENDENCE source="M_AggiornaPagamentiTDA" target="M_DettaglioVoucher"/>
+		<DEPENDENCE source="M_RiapriTDA" target="M_DettaglioVoucher"/>
+		<DEPENDENCE source="M_AggiornaIbanTDA" target="M_DettaglioVoucher"/>
+		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="TDAEventiPage" scope="REQUEST">
+     <MODULES>
+         <MODULE keep="false" name="M_ListaEventiTDA" />
+         <MODULE keep="false" name="M_SalvaEventoTDA" />
+         <MODULE keep="false" name="M_AggiornaEventoTDA" />
+         <MODULE keep="false" name="M_InfoGeneraliTDA" />
+         <MODULE keep="false" name="M_DeleteEventiTDA" />
+     </MODULES>
+     <DEPENDENCIES>
+         <DEPENDENCE source="TDAEventiPage" target="M_ListaEventiTDA">
+             <CONDITIONS>
+                   <PARAMETER name="OPERAZIONEEVENTO" 
+scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+             </CONDITIONS>
+         </DEPENDENCE>
+
+         <DEPENDENCE source="TDAEventiPage" target="M_ListaEventiTDA">
+             <CONDITIONS>
+                   <PARAMETER name="OPERAZIONEEVENTO" 
+scope="SERVICE_REQUEST" value="CHIUDI"/>
+             </CONDITIONS>
+         </DEPENDENCE>
+
+         <DEPENDENCE source="TDAEventiPage" target="M_SalvaEventoTDA">
+             <CONDITIONS>
+                   <PARAMETER name="OPERAZIONEEVENTO" 
+scope="SERVICE_REQUEST" value="INSERISCI"/>
+             </CONDITIONS>
+         </DEPENDENCE>
+
+         <DEPENDENCE source="TDAEventiPage" 
+target="M_AggiornaEventoTDA">
+             <CONDITIONS>
+                   <PARAMETER name="OPERAZIONEEVENTO" 
+scope="SERVICE_REQUEST" value="AGGIORNA"/>
+             </CONDITIONS>
+         </DEPENDENCE>
+         
+         <DEPENDENCE source="TDAEventiPage" target="M_DeleteEventiTDA">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONEEVENTO" scope="SERVICE_REQUEST" value="CANCELLA"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+         
+		<DEPENDENCE source="TDAEventiPage" target="M_InfoGeneraliTDA">
+		</DEPENDENCE>
+
+         <DEPENDENCE source="M_SalvaEventoTDA" 
+target="M_ListaEventiTDA"/>
+         <DEPENDENCE source="M_AggiornaEventoTDA" 
+target="M_ListaEventiTDA"/>
+
+		<DEPENDENCE source="M_DeleteEventiTDA" 
+		target="M_ListaEventiTDA"/>
+
+     </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="TDADettaglioEventoPage" scope="REQUEST">
+     <MODULES>
+         <MODULE keep="false" name="M_DettaglioEventoTDA" />
+         <MODULE keep="false" name="M_GetTipoContattoEventoTDA" />
+         <MODULE keep="false" name="M_InfoGeneraliTDA" />
+     </MODULES>
+     <DEPENDENCIES>
+         <DEPENDENCE source="TDADettaglioEventoPage" 
+target="M_DettaglioEventoTDA">
+             <CONDITIONS>
+                   <PARAMETER name="PRGEVENTO" scope="SERVICE_REQUEST" 
+value="AF_DEFINED"/>
+             </CONDITIONS>
+         </DEPENDENCE>
+         <DEPENDENCE source="TDADettaglioEventoPage" 
+target="M_GetTipoContattoEventoTDA"/>
+
+		<DEPENDENCE source="TDADettaglioEventoPage" target="M_InfoGeneraliTDA">
+			<CONDITIONS>
+          		<PARAMETER name="PRGEVENTO" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+	
+     </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="AttivaTDAPage" scope="REQUEST">
+	<MODULES>
+         <MODULE keep="false" name="M_SediEnteCollegato" />
+         <MODULE keep="false" name="M_SediEntiVoucher" />
+     </MODULES>
+     <DEPENDENCIES>
+     	<DEPENDENCE source="AttivaTDAPage" target="M_SediEnteCollegato">
+		</DEPENDENCE>
+		<DEPENDENCE source="AttivaTDAPage" target="M_SediEntiVoucher">
+		</DEPENDENCE>
+     </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="TDAAttivitaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ListaAttivitaTDA" />
+		<MODULE keep="false" name="M_SalvaAttivitaTDA" />
+		<MODULE keep="false" name="M_AggiornaAttivitaTDA" />
+		<MODULE keep="false" name="M_InfoGeneraliTDA" />
+		<MODULE keep="false" name="M_DeleteAttivitaTDA" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="TDAAttivitaPage" target="M_ListaAttivitaTDA">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONEATTIVITA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="TDAAttivitaPage" target="M_ListaAttivitaTDA">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONEATTIVITA" scope="SERVICE_REQUEST" value="CHIUDI"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="TDAAttivitaPage" target="M_SalvaAttivitaTDA">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONEATTIVITA" scope="SERVICE_REQUEST" value="INSERISCI"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="TDAAttivitaPage" target="M_AggiornaAttivitaTDA">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONEATTIVITA" scope="SERVICE_REQUEST" value="AGGIORNA"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="TDAAttivitaPage" target="M_DeleteAttivitaTDA">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONEEVENTO" scope="SERVICE_REQUEST" value="CANCELLA"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="TDAAttivitaPage" target="M_InfoGeneraliTDA">
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_SalvaAttivitaTDA" target="M_ListaAttivitaTDA"/>
+		<DEPENDENCE source="M_AggiornaAttivitaTDA" target="M_ListaAttivitaTDA"/>
+		
+		<DEPENDENCE source="M_DeleteAttivitaTDA" target="M_ListaAttivitaTDA"/>
+		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="TDADettaglioAttivitaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_DettaglioAttivitaTDA" />
+		<MODULE keep="false" name="M_GetCodificaAttivitaTDA" />
+		<MODULE keep="false" name="M_InfoGeneraliTDA" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="TDADettaglioAttivitaPage" target="M_DettaglioAttivitaTDA">
+			<CONDITIONS>
+          		<PARAMETER name="PRGATTIVITA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="TDADettaglioAttivitaPage" target="M_InfoGeneraliTDA">
+			<CONDITIONS>
+          		<PARAMETER name="PRGATTIVITA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="TDADettaglioAttivitaPage" target="M_GetCodificaAttivitaTDA"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="TDAObiettiviPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ListaObiettiviTDA" />
+		<MODULE keep="false" name="M_AggiornaObiettiviTDA" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="TDAObiettiviPage" target="M_ListaObiettiviTDA">
+			<CONDITIONS>
+          		<PARAMETER name="AGGIORNAOBBIETTIVI" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="TDAObiettiviPage" target="M_AggiornaObiettiviTDA">
+			<CONDITIONS>
+          		<PARAMETER name="AGGIORNAOBBIETTIVI" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_AggiornaObiettiviTDA" target="M_ListaObiettiviTDA"/>
+		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="TDAModalitaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ListaModalitaTDA" />
+		<MODULE keep="false" name="M_InfoGeneraliTDA" />
+		<MODULE keep="false" name="M_AggiornaModalitaTDA" />
+	</MODULES>
+	<DEPENDENCIES>
+	
+		<DEPENDENCE source="TDAModalitaPage" target="M_InfoGeneraliTDA">
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="TDAModalitaPage" target="M_ListaModalitaTDA">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONEMODALITA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="TDAModalitaPage" target="M_ListaModalitaTDA">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONEMODALITA" scope="SERVICE_REQUEST" value="CHIUDI"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="TDAModalitaPage" target="M_AggiornaModalitaTDA">
+			<CONDITIONS>
+          		<PARAMETER name="OPERAZIONEMODALITA" scope="SERVICE_REQUEST" value="AGGIORNA"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_AggiornaModalitaTDA" target="M_ListaModalitaTDA"/>
+		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="TDADettaglioModalitaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_COMBO_MODALITA_EROGAZIONE_TDA" />
+		<MODULE keep="false" name="M_COMBO_MN_YG_TIPOLOGIA_DURATA" />
+		<MODULE keep="false" name="M_DettaglioModalitaTDA" />
+		<MODULE keep="false" name="M_CHECK_SELEZIONE_MODALITA_TDA" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="TDADettaglioModalitaPage" target="M_COMBO_MODALITA_EROGAZIONE_TDA"/>
+		<DEPENDENCE source="TDADettaglioModalitaPage" target="M_COMBO_MN_YG_TIPOLOGIA_DURATA"/>
+		<DEPENDENCE source="TDADettaglioModalitaPage" target="M_DettaglioModalitaTDA"/>
+		<DEPENDENCE source="TDADettaglioModalitaPage" target="M_CHECK_SELEZIONE_MODALITA_TDA">
+			<CONDITIONS>
+          		<PARAMETER name="CODSTATOVOUCHER" scope="SERVICE_REQUEST" value="ATT"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="StampaVoucherPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetCodiceAttivazionePatto" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="StampaVoucherPage" target="M_GetCodiceAttivazionePatto">
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- GESTIONE MODELLO TDA (VOUCHER) -->
+<PAGE distributed="false" name="RicercaModelliTdaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_AzioniModelloVoucherNoFlag" />
+		<MODULE keep="false" name="M_ComboSiNo"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaModelliTdaPage" target="M_AzioniModelloVoucherNoFlag">
+		</DEPENDENCE>
+		<DEPENDENCE source="RicercaModelliTdaPage" target="M_ComboSiNo">
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="ListaModelliTdaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ListaModelliTda" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaModelliTdaPage" target="M_ListaModelliTda">
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="ModelloTdaMainPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_DettaglioModelloTDA"/>
+		<MODULE keep="false" name="COMBO_SERVIZIO_SCAD_COLLOQUI"/>
+		<MODULE keep="false" name="M_ComboObbiettivoMisuraYei"/>
+		<MODULE keep="false" name="M_AzioniModelloInserimento"/>
+		<MODULE keep="false" name="ComboObbiettivoMisuraYei"/>
+		<MODULE keep="false" name="M_GetAzioni"/>
+		<MODULE keep="false" name="ComboModalitaErogazione"/>
+		<MODULE keep="false" name="M_ComboSiNo"/>
+		<MODULE keep="false" name="M_InsertUpdateModelliTda"/>
+		<MODULE keep="false" name="M_GetModificabilitaTipoServizio"/>
+		<MODULE keep="false" name="M_AggiornaTipoServizio" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ModelloTdaMainPage" target="M_AggiornaTipoServizio">
+		   <CONDITIONS>
+				<PARAMETER name="confermaCambioTipologia" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_AggiornaTipoServizio" target="M_DettaglioModelloTDA">
+		</DEPENDENCE>
+		<DEPENDENCE source="ModelloTdaMainPage" target="M_DettaglioModelloTDA">
+			<CONDITIONS>
+          		<PARAMETER name="confermaModifiche" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ModelloTdaMainPage" target="COMBO_SERVIZIO_SCAD_COLLOQUI">
+		</DEPENDENCE>
+		<DEPENDENCE source="COMBO_SERVIZIO_SCAD_COLLOQUI" target="M_ComboObbiettivoMisuraYei">
+			<CONDITIONS>
+          		<PARAMETER name="PRGMODVOUCHER" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_ComboObbiettivoMisuraYei" target="M_GetAzioni">
+			<CONDITIONS>
+          		<PARAMETER name="PRGMODVOUCHER" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+	    <DEPENDENCE source="ModelloTdaMainPage" target="ComboObbiettivoMisuraYei">
+	    	<CONSEQUENCES>
+				<PARAMETER name="PRGMODVOUCHER" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_INSERTUPDATEMODELLITDA.PRGMODVOUCHER" />
+			</CONSEQUENCES>
+		</DEPENDENCE>  
+		<DEPENDENCE source="ModelloTdaMainPage" target="ComboObbiettivoMisuraYei">
+	    		<CONDITIONS>
+          		<PARAMETER name="PRGMODVOUCHER" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>  
+			    <DEPENDENCE source="ModelloTdaMainPage" target="M_AzioniModelloInserimento">
+	    	<CONSEQUENCES>
+				<PARAMETER name="PRGMODVOUCHER" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_INSERTUPDATEMODELLITDA.PRGMODVOUCHER" />
+			</CONSEQUENCES>
+		</DEPENDENCE>  
+		<DEPENDENCE source="ModelloTdaMainPage" target="M_AzioniModelloInserimento">
+	    		<CONDITIONS>
+          		<PARAMETER name="PRGMODVOUCHER" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ModelloTdaMainPage" target="ComboModalitaErogazione">
+		</DEPENDENCE>
+		<DEPENDENCE source="ModelloTdaMainPage" target="M_ComboSiNo">
+		</DEPENDENCE>
+		<DEPENDENCE source="ModelloTdaMainPage" target="M_InsertUpdateModelliTda">
+			<CONDITIONS>
+				<PARAMETER name="confermaModifiche" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_InsertUpdateModelliTda" target="M_DettaglioModelloTDA">
+		</DEPENDENCE>
+		<DEPENDENCE source="ModelloTdaMainPage" target="M_GetModificabilitaTipoServizio">
+	    		<CONDITIONS>
+          		<PARAMETER name="PRGMODVOUCHER" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        	</CONDITIONS>
+		</DEPENDENCE>  
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="LinguettaModalitaTdaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetModelloAttivo" />
+		<MODULE keep="false" name="M_ListaModModalitaTda" />
+		<MODULE keep="false" name="M_InsertUpdateModalitaTda"/>
+		<MODULE keep="false" name="M_DeleteModModalitaTda" />
+ 	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="LinguettaModalitaTdaPage" target="M_GetModelloAttivo">
+		</DEPENDENCE>
+		<DEPENDENCE source="LinguettaModalitaTdaPage" target="M_ListaModModalitaTda">
+			<CONDITIONS>
+				<PARAMETER name="confermaModificheModello" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="LinguettaModalitaTdaPage" target="M_InsertUpdateModalitaTda">
+			<CONDITIONS>
+				<PARAMETER name="confermaModificheModello" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_InsertUpdateModalitaTda" target="M_ListaModModalitaTda">
+		</DEPENDENCE>
+		<DEPENDENCE source="LinguettaModalitaTdaPage" target="M_DeleteModModalitaTda">
+	      <CONDITIONS>
+	        <PARAMETER name="OPERATION" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	      </CONDITIONS>
+	    </DEPENDENCE>
+	     <DEPENDENCE source="M_DeleteModModalitaTda" target="M_ListaModModalitaTda">
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="DettaglioModalitaTdaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_DettaglioMod_ModalitaTDA" />
+		<MODULE keep="false" name="M_COMBO_MN_YG_TIPOLOGIA_DURATA" />
+		<MODULE keep="false" name="M_GetModalitaRimborsoTDA" />
+		<MODULE keep="false" name="M_COMBO_MODALITA_EROGAZIONE_TDA" />
+		<MODULE keep="false" name="M_InsertUpdateModalitaTda"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DettaglioModalitaTdaPage" target="M_DettaglioMod_ModalitaTDA">
+			<CONDITIONS>
+				<PARAMETER name="confermaModificheModello" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	
+		<DEPENDENCE source="DettaglioModalitaTdaPage" target="M_GetModalitaRimborsoTDA">
+		</DEPENDENCE>
+		<DEPENDENCE source="DettaglioModalitaTdaPage" target="M_COMBO_MN_YG_TIPOLOGIA_DURATA">
+		</DEPENDENCE>
+		<DEPENDENCE source="DettaglioModalitaTdaPage" target="M_COMBO_MODALITA_EROGAZIONE_TDA">
+		</DEPENDENCE>
+		<DEPENDENCE source="DettaglioModalitaTdaPage" target="M_InsertUpdateModalitaTda">
+			<CONDITIONS>
+				<PARAMETER name="confermaModificheModello" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_InsertUpdateModalitaTda" target="M_DettaglioMod_ModalitaTDA">
+			<CONDITIONS>
+				<PARAMETER name="PRGMODMODALITA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_InsertUpdateModalitaTda" target="M_DettaglioMod_ModalitaTDA">
+			<CONDITIONS>
+				<PARAMETER name="PRGMODMODALITA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="PRGMODMODALITA" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_InsertUpdateModalitaTda.PRGMODMODALITA" />
+			</CONSEQUENCES>
+		</DEPENDENCE>	
+ 	</DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="InserisciModalitaTdaPage" scope="REQUEST">
+	<MODULES>
+ 		<MODULE keep="false" name="M_COMBO_MN_YG_TIPOLOGIA_DURATA" />
+		<MODULE keep="false" name="M_GetModalitaRimborsoTDA" />
+		<MODULE keep="false" name="M_COMBO_MODALITA_EROGAZIONE_TDA_NONUSATI" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="InserisciModalitaTdaPage" target="M_GetModalitaRimborsoTDA">
+		</DEPENDENCE>
+		<DEPENDENCE source="InserisciModalitaTdaPage" target="M_COMBO_MN_YG_TIPOLOGIA_DURATA">
+		</DEPENDENCE>
+		<DEPENDENCE source="InserisciModalitaTdaPage" target="M_COMBO_MODALITA_EROGAZIONE_TDA_NONUSATI">
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="LinguettaAttivitaTdaPage" scope="REQUEST">
+	<MODULES>
+ 		<MODULE keep="false" name="M_ListaModAttivitaTda" />
+ 		<MODULE keep="false" name="M_GetDescrizioneObiettivo" />
+ 		<MODULE keep="false" name="M_AzioniModelloVoucherAssociabili" />
+ 		<MODULE keep="false" name="M_DeleteModelloVoucherAssociabili" />
+ 		<MODULE keep="false" name="M_AssociaAzioneModelloTda" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="LinguettaAttivitaTdaPage" target="M_ListaModAttivitaTda">
+			<CONDITIONS>
+				<PARAMETER name="confermaAssociazione" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+				<PARAMETER name="OPERATION" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="LinguettaAttivitaTdaPage" target="M_GetDescrizioneObiettivo">
+		</DEPENDENCE>
+		<DEPENDENCE source="LinguettaAttivitaTdaPage" target="M_AzioniModelloVoucherAssociabili">
+		</DEPENDENCE>
+		<DEPENDENCE source="LinguettaAttivitaTdaPage" target="M_DeleteModelloVoucherAssociabili">
+	      <CONDITIONS>
+	        <PARAMETER name="OPERATION" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	      </CONDITIONS>
+	    </DEPENDENCE>
+	    <DEPENDENCE source="LinguettaAttivitaTdaPage" target="M_AssociaAzioneModelloTda">
+	      <CONDITIONS>
+				<PARAMETER name="confermaAssociazione" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+	    </DEPENDENCE>
+	    <DEPENDENCE source="M_DeleteModelloVoucherAssociabili" target="M_ListaModAttivitaTda">
+		</DEPENDENCE>
+		<DEPENDENCE source="M_AssociaAzioneModelloTda" target="M_ListaModAttivitaTda">
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="EsperienzeLavoratorePage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetEsperienzeLavoratore" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="EsperienzeLavoratorePage" target="M_GetEsperienzeLavoratore">
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="ModelloTdaTipoServizioPage" scope="REQUEST">
+	 <MODULES>
+		<MODULE keep="false" name="M_ComboTipoServizio" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ModelloTdaTipoServizioPage" target="M_ComboTipoServizio">
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE name="Pi3HomePage" scope="REQUEST" distributed="false">
+	<MODULES>
+    	<MODULE keep="false" name="M_GetInfoProtocollazionePi3"/>
+    	<MODULE keep="false" name="M_GET_CODICI_FROM_TITOLARIO"/>
+    	<MODULE keep="false" name="M_GetDocAssociatiPi3"/>
+    </MODULES>
+    <DEPENDENCIES>
+		<DEPENDENCE source="Pi3HomePage" target="M_GetDocAssociatiPi3"/>
+		<DEPENDENCE source="Pi3HomePage" target="M_GET_CODICI_FROM_TITOLARIO"/>
+		<DEPENDENCE source="M_GetDocAssociatiPi3" target="M_GetInfoProtocollazionePi3"/>
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="Pi3HomePattoPage" scope="REQUEST" distributed="false">
+	<MODULES>
+    	<MODULE keep="false" name="M_GetInfoProtocollazionePattoPi3"/>
+    	<MODULE keep="false" name="M_GET_CODICI_FROM_TITOLARIO"/>
+    	<MODULE keep="false" name="M_GetDocAssociatiPi3"/>
+    	<MODULE keep="false" name="MDettaglioTemplate"/>
+
+    </MODULES>
+    <DEPENDENCIES>
+        <DEPENDENCE source="Pi3HomePattoPage" target="MDettaglioTemplate">
+    	<CONDITIONS>
+    		<PARAMETER name="PRGTEMPLATESTAMPA" scope="SERVICE_REQUEST" value=""/>
+		</CONDITIONS>
+		</DEPENDENCE>
+
+		
+		<DEPENDENCE source="Pi3HomePattoPage" target="M_GetDocAssociatiPi3"/>
+		<DEPENDENCE source="Pi3HomePattoPage" target="M_GET_CODICI_FROM_TITOLARIO"/>
+		<DEPENDENCE source="M_GetDocAssociatiPi3" target="M_GetInfoProtocollazionePattoPi3"/>
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="Pi3StampeHomePage" scope="REQUEST" distributed="false">
+	<MODULES>
+    	<MODULE keep="false" name="M_GetInfoProtocollazioneStampeParamPi3"/>
+    	<MODULE keep="false" name="M_GET_CODICI_FROM_TITOLARIO"/>
+    	<MODULE keep="false" name="M_GetDocAssociatiPi3"/>
+    </MODULES>
+    <DEPENDENCIES>
+		<DEPENDENCE source="Pi3StampeHomePage" target="M_GetDocAssociatiPi3"/>
+		<DEPENDENCE source="Pi3StampeHomePage" target="M_GET_CODICI_FROM_TITOLARIO"/>
+		<DEPENDENCE source="M_GetDocAssociatiPi3" target="M_GetInfoProtocollazioneStampeParamPi3"/>
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="Pi3AllegatiStampePage" scope="REQUEST" distributed="false">
+	<MODULES>
+    	<MODULE keep="false" name="M_GetInfoProtocollazioneStampeParamPi3"/>
+    	<MODULE keep="false" name="M_GET_CODICI_FROM_TITOLARIO"/>
+    	<MODULE keep="false" name="M_GetDocAssociatiPi3"/>
+    </MODULES>
+    <DEPENDENCIES>
+		<DEPENDENCE source="Pi3StampeHomePage" target="M_GetDocAssociatiPi3"/>
+		<DEPENDENCE source="Pi3StampeHomePage" target="M_GET_CODICI_FROM_TITOLARIO"/>
+		<DEPENDENCE source="M_GetDocAssociatiPi3" target="M_GetInfoProtocollazioneStampeParamPi3"/>
+    </DEPENDENCIES>
+</PAGE>
+
+
+<!-- MATTEO: GESTIONE CONSENSO -->
+<PAGE name="HomeConsensoPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_GetInfoLavAdesioneGG"/>
+    </MODULES>
+    <DEPENDENCIES>
+		<DEPENDENCE source="HomeConsensoPage" target="M_GetInfoLavAdesioneGG"/>
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="VerificaConsensoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="MSEL_AG_LAVORATORE"/>
+    	<MODULE name="M_VerificaConsenso"/>
+    </MODULES>
+    <DEPENDENCIES>
+  	    <DEPENDENCE source="VerificaConsensoPage" target="MSEL_AG_LAVORATORE"/>
+		<DEPENDENCE source="VerificaConsensoPage" target="M_VerificaConsenso"/>
+    </DEPENDENCIES>
+</PAGE>

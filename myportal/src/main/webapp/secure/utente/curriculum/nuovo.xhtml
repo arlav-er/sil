@@ -1,0 +1,175 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	template="../../template/main.xhtml"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<ui:define name="title">
+		<h:outputText value="#{msg['cittadino.curriculum.edita.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputText value="#{msg['cittadino.curriculum.edita.descrizione']}" escape="false" />
+		<div class="widget_container">
+			<div class="ui-widget-content ui-widget ui-corner-all">
+				<h:form id="testata">
+					<h:panelGrid columns="1" cellspacing="10">
+						<cc:inputText id="data_nascita"
+							value="#{testataCurriculumBean.data.dtNascita}"
+							label="Data di nascita" type="dataNascita" required="true"
+							requiredMessage="La data di nascita e' obbligatoria.">
+							<f:validator validatorId="dateNotFutureValidator" for="function" />
+						</cc:inputText>
+
+						<cc:inputSuggestion id="comune_nascita" required="true"
+							label="Comune o stato di nascita"
+							value="#{testataCurriculumBean.data.strComNascita}"
+							valueCod="#{testataCurriculumBean.data.codComNascita}"
+							suggestionPath="comuni">
+							<f:validator validatorId="comuneSuggestionValidator"
+								for="function" />
+						</cc:inputSuggestion>
+
+						<cc:inputText id="indirizzo_domicilio" required="true"
+							label="Indirizzo domicilio" maxlength="512"
+							value="#{testataCurriculumBean.data.indirizzoDomicilio}">
+							<f:validateLength for="function" maximum="512" />
+						</cc:inputText>
+
+						<cc:inputSuggestion id="comune_domicilio" required="true"
+							label="Comune domicilio"
+							value="#{testataCurriculumBean.data.strComDomicilio}"
+							valueCod="#{testataCurriculumBean.data.codComDomicilio}"
+							suggestionPath="comuni">
+							<f:validator validatorId="comuneSuggestionValidator"
+								for="function" />
+						</cc:inputSuggestion>
+
+						<cc:inputText id="email" required="true" label="E-mail"
+							maxlength="255" value="#{testataCurriculumBean.data.email}">
+							<f:validator validatorId="emailValidator" for="function" />
+							<f:validateLength for="function" maximum="255" />
+						</cc:inputText>
+
+						<cc:inputText id="telefono1" required="true"
+							label="Telefono" maxlength="20"
+							value="#{testataCurriculumBean.data.tel1}">
+							<f:validateLength for="function" maximum="20" />
+						</cc:inputText>
+
+						<cc:inputText id="telefono2" required="false"
+							label="Cellulare" maxlength="20"
+							value="#{testataCurriculumBean.data.tel2}">
+							<f:validateLength for="function" maximum="20" />
+						</cc:inputText>
+
+						<cc:inputText id="descrizione" required="true"
+							label="Nome CV"
+							value="#{testataCurriculumBean.data.descrizione}" maxlength="100">
+							<f:validateLength for="function" maximum="100" />
+						</cc:inputText>
+						
+						<ui:fragment rendered="#{testataCurriculumBean.usaDecodificheSil()}">
+							<h:panelGroup>
+								<h:outputLabel for="titolo" value="Titolo *" />
+								<div class="helpPanelToggleButton" style="display: inline-block"
+									title="Il titolo inserito sarà visualizzato dalle aziende, si consiglia di non usare dati personali" />
+								<cc:inputText id="titolo" value="#{testataCurriculumBean.data.titolo}"
+									required="true" maxlength="100">
+									<f:validateLength for="function" maximum="100" />
+								</cc:inputText>
+							</h:panelGroup>
+							
+							<cc:inputTextarea id="descrizione_cv" required="false" maxlength="4000"
+								label="Descrizione" value="#{testataCurriculumBean.data.descrizioneCv}"
+								richTextMode="false">
+								<f:validateLength for="function" maximum="4000" />
+							</cc:inputTextarea>
+						</ui:fragment>
+
+						<h:panelGroup>
+							<h:commandLink id="dialog_attach_opener"
+								value="Inserisci un allegato" name="Inserisci un allegato"
+								title="Inserisci un allegato" styleClass="buttonStyle"
+								onclick="$('#dialog_allegato').dialog('open'); return false;">
+								<span class="ui-icon ui-icon-disk fix_icon" />
+							</h:commandLink>
+
+							<span id="original_file_name_display" style="margin:10px">
+								#{testataCurriculumBean.data.filename}
+							</span>
+							<h:commandLink id="attach_cleaner" value="Rimuovi" title="Rimuovi allegato"
+								styleClass="buttonStyle" onclick="removeFileAttach(); return false;">
+								<span class="ui-icon ui-icon-trash fix_icon" />
+							</h:commandLink>
+							<h:inputHidden
+								value="#{testataCurriculumBean.data.filename}"
+								id="original_file_name" />
+							<h:inputHidden
+								value="#{testataCurriculumBean.data.fileNameTmp}"
+								id="file_name" />
+						</h:panelGroup>
+						
+						<h:commandLink id="save" styleClass="saveButton"
+							value="Salva e procedi" action="#{testataCurriculumBean.save}">
+						</h:commandLink>
+					</h:panelGrid>
+					<cc:messages />
+				</h:form>
+			</div>
+		</div>
+		<cc:btnBack backTo="#{testataCurriculumBean.backTo}" />
+	<!-- Modale per la scelta dell'allegato -->
+	<div id="dialog_allegato" title="Seleziona un file da allegare">
+		<form name="allegatoUpload" id="allegatoUpload"
+			enctype="multipart/form-data"
+			action="#{request.contextPath}/secure/rest/uploadFileService/uploadAttachment" method="post">
+			<label for="fileupload" title="Attach"> Allegato </label>
+			<input type="file" name="fileupload" title="Carica un allegato" size="70"
+				id="fileupload" /> <br />
+			<button type="submit" id="UploadBtn" title="Carica"
+				class="buttonStyle">Carica</button>
+		</form>
+	</div>
+	<script type="text/javascript">
+		//<![CDATA[ 
+		function removeFileAttach() {
+		    $('#original_file_name_display').text('');
+		    $('#testata\\:original_file_name').val('');
+		    $('#testata\\:file_name').val('');
+		    $('#fileupload').val('');
+		    return false;
+		}
+			
+		function showResponse(responseJson, statusText, xhr, $form)  {
+			//console.log("responseJson:"+responseJson);
+			//console.log("responseJson.statusCode:"+responseJson.statusCode);
+// 			console.log("responseJson:"+responseJson);
+			if(responseJson.statusCode==200){
+			    $('#original_file_name_display').text(responseJson.original_file_name);
+			    $('#testata\\:original_file_name').val(responseJson.original_file_name);
+			    $('#testata\\:file_name').val(responseJson.file_name);
+			} else {
+     	    	$.jnotify("Errore durante il caricamento dell'allegato:"+responseJson.error_code,"error",true);
+			}			    
+		    $( "#dialog_allegato" ).dialog('close');
+		}
+		$(function() {
+			$('#dialog_allegato').dialog({
+				width: 520,
+				autoOpen: false,
+				modal: true
+			});
+
+			var options = {
+					success:       showResponse,  // post-submit callback 
+					dataType:  'json'
+					}; 
+			$('#allegatoUpload').ajaxForm(options);
+			$('#original_file_name_display').text($('#testata\\:original_file_name').val());
+		});
+		//]]> 
+	</script>
+	</ui:define>
+</ui:composition>

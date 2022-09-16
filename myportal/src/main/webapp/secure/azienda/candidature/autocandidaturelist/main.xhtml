@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/#{utilsBean.bootstrapTemplate}/main.xhtml">
+
+	<ui:param name="pagetitle" value="Elenco completo delle candidature ricevute" />
+
+	<ui:define name="content">
+		<h:outputScript library="commons" name="js/azienda/candidatura/candidature.list.js"></h:outputScript>
+		<div class="container-fluid">
+			<ui:include src="_filters.xhtml" />
+			<h:form id="candidatureForm" styleClass="m-t-10">
+				<p:dataTable id="candidatureDatatable" var="candidatura" value="#{visualizzaListaAutocandidatureBean.candidature}"
+					widgetVar="candidature_listWV" emptyMessage="Non ci sono autocandidature" reflow="true"
+					styleClass="default-data-table" paginator="true" rows="30"
+					paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+					filteredValue="#{visualizzaListaAutocandidatureBean.filterCandidatureList}"
+					selection="#{visualizzaListaAutocandidatureBean.selectedCandidature}" rowKey="#{candidatura.id}">
+					<p:ajax event="filter" listener="#{visualizzaListaAutocandidatureBean.filterListener}" ></p:ajax>
+					<f:facet name="header">
+
+						<div class="row">
+							<div class="col-md-12 text-left">
+								<p:outputLabel for="globalFilter" value="Filtro veloce:" styleClass="m-r-10" />
+								<p:inputText id="globalFilter" onkeyup="PF('candidature_listWV').filter()" value="#{visualizzaListaAutocandidatureBean.filtroVeloce}" style="width:150px"
+									placeholder="Inserire parola chiave" />
+							</div>
+						</div>
+					</f:facet>
+
+					<p:column headerText="Candidato" sortBy="#{candidatura.nomeCandidato} #{candidatura.cognomeCandidato}"
+						filterMatchMode="contains" filterBy="#{candidatura.nomeCandidato} #{candidatura.cognomeCandidato}"
+						filterStyle="display:none" rendered="#{sessionBean.azienda or sessionBean.provincia}">
+						<p:outputLabel value="#{candidatura.nomeCandidato} #{candidatura.cognomeCandidato}" />
+					</p:column>
+
+					<p:column headerText="Codice Ficale" sortBy="#{candidatura.codiceFiscaleCandicato}"
+							  filterMatchMode="contains" filterBy="#{candidatura.codiceFiscaleCandicatoo}"
+							  filterStyle="display:none" rendered="#{sessionBean.azienda or sessionBean.provincia}">
+						<p:outputLabel value="#{candidatura.codiceFiscaleCandicato}" />
+					</p:column>
+
+					<p:column headerText="Curriculum" sortBy="#{candidatura.id}"
+						rendered="#{sessionBean.azienda or sessionBean.provincia}">
+
+						<h:link immediate="true" styleClass="rightMargin"
+							outcome="#{visualizzaListaAutocandidatureBean.getOutcome(candidatura)}" title="Visualizza curriculum">
+							<p:outputLabel value="Candidatura n° - #{candidatura.id}" />
+							<f:param name="id" value="#{candidatura.idCvDatiPersonali}" />
+							<f:param name="idAcCandidatura" value="#{candidatura.id}" />
+							<f:param name="idVaDatiVacancy" value="#{candidatura.idVaDatiVacancy}" />
+						</h:link>
+
+						<h:link styleClass="buttonStyle rightMargin allineaDx" outcome="/secure/utente/offertelavoro/confronta_requisiti"
+							title="Confronta" rendered="#{cc.attrs.showCompare and candidatura.idVaDatiVacancy != null}">
+							<f:param name="idCurricula" value="#{candidatura.idCvDatiPersonali}" />
+							<f:param name="idVacancy" value="#{candidatura.idVaDatiVacancy}" />
+							<span class="fa fa-arrows-h" />
+						</h:link>
+						<ui:fragment rendered="#{candidatura.flagIdo}">
+ 						 <p:commandLink actionListener="#{curriculumOffcanvasBean.onDatiPersonaliSelected(candidatura.idCvDatiPersonali)}"
+							process="@this" update=":canvasPanel" oncomplete="$.UIkit.offcanvas.show('#canvasView');">
+							<i class="fa fa-eye" aria-hidden="true"></i>
+						 </p:commandLink>
+						</ui:fragment>
+					</p:column>
+
+					<p:column headerText="Download">
+						<h:outputLink immediate="true" styleClass="buttonStyle allineaDx" title="#{candidatura.allegatoFileName}"
+							rendered="#{candidatura.idAcAllegato != null}"
+							style="display:block;" 
+							onclick="MyPortal.fetchStampa('/#{const['contesto.app']}/secure/rest/services/getAllegatoCandidatura?idAcCandidatura='+#{candidatura.idAcAllegato});return false;">
+							<span class="fa fa-download" /> Allegato
+						</h:outputLink>
+					
+						<h:outputLink id="letteraPrintButton" styleClass="buttonStyle allineaDx"
+							rendered="#{candidatura.idCvLetteraAcc != null}" title="Stampa"
+							style="display:block;" 
+							onclick="MyPortal.fetchStampa('/#{const['contesto.app']}/secure/rest/services/getLetteraAccompagnamento?id='+#{candidatura.idCvLetteraAcc});return false;">
+							<span class="fa fa-envelope-o" /> Lettera
+						</h:outputLink>
+						
+						<h:outputLink id="cvPrintButton" styleClass="buttonStyle allineaDx" title="Stampa"
+							style="display:block;" 
+							onclick="MyPortal.fetchStampa('/#{const['contesto.app']}/secure/rest/services/getCurriculumUtente?curriculumId='+#{candidatura.idCvDatiPersonali});return false;">
+							<span class="fa fa-file-o" /> CV
+						</h:outputLink>
+					</p:column>
+
+					<p:column rendered="#{sessionBean.azienda or sessionBean.provincia}" headerText="Valutazione">
+						<p:outputLabel value="#{candidatura.deIdoneitaCandidaturaDTO.descrizione}" />
+					</p:column>
+
+					<p:column headerText="Data candidatura" filterMatchMode="contains" sortBy="#{candidatura.dtmMod}">
+						<p:outputLabel value="#{candidatura.dtmMod}">
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="date" />
+						</p:outputLabel>
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+			<br />
+			<p:button styleClass="btn btn-primary ui-button" href="#{visualizzaListaAutocandidatureBean.backTo}"
+					  rendered="#{not empty visualizzaListaCandidatureVacancyBean.backTo}" value="Torna alla scrivania"
+					  onclick="buttonToDisable = MyPortal.enableLoadingButton(this)" />
+		</div>
+		<h:panelGroup id="canvasPanel">
+			<div id="canvasView" class="uk-offcanvas canvas-quick-view">
+				<div class="uk-offcanvas-bar uk-offcanvas-bar-flip">
+					<c:if test="#{not empty curriculumOffcanvasBean.selectedDatiPersonali}">
+						<ui:include src="../../../utente/curriculum/_view/_offCanvas.xhtml">
+							<ui:param name="curriculum" value="#{curriculumOffcanvasBean.selectedDatiPersonali}" />
+							<ui:param name="altreInfo" value="#{curriculumOffcanvasBean.selectedCvAltreInfo}" />
+							<ui:param name="esperienze" value="#{curriculumOffcanvasBean.esperienzeSelezionate}" />
+							<ui:param name="lingue" value="#{curriculumOffcanvasBean.lingueSelezionate}" />
+							<ui:param name="istruzioni" value="#{curriculumOffcanvasBean.cvIstruzioniSelezionate}" />
+							<ui:param name="bean" value="#{curriculumOffcanvasBean}" />
+						</ui:include>
+					</c:if>
+				</div>
+			</div>
+		</h:panelGroup>
+
+		<script  type="text/javascript">
+            var filter;
+            filter = $( "[id$=globalFilter]").val();
+            if(filter !== "") {
+                $(document).ready(function () {
+                    jQuery('input[id*="globalFilter"]').val(filter);
+                    PF('candidature_listWV').filter()
+                });
+            }
+		</script>
+	</ui:define>
+</ui:composition>

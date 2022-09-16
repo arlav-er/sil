@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/template_portlet.xhtml">
+
+	<ui:param name="portletCssClass" value="portletAgenda" />
+
+	<ui:define name="portlet_title">
+		<h:outputText value="#{txt['cittadino.portlet.agenda.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="portlet_content">
+		<div style="text-align: justify;">
+			<h:outputText value="#{txt['cittadino.portlet.agenda.descrizione']}" escape="false" />
+			
+			<h:panelGroup rendered="#{not sessionBean.connectedUtente.abilitatoServizi}">
+				<ul>
+					<h:panelGroup rendered="#{empty sessionBean.connectedUtente.pfPrincipalDTO.flagAbilitaPec
+						or sessionBean.connectedUtente.pfPrincipalDTO.flagAbilitaPec}">
+						<li>
+							<a href="#{sessionBean.getUrlMyAccount()}/secure/account/edit">
+								Devi essere abilitato ai servizi amministrativi per poter accedere.</a>
+						</li>
+					</h:panelGroup>
+					<h:panelGroup rendered="#{not empty sessionBean.connectedUtente.pfPrincipalDTO.flagAbilitaPec
+						and not sessionBean.connectedUtente.pfPrincipalDTO.flagAbilitaPec}">
+						<li>
+							Richiesta di abilitazione ai servizi amministrativi in corso.
+							Attendere risposta dal CPI.
+						</li>
+					</h:panelGroup>
+				</ul>
+			</h:panelGroup>
+		</div>
+		<h:link
+			rendered="#{sessionBean.connectedUtente.abilitatoServizi}"
+			styleClass="buttonStyle" outcome="/secure/utente/orientamento_base/prenota_appuntamento.xhtml"
+			title="Prenota">Prenota</h:link>
+		<br />
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Created by TIBCO WSDL-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.tndigit.it/SMS/service" xmlns:ns0="http://www.infotn.it/SMS-EAI/InvioSMS_message" xmlns:ns1="http://www.infotn.it/SMS-EAI/InvioSMS_types" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap1="http://schemas.xmlsoap.org/wsdl/soap12/" name="Untitled" targetNamespace="http://www.tndigit.it/SMS/service">
+    <wsdl:types>
+        <xs:schema xmlns="http://www.infotn.it/SMS-EAI/InvioSMS_types" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.infotn.it/SMS-EAI/InvioSMS_types" elementFormDefault="qualified" attributeFormDefault="unqualified">
+            <xs:complexType name="Bundle_type">
+                <xs:sequence>
+                    <xs:element name="bundleId" type="xs:int"/>
+                    <xs:element name="serviceCode" type="xs:string" minOccurs="0"/>
+                    <xs:element name="creditoResiduo" type="xs:int" minOccurs="0"/>
+                    <xs:element name="creditoIniziale" type="xs:int" minOccurs="0"/>
+                    <xs:element name="dataAttivazione" type="xs:dateTime" minOccurs="0"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="InvioSMSFault_type">
+                <xs:sequence>
+                    <xs:element name="ErrorCode" type="xs:string"/>
+                    <xs:element name="ErrorDescription" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ListBundle_type">
+                <xs:sequence>
+                    <xs:element name="BundleInfo" type="ns1:Bundle_type" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="MessageInfo_type">
+                <xs:sequence>
+                    <xs:element name="DateReceived" type="xs:dateTime">
+                        <xs:annotation>
+                            <xs:documentation>Data e ora di ricezione. Formato xs:dateTime. Esempio: yyyy-MM-ddTHH:mm:ss (2002-05-30T09:00:00)</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="MsgID" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Identificativo del messaggio ricevuto </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="sender" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Mittente del messaggio.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="receiver" type="xs:string" minOccurs="0"/>
+                    <xs:element name="Text" type="xs:string" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Testo SMS: max 160 per unico, max 640 per concatenato</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SMSForStatusRequest_type">
+                <xs:sequence>
+                    <xs:element name="TrackingID" type="xs:string" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Identificativo opzionale per tracciare la richiesta stato SMS.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="SMSMsgId" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SMSMessage_type">
+                <xs:sequence>
+                    <xs:element name="MsgID" type="xs:string" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Se valorizzato viene utilizzato come identificativo del messaggio e come trackingId, altrimenti viene creato dal sistema un identificativo univoco.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Text" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Testo SMS: max 160 per unico, max 1000 per concatenato</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="MobileDest" type="xs:string" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation>Numeri telefono in formato italiano (3381234567) o internazionale (+393381234567)</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="DateForSend" type="xs:dateTime" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Data e ora da valorizzare se si vuole l'invio posticipato. Formato xs:dateTime. Esempio: yyyy-MM-ddTHH:mm:ss (2002-05-30T09:00:00)</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SMSReceiver_type">
+                <xs:sequence>
+                    <xs:element name="statusCode" type="xs:integer">
+                        <xs:annotation>
+                            <xs:documentation>Codice ritorno: da 0 a 610</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="statusMessage" type="xs:string" minOccurs="0"/>
+                    <xs:element name="numeroMessaggi" type="xs:integer" minOccurs="0"/>
+                    <xs:element name="msgReceived" type="ns1:MessageInfo_type" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SMSRequest_type">
+                <xs:sequence>
+                    <xs:element name="maxKeys" type="xs:integer" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Numero max elementi richiesti. Max 1000. Se non settato default 200.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="marker" type="xs:integer" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Ultimo msgId della precedente richiesta. Alla prima lettura deve essere 0.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="startDate" type="xs:date" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Data inizio invii. Se inserito è obbligatorio endDate. Solo data, l'ora è 00:00:00.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="endDate" type="xs:date" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Data fine invii. Se inserito è obbligatorio startDate. Solo data, l'ora è 23:59:59.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SMSResult_type">
+                <xs:sequence>
+                    <xs:element name="SMS" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="MsgID" type="xs:string">
+                                    <xs:annotation>
+                                        <xs:documentation>Identificativo messaggio</xs:documentation>
+                                    </xs:annotation>
+                                </xs:element>
+                                <xs:element name="Text" type="xs:string" minOccurs="0">
+                                    <xs:annotation>
+                                        <xs:documentation>Testo del messaggio inviato</xs:documentation>
+                                    </xs:annotation>
+                                </xs:element>
+                                <xs:element name="MobileDest" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:annotation>
+                                        <xs:documentation>Numeri telefono a cui è stato inviato l'SMS</xs:documentation>
+                                    </xs:annotation>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SMS_type">
+                <xs:sequence>
+                    <xs:element name="sender" type="xs:string" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Mittente personalizzato se specificato e il servizio lo consente, altrimenti vuoto o nullo. </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="SMS" type="ns1:SMSMessage_type"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SendStatusResponse_type">
+                <xs:sequence>
+                    <xs:element name="SMSStatus" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="SendStatus" minOccurs="0" maxOccurs="unbounded">
+                                    <xs:complexType>
+                                        <xs:simpleContent>
+                                            <xs:extension base="xs:string">
+                                                <xs:attribute name="recipient" type="xs:string">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Numero telefono</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute>
+                                                <xs:attribute name="sendDate" type="xs:string">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Data invio messaggio</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute>
+                                                <xs:attribute name="status" type="xs:string">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Stato SMS</xs:documentation>
+                                                    </xs:annotation>
+                                                </xs:attribute>
+                                            </xs:extension>
+                                        </xs:simpleContent>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                            <xs:attribute name="id" use="required" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation>Identificativo messaggio</xs:documentation>
+                                </xs:annotation>
+                            </xs:attribute>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="UserInfoType">
+                <xs:sequence>
+                    <xs:element name="UserName" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="numSMS_type">
+                <xs:sequence>
+                    <xs:element name="numeroSMS" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns="http://www.infotn.it/SMS-EAI/InvioSMS_message" xmlns:ns0="http://www.infotn.it/SMS-EAI/InvioSMS_types" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.infotn.it/SMS-EAI/InvioSMS_message" elementFormDefault="qualified" attributeFormDefault="unqualified">
+            <xs:import namespace="http://www.infotn.it/SMS-EAI/InvioSMS_types"/>
+            <xs:element name="InvioSMSFault" type="ns0:InvioSMSFault_type"/>
+            <xs:element name="NumSMSSentMessage" type="ns0:UserInfoType"/>
+            <xs:element name="NumSMSSentResponse" type="ns0:numSMS_type"/>
+            <xs:element name="SMSAvailableMessage" type="ns0:UserInfoType"/>
+            <xs:element name="SMSAvailableResponse" type="ns0:ListBundle_type"/>
+            <xs:element name="SendSMSMessage" type="ns0:SMS_type"/>
+            <xs:element name="SendSMSResponse" type="ns0:SMSResult_type"/>
+            <xs:element name="SentSMSStatusMessage" type="ns0:SMSForStatusRequest_type"/>
+            <xs:element name="SentSMSStatusResponse" type="ns0:SendStatusResponse_type"/>
+            <xs:element name="UserInfo" type="ns0:UserInfoType"/>
+            <xs:element name="getSMSMessage" type="ns0:SMSRequest_type"/>
+            <xs:element name="getSMSResponse" type="ns0:SMSReceiver_type"/>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:service name="SMSService.serviceagent">
+        <wsdl:port name="Endpoint1" binding="tns:Endpoint1Binding">
+            <soap:address location="https://ws-p.sms.intra.infotn.it:18710/SMS/service/v4"/>
+        </wsdl:port>
+        <wsdl:port name="Endpoint2" binding="tns:Endpoint2Binding">
+            <soap:address location="http://ws-p.sms.intra.infotn.it:18711/SMS/service/v4.1"/>
+        </wsdl:port>
+    </wsdl:service>
+    <wsdl:portType name="InvioSMS_port_type">
+        <wsdl:operation name="NumSMSSent">
+            <wsdl:input message="tns:NumSMSSentMessage"/>
+            <wsdl:output message="tns:NumSMSSentResponse"/>
+            <wsdl:fault name="SendSMSFaultMessage" message="tns:SendSMSFaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="SMSAvailable">
+            <wsdl:input message="tns:SMSAvailableMessage"/>
+            <wsdl:output message="tns:SMSAvailableResponse"/>
+            <wsdl:fault name="SendSMSFaultMessage" message="tns:SendSMSFaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="SMSStatus">
+            <wsdl:input message="tns:SentSMSStatusMessage"/>
+            <wsdl:output message="tns:SentSMSStatusResponse"/>
+            <wsdl:fault name="SendSMSFaultMessage" message="tns:SendSMSFaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="SendSMS">
+            <wsdl:input message="tns:SendSMSMessage"/>
+            <wsdl:output message="tns:SendSMSResponse"/>
+            <wsdl:fault name="SendSMSFaultMessage" message="tns:SendSMSFaultMessage"/>
+        </wsdl:operation>
+        <wsdl:operation name="getSMS">
+            <wsdl:input message="tns:getSMSMessage"/>
+            <wsdl:output message="tns:getSMSResponse"/>
+            <wsdl:fault name="SendSMSFaultMessage" message="tns:SendSMSFaultMessage"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="Endpoint1Binding" type="tns:InvioSMS_port_type">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="NumSMSSent">
+            <soap:operation style="document" soapAction="NumSMSSent"/>
+            <wsdl:input>
+                <soap:body use="literal" parts="Request"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" parts="Response"/>
+            </wsdl:output>
+            <wsdl:fault name="SendSMSFaultMessage">
+                <soap:fault use="literal" name="SendSMSFaultMessage"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SMSAvailable">
+            <soap:operation style="document" soapAction="SMSAvailable"/>
+            <wsdl:input>
+                <soap:body use="literal" parts="Request"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" parts="Response"/>
+            </wsdl:output>
+            <wsdl:fault name="SendSMSFaultMessage">
+                <soap:fault use="literal" name="SendSMSFaultMessage"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SMSStatus">
+            <soap:operation style="document" soapAction="SMSStatus"/>
+            <wsdl:input>
+                <soap:body use="literal" parts="Request"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" parts="Response"/>
+            </wsdl:output>
+            <wsdl:fault name="SendSMSFaultMessage">
+                <soap:fault use="literal" name="SendSMSFaultMessage"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SendSMS">
+            <soap:operation style="document" soapAction="SendSMS"/>
+            <wsdl:input>
+                <soap:body use="literal" parts="Request"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" parts="Response"/>
+            </wsdl:output>
+            <wsdl:fault name="SendSMSFaultMessage">
+                <soap:fault use="literal" name="SendSMSFaultMessage"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getSMS">
+            <soap:operation style="document" soapAction="getSMS"/>
+            <wsdl:input>
+                <soap:body use="literal" parts="Request"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" parts="Response"/>
+            </wsdl:output>
+            <wsdl:fault name="SendSMSFaultMessage">
+                <soap:fault use="literal" name="SendSMSFaultMessage"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="Endpoint2Binding" type="tns:InvioSMS_port_type">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="NumSMSSent">
+            <soap:operation style="document" soapAction="NumSMSSent"/>
+            <wsdl:input>
+                <soap:body use="literal" parts="Request"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" parts="Response"/>
+            </wsdl:output>
+            <wsdl:fault name="SendSMSFaultMessage">
+                <soap:fault use="literal" name="SendSMSFaultMessage"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SMSAvailable">
+            <soap:operation style="document" soapAction="SMSAvailable"/>
+            <wsdl:input>
+                <soap:body use="literal" parts="Request"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" parts="Response"/>
+            </wsdl:output>
+            <wsdl:fault name="SendSMSFaultMessage">
+                <soap:fault use="literal" name="SendSMSFaultMessage"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SMSStatus">
+            <soap:operation style="document" soapAction="SMSStatus"/>
+            <wsdl:input>
+                <soap:body use="literal" parts="Request"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" parts="Response"/>
+            </wsdl:output>
+            <wsdl:fault name="SendSMSFaultMessage">
+                <soap:fault use="literal" name="SendSMSFaultMessage"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SendSMS">
+            <soap:operation style="document" soapAction="SendSMS"/>
+            <wsdl:input>
+                <soap:body use="literal" parts="Request"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" parts="Response"/>
+            </wsdl:output>
+            <wsdl:fault name="SendSMSFaultMessage">
+                <soap:fault use="literal" name="SendSMSFaultMessage"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getSMS">
+            <soap:operation style="document" soapAction="getSMS"/>
+            <wsdl:input>
+                <soap:body use="literal" parts="Request"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" parts="Response"/>
+            </wsdl:output>
+            <wsdl:fault name="SendSMSFaultMessage">
+                <soap:fault use="literal" name="SendSMSFaultMessage"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:message name="NumSMSSentMessage">
+        <wsdl:part name="Request" element="ns0:NumSMSSentMessage"/>
+    </wsdl:message>
+    <wsdl:message name="NumSMSSentResponse">
+        <wsdl:part name="Response" element="ns0:NumSMSSentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="SendSMSFaultMessage">
+        <wsdl:part name="Fault" element="ns0:InvioSMSFault"/>
+    </wsdl:message>
+    <wsdl:message name="SMSAvailableMessage">
+        <wsdl:part name="Request" element="ns0:SMSAvailableMessage"/>
+    </wsdl:message>
+    <wsdl:message name="SMSAvailableResponse">
+        <wsdl:part name="Response" element="ns0:SMSAvailableResponse"/>
+    </wsdl:message>
+    <wsdl:message name="SentSMSStatusMessage">
+        <wsdl:part name="Request" element="ns0:SentSMSStatusMessage"/>
+    </wsdl:message>
+    <wsdl:message name="SentSMSStatusResponse">
+        <wsdl:part name="Response" element="ns0:SentSMSStatusResponse"/>
+    </wsdl:message>
+    <wsdl:message name="SendSMSMessage">
+        <wsdl:part name="Request" element="ns0:SendSMSMessage"/>
+    </wsdl:message>
+    <wsdl:message name="SendSMSResponse">
+        <wsdl:part name="Response" element="ns0:SendSMSResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getSMSMessage">
+        <wsdl:part name="Request" element="ns0:getSMSMessage"/>
+    </wsdl:message>
+    <wsdl:message name="getSMSResponse">
+        <wsdl:part name="Response" element="ns0:getSMSResponse"/>
+    </wsdl:message>
+</wsdl:definitions>

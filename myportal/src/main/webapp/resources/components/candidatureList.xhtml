@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+				xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:composite="http://java.sun.com/jsf/composite"
+				xmlns:cc="http://java.sun.com/jsf/composite/components"
+				xmlns:p="http://primefaces.org/ui">
+
+	<composite:interface>
+		<composite:attribute name="list" type="java.util.List" />
+		<composite:attribute name="showCompare" type="boolean" default="true"
+							 shortDescription="Parametro a FALSE solo lato azienda per non visualizzare il confronto CV" />
+		<composite:attribute name="showStatoOccupazionale" type="boolean" default="false"
+							 shortDescription="Parametro che determina se mostrare o no la colonna dello stato occupazionale" />
+		<composite:attribute name="showFlagCresco" type="boolean" default="false"
+							 shortDescription="Parametro che determina se mostrare o no la colonna del flag CRESCO" />
+		<composite:attribute name="showFlagCheckCV" type="boolean" default="false"
+							 shortDescription="Parametro che determina se mostrare o no la colonna del flag CheckCV" />
+		<composite:attribute name="showFlagCheckCVList" type="boolean" default="false"
+							 shortDescription="Parametro che determina se mostrare o no la colonna del flag CheckCV" />
+	</composite:interface>
+
+	<composite:implementation>
+		<div id="#{cc.clientId}">
+			<h:outputText value="Nessuna candidatura inserita"
+						  rendered="#{empty cc.attrs.list}" />
+
+			<h:commandLink  rendered="#{sessionBean.azienda and cc.attrs.showFlagCheckCV }" id="download" styleClass="buttonStyle" value="Download CV" ajax="false">
+				<p:fileDownload value="#{visualizzaVacancyBean.zipCurriculumSelected}"/>
+			</h:commandLink>
+
+			<h:commandLink  rendered="#{sessionBean.azienda and cc.attrs.showFlagCheckCVList}" id="downloadList" styleClass="buttonStyle" value="Download CV" ajax="false">
+				<p:fileDownload value="#{visualizzaListaCandidatureOldVacancyBean.zipCurriculumSelected}"/>
+			</h:commandLink>
+
+			<h:dataTable id="candidature_list" value="#{cc.attrs.list}"
+						 rendered="#{not empty cc.attrs.list}"
+						 columnClasses="#{cc.attrs.showFlagCheckCV ? 'notSortable,' : ''} #{cc.attrs.showFlagCheckCVList ? 'notSortable,' : ''} ,, notSortable, notSortable,notSortable," var="candidatura">
+
+				<h:column rendered="#{sessionBean.azienda and cc.attrs.showFlagCheckCV}">
+					<h:selectBooleanCheckbox value="#{candidatura.flagCVSelected}"  >
+						<p:ajax event="change"  listener="#{visualizzaVacancyBean.updateDownload()}" update=":#{cc.clientId}" />
+					</h:selectBooleanCheckbox>
+				</h:column>
+
+				<h:column rendered="#{sessionBean.azienda and cc.attrs.showFlagCheckCVList}">
+					<h:selectBooleanCheckbox value="#{candidatura.flagCVSelected}"  >
+						<p:ajax event="change"  listener="#{visualizzaListaCandidatureOldVacancyBean.updateDownload()}" update=":#{cc.clientId}" />
+					</h:selectBooleanCheckbox>
+				</h:column>
+
+				<h:column rendered="#{sessionBean.azienda or sessionBean.provincia}">
+					<f:facet name="header">
+						<h:outputText value="Candidato" />
+					</f:facet>
+
+					<h:outputText
+							value="#{candidatura.nomeCandidato} #{candidatura.cognomeCandidato}" />
+				</h:column>
+
+				<h:column rendered="#{cc.attrs.showStatoOccupazionale and utilsBean.regione != 8}">
+						<f:facet name="header">
+							<h:outputText value="S.O." />
+						</f:facet>
+						<h:outputText value="#{candidatura.statoOccupazionale}" escape="false" />
+				</h:column>
+				
+				<h:column rendered="#{cc.attrs.showStatoOccupazionale and utilsBean.regione != 8}">
+					<f:facet name="header">
+						<h:outputText value="INT" />
+					</f:facet>
+					<h:outputText value="#{candidatura.flgIntermittente}" escape="false" />
+				</h:column>
+
+				<h:column rendered="#{sessionBean.utente}">
+					<f:facet name="header">
+						<h:outputText value="Offerta di lavoro" />
+					</f:facet>
+
+					<h:link rendered="#{utilsBean.isStaticRER()}" outcome="#{candidatura.flagIdoVA ? '/secure/azienda/vacancies/view_pf.xhtml' : '/secure/azienda/vacancies/visualizza.xhtml'}"
+							title="Visualizza dettaglio offerta di lavoro">
+						<f:param name="id" value="#{candidatura.idVaDatiVacancy}" />
+						<h:outputText value="#{candidatura.descrizioneVacancy}" />
+					</h:link>
+					
+					<h:link rendered="#{!utilsBean.isStaticRER()}" outcome="/secure/azienda/vacancies/visualizza.xhtml"
+						title="Visualizza dettaglio offerta di lavoro">
+						<f:param name="id" value="#{candidatura.idVaDatiVacancy}" />
+						<h:outputText value="#{candidatura.descrizioneVacancy}" />
+					</h:link>
+					
+				</h:column>
+
+
+
+
+				<h:column rendered="#{cc.attrs.showFlagCresco}">
+					<f:facet name="header">
+						<h:outputText value="Pacchetto CRESCO" />
+					</f:facet>
+					<h:outputText value="#{candidatura.flagCresco ? 'Sì' : 'No'}" />
+				</h:column>
+
+				<h:column rendered="#{sessionBean.utente}">
+					<f:facet name="header">
+						<h:outputText value="Azienda" />
+					</f:facet>
+					<h:link outcome="/secure/azienda/vetrina/view_new.xhtml"
+							rendered="#{candidatura.idVetrina!=null}"
+							title="Visualizza Vetrina Azienda">
+						<f:param name="id" value="#{candidatura.idVetrina}" />
+						<h:outputText value="#{candidatura.ragioneSocialeAz}" />
+					</h:link>
+
+					<h:outputText rendered="#{candidatura.idVetrina == null}"
+								  value="#{candidatura.ragioneSocialeAz}" />
+				</h:column>
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Curriculum" />
+					</f:facet>
+					<h:link  rendered="#{utilsBean.regione == 8}" immediate="true" styleClass="rightMargin"
+					 outcome="#{candidatura.flagIdo ? 'visualizza_curriculumIdo' : 'visualizza_curriculum'}" title="Visualizza curriculum">
+						<h:outputText value="#{candidatura.descrizioneCurriculum}" />
+						<f:param name="id" value="#{candidatura.idCvDatiPersonali}" />
+						<f:param name="idAcCandidatura" value="#{candidatura.id}" />
+						<f:param name="idVaDatiVacancy" value="#{candidatura.idVaDatiVacancy}" />
+					</h:link>
+
+					<h:link rendered="#{utilsBean.regione != 8}" immediate="true" styleClass="rightMargin"
+							outcome="visualizza_curriculum" title="Visualizza curriculum">
+						<h:outputText value="#{candidatura.descrizioneCurriculum}" />
+						<f:param name="id" value="#{candidatura.idCvDatiPersonali}" />
+						<f:param name="idAcCandidatura" value="#{candidatura.id}" />
+						<f:param name="idVaDatiVacancy"
+								 value="#{candidatura.idVaDatiVacancy}" />
+					</h:link>
+
+
+					<h:outputLink id="cvPrintButton" styleClass="buttonStyle allineaDx"
+								  value="" title="Stampa"
+								  onclick="fetchStampa('/#{const['contesto.app']}/secure/rest/services/getCurriculumUtente?curriculumId='+#{candidatura.idCvDatiPersonali});return false;">
+						<span class="ui-icon ui-icon-print fix_icon" />
+					</h:outputLink>
+
+					<h:link  rendered="#{utilsBean.regione != 8 and cc.attrs.showCompare and candidatura.idVaDatiVacancy != null}" styleClass="buttonStyle rightMargin allineaDx"
+							 outcome="/secure/utente/offertelavoro/confronta_requisiti"
+							 title="Confronta" >
+						<f:param name="idCurricula"
+								 value="#{candidatura.idCvDatiPersonali}" />
+						<f:param name="idVacancy" value="#{candidatura.idVaDatiVacancy}" />
+						<span class="ui-icon ui-icon-arrowthick-2-e-w fix_icon" />
+					</h:link>
+				</h:column>
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Lettera di presentazione" />
+					</f:facet>
+
+					<h:link immediate="true" styleClass="rightMargin"
+							outcome="visualizza_lettera"
+							title="Visualizza lettera di presentazione"
+							rendered="#{candidatura.idCvLetteraAcc != null}">
+						<h:outputText value="#{candidatura.nomeLetteraAcc}" />
+						<f:param name="id" value="#{candidatura.idCvLetteraAcc}" />
+					</h:link>
+
+					<h:outputLink id="letteraPrintButton"
+								  styleClass="buttonStyle allineaDx"
+								  rendered="#{candidatura.idCvLetteraAcc != null}"
+								  value="" title="Stampa"
+								  onclick="fetchStampa('/#{const['contesto.app']}/secure/rest/services/getLetteraAccompagnamento?id='+#{candidatura.idCvLetteraAcc});return false;">
+						<span class="ui-icon ui-icon-print fix_icon" />
+					</h:outputLink>
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="File Allegato" />
+					</f:facet>
+
+					<h:outputLink immediate="true" styleClass="buttonStyle allineaDx"
+								  title="#{candidatura.allegatoFileName}"
+								  rendered="#{candidatura.idAcAllegato != null}"
+								  value=""
+								  onclick="fetchStampa('/#{const['contesto.app']}/secure/rest/services/getAllegatoCandidatura?idAcCandidatura='+#{candidatura.idAcAllegato});return false;">
+						<span class="ui-icon ui-icon-print fix_icon" />
+					</h:outputLink>
+
+				</h:column>
+
+				<h:column rendered="#{sessionBean.azienda or sessionBean.provincia}">
+					<f:facet name="header">
+						<h:outputText value="Valutazione" />
+					</f:facet>
+					<h:outputText value="#{candidatura.deIdoneitaCandidaturaDTO.descrizione}" />
+				</h:column>
+
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Data candidatura" />
+					</f:facet>
+					<h:outputText value="#{candidatura.dtmMod}">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="date" />
+					</h:outputText>
+				</h:column>
+			</h:dataTable>
+		</div>
+
+		<script type="text/javascript">
+            $(function() {
+                generateDataTable(jq('#{cc.clientId}:candidature_list'),
+                    {
+                        "aaSorting": [[ 4, "desc" ]],
+                        "aoColumns": [
+                            #{cc.attrs.showFlagCheckCV ? 'null,' : ''}
+                            #{cc.attrs.showFlagCheckCVList ? 'null,' : ''}
+                            #{!utilsBean.isRER() ? 'null,' : ''}
+                            #{!utilsBean.isRER() ? 'null,' : ''}
+                            null,
+                            null,
+                            null,
+                            #{cc.attrs.showStatoOccupazionale ? 'null,' : ''}
+                            #{cc.attrs.showStatoOccupazionale ? 'null,' : ''}
+                            #{cc.attrs.showFlagCresco ? 'null,' : ''}
+                            { 'sType': 'data-ora' }
+                        ],
+                        "bFilter" : true,
+                        "bInfo" : false,
+                        "bLengthChange" : true,
+                        "bPaginate" : false,
+                        "oLanguage": {
+                            "oPaginate" : {
+                                "sNext" : "Prossime",
+                                "sPrevious": "Precedenti"
+                            }
+                        }
+                    });
+
+                $('#dialog_stampa_allegato').dialog({
+                    autoOpen: false,
+                    modal: true
+                });
+
+                disegnaBottoni();
+
+            });
+
+		</script>
+	</composite:implementation>
+</ui:composition>

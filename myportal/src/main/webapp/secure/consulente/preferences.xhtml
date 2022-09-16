@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="/secure/template/main.xhtml">
+
+	<ui:param name="backBean" value="#{consulenteInfoBean}" />
+
+	<ui:define name="title">Profilo</ui:define>
+
+	<ui:define name="custom_js">
+		<h:outputScript library="js" name="jquery.form.js" />
+	</ui:define>
+
+	<ui:define name="content">
+		<div class="widget_container">
+				
+			<div id="visualizza_accordion"
+				class="ui-accordion ui-widget ui-helper-reset ui-accordion-icons">
+
+				<ui:include src="_preferences_dati_personali.xhtml" />
+				<ui:include src="_preferences_opzioni.xhtml" />
+			</div>
+
+			<cc:messages id="preferences_messages" />
+		</div>
+
+		<script type="text/javascript">
+			//<![CDATA[
+			function updateCallback(data) {
+				//alert("updateCallback status = " + data.status);
+				if (data.status == 'success') {
+					disegnaBottoni();
+				}
+			}
+			
+			$(function() {
+				$(".contentCollapse").hide();
+			  
+		  		//toggle the componenet with class msg_body
+		  		$(".headingCollapse").click(function() {				
+					jQuery(this).next(".contentCollapse").slideToggle(500);		
+				});
+	
+		  		$("#dati_personali_titolo").click(function() {
+					return changeCssCollapseDiv("#dati_personali_titolo", "#dati_personali_brake_titolo");
+				});
+	
+		  		$("#opzioni_titolo").click(function() {
+					return changeCssCollapseDiv("#opzioni_titolo", "#opzioni_brake_titolo");
+				});
+
+		  		$("#servizi_titolo").click(function() {
+					return changeCssCollapseDiv("#servizi_titolo", "#servizi_brake_titolo");
+				});
+			  		
+				// FIXME non va, dovrebbe servire a rendere il primo tab gia' aperto
+				$('#visualizza_accordion').accordion( "option", "active", 1 );
+	
+				// disegna i pulsanti
+				disegnaBottoni();
+	
+				selectMasterTab('#preferences_link');				
+
+				var v = $(jq('servizi_amministrativi_form:servizi')).prop('value');
+				if (v == 'true') {
+					$('#servizi_titolo').click();
+				} else {
+					$('#dati_personali_titolo').click();
+				}
+			});
+			//]]> 
+		</script>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+<ui:fragment rendered="#{not (
+empty visVaBean.vaVisualizzaDTO.listaVaContrattoDTO 
+and empty visVaBean.vaVisualizzaDTO.listaVaTurnoDTO 
+and empty visVaBean.vaVisualizzaDTO.listaVaOrarioDTO 
+and empty visVaBean.vaVisualizzaDTO.vaRetribuzioneDTO
+)}" >
+	<h3 id="rapporto_lavoro_titolo" aria-controls="rapporto_lavoro_content"
+		class="headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+		<span id="rapporto_lavoro_brake_titolo"
+			class="ui-icon ui-icon-triangle-1-e"></span> <a href="#">Rapporto
+			di lavoro</a>
+	</h3>
+	<div id="rapporto_lavoro_content"
+		class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+
+		<h:outputLabel for="retribuzione" value="Retribuzione" styleClass=""
+			rendered="#{not empty visVaBean.vaVisualizzaDTO.vaRetribuzioneDTO.descrizione}">
+			<br />
+		</h:outputLabel>
+		<h:panelGroup layout="block">
+			<h:outputText id="turno" styleClass="marginButton"
+				value="#{visVaBean.vaVisualizzaDTO.vaRetribuzioneDTO.descrizione}"
+				rendered="#{not empty visVaBean.vaVisualizzaDTO.vaRetribuzioneDTO.descrizione}" />
+		</h:panelGroup>
+		<br /> <br />
+
+		<h:outputLabel for="tipologieContratto" value="Tipologia di contratto"
+			styleClass=""
+			rendered="#{not empty visVaBean.vaVisualizzaDTO.listaVaContrattoDTO}">
+			<br />
+		</h:outputLabel>
+		<ui:repeat value="#{visVaBean.vaVisualizzaDTO.listaVaContrattoDTO}"
+			var="contratto" varStatus="status">
+			<h:panelGroup layout="block">
+					<h:panelGrid id="tipologieContratto_panel" columns="2" columnClasses="visualizza_left">
+						<h:outputText id="tipologieContratto" styleClass="marginButton" value="#{contratto.descrizione}" />
+						<div tabindex="#{status.index+100}" title="?" onclick="resolveCod('#{contratto.codice}',this);return false;"
+							onkeypress="if(event.keyCode==13) resolveCod('#{contratto.codice}',this);" class="buttonStyle contrattoInfo">?</div>
+					</h:panelGrid>
+				</h:panelGroup>
+		</ui:repeat>
+		<br />
+		<h:outputLabel for="turno" value="Turno" styleClass=""
+			rendered="#{not empty visVaBean.vaVisualizzaDTO.listaVaTurnoDTO}">
+			<br />
+		</h:outputLabel>
+		<ui:repeat value="#{visVaBean.vaVisualizzaDTO.listaVaTurnoDTO}"
+			var="turno" varStatus="status">
+			<h:panelGroup layout="block">
+				<h:panelGrid id="turno_panel" columns="1"
+					columnClasses="visualizza_left">
+					<h:outputText id="turno" styleClass="marginButton"
+						value="#{turno.descrizione}" />
+				</h:panelGrid>
+			</h:panelGroup>
+		</ui:repeat>
+		<br />
+		<h:outputLabel for="orario" value="Orario" styleClass=""
+			rendered="#{not empty visVaBean.vaVisualizzaDTO.listaVaOrarioDTO}">
+			<br />
+		</h:outputLabel>
+		<ui:repeat value="#{visVaBean.vaVisualizzaDTO.listaVaOrarioDTO}"
+			var="orario" varStatus="status">
+			<h:panelGroup layout="block">
+				<h:panelGrid id="turno_panel" columns="1"
+					columnClasses="visualizza_left">
+					<h:outputText id="turno" styleClass="marginButton"
+						value="#{orario.descrizione}" />
+				</h:panelGrid>
+			</h:panelGroup>
+		</ui:repeat>
+	</div>
+		<div id="contrattoInfoDialog" style="display: none;">
+			<div id="contrattoInfoContent" />
+		</div>
+		<script type="text/javascript">
+		
+		function resolveCod(cod,elem) { 
+			json_url="#{request.contextPath}/secure/rest/resolve/contrattiInfo";
+		  
+			$('#contrattoInfoDialog').dialog('close');
+			$.getJSON(json_url, ({term: cod,}),
+					function(data, textStatus, jqXHR) {
+							$('#contrattoInfoDialog').dialog({
+								title: data.titolo,
+								close: function(event, ui){
+									//console.log('$(elem):'+JSON.stringify($(elem).html()));
+									$(elem).focus();
+								 }
+								 });
+							$('#contrattoInfoContent').text(data.descrizione);
+							$('#contrattoInfoDialog').dialog('open');
+							//console.log('data:'+JSON.stringify(data));
+						  });
+		}
+
+			$(function() {
+				disegnaBottoni();
+				$( "#contrattoInfoDialog" ).dialog({
+					autoOpen: false,
+					modal: true
+					});
+			});
+		    </script>
+	</ui:fragment>
+
+</ui:composition>

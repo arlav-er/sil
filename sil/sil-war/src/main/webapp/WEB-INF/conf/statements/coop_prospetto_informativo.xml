@@ -1,0 +1,311 @@
+<STATEMENT name="COOP_INS_PROSPETTO_INFORMATIVO_ST" 
+		   query="
+INSERT INTO CM_PROSPETTO_INF (
+   PRGPROSPETTOINF, PRGAZIENDA, PRGUNITA, 
+   PRGAZREFERENTE, NUMORECCNL, CODPROVINCIA, 
+   CODMONOSTATOPROSPETTO, CODMONOPROV, NUMANNORIFPROSPETTO, 
+   DATCONSEGNAPROSPETTO, DATRIFINFORZA, DATPROSPETTO, 
+   NUMDIPENDENTINAZIONALE, CODMONOCATEGORIA, NUMDIPENDENTITOT, 
+   NUMBASECOMPUTO, NUMQUOTADISABILI, NUMDISABILINOM, 
+   NUMDISABILINUM, NUMQUOTAART18, NUMART18NOM, 
+   NUMART18NUM, DATPRIMAASSUNZIONE, DATSECONDAASSUNZIONE, 
+   NUMDISFORZA, NUMDISFORZARIFNOMI, NUMDISFORZANOMI, 
+   NUMDISFORZARIFNUME, NUMDISFORZANUME, NUMART18FORZA, 
+   NUMART18FORZARIFNOMI, NUMART18FORZANOMI, NUMART18FORZARIFNUME, 
+   NUMART18FORZANUME, FLGESONERO, NUMPERCESONERO, 
+   DATFINEESONERO, FLGESONRICHPROROGA, DATESONRICHPROROGA, 
+   FLGGRADUALITA, DATCONCGRADUALITA, NUMASSGRADUALITA, 
+   NUMQUOTADISGRAD, NUMLAVINFORZAGRAD, FLGCOMPTERRITORIALE, 
+   FLGSOSPENSIONE, DATSOSPENSIONE, NUMCONVENZIONI, 
+   NUMLAVORATORICONV, NUMDISCONVNUME, NUMDISCONVNOMI, 
+   NUMART18CONVNUME, NUMART18CONVNOMI, NUMDISCOMPTERRNOMI, 
+   NUMDISCOMPTERRNUME, NUMART18COMPTERRNOMI, NUMART18COMPTERRNUME, 
+   NUMDISESONNOMI, NUMDISESONNUME, STRNOTE, 
+   CODCOMUNICAZIONE, NUMASSCONVSARE, numdisbattistoni, 
+   numart18battistoni, numbattistoniinforza, flg15dipendenti, 
+   DATCOMPTERRITORIALE, NUMCENTNONVEDENTIOBBLIGO, NUMMASSOFISIOTERAPISTIOBBLIGO,
+   NUMCENTNONVEDENTIFORZA, NUMMASSOFISIOTERAPISTIFORZA,CODCOMUNICAZIONEORIG,
+   CDNUTINS, DTMINS, CDNUTMOD, DTMMOD, FLGSOSPENSIONEMOB, numPercGradualita, 
+   CODMONOSTATOSOSP, CODMONOCAUSALESOSP, numLavoratoriSosp, FLGCAPOGRUPPO, STRCFAZCAPOGRUPPO, FLGCOMPETENZA,
+   NUMBASECOMPUTOART3, NUMBASECOMPUTOART18, NUMBASECOMPUTOART3PROV, NUMBASECOMPUTOART18PROV, FLGCAPOGRUPPOESTERA, DATRIFQ3, DATFINESOSPMBNAZIONALE,
+   NUMTELELAVFT, NUMSOMMFT, NUMCONV12BIS14FT, 
+   FLGESONEROAUTOCERT, DATESONEROAUTOCERT, NUMLAV60XMILLE, NUMPERCESONEROAUTOCERT, NUMLAVESONEROAUTOCERT) 
+VALUES (?, ?, ?, 
+   ?, ?, (select codpro from mn_provincia m where m.COD_PROVINCIA = ?), 
+   ?, ?, ?, 
+   to_date(?, 'yyyy-mm-dd hh24:mi:ss'), to_date(?, 'yyyy-mm-dd'), to_date(?, 'yyyy-mm-dd'), 
+   ?, ?, ?, 
+   ?, ?, ?, 
+   ?, ?, ?, 
+   ?, to_date(?, 'yyyy-mm-dd'), to_date(?, 'yyyy-mm-dd'), 
+   ?, ?, ?, 
+   ?, ?, ?, 
+   ?, ?, ?, 
+   ?, ?, ?, 
+   to_date(?, 'yyyy-mm-dd'), ?, to_date(?, 'yyyy-mm-dd'), 
+   ?, to_date(?, 'yyyy-mm-dd'), ?, 
+   ?, ?, ?, 
+   ?, to_date(?, 'yyyy-mm-dd'), ?, 
+   ?, ?, ?, 
+   ?, ?, ?, 
+   ?, ?, ?, 
+   ?, ?, ?, 
+   ?, ?, ?, 
+   ?, ?, ?, 
+   to_date(?, 'yyyy-mm-dd'), ?, ?, 
+   ?, ?, ?,
+   ?, sysdate, ?, sysdate, ?, ?, 
+   ?, ?, ?, ?, ?, ?,
+   ?, ?, ?, ?, ?, to_date(?, 'yyyy-mm-dd'),to_date(?, 'yyyy-mm-dd'),
+   ?, ?, ?,
+   ?, to_date(?, 'yyyy-mm-dd'), ?, to_number(?,'9999999.999'), ?)
+"
+/>
+
+<STATEMENT name="COOP_PROSPETTO_RICERCA_LAVORATORE" 
+		   query="
+select cdnlavoratore from an_lavoratore where strCodiceFiscale = upper(?)
+"/>
+<STATEMENT name="COOP_INSERT_POSTI_PROSP" 
+		   query=" INSERT INTO CM_PI_MANSIONE_DISP
+			              (PRGMANSIONIDISP,
+			              PRGPROSPETTOINF,			              
+			              NUMPOSTI,			              
+			              CODMONOCATEGORIA,			              
+			              CODMANSIONE,			              
+			              STRNOTE,
+			              CDNUTINS,
+			          	  DTMINS,
+			          	  CDNUTMOD,
+			          	  DTMMOD,
+			          	  CODCOMDISP,
+			          	  CODMONOTIPO,
+			          	  flgmezzipubblici, flgturninotturni, flgbarriere, strdescrcompiti, strcapacita
+			          	  ) 
+			          	  VALUES 
+			          	  (s_cm_pi_mansione_disp.nextval,
+			          	  ?, to_number(?),?,?,?,
+			          	  ?,sysdate,?,sysdate, ?, ?, ?, ?, ?, ?, ?) " />	
+			          	  
+<STATEMENT name="COOP_INSERT_COMPENSAZIONE_PROSP" 
+		   query=" INSERT INTO CM_PI_COMPENSAZIONE
+			              (PRGCOMPENSAZ,
+			              PRGPROSPETTOINF,			              
+			              CODPROVINCIA,
+			              CODMONOECCDIFF,
+			              CODMONOCATEGORIA,
+			              NUMINTERESSATI,
+			              STRSEDE,
+			              STRCFAZCAPOGRUPPO
+			          	  ) 
+			          	  VALUES 
+			          	  (s_cm_pi_compensazione.nextval,
+			          	  ?,(select codpro from mn_provincia m where m.COD_PROVINCIA = ?),?,?,to_number(?), ?, ?) " />		
+
+<STATEMENT name="COOP_INSERT_LAV_L68_PROSP" 
+		   query=" INSERT INTO CM_PI_LAV_RISERVA
+			              (PRGLAVRISERVA,
+			              PRGPROSPETTOINF,
+			              CDNLAVORATORE,
+			              STRCODICEFISCALELAV,
+			              STRNOMELAV,
+			              STRCOGNOMELAV,
+			              DECORELAVORATE,
+			              DECORETOTALI,
+			              FLGCONVENZIONE,
+			              DATINIZIORAPP,
+			              DATFINERAPP,
+			              CODMONOCATEGORIA,
+			              CODMONOTIPO,
+			              CODMANSIONE,
+			              CODCONTRATTO,
+			              STRNOTE,
+			              DECCOPERTURA,
+			              flgbattistoni,
+			              NUMPERCDISABILITA, CODASSPROTETTA,
+			              CDNUTINS,
+			          	  DTMINS,
+			          	  CDNUTMOD,
+			          	  DTMMOD
+			          	  ) 
+			          	  VALUES 
+			          	  (s_cm_pi_lav_riserva.nextval,
+			          	  ?,?,
+			          	  upper(?),upper(?),upper(?),
+			          	  to_number(?, '9999999.999'),to_number(?, '9999999.999'),?,   
+			          	  to_date(?, 'yyyy-mm-dd'), to_date(?, 'yyyy-mm-dd'),
+			          	  ?,?,?,?,?,to_number(?, '9999999.999'),?,to_number(?),?,
+			          	  ?,sysdate,?,sysdate) "
+/>
+<STATEMENT name="COOP_INSERT_REFERENZA"
+           query="insert into an_az_referente
+                      (  PRGAZREFERENTE, 
+                         PRGAZIENDA, 
+                         PRGUNITA, 
+                         STRCOGNOME, 
+                         STRNOME, 
+                         CODRUOLOAZ, 
+                         STRTELEFONO, 
+                         STRFAX, 
+                         STREMAIL, 
+                         CDNUTINS, 
+                         DTMINS, 
+                         CDNUTMOD, 
+                         DTMMOD) 
+                      values 
+                      (  ?,
+                          ?, ?, ?, ?,
+                          ?, ?, ?, ?,
+                       ?, sysdate,
+                       ?, sysdate
+                       )"
+/>
+<STATEMENT name="COOP_GET_AN_AZ_REFERENTE"
+           query="SELECT 
+	                  PRGAZREFERENTE, 
+	                  STRTELEFONO, 
+	                  STRFAX, 
+	                  STREMAIL
+	              FROM 
+	                 AN_AZ_REFERENTE
+	              WHERE 
+		              PRGAZIENDA=? and PRGUNITA=? and upper(STRCOGNOME) = upper(?) and upper(STRNOME) = upper(?)
+		              and CODRUOLOAZ = ?
+	              "
+/>
+<STATEMENT name="COOP_UPD_AN_AZ_REFERENTE"
+           query="update an_az_referente 
+           			set strTelefono  = nvl(?, strTelefono), 
+           			strFax=nvl(?, strFax), 
+           			strEmail = nvl(?, strEmail) 
+ 				  where prgAzReferente = ?"/>
+<STATEMENT name="COOP_GET_UNITA_STESSO_COMUNE"
+           query="
+SELECT ua.PRGUNITA, decode(inf.PRGPROSPETTOINF, null, 'N', 'S') as con_prospetto, ua.CODCOM
+  FROM AN_UNITA_AZIENDA ua, cm_prospetto_inf inf
+ WHERE ua.PRGAZIENDA = ? AND UPPER(ua.CODCOM) = UPPER(?) and 
+  	   ua.PRGUNITA = inf.PRGUNITA (+) AND
+	   ua.PRGAZIENDA = inf.PRGAZIENDA(+)
+	   order by 2 desc, 1 asc
+"
+/>
+
+<STATEMENT name="COOP_GET_UNITA_AZIENDA_STESSO_COMUNE"
+           query="
+SELECT ua.PRGUNITA, ua.CODCOM, ua.numklounitaazienda, nvl(ua.flgSede, 'N') flgSede
+  FROM AN_UNITA_AZIENDA ua
+ WHERE ua.PRGAZIENDA = ? AND UPPER(ua.CODCOM) = UPPER(?)
+  	   order by ua.dtmins asc
+"
+/>
+
+<STATEMENT name="COOP_GET_UNITA_AZIENDA_STESSA_PROVINCIA"
+           query="
+SELECT ua.PRGUNITA, ua.CODCOM, com.codProvincia, ua.numklounitaazienda, nvl(ua.flgSede, 'N') flgSede
+  FROM AN_UNITA_AZIENDA ua
+  inner join de_comune com on (ua.CODCOM = com.CODCOM)
+ WHERE ua.PRGAZIENDA = ? AND com.CODPROVINCIA = (
+ 		select m.codprovincia FROM de_comune m where m.codcom = ?
+ 		)
+  	   order by ua.dtmins asc
+"
+/>
+
+<STATEMENT name="COOP_GET_INFO_UNITA_AZIENDA_INSERITA"
+           query="
+SELECT ua.numklounitaazienda
+  FROM AN_UNITA_AZIENDA ua
+ WHERE ua.PRGAZIENDA = ? AND ua.PRGUNITA = ?
+"
+/>
+
+<STATEMENT name="COOP_INSERT_ASSUNZ_PB_SELEZIONE" 
+		   query=" INSERT INTO CM_ASSUNZ_PB_SELEZIONE
+			              (PRGASSPUBSELEZIONE,
+			              PRGPROSPETTOINF,
+			              CODREGIONE,
+			              NUMSALDODISABILI,
+			              NUMSALDOEXART18,
+			              STRNOTE,
+			              CDNUTINS,
+			          	  DTMINS,
+			          	  CDNUTMOD,
+			          	  DTMMOD
+			          	  ) 
+			          	  VALUES 
+			          	  (s_cm_assunz_pb_selezione.nextval,
+			          	  ?, (select codregione from de_regione where codmin = ?),
+			          	  to_number(?), to_number(?), ?,
+			          	  ?,sysdate,?,sysdate) "
+/>
+
+<STATEMENT name="COOP_INSERT_INTERMITTENTI_PROS" 
+		   query=" INSERT INTO CM_INTERMITTENTI_PROSPETTO
+			              (PRGINTERMITTENTI,
+			              PRGPROSPETTOINF,
+			              NUMLAVORATORI,
+			              DECORESETTCONTRATTO,
+			              DECORESETTLAVORATE,
+			              CDNUTINS,
+			          	  DTMINS,
+			          	  CDNUTMOD,
+			          	  DTMMOD
+			          	  ) 
+			          	  VALUES 
+			          	  (s_cm_intermittenti_prospetto.nextval,
+			          	  ?,  to_number(?), to_number(?, '9999999.999'),
+			          	  to_number(?, '9999999.999'),
+			          	  ?,sysdate,?,sysdate) "
+/>
+
+
+<STATEMENT name="COOP_INSERT_PARTIME_PROS" 
+		   query=" INSERT INTO CM_PARTTIME_PROSPETTO
+			              (PRGPARTTIMEPROSPETTO,
+			              PRGPROSPETTOINF,
+			              NUMLAVORATORI,
+			              DECORETOTALI,
+			              DECORELAVORATE
+			          	  ) 
+			          	  VALUES 
+			          	  (s_cm_parttime_prospetto.nextval,
+			          	  ?,  to_number(?), to_number(?, '9999999.999'),
+			          	  to_number(?, '9999999.999')) "
+/>
+
+
+<STATEMENT name="GET_COMPETENZA_PROSPETTO"
+           query="select ts_generale.codprovinciasil codProvinciaSil, nvl(ts_generale.flgpoloreg, 'N') flgpoloreg
+           		  from ts_generale
+           		  where (nvl(ts_generale.flgpoloreg, 'N') = 'N' and 
+           		  		 ts_generale.codprovinciasil = (select m.codpro FROM mn_provincia m where m.cod_provincia = ?)) or
+           		  		(nvl(ts_generale.flgpoloreg, 'N') = 'S' and 
+           		  		 ts_generale.codregionesil = (select de_provincia.codregione FROM de_provincia where codmin = ?))" />
+           		  	
+           		  	
+<STATEMENT name="COOP_UPD_PEC_EMAIL"
+           query=" 
+	
+	UPDATE an_unita_azienda
+	   SET STRPECEMAIL = ?,
+	   		CDNUTMOD = ?,
+	   		DTMMOD = SYSDATE,
+	   		NUMKLOUNITAAZIENDA = ? + 1
+	WHERE PRGAZIENDA = ? 
+	  AND PRGUNITA = ?  
+	
+"/>
+
+<STATEMENT name="COOP_INSERT_PI_DETT_PT_DISABILI" 
+		   query=" INSERT INTO PI_DETT_PT_DISABILE
+			              (PRGDETTPTDISABILE,
+			              PRGPROSPETTOINF, NUMLAVORATORI,
+			              DECORARIOSETTCONTRATTUALE, DECORARIOSETTSVOLTO,
+			              CODTIPOPTDISABILE, FLGOLTRE50, DECCOPERTURA
+			          	  ) 
+			          	  VALUES 
+			          	  (S_PI_DETT_PT_DISABILE.NEXTVAL,
+			          	  ?, ?,
+			          	  to_number(?, '9999999.999'), to_number(?, '9999999.999'),
+			          	  ?, ?, to_number(?, '9999999.999')) "
+/>

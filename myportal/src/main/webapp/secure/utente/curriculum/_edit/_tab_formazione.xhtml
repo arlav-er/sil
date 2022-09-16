@@ -1,0 +1,199 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/tab.xhtml">
+
+	<ui:param name="tabBean" value="#{cvFormazioneBean}" />
+	<ui:param name="form_id" value="formazione" />
+	<ui:param name="deleteId" value="#{tabBean.data.id}"></ui:param>
+
+	<ui:define name="tabcontent">
+
+		<div style="width: 20px; position: relative; left: 98%;">
+			<cc:infoSectionPanel target_id="formazione_info_panel"
+				message="#{tabBean.info.testo}" />
+		</div>
+
+		<h:form id="#{form_id}">
+			<script type="text/javascript">			
+				checkSwitch('#{tabBean.switchtab}');		 		
+			</script>
+
+			<h:inputHidden id="tabClick" value="#{tabBean.tabClick}">
+				<f:converter converterId="booleanConverter" />
+			</h:inputHidden>
+
+			<h:panelGroup id="formazione_list" layout="block">
+				<h:outputText value="Nessun elemento inserito"
+					rendered="#{empty tabBean.list}"></h:outputText>
+				<h:dataTable id="table" rendered="#{not empty tabBean.list}"
+					columnClasses=",customcenter,customcenter notSortable"
+					value="#{tabBean.list}" var="element">
+					<h:column>
+						<f:facet name="header">
+							Corso
+						</f:facet>
+						<h:outputText value="#{element.titoloCorso}" />
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">
+							Anno
+						</f:facet>
+						<h:outputText value="#{element.anno}" />
+					</h:column>
+
+					<h:column>
+						<h:commandLink styleClass="buttonStyle" immediate="true"
+							action="#{tabBean.edit}">
+							<span class="ui-icon ui-icon-pencil fix_icon" />
+							<f:param name="id" value="#{element.id}" />
+							<f:ajax execute="@this" render="@form"
+								onevent="showPanelCallback" />
+						</h:commandLink>
+						<h:commandLink styleClass="buttonStyle" title="Rimuovi"
+							onclick="return document.getElementById('delete_form').open({id: #{element.id}},this);">
+							<span class="ui-icon ui-icon-trash fix_icon" />
+						</h:commandLink>
+					</h:column>
+
+				</h:dataTable>
+				<br />
+				<h:commandLink value="Inserisci nuovo corso" id="insertButton"
+					rendered="#{not tabBean.showPanel}" styleClass="insertButton"
+					action="#{tabBean.showInsertPanel}">
+					<f:ajax execute="@this" render="@form" onevent="showPanelCallback" />
+				</h:commandLink>
+			</h:panelGroup>
+
+			<h:panelGroup id="istrPanel" styleClass="insertPanel" layout="block"
+				rendered="#{tabBean.showPanel}">
+				<h:messages globalOnly="true" />
+
+				<h:panelGroup id="insert_form" style="display: none">
+					<h:panelGrid columns="1" cellspacing="10">
+						<cc:inputText id="titolo_corso" required="true"
+							label="Titolo Corso" maxlength="250" size="100"
+							value="#{tabBean.data.titoloCorso}">
+							<f:validateLength for="function" maximum="250" />
+						</cc:inputText>
+						
+						<h:panelGroup>
+							<cc:inputText id="descrizione" required="false" label="Descrizione"
+								maxlength="255" value="#{tabBean.data.descrizione}"
+								rendered="#{curriculumVitaeBean.usaDecodificheSil()}">
+								<f:validateLength for="function" maximum="255" />
+							</cc:inputText>
+						</h:panelGroup>
+	
+						<cc:inputTextarea id="tematiche_principali" required="false"
+							maxlength="250" label="Tematiche Principali" richTextMode="false"
+							value="#{tabBean.data.principaliTematiche}">
+							<f:validateLength for="function" maximum="250" />
+						</cc:inputTextarea>
+					</h:panelGrid>
+	
+					<h:panelGrid columns="2" cellspacing="10">
+						<cc:inputText id="nome_istituto" required="false"
+							label="Istituto" maxlength="250"
+							value="#{tabBean.data.nomeIstituto}">
+							<f:validateLength for="function" maximum="250" />
+						</cc:inputText>
+						
+						<h:panelGroup>
+							<cc:inputSuggestion id="sede_istituto" label="Sede istituto"
+								rendered="#{curriculumVitaeBean.usaDecodificheSil()}"
+								erroreSotto="true" valueCod="#{tabBean.data.deComuneEnte.id}"
+								value="#{tabBean.data.deComuneEnte.descrizione}"
+								requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+								suggestionPath="comuni">
+								<f:validator validatorId="comuneSuggestionValidator" for="function" />
+							</cc:inputSuggestion>
+						</h:panelGroup>
+	
+						<cc:inputText id="durata" required="false" label="Durata"
+							maxlength="20" value="#{tabBean.data.durata}">
+							<f:validateLength for="function" maximum="20" />
+						</cc:inputText>
+						
+						<h:panelGroup>
+							<cc:inputSuggestion id="ambito_disciplinare" label="Ambito disciplinare"
+								rendered="#{curriculumVitaeBean.usaDecodificheSil()}"
+								erroreSotto="true" valueCod="#{tabBean.data.deAmbitoDisciplinare.id}"
+								value="#{tabBean.data.deAmbitoDisciplinare.descrizione}"
+								requiredMessageCod="E' necessario scegliere un ambito dalla lista a tendina"
+								suggestionPath="deAmbitoDisciplinare">
+								<f:validator validatorId="deAmbitoDisciplinareSuggestionValidator" for="function" />
+							</cc:inputSuggestion>
+						</h:panelGroup>
+	
+						<cc:inputText id="livello_classificazione" required="false"
+							maxlength="100" label="Livello Classificazione"
+							value="#{tabBean.data.livelloClassificazione}">
+							<f:validateLength for="function" maximum="100" />
+						</cc:inputText>
+						
+						<h:panelGroup>
+							<cc:selectOneMenu id="tipo_corso" label="Tipo corso"
+								rendered="#{curriculumVitaeBean.usaDecodificheSil()}"
+								value="#{tabBean.data.deTipoCorso.id}"
+								disabled="#{not tabBean.editing}" required="false"
+								title="Tipo corso">
+								<f:selectItem itemLabel="Non specificato" itemValue="-" />
+								<f:selectItems value="#{tabBean.tipoCorsoOptions}" />
+							</cc:selectOneMenu>
+						</h:panelGroup>
+	
+						<cc:inputText id="anno_conseguimento" label="Anno conseguimento"
+							converterMessage="Anno non valido" maxlength="4" size="4"
+							value="#{tabBean.data.anno}">
+							<f:validator validatorId="annoPassatoValidator" for="function" />
+							<f:validateLength for="function" maximum="4" />
+						</cc:inputText>
+						
+						<h:panelGroup>
+							<cc:selectOneRadio id="flg_completato" rendered="#{curriculumVitaeBean.usaDecodificheSil()}"
+								value="#{tabBean.data.flgCompletato}" label="Completato">
+								<f:selectItem itemLabel="Sì" itemValue="#{true}" />
+								<f:selectItem itemLabel="No" itemValue="#{false}" />
+							</cc:selectOneRadio>
+						</h:panelGroup>
+					</h:panelGrid>
+				</h:panelGroup>
+
+				<ui:include src="../../../_buttons.xhtml" />
+			</h:panelGroup>
+
+			<script type="text/javascript">	
+				$(function() {
+					generateDataTable('##{form_id}\\:table');
+					
+					disegnaBottoni();
+
+					attachListener();		
+				});
+
+				var openDelete = function(params) {
+					var itemId = params.id;
+					$('[id$="delete_form\:modal_form\:objectId"]').val(itemId);
+				};	
+			</script>
+			<cc:messages />
+		</h:form>
+
+		<br />
+		<div id="formazione_info_panel" class="helpPanelMessage" />
+
+		<cc:modalDialog id="delete_form" title="Elimina il corso di studio"
+			openF="openDelete"
+			message="Sei sicuro di voler eliminare il corso di studio?"
+			actionSubmit="#{cvFormazioneBean.delete}" submitLabel="Elimina"
+			renderAjax=":formazione" eventAjax="refreshNumVacancyCompatibili">
+			<h:inputHidden id="objectId"></h:inputHidden>
+			<h:outputText value="#{cc.attrs.message}"></h:outputText>
+		</cc:modalDialog>
+
+	</ui:define>
+</ui:composition>

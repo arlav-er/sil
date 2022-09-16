@@ -1,0 +1,222 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<div
+		class="company-card #{not vacancyViewBean.vacancy.flgCandidatura or empty vacancyViewBean.vaContatto.mail?'hidden-sm hidden-xs':''}">
+		<div class="company-card-image hidden-sm hidden-xs">
+			<h:link	outcome="/secure/azienda/vetrina/view_new.xhtml" title="Visualizza vetrina"
+				rendered="#{not empty vacancyViewBean.getIdSvAziendaInfo() and not empty vacancyViewBean.aziendaRichiedente}">
+				<f:param name="id" value="#{vacancyViewBean.getIdSvAziendaInfo()}" />
+				<span>#{vacancyViewBean.aziendaRichiedente}</span>
+			</h:link>
+			<ui:fragment rendered="#{empty vacancyViewBean.getIdSvAziendaInfo()}">
+				<span>#{vacancyViewBean.aziendaRichiedente}</span>
+			</ui:fragment>
+            <ui:remove> 
+			<ui:fragment
+				rendered="#{vacancyViewBean.vacancy.isFromMyPortal() or vacancyViewBean.vacancy.isFromSIL()}">
+				<h:graphicImage id="foto"
+					rendered="#{not empty vacancyViewBean.vacancy.pfPrincipal and not empty vacancyViewBean.vacancy.pfPrincipal.idPfPrincipal}"
+					value="/secure/rest/getFoto?type=#{const['img.Type.Logo']}&amp;id=#{vacancyViewBean.vacancy.pfPrincipal.idPfPrincipal}&amp;size=normal"
+					alt="Nessun logo">
+				</h:graphicImage>
+			</ui:fragment>
+			</ui:remove>
+		</div>
+
+		<div class="company-card-data">
+			<div class="hidden-sm hidden-xs">
+				<ui:fragment
+					rendered="#{not empty vacancyViewBean.getAziendaRichiedentePaleseDFD()}">
+					<dl>
+						<dt>
+							<i class="fa fa-suitcase m-r-5" aria-hidden="true"></i> Azienda richiedente
+						</dt>
+						<dd>#{vacancyViewBean.getAziendaRichiedentePaleseDFD()}</dd>
+					</dl>
+				</ui:fragment>
+				<ui:fragment
+					rendered="#{not empty vacancyViewBean.vaContatto.cognomeRiferimentoPub and not empty vacancyViewBean.vaContatto.nomeRiferimentoPub}">
+					<dl>
+						<dt>
+							<i class="fa fa-user m-r-5" aria-hidden="true"></i> Rif.
+						</dt>
+						<dd>#{vacancyViewBean.vaContatto.cognomeRiferimentoPub}
+							#{vacancyViewBean.vaContatto.nomeRiferimentoPub}</dd>
+					</dl>
+				</ui:fragment>
+				<ui:fragment
+					rendered="#{not empty vacancyViewBean.vaContatto.telRiferimentoPub}">
+					<dl>
+						<dt>
+							<i class="fa fa-phone-square m-r-5" aria-hidden="true"></i> Tel
+						</dt>
+						<dd>#{vacancyViewBean.vaContatto.telRiferimentoPub}</dd>
+					</dl>
+				</ui:fragment>
+				<ui:fragment
+					rendered="#{not empty vacancyViewBean.vaContatto.faxRiferimentoPub}">
+					<dl>
+						<dt>
+							<i class="fa fa-fax m-r-5" aria-hidden="true"></i> Fax
+						</dt>
+						<dd>#{vacancyViewBean.vaContatto.faxRiferimentoPub}</dd>
+					</dl>
+				</ui:fragment>
+				<ui:fragment rendered="#{not empty vacancyViewBean.vaContatto.mail}">
+					<dl>
+						<dt>
+							<i class="fa fa-envelope m-r-5" aria-hidden="true"></i> Email
+						</dt>
+						<dd>#{vacancyViewBean.vaContatto.mail}</dd>
+					</dl>
+				</ui:fragment>
+				<ui:fragment rendered="#{sessionBean.isAzienda() or sessionBean.isProvincia()}">
+					<h:panelGroup id="statoAnnuncioGroup">
+						<div class="info-item">
+							<span class="info-label">Stato annuncio:</span>
+							<a class="buttonStyle" href="#statoAnnuncio"
+								title="Vai a stato annuncio">					
+				              #{vacancyViewBean.vacancy.codStatoVacancyEnum.descrizione}
+							</a>
+						</div>
+					</h:panelGroup>
+				</ui:fragment>
+				
+				<div class="info-item">
+				  <h:form id="form_numTotCand">
+					<span class="info-label">Totale candidature ricevute:</span> 					
+				    <ui:fragment rendered="#{!sessionBean.utente and vacancyViewBean.getNumTotalCandidatureCalc() > 0 and vacancyViewBean.checkOwner()}">
+						<h:link styleClass="buttonStyle yellowButton " outcome="/secure/azienda/candidature/list/main.xhtml"
+							title="Visualizza le candidature">
+							<f:param name="id" value="#{vacancyViewBean.vacancy.idVaDatiVacancy}" />									
+			              #{vacancyViewBean.getNumCandidatureCalc()}
+						</h:link>
+				  </ui:fragment>
+					  <ui:fragment rendered="#{!sessionBean.utente and vacancyViewBean.getNumTotalCandidatureCalc() > 0 and vacancyViewBean.checkOwner() == false}">
+							  #{vacancyViewBean.getNumCandidatureCalc()}
+					  </ui:fragment>
+				  <ui:fragment rendered="#{sessionBean.utente or (!sessionBean.utente and vacancyViewBean.getNumTotalCandidatureCalc() == 0)}">													
+			              #{vacancyViewBean.getNumCandidatureCalc()}
+				  </ui:fragment>
+				  
+				  </h:form> 
+				</div>
+				
+				<ui:fragment rendered="#{!sessionBean.isUtente() and vacancyViewBean.vacancy.flagNoDiscriminazione == true}">
+					<div class="info-item">
+						<p:outputLabel styleClass="info-label" value="Accettazione condizioni di servizio:">
+							<i class="fa fa-check" style="color:#5aad00;"></i>
+							<i class="m-l-10 fa fa-info-circle info-circle"
+								title="L’Azienda si impegna a:
+		                               · assicurare la coerenza tra le caratteristiche della richiesta di personale definite e dichiarate e quanto richiesto e proposto al candidato selezionato;
+									   · non comunicare ad aziende terze o ad altri soggetti intermediari i nominativi dei candidati raccolti tramite il portale nel rispetto del Regolamento Europeo n. 679/2016;
+		                               · rispettare i principi costituzionali di non discriminazione e quelli previsti dall’art. 10 del D. Lgs. n. 276/2003 sia nel testo della pubblicazione, sia nel contatto coi candidati."
+								data-toggle="tooltip" data-placement="top" data-container="body"></i>
+						</p:outputLabel>
+					</div>
+					<script>$('.info-circle[data-toggle="tooltip"]').tooltip()</script>
+				</ui:fragment>
+			</div>
+			<ui:fragment rendered="#{not vacancyViewBean.isExpiredVacancy()}">
+				<h:form id="form_pulsanti">
+					<h:panelGroup id="gruppoPulsanti">
+						<div class="text-center m-t-20 m-b-10">
+
+							<h:outputText
+								value="Sei già candidato a questa offerta di lavoro."
+								title="Sei già candidato a questa offerta di lavoro"
+								rendered="#{vacancyViewBean.hasCandidatura and sessionBean.utente}" /><br />
+							<h:outputText
+								value="Candidatura n°  #{vacancyViewBean.numCandidature}" 
+								title="Candidatura n°  #{vacancyViewBean.numCandidature}"
+								rendered="#{vacancyViewBean.hasCandidatura and sessionBean.utente}" />
+							<h:outputText
+								value=" di #{vacancyViewBean.getNumTotalCandidatureCalc()}" 
+								title=" di #{vacancyViewBean.getNumTotalCandidatureCalc()}"
+								rendered="#{vacancyViewBean.hasCandidatura and sessionBean.utente}" />
+
+							<ui:fragment
+								rendered="#{(not vacancyViewBean.hasCandidatura) and (sessionBean.utente) and (vacancyViewBean.isCandidaturaEnabled())}">
+								<ui:fragment
+									rendered="#{not vacancyViewBean.vacancy.fromClicLavoro}">									
+									<p:commandLink
+										rendered="#{not empty vacancyViewBean.myCurricula and vacancyViewBean.vacancy.isPubblicata()}"
+										styleClass="btn btn-primary btn-search m-r-70 text-center"
+										onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+										oncomplete="MyPortal.disableLoadingButton(this);$('#confermaCandidaturaView-modal').modal('show')" process="@this"
+										title="Candidati per quest'offerta di lavoro"
+										update="@(.ui-message)">
+												  Invia Candidatura
+						             </p:commandLink>
+									 <p:commandLink styleClass="btn btn-primary btn-search m-r-70 text-center"
+											rendered="#{empty  vacancyViewBean.myCurricula and vacancyViewBean.vacancy.isPubblicata()}"
+											value="Invia Candidatura" title="Invia Candidatura"
+											onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+										    oncomplete="MyPortal.disableLoadingButton(this);$('#noConfermaCandidaturaViewMyPortal-modal').modal('show')" process="@this"										
+										    update="@(.ui-message)">
+									</p:commandLink>								
+								</ui:fragment>
+							
+									<ui:fragment
+										rendered="#{vacancyViewBean.vacancy.fromClicLavoro}">
+										<p:commandLink
+										rendered="#{not empty vacancyViewBean.myClicLavoroCurricula and vacancyViewBean.vacancy.isPubblicata()}"
+										styleClass="btn btn-primary btn-search m-r-70 text-center"
+										onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+										oncomplete="MyPortal.VacancyView.onInviaCandidaturaVacancy();" process="@this"
+										title="Candidati per quest'offerta di lavoro"
+										update="@(.ui-message)">
+												  Invia Candidatura
+						             </p:commandLink>
+									 <p:commandLink styleClass="btn btn-primary btn-search m-r-70 text-center"
+											rendered="#{empty vacancyViewBean.myClicLavoroCurricula and vacancyViewBean.vacancy.isPubblicata()}"
+											value="Invia Candidatura" title="Invia Candidatura"
+											onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+											oncomplete="MyPortal.disableLoadingButton(this);$('#noConfermaCandidaturaView-modal').modal('show')" process="@this">
+									</p:commandLink>
+									</ui:fragment>								
+							</ui:fragment>
+							<ui:fragment rendered="#{utils.isTrento()}">
+								<ui:fragment
+									rendered="#{vacancyViewBean.renderContattaDatoreLav()}">
+									<p:commandLink onclick="$('#contatta-modal').modal('show')"
+										styleClass="btn btn-primary btn-search m-r-5 text-center">
+                                Invia la tua candidatura
+                            </p:commandLink>
+								</ui:fragment>
+							</ui:fragment>
+							<ui:fragment rendered="#{utils.isUmbria()}">
+								<ui:fragment
+									rendered="#{not vacancyViewBean.vacancy.cresco and (vacancyViewBean.vacancy.provenienza == 'SILPG' or vacancyViewBean.vacancy.provenienza == 'SILTR')}">
+									<a
+										href="#{utils.getVacancyURL(vacancyViewBean.vacancy.idVaDatiVacancy)}"
+										class="btn btn-primary btn-search m-r-70 text-center ui-command-link silpg-cresco">Candidati</a>
+								</ui:fragment>
+								<ui:fragment rendered="#{vacancyViewBean.vacancy.cresco}">
+									<a href="#" onclick="MyPortal.VacancyView.candidatiWarning();"
+										class="btn btn-primary btn-search m-r-70 text-center ui-command-link silpg-cresco">Candidati</a>
+								</ui:fragment>
+								<ui:fragment
+									rendered="#{not vacancyViewBean.vacancy.cresco and vacancyViewBean.vacancy.provenienza != 'SILPG' and vacancyViewBean.vacancy.provenienza != 'SILTR'}">
+									<ui:fragment
+										rendered="#{not empty vacancyViewBean.vaContatto.mail}">
+										<p:commandLink onclick="$('#contatta-modal').modal('show')"
+											styleClass="btn btn-primary btn-search m-r-70 text-center">
+                                    Candidati
+                                </p:commandLink>
+									</ui:fragment>
+								</ui:fragment>
+							</ui:fragment>
+						</div>
+					</h:panelGroup>
+				</h:form>
+			</ui:fragment>
+		</div>
+	</div>
+
+</ui:composition>
+

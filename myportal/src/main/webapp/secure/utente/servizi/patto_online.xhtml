@@ -1,0 +1,364 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" template="/WEB-INF/templates/#{utilsBean.bootstrapTemplate}/main.xhtml">
+	<ui:param name="pagetitle" value="Patti Stipulati" />
+
+	<ui:define name="content">
+		<h:outputScript library="commons" name="js/utente/pattoOnline/pattoOnline.js"></h:outputScript>
+		<div class="container">
+			<div class="row m-t-20 m-b-20">
+				<div class="col-md-12">
+					<h2>Elenco Patti/accordi Stipulati in modalità telematica</h2>
+					<p>In questa pagina vengono riportati i patti/accordi stipulati in modalità telematica con il CPI. È possibile
+						scaricarli per la visualizzazione e, se non sono decorsi i termini previsti e il patto/accordo è ancora in stato
+						“da accettare”, effettuare l’accettazione formale dello stesso</p>
+				</div>
+				<div class="col-md-12">
+					<h:form id="pattoList">
+						<p:dataTable var="patto" value="#{pattoSilOTPBean.pattiCittadino}" paginator="false"
+							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+							styleClass="default-data-table table-patto" emptyMessage="Nessun patto/accordo trovato">
+
+							<p:column headerText="Patto">
+								<p:commandLink rendered="#{patto.dtmMod != patto.dtmIns}" action="#{pattoSilOTPBean.downloadPatto(patto)}"
+									ajax="false" onclick="refreshRC()" style="text-decoration: underline;">
+                                     Patto/accordo del <h:outputFormat value="#{patto.dtPatto}">
+										<f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+									</h:outputFormat> Aggiornato il <h:outputFormat value="#{patto.tsInvio}">
+										<f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+									</h:outputFormat>
+								</p:commandLink>
+
+								<p:commandLink rendered="#{patto.dtmMod == patto.dtmIns}" action="#{pattoSilOTPBean.downloadPatto(patto)}"
+									ajax="false" onclick="refreshRC()" style="text-decoration: underline;">
+                                     Patto/accordo del <h:outputFormat value="#{patto.dtPatto}">
+										<f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+									</h:outputFormat>
+								</p:commandLink>
+
+							</p:column>
+							<p:column headerText="Stato">
+                            #{pattoSilOTPBean.getStatoPatto(patto)}
+                        </p:column>
+							<p:column styleClass="text-center">
+								<h:panelGroup rendered="#{empty pattoSilOTPBean.getDisabledMessage(patto)}">
+
+									<p:commandButton value="Accetta"
+										rendered="#{pattoSilOTPBean.isRenderedOTPCheck() and not pattoSilOTPBean.isRenderedSMSCheck()}"
+										disabled="#{not patto.flgPresaVisione}" update=":otpPanelGroup" oncomplete="requestOtpTimeout()"
+										styleClass="btn btn-primary btn-sm">
+										<f:setPropertyActionListener value="#{patto}" target="#{pattoSilOTPBean.selectedPattoSIl}" />
+										<f:setPropertyActionListener value="INITIAL" target="#{pattoSilOTPBean.currentOtpStep}" />
+									</p:commandButton>
+
+									<p:commandButton value="Accetta" actionListener="#{pattoSilOTPBean.submitVerificaSimpleRequest(patto)}"
+										rendered="#{pattoSilOTPBean.isRenderedSimpleCheck()}" disabled="#{not patto.flgPresaVisione}"
+										oncomplete="nootpTimeout(args)" styleClass="btn btn-primary btn-sm">
+										</p:commandButton>
+
+									<p:commandButton value="Accetta"
+										rendered="#{pattoSilOTPBean.isRenderedSMSCheck() and not pattoSilOTPBean.isRenderedOTPCheck()}"
+										disabled="#{not patto.flgPresaVisione}" update=":smsotpPanelGroup" oncomplete="requestSmsTimeout()"
+										styleClass="btn btn-primary btn-sm">
+										<f:setPropertyActionListener value="#{patto}" target="#{pattoSilOTPBean.selectedPattoSIl}" />
+										<f:setPropertyActionListener value="INITIAL" target="#{pattoSilOTPBean.currentOtpStep}" />
+									</p:commandButton>
+
+									<ui:remove>
+										<!-- this Accetta would be seen in case the user has SMS and PUSH enabled -->
+									</ui:remove>
+									<p:commandButton value="Accetta" update=":preSMSOTPGroup"
+										rendered="#{pattoSilOTPBean.isRenderedSMSCheck() and pattoSilOTPBean.isRenderedOTPCheck()}"
+										disabled="#{not patto.flgPresaVisione}" oncomplete="requestOTPandSMS()" styleClass="btn btn-primary btn-sm">
+										<f:setPropertyActionListener value="#{patto}" target="#{pattoSilOTPBean.selectedPattoSIl}" />
+										<f:setPropertyActionListener value="INITIAL" target="#{pattoSilOTPBean.currentOtpStep}" />
+									</p:commandButton>
+
+									<p:commandButton value="Accetta" actionListener="#{pattoSilOTPBean.requestBlackHole(patto)}"
+										rendered="#{not pattoSilOTPBean.isRenderedOTPCheck() and not pattoSilOTPBean.isRenderedSMSCheck() and not pattoSilOTPBean.isRenderedSimpleCheck()}"
+										disabled="#{not patto.flgPresaVisione}" oncomplete="blackholeTimeout(args)"
+										styleClass="btn btn-primary btn-sm">
+									</p:commandButton>
+
+								</h:panelGroup>
+								<p:outputLabel>#{pattoSilOTPBean.getDisabledMessage(patto)}</p:outputLabel>
+							</p:column>
+							<p:column styleClass="text-center" headerText="Storico">
+								<p:commandButton value="storico" rendered="#{pattoSilOTPBean.checkButton(patto.idPattoSil)}"
+									oncomplete="storicoPatto(args)" styleClass="btn btn-primary btn-sm">
+									<p:ajax listener="#{pattoSilOTPBean.pattoStorico(patto.idPattoSil)}" update=":pattoStorico" />
+								</p:commandButton>
+							</p:column>
+
+						</p:dataTable>
+						<p:remoteCommand name="refreshRC" update="pattoList" delay="5000" />
+						<p:remoteCommand name="clearOTPRC" actionListener="#{pattoSilOTPBean.clearOTP()}" />
+					</h:form>
+				</div>
+			</div>
+
+		</div>
+		<div>
+			<p:button outcome="home" value="Torna alla scrivania" styleClass="btn btn-primary btn-sm" />
+		</div>
+		<br />
+		<div class="modal fade" id="otp-timeout" tabindex="-1" role="dialog" aria-labelledby="otp-timeout"
+			style="background-color: rgba(16, 16, 16, 0.6);">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body text-center">
+						<h:panelGroup id="otpPanelGroup">
+							<h2>Accettazione del Patto/accordo con firma elettronica</h2>
+							<ui:fragment rendered="#{pattoSilOTPBean.currentOtpStep eq 'INITIAL'}">
+								<div class="desc">Proseguendo effettuerai l’accettazione formale del patto di servizio
+									personalizzato/accordo stipulato con il CPI che hai visualizzato. Per verificare la tua identità invieremo
+									all’app sul tuo dispositivo un codice che dovrà essere inserito nella schermata successiva.</div>
+								<div class="row">
+									<div class="col-md-12 text-center">
+										<p:commandButton value="Invia Codice"
+											actionListener="#{pattoSilOTPBean.submitVerificaPUSHRequest(pattoSilOTPBean.selectedPattoSIl)}"
+											rendered="#{pattoSilOTPBean.isRenderedOTPCheck()}"
+											disabled="#{not pattoSilOTPBean.selectedPattoSIl.flgPresaVisione}" oncomplete="otpTimeout(args)"
+											styleClass="btn btn-primary btn-sm" update=":otpPanelGroup">
+											<f:setPropertyActionListener value="VERIFICATION" target="#{pattoSilOTPBean.currentOtpStep}" />
+										</p:commandButton>
+									</div>
+								</div>
+							</ui:fragment>
+							<ui:fragment rendered="#{pattoSilOTPBean.currentOtpStep eq 'VERIFICATION'}">
+								<h:form>
+									<div class="desc">
+										L’accettazione del patto/accordo deve avvenire entro: <span class="countDown"></span>
+									</div>
+
+									<div class="row">
+										<div class="col-md-12">
+											<div class="desc">Controlla il codice inviato sul tuo dispositivo mobile e inseriscilo qui:</div>
+										</div>
+										<div class="col-md-12">
+											<div class="form-group">
+												<p:outputLabel for="codice" value="Codice" styleClass="col-sm-4 control-label" />
+												<div class="col-md-6">
+													<p:inputText id="codice" value="#{pattoSilOTPBean.reinsertedOTP}" maxlength="5" styleClass="form-control"
+														label="Codice" required="true">
+													</p:inputText>
+													<p:message id="codiceMessage" for="codice"></p:message>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-12 m-t-20">
+											<p:commandButton value="Accetta" actionListener="#{pattoSilOTPBean.convalida()}" styleClass="btn btn-primary"></p:commandButton>
+										</div>
+									</div>
+
+								</h:form>
+							</ui:fragment>
+						</h:panelGroup>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="modal fade" id="no-otp-timeout" tabindex="-1" role="dialog" aria-labelledby="otp-timeout"
+			style="background-color: rgba(16, 16, 16, 0.6);">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body text-center">
+						<h2>Accettazione del Patto/accordo con firma elettronica</h2>
+						<div class="desc">Proseguendo effettuerai l’accettazione formale del patto di servizio
+							personalizzato/accordo stipulato con il CPI che hai visualizzato. Per accettare è sufficiente premere il pulsante
+							di accettazione. L’accettazione deve avvenire entro</div>
+						<h2 class='countDown'></h2>
+						<h:form>
+							<div class="row">
+
+								<div class="col-md-12 m-t-20">
+									<p:commandButton value="Accetta" actionListener="#{pattoSilOTPBean.convalida()}" styleClass="btn btn-primary"></p:commandButton>
+								</div>
+							</div>
+
+						</h:form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal fade" id="sms-otp-timeout" tabindex="-1" role="dialog" aria-labelledby="otp-timeout"
+			style="background-color: rgba(16, 16, 16, 0.6);">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body text-center">
+						<h:panelGroup id="smsotpPanelGroup">
+							<h2>Accettazione del Patto/accordo con firma elettronica (SMS)</h2>
+							<ui:fragment rendered="#{pattoSilOTPBean.currentOtpStep eq 'INITIAL'}">
+								<div class="desc">Proseguendo effettuerai l’accettazione formale del patto di servizio
+									personalizzato/accordo stipulato con il CPI che hai visualizzato. Per verificare la tua identità invieremo al
+									tuo cellulare un codice che dovrà essere inserito nella schermata successiva.</div>
+								<div class="row">
+									<div class="col-md-12 text-center">
+										<p:commandButton value="Invia Codice"
+											actionListener="#{pattoSilOTPBean.submitVerificaSMSRequest(pattoSilOTPBean.selectedPattoSIl)}"
+											rendered="#{pattoSilOTPBean.isRenderedSMSCheck()}"
+											disabled="#{not pattoSilOTPBean.selectedPattoSIl.flgPresaVisione}" oncomplete="smsotpTimeout(args)"
+											styleClass="btn btn-primary btn-sm" update=":smsotpPanelGroup">
+											<f:setPropertyActionListener value="VERIFICATION" target="#{pattoSilOTPBean.currentOtpStep}" />
+										</p:commandButton>
+									</div>
+								</div>
+							</ui:fragment>
+							<ui:fragment rendered="#{pattoSilOTPBean.currentOtpStep eq 'VERIFICATION'}">
+								<h:form>
+									<div class="desc">
+										L’accettazione del patto/accordo deve avvenire entro: <span class="countDown"></span>
+									</div>
+
+									<div class="row">
+										<div class="col-md-12">
+											<div class="desc">Controlla il codice inviato via SMS sul tuo dispositivo mobile e inseriscilo qui:</div>
+										</div>
+										<div class="col-md-12">
+											<div class="form-group">
+												<p:outputLabel for="codice" value="Codice" styleClass="col-sm-4 control-label" />
+												<div class="col-md-6">
+													<p:inputText id="codice" value="#{pattoSilOTPBean.reinsertedOTP}" maxlength="5" styleClass="form-control"
+														label="Codice" required="true">
+													</p:inputText>
+													<p:message id="codiceMessage" for="codice"></p:message>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-12 m-t-20">
+											<p:commandButton value="Accetta" actionListener="#{pattoSilOTPBean.convalida()}" styleClass="btn btn-primary"></p:commandButton>
+										</div>
+									</div>
+
+								</h:form>
+							</ui:fragment>
+						</h:panelGroup>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="modal fade" id="storico-patto-sil-modal" tabindex="-1" role="dialog"
+			aria-labelledby="storico-patto-sil-modal" style="background-color: rgba(16, 16, 16, 0.6);">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body text-center">
+						<h:form id="pattoStorico">
+							<h2>#{pattoSilOTPBean.getTitoloStorico()}</h2>
+							<div class="col-md-12">
+
+								<p:dataTable var="storico" value="#{pattoSilOTPBean.getStoricoList()}" paginator="false"
+									paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+									styleClass="default-data-table table-patto" emptyMessage="Nessuno storico trovato">
+									<p:column headerText="Ricezione">
+										Patto/accordo del <h:outputFormat value="#{storico.tsInvio}">
+											<f:convertDateTime pattern="dd/MM/yyyy HH:mm"></f:convertDateTime>
+										</h:outputFormat>
+
+									</p:column>
+									<p:column headerText="Stato">
+										Stato del patto/accordo: <p:outputLabel>#{storico.codStatoAccettazione.descrizione}</p:outputLabel>
+									</p:column>
+									<p:column headerText="Accettazione">
+										Accettato e firmato elettronicamente:
+                                        <h:outputFormat value="#{storico.tsAccettazione}">
+											<f:convertDateTime pattern="dd/MM/yyyy HH:mm"></f:convertDateTime>
+										</h:outputFormat>
+									</p:column>
+
+								</p:dataTable>
+
+							</div>
+						</h:form>
+						<div class="row">
+							<div class="col-md-12 m-t-20">
+								<p:commandButton action="#" onclick="$('#storico-patto-sil-modal').modal('hide')" value="Chiudi"
+									styleClass="btn btn-primary"></p:commandButton>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+
+
+		<div class="modal fade" id="pre-sms-otp" tabindex="-1" role="dialog" aria-labelledby="pre-sms-otp"
+			style="background-color: rgba(16, 16, 16, 0.6);">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body text-center">
+						<h:panelGroup id="preSMSOTPGroup">
+							<h2>Accettazione del Patto/accordo con firma elettronica (SMS/APP)</h2>
+							<div class="desc">Per effettuare l’accettazione formale del patto di servizio personalizzato/accordo
+								stipulato con il CPI che hai visualizzato dobbiamo verificare la tua identità tramite l’invio di un codice di
+								verifica.</div>
+							<ui:fragment rendered="#{pattoSilOTPBean.isOTPPushAvailable() and pattoSilOTPBean.isOTPSmsAvailable()}">
+							Scegli se utilizzare l’APP oppure se vuoi utilizzare un SMS per la verifica.
+							</ui:fragment>
+							<div class="row" style="margin-top: 20px">
+								<div class="col-md-6 text-center">
+									<p:commandButton value="Invia codice APP" rendered="#{pattoSilOTPBean.isRenderedOTPCheck()}"
+										disabled="#{not pattoSilOTPBean.selectedPattoSIl.flgPresaVisione}" update=":otpPanelGroup"
+										oncomplete="closeOTPandSMS(); requestOtpTimeout()" styleClass="btn btn-primary btn-sm">
+									</p:commandButton>
+								</div>
+								<div class="col-md-6 text-center">
+									<p:commandButton value="Invia codice SMS" rendered="#{pattoSilOTPBean.isRenderedSMSCheck()}"
+										disabled="#{not pattoSilOTPBean.selectedPattoSIl.flgPresaVisione}" update=":smsotpPanelGroup"
+										oncomplete="closeOTPandSMS(); requestSmsTimeout()" styleClass="btn btn-primary btn-sm">
+									</p:commandButton>
+								</div>
+							</div>
+						</h:panelGroup>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="modal fade" id="black-hole" tabindex="-1" role="dialog" aria-labelledby="black-hole"
+			style="background-color: rgba(16, 16, 16, 0.6);">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body text-center">
+						<h2>Accettazione del Patto/accordo con firma elettronica</h2>
+						<div class="desc">
+							<ui:fragment rendered="#{pattoSilOTPBean.isOTPPushAvailable() or pattoSilOTPBean.isOTPSmsAvailable()}">
+							Per poter effettuare l’accettazione del patto/accordo è necessario avere certificato il proprio cellulare per
+							l’invio del codice di verifica <ui:fragment rendered="#{pattoSilOTPBean.isOTPPushAvailable() }">
+						oppure avere l’app di Lavoro per Te
+						</ui:fragment>. Per certificare il tuo cellulare vai nel tuo profilo, accedi in modifica e
+							inserisci il numero di cellulare per la firma elettronica seguendo le istruzioni. Una volta effettuato questo
+							passaggio puoi tornare in questa pagina e proseguire con l’accettazione del patto di servizio
+							personalizzato/accordo.
+							<ui:fragment rendered="#{pattoSilOTPBean.isOTPPushAvailable() }">
+						In alternativa puoi scaricare l’app e una volta effettuata l’installazione ed eseguito l’accesso puoi tornare in questa pagina e proseguire con l’accettazione del patto di servizio
+						</ui:fragment>
+
+Ricordati che puoi effettuare l’accettazione entro <span class="countDown"></span>
+							</ui:fragment>
+
+							<ui:fragment rendered="#{not pattoSilOTPBean.isOTPPushAvailable() and not pattoSilOTPBean.isOTPSmsAvailable()}">
+							Siamo spiacenti ma non sono presenti modalità di firma elettronica
+							</ui:fragment>
+						</div>
+						<div class="row">
+							<div class="col-md-12 m-t-20">
+								<a class="btn btn-primary" href="#{sessionBean.getUrlMyAccount()}/secure/account/edit">Completa Dati</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['regAz.provRiferimento']}" styleClass="col-md-4 control-label" />
+		<div class="col-md-8">
+			<ui:fragment rendered="#{empty provEditAz.aziendaInfo.deProvincia}">
+				<p:selectOneMenu id="provinciaRiferimento" widgetVar="provRifWV" required="true" converter="deProvinciaConverter" style="width: 100%;"
+					value="#{provEditAz.aziendaInfo.deProvincia}" styleClass="form-control">
+					<f:selectItem itemLabel="" itemValue="" />
+					<f:selectItems value="#{decodificheBean.provinceByCurrentRegione}" var="provincia" itemLabel="#{provincia.descrizione}"
+						itemValue="#{provincia}" />
+				</p:selectOneMenu>
+				<p:message id="provinciaRiferimentoMessage" for="provinciaRiferimento" />
+			</ui:fragment>
+			<ui:fragment rendered="#{not empty provEditAz.aziendaInfo.deProvincia}">
+						#{provEditAz.aziendaInfo.deProvincia.descrizione}
+					</ui:fragment>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel for="mittenteSare" value="#{ui['regAz.mittenteSARE']}" styleClass="col-md-4 control-label" />
+		<div class="col-md-8">
+			<p:inputText id="mittenteSare" value="#{provEditAz.aziendaInfo.mittenteSare}" required="true" label="#{ui['regAz.mittenteSARE']}"
+				maxlength="13" styleClass="form-control">
+				<o:validator validatorId="javax.faces.RegularExpression" pattern="#{validation['pattern.alphanumeric']}"
+					message="#{validation['message.alphanumeric']}"></o:validator>
+			</p:inputText>
+			<p:message id="mittenteSareMessage" for="mittenteSare"></p:message>
+			<div class="rettificaRecord">#{provEditAz.aziendaInfoRettifica.mittenteSare}</div>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel for="referenteSare" value="#{ui['regAz.referenteSAREAzienda']}" styleClass="col-md-4 control-label" />
+		<div class="col-md-8">
+			<p:inputText id="referenteSare" value="#{provEditAz.aziendaInfo.referenteSare}" required="true"
+				label="#{ui['regAz.referenteSAREAzienda']}" maxlength="50" styleClass="form-control">
+			</p:inputText>
+			<p:message id="referenteSareMessage" for="referenteSare"></p:message>
+			<div class="rettificaRecord">#{provEditAz.aziendaInfoRettifica.referenteSare}</div>
+		</div>
+	</div>
+
+
+	<div class="form-group">
+		<p:outputLabel for="telefonoReferente" value="#{ui['regAz.telefonoRefSARE']}" styleClass="col-md-4 control-label" />
+		<div class="col-md-8">
+			<p:inputText id="telefonoReferente" value="#{provEditAz.aziendaInfo.telefonoReferente}" required="true"
+				label="#{ui['regAz.telefonoRefSARE']}" maxlength="30" styleClass="form-control">
+			</p:inputText>
+			<p:message id="telefonoReferenteMessage" for="telefonoReferente"></p:message>
+			<div class="rettificaRecord">#{provEditAz.aziendaInfoRettifica.telefonoReferente}</div>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel for="emailReferente" value="#{ui['regAz.indirizzoEmRefSARE']}" styleClass="col-md-4 control-label" />
+		<div class="col-md-8">
+			<p:inputText id="emailReferente" value="#{provEditAz.aziendaInfo.emailReferente}" required="true"
+				label="#{ui['regAz.indirizzoEmRefSARE']}" maxlength="50" styleClass="form-control">
+				<o:validator validatorId="javax.faces.RegularExpression" pattern="#{validation['pattern.email']}"
+					message="#{validation['message.email']}" />
+			</p:inputText>
+			<p:message id="emailReferenteMessage" for="emailReferente"></p:message>
+			<div class="rettificaRecord">#{provEditAz.aziendaInfoRettifica.emailReferente}</div>
+		</div>
+	</div>
+
+
+	<div class="form-group">
+		<p:outputLabel for="tipoAbilitato" value="#{ui['regAz.tipoRichiedente']}" styleClass="col-md-4 control-label" />
+		<div class="col-md-8">
+			<p:selectOneRadio id="tipoAbilitato" required="true" converter="deTipoAbilitatoConverter" style="width: 100%;"
+				value="#{provEditAz.aziendaInfo.deTipoAbilitato}" styleClass="form-control" label="#{ui['regAz.tipoRichiedente']}" layout="grid"
+				columns="1">
+				<f:selectItems value="#{decodificheBean.deTipiAbilitato}" var="deTipoAbilitato" itemLabel="#{deTipoAbilitato.descrizione}"
+					itemValue="#{deTipoAbilitato}" />
+				<p:ajax listener="#{provEditAz.tipoAbilitatoChanged}" update="tipoDelegatoGroup extraSections"></p:ajax>
+			</p:selectOneRadio>
+			<p:message id="tipoAbilitatoMessage" for="tipoAbilitato" />
+			<div class="rettificaRecord">#{provEditAz.aziendaInfoRettifica.deTipoAbilitato.descrizione}</div>
+		</div>
+	</div>
+
+	<h:panelGroup id="tipoDelegatoGroup">
+	
+		<ui:fragment rendered="#{provEditAz.editTipoDelegato}">
+			<div class="form-group">
+				<p:outputLabel for="tipoDelegato" value="#{ui['regAz.tipoDelegato']}" styleClass="col-md-4 control-label" />
+				<div class="col-md-8">
+					<p:selectOneMenu id="tipoDelegato" required="true" converter="deTipoDelegatoConverter" style="width: 100%;"
+						value="#{provEditAz.aziendaInfo.deTipoDelegato}" styleClass="form-control" label="#{ui['regAz.tipoDelegato']}">
+						<f:selectItem itemValue="" itemLabel=""></f:selectItem>
+						<f:selectItems value="#{decodificheBean.deTipiDelegato}" var="deTipoDelegato" itemLabel="#{deTipoDelegato.descrizione}"
+							itemValue="#{deTipoDelegato}" />
+					</p:selectOneMenu>
+					<p:message id="tipoDelegatoMessage" for="tipoDelegato" />
+					<div class="rettificaRecord">#{provEditAz.aziendaInfoRettifica.deTipoDelegato.descrizione}</div>
+				</div>
+			</div>
+		</ui:fragment>
+	
+		<ui:fragment rendered="#{not provEditAz.editTipoDelegato and not empty provEditAz.aziendaInfo.deTipoDelegato}">
+			<div class="form-group">
+				<p:outputLabel value="#{ui['regAz.tipoDelegato']}" styleClass="col-md-4 control-label" />
+				<div class="col-md-8">
+					#{provEditAz.aziendaInfo.deTipoDelegato.descrizione}
+					<div class="rettificaRecord">#{provEditAz.aziendaInfoRettifica.deTipoDelegato.descrizione}</div>
+				</div>
+			</div>
+		</ui:fragment>
+		
+	</h:panelGroup>
+	
+</ui:composition>

@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/template_portlet.xhtml">
+
+	<ui:param name="portletCssClass" value="portletVacancies" />
+
+	<ui:define name="portlet_title">
+		<h:outputText value="#{msg['provincia.portlet.sare.titolo']}"
+			escape="false" />
+	</ui:define>
+
+	<ui:define name="portlet_content">
+		
+		<h:outputText 
+			value="#{txt['provincia.portlet.sare.descrizione']}" 
+			escape="false" 
+			rendered="#{not provinciaHomeBean.isProfilatoNuovoSare()}" />
+		<h:outputText 
+			value="#{txt['provincia.portlet.sare.descrizione_con_mysare']}" 
+			escape="false" 
+			rendered="#{provinciaHomeBean.isProfilatoNuovoSare()}" />
+		<h:outputText 
+			value="#{txt['provincia.portlet.sare.descrizione_con_mysare_tip']}" 
+			escape="false" 
+			rendered="#{provinciaHomeBean.isProfilatoNuovoSare() and provinciaHomeBean.checkAbilitazioneVisibile('accediSare')}"/>
+				
+		<h:panelGroup layout="block" rendered="#{provinciaHomeBean.checkAbilitazioneVisibile('accediSare')}">
+		
+			<h:panelGroup layout="block" rendered="#{provinciaHomeBean.isProfilatoNuovoSare()}">
+				<form id="accediNuovoSare" target="_blank" action="#{provinciaHomeBean.urlNuovoSARE}" method="post">
+					<button type="submit" class="buttonStyle float-left margin-right-5" alt="Servizi per CO" tabindex="0">Servizi per CO</button>				   				
+				</form>
+			</h:panelGroup>
+			
+			<form id="accediSare" target="_blank" action="#{provinciaHomeBean.urlSARE}" method="post">
+				<input type="hidden" value="#{provinciaHomeBean.tokenSARE}" id="t" name="t" />
+				<ui:fragment rendered="#{provinciaHomeBean.isProfilatoNuovoSare() and not utilsBean.isPAT()}">
+				<button type="submit" class="buttonStyle float-left" alt="Altri servizi" tabindex="0">Altri servizi</button>
+				</ui:fragment>
+				<ui:fragment rendered="#{not provinciaHomeBean.isProfilatoNuovoSare()}">
+				<button type="submit" class="buttonStyle float-left" alt="Accesso a SARE" tabindex="0">Accesso a SARE</button>
+				</ui:fragment>
+			</form>
+			
+		</h:panelGroup>
+		<h:panelGroup layout="block" rendered="#{not provinciaHomeBean.checkAbilitazioneVisibile('accediSare')}">
+			<h:outputText value="#{txt['provincia.portlet.sare.notAccediSare']}" escape="false" />
+		</h:panelGroup>			
+	</ui:define>
+
+</ui:composition>

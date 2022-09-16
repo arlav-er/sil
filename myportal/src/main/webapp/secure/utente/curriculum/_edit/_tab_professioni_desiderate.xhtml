@@ -1,0 +1,239 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/tab.xhtml">
+
+	<ui:param name="tabBean" value="#{cvProfDesiderateBean}" />
+	<ui:param name="form_id" value="professioni_desiderate" />
+	<ui:param name="deleteId" value="#{tabBean.data.id}" />
+
+	<ui:define name="tabcontent">
+		<div style="width: 20px; position: relative; left: 98%;">
+			<cc:infoSectionPanel target_id="professioni_info_panel"
+				message="#{tabBean.info.testo}" />
+		</div>
+
+		<h:form id="#{form_id}">
+			<script type="text/javascript">
+				checkSwitch('#{tabBean.switchtab}');
+			</script>
+
+			<h:inputHidden id="tabClick" value="#{tabBean.tabClick}">
+				<f:converter converterId="booleanConverter" />
+			</h:inputHidden>
+
+			<h:panelGroup id="professioni_desiderate_list" layout="block">
+				<h:outputText value="Nessun elemento inserito" rendered="#{empty tabBean.list and not tabBean.showPanel}" />
+
+				<h:dataTable id="table" rendered="#{not empty tabBean.list}"
+					columnClasses=",customcenter,customcenter,customcenter,customcenter notSortable"
+					value="#{tabBean.list}" var="element">
+
+					<h:column>
+						<f:facet name="header">Gruppo professionale</f:facet>
+						<h:outputText value="#{element.deMansione.descrizione}" />
+					</h:column>
+					<h:column>
+						<f:facet name="header">Corrispondente professione ministeriale</f:facet>
+						<h:outputText value="#{element.deMansioneMin.descrizione}" />
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">Esperienza nel settore</f:facet>
+						<h:outputText rendered="#{element.flagEspSettore}" value="SI" />
+						<h:outputText rendered="#{not element.flagEspSettore}" value="NO" />
+					</h:column>
+
+					<h:column>
+						<h:commandLink styleClass="buttonStyle" immediate="true"
+							action="#{tabBean.edit}">
+							<span class="ui-icon ui-icon-pencil fix_icon" />
+							<f:param name="id" value="#{element.id}" />
+							<f:ajax execute="@this" render="@form"
+								onevent="showPanelCallback" />
+						</h:commandLink>
+
+						<h:commandLink styleClass="buttonStyle" title="Rimuovi"
+							onclick="return document.getElementById('delete_professione').open({id: #{element.id}},this);">
+							<span class="ui-icon ui-icon-trash fix_icon" />
+						</h:commandLink>
+					</h:column>
+				</h:dataTable>
+
+				<br />
+				<h:commandLink id="insertButton"
+					value="Inserisci una nuova professione"
+					rendered="#{not tabBean.showPanel}" styleClass="insertButton"
+					action="#{tabBean.showInsertPanel}">
+					<f:ajax execute="@this" render="@form" onevent="showPanelCallback" />
+				</h:commandLink>
+			</h:panelGroup>
+
+			<h:panelGroup id="istrPanel" rendered="#{tabBean.showPanel}">
+				<br />
+				<h:panelGroup id="insert_form" style="display:none">
+					<h:panelGrid columns="1" cellspacing="10" style="width: 80%;">
+						
+						<cc:inputSuggestion id="mansione" size="114" style="width: 90%;"
+							helpMessage="#{msg['cittadino.info.cv.gruppo_professionale']}"										
+							label="Gruppo professionale" required="true"
+							valueCod="#{tabBean.data.deMansione.id}"
+							value="#{tabBean.data.deMansione.descrizione}"
+							disabled="#{not tabBean.editing}"
+							editingMode="#{tabBean.data.id==null}"
+							requiredMessage="Il Gruppo professionale è obbligatorio"
+							requiredMessageCod="E' necessario scegliere un gruppo professionale dalla lista a tendina"
+							showButton="true" suggestionPath="mansioni"
+							valueChangeListener="#{cvProfDesiderateBean.onSelectGruppoProfessionale}">
+							<f:validator validatorId="mansioneSuggestionValidator"
+								for="function" />
+							<f:ajax event="change" execute="@this" onevent="generateDataTableElProfMin"
+								render=":professioni_desiderate:el_prof_min" />
+						</cc:inputSuggestion>
+	
+						<h:panelGroup id="el_prof_min">
+						<!-- 
+						Elenco corrispondenti professioni ministeriali
+						 -->
+							<h:dataTable id="table_el_prof_min" columnClasses="notSortable"
+								rendered="#{not empty tabBean.data.listaDeMansioneMin}"
+								value="#{tabBean.data.listaDeMansioneMin}" var="elem">
+	
+								<h:column>
+									<f:facet name="header">Elenco corrispondenti professioni ministeriali</f:facet>
+									<h:outputText value="#{elem.descrizione}" />
+								</h:column>
+							</h:dataTable>
+						</h:panelGroup>
+						
+						<cc:inputText value="#{tabBean.data.deMansioneMin.descrizione}"
+							readonly="true" rendered="#{tabBean.data.id!=null}"
+							editingMode="false" label="Corrispondente professione ministeriale" />
+						
+						<cc:inputTextarea id="descrizione" required="false"
+							richTextMode="false" label="Descrizione" maxlength="300"
+							value="#{tabBean.data.descrizioneProfessione}">
+							<f:validateLength for="function" maximum="300" />
+						</cc:inputTextarea>
+						
+						<h:panelGroup id="chk_esperienza">
+							<h:outputLabel id="esperienza_label" for="esperienza"
+								value="Esperienza nel settore" />
+							<h:selectBooleanCheckbox value="#{tabBean.data.flagEspSettore}"
+								id="esperienza" disabled="#{not tabBean.editing}"
+								style="margin-left: 5px;" />
+						</h:panelGroup>
+	
+						<cc:inputTextarea id="descrizioneBreve" required="false"
+							richTextMode="false"
+							label="Breve descrizione e durata dell'esperienza" maxlength="300"
+							value="#{tabBean.data.breveDescrProfessione}">
+							<f:validateLength for="function" maximum="300" />
+						</cc:inputTextarea>
+	
+						<h:panelGroup id="chk_trasferte">
+							<h:outputLabel id="trasferte_label" for="trasferte"
+								value="Disponibilità a trasferte" />
+							<h:selectBooleanCheckbox value="#{tabBean.data.flagDispTrasferte}"
+								id="trasferte" disabled="#{not tabBean.editing}"
+								style="margin-left: 5px;" />
+						</h:panelGroup>
+						
+						<h:panelGroup rendered="#{curriculumVitaeBean.usaDecodificheSil()}">
+							<cc:selectOneMenu label="Tipo trasferta" value="#{tabBean.data.deTrasferta.id}" 
+								editingMode="#{tabBean.editing}">
+								<f:selectItems value="#{tabBean.trasfertaOptions}" />
+							</cc:selectOneMenu>
+						</h:panelGroup>
+	
+						<cc:inputToken label="Preferenze sulla modalità di lavoro"
+							value="#{tabBean.data.listaOrario}"
+							editingMode="#{tabBean.editing}">
+							<f:selectItems value="#{tabBean.orario}" />
+						</cc:inputToken>
+	
+						<cc:inputToken label="Preferenze sulla tipologia di contratto"
+							value="#{tabBean.data.listaRapportoLavoro}"
+							editingMode="#{tabBean.editing}">
+							<f:selectItems value="#{tabBean.rapportiLavoro}" />
+						</cc:inputToken>
+	
+						<h:panelGroup rendered="#{curriculumVitaeBean.usaDecodificheSil()}">
+							<cc:inputToken label="Disponibilità turni" value="#{tabBean.data.listaTurno}"
+								editingMode="#{tabBean.editing}">
+								<f:selectItems value="#{tabBean.turnoOptions}" />
+							</cc:inputToken>
+						</h:panelGroup>
+						
+						<h:panelGroup id="chk_mezzo">
+							<h:outputLabel id="mezzo_label" for="mezzo"
+								value="Disponibilità di utilizzo mezzo proprio" />
+							<h:selectBooleanCheckbox
+								value="#{tabBean.data.flagDispMezzoProprio}" id="mezzo"
+								disabled="#{not tabBean.editing}" style="margin-left: 5px;" />
+						</h:panelGroup>
+						
+						<ui:fragment rendered="#{curriculumVitaeBean.usaDecodificheSil()}">
+							<cc:inputTextarea label="Disponibilità territoriale (regioni)"
+								richTextMode="false" maxlength="2000" value="#{tabBean.data.dispTerritorialeRegioni}">
+								<f:validateLength for="function" maximum="2000" />
+							</cc:inputTextarea>
+							
+							<cc:inputTextarea label="Disponibilità territoriale (province)"
+								richTextMode="false" maxlength="2000" value="#{tabBean.data.dispTerritorialeProvince}">
+								<f:validateLength for="function" maximum="2000" />
+							</cc:inputTextarea>
+							
+							<cc:inputTextarea label="Disponibilità territoriale (comuni)"
+								richTextMode="false" maxlength="2000" value="#{tabBean.data.dispTerritorialeComuni}">
+								<f:validateLength for="function" maximum="2000" />
+							</cc:inputTextarea>
+						</ui:fragment>
+					</h:panelGrid>
+				</h:panelGroup>
+
+				<br />
+				<ui:include src="../../../_buttons.xhtml" />
+			</h:panelGroup>
+
+			<script type="text/javascript">									
+				$(function() {		
+					disegnaBottoni();
+
+					generateDataTable('##{form_id}\\:table');
+					attachListener();
+					
+				});	
+
+				var generateDataTableElProfMin = function(params) {
+					generateDataTable('##{form_id}\\:table_el_prof_min');
+				}
+									
+				var openDelete = function(params) {
+					var itemId = params.id;
+					$('[id$="delete_professione\:modal_form\:objectId"]').val(itemId);
+				};		
+			</script>
+
+			<cc:messages />
+		</h:form>
+
+		<br />
+		<div id="professioni_info_panel" class="helpPanelMessage" />
+
+		<cc:modalDialog id="delete_professione" title="Elimina la professione"
+			openF="openDelete"			
+			message="Sei sicuro di voler eliminare la professione?"
+			actionSubmit="#{cvProfDesiderateBean.delete()}" submitLabel="Elimina"
+			renderAjax=":professioni_desiderate @this">
+			<h:inputHidden id="objectId" />
+			<h:outputText value="#{cc.attrs.message}" />
+		</cc:modalDialog>	
+
+		<div id="professioneInfoDialog" style="display: none;">
+			<div id="professioneInfoContent" />
+		</div>
+	</ui:define>
+</ui:composition>

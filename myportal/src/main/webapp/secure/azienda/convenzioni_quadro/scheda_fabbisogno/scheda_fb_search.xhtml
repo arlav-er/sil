@@ -1,0 +1,135 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/main_primefaces.xhtml">
+<ui:param name="pagetitle" value="Cerca Schede Fabbisogno" />
+<ui:define name="content">
+	<div class="widget_container">
+		<h1>Cerca scheda fabbisogno</h1>
+		<h:form id="cercaSchedaFbForm">
+			<fieldset>
+				<legend>Parametri di ricerca</legend>
+				<table style="width:80%">
+					<tr>
+						<td>
+							<p:outputLabel for="ragioneSocialeInput" value="Soggetto ospitante" styleClass="block-label" />
+							<p:inputText id="ragioneSocialeInput" value="#{fbSchedaSearchBean.searchParams.ragioneSociale}" />
+							<p:message for="ragioneSocialeInput" />
+						</td>
+						<td>
+						   <p:outputLabel for="profiloRichiestoInput" value="Profilo richiesto" styleClass="block-label" />
+						   <p:inputText id="profiloRichiestoInput"  maxlength="100" value="#{fbSchedaSearchBean.searchParams.profilo}">							
+						</p:inputText>	
+						</td>
+						<td>
+						  <p:outputLabel for="comuneInput" value="Comune svolgimento tirocinio" styleClass="block-label" />
+						  <p:autoComplete id="comuneInput"  forceSelection="true"
+							value="#{fbSchedaSearchBean.searchParams.deComune}"
+							completeMethod="#{utilsBean.completeDeComuneValido}" var="comune"
+							itemLabel="#{comune.descrizione}" itemValue="#{comune}"
+							converter="deComuneDTOConverter" 
+							minQueryLength="2" maxResults="10" emptyMessage="Nessun comune trovato">							
+						</p:autoComplete>
+						<p:watermark for="comuneInput" value="Scrivi le prime lettere..." />
+						<p:message for="comuneInput" />
+						</td>
+						<!-- <td>
+							<p:outputLabel for="dataDaInput" value="Data pubblicazione da" styleClass="block-label" />
+							<p:calendar id="dataDaInput" value="#{fbSchedaSearchBean.searchParams.dataDa}" 
+								pattern="dd/MM/yyyy" />
+							<p:message for="dataDaInput" />
+						</td>
+						<td>
+							<p:outputLabel for="dataAInput" value="Data pubblicazione a" styleClass="block-label" />
+							<p:calendar id="dataAInput" value="#{fbSchedaSearchBean.searchParams.dataA}" 
+								pattern="dd/MM/yyyy" />
+							<p:message for="dataAInput" />
+						</td> -->
+					</tr>
+					<tr>
+					 <td>
+					    <p:outputLabel for="gruppoProfInput" value="Gruppo professionale" styleClass="block-label" />
+					    <p:autoComplete id="gruppoProfInput" value="#{fbSchedaSearchBean.searchParams.deMansione}"
+							 converter="deMansioneDTOConverter" 
+							completeMethod="#{utilsBean.completeDeMansione}" var="mansione" itemLabel="#{mansione.descrizione}" 
+							itemValue="#{mansione}" minQueryLength="2" maxResults="20" emptyMessage="Nessun gruppo professionale trovato" 
+							forceSelection="true">		
+							<p:ajax event="itemSelect" process="@this" update="qualificaInput" 
+								listener="#{fbSchedaSearchBean.onMansioneSelected}"/>				
+						</p:autoComplete>
+						<p:watermark for="gruppoProfInput" value="Scrivi le prime lettere..." />
+						<p:message for="gruppoProfInput" />
+					 </td>
+					 <td>
+					   <p:outputLabel id="qualificaLabel" for="qualificaInput" value="Qualifica" styleClass="block-label" />
+					   <p:autoComplete id="qualificaInput" value="#{fbSchedaSearchBean.searchParams.deMansioneMin}"
+							   converter="deMansioneMinDTOConverter" 
+							completeMethod="#{fbSchedaSearchBean.completeDeMansioneMin}" var="mansioneMin" itemLabel="#{mansioneMin.descrizione}" 
+							itemValue="#{mansioneMin}" minQueryLength="2" maxResults="20" 
+							forceSelection="true" dropdown="true" disabled="#{empty fbSchedaSearchBean.searchParams.deMansione}">
+						</p:autoComplete>
+						<p:watermark for="qualificaInput" value="Scrivi le prime lettere..." />
+						<p:message for="qualificaInput" />
+					 </td>
+					 <td>
+					  <p:outputLabel for="titoloStudioInput" value="Titolo di studio" styleClass="block-label" />
+					  <p:autoComplete id="titoloStudioInput"  forceSelection="true"
+							value="#{fbSchedaSearchBean.searchParams.deTitolo}"
+							completeMethod="#{utilsBean.completeDeTitolo}" var="titolo"
+							itemLabel="#{titolo.descrizione}" itemValue="#{titolo}"
+							converter="deTitoloDTOConverter" 
+							minQueryLength="2" maxResults="10" emptyMessage="Nessun titolo di studio trovato">
+						</p:autoComplete>
+						<p:watermark for="titoloStudioInput" value="Scrivi le prime lettere..." />
+						<p:message for="titoloStudioInput" />
+						</td>	
+					</tr>					
+				</table>
+				<p:commandButton value="Cerca" title="Cerca" process="@form" styleClass="margin-1em"
+					update="@form" actionListener="#{fbSchedaSearchBean.cerca}" />
+					
+					<div id="ajaxStatus_container">
+							<div id="ajaxStatus">
+								<p:ajaxStatus id="ajaxStatusPanel" widgetVar="ajaxStatusVar">
+									<f:facet name="start">
+										<p:graphicImage value="/resources/images/loader.gif" alt="loader" />
+									</f:facet>
+									<f:facet name="complete">
+										<h:outputText value="" />
+									</f:facet>
+								</p:ajaxStatus>
+							</div>
+						</div>
+			</fieldset>
+			
+			<p:dataTable id="fbSchedaTable" value="#{fbSchedaSearchBean.fbSchedaList}" pagination="true" rows="10"
+				lazy="true" emptyMessage="Nessuna scheda fabbisogno trovata" var="fbScheda"
+				rendered="#{not empty fbSchedaSearchBean.fbSchedaList}" paginator="true" paginatorAlwaysVisible="false"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
+				<p:column headerText="Soggetto ospitante" sortBy="#{fbScheda.aziendaOspitante}">
+					#{fbScheda.aziendaOspitante}
+				</p:column>
+				<p:column headerText="Data pubblicazione" sortBy="#{fbScheda.dtPubblicazione}">
+					<h:outputText value="#{fbScheda.dtPubblicazione}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Stato" sortBy="#{fbScheda.deStatoScheda.descrizione}">
+					#{fbScheda.deStatoScheda.descrizione}
+				</p:column>
+				<p:column headerText="Azioni">
+					<p:button  title="Dettaglio" outcome="scheda_fb_form" icon="ui-icon-search">
+						<f:param name="idFbSchedaFabbisogno" value="#{fbScheda.id}" />
+					</p:button>
+				</p:column>
+			</p:dataTable>
+			
+			<p:button outcome="home" styleClass="margin-1em" title="Torna alla scrivania"
+		value="Torna alla scrivania" />
+		</h:form>
+	</div>
+</ui:define>
+</ui:composition>

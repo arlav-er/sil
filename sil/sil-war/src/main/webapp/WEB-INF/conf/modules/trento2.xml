@@ -1,0 +1,888 @@
+<!-- Gestione Template -->
+<MODULE name="ComboPrgTipoDominio" class="it.eng.sil.module.trento.QueryGenerica">
+  <CONFIG pool="SIL_DATI" title="">
+     <QUERIES>
+        <QUERY statement="SELECT_COMBO_PRG_TIPO_DOMINI" />
+      </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="ComboTipoProtocollazioneTemplate" class="it.eng.sil.module.trento.QueryGenerica">
+  <CONFIG pool="SIL_DATI" title="">
+     <QUERIES>
+        <QUERY statement="SELECT_COMBO_TIPO_PROTOCOLLAZIONE_TEMPLATE" />
+      </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="ComboTipoTrattamentoTemplate" class="it.eng.sil.module.trento.QueryGenerica">
+  <CONFIG pool="SIL_DATI" title="">
+     <QUERIES>
+        <QUERY statement="SELECT_COMBO_TIPO_TRATTAMENTO_TEMPLATE" />
+      </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="ComboTitolarioClassificazioneTemplate" class="it.eng.sil.module.trento.QueryGenerica">
+  <CONFIG pool="SIL_DATI" title="">
+     <QUERIES>
+        <QUERY statement="SELECT_COMBO_TITOLARIO_TEMPLATE" />
+      </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="ComboClassificazioniPerDominioDati" class="it.eng.sil.module.trento.QueryGenerica">
+  <CONFIG pool="SIL_DATI" title="">
+     <QUERIES>
+        <QUERY statement="GET_LISTA_CLASSIFICAZIONI_PER_DOMINIO_DATI">
+        	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPODOMINIO"/>
+        </QUERY>
+      </QUERIES>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="MListaTemplate" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" title="Lista Template" rows="10">
+	<QUERIES>
+	   <SELECT_QUERY>
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.trento.TemplateList" />
+	   </SELECT_QUERY>
+	</QUERIES>
+    <COLUMNS>
+	  <COLUMN name="STRNOME" 				 label="Nome Template"/>
+	  <COLUMN name="NOMECLASSIF" 				 label="Classificazione"/>
+	  <COLUMN name="STRDESCRIZIONE" 		 label="Tipo Documento"/>
+      <COLUMN name="STRNOTE" 	             label="Note"/>
+    </COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/detail.gif" label="consulta o modifica" confirm="false">
+        <PARAMETER name="PAGE"           type="ABSOLUTE" value="DettaglioTemplatePage" scope=""/>
+        <PARAMETER name="MODULE"         type="ABSOLUTE" value="MDettaglioTemplate" scope=""/>
+        <PARAMETER name="MOSTRATEMPLATE" type="ABSOLUTE" value="S"  	scope=""/>
+        <PARAMETER name="PRGTEMPLATESTAMPA"  type="RELATIVE" value="PRGTEMPLATESTAMPA"  scope="LOCAL"/>
+        <PARAMETER name="PRGCONFIGPROT"  type="RELATIVE" value="PRGCONFIGPROT"  scope="LOCAL"/>
+        <PARAMETER name="CDNFUNZIONE"     type="RELATIVE" value="CDNFUNZIONE"     scope="SERVICE_REQUEST"/>
+        <PARAMETER name="CODTIPODOMINIO"  type="RELATIVE" value="CODTIPODOMINIO" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="PRGCLASSIF"  type="RELATIVE" value="PRGCLASSIF" scope="LOCAL"/>
+      </SELECT_CAPTION>
+      <DELETE_CAPTION image="../../img/del.gif" label="Cancella template" confirm="TRUE">
+  		<PARAMETER name="PAGE"           type="ABSOLUTE" value="GestTemplatePage" scope=""/>
+        <PARAMETER name="MODULE"         type="ABSOLUTE" value="MDeleteTemplate" scope=""/>
+        <PARAMETER name="PRGTEMPLATESTAMPA"  type="RELATIVE" value="PRGTEMPLATESTAMPA"  scope="LOCAL"/>
+        <PARAMETER name="NUMKLOTEMP"  type="RELATIVE" value="NUMKLOTEMP"  scope="LOCAL"/>
+        <PARAMETER name="CDNFUNZIONE"     type="RELATIVE" value="CDNFUNZIONE"     scope="SERVICE_REQUEST"/>
+      </DELETE_CAPTION>
+      <CAPTION image="../../img/Reitera.gif" label="Duplica template" confirm="FALSE">
+  		<PARAMETER name="PAGE"           type="ABSOLUTE" value="DettaglioTemplatePage" scope=""/>
+        <PARAMETER name="MODULE"         type="ABSOLUTE" value="MDettaglioTemplate" scope=""/>
+        <PARAMETER name="DUPLICATEMPLATE" type="ABSOLUTE" value="S" scope=""/>
+        <PARAMETER name="MOSTRATEMPLATE" type="ABSOLUTE" value="S" scope=""/>
+        <PARAMETER name="PRGTEMPLATESTAMPA"  type="RELATIVE" value="PRGTEMPLATESTAMPA"  scope="LOCAL"/>
+        <PARAMETER name="PRGCONFIGPROT"  type="RELATIVE" value="PRGCONFIGPROT"  scope="LOCAL"/>
+        <PARAMETER name="CDNFUNZIONE"     type="RELATIVE" value="CDNFUNZIONE"     scope="SERVICE_REQUEST"/>
+        <PARAMETER name="CODTIPODOMINIO"  type="RELATIVE" value="CODTIPODOMINIO" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="PRGCLASSIF"  type="RELATIVE" value="PRGCLASSIF" scope="LOCAL"/>
+      </CAPTION>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MAllegatoIsTemplate" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="Get_Template_As_Allegato">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATESTAMPA"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPODOMINIO"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDettaglioTemplate" class="it.eng.sil.module.trento.MDettaglioTemplate">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DettaglioTemplate">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATESTAMPA"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDettaglioAllegatoTemplate" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DettaglioAllegatoTemplate">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONFIGPROTDOCTIPO"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MListaAllegatiTemplate" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" title="Lista Allegati" rows="10">
+	<QUERIES>
+	   <SELECT_QUERY>
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.trento.AllegatiTemplateList" />
+	   </SELECT_QUERY>
+	</QUERIES>
+    <COLUMNS>
+	  <COLUMN name="STRDESCRIZIONE"	label="Tipo/Descrizione"/>
+	  <COLUMN name="FLGOBBL" 		label="Obbligatorio"/>
+    </COLUMNS>
+    <CAPTIONS>
+    	<SELECT_CAPTION image="../../img/detail.gif" label="consulta o modifica" confirm="false">
+	        <PARAMETER name="PAGE"           type="ABSOLUTE" value="DettaglioAllegatiTemplatePage" scope=""/>
+	        <PARAMETER name="MODULE"         type="ABSOLUTE" value="MDettaglioAllegatoTemplate" scope=""/>
+	        <PARAMETER name="PRGCONFIGPROT"  type="RELATIVE" value="PRGCONFIGPROT" scope="SERVICE_REQUEST"/>
+	        <PARAMETER name="PRGCONFIGPROTDOCTIPO" type="RELATIVE" value="PRGCONFIGPROTDOCTIPO" scope="LOCAL"/>
+	        <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+	        <PARAMETER name="PRGTEMPLATESTAMPA" type="RELATIVE" value="PRGTEMPLATESTAMPA" scope="SERVICE_REQUEST"/>
+      	</SELECT_CAPTION>
+      	<DELETE_CAPTION image="../../img/del.gif" label="Cancella allegato" confirm="TRUE">
+	  		<PARAMETER name="PAGE"           type="ABSOLUTE" value="DettaglioTemplatePage" scope=""/>
+	        <PARAMETER name="MODULE"         type="ABSOLUTE" value="MDeleteAllegatoConfig" scope=""/>
+	        <PARAMETER name="PRGCONFIGPROTDOCTIPO"  type="RELATIVE" value="PRGCONFIGPROTDOCTIPO"  scope="LOCAL"/>
+	        <PARAMETER name="NUMKLOCONFPROTDOC"  type="RELATIVE" value="NUMKLOCONFPROTDOC"  scope="LOCAL"/>
+	        <PARAMETER name="PRGCONFIGPROT"  type="RELATIVE" value="PRGCONFIGPROT" scope="SERVICE_REQUEST"/> 
+	        <PARAMETER name="CDNFUNZIONE"     type="RELATIVE" value="CDNFUNZIONE"     scope="SERVICE_REQUEST"/>
+	        <PARAMETER name="PRGTEMPLATESTAMPA" type="RELATIVE" value="PRGTEMPLATESTAMPA" scope="SERVICE_REQUEST"/>
+      </DELETE_CAPTION>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MAggiornaTemplate" class="it.eng.sil.module.trento.MAggiornaTemplate">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY_UPDATE_CONFIG_TEMPLATE statement="UpdateConfigurazioneTemplate">
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOPROTOCOLLAZIONE" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTITOLARIO" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGPREDISPOSTO"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGFIRMAGRAFO" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGTRASMISSIONEINTERNA" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOTRATT" />
+     	<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOCONFPROT"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONFIGPROT"/>
+    </QUERY_UPDATE_CONFIG_TEMPLATE>
+    <QUERY_UPDATE_TEMPLATE statement="UpdateTemplate">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOME"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="ambito"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="note"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="dataInizio"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="dataFine"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="dominio"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGOPPAT" />
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGCM" />
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="numklotemp"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONFIGPROT"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="classificazioni"/> 
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATESTAMPA"/>
+    </QUERY_UPDATE_TEMPLATE>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MAggiornaInsTemplate" class="it.eng.sil.module.trento.MAggiornaInsTemplate">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT_CONFIG statement="InsertConfigurazioneTemplate">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONFIGPROT"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOPROTOCOLLAZIONE" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTITOLARIO" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGPREDISPOSTO"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGFIRMAGRAFO" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGTRASMISSIONEINTERNA" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOTRATT" />
+     	<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+     	<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+    </QUERY_INSERT_CONFIG>
+    <QUERY_UPDATE_TEMPLATE statement="UpdateTemplate">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOME"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="ambito"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="note"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="dataInizio"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="dataFine"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="dominio"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGOPPAT" />
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGCM" />
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="numklotemp"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONFIGPROT"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATESTAMPA"/> 
+    </QUERY_UPDATE_TEMPLATE>
+    <QUERY_CONFIG_NEXT_VAL statement="DO_CONFIG_TEMPLATE_STAMPA_NEXTVAL"/>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="MInsTemplate" class="it.eng.sil.module.trento.MSalvaTemplate">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT statement="InsertTemplate">
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATESTAMPA"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOME" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="ambito" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="note"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="dataInizio" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="dataFine" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FILETEMPLATE" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="dominio" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGOPPAT" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGCM" />
+     <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+     <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONFIGPROT"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="classificazioni"/>
+    </QUERY_INSERT>
+    <QUERY_INSERT_CONFIG statement="InsertConfigurazioneTemplate">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONFIGPROT"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOPROTOCOLLAZIONE" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTITOLARIO" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGPREDISPOSTO"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGFIRMAGRAFO" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGTRASMISSIONEINTERNA" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOTRATT" />
+     	<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+     	<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+    </QUERY_INSERT_CONFIG>
+    <QUERY_SELECT statement="SELECT_DUPLICATI_TEMPLATE_STAMPA">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOME" />
+    	 <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="ambito" />
+	     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="dominio" />
+    </QUERY_SELECT>
+    <QUERY_NEXT_VAL statement="DO_TEMPLATE_STAMPA_NEXTVAL"/>
+    <QUERY_CONFIG_NEXT_VAL statement="DO_CONFIG_TEMPLATE_STAMPA_NEXTVAL"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MAggiornaAllegatoConfig" class="it.eng.sil.module.trento.MAggiornaAllegatoConfig">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY_UPDATE_ALLEGATO statement="UpdateAllegatoConfigurazioneTemplate">
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPODOCUMENTO" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRDESCRIZIONE" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATEALLEGATO" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGOBBL"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOCONFPROTDOC"/>
+     	<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONFIGPROTDOCTIPO"/>
+  	</QUERY_UPDATE_ALLEGATO>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MInsAllegatoConfig" class="it.eng.sil.module.trento.MSalvaAllegatoConfig">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT_ALLEGATO statement="InsertAllegatoConfigurazioneTemplate">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONFIGPROTDOCTIPO"/>
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONFIGPROT"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPODOCUMENTO" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRDESCRIZIONE" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATEALLEGATO" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGOBBL"/>
+     	<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+     	<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+    </QUERY_INSERT_ALLEGATO>
+    <QUERY_ALLEGATO_NEXT_VAL statement="DO_ALLEGATO_CONFIG_STAMPA_NEXTVAL"/>
+    <QUERY_SELECT statement="SELECT_DUPLICATI_ALLEGATI_TEMPLATE_STAMPA">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONFIGPROT" />
+    	 <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPODOCUMENTO" />
+	     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRDESCRIZIONE" />
+	     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATEALLEGATO" />
+    </QUERY_SELECT>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDeleteTemplate" class="it.eng.sil.module.trento.MDeleteTemplate">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY_UPDATE statement="UpdateCancellaTemplate">
+        <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOTEMP" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATESTAMPA" />
+  	</QUERY_UPDATE>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDeleteAllegatoConfig" class="it.eng.sil.module.trento.MDeleteAllegatoConfig">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY_UPDATE statement="UpdateCancellaAllegatoConfig">
+        <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOCONFPROTDOC" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONFIGPROTDOCTIPO" />
+  	</QUERY_UPDATE>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDettaglioEditor" class="it.eng.sil.module.trento.MDettaglioEditor">
+  <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+		<SELECT_QUERY statement="DettaglioEditor">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATESTAMPA"/>
+		</SELECT_QUERY>
+	 </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MAggiornaEditor" class="it.eng.sil.module.trento.MAggiornaEditor">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="AggiornaEditor">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FILETEMPLATE"/>
+      <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOTEMP"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATESTAMPA"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDatiCPI" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="CARICA_DATI_CPI">
+      <PARAMETER scope="SESSION" type="RELATIVE" value="PRG_PROF_UT"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_USERID_"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<!--  modulo lista stampe par. lavoratore -->
+<MODULE name="MListaStampeParLav" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" title="" rows="10">
+		<QUERIES>
+			<SELECT_QUERY>
+				<STATEMENT_PROVIDER CLASS="it.eng.sil.module.trento.DocumentiStampeLavList"/>
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRINFRIFAZILAV" label="Cognome Nome /Rag. Sociale" />
+			<COLUMN name="STRCODICEFISCALE" label="Codice fiscale" />
+			<COLUMN name="DATACQRIL" label="Data Acq/Ril" />
+			<COLUMN name="STRDESCRIZIONETIPODOC" label="Tipo documento" />
+			<COLUMN name="STRDESCRIZIONEDOC" label="Descrizione" />
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio"
+				confirm="false">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="DettaglioDocumentoPadreStampParamPage" />
+				<PARAMETER name="prgdocumento" type="RELATIVE" scope="LOCAL" value="prgdocumento" />
+				<PARAMETER name="prgtemplatestampa" type="RELATIVE" scope="LOCAL" value="prgtemplatestampa" />
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="LOCAL" value="cdnLavoratore" />
+				<PARAMETER name="prgAzienda" type="RELATIVE" scope="LOCAL" value="prgAzienda" />
+				<PARAMETER name="prgUnita" type="RELATIVE" scope="LOCAL" value="prgUnita" />
+				<PARAMETER name="codCpi" type="RELATIVE" scope="LOCAL" value="codCpi" />
+				<PARAMETER name="cdnFunzione" type="RELATIVE" scope="SERVICE_REQUEST" value="cdnFunzione" />
+				<PARAMETER name="strChiaveTabella" type="RELATIVE" scope="SERVICE_REQUEST" value="strChiaveTabella" />
+				
+			</SELECT_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="ComboTemplateStampeDominio" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY statement="SELECT_COMBO_PRG_TEMPLATE_STAMPE_DOMINIO">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DOMINIO"/>
+  	</QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="ComboTemplateStampeDominioPat" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY statement="SELECT_COMBO_PRG_TEMPLATE_STAMPE_DOMINIO_PAT">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DOMINIO"/>
+  	</QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="ComboTemplateStampeDominioNoCM" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY statement="SELECT_COMBO_PRG_TEMPLATE_STAMPE_DOMINIO_NO_CM">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DOMINIO"/>
+  	</QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MSalvaStampaParam" class="it.eng.sil.module.trento.MSalvaStampaParamLav">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT_DOC statement="INSERT_STAMPA_PARAM_LAV">
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGDOCUMENTO"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGUNITA" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPODOCUMENTO" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NOMETEMPLATEDESC" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSTATOATTO" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGCODMONOIO" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATAACQUISIZIONE" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATAINIZIO" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATAFINE" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATESTAMPA" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NOTE" />
+     <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+     <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+    </QUERY_INSERT_DOC>
+    <QUERY_INSERT_DOC_COLL statement="INSERT_AM_DOCUMENTO_COLL">
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGDOCUMENTOCOLL"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGDOCUMENTO" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNCOMPONENTE" />
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATESTAMPA" />
+    </QUERY_INSERT_DOC_COLL>
+    <QUERY_INSERT_DOC_BLOB statement="INSERT_AM_DOCUMENTO_BLOB">
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGDOCUMENTOBLOB"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGDOCUMENTO" />
+    </QUERY_INSERT_DOC_BLOB>
+    <QUERY_SELECT_COMPONENTE statement="GET_CDNCOMPONENTE">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PAGE" />
+    </QUERY_SELECT_COMPONENTE>
+    <QUERY_SELECT_TEMPLATE statement="DettaglioTemplate">
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATESTAMPA" />
+    </QUERY_SELECT_TEMPLATE>
+    <QUERY_NEXT_VAL statement="NEXT_S_AM_DOCUMENTO"/>
+    <QUERY_NEXT_VAL_COLL statement="NEXT_S_AM_DOCUMENTO_COLL"/>
+    <QUERY_NEXT_VAL_BLOB statement="NEXT_S_AM_DOCUMENTO_BLOB"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDettaglioStampaParam" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DETTAGLIO_STAMPA_PARAM_LAV">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGDOCUMENTO"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MAllegatiTemplateStampaParam" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="ALLEGATI_TEMPLATE_STAMPA_PARAM_LAV">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGDOCUMENTO"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MAllegatiTemplateStampaParamInfo" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="ALLEGATI_TEMPLATE_STAMPA_PARAM_LAV">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGDOCUMENTOPADRE"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="MSalvaAllegatoStampaParam" class="it.eng.sil.module.trento.SalvaAllegatoDocumento">
+	<CONFIG pool="SIL_DATI" title="">
+	</CONFIG>
+</MODULE>
+
+<MODULE name="MListaAllegatiStampaParam" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" title="" rows="-1">
+	<QUERIES>
+	   <SELECT_QUERY>
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.trento.AllegatiStampaParam" />
+	   </SELECT_QUERY>
+	</QUERIES>
+    <COLUMNS>
+      <COLUMN name="STRDESCRIZIONE"		label="Nome"/>
+      <COLUMN name="AM_NUMERO_PROTOCOLLO"		label="Protocollo"/>
+	  <COLUMN name="FLGPRESAVISIONE"	label="Presa Visione"/>
+	  <COLUMN name="FLGCARICSUCCESSIVO" label="Caricamento Successivo"/>
+    </COLUMNS>
+    <CAPTIONS>
+    	<SELECT_CAPTION image="../../img/detail.gif" label="consulta o modifica" confirm="false">
+	        <PARAMETER name="PAGE" type="ABSOLUTE" value="DettagliDocumentoAllegatoStampParamPage" scope=""/>
+	        <PARAMETER name="PAGEBACK" type="ABSOLUTE" value="InsStampaParamPage" scope=""/>
+	        <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+	        <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+	       	<PARAMETER name="PRGAZIENDA" type="RELATIVE" value="PRGAZIENDA" scope="SERVICE_REQUEST"/>
+	        <PARAMETER name="PRGUNITA" type="RELATIVE" value="PRGUNITA" scope="SERVICE_REQUEST"/>
+	        <PARAMETER name="PRGDOCUMENTOALLEGATO"  type="RELATIVE" value="PRGDOCUMENTOALLEGATO"  scope="LOCAL"/>
+	        <PARAMETER name="PRGDOCUMENTO" type="RELATIVE" value="PRGDOCUMENTOFIGLIO"  scope="LOCAL"/>
+	        <PARAMETER name="PRGDOCUMENTOPADRE" type="RELATIVE" value="PRGDOCUMENTOPADRE"  scope="LOCAL"/>
+	        <PARAMETER name="CODCPI"  type="RELATIVE" value="CODCPI"  scope="LOCAL"/>
+	        <PARAMETER name="PRGTEMPLATESTAMPA"  type="RELATIVE" value="PRGTEMPLATESTAMPA"  scope="SERVICE_REQUEST"/>
+      	</SELECT_CAPTION>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MListaAllegatiDocStampaParam" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" title="" rows="-1">
+	<QUERIES>
+	   <SELECT_QUERY>
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.trento.AllegatiStampaParam" />
+	   </SELECT_QUERY>
+	</QUERIES>
+    <COLUMNS>
+      <COLUMN name="AM_DOC_DESCRIZIONE"		label="Nome"/>
+      <COLUMN name="AM_NUMERO_PROTOCOLLO"		label="Protocollo"/>
+	  <COLUMN name="FLGPRESAVISIONE"	label="Presa Visione"/>
+	  <COLUMN name="FLGCARICSUCCESSIVO" label="Caricamento Successivo"/>
+	  <COLUMN name="statoatto" label="Stato Atto"/>
+	  <!-- modifica relativa alla segnalazione 4351 punto 6
+	  		aggiungere una colonna Tipo Allegato e modificare il campo nome
+	   -->
+	  <COLUMN name="STRDESCRIZIONE" label="Tipo Allegato"/>
+    </COLUMNS>
+    <CAPTIONS>
+    	<SELECT_CAPTION image="../../img/detail.gif" label="consulta o modifica" confirm="false">
+	        <PARAMETER name="PAGE" type="ABSOLUTE" value="DettagliDocumentoAllegatoStampParamPage" scope=""/>
+	        <PARAMETER name="PAGEBACK" type="ABSOLUTE" value="DettaglioDocumentoPadreStampParamPage" scope=""/>
+	        <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+	        <PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+	        <PARAMETER name="PRGAZIENDA" type="RELATIVE" value="PRGAZIENDA" scope="SERVICE_REQUEST"/>
+	        <PARAMETER name="PRGUNITA" type="RELATIVE" value="PRGUNITA" scope="SERVICE_REQUEST"/>
+	        <PARAMETER name="PRGDOCUMENTOALLEGATO"  type="RELATIVE" value="PRGDOCUMENTOALLEGATO"  scope="LOCAL"/>
+	        <PARAMETER name="PRGDOCUMENTO" type="RELATIVE" value="PRGDOCUMENTOFIGLIO"  scope="LOCAL"/>
+	        <PARAMETER name="PRGDOCUMENTOPADRE" type="RELATIVE" value="PRGDOCUMENTOPADRE"  scope="LOCAL"/>
+	        <PARAMETER name="CODCPI"  type="RELATIVE" value="CODCPI"  scope="LOCAL"/>
+	        <PARAMETER name="PRGTEMPLATESTAMPA"  type="RELATIVE" value="PRGTEMPLATESTAMPA"  scope="SERVICE_REQUEST"/>
+      	</SELECT_CAPTION>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetInfoDocAllegato" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI">
+		<QUERY statement="GET_INFO_DOCUMENTO_ALLEGATO">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="PRGDOCUMENTOALLEGATO" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_CHECK_AM_PROTOCOLLO_DOCUMENTO_PITRE_STATE" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI">
+		<QUERY statement="CHECK_AM_PROTOCOLLO_DOCUMENTO_PITRE_STATE">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="PRGDOCUMENTO" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="DettaglioDocumentoStampaParam" class="it.eng.sil.module.trento.DettaglioDocumentoStampaParam">
+	<CONFIG pool="SIL_DATI">
+		<QUERY statement="GET_INFO_DOCUMENTO_PADRE">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="PRGDOCUMENTO" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="DettagliDocumentoPadre" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI">
+		<QUERY statement="GET_INFO_DOCUMENTO_PADRE">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="PRGDOCUMENTOPADRE" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="MDettaglioEditorLav" class="it.eng.sil.module.trento.MDettaglioEditor">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERIES>
+		<SELECT_QUERY statement="DettaglioEditor">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTEMPLATESTAMPA"/>
+		</SELECT_QUERY>
+	</QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDatiLavoratore" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="CARICA_DATI_LAVORATORE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDATIAZIENDA" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="CARICA_DATI_AZIENDA">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDATILEGALIAZIENDA" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="CARICA_DATI_LEGALI_AZIENDA">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+
+<MODULE name="MDatiDidLavoratore" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="CARICA_DATI_DID_LAVORATORE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MCheckAllegatiDocPadre" class="it.eng.sil.module.trento.CheckAllegatiDocPadre">
+	<CONFIG pool="SIL_DATI">
+		<QUERY_DOC statement="CHECK_ALLEGATI_DOCUMENTO_PADRE">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="PRGDOCUMENTO" />
+		</QUERY_DOC>
+		<QUERY_ALLEGATI_TEMPLATE statement="CHECK_ALLEGATI_TEMPLATE">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="PRGTEMPLATESTAMPA" />
+		</QUERY_ALLEGATI_TEMPLATE>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="MCheckFirmaGrafometrica" class="it.eng.sil.module.trento.CheckFirmaGrafometrica">
+	<CONFIG pool="SIL_DATI">
+		<QUERY_CONFIG_PROTOCOLLO statement="CHECK_CONFIGURAZIONE_PROTOCOLLO">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="PRGTEMPLATESTAMPA" />
+		</QUERY_CONFIG_PROTOCOLLO>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="MProtocollaDocPadre" class="it.eng.sil.module.trento.ProtocollaDocumento">
+	<CONFIG pool="SIL_DATI">
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetListAllegatiStampParam" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" title="" rows="10">
+		<QUERIES>
+			<SELECT_QUERY>   
+				<STATEMENT_PROVIDER CLASS="it.eng.sil.module.trento.documentiListAllegati"/>
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRINFRIFAZILAV" label="Cognome Nome / Rag.Sociale"/>
+			<COLUMN name="DATACQRIL" label="Acq./Ril."/>
+			<COLUMN name="STRDESCRIZIONETIPODOC" label="Tipo di documento"/>
+			<COLUMN name="STRDESCRIZIONEDOC" label="Descrizione"/>
+			<COLUMN name="INFOPROTOCOLLO" label="Protocollo"/>
+			<COLUMN name="STRENTERILASCIO" label="Ente di rilascio(IN) / destinatario(OUT)"/>
+			<COLUMN name="CODCPI_DESC" label="CPI di riferim."/>
+		</COLUMNS>
+		<CHECKBOXES>
+	     	<CHECKBOX name="CHECKBOXDOCALLEGATO" label="" refColumn="" jsCheckBoxClick="checkboxDocAllegatoClick">
+	     		<CHECKBOXVALUE name="PRGDOCUMENTO" scope="LOCAL" type="RELATIVE" value="PRGDOCUMENTO"/>
+	     		<PARAMETER name="this" typeOf="object" scope="" type="ABSOLUTE" value="this"/>
+	     		<PARAMETER name="PRGDOCUMENTOSEL" scope="LOCAL" type="RELATIVE" value="PRGDOCUMENTO"/>
+	     	</CHECKBOX>
+	     </CHECKBOXES>
+		 <CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" confirm="FALSE" label="Dettaglio documento">
+				<PARAMETER name="PRGDOCUMENTO" type="RELATIVE" value="PRGDOCUMENTO"  scope="LOCAL"/>
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="DettaglioRicercaDocAllegatoStampParamPage" scope=""/>
+	        	<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+	        	<PARAMETER name="PRGAZIENDA" type="RELATIVE" value="PRGAZIENDA" scope="SERVICE_REQUEST"/>
+	        	<PARAMETER name="PRGUNITA" type="RELATIVE" value="PRGUNITA" scope="SERVICE_REQUEST"/>									
+			</SELECT_CAPTION>
+		 </CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="MSalvaDocumentoAllegatoStampaParam" class="it.eng.sil.module.trento.MSalvaDocAllegatoStampaParamLav">
+  <CONFIG pool="SIL_DATI" title="">
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MCaricaInfoTemplatePresenti" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GetInfoTemplatePresenti"/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MUpdateCaricaInfoTemplatePresenti" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GetUpdateInfoTemplatePresenti">
+    	<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="PRGTEMPLATESTAMPA" />
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDatiDataAppOrientamLavoratore" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="CARICA_DATI_DATA_APP_LAVORATORE">
+         <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" />
+    
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDatiDataAppPatronato" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="CARICA_DATI_DATA_PATRONATO">
+         <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" />
+    
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<!-- <MODULE name="MDatiDataAppPAILavoratore" class="it.eng.sil.module.doSelectModule"> -->
+<!--   <CONFIG pool="SIL_DATI" title=""> -->
+<!--     <QUERY statement="CARICA_DATI_DATA_PAI_LAVORATORE"> -->
+<!--           <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" /> -->
+     
+<!--     </QUERY> -->
+<!--   </CONFIG> -->
+<!-- </MODULE> -->
+
+<MODULE name="MDatiDataCMIscrizione" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="CARICA_DATI_DATA_CM_ISCRIZIONE">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" />
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ST_TEMPLATE_STAMPA" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_ST_TEMPLATE_STAMPA">
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_ST_TEMPLATE_STAMPA_ORD" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_LISTA_ORDINATA_TEMPLATE_CLASSIF_ORD">
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="MOrdinaTemplate" class="it.eng.sil.module.trento.MOrdinaTemplate">
+  <CONFIG pool="SIL_DATI" title="">
+	<QUERY statement="UPDATE_ORDINAMENTO_TEMPLATE">
+	    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+
+<!-- GESTIONE CLASSIFICAZIONE -->
+<MODULE name="MListaClassificazione" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" title="Lista Classificazione"  title2="Lista Classificazione" rows="15">
+	<QUERIES>
+	   <SELECT_QUERY>
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.trento.ClassificazioneList" />
+	   </SELECT_QUERY>
+	</QUERIES>
+    <COLUMNS>
+      <COLUMN name="STRNOME" label="Nome Classificazione" label2="Classificazione" />
+    </COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/detail.gif" label="consulta o modifica" confirm="false">
+        <PARAMETER name="PAGE" type="ABSOLUTE" value="AggClassificazionePage" scope=""/>
+        <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="OPERAZIONE" type="ABSOLUTE" value="AGGIORNA" scope=""/>
+        <PARAMETER name="PRGCLASSIF" type="RELATIVE" value="PRGCLASSIF" scope="LOCAL"/>
+        <PARAMETER name="STRNOME" type="RELATIVE" value="STRNOME" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="DESCDOMINIO" type="RELATIVE" value="DESCDOMINIO" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="prgTipoDominio" type="RELATIVE" value="prgTipoDominio" scope="SERVICE_REQUEST" />
+      </SELECT_CAPTION>
+      <DELETE_CAPTION image="../../img/del.gif" label="Cancella" confirm="TRUE">
+        <PARAMETER name="PAGE" type="ABSOLUTE" value="GestClassificazionePage" scope=""/>
+        <PARAMETER name="OPERAZIONE" type="ABSOLUTE" value="CANCELLA" scope=""/>
+        <PARAMETER name="PRGCLASSIF" type="RELATIVE" value="PRGCLASSIF" scope="LOCAL"/>
+        <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="STRNOME" type="RELATIVE" value="STRNOME" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="DESCDOMINIO" type="RELATIVE" value="DESCDOMINIO" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="NUMKLOCLASSIF"  type="RELATIVE" value="NUMKLOCLASSIF"  scope="LOCAL"/>
+        <PARAMETER name="prgTipoDominio"  type="RELATIVE" value="prgTipoDominio"  scope="SERVICE_REQUEST"/>
+      </DELETE_CAPTION>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="MDeleteClassificazione" class="it.eng.sil.module.trento.MDeleteClassificazione">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY_UPDATE statement="DeleteLogicClassificazione">
+        <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOCLASSIF" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCLASSIF" />
+  	</QUERY_UPDATE>
+  	<QUERY_RELATION_TEMPLATE statement="VerificaClassificazioneInTemplate">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCLASSIF"/>
+    </QUERY_RELATION_TEMPLATE>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MSalvaClassificazione" class="it.eng.sil.module.trento.MSalvaClassificazione">
+  <CONFIG pool="SIL_DATI" title="">
+		<QUERY_INSERT statement="InsertClassificazione">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strnome" />
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="descrizione" />
+			<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+			<PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgTipoDominio"/>
+		</QUERY_INSERT>
+		<QUERY_SELECT statement="ESISTE_CLASSIFICAZIONE">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strnome" />
+		</QUERY_SELECT>
+		<!-- <QUERY_NEXT_VAL statement="GET_PRG_CLASSIFICAZIONE_NEXTVAL"/> -->
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MAggiornaClassificazione" class="it.eng.sil.module.trento.MAggiornaClassificazione">
+  <CONFIG pool="SIL_DATI" title="">
+  	<QUERY_UPDATE statement="UpdateClassificazione">
+  		<PARAMETER name="STRNOME" type="RELATIVE" value="STRNOME" scope="SERVICE_REQUEST"/>
+  		<PARAMETER name="DESCRIZIONE" type="RELATIVE" value="DESCRIZIONE" scope="SERVICE_REQUEST"/>
+        <PARAMETER scope="SESSION"         type="RELATIVE" value="_CDUT_"/>
+        <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgTipoDominio"/>
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOCLASSIF" />
+     	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCLASSIF" />
+  	</QUERY_UPDATE>
+  	<QUERY_SELECT_DUPLICATI statement="ESISTE_CLASSIFICAZIONE_AGGIORNAMENTO">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="strnome" />
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCLASSIF" />
+	</QUERY_SELECT_DUPLICATI>
+	<QUERY_UPDATE_TEMPLATE_ASSOCIATI statement="UpdateClassificazioneAndTemplateAssociati">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="prgTipoDominio"/>
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCLASSIF" />
+	</QUERY_UPDATE_TEMPLATE_ASSOCIATI>
+	<QUERY_SELECT_DETTAGLIO statement="DettaglioClassificazione">
+		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCLASSIF" />
+	</QUERY_SELECT_DETTAGLIO>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDettaglioClassificazione" class="it.eng.sil.module.trento.MDettaglioClassificazione">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DettaglioClassificazione">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCLASSIF"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MListaClassificazioneOrdinata" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="GET_LISTA_ORDINATA_TEMPLATE_CLASSIF">
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MOrdinaClassificazione" class="it.eng.sil.module.trento.MOrdinaClassificazione">
+  <CONFIG pool="SIL_DATI" title="">
+	<QUERY statement="UpdateOrdinamentoClassificazione">
+	    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="ComboClassificazioni" class="it.eng.sil.module.trento.QueryGenerica">
+  <CONFIG pool="SIL_DATI" title="">
+     <QUERIES>
+        <QUERY statement="GET_LISTA_ORDINATA_CLASSIFICAZIONI_E_TEMPLATE" />
+      </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="ComboClassificazioniStampeDominio" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY  statement="GET_LISTA_ORDINATA_CLASSIFICAZIONI_E_TEMPLATE_DOMINIO">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DOMINIO"/>
+  	</QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="ComboClassificazioniStampeDominioPat" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY  statement="GET_LISTA_ORDINATA_CLASSIFICAZIONI_E_TEMPLATE_DOMINIO_PAT">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DOMINIO"/>
+  	</QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="ComboClassificazioniStampeDominioNoCM" class="it.eng.sil.module.doSelectModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY  statement="GET_LISTA_ORDINATA_CLASSIFICAZIONI_E_TEMPLATE_DOMINIO_NO_CM">
+  		<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DOMINIO"/>
+  	</QUERY>
+  </CONFIG>
+</MODULE>

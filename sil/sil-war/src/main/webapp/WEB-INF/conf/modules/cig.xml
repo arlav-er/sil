@@ -1,0 +1,854 @@
+<!-- lista tipo iscr cig -->
+<MODULE name="CI_TIPO_ISCR" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_TIPO_ISCR"/>		
+	</CONFIG>
+</MODULE>
+
+<!-- lista motivo chiusura cig -->
+<MODULE name="CI_MOTIVO_CHIUSURA" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_MOTIVO_CHIUSURA"/>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="CI_COMUNI_COMPETENZA" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_COMUNI_COMPETENZA"/>		
+	</CONFIG>
+</MODULE>
+
+<MODULE name="CI_STATO_ALTRA_ISCR" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_STATO_ALTRA_ISCR"/>		
+	</CONFIG>
+</MODULE>
+
+<MODULE name="CI_STATO_ALTRA_ISCR_NO_FLAG" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_STATO_ALTRA_ISCR_NO_FLAG"/>		
+	</CONFIG>
+</MODULE>
+
+<MODULE name="CI_STATO_ALTRA_ISCR_FLAG" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_STATO_ALTRA_ISCR_FLAG"/>		
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaDomandeCig" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+	<CONFIG pool="SIL_DATI" title="Lista altre iscrizioni" rows="10">
+    	<QUERIES>
+        	<SELECT_QUERY>   
+        		<STATEMENT_PROVIDER CLASS="it.eng.sil.module.cig.DynamicDomandeCig"/>
+          	</SELECT_QUERY>
+      	</QUERIES>
+    <COLUMNS>                         
+        <COLUMN name="lavoratore" label="CF Cognome Nome"/>
+        <COLUMN name="strIndirizzoRes" label="Indirizzo res."/>
+        <COLUMN name="strTelRes" label="Tel. res."/>
+        <COLUMN name="tipoIscr" label="Tipo Iscr."/>      
+        <COLUMN name="datInizio" label="Data Inizio"/>            
+        <COLUMN name="datFine" label="Data Fine"/>
+        <COLUMN name="datCompetenza" label="Data competenza"/>
+        <COLUMN name="descrCpiLav" label="Cpi Lavoratore"/>  
+        <COLUMN name="strragionesociale" label="Rag. Soc. Azienda/CF"/>
+        <COLUMN name="motChiusura" label="Motivo di chiusura"/>
+        <COLUMN name="codAccordo" label="Codice Domanda"/>
+        <COLUMN name="descrStato" label="Stato"/>
+        <COLUMN name="strNota" label="Note"/>
+	</COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+         <PARAMETER name="PAGE" type="ABSOLUTE" value="CigLavListaPage" />
+		 <PARAMETER name="prgAltraIscr"  type="RELATIVE" scope="LOCAL" value="prgAltraIscr" />
+		 <PARAMETER name="cdnlavoratore"  type="RELATIVE" scope="LOCAL" value="cdnlavoratore" />
+		 <PARAMETER name="APRIDIV" type="ABSOLUTE" value="1"/>
+		 <PARAMETER name="dettaglio" type="ABSOLUTE" value="1"/>
+		 <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+		 <PARAMETER name="LISTAALTREISCRIZIONI" scope="" type="ABSOLUTE" value="TRUE"/>
+	</SELECT_CAPTION>
+   </CAPTIONS>      
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaLavDomandeCig" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+	<CONFIG pool="SIL_DATI" title="" rows="10">
+    	<QUERIES>
+        	<SELECT_QUERY>   
+        		<STATEMENT_PROVIDER CLASS="it.eng.sil.module.cig.DynamicDomandeCig"/>
+          	</SELECT_QUERY>
+      	</QUERIES>
+    <COLUMNS>                         
+    	<COLUMN name="datInizio" label="Data Inizio"/>            
+        <COLUMN name="datFine" label="Data Fine"/>
+        <COLUMN name="tipoIscr" label="Tipo Iscr."/>
+        <COLUMN name="descrCpiLav" label="Cpi Lavoratore"/>  
+        <COLUMN name="strragionesociale" label="Rag. Soc. Azienda/CF"/>
+        <COLUMN name="datCompetenza" label="Data competenza"/>
+        <COLUMN name="motChiusura" label="Motivo di chiusura"/>
+        <COLUMN name="codAccordo" label="Codice Domanda"/>
+        <COLUMN name="descrStato" label="Stato"/>
+	</COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+        <PARAMETER name="prgAltraIscr"  type="RELATIVE" scope="LOCAL" value="prgAltraIscr" />
+      </SELECT_CAPTION>
+    </CAPTIONS>      
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetGiorniTolleranza" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_GG_TOLLERANZA"/>		
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_InsertDomandaCig" class="it.eng.sil.module.cig.SaveIscrCIG">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_NEXTVAL statement="SELECT_PRGALTRAISCR_SEQUENCE"/>  
+    	<QUERY_INSERT_DOMANDA_CIG statement="INS_DOMANDA_CIG">
+    		<PARAMETER name="PRGALTRAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGALTRAISCR"/>
+	        <PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+	        <PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+	        <PARAMETER name="PRGUNITA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGUNITA"/>
+	        <PARAMETER name="PRGACCORDO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGACCORDO"/>
+	        <PARAMETER name="CODCOMCOMPETENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="CODCOMCOMPETENZA"/>
+	        <PARAMETER name="CODMONOTIPOCOMPETENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOTIPOCOMPETENZA"/>
+	        <PARAMETER name="CODMOTCHIUSURAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMOTCHIUSURAISCR"/>
+	        <PARAMETER name="CODSTATO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODSTATO"/>
+	        <PARAMETER name="CODTIPOISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOISCR"/>
+	        <PARAMETER name="DATCHIUSURAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="DATCHIUSURAISCR"/>
+	        <PARAMETER name="DATCOMPETENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="DATCOMPETENZA"/>
+	        <PARAMETER name="DATFINE" scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINE"/>
+	        <PARAMETER name="DATINIZIO" scope="SERVICE_REQUEST" type="RELATIVE" value="DATINIZIO"/>
+	        <PARAMETER name="STRNOTA" scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTE"/>
+	        <PARAMETER name="NUMKLOALTRAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOALTRAISCR"/>
+	        <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>	
+		</QUERY_INSERT_DOMANDA_CIG>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_InsertAltraIscrizione" class="it.eng.sil.module.iscrizioni.SaveIscrizione">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_NEXTVAL statement="SELECT_PRGALTRAISCR_SEQUENCE"/>
+    	<QUERY_INSERT_DOMANDA_CIG statement="INS_DOMANDA_CIG">
+    		<PARAMETER name="PRGALTRAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGALTRAISCR"/>
+	        <PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+	        <PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+	        <PARAMETER name="PRGUNITA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGUNITA"/>
+	        <PARAMETER name="PRGACCORDO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGACCORDO"/>
+	        <PARAMETER name="CODCOMCOMPETENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="CODCOMCOMPETENZA"/>
+	        <PARAMETER name="CODMONOTIPOCOMPETENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOTIPOCOMPETENZA"/>
+	        <PARAMETER name="CODMOTCHIUSURAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMOTCHIUSURAISCR"/>
+	        <PARAMETER name="CODSTATO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODSTATO"/>
+	        <PARAMETER name="CODTIPOISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOISCR"/>
+	        <PARAMETER name="DATCHIUSURAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="DATCHIUSURAISCR"/>
+	        <PARAMETER name="DATCOMPETENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="DATCOMPETENZA"/>
+	        <PARAMETER name="DATFINE" scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINE"/>
+	        <PARAMETER name="DATINIZIO" scope="SERVICE_REQUEST" type="RELATIVE" value="DATINIZIO"/>
+	        <PARAMETER name="STRNOTA" scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTE"/>
+	        <PARAMETER name="NUMKLOALTRAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOALTRAISCR"/>
+	        <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>	
+		</QUERY_INSERT_DOMANDA_CIG>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_IscrizioniCIG" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="M_GetIscrizioniCIG">
+			<PARAMETER name="PRGALTRAISCR" type="RELATIVE" value="PRGALTRAISCR" scope="SERVICE_REQUEST"/>
+		</QUERY>		
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetAltraIscrizione" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="Get_AltraIscrizione">
+			<PARAMETER name="PRGALTRAISCR" type="RELATIVE" value="PRGALTRAISCR" scope="SERVICE_REQUEST"/>
+		</QUERY>		
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_PdfAccordoSindacale" class="it.eng.sil.module.cig.DynStatementGetUrlAccordoSin" >
+	<CONFIG pool="SIL_DATI" rows="1"/>
+</MODULE>
+
+<MODULE name="M_UpdateIscrCIG" class="it.eng.sil.module.cig.SaveIscrCIG">
+  <CONFIG pool="SIL_DATI" title="">
+  <QUERY_SELECT statement="SELECT_NUMKLOALTRAISCR">			
+        	<PARAMETER name="PRGALTRAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGALTRAISCR"/>	
+   </QUERY_SELECT>
+    <QUERY_UPDATE_ISCR_CIG statement="UPDATE_ISCR_CIG">    
+       	    <PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+	        <PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+	        <PARAMETER name="PRGUNITA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGUNITA"/>
+	        <PARAMETER name="PRGACCORDO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGACCORDO"/>
+	        <PARAMETER name="CODCOMCOMPETENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="CODCOMCOMPETENZA"/>
+	        <PARAMETER name="CODMONOTIPOCOMPETENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOTIPOCOMPETENZA"/>
+	        <PARAMETER name="CODMOTCHIUSURAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMOTCHIUSURAISCR"/>
+	        <PARAMETER name="CODSTATO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODSTATO"/>
+	        <PARAMETER name="CODTIPOISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOISCR"/>
+	        <PARAMETER name="DATCHIUSURAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="DATCHIUSURAISCR"/>
+	        <PARAMETER name="DATCOMPETENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="DATCOMPETENZA"/>
+	        <PARAMETER name="DATFINE" scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINE"/>
+	        <PARAMETER name="DATINIZIO" scope="SERVICE_REQUEST" type="RELATIVE" value="DATINIZIO"/>
+	        <PARAMETER name="STRNOTA" scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTE"/>
+       		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      		<PARAMETER name="NUMKLOALTRAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOALTRAISCR"/>
+      		<PARAMETER name="DATLICENZIAMENTO" scope="SERVICE_REQUEST" type="RELATIVE" value="DATLICENZIAMENTO"/>
+      		<PARAMETER name="FLGDIRITTODO" scope="SERVICE_REQUEST" type="RELATIVE" value="FLGDIRITTODO"/>
+      		<PARAMETER name="CODMOTIVONOTDO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMOTIVONOTDO"/>
+       		<PARAMETER name="PRGALTRAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGALTRAISCR"/>
+     </QUERY_UPDATE_ISCR_CIG>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_UpdateAltraIscrizione" class="it.eng.sil.module.iscrizioni.SaveIscrizione">
+  <CONFIG pool="SIL_DATI" title="">
+  <QUERY_SELECT statement="SELECT_NUMKLOALTRAISCR">			
+        	<PARAMETER name="PRGALTRAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGALTRAISCR"/>	
+   </QUERY_SELECT>
+    <QUERY_UPDATE_ISCR_CIG statement="UPDATE_ISCR_CIG">    
+       	    <PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE"/>
+	        <PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+	        <PARAMETER name="PRGUNITA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGUNITA"/>
+	        <PARAMETER name="PRGACCORDO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGACCORDO"/>
+	        <PARAMETER name="CODCOMCOMPETENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="CODCOMCOMPETENZA"/>
+	        <PARAMETER name="CODMONOTIPOCOMPETENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMONOTIPOCOMPETENZA"/>
+	        <PARAMETER name="CODMOTCHIUSURAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMOTCHIUSURAISCR"/>
+	        <PARAMETER name="CODSTATO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODSTATO"/>
+	        <PARAMETER name="CODTIPOISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="CODTIPOISCR"/>
+	        <PARAMETER name="DATCHIUSURAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="DATCHIUSURAISCR"/>
+	        <PARAMETER name="DATCOMPETENZA" scope="SERVICE_REQUEST" type="RELATIVE" value="DATCOMPETENZA"/>
+	        <PARAMETER name="DATFINE" scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINE"/>
+	        <PARAMETER name="DATINIZIO" scope="SERVICE_REQUEST" type="RELATIVE" value="DATINIZIO"/>
+	        <PARAMETER name="STRNOTA" scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTE"/>
+       		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      		<PARAMETER name="NUMKLOALTRAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOALTRAISCR"/>
+      		<PARAMETER name="DATLICENZIAMENTO" scope="SERVICE_REQUEST" type="RELATIVE" value="DATLICENZIAMENTO"/>
+      		<PARAMETER name="FLGDIRITTODO" scope="SERVICE_REQUEST" type="RELATIVE" value="FLGDIRITTODO"/>
+      		<PARAMETER name="CODMOTIVONOTDO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODMOTIVONOTDO"/> 
+       		<PARAMETER name="PRGALTRAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGALTRAISCR"/>
+     </QUERY_UPDATE_ISCR_CIG>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_DeleteIscrCig" class="it.eng.sil.module.doDeleteModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DELETE_ISCRIZIONE_CIG">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGALTRAISCR"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_DataInizioCig" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GetDataInizioCig">
+			<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+			<PARAMETER name="PRGACCORDO" type="RELATIVE" value="PRGACCORDO" scope="SERVICE_REQUEST"/>
+		</QUERY>		
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_DataFineCig" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GetDataFineCig">
+			<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+			<PARAMETER name="PRGACCORDO" type="RELATIVE" value="PRGACCORDO" scope="SERVICE_REQUEST"/>
+		</QUERY>	
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_CodComDomLav" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GetCodComDomLav">
+			<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+		</QUERY>	
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ListScadenzeCig" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERIES>
+       <SELECT_QUERY>
+        <STATEMENT_PROVIDER CLASS="it.eng.sil.module.cig.DynStatementScadenzeCig"/>
+      </SELECT_QUERY>
+    </QUERIES>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="M_DescCPI" class="it.eng.sil.module.cig.GenericTestSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_CPI_DESCRIZIONE">
+			<PARAMETER name="CODCPI" type="RELATIVE" value="CODCPI" scope="SERVICE_REQUEST"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_GetEsitoCig" class="it.eng.sil.module.doDynamicSelectModule">
+	<CONFIG pool="SIL_DATI">
+		<QUERY>
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.cig.DynComboEsito"/>
+		</QUERY>				
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetAzioniCig" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_AZIONI_CIG"/>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_EsitoCig" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="ESITO_CIG">
+			<PARAMETER name="CODESITO" type="RELATIVE" value="CODESITO" scope="SERVICE_REQUEST"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_AzioniCig" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="AZIONI_CIG">
+			<PARAMETER name="CODAZIONE" type="RELATIVE" value="CODAZIONE" scope="SERVICE_REQUEST"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<!-- Gestione Corsi CIG -->
+
+<MODULE name="M_ListaLavCorsiCig" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+	<CONFIG pool="SIL_DATI"  title="" ROWS="30">
+    	<QUERIES>
+        	<SELECT_QUERY>   
+        		<STATEMENT_PROVIDER CLASS="it.eng.sil.module.cig.DynamicListaCorsiCig"/>
+          	</SELECT_QUERY>
+      	</QUERIES>
+    <COLUMNS>                         
+        <COLUMN name="idCorso" label="ID Corso"/>                
+        <COLUMN name="descrizione" label="Descrizione"/>            
+        <COLUMN name="ente" label="Ente"/>
+        <COLUMN name="referente" label="Referente"/>  
+        <COLUMN name="tipo" label="Tipo"/>
+        <COLUMN name="periodoPrevisto" label="Periodo previsto"/>
+        <COLUMN name="periodoEffettivo" label="Periodo effettivo"/>
+        <COLUMN name="CigCollegata" label="Iscrizione Collegata"/>
+        <COLUMN name="dataCancellazione" label="Data cancellazione"/>
+	</COLUMNS>
+    <!-- le captions sono gestite nella classe DynamicListaCorsiCigConfig -->    
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ControlCorsiCig" class="it.eng.sil.module.cig.ControlCorsiCig" >
+	<CONFIG pool="SIL_DATI">
+    	<QUERY statement="S_ControlCorsiCig">
+    		<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+    	</QUERY>     
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaIscrAperteCorsiCig" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+	<CONFIG pool="SIL_DATI" title="" rows="10">
+    	<QUERIES>
+        	<SELECT_QUERY>   
+        		<STATEMENT_PROVIDER CLASS="it.eng.sil.module.cig.DynamicListaIscrAperteCorsiCig"/>
+          	</SELECT_QUERY>
+      	</QUERIES>
+    <COLUMNS>                         
+    	<COLUMN name="datInizio" label="Data Inizio"/>            
+        <COLUMN name="datFine" label="Data Fine"/>
+	</COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/add.gif" label="Seleziona" confirm="false">
+        <PARAMETER name="prgAltraIscr"  type="RELATIVE" scope="LOCAL" value="prgAltraIscr" />
+        <PARAMETER name="codTipoIscr"  type="RELATIVE" scope="LOCAL" value="codTipoIscr" />
+      </SELECT_CAPTION>
+    </CAPTIONS>      
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_RecuperaInfoPerOrienter" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+	<CONFIG pool="SIL_DATI" rows="1">
+		<QUERIES>
+	      <SELECT_QUERY>
+	        <STATEMENT_PROVIDER CLASS="it.eng.sil.module.cig.DynStatementGetInfoPerOrienter"/>
+	      </SELECT_QUERY>
+	    </QUERIES>  
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ContaIscrAperte" class="it.eng.sil.module.ido.GenericSelect" >
+	<CONFIG pool="SIL_DATI">
+    	<QUERY statement="ContaIscrAperte">
+    		<PARAMETER name="CDNLAVORATORE" type="RELATIVE" value="CDNLAVORATORE" scope="SERVICE_REQUEST"/>
+    	</QUERY>     
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_DettaglioCorsoOrienter" class="it.eng.sil.module.ido.GenericSelect" >
+	<CONFIG pool="SIL_DATI">
+    	<QUERY statement="DettaglioCorso">
+    		<PARAMETER name="PRGCORSO" type="RELATIVE" value="PRGCORSO" scope="SERVICE_REQUEST"/>
+    	</QUERY>     
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ContaOrPercorsi" class="it.eng.sil.module.ido.GenericSelect" >
+	<CONFIG pool="SIL_DATI">
+    	<QUERY statement="ContaPercorsi">
+    		<PARAMETER name="PRGALTRAISCR" type="RELATIVE" value="PRGALTRAISCR" scope="SERVICE_REQUEST"/>
+    	</QUERY>     
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ContaPresaIncarico" class="it.eng.sil.module.ido.GenericSelect" >
+	<CONFIG pool="SIL_DATI">
+    	<QUERY statement="ContaPresaIncarico">
+    		<PARAMETER name="PRGALTRAISCR" type="RELATIVE" value="PRGALTRAISCR" scope="SERVICE_REQUEST"/>
+    	</QUERY>     
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaOrPercConcordato" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+	<CONFIG pool="SIL_DATI" title="" rows="10">
+    	<QUERIES>
+        	<SELECT_QUERY>   
+        		<STATEMENT_PROVIDER CLASS="it.eng.sil.module.cig.DynamicListaOrPercorsi"/>
+          	</SELECT_QUERY>
+      	</QUERIES>
+    <COLUMNS>                         
+    	<COLUMN name="datcolloquio" label="Data colloquio"/>
+    	<COLUMN name="datstimata" label="Data stimata"/>
+    	<COLUMN name="esito" label="Esito"/>
+    	<COLUMN name="dateffettiva" label="Data di svolgimento/&lt;BR&gt;conclusione"/>
+	</COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/add.gif" label="Seleziona" confirm="false">
+        <PARAMETER name="PRGPERCORSO"  type="RELATIVE" scope="LOCAL" value="PRGPERCORSO" />
+        <PARAMETER name="PRGCOLLOQUIO"  type="RELATIVE" scope="LOCAL" value="PRGCOLLOQUIO" />
+      </SELECT_CAPTION>
+    </CAPTIONS>      
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ListaAltreIscrizioni" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+	<CONFIG pool="SIL_DATI" title="Lista altre iscrizioni" rows="10">
+    	<QUERIES>
+        	<SELECT_QUERY>   
+        		<STATEMENT_PROVIDER CLASS="it.eng.sil.module.iscrizioni.DynamicIscrizioni"/>
+          	</SELECT_QUERY>
+      	</QUERIES>
+    <COLUMNS>                         
+        <COLUMN name="lavoratore" label="Cognome Nome"/>
+        <COLUMN name="datNasc" label="Data di nascita"/>
+        <COLUMN name="cittadinanza" label="Cittadinanza"/>
+        <COLUMN name="residenza" label="Indirizzo res."/>
+        <COLUMN name="strTelRes" label="Tel. res."/>
+        <COLUMN name="indirizzoDomCompleto" label="Indir. dom./&lt;BR&gt;comune dom. "/>            
+        <COLUMN name="telefonoCompleto" label="Tel. dom./&lt;BR&gt;tel. cell. "/>
+        <COLUMN name="datCompetenza" label="Data competenza"/>
+        <COLUMN name="tipoIscr" label="Tipo Iscr."/>
+        <COLUMN name="motChiusura" label="Motivo di chiusura"/>
+        <COLUMN name="strNota" label="Note"/>
+	</COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+         <PARAMETER name="PAGE" type="ABSOLUTE" value="CigLavListaPage" />
+		 <PARAMETER name="prgAltraIscr"  type="RELATIVE" scope="LOCAL" value="prgAltraIscr" />
+		 <PARAMETER name="cdnlavoratore"  type="RELATIVE" scope="LOCAL" value="cdnlavoratore" />
+		 <PARAMETER name="APRIDIV" type="ABSOLUTE" value="1"/>
+		 <PARAMETER name="dettaglio" type="ABSOLUTE" value="1"/>
+		 <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+		 <PARAMETER name="LISTAALTREISCRIZIONI" scope="" type="ABSOLUTE" value="TRUE"/>
+	</SELECT_CAPTION>
+   </CAPTIONS>      
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_GetConfigAltreIscr" class="it.eng.sil.module.iscrizioni.GetConfigurazione">
+	<CONFIG pool="SIL_DATI" title="">	
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_InsertCorsoOrienter" class="it.eng.sil.module.cig.InsertCorsoOrienter">
+	<CONFIG pool="SIL_DATI">
+		<QUERY_NEXTVAL statement="getSequenceCiCorso"/>
+		
+		<QUERY_INSERT_CI_CORSO statement="InsertCiCorso">
+			<PARAMETER name="PRGCORSOCI" type="RELATIVE" value="PRGCORSOCI" scope="SERVICE_REQUEST"/>
+    		<PARAMETER name="PRGALTRAISCR" type="RELATIVE" value="PRGALTRAISCR" scope="SERVICE_REQUEST"/>
+    		<PARAMETER name="DATINIZIOPREV" type="RELATIVE" value="DATINIZIOPREV" scope="SERVICE_REQUEST"/>
+    		<PARAMETER name="DATFINEPREV" type="RELATIVE" value="DATFINEPREV" scope="SERVICE_REQUEST"/>
+    		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+			<PARAMETER name="PRGCOLLOQUIO" type="RELATIVE" value="PRGCOLLOQUIO" scope="SERVICE_REQUEST"/>
+    		<PARAMETER name="PRGPERCORSO" type="RELATIVE" value="PRGPERCORSO" scope="SERVICE_REQUEST"/>
+    		<PARAMETER name="STRNOTE" type="RELATIVE" value="STRNOTE" scope="SERVICE_REQUEST"/>
+    	</QUERY_INSERT_CI_CORSO> 
+    	
+    	<QUERY_INSERT_CORSO_ORIENTER statement="InsertCorsoOrienter">
+    		<PARAMETER name="PRGCORSOCI" type="RELATIVE" value="PRGCORSOCI" scope="SERVICE_REQUEST"/>
+    		<PARAMETER name="CODRIFPA" type="RELATIVE" value="CODRIFPA" scope="SERVICE_REQUEST"/>
+    		<PARAMETER name="STRDESCRIZIONERIFPA" type="RELATIVE" value="STRDESCRIZIONERIFPA" scope="SERVICE_REQUEST"/>
+    		<PARAMETER name="CODSEDE" type="RELATIVE" value="CODSEDE" scope="SERVICE_REQUEST"/>
+    	</QUERY_INSERT_CORSO_ORIENTER>    
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_DeleteCorso" class="it.eng.sil.module.cig.DeleteCorso">
+	<CONFIG pool="SIL_DATI">
+		<QUERY_DELETE_CI_CORSO statement="DeleteCiCorso">
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_" />
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_" />
+			<PARAMETER name="PRGCORSOCI" type="RELATIVE" value="PRGCORSOCI" scope="SERVICE_REQUEST"/>
+		</QUERY_DELETE_CI_CORSO>
+		
+		<QUERY_ISCONTATTOAB statement="IsContattiAbilitato"/>
+		
+		<QUERY_SELECT_PRGCONTATTO statement="SelectPrgContatto">
+			<PARAMETER name="PRGCORSOCI" type="RELATIVE" value="PRGCORSOCI" scope="SERVICE_REQUEST"  />			
+		</QUERY_SELECT_PRGCONTATTO>
+		<QUERY_SELECT_AG_CONTATTO statement="SelectAgContatto">
+			<PARAMETER name="PRGCONTATTO" type="RELATIVE" value="PRGCONTATTO" scope="SERVICE_REQUEST" />
+		</QUERY_SELECT_AG_CONTATTO>
+		
+		<QUERY_DELETE_CI_CORSO_CATALOGO statement="DeleteCiCorsoCatalogo">
+			<PARAMETER name="PRGCORSOCI" type="RELATIVE" value="PRGCORSOCI" scope="SERVICE_REQUEST"/>
+		</QUERY_DELETE_CI_CORSO_CATALOGO>
+		
+		<QUERY_DELETE_AG_CONTATTO statement="DeleteAgContatto">
+			<PARAMETER name="PRGCONTATTO" type="RELATIVE" value="PRGCONTATTO" scope="SERVICE_REQUEST"/>
+		</QUERY_DELETE_AG_CONTATTO>
+		
+		<QUERY_NEXTVAL statement="SELECT_AGCONTATTO_SEQUENCE"/> 
+		<QUERY_INSERT_CONTATTO statement="INSERT_CONTATTO_CORSO">
+			<PARAMETER name="PRGCONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONTATTO"/>
+    		<PARAMETER name="CODCPICONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPICONTATTO"/>
+	        <PARAMETER name="DATCONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="DATCONTATTO"/>
+	        <PARAMETER name="STRORACONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="STRORACONTATTO"/>
+	        <PARAMETER name="PRGSPICONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGSPICONTATTO"/>
+	        <PARAMETER name="TXTCONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="TXTCONTATTO"/>
+	        <PARAMETER name="PRGMOTCONTRATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGMOTCONTRATTO"/>
+	        <PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+	        <PARAMETER name="PRGUNITA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGUNITA"/>
+	        <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+          	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+          	<PARAMETER name="STREMAIL" scope="SERVICE_REQUEST" type="RELATIVE" value="STREMAIL"/>
+		</QUERY_INSERT_CONTATTO>
+		
+		<QUERY_UPDATE_CORSOCAT statement="UPDATE_CORSO_CATALOGO_DISDETTA">
+			<PARAMETER name="PRGCONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONTATTO"/>
+			<PARAMETER name="PRGCORSOCI" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCORSOCI"/>
+		</QUERY_UPDATE_CORSOCAT>
+		
+		
+		
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_ListaCatalogoCig" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+	<CONFIG pool="SIL_DATI" title="" rows="10">
+    	<QUERIES>
+        	<SELECT_QUERY>   
+        		<STATEMENT_PROVIDER CLASS="it.eng.sil.module.cig.DynamicListaCatalogo"/>
+          	</SELECT_QUERY>
+      	</QUERIES>
+    <COLUMNS>                         
+    	<COLUMN name="strcodiceproposta" label="Codice"/>
+    	<COLUMN name="strsede" label="Sede"/>
+    	<COLUMN name="strambitoprovinciale" label="Ambito provinciale"/>
+    </COLUMNS>
+    <CAPTIONS>
+    	<SELECT_CAPTION image="../../img/add.gif" label="Seleziona" confirm="false">
+      		<PARAMETER scope="LOCAL" type="RELATIVE" name="numidproposta" value="numidproposta" />
+      		<PARAMETER scope="LOCAL" type="RELATIVE" name="numrecid" value="numrecid" />
+      		<PARAMETER scope="LOCAL" type="RELATIVE" name="strcodiceproposta" value="strcodiceproposta" />
+      		<PARAMETER scope="LOCAL" type="RELATIVE" name="strsede" value="strsede" />
+      		<PARAMETER scope="LOCAL" type="RELATIVE" name="strambitoprovinciale" value="strambitoprovinciale" />
+      	</SELECT_CAPTION>
+    </CAPTIONS>      
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_InsertCorso" class="it.eng.sil.module.cig.InsertCatalogoCig">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_NEXTVAL statement="SELECT_PRGCORSOCI_SEQUENCE"/> 
+		<QUERY_INSERT_CORSO statement="INS_CI_CORSO">
+			<PARAMETER name="PRGCORSOCI" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCORSOCI"/>
+    		<PARAMETER name="PRGALTRAISCR" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGALTRAISCR"/>
+	        <PARAMETER name="DATINIZIOPREV" scope="SERVICE_REQUEST" type="RELATIVE" value="DATINIZIOPREV"/>
+	        <PARAMETER name="DATFINEPREV" scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINEPREV"/>
+	        <PARAMETER name="DATPRESAINCARICO" scope="SERVICE_REQUEST" type="RELATIVE" value="DATPRESAINCARICO"/>
+	        <PARAMETER name="DATINIZIO" scope="SERVICE_REQUEST" type="RELATIVE" value="DATINIZIO"/>
+	        <PARAMETER name="DATFINE" scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINE"/>
+	        <PARAMETER name="DATRITIRO" scope="SERVICE_REQUEST" type="RELATIVE" value="DATRITIRO"/>
+	        <PARAMETER name="STRMOTIVORITIRO" scope="SERVICE_REQUEST" type="RELATIVE" value="STRMOTIVORITIRO"/>
+	        <PARAMETER name="CDNUTENTECANCELLAZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="CDNUTENTECANCELLAZIONE"/>
+	        <PARAMETER name="DTMCANCELLAZIONE" scope="SERVICE_REQUEST" type="RELATIVE" value="DTMCANCELLAZIONE"/>
+	        <PARAMETER name="PRGCOLLOQUIO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCOLLOQUIO"/>
+	        <PARAMETER name="PRGPERCORSO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPERCORSO"/>
+	        <PARAMETER name="STRNOTE" scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTECATALOGO"/>
+	        <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>	
+		</QUERY_INSERT_CORSO>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_InsertCatalogo" class="it.eng.sil.module.doInsertModule">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="INS_CI_CORSO_CAT">
+    		<PARAMETER name="PRGCORSOCI" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCORSOCI"/>
+	        <PARAMETER name="NUMIDPROPOSTA" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMIDPROPOSTA"/>
+	        <PARAMETER name="NUMRECID" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMRECID"/>
+	        <PARAMETER name="FLGITALIANOSTRANIERI" scope="SERVICE_REQUEST" type="RELATIVE" value="FLGITALIANOSTRANIERI"/>
+	    </QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetContattoEmailBody" class="it.eng.sil.module.cig.GetContattoEmailBody">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY_CONTATTO_EMAIL_BODY statement="GET_CONTATTO_EMAIL_BODY">
+    		<PARAMETER name="PRGCORSOCI" scope="SESSION" type="RELATIVE" value="PRGCORSOCI"/>	
+  		</QUERY_CONTATTO_EMAIL_BODY>
+  	</CONFIG>	
+</MODULE>
+
+<MODULE name="M_InsertContatto" class="it.eng.sil.module.cig.InsertContatto">
+	<CONFIG pool="SIL_DATI" title="">
+		
+		<QUERY_ISCONTATTOAB statement="IsContattiAbilitato"/>
+			
+		<QUERY_SELECT_CPIDESC statement="GET_CPI_DESCRIZIONE">
+			<PARAMETER name="CODCPICONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPICONTATTO"/>
+		</QUERY_SELECT_CPIDESC>
+	    <QUERY_SELECT_AZUNITA statement="SELECT_AZIENDA_UNITA">
+	    	<PARAMETER name="NUMIDPROPOSTA" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMIDPROPOSTA"/>
+	    </QUERY_SELECT_AZUNITA>
+	    <QUERY_CATSEDE_EMAIL statement="SELECT_CATSEDE_EMAIL">
+	    	<PARAMETER name="NUMIDPROPOSTA" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMIDPROPOSTA"/>
+	        <PARAMETER name="NUMRECID" scope="SERVICE_REQUEST" type="RELATIVE" value="NUMRECID"/>
+	    </QUERY_CATSEDE_EMAIL>
+	    <QUERY_PRGSPIUT statement="CIG_GET_PRGSPIUT">
+      		<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    	</QUERY_PRGSPIUT>    	
+		<QUERY_NEXTVAL statement="SELECT_AGCONTATTO_SEQUENCE"/> 
+		<QUERY_INSERT_CONTATTO statement="INSERT_CONTATTO_CORSO">
+			<PARAMETER name="PRGCONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONTATTO"/>
+    		<PARAMETER name="CODCPICONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPICONTATTO"/>
+	        <PARAMETER name="DATCONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="DATCONTATTO"/>
+	        <PARAMETER name="STRORACONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="STRORACONTATTO"/>
+	        <PARAMETER name="PRGSPICONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGSPICONTATTO"/>
+	        <PARAMETER name="TXTCONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="TXTCONTATTO"/>
+	        <PARAMETER name="PRGMOTCONTRATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGMOTCONTRATTO"/>
+	        <PARAMETER name="PRGAZIENDA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIENDA"/>
+	        <PARAMETER name="PRGUNITA" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGUNITA"/>
+	        <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+          	<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+          	<PARAMETER name="STREMAIL" scope="SERVICE_REQUEST" type="RELATIVE" value="STREMAIL"/>
+		</QUERY_INSERT_CONTATTO>
+		<QUERY_UPDATE_CORSOCAT statement="UPDATE_CORSO_CATALOGO">
+			<PARAMETER name="PRGCONTATTO" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCONTATTO"/>
+			<PARAMETER name="PRGCORSOCI" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCORSOCI"/>
+		</QUERY_UPDATE_CORSOCAT>
+					
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetCatalogo" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_CATALOGO">
+    		<PARAMETER name="PRGCORSOCI" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCORSOCI"/>
+	    </QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_UPDATENOTECORSO" class="it.eng.sil.module.doInsertModule">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="UPDATE_NOTE_CI_CORSO">
+			<PARAMETER name="STRNOTE" scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOTE"/>
+			<PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>	
+    		<PARAMETER name="PRGCORSOCI" scope="SERVICE_REQUEST" type="RELATIVE" value="PRGCORSOCI"/>
+	    </QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_CigInvioSifer" class="it.eng.sil.module.cig.InvioWsSiferModule" >
+	<CONFIG pool="SIL_DATI">
+    	<QUERY statement="ContaPercorsi">
+    		<PARAMETER name="PRGALTRAISCR" type="RELATIVE" value="PRGALTRAISCR" scope="SERVICE_REQUEST"/>
+    	</QUERY>     
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="ListaContattiEntiModule" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+	<CONFIG pool="SIL_DATI" title="" rows="10">
+    	<QUERIES>
+        	<SELECT_QUERY>   
+        		<STATEMENT_PROVIDER CLASS="it.eng.sil.module.cig.DynamicListaContattiEmail"/>
+          	</SELECT_QUERY>
+      	</QUERIES>
+    	<COLUMNS>                         
+    		<COLUMN name="Data" label="Data"/>
+    		<COLUMN name="Ora" label="Ora"/>
+    		<COLUMN name="Operatore" label="Operatore"/>
+    		<COLUMN name="Testo" label="Testo"/>
+    		<COLUMN name="Destinatario" label="Destinatario"/>
+    		<COLUMN name="Motivo" label="Motivo"/>
+    		<COLUMN name="Inviato" label="Inviato"/>
+    	</COLUMNS>
+    </CONFIG>
+</MODULE>
+
+<MODULE name="CI_MOTIVO_NOT_DO" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_MOTIVO_NOT_DO"/>		
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_BloccaPulsanti" class="it.eng.sil.module.ido.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_BLOCCAPULSANTI"/>		
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_AccorpaIscrizione" class="it.eng.afExt.dispatching.module.impl.ListModule">
+<CONFIG pool="SIL_DATI" rows="15" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="GetAccorpaIscrizione">
+         <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNLAVORATORE" />
+      </SELECT_QUERY>
+    </QUERIES>
+   <COLUMNS>
+   		<COLUMN name="datInizio" label="Data Inizio"/>            
+        <COLUMN name="datFine" label="Data Fine"/>
+        <COLUMN name="tipoIscr" label="Tipo Iscr."/>
+        <COLUMN name="strragionesociale" label="Rag. Soc. Azienda/CF"/>
+        <COLUMN name="codAccordo" label="Codice Domanda"/>
+        <COLUMN name="descrStato" label="Stato"/>
+   </COLUMNS>
+  <CAPTIONS>
+      <SELECT_CAPTION image="../../img/add.gif" confirm="FALSE" label="Dettaglio">
+             <PARAMETER name="PAGE" type="ABSOLUTE" value="RefreshAccorpaIscrPage" />
+				<PARAMETER name="cdnFunzione"   type="RELATIVE" scope="SERVICE_REQUEST" value="cdnFunzione"/>
+				<PARAMETER name="AGG_FUNZ"   type="RELATIVE" scope="SERVICE_REQUEST" value="AGG_FUNZ"/>
+				<PARAMETER name="numero"   type="RELATIVE" scope="SERVICE_REQUEST" value="numero"/>
+				<PARAMETER name="prgAzienda"    type="RELATIVE" scope="LOCAL" value="prgAzienda"/>
+				<PARAMETER name="prgUnita"    type="RELATIVE" scope="LOCAL" value="prgUnita"/>
+				<PARAMETER name="datInizio" type="RELATIVE" scope="LOCAL" value="datInizio"/>
+				<PARAMETER name="datFine" type="RELATIVE" scope="LOCAL" value="datFine"/>
+				<PARAMETER name="tipoIscr" type="RELATIVE" scope="LOCAL" value="tipoIscr"/>
+				<PARAMETER name="ragSoc" type="RELATIVE" scope="LOCAL" value="ragSoc"/>
+				<PARAMETER name="cf" type="RELATIVE" scope="LOCAL" value="cf"/>
+				<PARAMETER name="codAccordo" type="RELATIVE" scope="LOCAL" value="codAccordo"/>
+				<PARAMETER name="descrStato" type="RELATIVE" scope="LOCAL" value="descrStato"/>
+				<PARAMETER name="prgaltraiscr" type="RELATIVE" scope="LOCAL" value="prgaltraiscr"/>
+	 </SELECT_CAPTION>
+  </CAPTIONS>    
+</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_GetInfoAltraIscr" class="it.eng.sil.module.cig.InfoAltraIscrDaAccorpare">
+	<CONFIG pool="SIL_DATI" title="">
+      <GET_INFO_ALTRA_ISCR statement="GET_INFO_ALTRA_ISCR">
+	      <PARAMETER type="RELATIVE" value="prgaltraiscr" scope="SERVICE_REQUEST"/>
+      </GET_INFO_ALTRA_ISCR>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_LIST_PIC_ISCR1" class="it.eng.afExt.dispatching.module.impl.ListModule">
+<CONFIG pool="SIL_DATI" rows="50" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="GET_LISTA_PIC_ISCR">
+       	  <PARAMETER name="cdnlavoratore" type="RELATIVE" value="cdnlavoratore" scope="SERVICE_REQUEST"/>
+          <PARAMETER name="prgaltraiscr1" type="RELATIVE" value="prgaltraiscr1" scope="SERVICE_REQUEST"/>
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="datstimata" label="Data Stimata"/>
+      <COLUMN name="azione" label="Azione"/>
+      <COLUMN name="obiettivo" label="Obiettivo"/>
+      <COLUMN name="esito" label="Esito"/>  
+      <COLUMN name="dateffettiva" label="Data di svolgimento/&lt;BR&gt;conclusione"/>  
+    </COLUMNS>
+    <CAPTIONS>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_LIST_PIC_ISCR2" class="it.eng.afExt.dispatching.module.impl.ListModule">
+<CONFIG pool="SIL_DATI" rows="50" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="GET_LISTA_PIC_ISCR">
+          <PARAMETER name="cdnlavoratore" type="RELATIVE" value="cdnlavoratore" scope="SERVICE_REQUEST"/>
+          <PARAMETER name="prgaltraiscr2" type="RELATIVE" value="prgaltraiscr2" scope="SERVICE_REQUEST"/>
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="datstimata" label="Data Stimata"/>
+      <COLUMN name="azione" label="Azione"/>
+      <COLUMN name="obiettivo" label="Obiettivo"/>
+      <COLUMN name="esito" label="Esito"/>  
+      <COLUMN name="dateffettiva" label="Data di svolgimento/&lt;BR&gt;conclusione"/>  
+    </COLUMNS>
+    <CAPTIONS>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_LIST_CORSI_ISCR1" class="it.eng.afExt.dispatching.module.impl.ListModule">
+<CONFIG pool="SIL_DATI" rows="50" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="GET_LISTA_CORSI_ISCR">
+          <PARAMETER name="cdnlavoratore" type="RELATIVE" value="cdnlavoratore" scope="SERVICE_REQUEST"/>
+          <PARAMETER name="prgaltraiscr1" type="RELATIVE" value="prgaltraiscr1" scope="SERVICE_REQUEST"/>
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+    	<COLUMN name="idCorso" label="ID Corso"/>                
+        <COLUMN name="descrizione" label="Descrizione"/>            
+        <COLUMN name="ente" label="Ente"/>
+        <COLUMN name="tipo" label="Tipo"/>
+        <COLUMN name="dataCancellazione" label="Data cancellazione"/>    
+    </COLUMNS>
+    <CAPTIONS>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_LIST_CORSI_ISCR2" class="it.eng.afExt.dispatching.module.impl.ListModule">
+<CONFIG pool="SIL_DATI" rows="50" title="">
+    <QUERIES>
+       <SELECT_QUERY statement="GET_LISTA_CORSI_ISCR">
+          <PARAMETER name="cdnlavoratore" type="RELATIVE" value="cdnlavoratore" scope="SERVICE_REQUEST"/>
+          <PARAMETER name="prgaltraiscr2" type="RELATIVE" value="prgaltraiscr2" scope="SERVICE_REQUEST"/>
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+    	<COLUMN name="idCorso" label="ID Corso"/>                
+        <COLUMN name="descrizione" label="Descrizione"/>            
+        <COLUMN name="ente" label="Ente"/>
+        <COLUMN name="tipo" label="Tipo"/>
+        <COLUMN name="dataCancellazione" label="Data cancellazione"/>      
+    </COLUMNS>
+    <CAPTIONS>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="ACCORPA_ISCRIZIONE" class="it.eng.sil.module.cig.AccorpaIscrizione">
+  <CONFIG pool="SIL_DATI" title="" rows="-1">
+  	  <PROC_ACCORPA_ISCRIZIONE statement="PROC_ACCORPA_ISCRIZIONE"/>
+  </CONFIG>
+</MODULE>
+
+
+

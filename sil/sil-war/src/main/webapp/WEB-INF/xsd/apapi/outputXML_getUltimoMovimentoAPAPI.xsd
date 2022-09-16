@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" attributeFormDefault="unqualified" elementFormDefault="qualified">
+	<xs:element name="Risposta">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element maxOccurs="1" minOccurs="1" name="Esito">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="1" minOccurs="1" name="codice">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:length value="2"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element maxOccurs="1" minOccurs="1" name="descrizione">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="250"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" name="datiUltimoMovimentoAPAPI">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CodiceFiscale" type="CodiceFiscale" minOccurs="1" maxOccurs="1"/>
+							<xs:element name="DataInizio" type="xs:date"  minOccurs="1" maxOccurs="1"/>
+							<xs:element name="DataFine" type="xs:date" nillable="true"/>
+							<xs:element name="MotivoCessazione" nillable="true">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="2"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CodTipologiaContrattuale" minOccurs="1" maxOccurs="1">
+								<xs:simpleType>
+									<xs:restriction base="Stringa">
+										<xs:pattern value="[A-Z]{1}(\.[0-9]{2}){2}"/>
+									</xs:restriction>
+								</xs:simpleType>	
+							</xs:element>
+							<xs:element name="CodQualificaProfessionale" type="QualificaProfessionale" minOccurs="1" maxOccurs="1"/>
+							<xs:element name="CodCcnl" type="CCNL" nillable="true"/>
+							<xs:element name="CodOrario" type="CodificaGenerica" minOccurs="1" maxOccurs="1"/>
+							<xs:element name="NumOrePartTime" nillable="true" type="int-or-empty" />													
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="Stringa">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CodiceFiscale">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]"/>
+			<xs:pattern value="[0-9]{11}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CCNL">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9,A-Z]{3}|[A-Z]{2}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="QualificaProfessionale">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([0-9]\.){5}[0-9]{1,2}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CodOrario">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[A-Z]{1}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="int-or-empty">
+		<xs:union memberTypes="xs:int empty-string" />
+	</xs:simpleType>
+	<xs:simpleType name="empty-string">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CodificaGenerica">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="8" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

@@ -1,0 +1,66 @@
+/**
+ * SpilAslWsSoapBindingSkeleton.java
+ *
+ * This file was auto-generated from WSDL
+ * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ */
+
+package it.eng.sil.coop.webservices.asl;
+
+public class SpilAslWsSoapBindingSkeleton
+		implements it.eng.sil.coop.webservices.asl.SPILASLWSImpl, org.apache.axis.wsdl.Skeleton {
+	private it.eng.sil.coop.webservices.asl.SPILASLWSImpl impl;
+	private static java.util.Map _myOperations = new java.util.Hashtable();
+	private static java.util.Collection _myOperationsList = new java.util.ArrayList();
+
+	/**
+	 * Returns List of OperationDesc objects with this name
+	 */
+	public static java.util.List getOperationDescByName(java.lang.String methodName) {
+		return (java.util.List) _myOperations.get(methodName);
+	}
+
+	/**
+	 * Returns Collection of OperationDescs
+	 */
+	public static java.util.Collection getOperationDescs() {
+		return _myOperationsList;
+	}
+
+	static {
+		org.apache.axis.description.OperationDesc _oper;
+		org.apache.axis.description.FaultDesc _fault;
+		org.apache.axis.description.ParameterDesc[] _params;
+		_params = new org.apache.axis.description.ParameterDesc[] { new org.apache.axis.description.ParameterDesc(
+				new javax.xml.namespace.QName("http://asl.webservices.coop.sil.eng.it", "req"),
+				org.apache.axis.description.ParameterDesc.IN,
+				new javax.xml.namespace.QName("http://asl.webservices.coop.sil.eng.it", "Request"),
+				it.eng.sil.coop.webservices.asl.Request.class, false, false), };
+		_oper = new org.apache.axis.description.OperationDesc("getInfoLavoratore", _params,
+				new javax.xml.namespace.QName("http://asl.webservices.coop.sil.eng.it", "getInfoLavoratoreResponse"));
+		_oper.setReturnType(
+				new javax.xml.namespace.QName("http://asl.webservices.coop.sil.eng.it", "getInfoLavoratoreResponse"));
+		_oper.setElementQName(new javax.xml.namespace.QName("", "getInfoLavoratore"));
+		_oper.setSoapAction("");
+		_myOperationsList.add(_oper);
+		if (_myOperations.get("getInfoLavoratore") == null) {
+			_myOperations.put("getInfoLavoratore", new java.util.ArrayList());
+		}
+		((java.util.List) _myOperations.get("getInfoLavoratore")).add(_oper);
+	}
+
+	public SpilAslWsSoapBindingSkeleton() {
+		this.impl = new it.eng.sil.coop.webservices.asl.SpilAslWsSoapBindingImpl();
+	}
+
+	public SpilAslWsSoapBindingSkeleton(it.eng.sil.coop.webservices.asl.SPILASLWSImpl impl) {
+		this.impl = impl;
+	}
+
+	public it.eng.sil.coop.webservices.asl.GetInfoLavoratoreResponse getInfoLavoratore(
+			it.eng.sil.coop.webservices.asl.Request req) throws java.rmi.RemoteException {
+		it.eng.sil.coop.webservices.asl.GetInfoLavoratoreResponse ret = impl.getInfoLavoratore(req);
+		return ret;
+	}
+
+}

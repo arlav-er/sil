@@ -1,0 +1,141 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html" 
+	xmlns:p="http://primefaces.org/ui"
+	template="../../template/main_primefaces.xhtml">
+
+	<ui:define name="title">
+		Offerte di lavoro
+	</ui:define>
+
+	<ui:param name="form_id" value="testata" />
+
+	<ui:define name="content">
+		<ui:param name="bean" value="#{testataVacancyPfBean}" />
+		<div class="widget_container">
+			<p>Compila questo modulo per inserire una nuova offerta di lavoro. Puoi scegliere se rendere visibile l'offerta
+				solo sul portale regionale o anche a livello nazionale tramite il portale ClicLavoro.</p>
+
+			<p>
+				Attenzione: tutte le offerte di lavoro pubblicate in questo portale sono da intendersi rivolte a uomini e donne
+				senza discriminazione di età, di convinzioni personali, affiliazione sindacale o politica, credo religioso,
+				orientamento sessuale, stato matrimoniale o di famiglia o di gravidanza, handicap, o razza, a meno che non siano
+				previsti limiti dal contratto proposto dall'azienda (es. contratto di apprendistato),o che non si tratti di
+				caratteristiche che incidono sulle modalità di svolgimento della attività lavorativa o che costituiscono un
+				requisito essenziale e determinante ai fini dell'attività lavorativa, come previsto dall'
+
+				<h:outputLink target="_blank"
+					value="http://portale.provincia.ra.it/binary/centri_impiego/normativa/D.lgs%2010%20settembre%202003%20n.%20276%20-%20Art._10.1241086595.pdf">
+					<h:outputText value="art. 10 del D.lgs 276/03" />
+				</h:outputLink>
+				.
+			</p>
+			
+			<div class="ui-widget-content ui-widget ui-corner-all">
+				<h:form id="#{form_id}">
+					<h:panelGrid columns="1" cellspacing="10">
+						<p:outputLabel for="attivitaPrincipale" value="Profilo richiesto" />
+						<p:inputText id="attivitaPrincipale" value="#{bean.data.attivitaPrincipale}"
+							required="true">
+						</p:inputText>
+						<p:message for="attivitaPrincipale"/>
+						
+						<p:outputLabel for="descrizione" value="Descrizione attività" />
+						<p:inputTextarea id="descrizione"
+							autoResize="false"
+							counter="display"
+							counterTemplate="{0} caratteri rimanenti." 
+							maxlength="18000"
+							required="true"
+							value="#{bean.data.descrizione}">
+						</p:inputTextarea>
+						<h:outputText id="display" />
+						<p:message for="descrizione"/>
+						
+						<p:outputLabel for="numeroLavoratoriRicercati" value="Numero lavoratori ricercati" />
+						<p:inputText id="numeroLavoratoriRicercati" required="true" label="Numero lavoratori ricercati"
+							value="#{bean.data.numeroLavoratoriRicercati}" maxlength="8">
+							<!-- <f:convertNumber validatorId="integerConverter" for="function" /> -->
+						</p:inputText>
+						<p:message for="numeroLavoratoriRicercati"/>
+						
+																	    		
+					</h:panelGrid>
+					
+					<h:panelGrid columns="2">
+						<p:outputLabel for="mansione" value="Gruppo professionale" />
+        				<p:autoComplete id="mansione"
+        					completeMethod="#{bean.completeDeMansione}"
+        					converter="deMansioneDTOConverter"
+        					forceSelection="true"
+        					itemLabel="#{mansioneVar.descrizione}" 
+        					itemValue="#{mansioneVar}"
+        					required="true"
+        					requiredMessage="Il Gruppo professionale è obbligatorio"
+        					value="#{bean.data.strMansione}"
+        					var="mansioneVar">
+        					<f:ajax event="change" process="@this"/>
+        					<f:validator validatorId="mansioneSuggestionValidator" for="function"/>
+        				</p:autoComplete>
+						
+					</h:panelGrid>
+					
+					<p:commandButton value="Apri"
+						actionListener="#{bean.buttonAction}"
+						process="@this"
+						oncomplete="PF('mansioniDlgWv').show();">
+					</p:commandButton>
+						
+						
+						
+						
+						
+					<h:panelGroup layout="block">
+						<h:commandLink id="save" styleClass="buttonStyle " value="Salva" action="#{bean.save}">							 							 
+						</h:commandLink>
+					</h:panelGroup>		
+				</h:form>
+				
+				<p:dialog id="mansioniDlg" header="Gruppo professionale" minHeight="40" widgetVar="mansioniDlgWv" dynamic="true">
+			    	<p:tree value="#{bean.root}" var="node" selectionMode="single">
+				        <p:treeNode>
+				            <h:outputText value="#{node}" />
+				        </p:treeNode>
+				    </p:tree>
+				    
+				    
+				    
+				    
+				    
+				    
+				    <p:tree value="#{treeSelectionView.root1}" var="doc"
+                        selectionMode="single"
+                        selection="#{treeSelectionView.selectedNode}">
+				        
+				        <p:treeNode expandedIcon="pi pi-folder-open" collapsedIcon="pi pi-folder">
+				            <h:outputText value="#{doc.name}"/>
+				        </p:treeNode>
+				        <p:treeNode type="document" icon="pi pi-file">
+				            <h:outputText value="#{doc.name}" />
+				        </p:treeNode>
+				        <p:treeNode type="picture" icon="pi pi-image">
+				            <h:outputText value="#{doc.name}" />
+				        </p:treeNode>
+				        <p:treeNode type="mp3" icon="pi pi-video">
+				            <h:outputText value="#{doc.name}" />
+				        </p:treeNode>
+				    </p:tree>
+				    
+				    
+				    
+				</p:dialog>
+				
+				
+				
+			</div>
+		</div>	
+
+	</ui:define>
+	
+</ui:composition>

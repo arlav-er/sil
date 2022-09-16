@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:composite="http://java.sun.com/jsf/composite">
+
+	<!-- Attributi da definire nell'interfaccia -->
+	<composite:interface name="modalDialog">
+		<!-- Il titolo della finestra -->
+		<composite:attribute name="title" required="true" />
+		<composite:attribute name="openF" default="" />
+		<composite:actionSource name="submitta" targets="modal_form:submitta" />
+		<composite:attribute name="actionSubmit" method-signature="void action()" />
+		<composite:attribute name="renderAjax" default="" />
+		<composite:attribute name="eventAjax" default="onEventDummy" />
+		<composite:attribute name="submitLabel" default=""	shortDescription="Label del pulsante SUBMIT" />
+		<composite:attribute name="height" default=""
+			shortDescription="Altezza della finestra" />
+		<composite:attribute name="width" default=""
+			shortDescription="Larghezza della finestra" />
+		<composite:attribute name="renderedButtonAnnulla" default="true" />
+	</composite:interface>
+
+	<!-- Interfaccia implementata -->
+	<composite:implementation>
+		<div id="#{cc.clientId}" class="modal_dialog"
+			title="#{cc.attrs.title}">
+			<h:form id="${'modal_form'}" style="display: inline-block; width: 100%;">
+				<span class="message_content" />
+				<composite:insertChildren />			
+				<br />
+				<br />
+				<h:panelGrid columns="2">
+
+					<h:commandLink action="#{cc.attrs.actionSubmit}" id="submitta"
+						class="buttonStyle disableButton"
+						value="#{cc.attrs.submitLabel}">
+						<f:ajax execute="@form" render="#{cc.attrs.renderAjax} @this" onevent="modalDialog_onEventManager['#{cc.clientId}']"/>
+					</h:commandLink>
+
+					<h:commandLink id="_cancelButton" styleClass="cancelButton" style="float: right;"
+						value="Annulla" title="Annulla" tabindex="0" rendered="#{cc.attrs.renderedButtonAnnulla}"
+						onclick="document.getElementById('#{cc.clientId}').close();return false;"
+						onkeypress="if (event.keyCode==13 )return document.getElementById('#{cc.clientId}').close();" />
+
+				</h:panelGrid>
+			</h:form>
+		</div>
+
+		<script type="text/javascript">
+			myportal.modalDialog.init({
+				ccid:'#{cc.clientId}',
+				open: '#{cc.attrs.openF}',
+				height:'#{cc.attrs.height}',
+				width:'#{cc.attrs.width}'
+			});
+			
+			if (!modalDialog_onEventManager)
+				var modalDialog_onEventManager = {};
+
+			modalDialog_onEventManager['#{cc.clientId}'] = function(data) {
+//				console.log(data);
+				func2exec = window['#{cc.attrs.eventAjax}'];
+				if ($.isFunction(func2exec)) {
+//					console.log('func2exec');
+//					console.log(func2exec);
+					result = func2exec(data);
+//					console.log('result');
+//					console.log(result);
+					if ('leaveOpen' == result) {
+						return false;
+					}
+				}
+				$(jq("#{cc.clientId}")).dialog('close');
+				return false;
+			};
+		</script>
+	</composite:implementation>
+
+</ui:composition>

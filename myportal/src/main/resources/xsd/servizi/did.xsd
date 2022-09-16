@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema elementFormDefault="qualified"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+		<xs:simpleType name="CodiceFiscale">
+		<xs:restriction base="xs:string">
+			<xs:pattern
+				value="[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]" />
+			<xs:pattern value="[0-9]{11}" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Stringa2Obbl">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1" />
+			<xs:maxLength value="2" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="IntestazioneCheck">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ON" />
+			<xs:enumeration value="OFF" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ProtocollazioneCheckON">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ON" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Stringa250">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="250" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Comune">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[A-Z]{1}\d{3}" />
+			<xs:pattern value="[0]{4}" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Sesso">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="M" />
+			<xs:enumeration value="F" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Cittadinanza">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d{3}" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Stringa50Obbl">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1" />
+			<xs:maxLength value="50" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Stringa100Obbl">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1" />
+			<xs:maxLength value="100" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Si-No">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SI" />
+			<xs:enumeration value="NO" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Email">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="80" />
+			<xs:pattern value="([A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*@[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*)?" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Cellulare">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="DatiDid">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="CodiceFiscale" type="CodiceFiscale" />
+				<xs:element name="DataDichiarazione" type="xs:date" />
+				<xs:element name="TipoDichiarazione" type="Stringa2Obbl" />
+				<xs:element name="IdProvincia" type="xs:integer" />
+				<xs:element name="Stampa">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ModelloStampa" type="Stringa250" />
+							<xs:element name="Protocollazione" type="ProtocollazioneCheckON" />
+							<xs:element name="Intestazione" type="IntestazioneCheck" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Lavoratore" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="nome" type="Stringa50Obbl" />
+							<xs:element name="cognome" type="Stringa50Obbl" />
+							<xs:element name="dataNascita" type="xs:date" />
+							<xs:element name="comuneNascita" type="Comune" />
+							<xs:element name="sesso" type="Sesso" />
+							<xs:element name="cittadinanza" type="Cittadinanza" />
+							<xs:element name="domicilio">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="comune" type="Comune" />
+										<xs:element name="indirizzo" type="Stringa100Obbl" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="residenza">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="comune" type="Comune" />
+										<xs:element name="indirizzo" type="Stringa100Obbl" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="rischiodisoccupazione" type="Si-No" />
+							<xs:element minOccurs="0" maxOccurs="1" name="datalicenziamento" type="xs:date" />
+							<xs:element minOccurs="0" maxOccurs="1" name="email" type="Email" />
+							<xs:element minOccurs="0" maxOccurs="1" name="cellulare" type="Cellulare" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

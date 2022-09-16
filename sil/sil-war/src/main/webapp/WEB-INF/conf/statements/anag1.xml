@@ -1,0 +1,2018 @@
+<STATEMENT name="ANAG_CLOSE_DICH_DISP"
+	query="
+	update am_dich_disponibilita 
+	set datFine =
+			(case
+				when (to_date(?, 'dd/mm/yyyy') - 1) &lt; trunc(datdichiarazione) then datdichiarazione
+				else (to_date(?, 'dd/mm/yyyy') - 1)
+			end),
+		  codMotivoFineAtto= 'TD',
+		  numklodichdisp = ?, 
+	 	  dtmmod = sysdate, 
+	 	  cdnutmod = ?
+	where prgdichdisponibilita = ?" />
+
+<STATEMENT name="CAP_DIAGNOSI_FUNZ" query="{ call ?:=PG_DIAGNOSI_FUNZ.capacita(?, ?) }" />
+
+<STATEMENT name="LIST_CODCOM_PERPOLO"
+	query="SELECT distinct com1.codcom
+			   FROM DE_COMUNE com1
+			   inner join de_comune com2 on com1.codProvincia=com2.codProvincia
+			   where com2.codCpi=? " />
+
+<STATEMENT name="CONTROLLO_DISABILITA"
+	query="
+			select   count(*) as numero
+			from     am_cm_iscr, de_cm_tipo_iscr
+			where    am_cm_iscr.CODCMTIPOISCR = de_cm_tipo_iscr.CODCMTIPOISCR
+					 and de_cm_tipo_iscr.CODMONOTIPORAGG = 'D'
+					 and datdatafine is null
+					 and cdnlavoratore = ENCRYPT(?,?)
+        " />
+        
+<STATEMENT name="CONTROLLO_DISABILITA_PROTOCOLLATA"
+	query="
+			select   count(*) as numero
+			from     am_cm_iscr, de_cm_tipo_iscr
+			where    am_cm_iscr.CODCMTIPOISCR = de_cm_tipo_iscr.CODCMTIPOISCR
+					 and de_cm_tipo_iscr.CODMONOTIPORAGG = 'D'
+					 and datdatafine is null
+					 and am_cm_iscr.codstatoatto = 'PR'
+					 and cdnlavoratore = ENCRYPT(?,?)
+        " />        
+
+<STATEMENT name="SELECT_STATO_ATTO"
+	query="
+			select doc.CODSTATOATTO, docColl.STRCHIAVETABELLA
+			from  am_documento doc,
+				  am_documento_coll docColl
+			where doc.CODTIPODOCUMENTO = 'RICHESON'
+			  and doc.PRGDOCUMENTO = docColl.PRGDOCUMENTO  
+			  and docColl.STRCHIAVETABELLA = ?         
+	  " />
+
+<STATEMENT name="COUNT_DATFINE"
+	query="select count(*) as conta
+			   from CM_DIAGNOSI_FUNZIONALE DF, AN_LAVORATORE AN
+			   WHERE AN.CDNLAVORATORE = DECRYPT(DF.CDNLAVORATORE, ?) 
+			   AND AN.CDNLAVORATORE = ?
+			   and DF.DATFINE is null " />
+
+<STATEMENT name="COUNT_DATFINE_CRYPTO"
+	query="select count(*) as conta
+			   from CM_DIAGNOSI_FUNZIONALE DF, AN_LAVORATORE AN
+			   WHERE DF.CDNLAVORATORE = ?
+			   and DF.DATFINE is null " />
+
+<STATEMENT name="SELECT_SP_LAV"
+	query="select SP_LAVORATORE.CODMINSAP, 
+    			DE_STATO_SAP.CODSTATO, 
+    			DE_STATO_SAP.STRDESCRIZIONE, 
+			    to_char(DATAINVIOMIN,'dd/mm/yyyy hh24:mi') AS DATAINVIOMIN,
+			    to_char(SP_LAVORATORE.DATINIZIOVAL,'dd/mm/yyyy hh24:mi') AS DATINIZIOVAL, 
+			    to_char(SP_LAVORATORE.DATFINEVAL,'dd/mm/yyyy hh24:mi') AS DATFINEVAL,
+			    to_char(SP_LAVORATORE.DTMINS,'dd/mm/yyyy hh24:mi') AS DTMINS,
+			    to_char(SP_LAVORATORE.DTMMOD,'dd/mm/yyyy hh24:mi') AS DTMMOD,
+			    cdnutins,
+			    cdnutmod			    
+               from SP_LAVORATORE
+               LEFT JOIN DE_STATO_SAP ON DE_STATO_SAP.CODSTATO = SP_LAVORATORE.CODSTATO
+               WHERE CDNLAVORATORE = ?
+               and SP_LAVORATORE.DATFINEVAL is null " />
+
+<STATEMENT name="INSERT_SP_LAV_PER_ANNULLA"
+	query=" insert into SP_LAVORATORE (
+                            PRGSPLAV,
+                            DATAINVIOMIN,
+                            CODMINSAP,
+                            CODENTETIT,
+                            DATNASC,
+                            CDNLAVORATORE,
+                            CDNUTINS,
+                            DTMINS,
+                            CDNUTMOD,
+                            DTMMOD,
+                            STRCODICEFISCALE,
+                            CODSTATO,
+                            DATINIZIOVAL,
+                            DATFINEVAL)
+                   select S_SP_LAVORATORE.NEXTVAL,
+                            DATAINVIOMIN,
+                            CODMINSAP,
+                            CODENTETIT,
+                            DATNASC,
+                            CDNLAVORATORE,
+                            ?,
+                            sysdate,
+                            ?,
+                            sysdate,
+                            STRCODICEFISCALE,  
+                            '03',
+                            sysdate,
+                            null
+                   from SP_LAVORATORE
+                   where PRGSPLAV = ?" />
+
+<STATEMENT name="CONTROLLO_DISPONIBILITA"
+	query="
+			select   count(*) as numero
+			from     pr_dispo_l68 dis
+			where    dis.CDNLAVORATORE = ?        
+	" />
+
+<STATEMENT name="LOAD_DISP_L68"
+	query="
+			select dis.FLGDISPOEP,
+				   dis.FLGDISPOAZI,
+				   dis.FLGDISPOTIROCINIO,
+				   dis.FLGDISPOFP,
+				   dis.STRNOTELIMDISPO,
+				   dis.CDNLAVORATORE,
+				   dis.CDNUTINS,
+				   dis.CDNUTMOD,
+				   dis.NUMKLODISPOL68,
+				   to_char(dis.DTMMOD,'dd/mm/yyyy') as DTMMOD,
+				   to_char(dis.DTMINS,'dd/mm/yyyy') as DTMINS,
+				   dis.PRGDISPOL68,
+				   dis.CODMONODISPOL8,
+				   dis.CODGRADOOCC
+			from pr_dispo_l68 dis
+			where dis.CDNLAVORATORE=?      
+	" />
+
+<STATEMENT name="LOAD_NUM_DIS"
+	query="
+			select distinct
+				   numdisabili,datiniziovalidita,dtmins			   
+			from cm_rich_eson_disabili
+			where prgRichEsonero = ?			
+			order by dtmins desc	" />
+
+<STATEMENT name="LOAD_DETT_DETT_PROV"
+	query="
+			select PRGCOMPTERRDETT,
+				   PRGRICHCOMPTERR,
+				   CODMONOCATEGORIA,
+				   CODPROVINCIA,
+				   CODMONOECCDIF,
+				   NUMINTERESSATI
+			from   CM_COMPTERR_DETTAGLIO
+			where  PRGCOMPTERRDETT = ?			
+			" />
+
+<STATEMENT name="LOAD_RICH_SOSP"
+	query="
+			select az.prgazienda,
+				   az.STRRAGIONESOCIALE,
+				   az.STRCODICEFISCALE,
+				   az.STRPARTITAIVA,
+				   to_char(sosp.DATRICHIESTA,'dd/mm/yyyy') as DATRICHIESTA,
+				   to_char(sosp.DATINIZIOSOSP,'dd/mm/yyyy') as DATINIZIOSOSP,
+				   to_char(sosp.DATFINESOSP,'dd/mm/yyyy') as DATFINESOSP,
+				   sosp.CODSTATORICHIESTA,
+				   sosp.CODMOTIVOSOSP,
+				   sosp.FLGPROVVEDIMENTO,
+				   sosp.FLGPROROGA,
+				   to_char(sosp.DATFINETEMPORANEA,'dd/mm/yyyy') as DATFINETEMPORANEA,				   				   
+				   sosp.CDNUTINS,
+				   sosp.CDNUTMOD,
+				   sosp.NUMKLOSOSPENSIONE,
+				   to_char(sosp.DTMMOD,'dd/mm/yyyy hh24:mi') as DTMMOD,
+				   to_char(sosp.DTMINS,'dd/mm/yyyy hh24:mi') as DTMINS,
+				   sosp.PRGRICHSOSPENSIONE
+			from   CM_RICH_SOSPENSIONE sosp,
+			       an_azienda az
+			where  PRGRICHSOSPENSIONE=?
+			  and  az.prgazienda = sosp.prgazienda	" />
+
+<STATEMENT name="LOAD_RICH_ESONERO"
+	query="
+			select az.prgazienda,
+				   az.STRRAGIONESOCIALE,
+				   az.STRCODICEFISCALE,
+				   az.STRPARTITAIVA,
+				   to_char(ES.DATRICHIESTA,'dd/mm/yyyy') as DATRICHIESTA,
+				   to_char(ES.DATINIZIOVALIDITA,'dd/mm/yyyy') as DATINIZIOVALIDITA,
+				   to_char(ES.DATFINE,'dd/mm/yyyy') as DATFINE,
+				   ES.CODSTATORICHIESTA,
+				   ES.NUMPERCESONERO,
+				   ES.STRMOTIVAZIONE,
+				   ES.CDNUTINS,
+				   ES.CDNUTMOD,
+				   ES.NUMKLOESONERO,
+				   es.CODPROVINCIA as PROVINCIA_ISCR,
+				   to_char(ES.DTMMOD,'dd/mm/yyyy hh24:mi') as DTMMOD,
+				   to_char(ES.DTMINS,'dd/mm/yyyy hh24:mi') as DTMINS,
+				   ES.PRGRICHESONERO
+			from   CM_RICH_ESONERO ES,
+			       an_azienda az
+			where  ES.PRGRICHESONERO=?
+			  and  az.prgazienda = ES.prgazienda 
+" />
+
+<STATEMENT name="LOAD_RICH_COMTER"
+	query="
+			select az.prgazienda,
+				   az.STRRAGIONESOCIALE,
+				   az.STRCODICEFISCALE,
+				   az.STRPARTITAIVA,
+				   to_char(ES.DATRICHIESTA,'dd/mm/yyyy') as DATRICHIESTA,
+				   to_char(ES.DATFINE,'dd/mm/yyyy') as DATFINE,
+				   ES.CODSTATORICHIESTA,
+				   ES.STRMOTIVAZIONE,
+				   ES.CDNUTINS,
+				   ES.CDNUTMOD,
+				   ES.NUMKLOCOMPTERR,
+				   to_char(ES.DTMMOD,'dd/mm/yyyy hh24:mi') as DTMMOD,
+				   to_char(ES.DTMINS,'dd/mm/yyyy hh24:mi') as DTMINS,
+				   ES.PRGRICHCOMPTERR
+			from   CM_RICH_COMP_TERR ES,
+			       an_azienda az
+			where  ES.PRGRICHCOMPTERR=?
+			  and  az.prgazienda = ES.prgazienda
+" />
+
+<STATEMENT name="GET_NUM_DIS"
+	query="
+			select DIS.PRGRICHESONDISABILI,
+				   DIS.PRGRICHESONERO,
+				   DIS.NUMDISABILI,
+				   DIS.NUMDISABILIEFFETT,
+				   DIS.DATINIZIOVALIDITA,
+				   DIS.NUMBASECOMPUTO
+			from   CM_RICH_ESON_DISABILI DIS
+			where  DIS.PRGRICHESONERO=?
+			order by DIS.DATINIZIOVALIDITA DESC
+	 	" />
+
+<STATEMENT name="LOAD_VARIAZIONI"
+	query="
+			select DIS.PRGRICHESONDISABILI,
+				   DIS.PRGRICHESONERO,
+				   DIS.NUMDISABILI, 
+				   DIS.NUMDISABILIEFFETT,
+				   to_char(DIS.DATINIZIOVALIDITA,'dd/mm/yyyy') as DATINIZIOVALIDITA,
+				   DIS.NUMBASECOMPUTO,
+				   decode(dis.codmonocategoria, 'A', 'maggiore di 50 dipendenti',
+				                                'B', 'da 36 a 50 dipendenti',
+				                                'C', 'da 15 a 35 dipendenti', 
+				                                '') as categoria,	
+				   DIS.CDNUTINS,
+				   DIS.CDNUTM,
+				   DIS.CDNUTMOD,
+				   to_char(DIS.DTMINS,'dd/mm/yyyy') as DTMINS,
+				   to_char(DIS.DTMMOD,'dd/mm/yyyy') as DTMMOD,
+				   DIS.NUMKLORICHESONDIS
+			from   CM_RICH_ESON_DISABILI DIS
+			where  DIS.PRGRICHESONERO=?
+			order by DIS.DATINIZIOVALIDITA DESC 
+	 	" />
+
+<STATEMENT name="LOAD_DETT_PROV"
+	query="select det.PRGCOMPTERRDETT,
+				   	  det.PRGRICHCOMPTERR,
+				      prov.STRDENOMINAZIONE as PROVINCIA,
+				      decode(det.CODMONOECCDIF,'E','Eccesso','D','Difetto') as CODMONOECCDIF,
+				      decode(det.CODMONOCATEGORIA,'D','Disabile','A','Categoria protetta ex art.18') as CODMONOCATEGORIA,
+				      det.NUMINTERESSATI
+			   from CM_COMPTERR_DETTAGLIO det,
+				    DE_PROVINCIA prov
+			  where det.CODPROVINCIA=prov.CODPROVINCIA
+			        and det.PRGRICHCOMPTERR=? " />
+
+<STATEMENT name="LOAD_AZIENDA"
+	query="
+			select STRRAGIONESOCIALE,
+				   STRCODICEFISCALE,
+				   STRPARTITAIVA
+			from   AN_AZIENDA
+			where  PRGAZIENDA=?
+	 	" />
+
+<STATEMENT name="ANAG_GETDIAGNOSIFUNZ"
+	query="select  PG_UTILS.TRUNC_DESC(DF.STRGIUDIZIODIAGNOSTICO,200,'...') as STRGIUDIZIODIAGNOSTICO,
+					   TO_CHAR(DF.DATDIAGNOSI,'DD/MM/YYYY') AS DATDIAGNOSI,
+					   df.prgdiagnosifunzionale,
+					   TO_CHAR(DF.DATFINE,'DD/MM/YYYY') AS DATFINE,
+					   DF.CDNLAVORATORE
+			   from
+					   AN_LAVORATORE AN,
+					   CM_DIAGNOSI_FUNZIONALE DF
+			   WHERE
+					   AN.CDNLAVORATORE = DECRYPT(DF.CDNLAVORATORE, ?) 
+					   AND AN.CDNLAVORATORE = ? 
+				 ORDER BY DF.DATDIAGNOSI DESC " />
+
+<STATEMENT name="GET_CM_DIAGNOSI_FUNZ_NEXTVAL"
+	query="SELECT S_CM_DIAGNOSI_FUNZIONALE.NEXTVAL as do_nextval FROM DUAL" />
+
+<STATEMENT name="GET_PR_DISPO_L68_NEXTVAL"
+	query="SELECT S_PR_DISPO_L68.NEXTVAL as do_nextval FROM DUAL" />
+
+<STATEMENT name="GET_CM_RICH_SOSP_NEXTVAL"
+	query="SELECT S_CM_RICH_SOSPENSIONE.NEXTVAL as do_nextval FROM DUAL" />
+
+<STATEMENT name="GET_CM_RICH_ESONERO_NEXTVAL"
+	query="SELECT S_CM_RICH_ESONERO.NEXTVAL as do_nextval FROM DUAL" />
+
+<STATEMENT name="GET_CM_RICH_COMTER_NEXTVAL"
+	query="SELECT S_CM_RICH_COMP_TERR.NEXTVAL as do_nextval FROM DUAL" />
+
+<STATEMENT name="GET_CM_PROGETTO_SOCIOASSIST_NEXTVAL"
+	query="SELECT S_CM_PROGETTO_SOCIOASSIST.NEXTVAL as do_nextval FROM DUAL" />
+
+<STATEMENT name="GET_CM_RICH_ESON_DISABILI_NEXTVAL"
+	query="SELECT S_CM_RICH_ESON_DISABILI.NEXTVAL as do_nextval FROM DUAL" />
+
+<STATEMENT name="GET_CM_COMPTERR_DETTAGLIO_NEXTVAL"
+	query="SELECT S_CM_COMPTERR_DETTAGLIO.NEXTVAL as do_nextval FROM DUAL" />
+
+<STATEMENT name="GET_CM_PAGAMENTO_ESON_NEXTVAL"
+	query="SELECT S_CM_PAGAMENTO_ESON.NEXTVAL as do_nextval FROM DUAL" />
+
+<STATEMENT name="GET_CM_CAPACITA_NEXTVAL"
+	query="SELECT S_CM_CAPACITA.NEXTVAL as do_nextval FROM DUAL" />
+
+<STATEMENT name="GET_AM_DOCUMENTO_NEXTVAL"
+	query="SELECT S_AM_DOCUMENTO.NEXTVAL as do_nextval FROM DUAL" />
+
+<STATEMENT name="INSERT_DOC"
+	query="	insert into am_documento
+					(prgdocumento, 
+					 CODTIPODOCUMENTO, 
+					 DATACQRIL, 
+					 CDNUTINS, 
+					 DTMINS, 
+					 CDNUTMOD, 
+					 DTMMOD, 
+					 NUMKLODOCUMENTO, 
+					 CODSTATOATTO,
+					 numAnnoProt,
+					 numProtocollo,
+					 datProtocollo,
+					 prgAzienda)
+				values
+					(?,
+					 'RICHESON',
+					 sysdate,
+					 ?,
+					 sysdate,
+					 ?,
+					 sysdate,
+					 ?,
+					 'NP',
+					 ?,?,
+					 to_date(?, 'dd/mm/yyyy hh24:mi'),
+					 ?
+					 )
+        " />
+
+<STATEMENT name="INSERT_DOC_COLL"
+	query="	insert into am_documento_coll
+					(prgdocumentocoll, prgdocumento, cdncomponente, strchiavetabella)
+				values
+					(S_AM_DOCUMENTO_COLL.nextval,
+					 ?, ?,?)                              
+        " />
+
+<STATEMENT name="INS_DIAGNOSI_FUNZ" query="SELECT * FROM DUAL" />
+
+<STATEMENT name="SELECT_GET_GIUDIZIO_ML"
+	query="select   codgiudizio as codice,
+        				strdescrizione AS descrizione
+			   from     de_giudizio_ml
+			   " />
+
+<STATEMENT name="DELETE_SERVIZIO"
+	query="DELETE FROM CM_PROGETTO_SOCIOASSIST
+               WHERE codServizio=?
+               AND prgDiagnosiFunzionale=?" />
+
+<STATEMENT name="DELETE_PAGAMENTO"
+	query="DELETE FROM CM_PAGAMENTO_ESON
+               WHERE prgPagamEsonero=?" />
+
+<STATEMENT name="DELETE_VARIAZIONE"
+	query="DELETE FROM CM_RICH_ESON_DISABILI
+               WHERE PRGRICHESONDISABILI=?" />
+
+<STATEMENT name="DELETE_SEDE"
+	query="DELETE FROM CM_UNITA_SOSPENSIONE
+               WHERE prgAzienda = ?
+                 AND PRGRICHSOSPENSIONE = ?
+                 AND prgUnita = ?
+               " />
+
+<STATEMENT name="DELETE_DETT_PROV"
+	query="DELETE FROM CM_COMPTERR_DETTAGLIO
+                 WHERE PRGCOMPTERRDETT = ?
+                 " />
+
+<STATEMENT name="COMBO_TIPI_CAP"
+	query="select
+					 codgradocapacita as codice,
+					 strdescrizione as descrizione
+			   from  de_grado_capacita
+			   where codmonotipogrado = 'C'
+			   " />
+<STATEMENT name="COMBO_STATO_ADESIONE_MIN"
+	query="select
+                     codstatoadesionemin as codice,
+                     strdescrizione as descrizione
+               from  de_sTATO_ADESIONE_MIN
+               " />
+
+<STATEMENT name="COMBO_MOTIVI"
+	query="select
+					 CODMOTIVOSOSP as codice,
+					 strdescrizione as descrizione
+			   from  DE_CM_MOTIVO_SOSP
+			   " />
+
+<STATEMENT name="COMBO_CAP_SINO"
+	query="select
+					 codgradocapacita as codice,
+					 strdescrizione as descrizione
+			   from  de_grado_capacita
+			   where codmonotipogrado = 'P'
+			   " />
+
+<STATEMENT name="INSERT_DIAGNOSI_FUNZ"
+	query="
+	insert into CM_DIAGNOSI_FUNZIONALE  (
+	   numPercInval,
+	   prgDiagnosiFunzionale,
+	   cdnLavoratore,
+	   CODAZIENDAASL,
+	   FLGREVACCERTAMENTO,
+	   DATREVISIONEACCERT ,
+	   FLGINVALIDFISICA,
+	   FLGINVALIDPSICHICA,
+	   FLGINVALIDNONDETERMINATA,
+	   FLGINVALIDINTELLETTIVA,
+	   FLGINVALIDSENSORIALE,
+	   STRGIUDIZIODIAGNOSTICO,
+	   CODGIUDIZIO,	   
+	   DATRICONOSCIMENTO,
+	   FLGPERMANENZASTATO,
+	   DATDIAGNOSI,
+	   DATFINE,
+	   FLGSTATOGRAVITA104,
+	   DATRICHREVDIAGNOSI,
+	   FLGREVDIAGNOSIPERVENUTA,
+	   DATARRIVOREVDIAGNOSI,
+	   CDNUTINS,
+	   CDNUTMOD,
+	   DTMINS,
+	   DTMMOD,
+	   NUMKLODIAGNOSIFUNZIONALE
+	 )
+	 values (
+	 	?,?,
+	 	?,
+	 	?,?,
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	?,?,?,?,?,?,?,
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	?,
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	?,
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	?,
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	?,?,
+	 	sysdate,
+	 	sysdate,? ) " />
+
+<STATEMENT name="INSERT_DISPO_L68"
+	query="
+	insert into PR_DISPO_L68  (
+	    FLGDISPOEP,
+	    FLGDISPOAZI,
+	    FLGDISPOTIROCINIO,
+	    FLGDISPOFP,
+	    STRNOTELIMDISPO,
+	    CDNLAVORATORE,
+	    CDNUTINS,
+	    CDNUTMOD,
+	    NUMKLODISPOL68,
+	    DTMMOD,
+	    DTMINS,
+	    PRGDISPOL68,
+	    CODMONODISPOL8,
+	    CODGRADOOCC
+	)
+	 values (
+	 	?,?,?,?,?,?,?,?,?,
+	 	sysdate,
+	 	sysdate,
+	 	?,?,?
+	 )		
+" />
+
+<STATEMENT name="INSERT_RICH_SOSP"
+	query="
+	insert into CM_RICH_SOSPENSIONE  (
+		PRGAZIENDA,
+		CODSTATORICHIESTA,
+		CODMOTIVOSOSP,
+		DATRICHIESTA,
+		FLGPROVVEDIMENTO,
+		FLGPROROGA,
+		DATINIZIOSOSP,
+		DATFINESOSP,
+		DATFINETEMPORANEA,
+		CDNUTINS,
+		CDNUTMOD,
+	    DTMMOD,
+	    DTMINS,
+		NUMKLOSOSPENSIONE,
+		PRGRICHSOSPENSIONE
+	)
+	 values (
+	 	?,?,?,
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	?,?,
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	?,?,
+	 	sysdate,
+	 	sysdate,
+	 	?,?
+	 )		
+" />
+
+<STATEMENT name="INSERT_RICH_ESONERO"
+	query="
+	insert into CM_RICH_ESONERO  (
+		PRGAZIENDA,
+		CODSTATORICHIESTA,
+		DATRICHIESTA,
+		DATINIZIOVALIDITA,
+		DATFINE,
+		NUMPERCESONERO,
+		STRMOTIVAZIONE,
+		CDNUTINS,
+		CDNUTMOD,
+	    DTMMOD,
+	    DTMINS,
+		NUMKLOESONERO,
+		PRGRICHESONERO,
+		CODPROVINCIA
+	)
+	 values (
+	 	?,?,
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	?,?,?,?,
+	 	sysdate,
+	 	sysdate,
+	 	?,?,?
+	 )		
+" />
+
+<STATEMENT name="INSERT_RICH_COMTER"
+	query="
+	insert into CM_RICH_COMP_TERR  (
+		PRGAZIENDA,
+		CODSTATORICHIESTA,
+		DATRICHIESTA,
+		DATFINE,
+		STRMOTIVAZIONE,
+		CDNUTINS,
+		CDNUTMOD,
+	    DTMMOD,
+	    DTMINS,
+		NUMKLOCOMPTERR,
+		PRGRICHCOMPTERR
+	)
+	 values (
+	 	?,?,
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	?,?,?,
+	 	sysdate,
+	 	sysdate,
+	 	?,?
+	 )		
+" />
+
+<STATEMENT name="LOAD_DIAGNOSI_FUNZ"
+	query="
+		select df.prgDiagnosiFunzionale,
+			   df.cdnLavoratore,
+			   df.numPercInval,
+			   df.CODAZIENDAASL,
+			   asl.strDescrizione as descrASL,
+			   df.FLGREVACCERTAMENTO,
+			   to_char(df.DATREVISIONEACCERT,'dd/mm/yyyy') as DATREVISIONEACCERT,
+			   df.FLGINVALIDFISICA,
+			   df.FLGINVALIDPSICHICA,
+			   df.FLGINVALIDNONDETERMINATA, 
+			   df.FLGINVALIDINTELLETTIVA,
+			   df.FLGINVALIDSENSORIALE,
+			   df.STRGIUDIZIODIAGNOSTICO,
+			   df.CODGIUDIZIO,
+			   ml.strDescrizione as descrGiudizioML,   
+			   to_char(df.DATRICONOSCIMENTO,'dd/mm/yyyy') as DATRICONOSCIMENTO,
+			   df.FLGPERMANENZASTATO,
+			   df.FLGSTATOGRAVITA104,
+			   to_char(df.DATDIAGNOSI,'dd/mm/yyyy') as DATDIAGNOSI,
+			   to_char(df.DATFINE,'dd/mm/yyyy') as DATFINE,
+			   to_char(df.DATFINE,'dd/mm/yyyy') as DATFINEDIAGNOSI,
+			   to_char(df.DATRICHREVDIAGNOSI,'dd/mm/yyyy') as DATRICHREVDIAGNOSI,
+			   df.FLGREVDIAGNOSIPERVENUTA,
+			   to_char(df.DATARRIVOREVDIAGNOSI,'dd/mm/yyyy') as DATARRIVOREVDIAGNOSI,
+			   df.CDNUTINS,
+			   df.CDNUTMOD,
+			   to_char(df.DTMINS,'dd/mm/yyyy') as DTMINS,
+			   to_char(df.DTMMOD,'dd/mm/yyyy') as DTMMOD,
+			   df.NUMKLODIAGNOSIFUNZIONALE 
+		from   CM_DIAGNOSI_FUNZIONALE df,
+			   DE_AZIENDA_ASL asl,
+			   DE_GIUDIZIO_ML ml
+		where  
+			   df.codAziendaASL = asl.codAziendaASL (+) and
+			   df.codGiudizio = ml.codGiudizio (+) and
+			   df.prgDiagnosiFunzionale = ?
+" />
+
+<STATEMENT name="LOAD_COMITATO_TEC"
+	query="
+		select ctec.PRGDIAGNOSIFUNZIONALE,
+			   ctec.STRIPOTESIINSLAV,
+			   ctec.STRNOTACOMITATOTEC,
+			   ctec.STRPROFILOSOCIOLAV,
+			   ctec.FLGDISPLIM,
+			   ctec.CDNUTINS,
+			   ctec.CDNUTMOD,
+			   to_char(ctec.DTMINS,'dd/mm/yyyy') as DTMINS,
+			   to_char(ctec.DTMMOD,'dd/mm/yyyy') as DTMMOD
+		  from cm_comitato_tec ctec
+		 where ctec.prgDiagnosiFunzionale = ?
+" />
+
+<STATEMENT name="DATINIZIOPERIODI_DECVALORE"
+	query=" 
+  	  select to_char(datinizioval,'DD/MM/YYYY') as datinizioval from (
+	  select datinizioval, datfineval, decvalore 
+ 	  from TS_CONFIG_LOC
+  	  where CODTIPOCONFIG = 'CM_ES_EU' 
+  	  and strcodrif = (select codprovinciasil from ts_generale)  
+	  order by datfineval asc) 
+	  where rownum = 1
+" />
+
+<STATEMENT name="DATFINEPERIODI_DECVALORE"
+	query=" 
+  	  select to_char(datfineval,'DD/MM/YYYY') as datfineval from (
+	  select datinizioval, datfineval, decvalore 
+ 	  from TS_CONFIG_LOC
+  	  where CODTIPOCONFIG = 'CM_ES_EU' 
+  	  and strcodrif = (select codprovinciasil from ts_generale)  
+	  order by datfineval desc) 
+	  where rownum = 1
+" />
+
+<STATEMENT name="DATINIZIOPERIODI_VARIAZIONI"
+	query=" 
+	  select to_char(datiniziovalidita,'DD/MM/YYYY') as datiniziovalidita from (
+	  select ed.datiniziovalidita 
+      from cm_rich_eson_disabili ed 
+      where ed.prgrichesonero = ?
+      and ed.datiniziovalidita &lt;= to_date(?,'DD/MM/YYYY') 
+      order by datiniziovalidita asc) 
+	  where rownum = 1
+" />
+
+<!-- Aggiornamento diagnosi funzionale (diagnosi di minorazione) -->
+<STATEMENT name="UPDATE_DIAGNOSI_FUNZ"
+	query="
+	update cm_diagnosi_funzionale
+	SET    NUMPERCINVAL = ?,
+		   CODAZIENDAASL = ?,
+		   FLGREVACCERTAMENTO = ?,
+		   DATREVISIONEACCERT = TO_DATE (?, 'dd/mm/yyyy'),
+		   FLGINVALIDFISICA = ?,
+		   FLGINVALIDPSICHICA = ?,
+		   FLGINVALIDNONDETERMINATA = ?,  
+		   FLGINVALIDINTELLETTIVA = ?,
+		   FLGINVALIDSENSORIALE = ?,
+		   STRGIUDIZIODIAGNOSTICO = ?,
+		   CODGIUDIZIO = ?,	   
+		   DATRICONOSCIMENTO = TO_DATE (?, 'dd/mm/yyyy'),
+		   FLGPERMANENZASTATO = ?,
+		   DATDIAGNOSI = TO_DATE (?, 'dd/mm/yyyy'),
+		   DATFINE = TO_DATE (?, 'dd/mm/yyyy'),
+		   FLGSTATOGRAVITA104 = ?,
+		   DATRICHREVDIAGNOSI = TO_DATE (?, 'dd/mm/yyyy'),
+		   FLGREVDIAGNOSIPERVENUTA = ?,
+		   DATARRIVOREVDIAGNOSI = TO_DATE (?, 'dd/mm/yyyy'),
+		   CDNUTMOD = ?,		   
+		   DTMMOD = sysdate,
+		   NUMKLODIAGNOSIFUNZIONALE = TO_NUMBER(?) + 1		   
+	WHERE  prgDiagnosiFunzionale = ?
+" />
+
+<STATEMENT name="UPDATE_DISPO_L68"
+	query="
+	update PR_DISPO_L68
+	SET    codMonoDispoL8 = ?,
+		   flgDispoEP = ?,
+		   flgDispoAzi = ?,		   
+		   flgDispoTirocinio = ?,
+		   flgDispoFP = ?,  
+		   strNoteLimDispo = ?,
+		   CDNUTMOD = ?,		   
+		   DTMMOD = sysdate,
+		   NUMKLODISPOL68 = TO_NUMBER(?) + 1,
+		   CODGRADOOCC = ?
+	WHERE  PRGDISPOL68 = ?
+" />
+
+<STATEMENT name="DELETE_DISPO_L68"
+	query="
+	delete 
+	from PR_DISPO_L68 
+	WHERE  PRGDISPOL68 = ?
+" />
+
+<STATEMENT name="UPDATE_RICH_SOSP"
+	query="
+	update CM_RICH_SOSPENSIONE
+	SET    CODSTATORICHIESTA = ?,
+		   CODMOTIVOSOSP = ?,		   
+		   DATRICHIESTA = TO_DATE (?, 'dd/mm/yyyy'),
+		   FLGPROVVEDIMENTO = ?,  
+		   FLGPROROGA = ?,
+		   DATINIZIOSOSP = TO_DATE (?, 'dd/mm/yyyy'),
+		   DATFINESOSP = TO_DATE (?, 'dd/mm/yyyy'),
+		   DATFINETEMPORANEA = TO_DATE (?, 'dd/mm/yyyy'),
+		   CDNUTMOD = ?,		   
+		   DTMMOD = sysdate,
+		   NUMKLOSOSPENSIONE = TO_NUMBER(?) + 1
+	WHERE  prgRichSospensione = ?
+" />
+
+<STATEMENT name="UPDATE_RICH_ESON"
+	query="
+	update CM_RICH_ESONERO
+	SET    
+		   CODSTATORICHIESTA = ?,
+		   DATRICHIESTA = TO_DATE (?, 'dd/mm/yyyy'),
+		   DATINIZIOVALIDITA = TO_DATE (?, 'dd/mm/yyyy'),
+		   DATFINE = TO_DATE (?, 'dd/mm/yyyy'),	   
+		   NUMPERCESONERO = TO_NUMBER(?), 
+		   STRMOTIVAZIONE = ?,  
+		   CDNUTMOD = ?,		   
+		   DTMMOD = sysdate,
+		   NUMKLOESONERO = TO_NUMBER(?) + 1
+	WHERE  prgRichEsonero = ?
+" />
+
+<STATEMENT name="UPDATE_RICH_COMTER"
+	query="
+	update CM_RICH_COMP_TERR
+	SET    
+		   CODSTATORICHIESTA = ?,
+		   DATRICHIESTA = TO_DATE (?, 'dd/mm/yyyy'),
+		   DATFINE = TO_DATE (?, 'dd/mm/yyyy'),	   
+		   STRMOTIVAZIONE = ?,  
+		   CDNUTMOD = ?,		   
+		   DTMMOD = sysdate,
+		   NUMKLOCOMPTERR = TO_NUMBER(?) + 1
+	WHERE  PRGRICHCOMPTERR = ?
+" />
+
+<STATEMENT name="UPDATE_RICH_DETTPROV"
+	query="
+	update CM_COMPTERR_DETTAGLIO
+	SET    
+		   CODMONOCATEGORIA = ?,
+		   CODPROVINCIA = ?,	   
+		   CODMONOECCDIF = ?,  
+		   NUMINTERESSATI = ?		   
+	WHERE  PRGCOMPTERRDETT = ?
+" />
+
+<STATEMENT name="UPDATE_ANNULLAMENTO_RICH_ESON"
+	query="
+	update CM_RICH_ESONERO
+	SET    
+		   CODSTATORICHIESTA = ?,
+		   CDNUTMOD = ?,		   
+		   DTMMOD = sysdate,
+		   NUMKLOESONERO = TO_NUMBER(?) + 1
+	WHERE  prgRichEsonero = ?
+" />
+
+<STATEMENT name="UPDATE_ANNULLAMENTO_RICH_SOSP"
+	query="
+	update CM_RICH_SOSPENSIONE
+	SET    
+		   CODSTATORICHIESTA = ?,
+		   CDNUTMOD = ?,		   
+		   DTMMOD = sysdate,
+		   NUMKLOSOSPENSIONE = TO_NUMBER(?) + 1
+	WHERE  PRGRICHSOSPENSIONE = ?
+" />
+
+<STATEMENT name="UPDATE_ANNULLAMENTO_RICH_COMTER"
+	query="
+	update CM_RICH_COMP_TERR
+	SET    
+		   CODSTATORICHIESTA = ?,
+		   CDNUTMOD = ?,		   
+		   DTMMOD = sysdate,
+		   NUMKLOCOMPTERR = TO_NUMBER(?) + 1
+	WHERE  PRGRICHCOMPTERR = ?
+" />
+
+<STATEMENT name="COMBO_SERVIZI"
+	query="
+	select codservizio as codice,
+		   strdescrizione || DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL), '(scaduto)', LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),'(scaduto)', '') as descrizione 
+	 from  de_servizio_soc
+" />
+
+<STATEMENT name="COMBO_PROVINCE"
+	query="
+	select prov.CODPROVINCIA codice,
+		   prov.STRDENOMINAZIONE descrizione
+	from   de_provincia prov
+	where  prov.CODPROVINCIA != 'NT'
+	  and  prov.CODPROVINCIA != '250'
+	  and  prov.CODPROVINCIA != '254'
+	  and  prov.CODPROVINCIA != '255'
+	order by prov.STRDENOMINAZIONE
+" />
+
+<STATEMENT name="LOAD_SOCIO_LAV"
+	query="
+	select df.prgdiagnosifunzionale,
+		   df.cdnLavoratore,
+	   	   df.flginterdetto,
+	       df.strcognomenometutore,
+	       df.strindirizzotutore,
+	       com.strcap as cap_tut,
+   	       com.strdenominazione as descrCom,
+   	       com.codcom as codcomtutore,
+	       df.strAutonomia,
+	       df.strnoteprogettosocioass,
+	       df.strcondizlavincompat,
+	       df.NUMKLODIAGNOSIFUNZIONALE,
+	       df.CDNUTINS,
+	       df.CDNUTMOD,
+	       to_char(df.DTMINS,'dd/mm/yyyy') as DTMINS,
+	       to_char(df.DTMMOD,'dd/mm/yyyy') as DTMMOD
+    from   cm_diagnosi_funzionale df,
+	       de_comune com
+    where  df.codcomtutore = com.codcom (+) and
+	       df.prgdiagnosifunzionale = ?
+" />
+
+<STATEMENT name="LOAD_SCHEDA_CONCLUSIVA"
+	query="
+	select prgdiagnosifunzionale,
+		   cdnLavoratore,
+		   CODLIVELLOLIM,
+		   STRNOTELIVELLOLIM,
+		   CODSUGGERIMENTO,
+		   STRNOTESUGGERIMENTO,
+	       NUMKLODIAGNOSIFUNZIONALE,
+	       CDNUTINS,
+	       CDNUTMOD,
+	       to_char(DTMINS,'dd/mm/yyyy') as DTMINS,
+	       to_char(DTMMOD,'dd/mm/yyyy') as DTMMOD
+    from   cm_diagnosi_funzionale
+    where  prgdiagnosifunzionale = ?
+" />
+
+<STATEMENT name="LOAD_CAP_MENREL"
+	query="
+	select distinct
+		   cmcap.codCapacita, 
+		   cap.strDescrizione as descrCapacita,
+		   cmCap.codGradoCapacita,
+		   gcap.strDescrizione as DescrGradCap,
+		   cmCap.strDescGrado
+	from   cm_capacita cmCap,
+		   de_capacita cap,
+		   de_grado_capacita gcap
+	where  cmCap.codcapacita=cap.codcapacita and
+		   cmCap.codGradoCapacita=gcap.codGradoCapacita and
+		   cmCap.prgDiagnosiFunzionale=?
+" />
+
+<STATEMENT name="LOAD_CAP_MIGL"
+	query="
+	select strCapacitaMigliori,
+		   NUMKLODIAGNOSIFUNZIONALE,
+		   CDNUTINS,
+		   to_char(DTMINS,'dd/mm/yyyy') as DTMINS,
+		   CDNUTMOD,
+		   to_char(DTMMOD,'dd/mm/yyyy') as DTMMOD
+	from   cm_diagnosi_funzionale
+	where  prgDiagnosiFunzionale=?
+" />
+
+<STATEMENT name="INSERT_SERVIZIO"
+	query="
+	insert into CM_PROGETTO_SOCIOASSIST  (
+	   prgProgSocioAss,
+	   prgDiagnosiFunzionale,
+	   codServizio
+	)
+	 values (
+	 	?,?,?
+	 )		
+" />
+
+<STATEMENT name="INSERT_VAR_DIS"
+	query="
+	insert into CM_RICH_ESON_DISABILI  (
+	   prgRichEsonDisabili,
+	   prgRichEsonero,
+	   numDisabili,
+	   numDisabiliEffett, 
+	   datInizioValidita,
+	   cdnUtIns,
+	   cdnUtMod,
+	   numKloRichEsonDis,
+	   dtmIns,
+	   dtmMod,
+	   cdnUtM,
+	   NUMBASECOMPUTO,
+	   CODMONOCATEGORIA
+	)
+	 values (
+	 	?,?,?,?,
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	?,?,?,
+	 	sysdate,
+	 	sysdate,
+	 	?,?,?
+	 )		
+" />
+
+<STATEMENT name="UPDATE_VAR_DIS"
+	query="	
+	update  CM_RICH_ESON_DISABILI SET    
+			numDisabili = ?,
+	   		cdnUtMod = ?,		   
+		    DTMMOD = sysdate,
+		    numKloRichEsonDis = numKloRichEsonDis + 1
+	WHERE   prgRichEsonDisabili = ?	
+" />
+
+<STATEMENT name="INSERT_COM_TEC"
+	query="
+	insert into CM_COMITATO_TEC  (
+	   prgDiagnosiFunzionale,
+ 	   strIpotesiInsLav,
+   	   strNotaComitatoTec,
+   	   strProfiloSocioLav,
+   	   flgdisplim,
+	   cdnUtIns,
+	   cdnUtMod,
+	   dtmIns,
+	   dtmMod
+	)
+	 values (
+	 	?,?,?,?,?,?,?,
+	 	sysdate,
+	 	sysdate
+	 )		
+" />
+
+<STATEMENT name="INSERT_DETT_PROV"
+	query="
+	insert into CM_COMPTERR_DETTAGLIO  (
+	   PRGCOMPTERRDETT,
+	   PRGRICHCOMPTERR,
+	   CODMONOCATEGORIA,
+	   CODPROVINCIA,
+	   CODMONOECCDIF,
+	   NUMINTERESSATI
+	)
+	 values (
+	 	?,?,?,?,?,?
+	 )		
+" />
+
+<STATEMENT name="INSERT_PAGAMENTO"
+	query="
+	insert into CM_PAGAMENTO_ESON  (
+	   prgPagamEsonero,
+	   prgRichEsonero,
+	   datPagamento,
+	   decImporto,
+	   cdnUtIns,
+	   cdnUtMod,
+	   dtmIns,
+	   dtmMod,
+	   NUMKLOPAGAMENTOESONERO,
+	   DATINIZIOCOMP,
+	   DATFINECOMP
+	)
+	 values (
+	 	?,?,
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	?,
+	 	?,?,
+	 	sysdate,
+	 	sysdate,
+	 	?,
+	 	TO_DATE(?,'DD/MM/YYYY'),
+	 	TO_DATE(?,'DD/MM/YYYY')
+	 )		
+" />
+
+<STATEMENT name="INSERT_CAPACITA"
+	query="
+	insert into CM_CAPACITA  (
+	   prgCapacitaLav,
+	   prgDiagnosiFunzionale,
+	   codCapacita,
+	   codGradoCapacita,
+	   strDescGrado
+	)
+	 values (
+	 	?,?,?,?,?
+	 )		
+" />
+
+<STATEMENT name="INSERT_SEDE_COINVOLTA"
+	query="
+	insert into CM_UNITA_SOSPENSIONE  (
+	   prgAzienda,
+	   prgUnita,
+	   prgRichSospensione
+	)
+	 values (
+	 	?,?,?
+	 )		
+" />
+
+<STATEMENT name="COMBO_SERVIZI_SELEZIONATI"
+	query="
+	select distinct 
+		   pro.codServizio as codice,
+		   ss.strDescrizione as descrizione
+	from   cm_progetto_socioassist pro,
+		   de_servizio_soc ss
+	where
+		   pro.codServizio = ss.codServizio and
+		   pro.prgdiagnosifunzionale = ?	
+" />
+
+<STATEMENT name="UPDATE_SOCIO_LAV"
+	query="
+	update  cm_diagnosi_funzionale SET    
+			FLGINTERDETTO = ?,
+		    STRCOGNOMENOMETUTORE = ?,
+			STRINDIRIZZOTUTORE = ?,
+			CODCOMTUTORE = ?,
+			STRAUTONOMIA = ?,
+			STRNOTEPROGETTOSOCIOASS = ?,
+			STRCONDIZLAVINCOMPAT = ?,
+		    CDNUTMOD = ?,		   
+		    DTMMOD = sysdate,
+		    NUMKLODIAGNOSIFUNZIONALE = TO_NUMBER(?) + 1
+	WHERE   prgDiagnosiFunzionale = ?
+" />
+
+<STATEMENT name="UPDATE_COM_TEC"
+	query="
+	update  cm_comitato_tec SET    
+			strIpotesiInsLav = ?,
+		    strNotaComitatoTec = ?,
+			strProfiloSocioLav = ?,
+			flgdisplim = ?,
+		    CDNUTMOD = ?,		   
+		    DTMMOD = sysdate
+	WHERE   prgDiagnosiFunzionale = ?
+" />
+
+<STATEMENT name="UPDATE_SCHEDA_CONCLUSIVA"
+	query="
+	update  cm_diagnosi_funzionale SET    
+			CODLIVELLOLIM = ?,
+			STRNOTELIVELLOLIM = ?,
+			CODSUGGERIMENTO = ?,
+			STRNOTESUGGERIMENTO = ?,
+		    CDNUTMOD = ?,		   
+		    DTMMOD = sysdate,
+		    NUMKLODIAGNOSIFUNZIONALE = TO_NUMBER(?) + 1
+	WHERE   prgDiagnosiFunzionale = ?
+" />
+
+<STATEMENT name="UPDATE_CAP_MIGL"
+	query="
+	update  cm_diagnosi_funzionale SET    
+			strCapacitaMigliori = ?,
+		    CDNUTMOD = ?,		   
+		    DTMMOD = sysdate,
+		    NUMKLODIAGNOSIFUNZIONALE = TO_NUMBER(?) + 1
+	WHERE   prgDiagnosiFunzionale = ?
+" />
+
+<STATEMENT name="LOAD_CAP_COGN"
+	query="
+	select distinct
+		   cmcap.codCapacita, 
+		   cap.strDescrizione,
+		   cmCap.codGradoCapacita,
+		   gcap.strDescrizione
+	from   cm_capacita cmCap,
+		   de_capacita cap,
+		   de_grado_capacita gcap
+	where  cmCap.codcapacita=cap.codcapacita and
+		   cmCap.codGradoCapacita=gcap.codGradoCapacita and
+		   cmCap.prgDiagnosiFunzionale=? 	
+" />
+
+<STATEMENT name="COMBO_LIVELLO_LIM"
+	query="SELECT LL.CODLIVELLOLIM AS CODICE,
+				LL.STRDESCRIZIONE || DECODE(SYSDATE,
+				GREATEST(SYSDATE, LL.DATINIZIOVAL, LL.DATFINEVAL),
+				LEAST(SYSDATE, LL.DATINIZIOVAL, LL.DATFINEVAL)) AS DESCRIZIONE
+				FROM DE_LIVELLO_LIMITAZIONE LL
+				WHERE LL.CODLIVELLOLIM IN (
+				SELECT TC.CODICE
+				FROM TS_CONFIG_CODIFICA TC
+				WHERE TC.NOMETABELLA='DE_LIVELLO_LIMITAZIONE' AND TC.CODTIPOCONFIG = 'DIAGNFNZ' AND TC.CONFIGURAZIONE = NVL(
+				(SELECT TL.NUM
+				FROM TS_CONFIG_LOC TL
+				WHERE TL.STRCODRIF = (SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE)
+				AND TL.CODTIPOCONFIG = 'DIAGNFNZ'),0)
+				)" />
+
+<STATEMENT name="COMBO_SUGGERIMENTI"
+	query="SELECT SI.CODSUGGERIMENTO AS CODICE,
+				pg_utils.trunc_desc (SI.STRDESCRIZIONE, 100, '...') || DECODE(SYSDATE,
+				GREATEST(SYSDATE, SI.DATINIZIOVAL, SI.DATFINEVAL),
+				LEAST(SYSDATE, SI.DATINIZIOVAL, SI.DATFINEVAL)) AS DESCRIZIONE
+				FROM DE_SUGGER_INSLAV SI
+				WHERE SI.CODSUGGERIMENTO IN (
+				SELECT TC.CODICE
+				FROM TS_CONFIG_CODIFICA TC
+				WHERE TC.NOMETABELLA='DE_SUGGER_INSLAV' AND TC.CODTIPOCONFIG = 'DIAGNFNZ' AND TC.CONFIGURAZIONE = NVL(
+				(SELECT TL.NUM
+				FROM TS_CONFIG_LOC TL
+				WHERE TL.STRCODRIF = (SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE)
+				AND TL.CODTIPOCONFIG = 'DIAGNFNZ'),0)
+				)" />
+
+<STATEMENT name="LOAD_DESCR_CAP_MENREL_SCAD"
+	query=" select codcapacita,
+				   codcapraggr,
+				   codMonoTipoGrado,
+				   strdescrizione as descrizioneCap
+			 from  de_capacita
+			 where codcapraggr = ? and ( TRUNC(sysdate) &gt;= TRUNC(DATFINEVAL) OR TRUNC(sysdate) &lt;= TRUNC(DATINIZIOVAL)) " />
+
+
+<STATEMENT name="LOAD_DESCR_CAP_MENREL"
+	query=" select codcapacita,
+				   codcapraggr,
+				   codMonoTipoGrado,
+				   strdescrizione as descrizioneCap
+			 from  de_capacita
+			 where codcapraggr = ? and ( TRUNC(sysdate) &lt;= TRUNC(DATFINEVAL) AND TRUNC(sysdate) &gt;= TRUNC(DATINIZIOVAL)) " />
+
+<STATEMENT name="SELECT_CODCAPACITA"
+	query="
+			select *
+			from cm_capacita
+			where codcapacita = ? and 
+				  prgdiagnosifunzionale = ?
+" />
+
+<STATEMENT name="UPDATE_CAPACITA"
+	query="
+	update  cm_capacita SET    
+			codGradoCapacita = ?,
+			strDescGrado = ?
+	WHERE   prgCapacitaLav = ? 
+" />
+
+<STATEMENT name="DELETE_CAPACITA"
+	query="
+	DELETE 
+	FROM cm_capacita     
+	WHERE prgCapacitaLav = ? 		
+" />
+
+<STATEMENT name="UPDATE_CAP_DIAGNOSI_FUNZ"
+	query="
+	update  CM_DIAGNOSI_FUNZIONALE SET    
+			DTMMOD = SYSDATE,
+			CDNUTMOD = ?,
+			NUMKLODIAGNOSIFUNZIONALE = TO_NUMBER(?) + 1
+	WHERE   prgDiagnosiFunzionale = ?		
+" />
+
+<!-- Stampa diagnosi funzionale -->
+<STATEMENT name="GET_DIAGNOSI_FUNZIONALE"
+	query="
+	SELECT CM_DIAGNOSI_FUNZIONALE.FLGREVACCERTAMENTO,
+	       to_char(CM_DIAGNOSI_FUNZIONALE.DATREVISIONEACCERT,'dd/mm/yyyy') as DATREVISIONEACCERT,
+	       to_char(CM_DIAGNOSI_FUNZIONALE.DATDIAGNOSI,'dd/mm/yyyy') as DATDIAGNOSI,
+	       CM_DIAGNOSI_FUNZIONALE.FLGINVALIDFISICA,
+	       CM_DIAGNOSI_FUNZIONALE.FLGINVALIDPSICHICA,
+	       CM_DIAGNOSI_FUNZIONALE.FLGINVALIDNONDETERMINATA,
+	       CM_DIAGNOSI_FUNZIONALE.FLGINVALIDSENSORIALE,
+	       CM_DIAGNOSI_FUNZIONALE.FLGINVALIDINTELLETTIVA,
+	       CM_DIAGNOSI_FUNZIONALE.CODGIUDIZIO,
+	       to_char(CM_DIAGNOSI_FUNZIONALE.DATRICONOSCIMENTO,'dd/mm/yyyy') as DATRICONOSCIMENTO,
+	       CM_DIAGNOSI_FUNZIONALE.FLGPERMANENZASTATO,
+	       to_char(CM_DIAGNOSI_FUNZIONALE.DATRICHREVDIAGNOSI,'dd/mm/yyyy') as DATRICHREVDIAGNOSI,
+	       CM_DIAGNOSI_FUNZIONALE.FLGREVDIAGNOSIPERVENUTA,
+	       to_char(CM_DIAGNOSI_FUNZIONALE.DATARRIVOREVDIAGNOSI,'dd/mm/yyyy') as DATARRIVOREVDIAGNOSI,
+	       AN_LAVORATORE.STRCOGNOME,
+	       AN_LAVORATORE.STRNOME,
+	       AN_LAVORATORE.STRCODICEFISCALE,
+	       to_char(AN_LAVORATORE.DATNASC,'dd/mm/yyyy') as DATNASC,
+	       DE_COMUNE.STRDENOMINAZIONE,
+	       DE_AZIENDA_ASL.STRDESCRIZIONE
+	FROM   MODENAAVVIO.CM_DIAGNOSI_FUNZIONALE CM_DIAGNOSI_FUNZIONALE,
+	       MODENAAVVIO.AN_LAVORATORE AN_LAVORATORE,
+	       MODENAAVVIO.DE_COMUNE DE_COMUNE,
+	       MODENAAVVIO.DE_AZIENDA_ASL DE_AZIENDA_ASL
+	WHERE  (? = CM_DIAGNOSI_FUNZIONALE.PRGDIAGNOSIFUNZIONALE) and 	       
+	       AN_LAVORATORE.CDNLAVORATORE = DECRYPT(CM_DIAGNOSI_FUNZIONALE.CDNLAVORATORE, ?)  and 
+	       AN_LAVORATORE.CODCOMNAS=DE_COMUNE.CODCOM and 
+	       CM_DIAGNOSI_FUNZIONALE.CODAZIENDAASL=DE_AZIENDA_ASL.CODAZIENDAASL
+" />
+
+<STATEMENT name="GET_GIUDIZIO_ML"
+	query="
+		SELECT DE_GIUDIZIO_ML.CODGIUDIZIO, 
+			   DE_GIUDIZIO_ML.STRDESCRIZIONEPERSTAMPA
+		FROM   MODENAAVVIO.DE_GIUDIZIO_ML   DE_GIUDIZIO_ML	
+" />
+
+<STATEMENT name="SELECT_RICH_SOSP_AZ"
+	query="
+		select 
+			    stato.strdescrizione as statoRichiesta, 
+			    mot.strdescrizione as motivoSosp, 
+		        az.prgazienda, 
+			    az.STRRAGIONESOCIALE, 
+			    az.STRCODICEFISCALE, 
+			    az.STRPARTITAIVA, 
+			    to_char(sosp.DATRICHIESTA,'dd/mm/yyyy') as DATRICHIESTA, 
+			    to_char(sosp.DATINIZIOSOSP,'dd/mm/yyyy') as DATINIZIOSOSP, 
+			    to_char(sosp.DATFINESOSP,'dd/mm/yyyy') as DATFINESOSP, 
+			    sosp.CODSTATORICHIESTA, 
+			    sosp.CODMOTIVOSOSP, 
+			    sosp.FLGPROVVEDIMENTO, 
+			    sosp.FLGPROROGA, 
+			    to_char(sosp.DATFINETEMPORANEA,'dd/mm/yyyy') as DATFINETEMPORANEA, 			   				   
+			    sosp.CDNUTINS, 
+			    sosp.CDNUTMOD, 
+				sosp.NUMKLOSOSPENSIONE, 
+				to_char(sosp.DTMMOD,'dd/mm/yyyy') as DTMMOD,
+				to_char(sosp.DTMINS,'dd/mm/yyyy') as DTMINS, 
+				sosp.PRGRICHSOSPENSIONE 
+		 from   CM_RICH_SOSPENSIONE sosp, 
+				an_azienda az, 
+				de_stato_atto stato, 
+				de_cm_motivo_sosp mot 
+		 where  stato.CODSTATOATTO = sosp.CODSTATORICHIESTA 
+				and  mot.CODMOTIVOSOSP = sosp.CODMOTIVOSOSP 
+				and  az.prgazienda = sosp.prgazienda 
+				and  sosp.prgazienda= ?
+" />
+
+<STATEMENT name="LOAD_SEDI_COINVOLTE"
+	query="
+		select com.STRDENOMINAZIONE as comune,
+			   un_az.STRINDIRIZZO as indirizzo,
+			   un.PRGRICHSOSPENSIONE,
+			   un_az.prgAzienda,
+			   un_az.prgunita
+		from
+			   cm_unita_sospensione un,
+			   an_unita_azienda un_az,
+			   de_comune com
+		where
+			   un.PRGRICHSOSPENSIONE = ?
+		   and un.PRGAZIENDA = un_az.PRGAZIENDA
+		   and un.PRGUNITA = un_az.PRGUNITA
+		   and un_az.CODCOM = com.CODCOM
+" />
+
+<STATEMENT name="LOAD_SEDI"
+	query="
+		select com.STRDENOMINAZIONE as comune,
+			   un_az.STRINDIRIZZO as indirizzo,
+			   un_az.prgAzienda,
+			   un_az.prgunita
+		from
+			   an_unita_azienda un_az,
+			   de_comune com
+		where
+			   un_az.prgAzienda = ?
+		   and un_az.CODCOM = com.CODCOM
+" />
+
+<STATEMENT name="LOAD_PAGAMENTI"
+	query="
+		select 
+			   pag.DATPAGAMENTO as aDATPAGAMENTO,
+			   to_char(pag.DATPAGAMENTO,'dd/mm/yyyy') as DATPAGAMENTO,
+			   pag.DECIMPORTO,
+			   pag.PRGPAGAMESONERO,
+			   pag.PRGRICHESONERO,
+			   pag.CDNUTINS, 
+			   pag.CDNUTMOD, 
+			   pag.NUMKLOPAGAMENTOESONERO, 
+			   to_char(pag.DTMMOD,'dd/mm/yyyy') as DTMMOD,
+			   to_char(pag.DTMINS,'dd/mm/yyyy') as DTMINS,
+			   to_char(pag.DATINIZIOCOMP,'dd/mm/yyyy') as DATINIZIOCOMP,
+			   to_char(pag.DATFINECOMP,'dd/mm/yyyy') as DATFINECOMP
+		from   cm_pagamento_eson pag
+		where  pag.PRGRICHESONERO=?
+		order by aDATPAGAMENTO desc 
+" />
+
+<STATEMENT name="SELECT_FROM_DOCUMENTO"
+	query="SELECT am_documento.NUMPROTOCOLLO, TO_CHAR(am_documento.DATPROTOCOLLO, 'dd/mm/yyyy hh24:mi') AS DATPROTOCOLLO, am_documento.NUMANNOPROT, am_documento.CODSTATOATTO
+					from am_documento, am_documento_coll	  
+					where am_documento.PRGDOCUMENTO = am_documento_coll.PRGDOCUMENTO
+					and am_documento.CODTIPODOCUMENTO = 'RICHESON'
+					and am_documento_coll.STRCHIAVETABELLA = ?" />
+
+<STATEMENT name="SELECT_FROM_DOCUMENTO_SOSP"
+	query="SELECT am_documento.NUMPROTOCOLLO, TO_CHAR(am_documento.DATPROTOCOLLO, 'dd/mm/yyyy hh24:mi') AS DATPROTOCOLLO, am_documento.NUMANNOPROT, am_documento.CODSTATOATTO
+					from am_documento, am_documento_coll	  
+					where am_documento.PRGDOCUMENTO = am_documento_coll.PRGDOCUMENTO
+					and am_documento.CODTIPODOCUMENTO = 'RICHSOSP'
+					and am_documento_coll.STRCHIAVETABELLA = ?" />
+
+<STATEMENT name="SELECT_FROM_DOCUMENTO_COMTER"
+	query="SELECT am_documento.NUMPROTOCOLLO, TO_CHAR(am_documento.DATPROTOCOLLO, 'dd/mm/yyyy hh24:mi') AS DATPROTOCOLLO, am_documento.NUMANNOPROT, am_documento.CODSTATOATTO
+					from am_documento, am_documento_coll	  
+					where am_documento.PRGDOCUMENTO = am_documento_coll.PRGDOCUMENTO
+					and am_documento.CODTIPODOCUMENTO = 'RICHCOMT'
+					and am_documento_coll.STRCHIAVETABELLA = ?" />
+
+<STATEMENT name="SELECT_PRG_DOCUMENTO_ESON"
+	query="SELECT am_documento.PRGDOCUMENTO, 
+            			  am_documento.CODSTATOATTO, 
+            			  to_char(am_documento.DATINIZIO, 'DD/MM/YYYY') AS DATINIZIO, 
+            			  to_char(am_documento.DATACQRIL, 'DD/MM/YYYY') AS DATACQRIL, 
+            			  am_documento.NUMKLODOCUMENTO
+					from am_documento, am_documento_coll	  
+					where am_documento.PRGDOCUMENTO = am_documento_coll.PRGDOCUMENTO
+					and am_documento.CODTIPODOCUMENTO = 'RICHESON'
+					and am_documento_coll.STRCHIAVETABELLA = ?" />
+
+<STATEMENT name="SELECT_PRG_DOCUMENTO_SOSP"
+	query="SELECT am_documento.PRGDOCUMENTO, 
+            			  am_documento.CODSTATOATTO, 
+            			  to_char(am_documento.DATINIZIO, 'DD/MM/YYYY') AS DATINIZIO, 
+            			  to_char(am_documento.DATACQRIL, 'DD/MM/YYYY') AS DATACQRIL, 
+            			  am_documento.NUMKLODOCUMENTO
+					from am_documento, am_documento_coll	  
+					where am_documento.PRGDOCUMENTO = am_documento_coll.PRGDOCUMENTO
+					and am_documento.CODTIPODOCUMENTO = 'RICHSOSP'
+					and am_documento_coll.STRCHIAVETABELLA = ?" />
+
+<STATEMENT name="SELECT_PRG_DOCUMENTO_COMTER"
+	query="SELECT am_documento.PRGDOCUMENTO, 
+            			  am_documento.CODSTATOATTO, 
+            			  to_char(am_documento.DATINIZIO, 'DD/MM/YYYY') AS DATINIZIO, 
+            			  to_char(am_documento.DATACQRIL, 'DD/MM/YYYY') AS DATACQRIL, 
+            			  am_documento.NUMKLODOCUMENTO
+					from am_documento, am_documento_coll	  
+					where am_documento.PRGDOCUMENTO = am_documento_coll.PRGDOCUMENTO
+					and am_documento.CODTIPODOCUMENTO = 'RICHCOMT'
+					and am_documento_coll.STRCHIAVETABELLA = ?" />
+
+<STATEMENT name="SELECT_VERBALE"
+	query="select ver.PRGVERBALEACC, 
+            			  to_char(ver.DATVERBALEPRIMAIST,'dd/mm/yyyy') as datPrimIst, 
+            			  PG_UTILS.TRUNC_DESC(ver.STRVERBALEPRIMAIST,200,'...') as verbale,
+            			  ver.STRNUMVERBALE as numVerb,
+	   					  to_char(ver.DATVERBALEDAREVISIONARE,'dd/mm/yyyy') as datDaRevisione, 
+	   					  to_char(ver.DATVERBALEREVISIONATO,'dd/mm/yyyy') as datRevisionato, 
+	   					  ver.CDNLAVORATORE
+				   from CM_VERBALE_ACCERT ver
+				   where ver.CDNLAVORATORE = ? " />
+
+<STATEMENT name="SELECT_PRGVERBALEACC_SEQUENCE"
+	query="SELECT S_CM_VERBALE_ACCERT.nextval AS DO_NEXTVAL
+      		   FROM DUAL" />
+
+<STATEMENT name="INS_VER_ACC"
+	query="INSERT INTO CM_VERBALE_ACCERT (
+   				  PRGVERBALEACC, 
+   				  CDNLAVORATORE, 
+   				  DATVERBALEPRIMAIST, 
+   				  STRNUMVERBALE,
+   				  STRVERBALEPRIMAIST,
+   				  DATVERBALEDAREVISIONARE, 
+   				  DATVERBALEREVISIONATO,
+   				  CDNUTINS, 
+   				  DTMINS, 
+   				  CDNUTMOD, 
+   				  DTMMOD) 
+				  VALUES ( ? ,? ,TO_DATE(?,'DD/MM/YYYY') ,? ,? ,
+				  		  TO_DATE(?,'DD/MM/YYYY') ,TO_DATE(?,'DD/MM/YYYY'), ?,
+				  		  SYSDATE , ? , SYSDATE)" />
+
+<STATEMENT name="Get_Load_VerbaleAcc"
+	query="select ver.PRGVERBALEACC, to_char(ver.DATVERBALEPRIMAIST,'dd/mm/yyyy') as datPrimIst, ver.STRVERBALEPRIMAIST as verbale,
+        			  ver.STRNUMVERBALE as numVerb, to_char(ver.DATVERBALEDAREVISIONARE,'dd/mm/yyyy') as datDaRevisione, 
+        			  to_char(ver.DATVERBALEREVISIONATO,'dd/mm/yyyy') as datRevisionato, ver.CDNLAVORATORE, 
+        			  ver.CDNUTINS,ver.CDNUTMOD,to_char(ver.DTMMOD,'dd/mm/yyyy') as DTMMOD,
+					  to_char(ver.DTMINS,'dd/mm/yyyy') as DTMINS,ver.NUMKLOVERBALEACC
+			   from CM_VERBALE_ACCERT ver
+			   where ver.PRGVERBALEACC = ?" />
+
+<STATEMENT name="Get_Referenzia_Iscr"
+	query="select am_cm_iscr.PRGVERBALEACC  
+				   from am_cm_iscr
+				   left join CM_VERBALE_ACCERT on (CM_VERBALE_ACCERT.PRGVERBALEACC = am_cm_iscr.PRGVERBALEACC)
+				   where CM_VERBALE_ACCERT.PRGVERBALEACC = ? " />
+
+<STATEMENT name="Delete_Verbale"
+	query="delete from CM_VERBALE_ACCERT where CM_VERBALE_ACCERT.PRGVERBALEACC = ? " />
+
+
+
+<STATEMENT name="SELECT_NUMKLOVERBALEACC"
+	query="SELECT PRGVERBALEACC, NUMKLOVERBALEACC
+                from CM_VERBALE_ACCERT
+                where PRGVERBALEACC=?" />
+
+
+<STATEMENT name="UPDATE_VER_ACC"
+	query="update CM_VERBALE_ACCERT SET
+		   		 		 DATVERBALEPRIMAIST=TO_DATE(?,'DD/MM/YYYY'), 
+   				 		 STRNUMVERBALE=?, 
+   				 		 STRVERBALEPRIMAIST=?, 
+   				 		 DATVERBALEDAREVISIONARE=TO_DATE(?,'DD/MM/YYYY'), 
+   				 		 DATVERBALEREVISIONATO=TO_DATE(?,'DD/MM/YYYY'),
+   				 	     CDNUTMOD=?,  
+   						 DTMMOD=SYSDATE,
+   						 NUMKLOVERBALEACC = TO_NUMBER(?) + 1
+   				where PRGVERBALEACC = ? " />
+
+
+<STATEMENT name="GET_TipoListSpec"
+	query=" select CODTIPOLISTA as codice, 
+		   				  STRDESCRIZIONE || DECODE(SYSDATE,GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL), '(scaduto)',
+               			  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),'(scaduto)', '') as descrizione, datinizioval, datfineval 
+               from DE_CM_LISTA_SPECIALE " />
+
+<STATEMENT name="GET_Motivo_FINE"
+	query=" SELECT mot.CODMOTIVOFINEATTO as codice,
+				mot.STRDESCRIZIONE || DECODE(SYSDATE,GREATEST(SYSDATE, mot.DATINIZIOVAL, mot.DATFINEVAL), '(scaduto)',
+               			  LEAST(SYSDATE, mot.DATINIZIOVAL, mot.DATFINEVAL),'(scaduto)', '') as descrizione
+				   FROM de_motivo_fine_atto mot, de_mot_fine_atto_lst_tab lst
+				   WHERE mot.codmotivofineatto = lst.codmotivofineatto 
+				   AND trunc(sysdate) between trunc(lst.DATINIZIOVAL) and trunc(lst.DATFINEVAL)
+				   AND lst.codlsttab = 'CM_ISCLS'" />
+
+<STATEMENT name="SELECT_PRGISCRART1_SEQUENCE"
+	query="SELECT S_cm_iscr_art1.nextval AS PRGISCRART1
+      		   FROM DUAL" />
+
+<STATEMENT name="INS_ISCR_LISTESPECIALI"
+	query="INSERT INTO CM_ISCR_ART1 (
+   			   		PRGISCRART1, 
+   			   		CDNLAVORATORE, 
+   			   		STRNUMALBO, 
+   					DATISCRALBO, 
+   					CODTIPOLISTA, 
+   					DATISCRLISTAPROV, 
+   					NUMMESISOSP, 
+   					NUMPUNTEGGIO, 
+   					NUMANNOPUNTEGGIO, 
+   					DATMODIFPUNTEGGIO, 
+   					CDNUTPUNTEGGIO, 
+   					PRGSPI, 
+   					DATFINE,
+   					CODMOTIVOFINEATTO, 
+   					NUMPERCINV,
+   					CODPROVINCIA,
+   					CDNUTINS, 
+   					DTMINS,
+   					CDNUTMOD,
+   					DTMMOD) 
+               VALUES (?, ?, ?, TO_DATE(?,'DD/MM/YYYY'), ?, TO_DATE(?,'DD/MM/YYYY'), 
+               		   ?, to_number(?,'9999999.999'), ?, TO_DATE(?,'DD/MM/YYYY hh24:mi:ss'), ?, 
+                   	   ?,TO_DATE(?,'DD/MM/YYYY'), 
+                   	   ?,?,?,?, SYSDATE, ?,SYSDATE)" />
+
+
+<STATEMENT name="SELECT_NUMKLOCMISCRART1"
+	query="SELECT PRGISCRART1, NUMKLOCMISCRART1, NUMPUNTEGGIO
+                from CM_ISCR_ART1
+                where PRGISCRART1=?" />
+
+<STATEMENT name="UPDATE_LISTESPEC"
+	query="update CM_ISCR_ART1 SET
+		   		 		 	STRNUMALBO=?,
+   							DATISCRALBO=TO_DATE(?,'DD/MM/YYYY'), 
+   							CODTIPOLISTA=?, 
+   							DATISCRLISTAPROV=TO_DATE(?,'DD/MM/YYYY'), 
+   							NUMMESISOSP=?, 
+   							NUMPUNTEGGIO=to_number(?,'9999999.999'), 
+   							NUMANNOPUNTEGGIO=?, 
+   							DATMODIFPUNTEGGIO=TO_DATE(?,'DD/MM/YYYY hh24:mi:ss'),
+   							CDNUTPUNTEGGIO=?, 
+   							PRGSPI=?, 
+   							DATFINE=TO_DATE(?,'DD/MM/YYYY'),
+   							CODMOTIVOFINEATTO=?, 
+   							NUMPERCINV = ?,
+   				 	     	CDNUTMOD=?,  
+   						 	DTMMOD=SYSDATE,
+   						    NUMKLOCMISCRART1 = TO_NUMBER(?) + 1
+   				 where PRGISCRART1 = ? " />
+
+<STATEMENT name="SELECT_PRG_DOC_LISTESPEC"
+	query="SELECT am_documento.PRGDOCUMENTO, 
+            			  am_documento.CODSTATOATTO,
+            		      am_documento.NUMKLODOCUMENTO 
+					from am_documento, am_documento_coll	  
+					where am_documento.PRGDOCUMENTO = am_documento_coll.PRGDOCUMENTO
+					and am_documento.CODTIPODOCUMENTO = 'ILS'
+					and am_documento_coll.STRCHIAVETABELLA = ?" />
+
+<STATEMENT name="UPDATE_DOC_ASS_LISTESPEC"
+	query="UPDATE am_documento SET 
+                  	  CODSTATOATTO=?,
+                  	  CDNUTMOD=?, 
+                      DTMMOD=SYSDATE, 
+                      NUMKLODOCUMENTO=?
+                   where am_documento.PRGDOCUMENTO=?" />
+
+<STATEMENT name="Get_ListeSpeciali"
+	query="SELECT PRGISCRART1, CDNLAVORATORE, STRNUMALBO, 
+   			   		  to_char(DATISCRALBO,'dd/mm/yyyy') DATISCRALBO, CODTIPOLISTA, to_char(DATISCRLISTAPROV,'dd/mm/yyyy') DATISCRLISTAPROV, 
+   			          NUMMESISOSP, NUMPUNTEGGIO, NUMANNOPUNTEGGIO, 
+   			          to_char(DATMODIFPUNTEGGIO,'dd/mm/yyyy') DATMODIFPUNTEGGIO, CDNUTPUNTEGGIO, PRGSPI, 
+   			          to_char(DATFINE,'dd/mm/yyyy') DATFINE , CODMOTIVOFINEATTO, 
+   			          NUMPERCINV,
+   			          prov1.STRDENOMINAZIONE as PROVINCIA_ISCR,
+   			          CDNUTINS,TO_CHAR(DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS,
+                      CDNUTMOD,TO_CHAR(DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD
+               FROM CM_ISCR_ART1 
+               LEFT JOIN de_provincia prov1 ON CM_ISCR_ART1.codprovincia = prov1.codprovincia
+			   where PRGISCRART1 = ? " />
+
+<STATEMENT name="CM_CALCOLO_PUNTEGGIO_ISCR"
+	query="{ call ? := PG_COLL_MIRATO.calcoloPunteggioLavoratoreArt1(?,?,?,?,?,?,?,?,?,?) }" />
+
+<STATEMENT name="CARICA_UTENTE_PUNT"
+	query="select STRCOGNOME as COGNOME,STRNOME as NOME
+			   from ts_utente
+  			   where cdnut = ? " />
+
+<STATEMENT name="Get_IscrNoAnnullata"
+	query="SELECT to_char(cm_iscr_art1.DATFINE,'dd/mm/yyyy') as datFine,           
+	   				  to_char(cm_iscr_art1.datiscrlistaprov,'dd/mm/yyyy') as datiscrlistaprov,           
+	   				  cm_iscr_art1.PRGISCRART1,cm_iscr_art1.NUMKLOCMISCRART1       
+			  FROM cm_iscr_art1        
+			  WHERE cm_iscr_art1.CDNLAVORATORE = ?  AND cm_iscr_art1.CODTIPOLISTA = ? 
+	  				AND to_char(cm_iscr_art1.datiscrlistaprov,'dd/mm/yyyy') =           
+	  	  				(SELECT max(TO_CHAR (art.datiscrlistaprov, 'dd/mm/yyyy')) AS datiscrlistprov            
+	  	  				 FROM cm_iscr_art1 art,am_documento_coll,am_documento       
+	  	  				 WHERE art.prgiscrart1 = TO_NUMBER (am_documento_coll.strchiavetabella)           
+	  						   AND art.prgiscrart1 = am_documento_coll.strchiavetabella           
+							   AND am_documento.prgdocumento = am_documento_coll.prgdocumento           
+							   AND am_documento.codtipodocumento = 'ILS'        
+							   AND am_documento.CODSTATOATTO != 'AN'        
+							   AND art.CDNLAVORATORE = ?        
+							   AND art.CODTIPOLISTA = ? )" />
+
+
+<STATEMENT name="UpdateIscrListe"
+	query="update CM_ISCR_ART1 SET
+		   		 		 	DATFINE = TO_DATE(?,'DD/MM/YYYY') - 1,
+   							CODMOTIVOFINEATTO=?, 
+   				 	     	CDNUTMOD=?,  
+   						 	DTMMOD=SYSDATE,
+   						    NUMKLOCMISCRART1 = TO_NUMBER(?) 
+   				 where PRGISCRART1 = ? " />
+
+
+
+<STATEMENT name="GET_SITUAZIONE_RICH_ESONERO"
+	query="{ call ? := PG_COLL_MIRATO.getCalcoloSituazioneEsonero(?,?,?,?,?) }" />
+
+<STATEMENT name="LISTA_SITUAZIONE_RICH_ESONERO"
+	query="{ call ? := PG_COLL_MIRATO.listaCalcoloSituazioneEsonero(?,?) }" />
+
+<STATEMENT name="CHECK_TS_CONFIG_LOC_SITUAZIONE_RICH_ESONERO"
+	query="{ call ? := PG_COLL_MIRATO.checkTsConfigLocCalcSituazEson }" />
+
+
+<!-- 08/11/2007 Esposito : Query per il recupero dei dati da passare a Madreperla -->
+<STATEMENT NAME="MP_ANAGRAFICA_CAREGIVER"
+	QUERY="SELECT az.strragionesociale ragionesociale,
+				         az.strcodicefiscale codicefiscale, az.strsessodi sesso,
+				         TO_CHAR (az.datnascdi, 'YYYY-MM-DD') datanascita,
+				         decode(substr(az.codcomnascdi,1,1),'Z','',az.codcomnascdi) codcomunenascita,
+						 decode(substr(az.codcomnascdi,1,1),'Z','',com1.strdenominazione) comunenascita,
+				         decode(substr(az.codcomnascdi,1,1),'Z','',com1.codprovincia) codprovincianascita,
+						 decode(substr(az.codcomnascdi,1,1),'Z','',prov1.strtarga) provincianascita,
+						 decode(substr(az.codcomnascdi,1,1),'Z',az.codcomnascdi,'ITALIA') statonascita,
+						 decode(substr(az.codcomnascdi,1,1),'Z',com1.strdenominazione,'Z000') codstatonascita,
+						 unaz.strindirizzo indirizzo,
+				         unaz.strlocalita localita, unaz.codcom codcomune,
+				         com2.strdenominazione comune, com2.codprovincia codprovincia,
+				         prov2.strtarga provincia, unaz.strtel telefono, unaz.strfax fax,
+				         unaz.stremail email, unaz.strcap cap
+				    FROM an_azienda az LEFT JOIN an_unita_azienda unaz ON az.prgazienda = unaz.prgazienda
+				         LEFT JOIN de_comune com1 ON az.codcomnascdi = com1.codcom
+				         LEFT JOIN de_provincia prov1 ON com1.codprovincia = prov1.codprovincia
+				         LEFT JOIN de_comune com2 ON com2.codcom = unaz.codcom
+				         LEFT JOIN de_provincia prov2 ON com2.codprovincia = prov2.codprovincia
+				   WHERE az.strcodicefiscale = ? AND ROWNUM = 1
+				ORDER BY unaz.prgunita" />
+
+<!-- La query ritorna una riga per ogni documento del Lavoratore presente 
+	nel SIL; le righe sono identiche tra loro cambiano solo i campi documentoidentita 
+	e codtipodocumento che contengono le info sui documenti. -->
+
+<STATEMENT name="MP_ANAGRAFICA_LAVORATORE"
+	query="SELECT an.strcodicefiscale codiceFiscale, an.strnome nome, an.strcognome cognome, an.strsesso sesso,
+				         TO_CHAR (an.datnasc, 'YYYY-MM-DD') datanascita, 
+						 decode(substr(an.codcomnas,1,1),'Z','',an.codcomnas) codcomnascita,
+				         decode(substr(an.codcomnas,1,1),'Z','',com1.strdenominazione) comunenascita, 
+						 decode(substr(an.codcomnas,1,1),'Z','',com1.codprovincia) codprovnascita,
+				         decode(substr(an.codcomnas,1,1),'Z','',p1.strtarga) provnascita, 
+						 decode(substr(an.codcomnas,1,1),'Z',com1.strdenominazione,'ITALIA') statonascita,
+						 decode(substr(an.codcomnas,1,1),'Z',an.codcomnas,'Z000') codstatonascita,
+						 an.codcittadinanza codcittadinanza, citt.strdescrizione cittadinanza,
+						 citt.flgcee comunitario,
+				         an.strindirizzores indresidenza, an.strlocalitares locresidenza,
+				         an.codcomres codcomresidenza, com2.strdenominazione comuneresidenza,
+				         com2.codprovincia codprovresidenza, p2.strtarga provresidenza,
+				         com2.strcap capresidenza, an.strindirizzodom, an.strlocalitadom,
+				         an.codcomdom codcomdomicilio, com3.strdenominazione comunedomicilio,
+				         com3.codprovincia codprovdomicilio, p3.strtarga provdomicilio,
+				         com3.strcap capdomicilio, an.strteldom telefono, an.strcell cellulare,
+				         an.strfax fax, an.stremail email, an.codstatocivile codstatocivile,
+				         statoc.strdescrizione statocivile, doc.strnumdoc documentoidentita, doc.codtipodocumento,
+						 permSogg.strnumdocumento numpermsoggiorno, deStr.strDescrizione motivopermsoggiorno,
+						 TO_CHAR (permSogg.datscadenza, 'YYYY-MM-DD') scadpermsoggiorno,
+						 deOccRagg.strdescrizione statoimpiego, TO_CHAR (occ.datinizio, 'YYYY-MM-DD') datastatoimpiego
+				    FROM an_lavoratore an 
+			   LEFT JOIN de_comune com1 ON an.codcomnas = com1.codcom
+			   LEFT JOIN de_provincia p1 ON com1.codprovincia = p1.codprovincia
+			   LEFT JOIN de_cittadinanza citt ON an.codcittadinanza = citt.codcittadinanza
+		 	   LEFT JOIN de_comune com2 ON an.codcomres = com2.codcom
+			   LEFT JOIN de_provincia p2 ON com2.codprovincia = p2.codprovincia
+			   LEFT JOIN de_comune com3 ON an.codcomdom = com3.codcom
+			   LEFT JOIN de_provincia p3 ON com3.codprovincia = p3.codprovincia
+			   LEFT JOIN de_stato_civile statoc ON an.codstatocivile = statoc.codstatocivile
+			   LEFT JOIN am_documento doc ON an.cdnlavoratore = doc.cdnlavoratore and doc.codstatoatto in ('PR','PA')
+			   LEFT JOIN am_ex_perm_sogg permSogg ON an.cdnlavoratore = permSogg.cdnlavoratore and (permSogg.datscadenza &gt;= sysdate or permSogg.datscadenza is null)
+			   LEFT JOIN am_stato_occupaz occ ON an.cdnlavoratore = occ.cdnlavoratore and occ.datfine IS NULL
+			   LEFT JOIN de_stato_occupaz deOcc ON occ.codstatooccupaz = deOcc.codstatooccupaz
+			   LEFT JOIN de_stato_occupaz_ragg deOccRagg ON deOcc.codstatooccupazragg = deOccRagg.codstatooccupazragg
+			   LEFT JOIN de_status_straniero deStr ON permSogg.codStatus = deStr.codStatus
+			   WHERE an.strcodicefiscale = ?" />
+
+<STATEMENT name="MP_GET_CONTRATTI"
+	query=" SELECT az.STRCODICEFISCALE codiceFiscaleCareGiver,
+				  		  TO_CHAR (mov.DATINIZIOMOV, 'YYYY-MM-DD') dataInizio, 
+				  		  TO_CHAR (mov.DATFINEMOV, 'YYYY-MM-DD') dataFine, 
+					 	  TO_CHAR (mov.DATFINEMOVEFFETTIVA, 'YYYY-MM-DD') dataInterruzione,
+					 	  mov.CODTIPOMOV codTipologia,
+					 	  lav.strcodicefiscale codiceFiscaleLavoratore,
+					 	  TO_CHAR (mov.NUMORESETT) oreSettimanali,
+					 	  deTMov.strdescrizione tipologia,
+						  mov.codgrado codtipo, deCodGrado.strdescrizione tipo,
+					 	  mov.CODMONOTEMPO codDurata, decode(upper(mov.CODMONOTEMPO),'D','Determinato','Indeterminato') durata,
+				  		  mov.DECRETRIBUZIONEMEN spesaDichiarata, mov.DECRETRIBUZIONEANN,
+				  		  mvCes.strdescrizione motivazione
+				 	 FROM AM_DOCUMENTO doc
+				     JOIN AM_DOCUMENTO_COLL docColl ON doc.PRGDOCUMENTO = docColl.PRGDOCUMENTO
+				     JOIN AM_MOVIMENTO mov ON to_number(docColl.STRCHIAVETABELLA) = mov.PRGMOVIMENTO
+					 JOIN AN_AZIENDA az ON mov.PRGAZIENDA = az.PRGAZIENDA
+					 JOIN AN_LAVORATORE lav ON mov.CDNLAVORATORE = lav.cdnlavoratore
+					 JOIN DE_CONTRATTO deCon ON mov.CODCONTRATTO = deCon.CODCONTRATTO
+					 JOIN DE_MV_TIPO_MOV deTMov ON mov.codtipomov = deTMov.codtipomov
+					 JOIN DE_MV_GRADO deCodGrado ON mov.CODGRADO = deCodGrado.codgrado
+				LEFT JOIN DE_MV_CESSAZIONE mvCes ON mov.CODMVCESSAZIONE = mvCes.codmvcessazione
+				    WHERE doc.NUMPROTOCOLLO = ?
+				      AND doc.NUMANNOPROT = ?" />
+
+<STATEMENT name="LISTA_PROSPETTI_ESONERO"
+	query="SELECT pi.prgprospettoinf, 
+        			  pi.numbasecomputo, 
+        			  pi.numpercesonero, 
+        			  pi.codmonocategoria,
+        			  TO_CHAR (pi.datfineesonero, 'DD/MM/YYYY') AS datfineesonero,
+         			  pi.numannorifprospetto,
+         			  TO_CHAR (pi.datprospetto, 'DD/MM/YYYY') AS datprospetto,
+         			  pi.codmonostatoprospetto,
+			          CASE
+			            WHEN pi.codmonostatoprospetto = 'A'
+			               THEN 'In corso d'' anno'
+			            WHEN pi.codmonostatoprospetto = 'S'
+			               THEN 'Storicizzato'
+			            WHEN pi.codmonostatoprospetto = 'V'
+			               THEN 'Da validare'
+			            WHEN pi.codmonostatoprospetto = 'N'
+			               THEN 'Annullato'
+			            WHEN pi.codmonostatoprospetto = 'U'
+			               THEN 'Storicizzato:uscita dall''obbligo'
+			          END AS decodmonostatoprospetto,
+			          (  pi.numquotadisabili - pi.numdisforza - 
+			          	(pi.numdisconvnomi + pi.numdisconvnume) + 
+			          	(pi.numdiscompterrnomi + pi.numdiscompterrnume) - 
+			          	(pi.numdisesonnume + pi.numdisesonnomi)
+			          ) AS tot_scopertura,
+			          pr.strdenominazione as PROVINCIA_ISCR
+    		   FROM cm_prospetto_inf pi, cm_rich_esonero re, de_provincia pr
+   			   WHERE pi.numannorifprospetto &gt;= TO_CHAR (TRUNC (re.datrichiesta), 'YYYY')
+		       AND (pi.codmonostatoprospetto in ('S','U') OR 
+			   	   		(pi.codmonostatoprospetto = 'A' AND pi.numannorifprospetto = 
+				( 
+			    SELECT max(pi.numannorifprospetto)
+				  FROM cm_prospetto_inf pi, cm_rich_esonero re
+				 WHERE pi.numannorifprospetto &gt;= TO_CHAR (TRUNC (re.datrichiesta), 'YYYY')
+				   AND (pi.codmonostatoprospetto = 'A')
+				   AND re.prgrichesonero = ?
+				   AND pi.prgazienda = re.prgazienda
+				   AND pi.codprovincia = re.codprovincia
+				   AND pi.numannorifprospetto &gt;= TO_CHAR (TRUNC (re.datiniziovalidita), 'YYYY')
+				   AND pi.numannorifprospetto &lt;= TO_CHAR (TRUNC (re.datfine), 'YYYY')
+			    ) 
+			   ) )
+		       AND re.prgrichesonero = ?
+		       AND pi.prgazienda = re.prgazienda
+		       AND pi.codprovincia = re.codprovincia
+		       AND pi.codprovincia = pr.codprovincia
+			   AND pi.numannorifprospetto &gt;= TO_CHAR (TRUNC (re.datiniziovalidita), 'YYYY')
+			   AND pi.numannorifprospetto &lt;= TO_CHAR (TRUNC (re.datfine), 'YYYY')
+			   ORDER BY pi.datprospetto DESC" />
+
+<STATEMENT name="AGGIORNA_PROSP_ESONERO"
+	query="{ call ? := PG_COLL_MIRATO_2.AGGIORNAPROSPESONERO(?,?,?) }" />
+
+<STATEMENT name="CM_AGG_PROSP_DA_SOSPENSIONE"
+	query="{ call ? := PG_COLL_MIRATO_2.CMAGGPROSPDASOSPENSIONE(?,?,?) }" />
+
+<STATEMENT name="GET_AGGIORNASCOPERTURA_L68"
+	query="{ call ? := PG_COLL_MIRATO_2.AggiornaScoperturaL68(?,?,?,?) }" />
+
+
+<STATEMENT NAME="ST_GetConfig_CMPART"
+	QUERY="select to_char(ts_config_loc.num) num, ts_generale.codprovinciasil
+				from ts_config_loc, de_tipo_config, ts_generale
+				where ts_generale.codprovinciasil = ts_config_loc.strcodrif
+				and de_tipo_config.codtipoconfig = ts_config_loc.codtipoconfig
+				and ts_config_loc.codtipoconfig = 'CMPART' " />
+
+<STATEMENT NAME="ST_Getflgdisplim"
+	QUERY="select b.flgdisplim   from cm_comitato_tec b,cm_diagnosi_funzionale a
+		   where b.prgdiagnosifunzionale=a.prgdiagnosifunzionale
+				and a.cdnlavoratore = encrypt(?,?) " />
+
+
+<statement name="Get_VerificaCodValidi"
+	query="select count(1) as scadCodici
+				  from CM_CAPACITA
+				  inner join de_capacita on (DE_CAPACITA.CODCAPACITA = CM_CAPACITA.CODCAPACITA)
+                  where CM_CAPACITA.PRGDIAGNOSIFUNZIONALE = ? 
+                  		and (TRUNC(sysdate) &lt;= TRUNC(DATINIZIOVAL) OR TRUNC(sysdate) &gt;= TRUNC(DATFINEVAL)) " />
+
+
+<STATEMENT name="COMBO_TIPI_IMPEGNI"
+	query="select codgradocapacita as codice,
+				  strdescrizione as descrizione
+		   from  de_grado_capacita
+		   where codmonotipogrado = 'R' 
+		   order by codice " />
+
+<STATEMENT name="ALTRI_TIPI_CAPACITA"
+	query="select codgradocapacita as codice,
+				  strdescrizione as descrizione
+		   from  de_grado_capacita
+		   where codmonotipogrado = 'S'
+		   order by codice " />
+
+
+<STATEMENT name="GET_LAV_VDA"
+	query="SELECT cdnlavoratore 
+		   		  FROM cm_diagnosi_funzionale 
+		   		  WHERE prgdiagnosifunzionale = ? " />
+
+
+
+<STATEMENT name="WS_SAVE_ANAG_ACCOUNT_PORTALE"
+	query="UPDATE AN_LAVORATORE SET
+               	STREMAIL = ?, 
+               	CODCITTADINANZA = 
+               	(CASE
+					WHEN ? IS NULL THEN CODCITTADINANZA
+					ELSE ?
+				END),
+                NUMKLOLAVORATORE = TO_NUMBER(?),
+                CDNUTMOD = ?,
+                DTMMOD = SYSDATE
+                WHERE CDNLAVORATORE = ?" />
+
+<STATEMENT name="INSERT_AM_EX_PERM_SOGG_ACCOUNT_PORTALE"
+	query="INSERT INTO AM_EX_PERM_SOGG 
+                          (AM_EX_PERM_SOGG.PRGPERMSOGG,
+                           AM_EX_PERM_SOGG.CDNLAVORATORE,
+                           AM_EX_PERM_SOGG.CODSTATUS,
+                           AM_EX_PERM_SOGG.DATSCADENZA,
+                           AM_EX_PERM_SOGG.DTMINS,
+                           AM_EX_PERM_SOGG.DTMMOD,
+                           AM_EX_PERM_SOGG.CDNUTINS,
+                           AM_EX_PERM_SOGG.CDNUTMOD,
+                           AM_EX_PERM_SOGG.STRNUMDOCUMENTO
+                           )
+                  VALUES (S_AM_EX_PERM_SOGG.nextval, 
+                           ?, ?, TO_DATE(?, 'DD/MM/YYYY'), SYSDATE, SYSDATE,
+                           ?, ?, ?)" />
+
+<STATEMENT name="SELECT_COMBO_COMUNE"
+	query="select CODCOM as CODICE, 
+                  STRDENOMINAZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_COMUNE order by STRDENOMINAZIONE" />
+
+<STATEMENT name="SELECT_COMBO_CITTADINANZA"
+	query="select CODCITTADINANZA as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_CITTADINANZA order by STRDESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_TIPOVARIAZIONE"
+	query="select CODTIPOVARIAZIONE as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIO, DATFINE),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIO, DATFINE),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from MN_YG_TIPO_VARIAZIONE order by STRDESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_STATOOCC"
+	query="select COD_STATOANAG as CODICE, 
+                  DES_STATOANAG AS DESCRIZIONE
+                  from MN_STATO_OCCUP order by DES_STATOANAG" />
+<STATEMENT name="SELECT_COMBO_TIPODOC"
+	query="select CODSTATUS as CODICE, 
+                  STRDESCRIZIONE AS DESCRIZIONE
+                  from DE_STATUS_STRANIERO order by DESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_MODLAVORO"
+	query="select COD_TIPOORARIO as CODICE, 
+                  DES_TIPORARIO AS DESCRIZIONE
+                  from MN_ORARIO order by DESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_ENTETIT"
+	query="select sc.codcpimin as CODICE, 
+                  sc.strdenominazione as DESCRIZIONE
+                  from mn_st_cpi sc
+                  order by sc.codmonotipo, sc.strdenominazione" />
+<STATEMENT name="SELECT_COMBO_TITOLOPROGETTO"
+	query="select CODPROGETTO as CODICE, 
+                  STRDESCRIZIONE AS DESCRIZIONE
+                  from mn_yg_tipo_progetti order by DESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_ATTIVITA_POLATT"
+	query="select CODTIPOATTIVITA as CODICE, 
+                  STRDESCRIZIONE AS DESCRIZIONE
+                  from mn_yg_tipo_attivita" />
+<STATEMENT name="SELECT_COMBO_STATOOCC_ESITO"
+	query="select COD_ESITO as CODICE, 
+                  DES_ESITO_2 AS DESCRIZIONE
+                  from MN_STATUS_OCCUPAZ order by DES_ESITO_2" />
+<STATEMENT name="SELECT_COMBO_MN_ATECO"
+	query="select CODATECODOT as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_ATTIVITA WHERE CODATECODOT IS NOT NULL order by STRDESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_MN_TIPO_CONTRATTO"
+	query="select CODTIPOCONTRATTO as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_TIPO_CONTRATTO order by STRDESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_MN_MANSIONE"
+	query="select CODMANSIONEDOT as CODICE, 
+                  STRDESCRIZIONE  AS DESCRIZIONE
+                  from DE_MANSIONE 
+                  WHERE CODMANSIONEDOT IS NOT NULL order by STRDESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_LIVELLO_STUDIO"
+	query="select CODICE, 
+                  DESCRIZIONE
+                  from MN_TITOLO_L1 order by DESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_LINGUA"
+	query="select CODLINGUA as CODICE, 
+                  STRDENOMINAZIONE  || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_LINGUA order by DESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_LIV_LINGUA"
+	query="select COD_CONOSCENZA AS CODICE, 
+                  DES_CONOSCENZA AS DESCRIZIONE
+                  from MN_GRADO_CONSC_LIN order by DESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_LIV_CONSC_INF"
+	query="select COD_GRADOCONOSC AS CODICE, 
+                  DES_GRADOCONOSC AS DESCRIZIONE
+                  from MN_GRADO_CONSC_INF order by DESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_CONSC_INF"
+	query="select COD_CONOSCENZA AS CODICE, 
+                  DES_CONOSCENZA AS DESCRIZIONE
+                  from MN_CONSC_INF order by DESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_CORSO_STUDIO"
+	query="select CODTITOLO as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;,
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto)&apos;, 
+                                    &apos;&apos;) AS DESCRIZIONE
+                  from DE_TITOLO order by STRDESCRIZIONE" />
+<STATEMENT name="SELECT_COMBO_ABIGEN"
+	query="select COD_ABILITAZIONE AS CODICE, 
+                  DES_DESABILITAZIONE AS DESCRIZIONE
+                  from MN_ABILITAZIONE order by DESCRIZIONE" />
+                  
+<STATEMENT name="SELECT_CODCPIMIN_PROVINCIALI" 
+	query="select distinct m.codcpimin
+	from de_cpi d
+	inner join de_cpi_validita_min m on (d.codcpi=m.codcpisil) 
+	where d.codprovincia = (select codprovinciasil from ts_generale)" />
+	               
+<STATEMENT
+    name="INSERT_SP_LAVORATORE_FROM_SAP"  
+    query=" insert into SP_LAVORATORE (
+                            PRGSPLAV,
+                            DATAINVIOMIN,
+                            CODMINSAP,
+                            CODENTETIT,
+                            DATNASC,
+                            CDNLAVORATORE,
+                            CDNUTINS,
+                            DTMINS,
+                            CDNUTMOD,
+                            DTMMOD,
+                            STRCODICEFISCALE,
+                            CODSTATO,
+                            DATINIZIOVAL,
+                            DATFINEVAL) values(
+                    S_SP_LAVORATORE.NEXTVAL,
+                            TO_DATE(?, 'DD/MM/YYYY'),
+                            ?,
+                            ?,
+                            TO_DATE(?, 'DD/MM/YYYY'),
+                            ?,
+                            ?,
+                            sysdate,
+                            ?,
+                            sysdate,
+                            ?,
+                            ?,
+                            sysdate,
+                            null)" />
+
+<STATEMENT name="SELECT_COMBO_EVENTO_MINISTERO"
+	query="select codevento as CODICE, 
+                  strdescrizione as DESCRIZIONE
+                  from Mn_Yg_Evento 
+                  order by codevento, strdescrizione" />
+                  
+ <STATEMENT name="SELECT_CODCPIMIN_PROV_REG" 
+	query="select distinct m.codcpimin 
+    from de_cpi d 
+  inner join de_provincia prov on (d.codprovincia=prov.codprovincia) 
+    inner join de_cpi_validita_min m on (d.codcpi=m.codcpisil) 
+      left join mn_st_cpi on (d.CODCPIMIN = mn_st_cpi.CODCPIMIN)
+    where (prov.codregione=(select codregionesil from ts_generale where prggenerale=1)  
+  and d.codprovincia  &lt;&gt; (select codprovinciasil from ts_generale where prggenerale=1) )
+  or (mn_st_cpi.CODCPIMIN is null )
+union
+select mn.codcpimin 
+    from mn_st_cpi  mn
+     where mn.CODMONOTIPO = 'I'
+  and mn.CODREGIONE = (select codregionesil from ts_generale where prggenerale=1) 
+  order by 1" />
+	
+ <STATEMENT name="CHECK_ESISTENZA_CODCPI_SAPMINISTERO" 
+	query="select count(mn.codcpimin) as num
+    from mn_st_cpi  mn
+     where upper(mn.codcpimin) = upper(?)
+union
+select count(de_cpi_validita_min.codcpimin) as num
+from de_cpi_validita_min 
+where upper(de_cpi_validita_min.codcpimin) = upper(?) " />
+	

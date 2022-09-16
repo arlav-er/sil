@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.inps.it/comunicazioniAsdiNraRequest/0.0.1"
+	xmlns:tns="http://www.inps.it/comunicazioniAsdiNraRequest/0.0.1"
+	xmlns:commonasdinra="http://www.inps.it/comunicazioniAsdiNraCommon/0.0.1"
+	elementFormDefault="qualified">
+	<import namespace="http://www.inps.it/comunicazioniAsdiNraCommon/0.0.1"
+		schemaLocation="Collaborazione_NRA_PAT_INPSCommon.xsd" />
+	<complexType name="comunicazioneDatiDomandaType">
+		<sequence>
+			<element name="idDomandaWeb" type="int" minOccurs="1"
+				maxOccurs="1" nillable="false" />
+			<element name="idDomandaIntranet" type="int" minOccurs="1"
+				maxOccurs="1" nillable="false" />
+			<element name="richiedente" type="commonasdinra:datiRichiedenteType"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="residenzaRichiedente" type="commonasdinra:indirizzoType"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="dataPresentazioneAsdiNra" type="dateTime"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="dataInizioPrestazioneAsdiNra" type="date"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="dataFinePrestazioneAsdiNra" type="date"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="importoGiornalieroNra" type="commonasdinra:importoType"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="importoComplessivoNra" type="commonasdinra:importoType"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="importoGiornalieroAsdi" type="commonasdinra:importoType"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="importoComplessivoAsdi" type="commonasdinra:importoType"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="codiceReiezione" type="int" minOccurs="0"
+				maxOccurs="1" nillable="false" />
+			<element name="noteDifferenze" type="string" minOccurs="0"
+				maxOccurs="1" nillable="false" />
+			<element name="datiSottoscrizioneProgettoPersonalizzato"
+				type="tns:sottoscrizioneProgettoType" minOccurs="0" maxOccurs="1" />
+			<element name="tipoPrestazione" type="commonasdinra:tipoPrestazioneType"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<group ref="commonasdinra:datiGenerici" minOccurs="1"
+				maxOccurs="1" />
+		</sequence>
+	</complexType>
+
+	<complexType name="comunicazioniEventiSuccessiviType">
+		<sequence>
+			<element name="idDomandaWeb" type="int" minOccurs="1"
+				maxOccurs="1" nillable="false" />
+			<element name="idDomandaIntranet" type="int" minOccurs="1"
+				maxOccurs="1" nillable="false" />
+			<element name="richiedente" type="commonasdinra:datiRichiedenteType"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<choice minOccurs="1" maxOccurs="1">
+				<element name="comunicazioneMinisteroLavoro" type="tns:comunicazioneMinisteroLavoroType" />
+				<element name="altreComunicazioni" type="tns:altreComunicazioniType" />
+			</choice>
+
+			<element name="importoComplessivoNraDecurtato" type="commonasdinra:importoType"
+				minOccurs="0" maxOccurs="1" nillable="false">
+				<annotation>
+					<documentation>Obbligatorio in caso di decurtazione</documentation>
+				</annotation>
+			</element>
+
+			<element name="importoComplessivoAsdiDecurtato" type="commonasdinra:importoType"
+				minOccurs="0" maxOccurs="1" nillable="false">
+				<annotation>
+					<documentation>Obbligatorio in caso di decurtazione</documentation>
+				</annotation>
+			</element>
+
+			<group ref="commonasdinra:datiGenerici" minOccurs="1"
+				maxOccurs="1" />
+
+		</sequence>
+	</complexType>
+
+	<simpleType name="codiceIntermediarioType">
+		<restriction base="string">
+			<length value="11" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="motivoComunicazioneType">
+		<restriction base="string">
+			<enumeration value="A">
+				<annotation>
+					<documentation>Annulata</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="N">
+				<annotation>
+					<documentation>Nuova</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="tipoComunicazioneType">
+		<restriction base="string">
+			<enumeration value="AGP">
+				<annotation>
+					<documentation>Aggiornamento progetto</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="FTS">
+				<annotation>
+					<documentation>Fatto sanzionabile</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="STP">
+				<annotation>
+					<documentation>Sottoscrizione progetto</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+
+
+	<simpleType name="motivoSanzioneType">
+		<restriction base="string">
+			<enumeration value="MP1">
+				<annotation>
+					<documentation>Mancata Presentazione (la prima volta) alle
+						convocazioni/appuntamenti
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="MP2">
+				<annotation>
+					<documentation>Mancata Presentazione (la seconda volta) alle
+						convocazioni/appuntamenti
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="MO1">
+				<annotation>
+					<documentation>Mancata Presentazione (la prima volta) alle
+						iniziative di orientamento
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="MO2">
+				<annotation>
+					<documentation>Mancata Presentazione (la seconda volta) alle
+						iniziative di orientamento
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="MP3">
+				<annotation>
+					<documentation>Mancata Presentazione (la terza volta) alle
+						convocazioni/appuntamenti
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="PDS">
+				<annotation>
+					<documentation>Perdita dello stato di disoccupazione
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="MPA">
+				<annotation>
+					<documentation>Mancata partecipazione a iniziative di formazione,
+						riqualificazione o altra politica attiva
+					</documentation>
+				</annotation>
+			</enumeration>
+			<enumeration value="ROC">
+				<annotation>
+					<documentation>Rifiuto offerta congrua</documentation>
+				</annotation>
+			</enumeration>
+		</restriction>
+	</simpleType>
+
+	<complexType name="comunicazioneMinisteroLavoroType">
+		<sequence>
+			<element name="codiceIntermediario" type="tns:codiceIntermediarioType"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="motivoComunicazione" type="tns:motivoComunicazioneType"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="tipoComunicazione" type="tns:tipoComunicazioneType"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="tipoEvento" type="commonasdinra:tipologiaEventoType"
+				minOccurs="0" maxOccurs="1" nillable="false" />
+			<element name="motivoSanzione" type="tns:motivoSanzioneType"
+				minOccurs="0" maxOccurs="1" nillable="false" />
+			<element name="identificativoComunicazioneAnnullata" type="commonasdinra:identificativoComunicazioneType"
+				minOccurs="0" maxOccurs="1" nillable="false" />
+		</sequence>
+	</complexType>
+
+	<complexType name="altreComunicazioniType">
+		<sequence>
+			<element name="tipoEvento" type="commonasdinra:tipologiaEventoType"
+				minOccurs="1" maxOccurs="1" />
+			<element name="motivoEvento" type="int" minOccurs="1"
+				maxOccurs="1" nillable="false" />
+			<element name="descrizioneEvento" type="string" minOccurs="1"
+				maxOccurs="1" nillable="false" />
+			<element name="notaEvento" type="string" minOccurs="0"
+				maxOccurs="1" nillable="false" />
+			<element name="dataEvento" type="date" minOccurs="0" 
+				maxOccurs="1" nillable="false" />
+		</sequence>
+	</complexType>
+
+	<complexType name="sottoscrizioneProgettoType">
+		<sequence>
+			<element name="idComunicazioneMinisteroLavoro" type="commonasdinra:identificativoComunicazioneType"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="codiceIntermediario" type="tns:codiceIntermediarioType"
+				minOccurs="1" maxOccurs="1" nillable="false" />
+			<element name="dataComunicazione" type="dateTime" minOccurs="1"
+				maxOccurs="1" nillable="false" />
+		</sequence>
+	</complexType>
+
+	<element name="comunicazioneDatiDomanda" type="tns:comunicazioneDatiDomandaType" />
+	<element name="comunicazioneEventiSuccessivi" type="tns:comunicazioniEventiSuccessiviType" />
+	<element name="comunicazioneDatiDomandaOutput" type="commonasdinra:esitoComunicazioneType" />
+	<element name="comunicazioneEventiSuccessiviOutput" type="commonasdinra:esitoComunicazioneType" />
+</schema>

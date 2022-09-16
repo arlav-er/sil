@@ -1,0 +1,68 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="../../template/main_primefaces.xhtml"
+>
+	<ui:param name="bean" value="#{programmaLavoroBean}" />
+
+	<ui:define name="title">
+		<h:outputText value="#{msg['cittadino.programma.lavoro.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+		<h:panelGroup id="contentProgrammaAdesione">
+			<ui:fragment rendered="#{!bean.showProgrammaAdesioneForm}">
+				<div class="widget_container">
+					<div class="ui-widget-content ui-widget ui-corner-all">
+						<p:messages id="messages" showDetail="true" closable="true" escape="false"/>
+						<h:panelGroup id="umbria_attiva">
+							<ui:fragment rendered="#{bean.isInformativaRendered()}">
+								<p:scrollPanel style="height:300px;" mode="native">
+									<ui:include src="_informativa/_informativa_pre_adesione.xhtml" />
+								</p:scrollPanel>
+								<br/>
+							</ui:fragment>
+							
+							<ui:fragment rendered="#{bean.checkUmbAttExists()}">
+								La tua adesione al programma Umbriattiva Tirocini - Giovani/Adulti è avvenuta con successo.
+		            			<p:panelGrid columns="2">
+									<h:outputLabel for="dataAdesioneUmbAtt" value="Data adesione"/>
+									<h:outputText id="dataAdesioneUmbAtt" value="#{bean.latestBdAdesioneDTOUmbAttPerformed.dtAdesione}">
+										<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+									</h:outputText>
+									<p:button id="agendaBtn"
+										href="#{bean.getAgendaUrl()}"
+										title="Prendi appuntamento"
+										value="Prendi appuntamento">
+									</p:button>
+								</p:panelGrid>
+							</ui:fragment>
+							<h:form id="informativa_form">
+								<h:panelGrid columns="2">
+									<p:button outcome="home"
+										styleClass="buttonStyle" 
+										title="Torna alla scrivania"
+										value="Torna alla scrivania">
+									</p:button>
+									<p:commandButton id="showFormProgramaAdesioneBtn" 
+										action="#{bean.switchToViewForm()}"
+										rendered="#{bean.isInformativaRendered()}"
+										styleClass="buttonStyle"
+										title="Aderisci ad Umbriattiva"
+										value="Aderisci ad Umbriattiva"
+										update=":messages :contentProgrammaAdesione"/>
+								</h:panelGrid>
+							</h:form>					
+						</h:panelGroup>
+					</div>
+				</div>
+			</ui:fragment>
+			<ui:fragment rendered="#{bean.showProgrammaAdesioneForm}">
+				<ui:include src="adesione/adesione.xhtml" />
+			</ui:fragment>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

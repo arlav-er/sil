@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:pretty="http://ocpsoft.com/prettyfaces"
+	template="/templates/#{godfatherBean.theme}/main.xhtml">
+
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{sessionLogger.grantAccessFor(sessionLogger.getProvinciaAccess())}" />
+	</f:metadata>
+	<ui:param name="pagetitle" value="Profile" />
+	
+	<ui:define name="content">
+		<div class="container-fluid">
+			<div class="panel-body profile-information animated fadeIn">
+				<div class="col-md-2">
+					<div class="profile-pic text-center">
+						<h:panelGroup id="userProfilePic">
+							<h:panelGroup rendered="#{empty provinciaViewUtenteBean.utenteInfo.foto}">
+								<h:graphicImage library="commons" name="images/profilePic.jpg"></h:graphicImage>
+							</h:panelGroup>
+							<h:panelGroup rendered="#{not empty provinciaViewUtenteBean.utenteInfo.foto}">
+								<pretty:urlbuffer var="imgURL" mappingId="profilePicture">
+									<f:param id="type" value="utente" />
+									<f:param id="id" value="#{provinciaViewUtenteBean.utenteInfo.pfPrincipal.idPfPrincipal}" />
+									<f:param id="username" value="#{provinciaViewUtenteBean.utenteInfo.pfPrincipal.username}" />
+								</pretty:urlbuffer>
+								<img class="animated fadeInUp" src="#{imgURL}?#{utils.currentTimeMillis()}" />
+							</h:panelGroup>
+						</h:panelGroup>
+						<h3>
+							#{provinciaViewUtenteBean.utenteInfo.pfPrincipal.nome} #{provinciaViewUtenteBean.utenteInfo.pfPrincipal.cognome} <br />
+						</h3>
+					</div>
+				</div>
+	
+				<div class="col-md-5">
+					<div class="panel panel-warning">
+						<div class="panel-heading">#{ui['prof.datiAccount']}</div>
+						<div class="panel-body">
+							<ui:include src="viewUtente/_datiAccount.xhtml" />
+						</div>
+					</div>
+					<ui:remove>
+						<!-- Specific for RER-->
+					</ui:remove>
+					<ui:fragment rendered="#{provinciaViewUtenteBean.checkSezioneServiziAmministrativiAbilitato()}">
+						<div class="panel panel-warning">
+							<div class="panel-heading">#{ui['prof.serviziAmministrativi']}</div>
+							<div class="panel-body">
+								<ui:include src="viewUtente/_servAmini.xhtml" />
+							</div>
+						</div>
+					</ui:fragment>
+				</div>
+				
+				<div class="col-md-5">
+					<div class="panel panel-warning">
+						<div class="panel-heading">#{ui['prof.datiPersonali']}</div>
+						<div class="panel-body">
+							<ui:include src="viewUtente/_datiPers.xhtml" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

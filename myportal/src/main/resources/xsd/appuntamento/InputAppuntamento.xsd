@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio 1.0.8.0 (http://www.liquid-technologies.com) -->
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="CodiceFiscale">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]" />
+      <xs:pattern value="[0-9]{11}" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Stringa50Obbl">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="50" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Comune">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Z]{1}\d{3}" />
+      <xs:pattern value="[0]{4}" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Sesso">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="M" />
+      <xs:enumeration value="F" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Cittadinanza">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{3}" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Stringa100Obbl">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="100" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="EMail">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="80" />
+      <xs:pattern value="([A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*@[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*)?" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Telefono">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="15" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="Appuntamento">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="codiceFiscale" type="CodiceFiscale" />
+        <xs:choice>
+          <xs:element name="utenteLavoratore">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="UtenteServizio">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:length value="1" />
+                      <xs:enumeration value="L" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:element>
+                <xs:element name="Lavoratore">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="nome" type="Stringa50Obbl" />
+                      <xs:element name="cognome" type="Stringa50Obbl" />
+                      <xs:element name="dataNascita" type="xs:date" />
+                      <xs:element name="comuneNascita" type="Comune" />
+                      <xs:element name="sesso" type="Sesso" />
+                      <xs:element name="cittadinanza" type="Cittadinanza" />
+                      <xs:element name="domicilio">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="comune" type="Comune" />
+                            <xs:element name="indirizzo" type="Stringa100Obbl" />
+                          </xs:sequence>
+                        </xs:complexType>
+                      </xs:element>
+                      <xs:element name="residenza">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="comune" type="Comune" />
+                            <xs:element name="indirizzo" type="Stringa100Obbl" />
+                          </xs:sequence>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="utenteAzienda">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="UtenteServizio">
+                  <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:length value="1" />
+                      <xs:enumeration value="A" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+        <xs:element name="IdProvincia" type="xs:string" />
+        <xs:element name="datiContatto">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" name="email" type="EMail" />
+              <xs:element minOccurs="0" name="cellulare" type="Telefono" />
+              <xs:element name="consensoSMS">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:length value="1" />
+                    <xs:enumeration value="S" />
+                    <xs:enumeration value="N" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="parametriAppuntamento">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="IdCPI">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:length value="9" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="codiceRichiesta">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="8" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:choice>
+                <xs:element name="identificativoSlot" type="xs:integer" />
+                <xs:element name="datiRicerca">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" name="dataDal" type="xs:date" />
+                      <xs:element minOccurs="0" name="dataAl" type="xs:date" />
+                      <xs:element minOccurs="0" name="mattina_pomeriggio">
+                        <xs:simpleType>
+                          <xs:restriction base="xs:string">
+                            <xs:length value="1" />
+                            <xs:enumeration value="M" />
+                            <xs:enumeration value="P" />
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:choice>
+              <xs:element name="contattiAutomatici">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="invioSMS">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:length value="1" />
+                          <xs:enumeration value="S" />
+                          <xs:enumeration value="N" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="invioEmail">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:length value="1" />
+                          <xs:enumeration value="S" />
+                          <xs:enumeration value="N" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

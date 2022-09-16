@@ -1,0 +1,414 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/tab.xhtml">
+
+	<ui:param name="tabBean" value="#{cvEsperienzeProfessionaliBean}" />
+	<ui:param name="form_id" value="esperienze_professionali" />
+	<ui:param name="deleteId" value="#{tabBean.data.id}"></ui:param>
+
+	<ui:define name="tabcontent">
+
+		<div style="width: 20px; position: relative; left: 98%;">
+			<cc:infoSectionPanel target_id="esperienze_professionali_info_panel"
+				message="#{tabBean.info.testo}" />
+		</div>
+
+		<h:form id="#{form_id}">
+			<script type="text/javascript">			
+				checkSwitch('#{tabBean.switchtab}');						
+			</script>
+
+
+			<h:inputHidden id="tabClick" value="#{tabBean.tabClick}">
+				<f:converter converterId="booleanConverter" />
+			</h:inputHidden>
+
+			<h:panelGroup id="esp_list">
+				<h:outputText value="Nessun elemento inserito"
+					rendered="#{empty tabBean.list}" />
+
+				<h:dataTable id="table" rendered="#{not empty tabBean.list}"
+					summary="Tabella riassuntiva delle esperienze professionali"
+					columnClasses="customcenter,customcenter,,,,customcenter notSortable"
+					value="#{tabBean.list}" var="element">
+
+					<h:column>
+						<f:facet name="header">Da</f:facet>
+						<h:outputText value="#{element.da}">
+							<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+						</h:outputText>
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">A</f:facet>
+						<h:outputText value="#{element.a}" rendered="#{!element.inCorso}">
+							<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+						</h:outputText>
+						<h:outputText value="In corso" rendered="#{element.inCorso}" />
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">Datore di lavoro</f:facet>
+						<h:outputText value="#{element.datoreLavoro}" />
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">Gruppo professionale</f:facet>
+						<h:outputText value="#{element.strMansione}" />
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">Tipologia di contratto</f:facet>
+						<h:outputText value="#{element.deContratto.descrizione}" />
+					</h:column>
+
+					<h:column>
+						<h:commandLink styleClass="buttonStyle" immediate="true"
+							action="#{tabBean.edit}">
+							<span class="ui-icon ui-icon-pencil fix_icon" />
+							<f:param name="id" value="#{element.id}" />
+							<f:ajax execute="@this" render="@form"
+								onevent="showPanelCallback" />
+						</h:commandLink>
+
+						<h:commandLink styleClass="buttonStyle"
+							onclick="return document.getElementById('delete_esper').open({id: #{element.id}},this);">
+							<span class="ui-icon ui-icon-trash fix_icon" />
+							<f:ajax execute="@form" render="@form"
+								onevent="refreshNumVacancyCompatibili" />
+						</h:commandLink>
+					</h:column>
+				</h:dataTable>
+				<br />
+				<h:commandLink id="insertButton" styleClass="insertButton"
+					value="Inserisci una nuova esperienza professionale"
+					rendered="#{not tabBean.showPanel}"
+					action="#{tabBean.showInsertPanel}">
+					<f:ajax execute="@this" render="@form" onevent="showPanelCallback" />
+				</h:commandLink>
+			</h:panelGroup>
+
+			<h:panelGroup id="istrPanel" styleClass="insertPanel" layout="block"
+				rendered="#{tabBean.showPanel}">
+
+				<h:panelGrid id="insert_form" columns="1" cellspacing="10"
+					style="display:none">
+
+					<cc:inputSuggestion id="mansione" size="114" style="width: 90%"
+						label="Gruppo professionale" required="true"
+						valueCod="#{tabBean.data.codMansione}"
+						value="#{tabBean.data.strMansione}"
+						disabled="#{not tabBean.editing}"
+						requiredMessage="Il Gruppo professionale è obbligatorio"
+						requiredMessageCod="E' necessario scegliere un gruppo professionale dalla lista a tendina"
+						showButton="true" suggestionPath="mansioni"
+						valueChangeListener="#{cvEsperienzeProfessionaliBean.setQualificaFilter}">
+						<f:validator validatorId="mansioneSuggestionValidator"
+							for="function" />
+						<f:ajax event="change" execute="@this"
+							render=":esperienze_professionali:qualifica" />
+					</cc:inputSuggestion>
+
+					<h:panelGroup id="qualifica">
+						<cc:inputSuggestion id="qualifica_svolta" size="114" style="width: 90%"
+							helpMessage="#{msg['cittadino.info.cv.qualifica_svolta']}"						
+							label="Qualifica Svolta"
+							valueCod="#{tabBean.data.qualificaSvolta.id}"
+							value="#{tabBean.data.qualificaSvolta.descrizione}"
+							disabled="#{not tabBean.editing}" showButton="true"
+							suggestionPath="mansioneMin"
+							filter="#{cvEsperienzeProfessionaliBean.filtroQualifica}"
+							extraParamF="getQualificaSvoltaExtraParams">
+							<f:attribute name="codMansione"
+										value=":esperienze_professionali:mansione:inputHidden" />
+							<f:validator validatorId="mansioneMinSuggestionValidator"
+								for="function" />
+						</cc:inputSuggestion>
+						<script type="text/javascript">
+							disegnaBottoni();
+
+							function getQualificaSvoltaExtraParams() { 
+								var extraParams = [['filter','#{tabBean.filtroQualifica}']];
+								return extraParams;
+							}
+						</script>
+					</h:panelGroup>
+
+					<cc:inputText id="attivita_responsabilita" size="114" style="width: 90%"
+						maxlength="250" disabled="#{not tabBean.editing}"
+						label="Attività/Responsabilità"
+						value="#{tabBean.data.attivitaResponsabilita}">
+						<f:validateLength for="function" maximum="250" />
+					</cc:inputText>
+
+					<h:panelGroup>
+						<cc:selectOneMenu label="Tipologia di contratto"
+							value="#{tabBean.data.deContratto.id}" id="rapportoLavoro"
+							disabled="#{not tabBean.editing}" required="false"
+							title="Rapporto di lavoro" style="display: inline-block;"
+							requiredMessage="Rapporto di lavoro obbligatorio">
+							<f:selectItems value="#{tabBean.rapportiLavoroOptions}" />
+							<f:ajax event="change" execute="@this" render=":esperienze_professionali:espLavorativaGroup" 
+								listener="#{tabBean.setDeContrattoFlagLavorativa}"/>
+						</cc:selectOneMenu>
+						<h:panelGroup id="espLavorativaGroup" style="display: inline-block; margin-left: 2em;">
+							<ui:fragment rendered="#{not empty tabBean.data.deContratto.flagTirocini}">
+								<label>Lavorativa</label><br />
+								#{tabBean.data.deContratto.flagTirocini ? 'No' : 'Sì'}
+							</ui:fragment>
+						</h:panelGroup>
+					</h:panelGroup>
+
+					<cc:inputSuggestion id="area"
+						label="Area" disabled="#{not tabBean.editing}"
+						value="#{tabBean.data.deAreaSil.descrizione}"
+						valueCod="#{tabBean.data.deAreaSil.id}" showButton="false"
+						requiredMessageCod="E' necessario scegliere un'un valore dalla lista a tendina"
+						suggestionPath="deAreaSil">
+						<f:validator validatorId="deAreaSilSuggestionValidator" for="function" />
+					</cc:inputSuggestion>
+					
+					<cc:inputText id="datore_lavoro" disabled="#{not tabBean.editing}"
+						maxlength="250" required="true" label="Datore di lavoro"
+						value="#{tabBean.data.datoreLavoro}"
+						requiredMessage="Il datore di lavoro e' obbligatorio!">
+						<f:validateLength for="function" maximum="250" />
+					</cc:inputText>
+					
+					<cc:inputSuggestion id="comune_datore"
+						label="Comune del datore di lavoro" disabled="#{not tabBean.editing}"
+						value="#{tabBean.data.deComuneDatore.descrizione}"
+						valueCod="#{tabBean.data.deComuneDatore.id}" showButton="false"
+						requiredMessageCod="E' necessario scegliere un'un valore dalla lista a tendina"
+						suggestionPath="comuni">
+						<f:validator validatorId="comuneSuggestionValidator" for="function" />
+					</cc:inputSuggestion>
+
+					<cc:inputSuggestion id="attivita" style="width: 90%"
+						label="Attività o settore del datore di lavoro" required="true"
+						size="114" disabled="#{not tabBean.editing}"
+						value="#{tabBean.data.strAteco}"
+						valueCod="#{tabBean.data.codAteco}" showButton="true"
+						requiredMessage="L'attività e' obbligatoria"
+						requiredMessageCod="E' necessario scegliere un'attività dalla lista a tendina"
+						suggestionPath="attivita">
+						<f:validator validatorId="attivitaSuggestionValidator"
+							for="function" />
+					</cc:inputSuggestion>
+
+					<cc:inputText id="data_da" type="date"
+						disabled="#{not tabBean.editing}" required="true"
+						label="Data di inizio rapporto" value="#{tabBean.data.da}"
+						requiredMessage="La data di inizio rapporto e' obbligatoria">
+						<f:validator validatorId="dateNotFutureValidator" for="function" />
+					</cc:inputText>
+
+					<h:panelGrid id="data_a_panelgrid" columns="2">
+						<cc:inputText id="data_a" type="date"
+							disabled="#{not tabBean.editing}" label="Data di fine rapporto"
+							value="#{tabBean.data.a}">
+							<f:attribute name="data_da_id"
+								value="#{form_id}:data_da:inputText"></f:attribute>
+							<f:validator validatorId="twoDatesValidator" for="function" />
+							<f:validator validatorId="dateNotFutureValidator" for="function" />
+						</cc:inputText>
+						<h:panelGroup layout="block">
+							<h:outputLabel value="Ancora in corso" for="in_corso" />
+							<h:selectBooleanCheckbox id="in_corso"
+								value="#{tabBean.data.inCorso}" />
+						</h:panelGroup>
+					</h:panelGrid>
+
+				</h:panelGrid>
+
+				<ui:include src="../../../_buttons.xhtml" />
+			</h:panelGroup>
+
+			<script type="text/javascript">
+			function infoResolver(params) {
+				jqBtnResolver=jq('#{form_id}:'+params.id+':cerca');
+				if(jQuery.isEmptyObject($(jqBtnResolver))){
+					return;
+					}
+				base_url="#{request.contextPath}/secure/rest/resolve/",
+				json_url=base_url+params.id+"Info";
+				
+				//resolvInfoBtn=$(document.createElement('div')).attr('id',params.id+"InfoImg").attr('tabindex',0).addClass('buttonStyle').append('?');
+				//.attr('src','#{request.contextPath}/resources/images/info-icon-20.png');
+				resolvInfoBtn=	$(document.createElement('div')).attr('tabindex',0).append('?').addClass('buttonStyle').button();
+						//.click(closeResolverInfoDiv).keypress(closeResolverInfoDiv)
+				/*	$(document.createElement('div')).css('text-align','left')
+				.append(
+						 );*/
+				$(jqBtnResolver).after(resolvInfoBtn);
+				defaultsBtn={
+					    my:        "left top",
+					    at:        "right top",
+					    of:        jqBtnResolver,
+					    offset:		"5 0",
+					    collision: "none none"
+					};
+						
+				$(resolvInfoBtn).position(defaultsBtn);
+				
+				//resolvInfoDiv=$(document.createElement('div')).attr('id',params.id+"InfoDiv").css('display','none');
+				resolvInfoDivCloser=$(document.createElement('div')).css('text-align','left')
+				.append(
+						$(document.createElement('div')).attr('tabindex',0).append('X').addClass('buttonStyle').button()
+						.click(closeResolverInfoDiv).keypress(
+						function (event) {
+							//con invio si chiude le info mansioni
+							if(event.keyCode==13) closeResolverInfoDiv()
+						})
+						);
+				resolvInfoDiv=$(document.createElement('div')).css('display','none');
+				resolvInfoDivContent=$(document.createElement('div'));
+				resolvInfoDiv.append(resolvInfoDivContent).append(resolvInfoDivCloser);
+				
+				jqCod2resolve=jq('#{form_id}:'+params.id+':inputHidden');
+				jqMasterDiv=jq("#{form_id}:"+params.id+ "");
+				jqInput=jq("#{form_id}:"+params.id+ ":inputText");
+				$(jqMasterDiv).after(resolvInfoDiv);
+
+				//console.log('jqMasterDiv:'+JSON.stringify(jqMasterDiv));
+				//console.log('$jqMasterDiv:'+JSON.stringify($(jqMasterDiv)));
+				//console.log('$jqMasterDiv:'+JSON.stringify($(jqMasterDiv).val()));
+				
+				defaultsDiv={
+					    my:        "left top",
+					    at:        "left bottom",
+					    of:       	jqMasterDiv,
+					    offset:		"0 20",
+					    collision: "none none"
+					};
+				$(resolvInfoDiv).position(defaultsDiv);
+
+				defaultsClos={
+					    my:        "left top",
+					    at:        "right top",
+					    of:        $(resolvInfoBtn),
+					    offset:		"5 0",
+					    collision: "none none"
+					};
+				//onclick recupero la info in base al codice
+				$(resolvInfoBtn)
+				.click(resolveCod)
+				.keypress(function (event) {
+							//con invio si recupera le info mansioni
+							if(event.keyCode==13) resolveCod()
+						});
+			}
+
+			function closeResolverInfoDiv(){
+				$(resolvInfoDiv).hide();
+			}
+
+			function resolveCod() {
+				codSel=$(jqCod2resolve).val();
+				if(codSel){
+					$('#mansioneInfoDialog').dialog('close');
+					$.getJSON(json_url, {term: codSel,},
+						function(data, textStatus, jqXHR) {
+								$('#mansioneInfoDialog').dialog({
+									title: data.titolo,
+									close: function(event, ui){
+										//console.log('event CLOSE');
+										//console.log('$(elem):'+JSON.stringify($(elem).html()));
+										$(resolvInfoBtn).focus();
+										//console.log('event:'+JSON.stringify(event));
+									 }
+								  });
+								$('#mansioneInfoContent').text(data.descrizione);
+								$('#mansioneInfoDialog').dialog('open');
+								//console.log('data:'+JSON.stringify(data));
+								/*
+								console.log('data:'+JSON.stringify(data));
+								$(resolvInfoDivContent).text(data.descrizione);
+								$(resolvInfoDiv).show();
+								$(resolvInfoDivCloser).position(defaultsClos);
+								*/
+							  });
+					}
+			}
+
+
+			
+			
+				$(function() {
+
+				
+
+					if ($( "[id$=in_corso]" ).is(':checked')) {
+						$(jq('#{form_id}:data_a:inputText')).val("");
+						$(jq('#{form_id}:data_a:inputText')).attr("disabled", "disabled");
+					};
+					
+					generateDataTable(jq('#{form_id}:table'), {
+						"aaSorting": [[ 1, "desc" ], [0,"desc"]],
+						"aoColumns": [
+						              { "sType": "uk_date" },
+						              { "sType": "uk_date" },
+						              null,
+						              null,
+						              null,
+						              null
+						          ]
+					});
+					
+					disegnaBottoni();
+
+					attachListener();
+					try{
+				    	infoResolver({id:'mansione'}); 
+					} catch(e){
+						//console.log('inforesolver not started');
+					}
+					$( "#mansioneInfoDialog" ).dialog({
+						autoOpen: false,
+						modal: true
+						});		
+				});
+				
+
+				//Quando viene selezionata la checkbox "In corso" il campo "data a" viene disabilitato, e viceversa 
+				$( "[id$=in_corso]" ).click(
+					function() {						
+						if ( $(this).is(':checked')) {
+							$(jq('#{form_id}:data_a:inputText')).val("");
+							$(jq('#{form_id}:data_a:inputText')).attr("disabled", "disabled");
+						} else {
+							$(jq('#{form_id}:data_a:inputText')).removeAttr("disabled");
+						}
+					}
+				);
+
+				var openDelete = function(params) {
+					var itemId = params.id;
+					$('[id$="delete_esper\:modal_form\:objectId"]').val(itemId);
+				};		
+			</script>
+			<cc:messages />
+		</h:form>
+
+		<br />
+		<div id="esperienze_professionali_info_panel" class="helpPanelMessage" />
+
+		<cc:modalDialog id="delete_esper"
+			title="Elimina l'esperienza professionale" openF="openDelete"
+			message="Sei sicuro di voler eliminare l'esperienza professionale?"
+			actionSubmit="#{cvEsperienzeProfessionaliBean.delete}"
+			submitLabel="Elimina" renderAjax=":esperienze_professionali">
+			<h:inputHidden id="objectId"></h:inputHidden>
+			<h:outputText value="#{cc.attrs.message}"></h:outputText>
+		</cc:modalDialog>
+
+
+		<div id="mansioneInfoDialog" style="display: none;">
+			<div id="mansioneInfoContent" />
+		</div>
+	</ui:define>
+
+</ui:composition>

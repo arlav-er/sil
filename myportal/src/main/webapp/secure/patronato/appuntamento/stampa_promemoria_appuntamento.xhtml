@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="../../template/main_primefaces.xhtml">
+
+	<ui:define name="title">
+		<h:outputText
+			value="#{txt['patronato.app.stampa_promemoria_appuntamento.titolo']}"
+			escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+		<h:outputStylesheet library="css" name="#{sessionBean.cssStyle}/myportalPrimeFacesPatronato.css" />
+		<div class="container-div">
+			<h:form id="stampaPromemoriaAppuntamentoPatronatoForm">
+				<table style="border-spacing: 1.5em; width: 55%;">
+					<tr>
+						<td class="width50">
+							<div class="marginLeft15">
+								<p:outputLabel for="codiceFiscaleInput" value="Codice Fiscale" />
+								<br />
+								<p:inputText id="codiceFiscaleInput" maxlength="16" size="16"
+									value="#{stampaPromemoriaAppuntamentoPatronatoBean.appuntamentoFilterDTO.codiceFiscale}">
+								</p:inputText>
+								<br />
+								<p:message for="codiceFiscaleInput" display="text" />
+							</div>
+						</td>
+						<td class="width50 right-td"></td>
+					</tr>
+
+					<tr>
+						<td class="width50">
+							<div class="marginLeft15">
+								<p:outputLabel for="nomeInput" value="Nome" />
+								<br />
+								<p:inputText id="nomeInput" size="25"
+									value="#{stampaPromemoriaAppuntamentoPatronatoBean.appuntamentoFilterDTO.nome}">
+								</p:inputText>
+							</div>
+						</td>
+						<td class="width50 right-td">
+							<p:outputLabel for="cognomeInput" value="Cognome" />
+							<br />
+							<p:inputText id="cognomeInput" size="25"
+								value="#{stampaPromemoriaAppuntamentoPatronatoBean.appuntamentoFilterDTO.cognome}">
+							</p:inputText>
+						</td>
+					</tr>
+					<tr>
+						<td class="width50">
+							<div class="marginLeft15">
+								<p:outputLabel for="dataDalInput" value="Data dal" />
+								<br />
+								<p:calendar id="dataDalInput" showOn="button" size="10"
+									binding="#{dataDalComponent}" showOtherMonths="false"
+									converterMessage="La data deve essere nel formato gg/mm/aaaa"
+									pattern="dd/MM/yyyy" navigator="true" yearRange="c:c+2"
+									styleClass="yellow-datepicker"
+									value="#{stampaPromemoriaAppuntamentoPatronatoBean.appuntamentoFilterDTO.dataDal}" />
+								<br />
+								<p:message for="dataDalInput" display="text" />
+							</div>
+						</td>
+						<td class="width50 right-td">
+							<p:outputLabel for="dataAlInput" value="Data Al" />
+							<br />
+							<p:calendar id="dataAlInput" showOn="button" size="10"
+								showOtherMonths="false" pattern="dd/MM/yyyy" navigator="true"
+								converterMessage="La data deve essere nel formato gg/mm/aaaa"
+								yearRange="c:c+2" styleClass="yellow-datepicker"
+								value="#{stampaPromemoriaAppuntamentoPatronatoBean.appuntamentoFilterDTO.dataAl}">
+								<f:validator validatorId="twoDatesValidatorPrimefaces" />
+								<f:attribute name="otherDate" value="#{dataDalComponent}" />
+								<f:attribute name="lessOrEqual" value="true" />
+							</p:calendar>
+							<br />
+							<p:message for="dataAlInput" display="text" />
+						</td>
+					</tr>
+					<tr>
+						<td class="width50">
+							<div class="marginLeft15">
+								<p:selectOneButton id="tipoRicercaInput"
+									value="#{stampaPromemoriaAppuntamentoPatronatoBean.appuntamentoFilterDTO.ricercaEsatta}">
+									<f:selectItem itemLabel="Inizia per" itemValue="false" />
+									<f:selectItem itemLabel="Esatta" itemValue="true" />
+								</p:selectOneButton>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<div class="marginLeft15">
+								<p:messages id="messages" globalOnly="true" />
+							</div>
+						</td>
+					</tr>
+
+					<tr>
+						<td class="width50">
+							<div class="marginLeft15">
+								<p:commandButton id="cercaButton" value="Cerca appuntamenti"
+									alt="Cerca appuntamenti"
+									actionListener="#{stampaPromemoriaAppuntamentoPatronatoBean.cercaAppuntamenti}"
+									title="Cerca appuntamenti" update=":appuntamenti_result @(.ui-message)">
+								</p:commandButton>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</h:form>
+
+			<h:panelGroup id="appuntamenti_result">
+				<h:panelGroup
+					rendered="#{stampaPromemoriaAppuntamentoPatronatoBean.noResults}">
+					<h3>
+						<h:outputText styleClass="centeredItem"
+							value="Nessun appuntamento trovato" />
+					</h3>
+				</h:panelGroup>
+				<h:panelGroup
+					rendered="#{not empty stampaPromemoriaAppuntamentoPatronatoBean.appuntamenti}">
+					<p:dataGrid columns="1" paginator="true" rows="10"
+						value="#{stampaPromemoriaAppuntamentoPatronatoBean.appuntamenti}"
+						var="appuntamento">
+						<fieldset>
+							<legend>
+								<h:outputText
+									value="#{appuntamento.descTipoAppuntamento}" />
+							</legend>
+							<table>
+								<tr>
+									<td>
+										<p:outputLabel for="data" value="Data" />
+										<h:outputText id="data" style="padding-left:1em"
+											value="#{appuntamento.data}">
+											<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+										</h:outputText>
+									</td>
+									<td>
+										<p:outputLabel for="orario" value="Orario" />
+										<h:outputText id="orario" style="padding-left:1em"
+											value="#{appuntamento.orario}" />
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<p:outputLabel for="cpi" value="CPI" />
+										<br />
+										<h:outputText id="cpi"
+											value="#{appuntamento.denominazioneCpi}" />
+										<br />
+										<h:outputText id="cpi2"
+											value="#{appuntamento.indirizzoStampaCpi}" />
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<p:outputLabel for="siglaOperatore" value="Sigla Operatore" />
+									</td>
+									<td>
+										<h:outputText id="siglaOperatore"
+											value="#{appuntamento.siglaOperatore}" />
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<p:outputLabel for="sportelloDistaccato"
+											value="Sportello distaccato" />
+									</td>
+									<td>
+										<h:outputText id="sportelloDistaccato"
+											value="#{appuntamento.ambienteCpi}" />
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<p:outputLabel for="cfLavoratore" value="Lavoratore" />
+									</td>
+									<td>
+										<h:outputText id="cfLavoratore"
+											value="#{appuntamento.codiceFiscale}" />
+										<h:outputText id="nomeLavoratore" style="padding-left:3em"
+											value="#{appuntamento.cognome} #{appuntamento.nome}" />
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<h:form>
+											<p:commandButton id="stampaButton"
+												styleClass="commandButtonMargin" value="Stampa Promemoria"
+												alt="Stampa Promemoria" title="Stampa Promemoria"
+												ajax="false"
+												actionListener="#{stampaPromemoriaAppuntamentoPatronatoBean.preparePromemoriaPdfFile(appuntamento.idAgAppuntamento)}">
+												<p:fileDownload
+													value="#{stampaPromemoriaAppuntamentoPatronatoBean.promemoriaPdfFile}">
+												</p:fileDownload>
+											</p:commandButton>
+										</h:form>
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+					</p:dataGrid>
+				</h:panelGroup>
+			</h:panelGroup>
+		</div>
+		<h:form>
+			<p:commandButton id="scrivaniaButton" ajax="false"
+				styleClass="commandButtonMargin redButton"
+				value="Torna alla Scrivania" alt="Torna alla Scrivania"
+				icon="ui-icon-arrowthick-1-w"
+				action="#{stampaPromemoriaAppuntamentoPatronatoBean.redirectHome}"
+				title="Torna alla Scrivania" />
+		</h:form>
+	</ui:define>
+</ui:composition>

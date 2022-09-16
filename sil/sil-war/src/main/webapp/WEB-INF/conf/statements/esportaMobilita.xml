@@ -1,0 +1,1037 @@
+<!-- *************************************************************************** 
+                           Estrazioni per esportazione mobilità in DBF
+                           			Alessandro Pegoraro 09/2007
+     *************************************************************************** -->
+     
+     
+<STATEMENT
+        name="MB_DBF_ISCR"
+        query="SELECT 	STRCODICEFISCALE AS CODFIS_LA,
+	   					substr(STRCOGNOME,0,30) AS COG_LA, 
+	   					substr(STRNOME,0,20) AS NOME_LA,
+	   					to_char(DATNASC, 'yyyymmdd') AS NAS_LA,
+	 					STRSESSO AS SESSO_LA,
+	   					CODCOMNAS AS CODNAS_LA,	   					
+	   					(select citt.codcittadinanzap
+                        from mp_cittadinanza citt
+                        where citt.codcittadinanza = LAV.CODCITTADINANZA) AS CIT_LA,	   					
+	   					NULL AS STACIV_LA,
+	   					CODCOMRES AS CODSED_LA,
+	   					substr(STRINDIRIZZORES,0,40) AS INDSED_LA,
+	   					/*NULL AS CIVSED_LA, /*CAMPO NUOVO*/
+	   					STRCAPRES AS CAPSED_LA,
+	   					LAV.CODCOMDOM AS CODRES_LA, 
+	   					substr(STRINDIRIZZODOM,0,40) AS INDIRIZZO, 
+	   					/*NULL AS CIVRES_LA, /*CAMPO NUOVO*/
+	   					STRCAPDOM AS CAP, 
+	   					substr(STRTELDOM,0,15) AS TEL, 
+						
+						CASE 
+      	      			WHEN STRTELALTRO IS NOT NULL THEN substr(STRTELALTRO,0,15)
+     		   	    	ELSE substr(STRCELL,0,15)
+    	 		  	    END TEL2,
+						
+	   					NULL AS CLASSE,
+	   					NULL AS N_ARCHI,
+	   					NULL AS FLAG,
+	   					substr(CODSTATOOCCUPAZ,0,4) AS CLA181,
+	   					NULL AS DATA_REV,
+	   					to_char(DTMMODSchedaAnagProf, 'yyyymmdd')  AS DATA_181,
+	   					NULL AS DATA_ELE,
+	   					NULL AS L407,
+						NULL AS LISTE,
+						FLGCFOK AS VALISCR,
+						NULL AS RISERVA,
+						CODCPITIT AS CIRC_LA,
+						/*NULL AS IND181, /*CAMPO NUOVO*/
+						NULL AS OBBSCO,
+					   NULL AS OBBSOG,
+					   substr(STREMAIL,0,50) AS MAIL_LA,
+					   NULL AS ANZ56,
+					   NULL AS MOD56,
+					   NULL AS DISL68,
+					   NULL AS IS_TMOD,
+					   NULL AS IS_DMOD,
+					   NULL AS IS_HMOD
+		FROM AN_LAVORATORE LAV, AM_STATO_OCCUPAZ, AN_LAV_STORIA_INF
+		/* Solo se esiste nella AM_MOBILITA_ISCR */
+		WHERE exists (
+	  		 select CDNLAVORATORE 
+	  		 from AM_MOBILITA_ISCR left join DE_MB_TIPO mt ON AM_MOBILITA_ISCR.CODTIPOMOB = mt.CODMBTIPO
+	  		 where LAV.CDNLAVORATORE = AM_MOBILITA_ISCR.CDNLAVORATORE
+	  		 AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AM_MOBILITA_ISCR.cdnmbstatorich = '2') ) 
+	 	 ) AND
+	 			AM_STATO_OCCUPAZ.DATFINE is NULL AND
+	  			AN_LAV_STORIA_INF.DATFINE is NULL AND 
+	  			LAV.CDNLAVORATORE = AM_STATO_OCCUPAZ.CDNLAVORATORE AND
+	  			LAV.CDNLAVORATORE = AN_LAV_STORIA_INF.CDNLAVORATORE   
+"/>
+
+
+<STATEMENT
+        name="MB_DBF_ISCREI"
+        query="SELECT prgdichdisponibilita toremove, strcodicefiscale AS codfis_la,
+       TO_CHAR (datanzianitadisoc, 'yyyymmdd') AS data_rei, 'I1' AS tipo_iscr,
+       SUBSTR (codstatooccupaz, 0, 4) AS clas_iscr, NULL AS c4,
+       TO_CHAR (datdichiarazione, 'yyyymmdd') AS datac4, NULL AS m_sos,
+       NULL AS reddito, NULL AS dic_red, NULL AS redd_aut, NULL AS carico,
+       NULL AS car_altro, NULL AS rinenti, NULL AS rinditte, NULL AS nucleo,
+       NULL AS diff, NULL AS punt_inv, NULL AS punt_tot
+  FROM am_dich_disponibilita disp, am_elenco_anagrafico, an_lavoratore lav
+ WHERE disp.prgelencoanagrafico = am_elenco_anagrafico.prgelencoanagrafico
+   AND lav.cdnlavoratore = am_elenco_anagrafico.cdnlavoratore
+   AND disp.codstatoatto = 'PR'
+   /* Solo Se è (stato) in mobilita */
+   AND EXISTS (SELECT cdnlavoratore
+                 FROM am_mobilita_iscr
+                WHERE lav.cdnlavoratore = am_mobilita_iscr.cdnlavoratore)
+   AND disp.prgdichdisponibilita IN (
+   /* Seleziona al piu un prgdichdisp per lavoratore */
+          SELECT maxprg
+            FROM am_dich_disponibilita p1,
+                 (SELECT   MAX (prgdichdisponibilita) maxprg,
+                           strcodicefiscale, datdichiarazione
+                      FROM am_dich_disponibilita,
+                           am_elenco_anagrafico,
+                           an_lavoratore
+                     WHERE am_dich_disponibilita.prgelencoanagrafico =
+                                      am_elenco_anagrafico.prgelencoanagrafico
+                       AND an_lavoratore.cdnlavoratore =
+                                            am_elenco_anagrafico.cdnlavoratore
+                  GROUP BY strcodicefiscale, datdichiarazione) p2,
+                 am_elenco_anagrafico ana1,
+                 an_lavoratore lav
+           WHERE p1.prgdichdisponibilita = p2.maxprg
+             AND lav.strcodicefiscale = p2.strcodicefiscale
+             AND p1.datdichiarazione = p2.datdichiarazione
+             AND p1.prgelencoanagrafico = ana1.prgelencoanagrafico
+             AND lav.strcodicefiscale = p2.strcodicefiscale
+             /*Queste due condizioni sono ridondanti per le prestazioni*/
+             AND p1.codstatoatto = 'PR'
+             AND EXISTS (
+                      SELECT cdnlavoratore
+                        FROM am_mobilita_iscr left join DE_MB_TIPO mt ON AM_MOBILITA_ISCR.CODTIPOMOB = mt.CODMBTIPO
+                       WHERE lav.cdnlavoratore = am_mobilita_iscr.cdnlavoratore
+                       AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AM_MOBILITA_ISCR.cdnmbstatorich = '2') ) 
+                       ))"/>
+
+<STATEMENT
+        name="MB_DBF_ISCSTU"
+        query="SELECT lav.strcodicefiscale AS codfis_la, 
+	   decode(SUBSTR (stu.codtitoloold, 0, 6) ,
+	   '2N0000','NT', 
+	    '2NA000','NT', 
+		 '7A0000','NT', 
+		  '300000','NT', 
+		   '7AC000','NT', 
+		    '7AG000','NT', 
+			 '7AH000','NT', 
+			  '7LB000','NT', 
+			   '7SB000','NT', 
+			    'NP','NT',
+	   /* Se la codifica non è tra le indicate, usa il default*/
+	   SUBSTR (stu.codtitoloold, 0, 6))
+	   AS tit,
+       NULL AS voto, TO_CHAR (stu.numanno) AS antit
+  FROM pr_studio stu, an_lavoratore lav
+ WHERE lav.cdnlavoratore = stu.cdnlavoratore
+   /* Seleziono il titolo di studio principale */
+   AND stu.flgprincipale = 'S'
+   /* Solo Lavoratori in mobilità */
+   AND EXISTS (SELECT cdnlavoratore
+                 FROM am_mobilita_iscr mob left join DE_MB_TIPO mt ON mob.CODTIPOMOB = mt.CODMBTIPO
+                WHERE lav.cdnlavoratore = mob.cdnlavoratore
+                AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND mob.cdnmbstatorich = '2') ) )"/>
+                
+<STATEMENT
+        name="MB_DBF_ISCMOB"
+        query="SELECT 
+        MOB.PRGMOBILITAISCR AS PRGMOBILITA,
+	   LAV.STRCODICEFISCALE AS CODFIS_LA,
+	   LAV.STRNOME AS STRNOME,
+	   LAV.STRCOGNOME AS STRCOGNOME,
+ 	   to_char(LAV.DATNASC,'dd/mm/yyyy') AS DATNAS_LA,
+ 	   LAV.CODCOMNAS AS CODCOMNAS,
+ 	   mt.CODMONOATTIVA AS CODMONOATT,
+ 	   MOB.CODTIPOMOB AS CODTIPOMOB,
+ 	   LAVINF.CODCPITIT AS CODCPITIT,
+ 	   az.STRRAGIONESOCIALE as STRRAGIONESOCIALE,
+	   GM.STRCF AS RAGMOB,
+	   substr(MOB.CODTIPOMOB,0,2) as TIPMOB,
+	   to_char(MOB.DATINIZIOMOV, 'yyyymmdd') as ASSMOB,
+	   to_char(MOB.DATFINEMOV, 'yyyymmdd') as CESMOB,
+	   to_char(MOB.DATINIZIO, 'yyyymmdd') AS INIMOB,
+	   MOB.FLGINDENNITA AS SPEMOB,
+	   to_char(MOB.DATINIZIOINDENNITA, 'yyyymmdd') AS INDMOB,
+	   to_char(MOB.DATFINEINDENNITA, 'yyyymmdd') AS FNDMOB,
+	   to_char(MOB.DATFINE, 'yyyymmdd') AS FINMOB,
+	   substr(MOB.CODMOTIVOFINE,0,1) AS MOTMOB,
+	   to_char(MOB.DATMAXDIFF, 'yyyymmdd') AS DIFMOB,
+	   substr(MOB.CODMOTIVODIFF,0,1) AS NOTMOB,
+	   to_char(MOB.DATCRT,'yyyymmdd') AS CRIMOB,
+	      
+  	      CASE 
+      	      WHEN MOB.CODPROVINCIA IS NOT NULL THEN pr.STRTARGA
+     		  WHEN MOB.CODREGIONE  ='8' THEN 'BO'
+     		  	  ELSE NULL
+    	  END PROMOB,
+	  
+	   substr(MOB.STRNUMATTO,0,6) AS NUMMOB,
+	   'NT' AS QUAMOB,
+	   /*substr(MOB.CODMANSIONE,0,6) AS QUAMOB,*/
+	   NULL AS AREMOB,
+	   substr(MOB.CODGRADO,0,2) AS GRAMOB,
+	   'NT' AS CNLMOB,
+	   /*substr(MOB.CODCCNL,0,4) AS CNLMOB,*/
+	   NULL AS LIVMOB,
+	   MOB.FLGSCHEDA AS SCHMOB,
+	   NULL AS DISMOB,
+	   NULL AS LUNMOB,
+	   NULL AS INTMOB,
+	   LAV.STRSESSO, LAV.CODCITTADINANZA, LAV.CODCOMRES, 
+	   LAV.STRINDIRIZZORES, LAV.STRLOCALITARES, 
+       LAV.CODCOMDOM,LAV.STRINDIRIZZODOM,LAV.STRLOCALITADOM,
+	   az.STRCODICEFISCALE as STRCODICEFISCALEAZ
+from AM_MOBILITA_ISCR mob
+left join DE_PROVINCIA pr ON mob.codprovincia = pr.codprovincia 
+left join DE_MB_TIPO mt ON mob.CODTIPOMOB = mt.CODMBTIPO
+left join AN_AZIENDA az ON az.PRGAZIENDA = MOB.PRGAZIENDA
+left join AN_LAVORATORE lav ON lav.cdnlavoratore = mob.cdnlavoratore
+left join an_lav_storia_inf lavinf ON ( lav.cdnLavoratore = lavinf.cdnLavoratore AND lavinf.datFine is null )
+left join GLOBAL_MB GM ON mob.PRGAZIENDA = GM.PRGAZIENDA AND mob.PRGUNITA = GM.PRGUNITA
+WHERE (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND mob.cdnmbstatorich = '2') ) 
+
+"/>
+
+
+
+
+
+<STATEMENT
+        name="MB_DBF_ISCATT"
+        query="SELECT l.strcodicefiscale AS codfis_la, NULL AS datacc,
+       NULL AS notacc, NULL AS datsan, NULL AS datcer, NULL AS numcer,
+       NULL AS datlib, NULL AS numlib,
+       CASE
+       		WHEN ps.codstatus in ('2','5')
+       			THEN 'C'
+       		WHEN ps.codstatus in ('1','6')
+       			THEN 'P'
+       		ELSE NULL
+       END exttip,
+       CASE
+          WHEN ps.codstatus in('2','5')
+             THEN to_char(ps.datscadenza,'yyyymmdd')
+          ELSE NULL
+       END EXTDEL,
+       CASE
+          WHEN ps.codstatus in ('1','6')
+             THEN ps.datscadenza
+          ELSE NULL
+       END DATSCA,
+       
+       CASE
+          WHEN ps.codstatus in ('1','2','5','6')
+	      	THEN
+		       CASE 
+				   WHEN codexent='NT' THEN NULL
+				   ELSE codexent
+			   END
+		  ELSE NULL
+	   END tipent,
+	   
+	   NULL AS extmod
+  
+FROM   an_lavoratore l, am_ex_perm_sogg ps, MP_EX_MOTIVO_RIL mapex
+ WHERE l.cdnlavoratore = ps.cdnlavoratore
+   AND ps.codmotivoril = mapex.codmotivoril
+   AND EXISTS (SELECT l.cdnlavoratore
+                 FROM am_mobilita_iscr left join DE_MB_TIPO mt ON AM_MOBILITA_ISCR.CODTIPOMOB = mt.CODMBTIPO
+                WHERE l.cdnlavoratore = am_mobilita_iscr.cdnlavoratore
+                AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AM_MOBILITA_ISCR.cdnmbstatorich = '2') ) )
+	/*Il prg deve apparire nella SELECT sottostante */
+   AND ps.prgpermsogg IN (
+   	   /* Seleziona solo il maxPrg in base a data E Cdnlav */
+          SELECT maxprg
+            FROM am_ex_perm_sogg p1,
+                 (SELECT   MAX (datscadenza) maxscad, cdnlavoratore
+                      FROM am_ex_perm_sogg
+                  GROUP BY cdnlavoratore) p2,
+                 (SELECT   MAX (prgpermsogg) maxprg, datscadenza,
+                           cdnlavoratore
+                      FROM am_ex_perm_sogg
+                  GROUP BY datscadenza, cdnlavoratore) p3
+           WHERE p1.datscadenza = p2.maxscad
+             AND p1.cdnlavoratore = p2.cdnlavoratore
+             AND p1.prgpermsogg = p3.maxprg
+             AND p1.datscadenza = p3.datscadenza
+             AND p1.cdnlavoratore = p3.cdnlavoratore)"/>
+                
+<STATEMENT
+        name="MB_DBF_AZIENDE"
+        query="SELECT  
+       GB.STRCF AS PART_IVA,
+       substr(AZ.STRRAGIONESOCIALE,0,35) AS RAG_SOC,
+       'NT' AS COD_ATT,
+       'NT' AS CCNL_AZ,
+       substr(STRINDIRIZZO,0,30) AS IND_AZ,
+       substr(UN.STRTEL,0,15) AS TEL_AZ,
+       CASE 
+       WHEN AZ.NUMDIPENDENTI &gt; 999999999 THEN NULL
+       ELSE AZ.NUMDIPENDENTI
+       END LIB_AZ,
+       UN.STRCAP AS CAP_AZ,
+       NULL AS CON_AZ,
+       NULL AS DAL_AZ,
+       NULL AS NUM_AZ,
+       UN.STRNUMEROINPS AS INP_AZ,
+       NULL AS RCD_AZ,
+       substr(AZ.STRNUMALBOINTERINALI,0,3) AS ALI_AZ,
+       NULL AS RIF_AZ,
+       AZ.FLGDATIOK AS VAL_AZ,
+       AZ.FLGOBBLIGOL68 AS CL9_AZ,
+       AZ.STRPARTITAIVA AS PI_AZ,
+       substr(UN.STREMAIL,0,50) AS MAIL_AZ,
+       substr(UN.STRFAX,0,15) AS FAX_AZ,
+       NULL AS TIP_AZ,
+       NULL AS ASS_AZ,
+       NULL AS POS_AZ
+FROM AN_AZIENDA AZ, AN_UNITA_AZIENDA UN, GLOBAL_MB GB, AM_MOBILITA_ISCR AMISCR,DE_MB_TIPO mt
+WHERE UN.PRGAZIENDA = AZ.PRGAZIENDA AND
+        UN.PRGAZIENDA =GB.PRGAZIENDA AND
+        UN.PRGUNITA = GB.PRGUNITA
+        AND un.prgazienda = AMISCR.prgazienda
+        AND un.prgunita = AMISCR.prgunita
+        AND AMISCR.CODTIPOMOB = mt.CODMBTIPO (+)
+        AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AMISCR.cdnmbstatorich = '2') )  
+UNION     
+        SELECT    
+        GB.STRCF AS PART_IVA,
+       substr(AZ.STRRAGIONESOCIALE,0,35) AS RAG_SOC,
+       'NT' AS COD_ATT,
+       'NT' AS CCNL_AZ,
+       substr(STRINDIRIZZO,0,30) AS IND_AZ,
+       substr(UN.STRTEL,0,15) AS TEL_AZ,
+       CASE 
+       WHEN AZ.NUMDIPENDENTI &gt; 999999999 THEN NULL
+       ELSE AZ.NUMDIPENDENTI
+       END LIB_AZ,
+       UN.STRCAP AS CAP_AZ,
+       NULL AS CON_AZ,
+       NULL AS DAL_AZ,
+       NULL AS NUM_AZ,
+       UN.STRNUMEROINPS AS INP_AZ,
+       NULL AS RCD_AZ,
+       substr(AZ.STRNUMALBOINTERINALI,0,3) AS ALI_AZ,
+       NULL AS RIF_AZ,
+       AZ.FLGDATIOK AS VAL_AZ,
+       AZ.FLGOBBLIGOL68 AS CL9_AZ,
+       AZ.STRPARTITAIVA AS PI_AZ,
+       substr(UN.STREMAIL,0,50) AS MAIL_AZ,
+       substr(UN.STRFAX,0,15) AS FAX_AZ,
+       NULL AS TIP_AZ,
+       NULL AS ASS_AZ,
+       NULL AS POS_AZ    
+        FROM AM_MOBILITA_ISCR AMISCR,AN_AZIENDA AZ, AN_UNITA_AZIENDA UN, GLOBAL_MB GB, DE_MB_TIPO mt, AM_MOVIMENTO mov
+WHERE   (UN.PRGAZIENDA = MOV.PRGAZIENDAUTILIZ AND UN.PRGUNITA = mov.prgunitautiliz  AND AZ.prgazienda = UN.prgazienda)
+        AND UN.PRGAZIENDA =GB.PRGAZIENDA 
+        AND UN.PRGUNITA = GB.PRGUNITA 
+        AND mov.prgmovimento = AMISCR.prgmovimento
+        AND MOV.PRGAZIENDAUTILIZ is not null
+        AND AMISCR.CODTIPOMOB = mt.CODMBTIPO (+)
+        AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AMISCR.cdnmbstatorich = '2') )
+        
+        "/>
+
+<STATEMENT
+        name="MB_DBF_ISCCAN"
+        query="Select AL.STRCODICEFISCALE AS CODFIS_LA,
+	   to_char(ADDISP.DATFINE,'yyyymmdd') AS DATA_CANC,
+	   fineattomap.codcanc AS MOTIVO,
+	   	NULL AS NOTE_CANC,
+		NULL AS DATA_RIC,
+		NULL AS PROT_RIC,
+		NULL AS DATA_REV,
+		NULL AS MOTI_REV
+
+FROM AM_DICH_DISPONIBILITA ADDISP, AM_ELENCO_ANAGRAFICO AEA, AN_LAVORATORE AL, MP_MOTIVO_FINE_ATTO fineattomap
+
+WHERE ADDISP.PRGELENCOANAGRAFICO = AEA.PRGELENCOANAGRAFICO AND
+	  AEA.CDNLAVORATORE = AL.CDNLAVORATORE AND
+	  ADDISP.codmotivofineatto = fineattomap.codmotivofineatto AND
+	  ADDISP.DATFINE IS NOT NULL AND ADDISP.CODSTATOATTO='PR' AND
+	  /* Solo se il lavoratore è (stato) in mobilita) */
+	  EXISTS (
+            SELECT cdnlavoratore
+              FROM am_mobilita_iscr left join DE_MB_TIPO mt ON AM_MOBILITA_ISCR.CODTIPOMOB = mt.CODMBTIPO
+             WHERE AL.cdnlavoratore = am_mobilita_iscr.cdnlavoratore
+             AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AM_MOBILITA_ISCR.cdnmbstatorich = '2') ) 
+             )
+             "/>
+
+<STATEMENT
+        name="MB_DBF_ISCAVV"
+        query="SELECT 
+	   AN.STRCODICEFISCALE AS CODFIS_LA,
+	   to_char(AM1.DATINIZIOMOV, 'yyyymmdd') AS DATA_AVV,
+	   
+	   decode(AM1.CODTIPOMOV, 'TRA', 'TR2'  ,'PRO','TR3', 'AVV', tipoassmap.codass) AS TIPO_AVV,
+	   NULL AS RISE_AVV,
+	   AM1.CODmonotempo || CASE 
+	   			 	  WHEN AM1.numoresett IS NULL THEN '1'
+					  WHEN AM1.numoresett &lt;= 20 THEN '2'
+		   			  ELSE '3'
+	   END
+	   AS RAPP_AVV,
+	   
+	   NULL AS NORM_AVV,
+	   
+	   GM.STRCF AS PART_IVA,
+	   'NT' AS QUAL_AVV,
+	   NULL AS GRAD_AVV,
+	   'NT' AS CCNL_AVV,
+	   NULL AS CAMPO1,
+	   NULL AS CAMPO2,
+	   
+	   CASE 
+	   WHEN AM1.DATFINEMOVEFFETTIVA IS NOT NULL THEN to_char(AM1.DATFINEMOVEFFETTIVA,'yyyymmdd')
+	   WHEN AM1.DATFINEMOV IS NOT NULL THEN to_char(AM1.DATFINEMOV,'yyyymmdd')
+ 	  		ELSE CASE 
+	   			 	  WHEN AM1.PRGMOVIMENTOSUCC IS NOT NULL 
+					  THEN to_char(AM2.DATINIZIOMOV-1,'yyyymmdd')
+		   		
+ 	  		ELSE NULL
+	   END
+	   END DATA_LIC,
+	   
+	   
+	   CASE 
+	   WHEN AM1.CODMVCESSAZIONE IS NOT NULL THEN cesmap.CODCESS
+ 	  		ELSE CASE 
+	   			 	  WHEN AM1.PRGMOVIMENTOSUCC IS NOT NULL 
+					  THEN CASE
+					  	   WHEN AM2.CODTIPOMOV='TRA' THEN 'M1'
+						   WHEN AM2.CODTIPOMOV='PRO' THEN 'M2'
+						   ELSE NULL
+		   				 END
+ 	  				  ELSE NULL
+	   END
+	   END MOT_LIC,
+	   
+	   AM1.CODCPILAV AS SEZ_CIRC,
+	   NULL AS PRECED,
+	   NULL AS VALPRE,
+	   NULL AS DATPROT1,
+	   NULL AS DATPROT2,
+	   
+	   CASE 
+	   WHEN AM1.CODMONOTEMPO='I' THEN NULL
+	   WHEN AM1.CODMONOTEMPO='D' THEN AM1.DATFINEMOV-AM1.DATINIZIOMOV+1
+	   END MESI_AVV,
+	   AM1.NUMORESETT AS ORE_AVV,
+	   NULL AS NOTE_AVV,
+	   NULL AS BENE_AVV,
+	   NULL AS AREA_AVV,
+	   NULL AS LIVE_AVV,
+	   
+	   GM2.STRCF AS LUOG_AVV,
+	   
+	   NULL AS CAMPO3,
+	   NULL AS MATR_AVV,
+	   
+	   CASE 
+	   WHEN AM1.NUMGGPREVISTIAGR &gt; 999 THEN NULL
+	   ELSE AM1.NUMGGPREVISTIAGR
+	   END GGPRE,
+	   
+	   CASE 
+	   WHEN AM1.NUMGGEffettuatiagr &gt; 999 THEN NULL
+	   ELSE AM1.NUMGGEffettuatiagr
+	   END GGEFF,
+	    
+	   NULL AS REGIMP,
+	   NULL AS LAV_AVV,
+	   NULL AS POD_AVV,
+	   NULL AS COR_INI,
+	   NULL AS COR_ORE,
+	   NULL AS DCONL68,
+	   NULL AS NCONL68,
+	   
+	   CASE 
+	   WHEN   trunc(AM1.DECRETRIBUZIONEMEN)  =0  THEN 0
+	   WHEN   (AM1.DECRETRIBUZIONEMEN/trunc(AM1.DECRETRIBUZIONEMEN))!=1  THEN null
+	   ELSE   AM1.DECRETRIBUZIONEMEN 
+	   END REDD_AVV,
+	    
+	   NULL AS PT_AVV,
+	   NULL AS DISP_AVV
+	   	   
+
+FROM AM_MOVIMENTO AM1, AM_MOBILITA_ISCR AMISCR ,DE_PROVINCIA,DE_MB_TIPO mt, AN_AZIENDA, AN_UNITA_AZIENDA, AM_MOVIMENTO AM2, AN_LAVORATORE AN,
+AN_UNITA_AZIENDA UNITUTILIZ, AN_AZIENDA UTILIZ, GLOBAL_MB GM, GLOBAL_MB GM2, MP_MV_TIPO_ASS tipoassmap, MP_MV_CESSAZIONE cesmap /*,MP_AGEVOLAZIONE agemap MP_NORMATIVA normap,*/
+
+WHERE AM1.CDNLAVORATORE = AMISCR.CDNLAVORATORE AND
+	  AM1.codtipoass =tipoassmap.codtipoass (+) AND
+	 /*AM1.CODAGEVOLAZIONE = agemap.CODAGEVOLAZIONE AND
+	 AM1.CODNORMATIVA = normap.codnormativa AND*/
+	  AM1.codmvcessazione = cesmap.codmvcessazione (+) AND
+	  AM1.CDNLAVORATORE = AN.CDNLAVORATORE AND
+	  AMISCR.CODPROVINCIA = DE_PROVINCIA.CODPROVINCIA (+) AND
+	  AM1.PRGMOVIMENTOSUCC = AM2.PRGMOVIMENTO (+) AND
+	  AM1.CODTIPOMOV != 'CES' AND
+	  AM1.CODSTATOATTO='PR' AND
+	  
+	  AN_AZIENDA.PRGAZIENDA(+) = AMISCR.PRGAZIENDA AND
+	  AN_UNITA_AZIENDA.PRGAZIENDA (+)= AMISCR.PRGAZIENDA AND
+	  AN_UNITA_AZIENDA.PRGUNITA (+)= AMISCR.PRGUNITA AND
+	  AM1.PRGAZIENDAUTILIZ = UTILIZ.PRGAZIENDA (+) AND
+	  AM1.PRGUNITAUTILIZ = UNITUTILIZ.PRGUNITA (+) AND
+	  AM1.PRGAZIENDAUTILIZ = UNITUTILIZ.PRGAZIENDA (+) AND
+	  AMISCR.PRGAZIENDA = GM.PRGAZIENDA (+)AND
+	  AMISCR.PRGUNITA = GM.PRGUNITA (+)AND
+	  AMISCR.CODTIPOMOB = mt.CODMBTIPO (+)AND
+	  
+	  UNITUTILIZ.PRGAZIENDA = GM2.PRGAZIENDA (+) AND
+	  UNITUTILIZ.PRGUNITA = GM2.PRGUNITA (+)
+	  
+	  AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AMISCR.cdnmbstatorich = '2') 	)
+	  
+"/>
+                
+<STATEMENT
+        name="MB_DBF_FILENAME"
+        query="select strvalore from ts_config_loc, ts_generale
+				where strcodrif=ts_generale.codprovinciasil
+				and codTipoConfig='MB_DBF' "/>
+
+<STATEMENT
+        name="MB_DBF_INSERT_APPOGGIO"
+        query="INSERT INTO am_rep_mobilita_appoggio
+            (strcodicefiscalelav, strsessid, codmonoattiva, prgmobilita,
+             strcognome, strnome, datnasc, codcomnas, codtipomob, datfinemov,
+             codcpilav, strragionesociale, datiniziomov, strsesso,
+             codcittadinanza, codcomres, strindirizzores, strlocalitares,
+             codcomdom, strindirizzodom, strlocalitadom, strcodicefiscaleaz
+            )
+     VALUES (?, ?, ?, ?,
+             ?, ?, TO_DATE (?, 'dd/mm/yyyy'), ?, ?, TO_DATE (?, 'yyyymmdd'),
+             ?, ?, TO_DATE (?, 'yyyymmdd'), ?,
+             ?, ?, ?, ?,
+             ?, ?, ?, ?
+            )"/>
+
+<STATEMENT
+        name="MB_DBF_SELECT_APPOGGIO"
+        query="SELECT STRCODICEFISCALELAV, STRSESSID, mob.CODMONOATTIVA, 
+   PRGMOBILITA, STRCOGNOME, STRNOME, 
+   to_char(DATNASC,'dd/mm/yyyy') AS DATNASC,decom.STRDENOMINAZIONE as COMNAS, demb.STRDESCRIZIONE as MOBDESC, 
+   to_char(DATFINEMOV,'dd/mm/yyyy') AS DATFINEMOV, CODCPILAV, STRRAGIONESOCIALE FROM AM_REP_MOBILITA_APPOGGIO MOB
+   JOIN DE_MB_TIPO demb ON demb.CODMBTIPO = mob.CODTIPOMOB
+   JOIN DE_COMUNE decom ON mob.CODCOMNAS = decom.CODCOM
+   WHERE STRSESSID = ? AND mob.CODMONOATTIVA = 'S' "/>
+
+        
+<STATEMENT
+		name="MB_DBF_UPDATE_EXPORTED"
+		query="UPDATE AM_MOBILITA_ISCR SET CDNMBSTATORICH = '3' , NUMKLOMOBISCR = NUMKLOMOBISCR + 1
+		WHERE PRGMOBILITAISCR IN 
+			 	(SELECT PRGMOBILITA 
+			 	 FROM AM_REP_MOBILITA_APPOGGIO 
+			 	 WHERE CODTIPOMOB = 'S2' and STRSESSID = ? ) "/>
+			 	 
+			 	 
+			 	 
+	  
+<STATEMENT
+        name="MB_DBF_ISCMOB_TUTTO"
+        query="SELECT 
+        MOB.PRGMOBILITAISCR AS PRGMOBILITA,
+	   LAV.STRCODICEFISCALE AS CODFIS_LA,
+	   LAV.STRNOME AS STRNOME,
+	   LAV.STRCOGNOME AS STRCOGNOME,
+	   LAV.CODCOMNAS AS CODCOMNAS,
+	   MOB.CODTIPOMOB AS CODTIPOMOB,
+	   LAVINF.CODCPITIT AS CODCPITIT,
+ 	   to_char(LAV.DATNASC,'dd/mm/yyyy') AS DATNAS_LA,
+ 	   mt.CODMONOATTIVA AS CODMONOATT,
+ 	   mt.STRDESCRIZIONE AS MOBDESC,
+ 	   az.STRRAGIONESOCIALE as STRRAGIONESOCIALE,
+	   GM.STRCF AS RAGMOB,
+	   substr(MOB.CODTIPOMOB,0,2) as TIPMOB,
+	   to_char(MOB.DATINIZIOMOV, 'yyyymmdd') as ASSMOB,
+	   to_char(MOB.DATFINEMOV, 'yyyymmdd') as CESMOB,
+	   to_char(MOB.DATINIZIO, 'yyyymmdd') AS INIMOB,
+	   MOB.FLGINDENNITA AS SPEMOB,
+	   to_char(MOB.DATINIZIOINDENNITA, 'yyyymmdd') AS INDMOB,
+	   to_char(MOB.DATFINEINDENNITA, 'yyyymmdd') AS FNDMOB,
+	   to_char(MOB.DATFINE, 'yyyymmdd') AS FINMOB,
+	   substr(MOB.CODMOTIVOFINE,0,1) AS MOTMOB,
+	   to_char(MOB.DATMAXDIFF, 'yyyymmdd') AS DIFMOB,
+	   substr(MOB.CODMOTIVODIFF,0,1) AS NOTMOB,
+	   to_char(MOB.DATCRT,'yyyymmdd') AS CRIMOB,
+	      
+  	      CASE 
+      	      WHEN MOB.CODPROVINCIA IS NOT NULL THEN pr.STRTARGA
+     		  WHEN MOB.CODREGIONE  ='8' THEN 'BO'
+     		  	  ELSE NULL
+    	  END PROMOB,
+	  
+	   substr(MOB.STRNUMATTO,0,6) AS NUMMOB,
+	   'NT' AS QUAMOB,
+	   /*substr(MOB.CODMANSIONE,0,6) AS QUAMOB,*/
+	   NULL AS AREMOB,
+	   substr(MOB.CODGRADO,0,2) AS GRAMOB,
+	   'NT' AS CNLMOB,
+	   /*substr(MOB.CODCCNL,0,4) AS CNLMOB,*/
+	   NULL AS LIVMOB,
+	   MOB.FLGSCHEDA AS SCHMOB,
+	   NULL AS DISMOB,
+	   NULL AS LUNMOB,
+	   NULL AS INTMOB,
+	   LAV.STRSESSO, LAV.CODCITTADINANZA, LAV.CODCOMRES, 
+	   LAV.STRINDIRIZZORES, LAV.STRLOCALITARES, 
+       LAV.CODCOMDOM,LAV.STRINDIRIZZODOM,LAV.STRLOCALITADOM,
+	   az.STRCODICEFISCALE as STRCODICEFISCALEAZ
+from AM_MOBILITA_ISCR mob
+left join DE_PROVINCIA pr ON mob.codprovincia = pr.codprovincia 
+left join DE_MB_TIPO mt ON mob.CODTIPOMOB = mt.CODMBTIPO
+left join AN_AZIENDA az ON az.PRGAZIENDA = MOB.PRGAZIENDA
+left join AN_LAVORATORE lav ON lav.cdnlavoratore = mob.cdnlavoratore
+left join an_lav_storia_inf lavinf ON ( lav.cdnLavoratore = lavinf.cdnLavoratore AND lavinf.datFine is null )
+left join GLOBAL_MB GM ON mob.PRGAZIENDA = GM.PRGAZIENDA AND mob.PRGUNITA = GM.PRGUNITA
+WHERE (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND mob.cdnmbstatorich = '2') OR
+(mt.CODMONOATTIVA = 'S' AND mob.cdnmbstatorich = '3') )
+"/>
+
+
+
+<STATEMENT
+        name="MB_DBF_ISCR_TUTTO"
+        query="SELECT 	STRCODICEFISCALE AS CODFIS_LA,
+	   					substr(STRCOGNOME,0,30) AS COG_LA, 
+	   					substr(STRNOME,0,20) AS NOME_LA,
+	   					to_char(DATNASC, 'yyyymmdd') AS NAS_LA,
+	 					STRSESSO AS SESSO_LA,
+	   					CODCOMNAS AS CODNAS_LA,	   					
+	   					(select citt.codcittadinanzap
+                        from mp_cittadinanza citt
+                        where citt.codcittadinanza = LAV.CODCITTADINANZA) AS CIT_LA,	   					
+	   					NULL AS STACIV_LA,
+	   					CODCOMRES AS CODSED_LA,
+	   					substr(STRINDIRIZZORES,0,40) AS INDSED_LA,
+	   					/*NULL AS CIVSED_LA, /*CAMPO NUOVO*/
+	   					STRCAPRES AS CAPSED_LA,
+	   					LAV.CODCOMDOM AS CODRES_LA, 
+	   					substr(STRINDIRIZZODOM,0,40) AS INDIRIZZO, 
+	   					/*NULL AS CIVRES_LA, /*CAMPO NUOVO*/
+	   					STRCAPDOM AS CAP, 
+	   					substr(STRTELDOM,0,15) AS TEL, 
+						
+						CASE 
+      	      			WHEN STRTELALTRO IS NOT NULL THEN substr(STRTELALTRO,0,15)
+     		   	    	ELSE substr(STRCELL,0,15)
+    	 		  	    END TEL2,
+						
+	   					NULL AS CLASSE,
+	   					NULL AS N_ARCHI,
+	   					NULL AS FLAG,
+	   					substr(CODSTATOOCCUPAZ,0,4) AS CLA181,
+	   					NULL AS DATA_REV,
+	   					to_char(DTMMODSchedaAnagProf, 'yyyymmdd')  AS DATA_181,
+	   					NULL AS DATA_ELE,
+	   					NULL AS L407,
+						NULL AS LISTE,
+						FLGCFOK AS VALISCR,
+						NULL AS RISERVA,
+						CODCPITIT AS CIRC_LA,
+						/*NULL AS IND181, /*CAMPO NUOVO*/
+						NULL AS OBBSCO,
+					   NULL AS OBBSOG,
+					   substr(STREMAIL,0,50) AS MAIL_LA,
+					   NULL AS ANZ56,
+					   NULL AS MOD56,
+					   NULL AS DISL68,
+					   NULL AS IS_TMOD,
+					   NULL AS IS_DMOD,
+					   NULL AS IS_HMOD
+		FROM AN_LAVORATORE LAV, AM_STATO_OCCUPAZ, AN_LAV_STORIA_INF
+		/* Solo se esiste nella AM_MOBILITA_ISCR */
+		WHERE exists (
+	  		 select CDNLAVORATORE 
+	  		 from AM_MOBILITA_ISCR left join DE_MB_TIPO mt ON AM_MOBILITA_ISCR.CODTIPOMOB = mt.CODMBTIPO
+	  		 where LAV.CDNLAVORATORE = AM_MOBILITA_ISCR.CDNLAVORATORE
+	  		 AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AM_MOBILITA_ISCR.cdnmbstatorich = '2')OR (mt.CODMONOATTIVA = 'S' AND AM_MOBILITA_ISCR.cdnmbstatorich = '3') ) 
+	 	 ) AND
+	 			AM_STATO_OCCUPAZ.DATFINE is NULL AND
+	  			AN_LAV_STORIA_INF.DATFINE is NULL AND 
+	  			LAV.CDNLAVORATORE = AM_STATO_OCCUPAZ.CDNLAVORATORE AND
+	  			LAV.CDNLAVORATORE = AN_LAV_STORIA_INF.CDNLAVORATORE   
+"/>
+
+
+<STATEMENT
+        name="MB_DBF_ISCREI_TUTTO"
+        query="SELECT prgdichdisponibilita toremove, strcodicefiscale AS codfis_la,
+       TO_CHAR (datanzianitadisoc, 'yyyymmdd') AS data_rei, 'I1' AS tipo_iscr,
+       SUBSTR (codstatooccupaz, 0, 4) AS clas_iscr, NULL AS c4,
+       TO_CHAR (datdichiarazione, 'yyyymmdd') AS datac4, NULL AS m_sos,
+       NULL AS reddito, NULL AS dic_red, NULL AS redd_aut, NULL AS carico,
+       NULL AS car_altro, NULL AS rinenti, NULL AS rinditte, NULL AS nucleo,
+       NULL AS diff, NULL AS punt_inv, NULL AS punt_tot
+  FROM am_dich_disponibilita disp, am_elenco_anagrafico, an_lavoratore lav
+ WHERE disp.prgelencoanagrafico = am_elenco_anagrafico.prgelencoanagrafico
+   AND lav.cdnlavoratore = am_elenco_anagrafico.cdnlavoratore
+   AND disp.codstatoatto = 'PR'
+   /* Solo Se è (stato) in mobilita */
+   AND EXISTS (SELECT cdnlavoratore
+                 FROM am_mobilita_iscr
+                WHERE lav.cdnlavoratore = am_mobilita_iscr.cdnlavoratore)
+   AND disp.prgdichdisponibilita IN (
+   /* Seleziona al piu un prgdichdisp per lavoratore */
+          SELECT maxprg
+            FROM am_dich_disponibilita p1,
+                 (SELECT   MAX (prgdichdisponibilita) maxprg,
+                           strcodicefiscale, datdichiarazione
+                      FROM am_dich_disponibilita,
+                           am_elenco_anagrafico,
+                           an_lavoratore
+                     WHERE am_dich_disponibilita.prgelencoanagrafico =
+                                      am_elenco_anagrafico.prgelencoanagrafico
+                       AND an_lavoratore.cdnlavoratore =
+                                            am_elenco_anagrafico.cdnlavoratore
+                  GROUP BY strcodicefiscale, datdichiarazione) p2,
+                 am_elenco_anagrafico ana1,
+                 an_lavoratore lav
+           WHERE p1.prgdichdisponibilita = p2.maxprg
+             AND lav.strcodicefiscale = p2.strcodicefiscale
+             AND p1.datdichiarazione = p2.datdichiarazione
+             AND p1.prgelencoanagrafico = ana1.prgelencoanagrafico
+             AND lav.strcodicefiscale = p2.strcodicefiscale
+             /*Queste due condizioni sono ridondanti per le prestazioni*/
+             AND p1.codstatoatto = 'PR'
+             AND EXISTS (
+                      SELECT cdnlavoratore
+                        FROM am_mobilita_iscr left join DE_MB_TIPO mt ON AM_MOBILITA_ISCR.CODTIPOMOB = mt.CODMBTIPO
+                       WHERE lav.cdnlavoratore = am_mobilita_iscr.cdnlavoratore
+                       AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AM_MOBILITA_ISCR.cdnmbstatorich = '2') OR (mt.CODMONOATTIVA = 'S' AND AM_MOBILITA_ISCR.cdnmbstatorich = '3') ) 
+                       ))"/>
+
+<STATEMENT
+        name="MB_DBF_ISCSTU_TUTTO"
+        query="SELECT lav.strcodicefiscale AS codfis_la, 
+	   decode(SUBSTR (stu.codtitoloold, 0, 6) ,
+	   '2N0000','NT', 
+	    '2NA000','NT', 
+		 '7A0000','NT', 
+		  '300000','NT', 
+		   '7AC000','NT', 
+		    '7AG000','NT', 
+			 '7AH000','NT', 
+			  '7LB000','NT', 
+			   '7SB000','NT', 
+			    'NP','NT',
+	   /* Se la codifica non è tra le indicate, usa il default*/
+	   SUBSTR (stu.codtitoloold, 0, 6))
+	   AS tit,
+       NULL AS voto, TO_CHAR (stu.numanno) AS antit
+  FROM pr_studio stu, an_lavoratore lav
+ WHERE lav.cdnlavoratore = stu.cdnlavoratore
+   /* Seleziono il titolo di studio principale */
+   AND stu.flgprincipale = 'S'
+   /* Solo Lavoratori in mobilità */
+   AND EXISTS (SELECT cdnlavoratore
+                 FROM am_mobilita_iscr mob left join DE_MB_TIPO mt ON mob.CODTIPOMOB = mt.CODMBTIPO
+                WHERE lav.cdnlavoratore = mob.cdnlavoratore
+                AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND mob.cdnmbstatorich = '2')OR (mt.CODMONOATTIVA = 'S' AND mob.cdnmbstatorich = '3') ) )"/>
+                
+
+<STATEMENT
+        name="MB_DBF_ISCATT_TUTTO"
+        query="SELECT l.strcodicefiscale AS codfis_la, NULL AS datacc,
+       NULL AS notacc, NULL AS datsan, NULL AS datcer, NULL AS numcer,
+       NULL AS datlib, NULL AS numlib,
+       CASE
+       		WHEN ps.codstatus in ('2','5')
+       			THEN 'C'
+       		WHEN ps.codstatus in ('1','6')
+       			THEN 'P'
+       		ELSE NULL
+       END exttip,
+       CASE
+          WHEN ps.codstatus in('2','5')
+             THEN to_char(ps.datscadenza,'yyyymmdd')
+          ELSE NULL
+       END EXTDEL,
+       CASE
+          WHEN ps.codstatus in ('1','6')
+             THEN ps.datscadenza
+          ELSE NULL
+       END DATSCA,
+       
+       CASE
+          WHEN ps.codstatus in ('1','2','5','6')
+	      	THEN
+		       CASE 
+				   WHEN codexent='NT' THEN NULL
+				   ELSE codexent
+			   END
+		  ELSE NULL
+	   END tipent,
+	   
+	   NULL AS extmod
+  
+FROM   an_lavoratore l, am_ex_perm_sogg ps, MP_EX_MOTIVO_RIL mapex
+ WHERE l.cdnlavoratore = ps.cdnlavoratore
+   AND ps.codmotivoril = mapex.codmotivoril
+   AND EXISTS (SELECT l.cdnlavoratore
+                 FROM am_mobilita_iscr left join DE_MB_TIPO mt ON AM_MOBILITA_ISCR.CODTIPOMOB = mt.CODMBTIPO
+                WHERE l.cdnlavoratore = am_mobilita_iscr.cdnlavoratore
+                AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AM_MOBILITA_ISCR.cdnmbstatorich = '2')OR (mt.CODMONOATTIVA = 'S' AND AM_MOBILITA_ISCR.cdnmbstatorich = '3') ) )
+	/*Il prg deve apparire nella SELECT sottostante */
+   AND ps.prgpermsogg IN (
+   	   /* Seleziona solo il maxPrg in base a data E Cdnlav */
+          SELECT maxprg
+            FROM am_ex_perm_sogg p1,
+                 (SELECT   MAX (datscadenza) maxscad, cdnlavoratore
+                      FROM am_ex_perm_sogg
+                  GROUP BY cdnlavoratore) p2,
+                 (SELECT   MAX (prgpermsogg) maxprg, datscadenza,
+                           cdnlavoratore
+                      FROM am_ex_perm_sogg
+                  GROUP BY datscadenza, cdnlavoratore) p3
+           WHERE p1.datscadenza = p2.maxscad
+             AND p1.cdnlavoratore = p2.cdnlavoratore
+             AND p1.prgpermsogg = p3.maxprg
+             AND p1.datscadenza = p3.datscadenza
+             AND p1.cdnlavoratore = p3.cdnlavoratore)"/>
+                
+<STATEMENT
+        name="MB_DBF_AZIENDE_TUTTO"
+        query="SELECT  
+       GB.STRCF AS PART_IVA,
+       substr(AZ.STRRAGIONESOCIALE,0,35) AS RAG_SOC,
+       'NT' AS COD_ATT,
+       'NT' AS CCNL_AZ,
+       substr(STRINDIRIZZO,0,30) AS IND_AZ,
+       substr(UN.STRTEL,0,15) AS TEL_AZ,
+       CASE 
+       WHEN AZ.NUMDIPENDENTI &gt; 999999999 THEN NULL
+       ELSE AZ.NUMDIPENDENTI
+       END LIB_AZ,
+       UN.STRCAP AS CAP_AZ,
+       NULL AS CON_AZ,
+       NULL AS DAL_AZ,
+       NULL AS NUM_AZ,
+       UN.STRNUMEROINPS AS INP_AZ,
+       NULL AS RCD_AZ,
+       substr(AZ.STRNUMALBOINTERINALI,0,3) AS ALI_AZ,
+       NULL AS RIF_AZ,
+       AZ.FLGDATIOK AS VAL_AZ,
+       AZ.FLGOBBLIGOL68 AS CL9_AZ,
+       AZ.STRPARTITAIVA AS PI_AZ,
+       substr(UN.STREMAIL,0,50) AS MAIL_AZ,
+       substr(UN.STRFAX,0,15) AS FAX_AZ,
+       NULL AS TIP_AZ,
+       NULL AS ASS_AZ,
+       NULL AS POS_AZ
+FROM AN_AZIENDA AZ, AN_UNITA_AZIENDA UN, GLOBAL_MB GB, AM_MOBILITA_ISCR AMISCR,DE_MB_TIPO mt
+WHERE UN.PRGAZIENDA = AZ.PRGAZIENDA AND
+        UN.PRGAZIENDA =GB.PRGAZIENDA AND
+        UN.PRGUNITA = GB.PRGUNITA
+        AND un.prgazienda = AMISCR.prgazienda
+        AND un.prgunita = AMISCR.prgunita
+        AND AMISCR.CODTIPOMOB = mt.CODMBTIPO (+)
+        AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AMISCR.cdnmbstatorich = '2')OR (mt.CODMONOATTIVA = 'S' AND AMISCR.cdnmbstatorich = '3') )  
+UNION     
+        SELECT    
+        GB.STRCF AS PART_IVA,
+       substr(AZ.STRRAGIONESOCIALE,0,35) AS RAG_SOC,
+       'NT' AS COD_ATT,
+       'NT' AS CCNL_AZ,
+       substr(STRINDIRIZZO,0,30) AS IND_AZ,
+       substr(UN.STRTEL,0,15) AS TEL_AZ,
+       CASE 
+       WHEN AZ.NUMDIPENDENTI &gt; 999999999 THEN NULL
+       ELSE AZ.NUMDIPENDENTI
+       END LIB_AZ,
+       UN.STRCAP AS CAP_AZ,
+       NULL AS CON_AZ,
+       NULL AS DAL_AZ,
+       NULL AS NUM_AZ,
+       UN.STRNUMEROINPS AS INP_AZ,
+       NULL AS RCD_AZ,
+       substr(AZ.STRNUMALBOINTERINALI,0,3) AS ALI_AZ,
+       NULL AS RIF_AZ,
+       AZ.FLGDATIOK AS VAL_AZ,
+       AZ.FLGOBBLIGOL68 AS CL9_AZ,
+       AZ.STRPARTITAIVA AS PI_AZ,
+       substr(UN.STREMAIL,0,50) AS MAIL_AZ,
+       substr(UN.STRFAX,0,15) AS FAX_AZ,
+       NULL AS TIP_AZ,
+       NULL AS ASS_AZ,
+       NULL AS POS_AZ    
+        FROM AM_MOBILITA_ISCR AMISCR,AN_AZIENDA AZ, AN_UNITA_AZIENDA UN, GLOBAL_MB GB, DE_MB_TIPO mt, AM_MOVIMENTO mov
+WHERE   (UN.PRGAZIENDA = MOV.PRGAZIENDAUTILIZ AND UN.PRGUNITA = mov.prgunitautiliz  AND AZ.prgazienda = UN.prgazienda)
+        AND UN.PRGAZIENDA =GB.PRGAZIENDA 
+        AND UN.PRGUNITA = GB.PRGUNITA 
+        AND mov.prgmovimento = AMISCR.prgmovimento
+        AND MOV.PRGAZIENDAUTILIZ is not null
+        AND AMISCR.CODTIPOMOB = mt.CODMBTIPO (+)
+        AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AMISCR.cdnmbstatorich = '2')OR (mt.CODMONOATTIVA = 'S' AND AMISCR.cdnmbstatorich = '3') )
+        
+        "/>
+
+<STATEMENT
+        name="MB_DBF_ISCCAN_TUTTO"
+        query="Select AL.STRCODICEFISCALE AS CODFIS_LA,
+	   to_char(ADDISP.DATFINE,'yyyymmdd') AS DATA_CANC,
+	   fineattomap.codcanc AS MOTIVO,
+	   	NULL AS NOTE_CANC,
+		NULL AS DATA_RIC,
+		NULL AS PROT_RIC,
+		NULL AS DATA_REV,
+		NULL AS MOTI_REV
+
+FROM AM_DICH_DISPONIBILITA ADDISP, AM_ELENCO_ANAGRAFICO AEA, AN_LAVORATORE AL, MP_MOTIVO_FINE_ATTO fineattomap
+
+WHERE ADDISP.PRGELENCOANAGRAFICO = AEA.PRGELENCOANAGRAFICO AND
+	  AEA.CDNLAVORATORE = AL.CDNLAVORATORE AND
+	  ADDISP.codmotivofineatto = fineattomap.codmotivofineatto AND
+	  ADDISP.DATFINE IS NOT NULL AND ADDISP.CODSTATOATTO='PR' AND
+	  /* Solo se il lavoratore è (stato) in mobilita) */
+	  EXISTS (
+            SELECT cdnlavoratore
+              FROM am_mobilita_iscr left join DE_MB_TIPO mt ON AM_MOBILITA_ISCR.CODTIPOMOB = mt.CODMBTIPO
+             WHERE AL.cdnlavoratore = am_mobilita_iscr.cdnlavoratore
+             AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AM_MOBILITA_ISCR.cdnmbstatorich = '2')OR (mt.CODMONOATTIVA = 'S' AND AM_MOBILITA_ISCR.cdnmbstatorich = '3') ) 
+             )
+             "/>
+
+<STATEMENT
+        name="MB_DBF_ISCAVV_TUTTO"
+        query="SELECT 
+	   AN.STRCODICEFISCALE AS CODFIS_LA,
+	   to_char(AM1.DATINIZIOMOV, 'yyyymmdd') AS DATA_AVV,
+	   
+	   decode(AM1.CODTIPOMOV, 'TRA', 'TR2'  ,'PRO','TR3', 'AVV', tipoassmap.codass) AS TIPO_AVV,
+	   NULL AS RISE_AVV,
+	   AM1.CODmonotempo || CASE 
+	   			 	  WHEN AM1.numoresett IS NULL THEN '1'
+					  WHEN AM1.numoresett &lt;= 20 THEN '2'
+		   			  ELSE '3'
+	   END
+	   AS RAPP_AVV,
+	   
+	   NULL AS NORM_AVV,
+	   
+	   GM.STRCF AS PART_IVA,
+	   'NT' AS QUAL_AVV,
+	   NULL AS GRAD_AVV,
+	   'NT' AS CCNL_AVV,
+	   NULL AS CAMPO1,
+	   NULL AS CAMPO2,
+	   
+	   CASE 
+	   WHEN AM1.DATFINEMOVEFFETTIVA IS NOT NULL THEN to_char(AM1.DATFINEMOVEFFETTIVA,'yyyymmdd')
+	   WHEN AM1.DATFINEMOV IS NOT NULL THEN to_char(AM1.DATFINEMOV,'yyyymmdd')
+ 	  		ELSE CASE 
+	   			 	  WHEN AM1.PRGMOVIMENTOSUCC IS NOT NULL 
+					  THEN to_char(AM2.DATINIZIOMOV-1,'yyyymmdd')
+		   		
+ 	  		ELSE NULL
+	   END
+	   END DATA_LIC,
+	   
+	   
+	   CASE 
+	   WHEN AM1.CODMVCESSAZIONE IS NOT NULL THEN cesmap.CODCESS
+ 	  		ELSE CASE 
+	   			 	  WHEN AM1.PRGMOVIMENTOSUCC IS NOT NULL 
+					  THEN CASE
+					  	   WHEN AM2.CODTIPOMOV='TRA' THEN 'M1'
+						   WHEN AM2.CODTIPOMOV='PRO' THEN 'M2'
+						   ELSE NULL
+		   				 END
+ 	  				  ELSE NULL
+	   END
+	   END MOT_LIC,
+	   
+	   AM1.CODCPILAV AS SEZ_CIRC,
+	   NULL AS PRECED,
+	   NULL AS VALPRE,
+	   NULL AS DATPROT1,
+	   NULL AS DATPROT2,
+	   
+	   CASE 
+	   WHEN AM1.CODMONOTEMPO='I' THEN NULL
+	   WHEN AM1.CODMONOTEMPO='D' THEN AM1.DATFINEMOV-AM1.DATINIZIOMOV+1
+	   END MESI_AVV,
+	   AM1.NUMORESETT AS ORE_AVV,
+	   NULL AS NOTE_AVV,
+	   NULL AS BENE_AVV,
+	   NULL AS AREA_AVV,
+	   NULL AS LIVE_AVV,
+	   
+	   GM2.STRCF AS LUOG_AVV,
+	   
+	   NULL AS CAMPO3,
+	   NULL AS MATR_AVV,
+	   
+	   CASE 
+	   WHEN AM1.NUMGGPREVISTIAGR &gt; 999 THEN NULL
+	   ELSE AM1.NUMGGPREVISTIAGR
+	   END GGPRE,
+	   
+	   CASE 
+	   WHEN AM1.NUMGGEffettuatiagr &gt; 999 THEN NULL
+	   ELSE AM1.NUMGGEffettuatiagr
+	   END GGEFF,
+	    
+	   NULL AS REGIMP,
+	   NULL AS LAV_AVV,
+	   NULL AS POD_AVV,
+	   NULL AS COR_INI,
+	   NULL AS COR_ORE,
+	   NULL AS DCONL68,
+	   NULL AS NCONL68,
+	   
+	   CASE 
+	   WHEN   trunc(AM1.DECRETRIBUZIONEMEN)  =0  THEN 0
+	   WHEN   (AM1.DECRETRIBUZIONEMEN/trunc(AM1.DECRETRIBUZIONEMEN))!=1  THEN null
+	   ELSE   AM1.DECRETRIBUZIONEMEN 
+	   END REDD_AVV,
+	    
+	   NULL AS PT_AVV,
+	   NULL AS DISP_AVV
+	   	   
+
+FROM AM_MOVIMENTO AM1, AM_MOBILITA_ISCR AMISCR ,DE_PROVINCIA,DE_MB_TIPO mt, AN_AZIENDA, AN_UNITA_AZIENDA, AM_MOVIMENTO AM2, AN_LAVORATORE AN,
+AN_UNITA_AZIENDA UNITUTILIZ, AN_AZIENDA UTILIZ, GLOBAL_MB GM, GLOBAL_MB GM2, MP_MV_TIPO_ASS tipoassmap, MP_MV_CESSAZIONE cesmap /*,MP_AGEVOLAZIONE agemap MP_NORMATIVA normap,*/
+
+WHERE AM1.CDNLAVORATORE = AMISCR.CDNLAVORATORE AND
+	  AM1.codtipoass =tipoassmap.codtipoass (+) AND
+	 /*AM1.CODAGEVOLAZIONE = agemap.CODAGEVOLAZIONE AND
+	 AM1.CODNORMATIVA = normap.codnormativa AND*/
+	  AM1.codmvcessazione = cesmap.codmvcessazione (+) AND
+	  AM1.CDNLAVORATORE = AN.CDNLAVORATORE AND
+	  AMISCR.CODPROVINCIA = DE_PROVINCIA.CODPROVINCIA (+) AND
+	  AM1.PRGMOVIMENTOSUCC = AM2.PRGMOVIMENTO (+) AND
+	  AM1.CODTIPOMOV != 'CES' AND
+	  AM1.CODSTATOATTO='PR' AND
+	  
+	  AN_AZIENDA.PRGAZIENDA(+) = AMISCR.PRGAZIENDA AND
+	  AN_UNITA_AZIENDA.PRGAZIENDA (+)= AMISCR.PRGAZIENDA AND
+	  AN_UNITA_AZIENDA.PRGUNITA (+)= AMISCR.PRGUNITA AND
+	  AM1.PRGAZIENDAUTILIZ = UTILIZ.PRGAZIENDA (+) AND
+	  AM1.PRGUNITAUTILIZ = UNITUTILIZ.PRGUNITA (+) AND
+	  AM1.PRGAZIENDAUTILIZ = UNITUTILIZ.PRGAZIENDA (+) AND
+	  AMISCR.PRGAZIENDA = GM.PRGAZIENDA (+)AND
+	  AMISCR.PRGUNITA = GM.PRGUNITA (+)AND
+	  AMISCR.CODTIPOMOB = mt.CODMBTIPO (+)AND
+	  
+	  UNITUTILIZ.PRGAZIENDA = GM2.PRGAZIENDA (+) AND
+	  UNITUTILIZ.PRGUNITA = GM2.PRGUNITA (+)
+	  
+	  AND (mt.CODMONOATTIVA = 'A' OR (mt.CODMONOATTIVA = 'S' AND AMISCR.cdnmbstatorich = '2') OR (mt.CODMONOATTIVA = 'S' AND AMISCR.cdnmbstatorich = '3')	)
+	  
+"/>

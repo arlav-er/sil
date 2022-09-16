@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/main.xhtml">
+
+	<ui:param name="visCvBean" value="#{visualizzaCurriculumVitaeBean}" />
+	<ui:define name="title">
+		<h:outputText
+			value="#{msg['cittadino.curriculum.visualizza.titolo']} #{visualizzaCurriculumVitaeBean.cvVisualizzaDTO.cvDatiPersonaliDTO.descrizione}"
+			escape="false" />
+		
+	</ui:define>
+
+	<ui:define name="content">
+		<div class="widget_container">
+			<div id="visualizza_accordion"
+				class="ui-accordion ui-widget ui-helper-reset ui-accordion-icons">
+
+				<ui:fragment rendered="#{not visualizzaCurriculumVitaeBean.usaDecodificheSil()}">
+					<ui:include src="_visualizza/_vis_dati_anagrafici.xhtml" />
+					<ui:include src="_visualizza/_vis_dati_anagrafici_anonimo.xhtml" />
+					<ui:include src="_visualizza/_vis_istruzione.xhtml" />
+					<ui:include src="_visualizza/_vis_formazione.xhtml" />
+					<ui:include src="_visualizza/_vis_esperienze_professionali.xhtml" />
+					<ui:include src="_visualizza/_vis_lingue.xhtml" />
+					<ui:include src="_visualizza/_vis_conoscenze_informatiche.xhtml" />
+					<ui:include src="_visualizza/_vis_abilitazioni.xhtml" />
+					<ui:include src="_visualizza/_vis_competenze_trasversali.xhtml" />
+					<ui:include src="_visualizza/_vis_altre_informazioni.xhtml" />
+					<ui:include src="_visualizza/_vis_professioni_desiderate.xhtml" />
+				</ui:fragment>
+				
+				<ui:fragment rendered="#{visualizzaCurriculumVitaeBean.usaDecodificheSil()}">
+					<ui:include src="_visualizza_new/_vis_dati_anagrafici.xhtml" />
+					<ui:include src="_visualizza_new/_vis_dati_anagrafici_anonimo.xhtml" />
+					<ui:include src="_visualizza_new/_vis_istruzione.xhtml" />
+					<ui:include src="_visualizza_new/_vis_formazione.xhtml" />
+					<ui:include src="_visualizza_new/_vis_esperienze_professionali.xhtml" />
+					<ui:include src="_visualizza_new/_vis_lingue.xhtml" />
+					<ui:include src="_visualizza_new/_vis_conoscenze_informatiche.xhtml" />
+					<ui:include src="_visualizza_new/_vis_abilitazioni.xhtml" />
+					<ui:include src="_visualizza_new/_vis_competenze_trasversali.xhtml" />
+					<ui:include src="_visualizza_new/_vis_altre_informazioni.xhtml" />
+					<ui:include src="_visualizza_new/_vis_professioni_desiderate.xhtml" />
+				</ui:fragment>
+			</div>
+		</div>
+
+		<br />
+		
+		<h:link styleClass="buttonStyle rightMargin"
+			rendered="#{sessionBean.utente and not empty visualizzaCurriculumVitaeBean.vacancyId}"
+			outcome="/secure/utente/offertelavoro/confronta_requisiti"
+			title="Confronta">
+			<f:param name="idCurricula"
+				value="#{visualizzaCurriculumVitaeBean.curriculumId}" />
+			<f:param name="idVacancy"
+				value="#{visualizzaCurriculumVitaeBean.vacancyId}" />
+			<h:outputText value="Confronta con offerta" />
+		</h:link>
+		
+		
+		<h:link id="editButton" outcome="edit_curriculum"
+			styleClass="editButton rightMargin"
+			rendered="#{sessionBean.isProprietary(visualizzaCurriculumVitaeBean.cvVisualizzaDTO)
+			and not visualizzaCurriculumVitaeBean.cvVisualizzaDTO.cvDatiPersonaliDTO.flagInviato
+			and visualizzaCurriculumVitaeBean.cvVisualizzaDTO.cvDatiPersonaliDTO.visibilita
+			and visualizzaCurriculumVitaeBean.cvVisualizzaDTO.cvDatiPersonaliDTO.fromMyPortal }"
+			value="Modifica">
+			<f:param name="id"
+				value="#{visualizzaCurriculumVitaeBean.cvVisualizzaDTO.id}" />
+		</h:link>
+
+		<ui:fragment id="contatto" rendered="#{sessionBean.azienda}">
+			<a href="#" onclick="openContattoModal();return false;"
+				class="buttonStyle">Contatta il lavoratore</a>
+
+			<cc:modalDialog id="contattaLavoratore"
+				title="Messaggio di contatto di un lavoratore"
+				submitLabel="Invia messaggio"
+				actionSubmit="#{visualizzaCurriculumVitaeBean.inviaPrimoContatto}"
+				renderAjax=":messages" eventAjax="modalContattoCallback" width="540"
+				height="300">
+				<hr />
+				<h:panelGrid id="dati_cv_panel" columns="1" columnClasses="cv_col1">
+					<h:panelGroup>
+						<b> <h:outputText
+								value="Inserire nella sezione sottostante il testo che verrà inviato al titolare del CV interessato." />
+						</b>
+					</h:panelGroup>
+					<cc:inputTextarea
+						value="#{visualizzaCurriculumVitaeBean.primoContatto.messaggio}"
+						id="comment" label="Testo del messaggio" richTextMode="false"
+						required="true" maxlength="2000">
+					</cc:inputTextarea>
+				</h:panelGrid>
+			</cc:modalDialog>
+		</ui:fragment>
+
+		<h:outputLink id="printButton" styleClass="printButton" title="Stampa"
+			onclick="fetchStampa('#{request.contextPath}/secure/rest/services/getCurriculumUtente?curriculumId='+#{visualizzaCurriculumVitaeBean.cvVisualizzaDTO.id});return false;">			
+			Stampa
+		</h:outputLink>
+
+		<br />
+		<br />
+		<cc:btnBack backTo="#{visualizzaCurriculumVitaeBean.backTo}" />
+
+		<cc:messages id="messages"></cc:messages>
+
+		<script type="text/javascript">	
+			function modalContattoCallback(data) {
+				console.log('callback ' + data.status);
+				if (data.status == 'success') {
+					disegnaBottoni();
+					//controlla se l'invio messaggio è andato a buon fine
+					var validationFailed = (data.responseText.indexOf('Messaggio inviato correttamente') == -1);
+					console.log('valRes: ' + validationFailed);
+					//chiudi solo se la Candidatura è andata a buon fine
+					if (validationFailed) {				
+						return 'leaveOpen';
+					}
+					else {
+						return 'close';
+					}
+				}
+				return 'leaveOpen';
+			}
+		
+			function openContattoModal() {
+				document.getElementById('contattaLavoratore').open();
+			}
+		
+			$(function() {
+				jQuery(".contentCollapse").hide();
+		  
+		  		//toggle the componenet with class msg_body
+		  		jQuery(".headingCollapse").click(function() {				
+					jQuery(this).next(".contentCollapse").slideToggle(500);		
+				});
+
+		  		jQuery(".dati_anagrafici_titolo").click(function() {
+					return changeCssCollapseDiv(".dati_anagrafici_titolo", ".dati_anagrafici_brake_titolo");
+				});
+				
+		  		jQuery(".dati_anagrafici_anonimo_titolo").click(function() {
+					return changeCssCollapseDiv(".dati_anagrafici_anonimo_titolo", ".dati_anagrafici_anonimo_brake_titolo");
+				});
+
+		  		jQuery(".istruzione_titolo").click(function() {
+					return changeCssCollapseDiv(".istruzione_titolo", ".istruzione_brake_titolo");
+				});
+
+		  		jQuery(".formazione_titolo").click(function() {
+					return changeCssCollapseDiv(".formazione_titolo", ".formazione_brake_titolo");
+				});
+
+		  		jQuery(".esperienze_professionali_titolo").click(function() {
+					changeCssCollapseDiv(".esperienze_professionali_titolo", ".esperienze_professionali_brake_titolo");
+					$('div.mansioneInfo:first').filter(":visible").focus();
+					return false;
+				});
+
+		  		jQuery(".lingue_titolo").click(function() {
+					return changeCssCollapseDiv(".lingue_titolo", ".lingue_brake_titolo");
+				});
+
+		  		jQuery(".conoscenze_informatiche_titolo").click(function() {
+					return changeCssCollapseDiv(".conoscenze_informatiche_titolo", ".conoscenze_informatiche_brake_titolo");
+				});
+
+		  		$(".abilitazioni_titolo").click(function() {
+					return changeCssCollapseDiv(".abilitazioni_titolo", ".abilitazioni_brake_titolo");
+				});
+
+		  		jQuery(".competenze_trasversali_titolo").click(function() {
+					return changeCssCollapseDiv(".competenze_trasversali_titolo", ".competenze_trasversali_brake_titolo");
+				});
+
+		  		jQuery(".altre_informazioni_titolo").click(function() {
+					return changeCssCollapseDiv(".altre_informazioni_titolo", ".altre_informazioni_brake_titolo");
+				});
+
+		  		jQuery(".professioni_desiderate_titolo").click(function() {
+					return changeCssCollapseDiv(".professioni_desiderate_titolo", ".professioni_desiderate_brake_titolo");
+				});
+		  		
+				// FIXME non va, dovrebbe servire a rendere il primo tab gia' aperto
+				jQuery('.visualizza_accordion').accordion( "option", "active", 1 );
+
+				// disegna i pulsanti
+				disegnaBottoni();
+
+				$('.dati_anagrafici_titolo').click();
+				$('.dati_anagrafici_anonimo_titolo').click();
+ 
+				changeTdWithTh();
+			});
+
+			function refreshCss(data) {
+				if (data.status == 'success') {
+					//alert('reloading...');
+					location.reload();
+				}
+			}
+		</script>
+	</ui:define>
+</ui:composition>

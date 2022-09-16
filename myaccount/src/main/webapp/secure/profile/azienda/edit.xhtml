@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:pretty="http://ocpsoft.com/prettyfaces">
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{sessionLogger.grantAccessFor(sessionLogger.getAziendaAccess())}" />
+	</f:metadata>
+	<div class="container-fluid animated fadeIn">
+		<h:form id="profileEditForm" enctype="multipart/form-data" styleClass="form-horizontal">
+
+			<div class="panel-body profile-information">
+				<div class="col-md-2">
+
+					<div class="profile-pic text-center">
+						<h:panelGroup id="userProfilePic">
+							<h:panelGroup rendered="#{empty aziendaEditBean.aziendaInfo.logo}">
+								<h:graphicImage library="commons" name="images/profilePic.jpg"></h:graphicImage>
+							</h:panelGroup>
+							<h:panelGroup rendered="#{not empty aziendaEditBean.aziendaInfo.logo}">
+								<pretty:urlbuffer var="imgURL" mappingId="profilePicture">
+									<f:param id="type" value="azienda" />
+									<f:param id="id" value="#{aziendaEditBean.aziendaInfo.pfPrincipal.idPfPrincipal}" />
+									<f:param id="username" value="#{aziendaEditBean.aziendaInfo.pfPrincipal.username}" />
+								</pretty:urlbuffer>
+								<img src="#{imgURL}?#{utils.currentTimeMillis()}" />
+							</h:panelGroup>
+						</h:panelGroup>
+
+					</div>
+				</div>
+
+				<div class="col-md-5">
+					<div class="panel panel-warning">
+						<div class="panel-heading">#{ui['prof.datiAzienda']}</div>
+						<div class="panel-body">
+							<ui:include src="edit/_datiAzienda.xhtml" />
+						</div>
+					</div>
+				</div>
+				<div class="col-md-5">
+					<div class="panel panel-warning">
+						<div class="panel-heading">#{ui['prof.datiAccount']}</div>
+						<div class="panel-body">
+							<ui:include src="edit/_datiAccount.xhtml" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<ui:remove>
+				<!-- Specific for RER-->
+			</ui:remove>
+
+			<div class="panel-body ricSare">
+				<h:panelGroup>
+					<ui:include src="edit/_ricSARE.xhtml" />
+				</h:panelGroup>
+			</div>
+			<script>
+				function onActionStart() {
+					$('.action-link').hide();
+					$('.action-loader').show();
+				}
+
+				function onActionComplete() {
+					$('.action-link').show();
+					$('.action-loader').hide();
+				}
+			</script>
+
+			<div class="well text-center">
+				<ui:fragment rendered="#{!aziendaEditBean.rettificaAlreadyExists}">
+					<p:commandLink id="modificaBtn" action="#{aziendaEditBean.sync}" styleClass="ui-button btn btn-primary action-link"
+						update="@(.ui-message)" onstart="onActionStart()" oncomplete="onActionComplete();" global="false">
+						<i class="fa fa-edit"></i> #{aziendaViewBean.aziendaInfo.pfPrincipal.flagAbilitatoSare?ui['prof.inviaRichiesta']:ui['shared.modifica']}
+					</p:commandLink>
+				</ui:fragment>
+
+				<ui:fragment rendered="#{aziendaEditBean.rettificaAlreadyExists}">
+					<p:commandLink id="modificaRettBtn" styleClass="ui-button btn btn-primary action-link"
+						onclick="PF('modificaRettDlg').show();" update="@(.ui-message)" global="false">
+						<i class="fa fa-edit"></i> #{ui['prof.inviaRichiesta']}
+					</p:commandLink>
+					
+					<p:commandLink id="annulaRettBtn" action="#{aziendaEditBean.annulaRett}"
+						styleClass="ui-button btn btn-primary action-link uk-margin-small-left" update="@(.ui-message)" onstart="onActionStart()"
+						oncomplete="onActionComplete();" global="false">
+						<i class="fa fa-times"></i> #{ui['prof.annulaRettifica']}
+					</p:commandLink>
+				</ui:fragment>
+				<pretty:urlbuffer var="profileURL" mappingId="profile">
+				</pretty:urlbuffer>
+				<a href="#{profileURL}" class="ui-button btn btn-primary action-link">
+					<i class="fa fa-arrow-left"></i>
+					#{ui['shared.back']}
+				</a>
+				<h:graphicImage styleClass="action-loader" library="#{godfatherBean.theme}" name="images/loader.gif" alt="loader" style="display: none" />
+			</div>
+		</h:form>
+	</div>
+	
+	<p:dialog header="#{ui['prof.confermaNuovaRettificaHeader']}" widgetVar="modificaRettDlg" resizable="false"
+		modal="true" showEffect="fade" hideEffect="fade">
+		<div class="well">
+			<p>
+				#{ui['prof.confermaNuovaRettifica1']}<br/>
+				#{ui['prof.confermaNuovaRettifica2']}
+			</p>
+			<div class="text-center">
+				<p:commandLink id="confermaModificaRettBtn" action="#{aziendaEditBean.sync}" 
+					styleClass="ui-button btn btn-primary action-link" update="@(.ui-message)" 
+					onclick="PF('modificaRettDlg').hide();" onstart="onActionStart()" 
+					oncomplete="onActionComplete();" global="false">
+					<i class="fa fa-edit"></i> #{ui['shared.conferma']}
+				</p:commandLink>
+				<p:commandLink id="annullaModificaRettBtn" onclick="PF('modificaRettDlg').hide();"
+					styleClass="ui-button btn btn-primary action-link uk-margin-small-left" update="@(.ui-message)" 
+					global="false">
+					<i class="fa fa-arrow-left"></i> #{ui['shared.annulla']}
+				</p:commandLink>
+			</div>
+		</div>
+	</p:dialog>
+</ui:composition>
+

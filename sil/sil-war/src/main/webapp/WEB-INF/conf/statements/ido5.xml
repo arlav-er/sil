@@ -1,0 +1,76 @@
+
+<STATEMENT
+        name="ListaCittadinanzaRichiesta"
+        query="SELECT     PRGCITTADINANZA,
+                          PRGRICHIESTAAZ,
+                          DE_CITTADINANZA.STRDESCRIZIONE,
+                          CASE
+							WHEN DO_CITTADINANZA.CODMOTNAZIONALITA = 'ALT' THEN STRMOTIVAZIONE
+							WHEN DO_CITTADINANZA.CODMOTNAZIONALITA = '' THEN ''
+							WHEN DO_CITTADINANZA.CODMOTNAZIONALITA IS NULL THEN ''
+							ELSE DE_MOT_NAZIONALITA.STRDESCRIZIONE
+							END
+						  STRMOTIVAZIONE                          
+						  FROM DO_CITTADINANZA,DE_CITTADINANZA,DE_MOT_NAZIONALITA
+                          WHERE DO_CITTADINANZA.CODCITTADINANZA=DE_CITTADINANZA.CODCITTADINANZA
+                          AND DO_CITTADINANZA.CODMOTNAZIONALITA = 
+                          	  DE_MOT_NAZIONALITA.CODMOTNAZIONALITA (+)
+                          AND DO_CITTADINANZA.PRGRICHIESTAAZ=?"/>
+
+
+
+<STATEMENT name="DeleteCittadinanzaRichiestaAzienda"
+            query="DELETE FROM DO_CITTADINANZA
+                          WHERE DO_CITTADINANZA.PRGCITTADINANZA=?"/>
+
+
+<STATEMENT name="UpdateCittadinanzaRichiesta"
+            query="UPDATE DO_CITTADINANZA
+                  SET CODCITTADINANZA=?,
+                      CDNUTMOD=TO_NUMBER(?),
+                      DTMMOD=sysdate,
+                      CODMOTNAZIONALITA=?,
+                      STRMOTIVAZIONE=?
+                  WHERE PRGCITTADINANZA=TO_NUMBER(?)"/>
+
+<STATEMENT name="InsertCittadinanzaRichiesta"
+            query="INSERT INTO DO_CITTADINANZA (
+                     PRGCITTADINANZA, PRGRICHIESTAAZ, CODCITTADINANZA, CODMOTNAZIONALITA, STRMOTIVAZIONE,
+                    CDNUTINS, DTMINS, CDNUTMOD, DTMMOD) 
+                VALUES (S_DO_CITTADINANZA.NEXTVAL, ?, ?, ?,
+               ?, ?, sysdate, ?, sysdate)"/>
+
+<STATEMENT name="SELECT_UNIQUE_CITTADINANZA"
+            query="SELECT PRGCITTADINANZA
+                   FROM DO_CITTADINANZA
+                   WHERE CODCITTADINANZA=?
+                   AND PRGRICHIESTAAZ=?"/>
+
+<STATEMENT name="SELECT_CITTADINANZA" query="
+SELECT 
+      CODCITTADINANZA AS CODICE,
+      STRDESCRIZIONE ||
+        DECODE(
+          SYSDATE, 
+          GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)',
+          LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+          ' (scaduto)', 
+          ''
+        ) AS DESCRIZIONE
+    FROM DE_CITTADINANZA 
+    ORDER BY DECODE(CODCITTADINANZA,'NT', 1,'999',1,0), DESCRIZIONE
+    "/>
+
+<STATEMENT name="GetCittadinanzaRichiesta"
+            query="SELECT DO_CITTADINANZA.PRGCITTADINANZA,
+                          DO_CITTADINANZA.PRGRICHIESTAAZ,
+                          DO_CITTADINANZA.CODCITTADINANZA,
+                          DO_CITTADINANZA.CODMOTNAZIONALITA,
+						  DO_CITTADINANZA.STRMOTIVAZIONE,	
+                          DO_CITTADINANZA.CDNUTINS,
+                          TO_CHAR(DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS,
+                          DO_CITTADINANZA.CDNUTMOD,
+                          TO_CHAR(DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD
+                          FROM DO_CITTADINANZA
+                          WHERE DO_CITTADINANZA.PRGCITTADINANZA=?"/>

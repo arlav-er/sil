@@ -1,0 +1,86 @@
+<STATEMENT name="GET_Partecipante_GG_DatiProfiling_Patto_Dynamic"
+    query="SELECT distinct pl.prgpattolavoratore,
+                    pl.numindicesvantaggio,
+                    pl.numindicesvantaggio2,
+                    pl.codtipopatto, to_char(pl.datscadconferma, 'dd/mm/yyyy') AS datscadconferma,
+                    (SELECT TO_CHAR(MAX(DID1.DATDICHIARAZIONE), 'DD/MM/YYYY') 
+		            FROM AM_DICH_DISPONIBILITA DID1
+		            INNER JOIN AM_ELENCO_ANAGRAFICO ELENCO1 ON (DID1.PRGELENCOANAGRAFICO = ELENCO1.PRGELENCOANAGRAFICO)
+		            WHERE ELENCO1.CDNLAVORATORE = pl.cdnlavoratore AND TRUNC(DID1.DATDICHIARAZIONE) &lt;=
+		            (select max(pt.DATADESIONEPA) from am_patto_lavoratore pt where pt.cdnlavoratore = pl.cdnlavoratore and pt.codstatoatto = 'PR')
+		            AND DID1.CODSTATOATTO = 'PR') AS datdichiarazione,
+                    to_char(pl.datriferimento, 'dd/mm/yyyy') AS datriferimento,
+                    to_char(pl.datstipula, 'dd/mm/yyyy') AS datstipula,
+                    pl.codcpi,
+                    to_char(pl.datfine, 'dd/mm/yyyy') AS datfine,
+                    pl.codmotivofineatto,
+                    (case
+                      when
+                        (select t.numprotocollo numprotocollo
+                        from
+                        (select min(am_doc.numprotocollo) numprotocollo, patto.prgpattolavoratore prgpattolavoratore,
+                                am_doc.numannoprot numannoprot
+                        from am_patto_lavoratore patto
+                        inner join am_documento_coll doc_coll on (to_number(doc_coll.strchiavetabella) = patto.prgpattolavoratore)
+                        inner join am_documento am_doc on (am_doc.prgdocumento = doc_coll.prgdocumento and
+                        am_doc.cdnlavoratore = patto.cdnlavoratore)
+                        where patto.cdnlavoratore = ?
+                        and am_doc.codtipodocumento in ('PT297', 'ACLA')
+                        and am_doc.codstatoatto = 'AU' and am_doc.codmotannullamentoatto = 'RIS'
+                        group by patto.prgpattolavoratore, am_doc.numannoprot
+                        order by patto.prgpattolavoratore asc, am_doc.numannoprot asc) t
+                        where t.prgpattolavoratore = pl.prgpattolavoratore and rownum = 1
+                      ) is not null then (select t.numprotocollo numprotocollo
+                                          from
+                                          (select min(am_doc.numprotocollo) numprotocollo, patto.prgpattolavoratore prgpattolavoratore,
+                                          		  am_doc.numannoprot numannoprot
+                                          from am_patto_lavoratore patto
+                                          inner join am_documento_coll doc_coll on (to_number(doc_coll.strchiavetabella) = patto.prgpattolavoratore)
+                                          inner join am_documento am_doc on (am_doc.prgdocumento = doc_coll.prgdocumento and
+                                          am_doc.cdnlavoratore = patto.cdnlavoratore)
+                                          where patto.cdnlavoratore = ?
+                                          and am_doc.codtipodocumento in ('PT297', 'ACLA')
+                                          and am_doc.codstatoatto = 'AU' and am_doc.codmotannullamentoatto = 'RIS'
+                                          group by patto.prgpattolavoratore, am_doc.numannoprot
+                                          order by patto.prgpattolavoratore asc, am_doc.numannoprot asc) t
+                                          where t.prgpattolavoratore = pl.prgpattolavoratore and rownum = 1
+                                        )
+                           else do.numprotocollo
+                      end) AS numprotocollo,
+                    so.codstatooccupaz, coll.prgcolloquio, coll.codservizio, de_servizio.codmonoprogramma,
+                    to_char(coll.datcolloquio, 'dd/mm/yyyy') AS datinizioprogramma,
+                    to_char(coll.datfineprogramma, 'dd/mm/yyyy') AS datfineprogramma
+           FROM
+                    am_patto_lavoratore pl
+                    INNER JOIN or_colloquio coll on (pl.cdnlavoratore = coll.cdnlavoratore)
+           			INNER JOIN de_servizio on (coll.codservizio = de_servizio.codservizio) 
+		   			INNER JOIN or_percorso_concordato per on (coll.prgcolloquio = per.prgcolloquio)
+		   			INNER JOIN de_azione az on (per.prgazioni = az.prgazioni)
+	       			INNER JOIN am_lav_patto_scelta scelta on (pl.prgpattolavoratore = scelta.prgpattolavoratore
+	        			and per.prgpercorso = to_number(scelta.strchiavetabella)
+	        			and scelta.codlsttab = 'OR_PER')
+                    INNER JOIN am_stato_occupaz so ON (so.cdnlavoratore = pl.cdnlavoratore)
+                    INNER JOIN am_documento do ON (do.cdnlavoratore = pl.cdnlavoratore)
+           			INNER JOIN am_documento_coll dc ON (do.prgdocumento = dc.prgdocumento and to_number(dc.strchiavetabella) = pl.prgpattolavoratore)
+           WHERE	pl.cdnlavoratore = ?
+           			AND nvl(de_servizio.flgServizioSifer, 'N') = 'S'
+           			AND (nvl(az.flgformazione, 'N') = 'S')
+           			AND do.codtipodocumento in ('PT297', 'ACLA')
+                    AND pl.codstatoatto = 'PR'
+                    AND do.codstatoatto = 'PR'
+                    AND so.datinizio &lt;= pl.datstipula
+                    AND (so.datfine is null OR so.datfine &gt;= pl.datstipula) " />
+
+<STATEMENT name="GET_Partecipante_CondObb_TN"
+	query="SELECT COUNT(per.prgazioni) AS azioni
+			 FROM AM_PATTO_LAVORATORE PATTO
+			 INNER JOIN or_colloquio coll on (PATTO.cdnlavoratore = coll.cdnlavoratore)
+			 INNER JOIN or_percorso_concordato per on (coll.prgcolloquio = per.prgcolloquio)
+	         INNER JOIN am_lav_patto_scelta scelta on (PATTO.prgpattolavoratore = scelta.prgpattolavoratore
+	         	and per.prgpercorso = to_number(scelta.strchiavetabella)
+	         	and scelta.codlsttab = 'OR_PER')
+	         INNER JOIN de_servizio on (coll.codservizio = de_servizio.codservizio)
+	         INNER JOIN de_azione az on (per.prgazioni = az.prgazioni)
+			 WHERE (PATTO.cdnlavoratore = ?) and (PATTO.codstatoatto = 'PR')
+			 and (nvl(de_servizio.flgServizioSifer, 'N') = 'S')
+			 and (nvl(az.flgformazione, 'N') = 'S') " />

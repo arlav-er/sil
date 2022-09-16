@@ -1,0 +1,154 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/main_primefaces.xhtml">
+
+	<ui:define name="content">
+		<ui:include src="_header.xhtml" />
+		<div class="widget_container">
+			<div class="ui-widget-content ui-widget ui-corner-all">
+				<div style="margin: 2em">
+					<h:form id="dichiarazioneNeetForm">
+						<fieldset>
+							<legend>Dati ente</legend>
+							<table style="border-spacing: 1em; width: 80%">
+								<tr>
+									<td>
+										<p:outputLabel value="Ragione Sociale" />
+										<br />
+										<h:outputText
+											value="#{ygNewDichiarazioneNeetBean.dichiarazione.strRagioneSocialeEnte}" />
+									</td>
+									<td>
+										<p:outputLabel value="Codice fiscale"></p:outputLabel>
+										<br />
+										<h:outputText
+											value="#{ygNewDichiarazioneNeetBean.dichiarazione.strCodiceFiscaleEnte}" />
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+
+						<fieldset>
+							<legend>Dati della dichiarazione:</legend>
+							<table style="border-spacing: 1em; width: 80%">
+								<tr>
+									<td>
+										<p:outputLabel value="Nome" for="nomeInput" />
+										<br />
+										<p:inputText id="nomeInput" size="25" maxlength="255"
+											required="true"
+											value="#{ygNewDichiarazioneNeetBean.dichiarazione.strNomeLav}"
+											requiredMessage="Il nome del cittadino è obbligatorio."
+											binding="#{nomeComponent}"></p:inputText>
+										<p:message for="nomeInput"></p:message>
+									</td>
+									<td>
+										<p:outputLabel value="Cognome" for="cognomeInput"></p:outputLabel>
+										<br />
+										<p:inputText id="cognomeInput" size="25" maxlength="255"
+											required="true"
+											value="#{ygNewDichiarazioneNeetBean.dichiarazione.strCognomeLav}"
+											requiredMessage="Il cognome del cittadino è obbligatorio."
+											binding="#{cognomeComponent}"></p:inputText>
+										<p:message for="cognomeInput"></p:message>
+									</td>
+									<td>
+										<p:outputLabel value="Codice Fiscale" for="cfLavInput"></p:outputLabel>
+										<br />
+										<p:inputText id="cfLavInput" required="true" size="25"
+											maxlength="16"
+											value="#{ygNewDichiarazioneNeetBean.dichiarazione.strCodiceFiscaleLav}"
+											requiredMessage="Il codice fiscale del cittadino è obbligatorio.">
+											<f:validator
+												validatorId="codiceFiscaleCorrispondenzaValidator" />
+											<f:attribute name="nome" value="#{nomeComponent}" />
+											<f:attribute name="cognome" value="#{cognomeComponent}" />
+											<f:attribute name="dataNascita"
+												value="#{dataNascitaComponent}" />
+										</p:inputText>
+										<p:message for="cfLavInput"></p:message>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<p:outputLabel value="Data di nascita" for="dataNascitaInput"></p:outputLabel>
+										<br />
+										<p:calendar id="dataNascitaInput" required="true"
+											pattern="dd/MM/yyyy" navigator="true" yearRange="-50:-17"
+											binding="#{dataNascitaComponent}"
+											value="#{ygNewDichiarazioneNeetBean.dichiarazione.dtNascitaLav}"
+											requiredMessage="La data di nascita del cittadino è obbligatoria."></p:calendar>
+										<p:message for="dataNascitaInput"></p:message>
+									</td>
+									<td>
+										<p:outputLabel value="Comune di nascita" for="comuneNascitaInput"></p:outputLabel>
+										<br />
+										<p:autoComplete id="comuneNascitaInput" required="true" 
+											var="comuneVar" converter="deComuneDTOConverter" forceSelection="true"
+											completeMethod="#{ygNewDichiarazioneNeetBean.completeComune}"
+											itemLabel="#{comuneVar.descrizione}" itemValue="#{comuneVar}"
+											value="#{ygNewDichiarazioneNeetBean.dichiarazione.deComuneNascitaDTO}"
+											requiredMessage="Il comune di nascita del cittadino è obbligatorio">							
+										</p:autoComplete>
+										<p:message for="comuneNascitaInput"></p:message>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<p:outputLabel value="Data della dichiarazione"
+											for="dataDicInput"></p:outputLabel>
+										<br />
+										<p:calendar id="dataDicInput" required="true"
+											pattern="dd/MM/yyyy" navigator="true"
+											requiredMessage="La data della dichiarazione è obbligatoria."
+											value="#{ygNewDichiarazioneNeetBean.dichiarazione.dtDichiarazione}"></p:calendar>
+										<p:message for="dataDicInput"></p:message>
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+
+						<ui:include src="_insertVerificaStatoNeetTable.xhtml" />
+
+						<fieldset>
+							<legend>Scansione del documento di identità</legend>
+							<h:panelGroup id="uploadDocumentoPanel">
+							<p>Perchè la dichiarazione sia completa, devi caricare una
+								scansione del documento di identità del lavoratore. Potrai anche
+								caricarla in seguito. (Dimensione massima: 5 MB)</p>
+							<ui:fragment rendered="#{empty ygNewDichiarazioneNeetBean.dichiarazioneUpload}">
+								<p:fileUpload id="documentoIdentitaFileUpload" styleClass="neet-fileupload"
+									fileUploadListener="#{ygNewDichiarazioneNeetBean.documentoIdentitaUploaded}"
+									sizeLimit="5242880" allowTypes="/(\.|\/)(gif|jpe?g|png|pdf|bmp)$/"
+									dragDropSupport="false" fileLimit="1" multiple="false" 
+									label="Carica documento" auto="true" update="uploadDocumentoPanel"
+									invalidSizeMessage="La dimensione del file dev'essere inferiore a 5 MB."
+									invalidFileMessage="Il file deve essere un'immagine o un PDF.">
+								</p:fileUpload>
+							</ui:fragment>
+							<ui:fragment rendered="#{not empty ygNewDichiarazioneNeetBean.dichiarazioneUpload}">
+								<p>#{ygNewDichiarazioneNeetBean.dichiarazioneUpload.fileName}</p>
+								<p:messages id="messages" globalOnly="true"></p:messages>
+							</ui:fragment>
+							</h:panelGroup>
+						</fieldset>
+
+						<div>
+							<p:commandButton value="Inserisci" ajax="false" 
+								action="main?faces-redirect=true" styleClass="m-r-1em white-icon"
+								actionListener="#{ygNewDichiarazioneNeetBean.sync}"
+								icon="ui-button-icon-primary ui-icon ui-icon-check" />
+								
+							<p:button value="Annulla" outcome="main" styleClass="white-icon"
+								icon="ui-button-icon-primary ui-icon ui-icon-close" />
+						</div>
+					</h:form>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

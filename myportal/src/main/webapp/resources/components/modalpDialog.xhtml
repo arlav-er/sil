@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:composite="http://java.sun.com/jsf/composite">
+
+	<!-- Attributi da definire nell'interfaccia -->
+	<composite:interface name="modalpDialog">
+		<!-- Il titolo della finestra -->
+		<composite:attribute name="title" required="true" />
+		<composite:attribute name="openF" default="" />
+		<composite:actionSource name="submitta" targets="modal_form:submitta" />
+		<composite:attribute name="actionSubmit" method-signature="void action()" />
+		<composite:attribute name="renderAjax" default="" />
+		<composite:attribute name="eventAjax" default="onEventDummy" />
+		<composite:attribute name="submitLabel" default=""	shortDescription="Label del pulsante SUBMIT" />
+		<composite:attribute name="height" default=""
+			shortDescription="Altezza della finestra" />
+		<composite:attribute name="width" default=""
+			shortDescription="Larghezza della finestra" />
+		<composite:attribute name="renderedButtonAnnulla" default="true" />
+	</composite:interface>
+
+	<!-- Interfaccia implementata -->
+	<composite:implementation>
+		<div id="#{cc.clientId}" class="modal_dialog"
+			title="#{cc.attrs.title}">
+			<h:form id="${'modal_form'}">
+				<span class="message_content" />
+				<composite:insertChildren />			
+				<br />
+				<br />
+				<h:panelGrid columns="2">
+
+					 <h:commandLink  id="submitta"
+						class="buttonStyle disableButton" 
+						value="#{cc.attrs.submitLabel}" style="width: 100%;">
+						 <f:ajax execute="@form" render="#{cc.attrs.renderAjax} @this" onevent="modalpDialog_onEventManager['#{cc.clientId}']"/> 
+					</h:commandLink> 
+
+				</h:panelGrid>
+			</h:form>
+		</div>
+
+		<script type="text/javascript">
+			myportal.modalDialog.init({
+				ccid:'#{cc.clientId}',
+				open: '#{cc.attrs.openF}',
+				height:'#{cc.attrs.height}',
+				width:'#{cc.attrs.width}'
+			});
+			
+			if (!modalpDialog_onEventManager)
+				var modalpDialog_onEventManager = {};
+
+			modalpDialog_onEventManager['#{cc.clientId}'] = function(data) {
+//				console.log(data);
+				func2exec = window['#{cc.attrs.eventAjax}'];
+				if ($.isFunction(func2exec)) {
+					result = func2exec(data);
+					if ('leaveOpen' == result) {
+						return false;
+					}
+				}
+				$(jq("#{cc.clientId}")).dialog('close');
+				return false;
+			};
+		</script>
+		
+<style type="text/css">
+ui-button ui-widget ui-state-default ui-state-focus {
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+	background: none repeat scroll 0 0 #CB1D15;
+	border-color: #D85650 #981610 #981610 #D85650;
+	text-shadow: none;
+	color: white;
+}
+</style>
+	</composite:implementation>
+
+</ui:composition>

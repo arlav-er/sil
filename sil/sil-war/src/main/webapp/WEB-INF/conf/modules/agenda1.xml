@@ -1,0 +1,673 @@
+<!-- MODULES/AGENDA1.XML -->
+<MODULE name="ComboAreaServizio" class="it.eng.sil.module.agenda.QueryGenerica">
+    <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <QUERY statement="SELECT_COMBO_SERVIZIO_AREA">
+          <PARAMETER name="data_cod" type="RELATIVE" value="data_cod" scope="SERVICE_REQUEST"/>
+        </QUERY>
+      </QUERIES>
+    </CONFIG>
+  </MODULE>
+
+<!-- Giovanni Landi -->
+<!-- Lucia zozzona -->
+<!-- Modulo che visualizza la lista Assegnazione -->
+<MODULE name="MListaAssegnazione" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" title="Lista Assegnazione" rows="15">
+    <QUERIES>
+      <SELECT_QUERY>   
+        <STATEMENT_PROVIDER CLASS="it.eng.sil.module.agenda.cpi_list_assegnazione">
+        </STATEMENT_PROVIDER>    
+      </SELECT_QUERY>
+      <DELETE_QUERY statements="DELETE_ASSEGNAZIONE">
+        <PARAMETER type="RELATIVE" value="CODCPI" scope="SERVICE_REQUEST"/>
+        <PARAMETER type="RELATIVE" value="PRGASSEGNAZIONE" scope="SERVICE_REQUEST"/>
+      </DELETE_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="strCognome" label="Cognome"/>
+      <COLUMN name="strNome" label="Nome"/>
+      <COLUMN name="DescrizioneServizio" label="Servizio" label2="Area"/>
+      <COLUMN name="DescrizioneAmbiente" label="Ambiente/Aula" />
+    </COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="FALSE">
+        <PARAMETER name="PAGE" type="ABSOLUTE" value="SelectDettaglioPage" scope=""/>
+        <PARAMETER name="CODCPI" type="RELATIVE" value="CODCPI" scope="LOCAL"/>
+        <PARAMETER name="PRGASSEGNAZIONE" type="RELATIVE" value="PRGASSEGNAZIONE" scope="LOCAL"/>
+        <PARAMETER name="CODSERVIZIO" type="RELATIVE" value="CODSERVIZIO" scope="LOCAL"/>
+        <PARAMETER name="PRGSPI" type="RELATIVE" value="PRGSPI" scope="LOCAL"/>
+        <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+      </SELECT_CAPTION>
+      <DELETE_CAPTION image="../../img/del.gif" label="Cancella" confirm="TRUE">
+        <PARAMETER name="PAGE" type="ABSOLUTE" value="GestAssegnazionePage" scope=""/>
+        <PARAMETER name="MODULE" type="ABSOLUTE" value="CANC" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="CODCPI" type="RELATIVE" value="CODCPI" scope="LOCAL"/>
+        <PARAMETER name="PRGASSEGNAZIONE" type="RELATIVE" value="PRGASSEGNAZIONE" scope="LOCAL"/>
+        <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+      </DELETE_CAPTION>
+    </CAPTIONS>
+    <BUTTONS/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MSalvaAssegnazione" class="it.eng.sil.module.agenda.MSalvaAssegnazione">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT  statement="INSERT_ASSEGNAZIONE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAMBIENTE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGSPIASSEGNAZIONE"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    </QUERY_INSERT>
+    <QUERY_SELECT statement="SELECT_UNIQUE_ASSEGNAZIONE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAMBIENTE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGSPIASSEGNAZIONE"/>     
+    </QUERY_SELECT>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDeleteAssegnazione" class="it.eng.sil.module.agenda.DeleteAssegnazioneModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DELETE_ASSEGNAZIONE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGASSEGNAZIONE"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+<MODULE name="MListaAssegnazioneAppuntamento" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" title="Lista Assegnazione" rows="15">
+    <QUERIES>
+      <SELECT_QUERY>   
+        <STATEMENT_PROVIDER CLASS="it.eng.sil.module.agenda.cpi_list_assegnazione">
+        </STATEMENT_PROVIDER>    
+      </SELECT_QUERY>
+      <!--DELETE_QUERY statements="DELETE_ASSEGNAZIONE">
+        <PARAMETER type="RELATIVE" value="CODCPI" scope="SERVICE_REQUEST"/>
+        <PARAMETER type="RELATIVE" value="PRGASSEGNAZIONE" scope="SERVICE_REQUEST"/>
+      </DELETE_QUERY-->
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="Operatore" label="Operatore"/>
+      <COLUMN name="DescrizioneServizio" label="Servizio" label2="Area"/>
+      <COLUMN name="DescrizioneAmbiente" label="Ambiente/Aula" />
+    </COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/add.gif" label="Dettaglio" confirm="FALSE">
+        <PARAMETER name="PRGSPI" type="RELATIVE" value="PRGSPI" scope="LOCAL"/>
+        <PARAMETER name="CODSERVIZIO" type="RELATIVE" value="CODSERVIZIO" scope="LOCAL"/>
+        <PARAMETER name="PRGAMBIENTE" type="RELATIVE" value="PRGAMBIENTE" scope="LOCAL"/>
+        <PARAMETER name="CODSERVIZIO" type="RELATIVE" value="STRCOGNOME" scope="LOCAL"/>
+        <PARAMETER name="CODSERVIZIO" type="RELATIVE" value="STRNOME"    scope="LOCAL"/>
+      </SELECT_CAPTION>
+    </CAPTIONS>
+    <BUTTONS/>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="SelectDettaglioModulo" class="it.eng.sil.module.agenda.SelectAssegnazioneModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="SELECT_ASSEGNAZIONE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGASSEGNAZIONE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MAggiornaAssegnazione" class="it.eng.sil.module.agenda.MAggiornaAssegnazione">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_UPDATE statement="UPDATE_ASSEGNAZIONE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAMBIENTE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGSPIASSEGNAZIONE"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOASSEGNAZIONE"/>
+      <PARAMETER scope="SERVICE_REQUEST" value="PRGASSEGNAZIONE" type="RELATIVE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+    </QUERY_UPDATE>
+    <QUERY_SELECT statement="SELECT_UNIQUE_ASSEGNAZIONE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAMBIENTE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGSPIASSEGNAZIONE"/>
+    </QUERY_SELECT>
+  </CONFIG>
+</MODULE>
+
+<!-- Modulo che visualizza la lista degli Ambienti -->
+<MODULE name="MListaAmbienti" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" title="Lista Ambienti" rows="15">
+    <QUERIES>
+      <SELECT_QUERY>   
+        <STATEMENT_PROVIDER CLASS="it.eng.sil.module.agenda.cpi_list_ambienti">
+        </STATEMENT_PROVIDER>    
+      </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="STRDESCRIZIONE" label="Descrizione"/>
+      <COLUMN name="DATINIZIOVAL" label="Data inizio validit&amp;agrave;"/>
+      <COLUMN name="DATFINEVAL" label="Data fine validit&amp;agrave;"/>
+      <COLUMN name="NUMCAPACITA" label="Postazioni di lavoro"/>
+      <COLUMN name="NUMCAPIENZA" label="Capienza"/>
+    </COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/detail.gif" label="consulta o modifica" confirm="false">
+        <PARAMETER name="PAGE" type="ABSOLUTE" value="DettaglioAmbientePage" scope=""/>
+        <PARAMETER name="CODCPI" type="RELATIVE" value="CODCPI" scope="LOCAL"/>
+        <PARAMETER name="PRGAMBIENTE" type="RELATIVE" value="PRGAMBIENTE" scope="LOCAL"/>
+        <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+      </SELECT_CAPTION>
+      <DELETE_CAPTION image="../../img/del.gif" label="Cancella" confirm="TRUE">
+        <PARAMETER name="PAGE" type="ABSOLUTE" value="GestAmbientiPage" scope=""/>
+        <PARAMETER name="MODULE" type="ABSOLUTE" value="MDeleteAmbiente" scope=""/>
+        <PARAMETER name="CODCPI" type="RELATIVE" value="CODCPI" scope="LOCAL"/>
+        <PARAMETER name="PRGAMBIENTE" type="RELATIVE" value="PRGAMBIENTE" scope="LOCAL"/>
+        <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+      </DELETE_CAPTION>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDeleteAmbiente" class="it.eng.sil.module.agenda.DeleteAmbiente">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DELETE_AMBIENTE">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAMBIENTE"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MSalvaAmbiente" class="it.eng.sil.module.agenda.MSalvaAmbiente">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="InsertAmbiente">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRDESCRIZIONE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATINIZIOVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINEVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATA_DEFAULT"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMCAPACITA"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMCAPIENZA"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDettaglioAmbiente" class="it.eng.sil.module.agenda.MDettaglioAmbiente">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DettaglioAmbiente">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAMBIENTE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MSelectDataDefault" class="it.eng.sil.module.agenda.SelectDataDefault">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DataFineDefault">
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MAggiornaAmbiente" class="it.eng.sil.module.agenda.MAggiornaAmbiente">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="UpdateAmbiente">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRDESCRIZIONE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATINIZIOVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINEVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATA_DEFAULT"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMCAPACITA"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMCAPIENZA"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOAMBIENTE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAMBIENTE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODCPI"/>
+    </QUERY>    
+  </CONFIG>
+</MODULE>
+
+<!-- Modulo che visualizza la lista dei Servizi -->
+<MODULE name="MListaServizi" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+<!-- <MODULE name="MListaServizi" class="it.eng.afExt.dispatching.module.impl.ListModule"> -->
+  <CONFIG pool="SIL_DATI" title="Lista Servizi"  title2="Lista Aree" rows="15">
+	<QUERIES>
+	   <SELECT_QUERY>
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.agenda.ServizioList" />
+	   </SELECT_QUERY>
+	</QUERIES>
+    <COLUMNS>
+      <COLUMN name="Servizio" label="Servizio" label2="Area" />
+      <COLUMN name="CODSERVIZIO" label="Codice Servizio" label2="Codice Area"/>
+      <COLUMN name="Area" label="Area Appartenenza"/>
+      <COLUMN name="DATINIZIOVAL" label="Data inizio validit&amp;agrave;"/>
+      <COLUMN name="DATFINEVAL" label="Data fine validit&amp;agrave;"/>
+      <COLUMN name="DESCTIPOATTIVITALISTA" label="Tipo Attivit&amp;agrave;"/>
+      <COLUMN name="DESCPRESTAZIONELISTA" label="Prestazione"/>
+    </COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/detail.gif" label="consulta o modifica" confirm="false">
+        <PARAMETER name="PAGE" type="ABSOLUTE" value="DettaglioServizioPage" scope=""/>
+        <PARAMETER name="CODSERVIZIO" type="RELATIVE" value="CODSERVIZIO" scope="LOCAL"/>
+        <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="SERVIZIO" type="RELATIVE" value="SERVIZIO" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="DESCAREA" type="RELATIVE" value="DESCAREA" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="CODAREA" type="RELATIVE" value="CODAREA" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="VALIDI" type="RELATIVE" value="VALIDI" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="PRESTAZIONE" type="RELATIVE" value="PRESTAZIONE" scope="LOCAL"/>
+        <PARAMETER name="TIPOATTIVITA" type="RELATIVE" value="TIPOATTIVITA" scope="LOCAL"/>
+        <PARAMETER name="POLATTIVA" type="RELATIVE" value="POLATTIVA" scope="LOCAL"/>
+        <PARAMETER name="DESCTIPOATTIVITA" type="RELATIVE" value="DESCTIPOATTIVITA" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="DESCPRESTAZIONE" type="RELATIVE" value="DESCPRESTAZIONE" scope="SERVICE_REQUEST"/>
+      </SELECT_CAPTION>
+      <DELETE_CAPTION image="../../img/del.gif" label="Cancella" confirm="TRUE">
+        <PARAMETER name="PAGE" type="ABSOLUTE" value="GestServiziPage" scope=""/>
+        <PARAMETER name="MODULE" type="ABSOLUTE" value="MDeleteServizio" scope=""/>
+        <PARAMETER name="CODSERVIZIO" type="RELATIVE" value="CODSERVIZIO" scope="LOCAL"/>
+        <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="SERVIZIO" type="RELATIVE" value="SERVIZIO" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="DESCAREA" type="RELATIVE" value="DESCAREA" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="CODAREA" type="RELATIVE" value="CODAREA" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="VALIDI" type="RELATIVE" value="VALIDI" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="PRGPRESTAZIONE" type="RELATIVE" value="PRGPRESTAZIONE" scope="LOCAL"/>
+        <PARAMETER name="PRGTIPOATTIVITA" type="RELATIVE" value="PRGTIPOATTIVITA" scope="LOCAL"/>
+        <PARAMETER name="POLATTIVA" type="RELATIVE" value="POLATTIVA" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="PRESTAZIONE" type="RELATIVE" value="PRESTAZIONE" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="TIPOATTIVITA" type="RELATIVE" value="TIPOATTIVITA" scope="SERVICE_REQUEST"/>
+        
+      </DELETE_CAPTION>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+<!--  <MODULE name="MSalvaServizio" class="it.eng.sil.module.agenda.MSalvaServizio">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="InsertServizio">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRDESCRIZIONE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATINIZIOVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINEVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATA_DEFAULT"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODICE"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+-->
+<MODULE name="MSalvaServizio" class="it.eng.sil.module.agenda.InserisciServizioPrestazioneAttivitaModule">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT_DE_SERVIZIO statement="InsertServizio">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRDESCRIZIONE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATINIZIOVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINEVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATA_DEFAULT"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODICE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGPATRONATO"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    </QUERY_INSERT_DE_SERVIZIO> 
+	
+    <QUERY_INSERT_MA_SERVIZIO_PRESTAZIONE statement="InsertMaServizioPrestazione">
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODICEPRESTAZIONE"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGPOLATTIVA"/>
+    </QUERY_INSERT_MA_SERVIZIO_PRESTAZIONE> 
+
+    <QUERY_INSERT_MA_SERVIZIO_TIPOATTIVITA statement="InsertMaServizioTipoAttivita">
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODICETIPOATTIVITA"/>
+    </QUERY_INSERT_MA_SERVIZIO_TIPOATTIVITA> 
+
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="MDeleteServizio" class="it.eng.sil.module.agenda.DeleteServizio">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_DELETE_MA_SERVIZIO_PRESTAZIONE statement="DeleteServizioPrestazione">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPRESTAZIONE"/>
+    </QUERY_DELETE_MA_SERVIZIO_PRESTAZIONE>
+
+    <QUERY_DELETE_MA_SERVIZIO_TIPOATTIVITA statement="DeleteServizioTipoAttivita">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTIPOATTIVITA"/>
+    </QUERY_DELETE_MA_SERVIZIO_TIPOATTIVITA>
+
+    <QUERY_DELETE_SERVIZIO statement="DeleteServizio">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+    </QUERY_DELETE_SERVIZIO>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDettaglioServizio" class="it.eng.sil.module.agenda.MDettaglioServizio">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DettaglioServizio">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MAggiornaServizio" class="it.eng.sil.module.agenda.MAggiornaServizio">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_UPDATE_SERVIZIO statement="UpdateServizio">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRDESCRIZIONE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATINIZIOVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINEVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATA_DEFAULT"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODICE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGPATRONATO"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMKLOSERVIZIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO_OLD"/>
+    </QUERY_UPDATE_SERVIZIO>
+        
+    <QUERY_UPDATE_MA_SERVIZIO_PRESTAZIONE statement="UpdateMaServizioPrestazione">
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODICEPRESTAZIONE"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGPOLATTIVA"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+    </QUERY_UPDATE_MA_SERVIZIO_PRESTAZIONE> 
+
+    <QUERY_UPDATE_MA_SERVIZIO_TIPOATTIVITA statement="UpdateMaServizioTipoAttivita">
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODICETIPOATTIVITA"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+    </QUERY_UPDATE_MA_SERVIZIO_TIPOATTIVITA> 
+    
+    <QUERY_SELECT_MA_SERVIZIO_PRESTAZIONE statement="VerificaEsistenzaMaServizioPrestazione">
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+     <!--  <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODICEPRESTAZIONE"/> -->
+     
+    </QUERY_SELECT_MA_SERVIZIO_PRESTAZIONE> 
+
+    <QUERY_SELECT_MA_SERVIZIO_TIPOATTIVITA statement="VerificaEsistenzaMaServizioTipoAttivita">
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+     <!--  <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODICETIPOATTIVITA"/> -->
+    </QUERY_SELECT_MA_SERVIZIO_TIPOATTIVITA> 
+    
+    <QUERY_INSERT_MA_SERVIZIO_PRESTAZIONE statement="InsertMaServizioPrestazione">
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODICEPRESTAZIONE"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGPOLATTIVA"/>
+    </QUERY_INSERT_MA_SERVIZIO_PRESTAZIONE> 
+
+    <QUERY_INSERT_MA_SERVIZIO_TIPOATTIVITA statement="InsertMaServizioTipoAttivita">
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+     <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODICETIPOATTIVITA"/>
+    </QUERY_INSERT_MA_SERVIZIO_TIPOATTIVITA> 
+    
+    <QUERY_DELETE_MA_SERVIZIO_PRESTAZIONE statement="DeleteServizioPrestazione">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGPRESTAZIONE"/>
+    </QUERY_DELETE_MA_SERVIZIO_PRESTAZIONE>
+
+    <QUERY_DELETE_MA_SERVIZIO_TIPOATTIVITA statement="DeleteServizioTipoAttivita">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CODSERVIZIO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGTIPOATTIVITA"/>
+    </QUERY_DELETE_MA_SERVIZIO_TIPOATTIVITA>
+    
+  </CONFIG>
+</MODULE>
+
+<!-- Modulo che visualizza la lista degli Operatori -->
+<MODULE name="MListaOperatori" class="it.eng.afExt.dispatching.module.impl.ListModule">
+  <CONFIG pool="SIL_DATI" title="Lista Operatori" rows="15">
+     <QUERIES>
+	    <SELECT_QUERY statement="ListaOperatori">
+   	      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FSTRCOGNOME"/>
+   	      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FSTRNOME"/>
+   	      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FSTRCODICEFISCALE"/>
+   	      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FSTRSIGLAOPERATORE"/>
+   	      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FDATNASC"/>
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="VALIDI"/>
+	    </SELECT_QUERY>
+    </QUERIES>
+    <COLUMNS>
+      <COLUMN name="STRCODICEFISCALE" label="Codice Fiscale"/>
+      <COLUMN name="STRCOGNOME" label="Cognome"/>
+      <COLUMN name="STRNOME" label="Nome"/>
+      <COLUMN name="STRSESSO" label="Sesso"/>
+      <COLUMN name="STRSIGLAOPERATORE" label="Sigla Operatore"/>
+      <COLUMN name="DATNASC" label="Data Nascita"/>
+      <COLUMN name="DATINIZIOVAL" label="Data inizio validit&amp;agrave;"/>
+      <COLUMN name="DATFINEVAL" label="Data fine validit&amp;agrave;"/>
+    </COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/detail.gif" label="consulta o modifica" confirm="false">
+        <PARAMETER name="PAGE" type="ABSOLUTE" value="DettaglioOperatorePage" scope=""/>
+        <PARAMETER name="PRGSPI" type="RELATIVE" value="PRGSPI" scope="LOCAL"/>
+        <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="FSTRCOGNOME" type="RELATIVE" value="FSTRCOGNOME" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="FSTRNOME" type="RELATIVE" value="FSTRNOME" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="FSTRCODICEFISCALE" type="RELATIVE" value="FSTRCODICEFISCALE" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="FSTRSIGLAOPERATORE" type="RELATIVE" value="FSTRSIGLAOPERATORE" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="FDATNASC" type="RELATIVE" value="FDATNASC" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="VALIDI" type="RELATIVE" value="VALIDI" scope="SERVICE_REQUEST"/>
+      </SELECT_CAPTION>
+      <DELETE_CAPTION image="../../img/del.gif" label="Cancella" confirm="TRUE">
+        <PARAMETER name="PAGE" type="ABSOLUTE" value="GestOperatoriPage" scope=""/>
+        <PARAMETER name="MODULE" type="ABSOLUTE" value="MDeleteOperatore" scope=""/>
+        <PARAMETER name="PRGSPI" type="RELATIVE" value="PRGSPI" scope="LOCAL"/>
+        <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="FSTRCOGNOME" type="RELATIVE" value="FSTRCOGNOME" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="FSTRNOME" type="RELATIVE" value="FSTRNOME" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="FSTRCODICEFISCALE" type="RELATIVE" value="FSTRCODICEFISCALE" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="FSTRSIGLAOPERATORE" type="RELATIVE" value="FSTRSIGLAOPERATORE" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="FDATNASC" type="RELATIVE" value="FDATNASC" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="VALIDI" type="RELATIVE" value="VALIDI" scope="SERVICE_REQUEST"/>
+      </DELETE_CAPTION>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MSalvaOperatore" class="it.eng.sil.module.agenda.MSalvaOperatore">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_INSERT statement="InsertOperatore">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGSPI"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCOGNOME"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOME"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCODICEFISCALE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRSESSO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRSIGLAOPERATORE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATNASC"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRTELOPERATORE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATINIZIOVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINEVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATA_DEFAULT"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+       <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STREMAIL"/>
+    </QUERY_INSERT>
+    <QUERY_NEXTVAL statement="InsertOperatoreNextVal"/> 
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDeleteOperatore" class="it.eng.sil.module.agenda.DeleteOperatore">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DeleteOperatore">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGSPI"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDettaglioOperatore" class="it.eng.sil.module.agenda.MDettaglioOperatore">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DettaglioOperatore">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGSPI"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MAggiornaOperatore" class="it.eng.sil.module.agenda.MAggiornaOperatore">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="UpdateOperatore">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCOGNOME"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRNOME"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRCODICEFISCALE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRSESSO"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRSIGLAOPERATORE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATNASC"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STRTELOPERATORE"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATINIZIOVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATFINEVAL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="DATA_DEFAULT"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="STREMAIL"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGSPI"/>
+    </QUERY>    
+  </CONFIG>
+</MODULE>
+
+<MODULE name="COMBO_STATO_SLOT_SETTIMANA_TIPO" class="it.eng.sil.module.agenda.QueryGenerica">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERIES>
+      <QUERY statement="SELECT_COMBO_STATO_SLOT_SETTIMANA_TIPO">
+        <PARAMETER name="data_cod" type="RELATIVE" value="data_cod" scope="SERVICE_REQUEST"/>
+      </QUERY>
+    </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="ComboModelloStampa" class="it.eng.sil.module.agenda.QueryGenerica">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERIES>
+      <QUERY statement="SELECT_COMBO_MODELLO_STAMPA">
+        <PARAMETER name="data_cod" type="RELATIVE" value="data_cod" scope="SERVICE_REQUEST"/>
+      </QUERY>
+    </QUERIES>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="StampaPromemoria" class="it.eng.sil.module.agenda.StampaPromemoria"/>
+
+<!-- Fabio Spadaro 20140710  - start  -->
+<MODULE name="ComboTipoAttivita" class="it.eng.sil.module.agenda.QueryGenerica">
+    <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <QUERY statement="SELECT_COMBO_TIPO_ATTIVITA" />
+      </QUERIES>
+    </CONFIG>
+  </MODULE>
+
+  <MODULE name="ComboPrestazione" class="it.eng.sil.module.agenda.QueryGenerica">
+    <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <QUERY statement="SELECT_COMBO_PRESTAZIONE" />
+      </QUERIES>
+    </CONFIG>
+  </MODULE>
+<!-- Fabio Spadaro 20140710  - end  -->
+
+<MODULE name="ComboObbiettivoMisuraYei" class="it.eng.sil.module.agenda.QueryGenerica">
+  <CONFIG pool="SIL_DATI" title="">
+     <QUERIES>
+        <QUERY statement="SELECT_COMBO_OBBIETTIVO_MISURA_YEI" />
+      </QUERIES>
+  </CONFIG>
+</MODULE>
+
+
+
+<MODULE name="MListaAzioni" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+  <CONFIG pool="SIL_DATI" title="Lista Azioni" rows="15">
+	<QUERIES>
+	   <SELECT_QUERY>
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.agenda.AzioneList" />
+	   </SELECT_QUERY>
+	</QUERIES>
+    <COLUMNS>
+	  <COLUMN name="DESCOBBIETTIVOMISURAYEI" label="Obbiettivo/Misura"/>
+	  <COLUMN name="AZIONE" 				 label="Azione"/>
+      <COLUMN name="DATA_INIZIO_VALIDITA"    label="Data inizio validit&amp;agrave;"/>
+      <COLUMN name="DATA_FINE_VALIDITA"      label="Data fine validit&amp;agrave;"/>
+      <COLUMN name="TIPO_ATTIVITA"           label="Tipo attivit&amp;agrave;"/>
+      <COLUMN name="PRESTAZIONE"             label="Prestazione"/>
+    </COLUMNS>
+    <CAPTIONS>
+      <SELECT_CAPTION image="../../img/detail.gif" label="consulta o modifica" confirm="false">
+        <PARAMETER name="PAGE"          type="ABSOLUTE" value="DettaglioAzioniPage" scope=""/>
+        <PARAMETER name="MODULE"        type="ABSOLUTE" value="MDettaglioServizio" scope=""/>
+        <PARAMETER name="PRGAZIONI"     type="RELATIVE" value="PRGAZIONI"  	scope="LOCAL"/> <!-- valore presa dalla query din. it.eng.sil.module.agenda.AzioneList  -->
+        <PARAMETER name="CDNFUNZIONE"   type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+
+		<!-- valori dal form di ricerca: li riporto nella pagina di dettaglio -->
+        <PARAMETER name="COMBOOBBIETTIVOMISURAYEI" type="RELATIVE" value="COMBOOBBIETTIVOMISURAYEI" scope="SERVICE_REQUEST"/>
+        <PARAMETER name="COMBOTIPOATTIVITA" type="RELATIVE" value="COMBOTIPOATTIVITA" scope="SERVICE_REQUEST"/>
+		<PARAMETER name="COMBOPRESTAZIONE" type="RELATIVE" value="COMBOPRESTAZIONE" scope="SERVICE_REQUEST"/>
+		<PARAMETER name="AZIONE" type="RELATIVE" value="AZIONE" scope="SERVICE_REQUEST"/>
+		<PARAMETER name="FLAGMISURAYEI" type="RELATIVE" value="FLAGMISURAYEI" scope="SERVICE_REQUEST"/>
+		<PARAMETER name="FLAGPOLATTIVA" type="RELATIVE" value="FLAGPOLATTIVA" scope="SERVICE_REQUEST"/>
+		<PARAMETER name="DESCOBBIETTIVOMISURAYEI" type="RELATIVE" value="DESCOBBIETTIVOMISURAYEI" scope="SERVICE_REQUEST"/> 
+		<PARAMETER name="DESCTIPOATTIVITA" type="RELATIVE" value="DESCTIPOATTIVITA" scope="SERVICE_REQUEST"/>
+		<PARAMETER name="DESCPRESTAZIONE" type="RELATIVE" value="DESCPRESTAZIONE" scope="SERVICE_REQUEST"/>
+       </SELECT_CAPTION>
+    </CAPTIONS>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MDettaglioAzione" class="it.eng.sil.module.agenda.MDettaglioAzione">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY statement="DettaglioAzione">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAZIONI"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+<MODULE name="MAggiornaAzione" class="it.eng.sil.module.agenda.MAggiornaAzione">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_UPDATE_AZIONE statement="UpdateAzione">
+      <!-- <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="COMBOOBBIETTIVOMISURAYEI_OLD"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="COMBOOBBIETTIVOMISURAYEIDETT"/> -->
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="AZIONEDETT"/>
+      <PARAMETER scope="SESSION" type="RELATIVE" value="_CDUT_"/>
+    </QUERY_UPDATE_AZIONE>
+        
+  </CONFIG>
+</MODULE>
+
+<MODULE name="MSalvaAzione" class="it.eng.sil.module.agenda.MSalvaAzione">
+  <CONFIG pool="SIL_DATI" title="">
+    <QUERY_SELECT_MAX_DE_AZIONE  statement="SelectMaxDeAzione">
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="COMBOOBBIETTIVOMISURAYEIDETT"/>
+    </QUERY_SELECT_MAX_DE_AZIONE>
+    
+    <QUERY_INSERT_DE_AZIONE  statement="InsertDeAzione">
+      <!-- IL PROGRESSIVO DE_AZIONE VIENE CALCOLATO DALLA CLASSE MSALVAAZIONE -->
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGA"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="AZIONEDETT"/>
+      <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="COMBOOBBIETTIVOMISURAYEIDETT"/>
+      
+    </QUERY_INSERT_DE_AZIONE>
+    
+  </CONFIG>
+</MODULE>
+<MODULE name="GetAppUltimoInvioAnpal" class="it.eng.sil.module.agenda.QueryGenerica">
+    <CONFIG pool="SIL_DATI" title="">
+      <QUERIES>
+        <QUERY statement="APP_ULTIMO_INVIO_ANPAL">
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAPPUNTAMENTO" />
+          <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAPPUNTAMENTO" />
+        </QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE>
+<MODULE name="StoricoAppInvioAnpal" class="it.eng.afExt.dispatching.module.impl.ListModule">
+  <CONFIG pool="SIL_DATI" title="Storico Invii Appuntamento ad Anpal" rows="15">
+	<QUERIES>
+			<SELECT_QUERY statement="APP_ALL_INVIO_ANPAL">
+				 <PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGAPPUNTAMENTO" />
+			</SELECT_QUERY>
+		</QUERIES>
+    <COLUMNS>
+	  <COLUMN name="dataInvio" label="Data e ora invio"/>
+	  <COLUMN name="esitoNotifica" label="Esito invio"/>
+      <COLUMN name="esitoAppuntamento"    label="Esito appuntamento inviato"/>
+      <COLUMN name="esitoSil"    label="Esito appuntamento (SIL) inviato"/>
+    </COLUMNS>
+  </CONFIG>
+</MODULE>

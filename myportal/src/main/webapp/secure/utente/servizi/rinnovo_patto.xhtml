@@ -1,0 +1,93 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components" template="../../template/main.xhtml">
+
+	<ui:define name="title">
+		<h:outputText value="#{txt['cittadino.servizi.rinnovo_patto.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+		<div class="violet_panel"></div>
+
+		<h:panelGroup layout="block" styleClass="ui-widget-content ui-corner-all elencoStampeDid"
+			rendered="#{empty rinnovoPattoBean.stampe}">
+			<h3>Non vi sono patti precedentemente rinnovati</h3>
+			<br />
+			<a href="#" class="buttonStyle" onclick="return rinnovaPatto(#{sessionBean.connectedUtente.id});"> Rinnova patto
+			</a>
+		</h:panelGroup>
+		
+		<h:panelGroup layout="block" styleClass="ui-widget-content ui-corner-all elencoStampeDid"
+			rendered="#{not empty rinnovoPattoBean.stampe}">
+			<h3>Elenco rinnovi effettuati precedentemente</h3>
+			<ul style="padding-left: 20px;">
+				<ui:repeat var="stampa" value="#{rinnovoPattoBean.stampe}">
+					<li class="stampaDid">
+						<div class="disabled">
+							<a href="#" tabindex="0" class="toggleLink"
+								onclick="fetchStampa('#{request.contextPath}/secure/rest/services/get_stampa?stampa_id=#{stampa.id}');return false;">
+								Rinnovo patto del
+								<h:outputText value="#{stampa.dtmIns}">
+									<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+								</h:outputText>
+							</a>
+							<span class="toggleLink">
+								Rinnovo patto del
+								<h:outputText value="#{stampa.dtmIns}">
+									<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+								</h:outputText>
+							</span>
+						</div>
+					</li>
+				</ui:repeat>
+			</ul>
+			<a href="#" class="buttonStyle" onclick="return rinnovaPatto(#{sessionBean.connectedUtente.id});"> Rinnova patto
+			</a>
+		</h:panelGroup>
+
+		<div id="answer" class="answer">
+
+			<cc:waiting id="waitDid" hidden="true"
+				waitMessage="Stiamo rinnovando il patto con il Centro per l'impiego di tua competenza..."></cc:waiting>
+
+			<div id="waitStampa" style="display: none; text-align: center;">
+				<h:graphicImage value="/resources/images/ajax-loader-blue.gif" alt="loading..." />
+				<br />
+				<b>Stampa in corso...</b>
+			</div>
+
+			<div class="ok" style="display: none">
+				<h:graphicImage value="/resources/images/check.gif" alt="ok" />
+				<b>Dati recuperati con successo.</b>
+			</div>
+
+			<div class="warning" style="display: none">
+				<h:graphicImage value="/resources/images/icons/warning.gif" alt="warning" />
+				<b></b>
+			</div>
+
+			<div class="error" style="display: none">
+				<h:graphicImage value="/resources/images/error.png" alt="error" />
+				<br />
+				<b>Impossibile elaborare la richiesta.</b>
+				<br />
+			</div>
+
+			<div class="errorStampa" style="display: none; text-align: center;">
+				<h:graphicImage value="/resources/images/error.png" alt="error" />
+				<br />
+				<b>Impossibile elaborare la richiesta.</b>
+				<br />
+				<b>Ti invitiamo a contattare il Centro per l'impiego di tua competenza.</b>
+			</div>
+		</div>
+
+		<h:link class="backButtonStyle" value="Torna indietro" title="Torna alla pagina dei servizi"
+			outcome="/secure/utente/servizi/index.xhtml" />
+
+		<script type="text/javascript">
+            attivaLinkStampa();
+        </script>
+	</ui:define>
+
+</ui:composition>

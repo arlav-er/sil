@@ -1,0 +1,101 @@
+<STATEMENT name="STATEMENT_GET_DELEGA_FROM_GRUPPO"
+				query="select d.cdndelega AS CDNDELEGA 
+						from ts_delega d  
+						inner join ts_gruppo g on ( d.cdngruppo = g.cdngruppo )
+						where d.cdngruppo = ? " />
+
+
+<STATEMENT name="STATEMENT_INSERT_NEW_DELEGA"
+				query="INSERT INTO AM_DELEGA (
+				PRGDELEGA,
+				CDNDELEGA,
+				CDNLAVORATORE,
+				DATINIZIOVAL,
+				CDNUTINS,
+				DTMINS,
+				CDNUTMOD,
+				DTMMOD				
+				) 
+                  VALUES(
+                  S_AM_DELEGA.NEXTVAL,
+                  ?,
+                  ?,
+                  to_date(to_char(sysdate, 'dd/mm/yyyy'),'dd/mm/yyyy'),                                    
+                  ?,
+                  sysdate,
+                  ?,
+                  sysdate                  
+                  )" />
+                  
+<STATEMENT name="STATEMENT_UPDATE_ALTRA_DELEGA_END_DATE"
+				query="update AM_DELEGA 
+						set datfineval = to_date(to_char(sysdate, 'dd/mm/yyyy'),'dd/mm/yyyy'),
+						NUMKLODELEGA = NUMKLODELEGA+1
+						where cdndelega &lt;&gt; ?
+						and  cdnlavoratore = ?						
+						and datfineval IS NULL " />
+						
+<STATEMENT name="STATEMENT_CHECK_DELEGA_ATTIVA"
+				query="select count(*) AS CHECK_DELEGA
+						from AM_DELEGA amD
+						inner join ts_delega d on ( amD.cdndelega = d.cdndelega )
+						inner join ts_gruppo g on ( d.cdngruppo = g.cdngruppo )	
+						inner join ts_tipo_gruppo tg on tg.cdntipogruppo = g.cdntipogruppo						
+						where d.cdndelega = amD.cdnDelega
+						and g.cdntipogruppo &lt;&gt; ?
+						and amD.cdnlavoratore = ? 
+						and amD.datfineval IS NULL " />
+						
+<STATEMENT name="STATEMENT_CHECK_NOT_DELEGA_ATTIVA"
+				query="select count(*) AS CHECK_DELEGA
+						from AM_DELEGA amD					
+						where amD.cdnlavoratore = ? 
+						and amD.datfineval IS NULL " />
+
+<STATEMENT name="STATEMENT_DELETE_DELEGA"
+				query="delete from AM_DELEGA where prgdelega = ? " />
+				
+<STATEMENT name="STATEMENT_UPDATE_DELEGA_PER_DELETE"
+		query="update AM_DELEGA  
+				set datfineval = NULL,
+			        	numklodelega = numklodelega + 1,
+			        	cdnutmod =  ?,
+			        	dtmmod = sysdate
+				where   datfineval IS NOT NULL
+						and prgdelega = 
+						(select max(d2.prgdelega) from AM_DELEGA d2 where d2.datfineval = 
+						(select max(d3.datfineval) from am_delega d3 where d3.cdnlavoratore = ?)) " />				
+
+<STATEMENT name="GET_LISTA_TIPO_PATRONATO"
+          query="
+          		select 
+          			tg.cdntipogruppo AS CODICE, 
+          			tg.strdenominazione AS DESCRIZIONE
+				from 
+					ts_tipo_gruppo tg 
+				where 
+					tg.codtipo='P'
+				order by 
+					tg.strdenominazione
+"/>
+
+<STATEMENT name="GET_LISTA_UFFICIO_PATRONATO"
+          query="select
+          			g.cdngruppo CODICE, 
+          			g.strdenominazione AS DESCRIZIONE
+				from ts_gruppo g, ts_tipo_gruppo tg
+				where g.cdntipogruppo=tg.cdntipogruppo
+				and tg.codtipo='P'
+				order by g.strdenominazione" />
+
+<STATEMENT name="GET_LISTA_OPERATORE_PATRONATO"
+          query="select u.cdnut AS CODICE,
+				initcap(U.strcognome || ' ' ||  U.strnome) || ' ( ' || g.strdenominazione || ')'
+				/*as nominativo*/
+				AS DESCRIZIONE
+				from ts_utente u, ts_profilatura_utente pu,
+				ts_gruppo g, ts_tipo_gruppo tg
+				where u.cdnut=pu.cdnut
+				and pu.cdngruppo=g.cdngruppo
+				and g.cdntipogruppo=tg.cdntipogruppo and tg.codtipo='P'
+				order by g.strdenominazione, u.strcognome, u.strnome" />

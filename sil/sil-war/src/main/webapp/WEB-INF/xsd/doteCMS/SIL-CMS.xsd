@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:simpleType name="varchar_type">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\S[\S| ]*\S|\S"/>
+			<xs:maxLength value="512"/>
+		</xs:restriction>
+	</xs:simpleType>
+    <xs:simpleType name="codice_esito_type">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d{2}"/>
+		</xs:restriction>
+	</xs:simpleType>	
+	<xs:simpleType name="descrizione_esito_type">
+		<xs:restriction base="varchar_type">
+			<xs:maxLength value="500"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="codice_fiscale_type">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([A-Z]{6}[\dLMNPQRSTUV]{2}[A-Z][\dLMNPQRSTUV]{2}[A-Z][\dLMNPQRSTUV]{3}[A-Z])|(\d{11})"/>
+		</xs:restriction>
+	</xs:simpleType>
+    <xs:simpleType name="int_type">
+		<xs:restriction base="xs:positiveInteger">
+			<xs:totalDigits value="38"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="EsitoPartecipanteDote">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element name="codiceFiscale" type="codice_fiscale_type"/>
+				<xs:element name="codiceEsito" type="codice_esito_type"/>		
+				<xs:element name="descrizioneEsito" type="descrizione_esito_type"/>             
+				<xs:element name="prgPatto" minOccurs="0" type="int_type"/>
+				<xs:element minOccurs="0" name="PoliticheAttive">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element minOccurs="0" maxOccurs="unbounded" name="PoliticaAttiva">
+								<xs:complexType>
+									<xs:choice>
+										<xs:sequence>
+											<xs:element name="prgPercorso" type="int_type"/>
+											<xs:element name="prgColloquio" type="int_type"/>
+										</xs:sequence>
+										<xs:sequence>
+											<xs:element name="codiceErrorePolitica" type="codice_esito_type"/>		
+											<xs:element name="descrizioneErrorePolitica" type="descrizione_esito_type"/> 	
+										</xs:sequence>
+									</xs:choice>
+								</xs:complexType>
+							</xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element> 
+</xs:schema>

@@ -1,0 +1,1229 @@
+<!-- PAGES/AGENDA.XML -->
+
+
+
+<!-- Paolo Cavaciocchi -->
+<!-- DETTAGLIO APPUNTAMENTO -->
+<PAGE distributed="false" name="SELECT_AGENDA_PAGE" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="MSalvaAppuntamento" />
+		<MODULE keep="false" name="DELETE_LAVORATORE_APPUNTAMENTO_AGENDA_MOD" />
+		<!-- Eliminato il 31/08/2004
+			<MODULE keep="false" name="MDelPattoApp"/>
+		-->
+		<MODULE keep="false" name="M_DeleteAmLavPattoScelta" />
+		<MODULE keep="false" name="MAllineaSlot" />
+		<MODULE keep="false" name="SELECT_DETTAGLIO_AGENDA_MOD" />
+		<MODULE keep="false" name="MIncongruenze" />
+		<MODULE keep="false" name="MDati_Slot_App" />
+		<MODULE keep="false" name="COMBO_SERVIZIO_SCAD" />
+		<MODULE keep="false" name="COMBO_SPI_SCAD" />
+		<MODULE keep="false" name="COMBO_SPI_SCAD_EFF" />
+		<MODULE keep="false" name="COMBO_TIPO_PRENOTAZIONE" />
+		<MODULE keep="false" name="COMBO_EFFETTO_APPUNTAMENTO" />
+		<MODULE keep="false" name="COMBO_ESITO_APPUNTAMENTO" />
+		<MODULE keep="false" name="COMBO_STATO_APPUNTAMENTO" />
+		<MODULE keep="false" name="COMBO_AMBIENTE" />
+		<MODULE keep="false" name="LISTA_LAVORATORI_APPUNTAMENTO_AGENDA_MOD" />
+		<MODULE keep="false" name="M_InvioEsitoAppuntamentoANPAL" />
+		<MODULE keep="false" name="GetAppUltimoInvioAnpal" />
+ 	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="M_CONFIG_UMB_NGE_AZ"></DEPENDENCE>
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="MSalvaAppuntamento">
+			<CONDITIONS>
+				<PARAMETER name="SALVA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="MSalvaAppuntamento" target="MIncongruenze">
+			<CONSEQUENCES>
+				<PARAMETER name="PRGAPPUNTAMENTO" type="RELATIVE" scope="SERVICE_RESPONSE" value="MSalvaAppuntamento.PRGAPPUNTAMENTO" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<!--RAMO DI CANCELLAZIONE LAVORATORE-->
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="DELETE_LAVORATORE_APPUNTAMENTO_AGENDA_MOD">
+			<CONDITIONS>
+				<PARAMETER name="AZIONE_DEL" scope="SERVICE_REQUEST" value="DEL" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="DELETE_LAVORATORE_APPUNTAMENTO_AGENDA_MOD" target="SELECT_DETTAGLIO_AGENDA_MOD" />
+		<!--RAMO DI CANCELLAZIONE PATTO LAVORATORE -->
+
+		<!-- Eliminato il 31/08/2004
+			<DEPENDENCE source="SELECT_AGENDA_PAGE" target="MDelPattoApp">
+			<CONDITIONS>
+			<PARAMETER name="AZIONE_DEL" scope="SERVICE_REQUEST" value="DELPATTO"/>
+			</CONDITIONS>
+			</DEPENDENCE>
+			<DEPENDENCE source="MDelPattoApp" target="SELECT_DETTAGLIO_AGENDA_MOD"/>
+		-->
+
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="M_DeleteAmLavPattoScelta">
+			<CONDITIONS>
+				<PARAMETER name="AZIONE_DEL" scope="SERVICE_REQUEST" value="DELPATTO" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_DeleteAmLavPattoScelta" target="SELECT_DETTAGLIO_AGENDA_MOD" />
+		<!--DEPENDENCE source="MSalvaAppuntamento" target="MAllineaSlot"/-->
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="MAllineaSlot">
+			<CONDITIONS>
+				<PARAMETER name="ALLINEA_SLOT" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="SELECT_DETTAGLIO_AGENDA_MOD" />
+		<DEPENDENCE source="SELECT_DETTAGLIO_AGENDA_MOD" target="MIncongruenze">
+			<CONDITIONS>
+				<PARAMETER name="SALVA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="SELECT_DETTAGLIO_AGENDA_MOD" target="LISTA_LAVORATORI_APPUNTAMENTO_AGENDA_MOD" />
+		<DEPENDENCE source="SELECT_DETTAGLIO_AGENDA_MOD" target="MDati_Slot_App" />
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="COMBO_SERVIZIO_SCAD" />
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="COMBO_SPI_SCAD" />
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="COMBO_SPI_SCAD_EFF" />
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="COMBO_TIPO_PRENOTAZIONE" />
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="COMBO_EFFETTO_APPUNTAMENTO" />
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="COMBO_ESITO_APPUNTAMENTO" />
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="COMBO_STATO_APPUNTAMENTO" />
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="COMBO_AMBIENTE" />
+		<!--DEPENDENCE source="SELECT_AGENDA_PAGE" target="LISTA_LAVORATORI_APPUNTAMENTO_AGENDA_MOD"/-->
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="M_InvioEsitoAppuntamentoANPAL">
+			<CONDITIONS>
+				<PARAMETER name="ANPAL" scope="SERVICE_REQUEST" value="INVIOANPAL" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="M_InvioEsitoAppuntamentoANPAL" target="SELECT_DETTAGLIO_AGENDA_MOD" />
+		<DEPENDENCE source="SELECT_AGENDA_PAGE" target="GetAppUltimoInvioAnpal" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="NEW_AGENDA_PAGE" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="COMBO_SERVIZIO_SCAD" />
+		<MODULE keep="false" name="COMBO_SPI_SCAD" />
+		<MODULE keep="false" name="COMBO_SPI_SCAD_EFF" />
+		<MODULE keep="false" name="COMBO_TIPO_PRENOTAZIONE" />
+		<MODULE keep="false" name="COMBO_EFFETTO_APPUNTAMENTO" />
+		<MODULE keep="false" name="COMBO_ESITO_APPUNTAMENTO" />
+		<MODULE keep="false" name="COMBO_STATO_APPUNTAMENTO" />
+		<MODULE keep="false" name="COMBO_AMBIENTE" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="NEW_AGENDA_PAGE" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="NEW_AGENDA_PAGE" target="COMBO_SERVIZIO_SCAD" />
+		<DEPENDENCE source="NEW_AGENDA_PAGE" target="COMBO_SPI_SCAD" />
+		<DEPENDENCE source="NEW_AGENDA_PAGE" target="COMBO_SPI_SCAD_EFF" />
+		<DEPENDENCE source="NEW_AGENDA_PAGE" target="COMBO_TIPO_PRENOTAZIONE" />
+		<DEPENDENCE source="NEW_AGENDA_PAGE" target="COMBO_EFFETTO_APPUNTAMENTO" />
+		<DEPENDENCE source="NEW_AGENDA_PAGE" target="COMBO_ESITO_APPUNTAMENTO" />
+		<DEPENDENCE source="NEW_AGENDA_PAGE" target="COMBO_STATO_APPUNTAMENTO" />
+		<DEPENDENCE source="NEW_AGENDA_PAGE" target="COMBO_AMBIENTE" />
+	</DEPENDENCIES>
+
+</PAGE>
+
+<PAGE distributed="false" name="RICERCA_AGENDA_LAVORATORI_PAGE" scope="REQUEST">
+	<DEPENDENCIES>
+		<DEPENDENCE source="RICERCA_AGENDA_LAVORATORI_PAGE" target="RICERCA_AGENDA_LAVORATORI_MOD">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+	<MODULES>
+		<MODULE keep="false" name="RICERCA_AGENDA_LAVORATORI_MOD" />
+	</MODULES>
+</PAGE>
+
+<PAGE distributed="false" name="LISTA_AGENDA_LAVORATORI_PAGE" scope="REQUEST">
+	<DEPENDENCIES>
+		<DEPENDENCE source="LISTA_AGENDA_LAVORATORI_PAGE" target="LISTA_AGENDA_LAVORATORI_MOD">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+	<MODULES>
+		<MODULE keep="false" name="LISTA_AGENDA_LAVORATORI_MOD" />
+	</MODULES>
+</PAGE>
+
+<PAGE distributed="false" name="INSERT_AGENDA_LAVORATORE_PAGE" scope="REQUEST">
+	<DEPENDENCIES>
+		<DEPENDENCE source="INSERT_AGENDA_LAVORATORE_PAGE" target="INSERT_AGENDA_LAVORATORE_PAGE_MOD">
+			<CONDITIONS>
+				<PARAMETER name="PROV" scope="SERVICE_REQUEST" value="" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="INSERT_AGENDA_LAVORATORE_PAGE" target="MSEL_AG_LAVORATORE">
+			<CONDITIONS>
+				<PARAMETER name="PROV" scope="SERVICE_REQUEST" value="CONTATTI" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+	<MODULES>
+		<MODULE keep="false" name="INSERT_AGENDA_LAVORATORE_PAGE_MOD" />
+		<MODULE keep="false" name="MSEL_AG_LAVORATORE" />
+	</MODULES>
+</PAGE>
+
+<!--Pagina per stampa Giornaliera-->
+<PAGE distributed="false" name="AGENDA_STAMPA_GIORNALIERA_PAGE" scope="REQUEST">
+	<DEPENDENCIES>
+		<DEPENDENCE source="AGENDA_STAMPA_GIORNALIERA_PAGE" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="AGENDA_STAMPA_GIORNALIERA_PAGE" target="COMBO_SPI" />
+		<DEPENDENCE source="AGENDA_STAMPA_GIORNALIERA_PAGE" target="COMBO_SERVIZIO" />
+	</DEPENDENCIES>
+	<MODULES>
+		<MODULE keep="false" name="COMBO_SERVIZIO" />
+		<MODULE keep="false" name="COMBO_SPI" />
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+	</MODULES>
+</PAGE>
+
+<!--Pagina per stampa appuntamenti SMS-->
+<PAGE distributed="false" name="AGENDA_STAMPA_SMS_PAGE" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="COMBO_SERVIZIO" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AGENDA_STAMPA_SMS_PAGE" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="AGENDA_STAMPA_SMS_PAGE" target="COMBO_SERVIZIO" />
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Stefania Orioli -->
+<!-- Appuntamento - Collegamento con il patto -->
+<PAGE distributed="false" name="AgPattiLavPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MAgDatiLav" />
+		<MODULE keep="false" name="MAgPattiLav" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AgPattiLavPage" target="MAgDatiLav" />
+		<DEPENDENCE source="AgPattiLavPage" target="MAgPattiLav" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="AgInsertPattoPage" scope="REQUEST">
+	<MODULES>
+		<!--<MODULE keep="false" name="MInsUpdPattoApp"/>-->
+		<MODULE keep="false" name="M_InsertAmLavPattoScelta" />
+	</MODULES>
+	<DEPENDENCIES>
+		<!--<DEPENDENCE source="AgInsertPattoPage" target="MInsUpdPattoApp"/>-->
+		<DEPENDENCE source="AgInsertPattoPage" target="M_InsertAmLavPattoScelta" />
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- AGENDA APPUNTAMENTI -->
+<PAGE distributed="false" name="PCalendario" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="true" name="MSel_TipoVista_Giorni" />
+		<MODULE keep="true" name="MDescrCpi" />
+		<MODULE keep="false" name="MGiorni_NL" />
+		<MODULE keep="false" name="MGiorni_Vista" />
+		<MODULE keep="false" name="MAppuntamenti" />
+		<!--MODULE keep="false" name="MSlot_X_App"/-->
+		<MODULE keep="false" name="MSettimana" />
+		<MODULE keep="false" name="MAppuntamentiRicerca" />
+		<MODULE keep="false" name="MContattiRicerca" />
+		<MODULE keep="false" name="MEventiG" />
+		<MODULE keep="false" name="MEventiS" />
+		<MODULE keep="false" name="MContatti" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PCalendario" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="PCalendario" target="MDescrCpi" />
+		<DEPENDENCE source="PCalendario" target="MGiorni_NL" />
+		<DEPENDENCE source="PCalendario" target="MGiorni_Vista">
+			<CONDITIONS>
+				<PARAMETER name="cod_vista" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="PCalendario" target="MSel_TipoVista_Giorni" />
+		<DEPENDENCE source="PCalendario" target="MAppuntamenti">
+			<CONDITIONS>
+				<PARAMETER name="MOD" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="PCalendario" target="MAppuntamenti">
+			<CONDITIONS>
+				<PARAMETER name="MOD" scope="SERVICE_REQUEST" value="0" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="MAppuntamenti" target="MEventiG" />
+		<DEPENDENCE source="MAppuntamenti" target="MContatti" />
+		<!--DEPENDENCE source="MAppuntamenti" target="MSlot_X_App"/-->
+		<DEPENDENCE source="PCalendario" target="MSettimana">
+			<CONDITIONS>
+				<PARAMETER name="MOD" scope="SERVICE_REQUEST" value="1" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="MSettimana" target="MEventiS" />
+		<DEPENDENCE source="PCalendario" target="MAppuntamentiRicerca">
+			<CONDITIONS>
+				<PARAMETER name="MOD" scope="SERVICE_REQUEST" value="2" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="PCalendario" target="MContattiRicerca">
+			<CONDITIONS>
+				<PARAMETER name="MOD" scope="SERVICE_REQUEST" value="3" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PGruppoLav_Popup" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MGruppoLav_Popup" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PGruppoLav_Popup" target="MGruppoLav_Popup" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PRicercaAppuntamenti" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="COMBO_SERVIZIO" />
+		<MODULE keep="false" name="COMBO_SPI" />
+		<MODULE keep="false" name="COMBO_AMBIENTE" />
+		<MODULE keep="false" name="COMBO_ESITO_APPUNTAMENTO" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PRicercaAppuntamenti" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="PRicercaAppuntamenti" target="COMBO_SPI" />
+		<DEPENDENCE source="PRicercaAppuntamenti" target="COMBO_SERVIZIO" />
+		<DEPENDENCE source="PRicercaAppuntamenti" target="COMBO_AMBIENTE" />
+		<DEPENDENCE source="PRicercaAppuntamenti" target="COMBO_ESITO_APPUNTAMENTO" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PRicercaContatti" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="COMBO_SPI" />
+		<MODULE keep="false" name="COMBO_TIPO_CONTATTO_AG" />
+		<MODULE keep="false" name="COMBO_EFFETTO_CONTATTO_AG" />
+		<MODULE keep="false" name="COMBO_MOTIVO_CONTATTO_AG" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PRicercaContatti" target="COMBO_SPI" />
+		<DEPENDENCE source="PRicercaContatti" target="COMBO_TIPO_CONTATTO_AG" />
+		<DEPENDENCE source="PRicercaContatti" target="COMBO_EFFETTO_CONTATTO_AG" />
+		<DEPENDENCE source="PRicercaContatti" target="COMBO_MOTIVO_CONTATTO_AG" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PFiltriAppuntamenti" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="COMBO_SERVIZIO" />
+		<MODULE keep="false" name="COMBO_SPI" />
+		<MODULE keep="false" name="COMBO_AMBIENTE" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PFiltriAppuntamenti" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="PFiltriAppuntamenti" target="COMBO_SPI" />
+		<DEPENDENCE source="PFiltriAppuntamenti" target="COMBO_SERVIZIO" />
+		<DEPENDENCE source="PFiltriAppuntamenti" target="COMBO_AMBIENTE" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PImpostaFiltriApp" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MImpostaFiltriApp" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PImpostaFiltriApp" target="MImpostaFiltriApp" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PEvento" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MSalvaEvento" />
+		<MODULE keep="false" name="MDettEvento" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PEvento" target="MSalvaEvento">
+			<CONDITIONS>
+				<PARAMETER name="SALVA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="PEvento" target="MDettEvento" />
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="PInsEvento" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MInsEvento" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PInsEvento" target="MInsEvento" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PRicercaAzienda" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MRicercaAzienda" />
+		<MODULE keep="false" name="M_GetIDOProvince" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PRicercaAzienda" target="MRicercaAzienda" />
+		<DEPENDENCE source="PRicercaAzienda" target="M_GetIDOProvince" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PListaAziende" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MListaAziende" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PListaAziende" target="MListaAziende" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PModAgAzienda" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MModAgAzienda" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PModAgAzienda" target="MModAgAzienda" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="NuovoAppSlotPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="NEW_DETTAGLIO_AGENDA" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="NuovoAppSlotPage" target="NEW_DETTAGLIO_AGENDA" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="InsAppDaSlotPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MIns_AppDaSlot" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="InsAppDaSlotPage" target="MIns_AppDaSlot" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DelAppPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MDel_Appuntamento" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DelAppPage" target="MDel_Appuntamento" />
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- GESTIONE GIORNI NON LAVORATIVI -->
+<PAGE distributed="false" name="FestiviPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="true" name="MDescrCpi" />
+		<MODULE keep="false" name="MGiorni_NL" />
+		<MODULE keep="false" name="MFestivo" />
+		<MODULE keep="false" name="MSettFestivi" />
+		<MODULE keep="false" name="MDelFestivo" />
+		<MODULE keep="false" name="MDelRipetizione" />
+		<MODULE keep="false" name="MDelRipGSett" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="FestiviPage" target="MDescrCpi" />
+		<DEPENDENCE source="FestiviPage" target="MGiorni_NL" />
+		<DEPENDENCE source="FestiviPage" target="MFestivo">
+			<CONDITIONS>
+				<PARAMETER name="MOD" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="FestiviPage" target="MFestivo">
+			<CONDITIONS>
+				<PARAMETER name="MOD" scope="SERVICE_REQUEST" value="0" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="FestiviPage" target="MSettFestivi">
+			<CONDITIONS>
+				<PARAMETER name="MOD" scope="SERVICE_REQUEST" value="1" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="FestiviPage" target="MDelFestivo">
+			<CONDITIONS>
+				<PARAMETER name="DEL" scope="SERVICE_REQUEST" value="true" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="MDelFestivo" target="MFestivo" />
+		<DEPENDENCE source="MDelFestivo" target="MGiorni_NL" />
+
+		<DEPENDENCE source="FestiviPage" target="MDelRipetizione">
+			<CONDITIONS>
+				<PARAMETER name="UPDF" scope="SERVICE_REQUEST" value="true" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="MDelRipetizione" target="MFestivo" />
+		<DEPENDENCE source="MDelRipetizione" target="MGiorni_NL" />
+
+		<DEPENDENCE source="FestiviPage" target="MDelRipGSett">
+			<CONDITIONS>
+				<PARAMETER name="UPDF" scope="SERVICE_REQUEST" value="GSETT" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="MDelRipGSett" target="MFestivo" />
+		<DEPENDENCE source="MDelRipGSett" target="MGiorni_NL" />
+
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ModGNLPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MSalvaFestivo" />
+		<MODULE keep="false" name="MDettFestivo" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ModGNLPage" target="MSalvaFestivo">
+			<CONDITIONS>
+				<PARAMETER name="SALVA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<!--DEPENDENCE source="ModGNLPage" target="MDettFestivo"/-->
+		<DEPENDENCE source="ModGNLPage" target="MDettFestivo">
+			<CONDITIONS>
+				<PARAMETER name="PRGGIORNONL" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DelGNLPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MDettFestivo" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DelGNLPage" target="MDettFestivo" />
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="NuovoGNLPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MInsFestivo" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="NuovoGNLPage" target="MInsFestivo" />
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Giorni di Riposo Settimanale -->
+<PAGE distributed="false" name="ModGSettPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MSalvaGSett" />
+		<MODULE keep="false" name="MDettGSett" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ModGSettPage" target="MSalvaGSett">
+			<CONDITIONS>
+				<PARAMETER name="SALVA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="ModGSettPage" target="MDettGSett">
+			<CONDITIONS>
+				<PARAMETER name="PRGGIORNONL" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DelGSettPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MDettGSett" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DelGSettPage" target="MDettGSett" />
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="NuovoGSettPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MInsFestivo" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="NuovoGSettPage" target="MInsGSett" />
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- Gestione Contatti -->
+<PAGE distributed="false" name="NuovoContattoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MInsContatto" />
+		<MODULE keep="false" name="COMBO_SPI_SCAD" />
+		<MODULE keep="false" name="COMBO_TIPO_CONTATTO_AG" />
+		<MODULE keep="false" name="COMBO_EFFETTO_CONTATTO_AG" />
+		<MODULE keep="false" name="COMBO_MOTIVO_CONTATTO_AG" />
+		<MODULE keep="false" name="MSPI_UTENTE" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="NuovoContattoPage" target="MInsContatto" />
+		<DEPENDENCE source="NuovoContattoPage" target="MSPI_UTENTE" />
+		<DEPENDENCE source="NuovoContattoPage" target="COMBO_SPI_SCAD" />
+		<DEPENDENCE source="NuovoContattoPage" target="COMBO_TIPO_CONTATTO_AG" />
+		<DEPENDENCE source="NuovoContattoPage" target="COMBO_EFFETTO_CONTATTO_AG" />
+		<DEPENDENCE source="NuovoContattoPage" target="COMBO_MOTIVO_CONTATTO_AG" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ModContattoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MSalvaContatto" />
+		<MODULE keep="false" name="MDettContatto" />
+		<MODULE keep="false" name="COMBO_SPI_SCAD" />
+		<MODULE keep="false" name="COMBO_TIPO_CONTATTO_AG" />
+		<MODULE keep="false" name="COMBO_EFFETTO_CONTATTO_AG" />
+		<MODULE keep="false" name="COMBO_MOTIVO_CONTATTO_AG" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ModContattoPage" target="MSalvaContatto">
+			<CONDITIONS>
+				<PARAMETER name="SALVA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="ModContattoPage" target="MDettContatto" />
+		<DEPENDENCE source="ModContattoPage" target="COMBO_SPI_SCAD" />
+		<DEPENDENCE source="ModContattoPage" target="COMBO_TIPO_CONTATTO_AG" />
+		<DEPENDENCE source="ModContattoPage" target="COMBO_EFFETTO_CONTATTO_AG" />
+		<DEPENDENCE source="ModContattoPage" target="COMBO_MOTIVO_CONTATTO_AG" />
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Gestione Settimana Tipo -->
+<PAGE distributed="false" name="ListSettimanaTipoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MDelSettTipo" />
+		<MODULE keep="false" name="MInsSettTipo" />
+		<MODULE keep="false" name="MUpdSettTipo" />
+		<MODULE keep="false" name="MListSettimanaTipo" />
+	</MODULES>
+	<DEPENDENCIES>
+		<!-- Insert -->
+		<DEPENDENCE source="ListSettimanaTipoPage" target="MInsSettTipo">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="MInsSettTipo" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MInsSettTipo" target="MListSettimanaTipo" />
+		<!-- Update -->
+		<DEPENDENCE source="ListSettimanaTipoPage" target="MUpdSettTipo">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="MUpdSettTipo" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MUpdSettTipo" target="MListSettimanaTipo" />
+		<!-- Delete -->
+		<DEPENDENCE source="ListSettimanaTipoPage" target="MDelSettTipo">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="MDelSettTipo" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MDelSettTipo" target="MListSettimanaTipo" />
+
+		<DEPENDENCE source="ListSettimanaTipoPage" target="MListSettimanaTipo">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="ListSettimanaTipoPage" target="MListSettimanaTipo">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="MListSettimanaTipo" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="NuovaSettimanaTipoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="NEW_DETTAGLIO_AGENDA" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListSettimanaTipoPage" target="NEW_DETTAGLIO_AGENDA" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ModSettimanaTipoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MDettSettTipo" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ModSettimanaTipoPage" target="MDettSettTipo" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CheckDelSettipoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MDescrSettTipo" />
+		<MODULE keep="false" name="MCheckSlotTipo" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CheckDelSettipoPage" target="MDescrSettTipo" />
+		<DEPENDENCE source="CheckDelSettipoPage" target="MCheckSlotTipo" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="VSettTipoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MDescrSettTipo" />
+		<MODULE keep="false" name="MCopiaGiornoTipo" />
+		<MODULE keep="false" name="MVSettOperatori" />
+		<MODULE keep="false" name="MVSettServizi" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="VSettTipoPage" target="MDescrSettTipo" />
+		<!--DEPENDENCE source="VSettTipoPage" target="MVSettOperatori"/>
+			<DEPENDENCE source="VSettTipoPage" target="MVSettServizi"/-->
+		<DEPENDENCE source="VSettTipoPage" target="MVSettOperatori">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="VSettTipoPage" target="MVSettServizi">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<!-- COPIA DI UN GIORNO TIPO -->
+		<DEPENDENCE source="VSettTipoPage" target="MCopiaGiornoTipo">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="COPIAGIORNOTIPO" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MCopiaGiornoTipo" target="MVSettOperatori" />
+		<DEPENDENCE source="MCopiaGiornoTipo" target="MVSettServizi" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="VGiornoTipoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MDescrSettTipo" />
+		<MODULE keep="false" name="MVGiornoOperatori" />
+		<MODULE keep="false" name="MVGiornoServizi" />
+		<MODULE keep="false" name="MUpdSlotTipo" />
+		<MODULE keep="false" name="MInsSlotTipo" />
+		<MODULE keep="false" name="MDelSlotTipo" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="VGiornoTipoPage" target="MDescrSettTipo" />
+		<DEPENDENCE source="VGiornoTipoPage" target="MVGiornoOperatori">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="VGiornoTipoPage" target="MVGiornoServizi">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<!-- Update -->
+		<DEPENDENCE source="VGiornoTipoPage" target="MUpdSlotTipo">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="MUpdSlotTipo" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MUpdSlotTipo" target="MVGiornoOperatori" />
+		<DEPENDENCE source="MUpdSlotTipo" target="MVGiornoServizi" />
+		<!-- Insert -->
+		<DEPENDENCE source="VGiornoTipoPage" target="MInsSlotTipo">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="MInsSlotTipo" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MInsSlotTipo" target="MVGiornoOperatori" />
+		<DEPENDENCE source="MInsSlotTipo" target="MVGiornoServizi" />
+		<!-- Delete -->
+		<DEPENDENCE source="VGiornoTipoPage" target="MDelSlotTipo">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="MDelSlotTipo" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MDelSlotTipo" target="MVGiornoOperatori" />
+		<DEPENDENCE source="MDelSlotTipo" target="MVGiornoServizi" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DettSlotTipoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="MDescrSettTipo" />
+		<MODULE keep="false" name="MDettSlotTipo" />
+		<MODULE keep="false" name="COMBO_SPI_SCAD" />
+		<MODULE keep="false" name="COMBO_SERVIZIO_SCAD" />
+		<MODULE keep="false" name="COMBO_AMBIENTE" />
+		<MODULE keep="false" name="COMBO_DESTINATARIO" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DettSlotTipoPage" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="DettSlotTipoPage" target="MDescrSettTipo" />
+		<DEPENDENCE source="DettSlotTipoPage" target="MDettSlotTipo" />
+		<DEPENDENCE source="DettSlotTipoPage" target="COMBO_SPI_SCAD" />
+		<DEPENDENCE source="DettSlotTipoPage" target="COMBO_SERVIZIO_SCAD" />
+		<DEPENDENCE source="DettSlotTipoPage" target="COMBO_AMBIENTE" />
+		<DEPENDENCE source="DettSlotTipoPage" target="COMBO_DESTINATARIO" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="NuovoSlotTipoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="MDescrSettTipo" />
+		<MODULE keep="false" name="COMBO_SPI_SCAD" />
+		<MODULE keep="false" name="COMBO_SERVIZIO_SCAD" />
+		<MODULE keep="false" name="COMBO_DESTINATARIO" />
+		<MODULE keep="false" name="COMBO_AMBIENTE" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="NuovoSlotTipoPage" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="NuovoSlotTipoPage" target="MDescrSettTipo" />
+		<DEPENDENCE source="NuovoSlotTipoPage" target="COMBO_SPI_SCAD" />
+		<DEPENDENCE source="NuovoSlotTipoPage" target="COMBO_SERVIZIO_SCAD" />
+		<DEPENDENCE source="NuovoSlotTipoPage" target="COMBO_DESTINATARIO" />
+		<DEPENDENCE source="NuovoSlotTipoPage" target="COMBO_AMBIENTE" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CopiaGiornoTipoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MDescrSettTipo" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CopiaGiornoTipoPage" target="MDescrSettTipo" />
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Gestione SLOT -->
+<PAGE distributed="false" name="GestSlotPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ"/>
+		<MODULE keep="false" name="MSel_TipoVista_Slot" />
+		<MODULE keep="false" name="MDescrCpi" />
+		<MODULE keep="false" name="MGiorni_NL" />
+		<MODULE keep="false" name="MGiorniVistaSlot" />
+		<MODULE keep="false" name="MSlot" />
+		<MODULE keep="false" name="MDelSlot" />
+		<MODULE keep="false" name="MSlotSettimana" />
+		<MODULE keep="false" name="MSlotRicerca" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="GestSlotPage" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="GestSlotPage" target="MSel_TipoVista_Slot" />
+		<DEPENDENCE source="GestSlotPage" target="MDescrCpi" />
+		<DEPENDENCE source="GestSlotPage" target="MGiorni_NL" />
+		<DEPENDENCE source="GestSlotPage" target="MGiorniVistaSlot">
+			<CONDITIONS>
+				<PARAMETER name="cod_vista" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="GestSlotPage" target="MSlot">
+			<CONDITIONS>
+				<PARAMETER name="MOD" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+				<PARAMETER name="DEL" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="GestSlotPage" target="MSlot">
+			<CONDITIONS>
+				<PARAMETER name="MOD" scope="SERVICE_REQUEST" value="0" />
+				<PARAMETER name="DEL" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<!-- Del Slot-->
+		<DEPENDENCE source="GestSlotPage" target="MDelSlot">
+			<CONDITIONS>
+				<PARAMETER name="DEL" scope="SERVICE_REQUEST" value="MDelSlot" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MDelSlot" target="MSlot" />
+		<!-- Vista Settimanale -->
+		<DEPENDENCE source="GestSlotPage" target="MSlotSettimana">
+			<CONDITIONS>
+				<PARAMETER name="MOD" scope="SERVICE_REQUEST" value="1" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<!-- Risultato Ricerca -->
+		<DEPENDENCE source="GestSlotPage" target="MSlotRicerca">
+			<CONDITIONS>
+				<PARAMETER name="MOD" scope="SERVICE_REQUEST" value="2" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="RicercaSlotPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="COMBO_SERVIZIO" />
+		<MODULE keep="false" name="COMBO_SPI" />
+		<MODULE keep="false" name="COMBO_AMBIENTE" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaSlotPage" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="RicercaSlotPage" target="COMBO_SPI" />
+		<DEPENDENCE source="RicercaSlotPage" target="COMBO_SERVIZIO" />
+		<DEPENDENCE source="RicercaSlotPage" target="COMBO_AMBIENTE" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="FiltriSlotPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="COMBO_SERVIZIO" />
+		<MODULE keep="false" name="COMBO_SPI" />
+		<MODULE keep="false" name="COMBO_AMBIENTE" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="FiltriSlotPage" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="FiltriSlotPage" target="COMBO_SPI" />
+		<DEPENDENCE source="FiltriSlotPage" target="COMBO_SERVIZIO" />
+		<DEPENDENCE source="FiltriSlotPage" target="COMBO_AMBIENTE" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ImpostaFiltriSlotPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MImpostaFiltriSlot" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ImpostaFiltriSlotPage" target="MImpostaFiltriSlot" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DettaglioSlotPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="MSalvaSlot" />
+		<MODULE keep="false" name="MDettSlot" />
+		<MODULE keep="false" name="MIncongruenzeSlot" />
+		<MODULE keep="false" name="COMBO_SERVIZIO_SCAD" />
+		<MODULE keep="false" name="COMBO_AMBIENTE" />
+		<MODULE keep="false" name="COMBO_STATO_SLOT" />
+		<MODULE keep="false" name="MListaOperatoriSlot" />
+		<MODULE keep="false" name="DelSlotOperatore" />
+		<MODULE keep="false" name="MInsAgOperatore" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DettaglioSlotPage" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="DettaglioSlotPage" target="MSalvaSlot">
+			<CONDITIONS>
+				<PARAMETER name="SALVA" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MSalvaSlot" target="MIncongruenzeSlot">
+			<CONSEQUENCES>
+				<PARAMETER name="PRGSLOT" type="RELATIVE" scope="SERVICE_RESPONSE" value="MSalvaSlot.PRGSLOT" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="DettaglioSlotPage" target="MDettSlot">
+			<CONDITIONS>
+				<PARAMETER name="AZIONE_DEL" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="DettaglioSlotPage" target="MDettSlot">
+			<CONDITIONS>
+				<PARAMETER name="AZIONE_DEL" scope="SERVICE_REQUEST" value="" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MSalvaSlot" target="MInsAgOperatore">
+			<CONDITIONS>
+				<PARAMETER name="DA_ASSEGNAZIONE" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="PRGSLOT" type="RELATIVE" scope="SERVICE_RESPONSE" value="MSalvaSlot.PRGSLOT" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="DettaglioSlotPage" target="COMBO_SERVIZIO_SCAD" />
+		<DEPENDENCE source="DettaglioSlotPage" target="COMBO_AMBIENTE" />
+		<DEPENDENCE source="DettaglioSlotPage" target="COMBO_STATO_SLOT" />
+		<DEPENDENCE source="MDettSlot" target="MListaOperatoriSlot">
+			<CONDITIONS>
+				<PARAMETER name="DA_ASSEGNAZIONE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="MInsAgOperatore" target="MListaOperatoriSlot">
+			<CONSEQUENCES>
+				<PARAMETER name="PRGSLOT" type="RELATIVE" scope="SERVICE_RESPONSE" value="MSalvaSlot.PRGSLOT" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="MDettSlot" target="MIncongruenzeSlot">
+			<CONDITIONS>
+				<PARAMETER name="SALVA" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<!--RAMO DI CANCELLAZIONE-->
+		<DEPENDENCE source="DettaglioSlotPage" target="DelSlotOperatore">
+			<CONDITIONS>
+				<PARAMETER name="AZIONE_DEL" scope="SERVICE_REQUEST" value="DEL" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="DelSlotOperatore" target="MDettSlot" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="NuovoSlotPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="COMBO_SERVIZIO_SCAD" />
+		<!--MODULE keep="false" name="COMBO_STATO_SLOT"/-->
+		<MODULE keep="false" name="COMBO_STATO_SLOT_SETTIMANA_TIPO" />
+		<MODULE keep="false" name="COMBO_AMBIENTE" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="NuovoSlotPage" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="NuovoSlotPage" target="COMBO_SERVIZIO_SCAD" />
+		<!--DEPENDENCE source="NuovoSlotPage" target="COMBO_STATO_SLOT"/-->
+		<DEPENDENCE source="NuovoSlotPage" target="COMBO_STATO_SLOT_SETTIMANA_TIPO" />
+		<DEPENDENCE source="NuovoSlotPage" target="COMBO_AMBIENTE" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="RicercaAgOperatoriPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="NEW_DETTAGLIO_AGENDA" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaAgOperatoriPage" target="NEW_DETTAGLIO_AGENDA" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="AgListaOperatoriPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MListaAgOperatori" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AgListaOperatoriPage" target="MListaAgOperatori" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="InsAgOperatorePage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MInsAgOperatore" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="InsAgOperatorePage" target="MInsAgOperatore" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PGruppoOpe_Popup" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MGruppoOpe_Popup" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PGruppoOpe_Popup" target="MGruppoOpe_Popup" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ImpostaSlotPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="COMBO_SPI_SCAD" />
+		<MODULE keep="false" name="COMBO_SERVIZIO_SCAD" />
+		<MODULE keep="false" name="COMBO_AMBIENTE" />
+		<MODULE keep="false" name="COMBO_STATO_SLOT_SETTIMANA_TIPO" />
+
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ImpostaSlotPage" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="ImpostaSlotPage" target="COMBO_SPI_SCAD" />
+		<DEPENDENCE source="ImpostaSlotPage" target="COMBO_SERVIZIO_SCAD" />
+		<DEPENDENCE source="ImpostaSlotPage" target="COMBO_AMBIENTE" />
+		<DEPENDENCE source="ImpostaSlotPage" target="COMBO_STATO_SLOT_SETTIMANA_TIPO" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="InsNSlotPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MInsMultiploSlot" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="InsNSlotPage" target="MInsMultiploSlot" />
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Inserimento Slot da Settimana Tipo -->
+<PAGE distributed="false" name="SlotDaSettTipoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="COMBO_SETTIMANA_TIPO" />
+		<MODULE keep="false" name="COMBO_STATO_SLOT_SETTIMANA_TIPO" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="SlotDaSettTipoPage" target="COMBO_SETTIMANA_TIPO" />
+		<DEPENDENCE source="SlotDaSettTipoPage" target="COMBO_STATO_SLOT_SETTIMANA_TIPO" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="InsMassivoSlotPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MIns_Massivo_Slot" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="InsMassivoSlotPage" target="MIns_Massivo_Slot" />
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Cancellazione Massiva Slot -->
+<PAGE distributed="false" name="ParCancMassivaSlotPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="COMBO_SERVIZIO" />
+		<MODULE keep="false" name="COMBO_SPI" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ParCancMassivaSlotPage" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="ParCancMassivaSlotPage" target="COMBO_SERVIZIO" />
+		<DEPENDENCE source="ParCancMassivaSlotPage" target="COMBO_SPI" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="CancMassivaSlotPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="MCanc_Massiva_Slot" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CancMassivaSlotPage" target="MCanc_Massiva_Slot" />
+	</DEPENDENCIES>
+</PAGE>
+<!-- fine sezione Stefy -->
+
+<!-- Scelta Centro per l'Impiego -->
+<PAGE distributed="false" name="SelezionaCPIPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetCpiPoloProvinciale" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="SelezionaCPIPage" target="M_GetCpiPoloProvinciale" />
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- Ricerca Contatti SMS - Giordano Gritti -->
+
+<PAGE distributed="false" name="AGENDA_SMS_RICERCAAPPUNTAMENTO_PAGE" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="M_SMS_COMBO_CPI" />
+		<MODULE keep="false" name="COMBO_SPI" />
+		<MODULE keep="false" name="COMBO_SERVIZIO" />
+		<MODULE keep="false" name="M_SMS_COMBO_AMBIENTE" />
+		<MODULE keep="false" name="M_SMS_COMBO_ESITO_APPUNTAMENTO" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AGENDA_SMS_RICERCAAPPUNTAMENTO_PAGE" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="AGENDA_SMS_RICERCAAPPUNTAMENTO_PAGE" target="M_SMS_COMBO_CPI" />
+		<DEPENDENCE source="AGENDA_SMS_RICERCAAPPUNTAMENTO_PAGE" target="COMBO_SPI" />
+		<DEPENDENCE source="AGENDA_SMS_RICERCAAPPUNTAMENTO_PAGE" target="COMBO_SERVIZIO" />
+		<DEPENDENCE source="AGENDA_SMS_RICERCAAPPUNTAMENTO_PAGE" target="M_SMS_COMBO_AMBIENTE" />
+		<DEPENDENCE source="AGENDA_SMS_RICERCAAPPUNTAMENTO_PAGE" target="M_SMS_COMBO_ESITO_APPUNTAMENTO" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="AGENDA_SMS_LISTALAVORATORI_PAGE" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetCodConfigSMSFiltrati" />		
+		<MODULE keep="false" name="M_AGENDA_SMS_LISTALAVORATORI" />
+		<MODULE keep="false" name="M_AGENDA_SMS_LISTALAVORATORI_FILTRATI" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AGENDA_SMS_LISTALAVORATORI_PAGE" target="M_GetCodConfigSMSFiltrati"></DEPENDENCE>
+		<DEPENDENCE source="AGENDA_SMS_LISTALAVORATORI_PAGE" target="M_AGENDA_SMS_LISTALAVORATORI"></DEPENDENCE>
+		<DEPENDENCE source="AGENDA_SMS_LISTALAVORATORI_PAGE" target="M_AGENDA_SMS_LISTALAVORATORI_FILTRATI"></DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="M_CONFIG_SMS_PERS" />
+		<MODULE keep="false" name="M_AGENDA_SMS_DETTAPPUNTAMENTI" />
+		<MODULE keep="false" name="M_SMS_COMBO_CPI" />
+		<MODULE keep="false" name="COMBO_SPI_SCAD" />
+		<MODULE keep="false" name="COMBO_SPI_SCAD_EFF" />
+		<MODULE keep="false" name="COMBO_SERVIZIO" />
+		<MODULE keep="false" name="M_SMS_COMBO_AMBIENTE" />
+		<MODULE keep="false" name="M_SMS_COMBO_ESITO_APPUNTAMENTO" />
+		<MODULE keep="false" name="COMBO_TIPO_PRENOTAZIONE" />
+		<MODULE keep="false" name="COMBO_EFFETTO_APPUNTAMENTO" />		
+		<MODULE keep="false" name="COMBO_STATO_APPUNTAMENTO" />
+		<MODULE keep="false" name="LISTA_LAVORATORI_APPUNTAMENTO_SCAD"/>
+		<MODULE keep="false" name="M_GetLavoratoreAnag"/>
+		<MODULE keep="false" name="M_GET_TESTO_SMS_PERS"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" target="M_AGENDA_SMS_DETTAPPUNTAMENTI" />
+		<DEPENDENCE source="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" target="M_SMS_COMBO_CPI" />
+		<DEPENDENCE source="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" target="COMBO_SPI_SCAD" />
+		<DEPENDENCE source="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" target="COMBO_SPI_SCAD_EFF" />
+		<DEPENDENCE source="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" target="COMBO_SERVIZIO" />
+		<DEPENDENCE source="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" target="M_SMS_COMBO_AMBIENTE" />
+		<DEPENDENCE source="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" target="M_SMS_COMBO_ESITO_APPUNTAMENTO" />
+		<DEPENDENCE source="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" target="COMBO_TIPO_PRENOTAZIONE" />
+		<DEPENDENCE source="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" target="COMBO_EFFETTO_APPUNTAMENTO" />
+		<DEPENDENCE source="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" target="COMBO_STATO_APPUNTAMENTO" />
+		<DEPENDENCE source="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" target="LISTA_LAVORATORI_APPUNTAMENTO_SCAD"/>
+		<DEPENDENCE source="AGENDA_SMS_DETTAPPUNTAMENTI_PAGE" target="M_CONFIG_SMS_PERS" />
+		<DEPENDENCE source="M_CONFIG_SMS_PERS" target="M_GetLavoratoreAnag">
+			<CONDITIONS>
+		        <PARAMETER name="M_CONFIG_SMS_PERS.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1" />
+		    </CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_GET_TESTO_SMS_PERS">
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="AGENDA_SMS_INVIO_PAGE" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_AGENDA_SMS_INVIO" />
+		<MODULE keep="false" name="M_AGENDA_SMS_LISTALAVORATORI_FILTRATI" />
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="AGENDA_SMS_INVIO_PAGE" target="M_AGENDA_SMS_LISTALAVORATORI_FILTRATI" >
+	        <CONDITIONS>
+		        <PARAMETER name="SMSFILTRATI" scope="SERVICE_REQUEST" value="1" />
+		    </CONDITIONS>
+		 </DEPENDENCE>
+		<DEPENDENCE source="AGENDA_SMS_INVIO_PAGE" target="M_AGENDA_SMS_INVIO" >
+		   <CONDITIONS>
+		        <PARAMETER name="SMSFILTRATI" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+		    </CONDITIONS>
+		  </DEPENDENCE>	
+		<DEPENDENCE source="M_AGENDA_SMS_LISTALAVORATORI_FILTRATI" target="M_AGENDA_SMS_INVIO" />  			
+	</DEPENDENCIES>	
+</PAGE>
+

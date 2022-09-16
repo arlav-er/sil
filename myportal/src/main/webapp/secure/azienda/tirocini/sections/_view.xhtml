@@ -1,0 +1,59 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+	<h:form id="remoteForm">
+		<p:remoteCommand name="initView" actionListener="#{aziendaTirociniBean.initView()}" update=":content" process="@this"
+			onstart="contentLoading()" global="false" oncomplete="comeToYuri()"></p:remoteCommand>
+	</h:form>
+	<h:panelGroup id="content" layout="block" styleClass="row tirocini-view">
+		<div class="col-md-2"></div>
+		<div class="col-md-8">
+			<h3>#{ui['tirocini.title']}</h3>
+			<p class="text-right">
+				<strong> <h:outputText value="#{aziendaTirociniBean.doTirocini.dataRichiesta}" title="Data richiesta">
+						<f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+					</h:outputText>
+				</strong>
+			</p>
+			<p>
+				Il sottoscritto <u>#{aziendaTirociniBean.doTirocini.pfPrincipal.nome} #{aziendaTirociniBean.doTirocini.pfPrincipal.cognome}</u>, in
+				qualità di <u>#{aziendaTirociniBean.doTirocini.tipoDelegatoRifAzienda}</u> dell'Azienda <u>#{aziendaTirociniBean.doTirocini.pfPrincipal.aziendaInfo.ragioneSociale}</u>,
+				<br /> chiede al vostro Servizio per l'Impiego di effettuare una ricerca tra i giovani iscritti che abbiano
+				requisiti idonei ad essere ospitati all'interno di un tirocinio dalle seguenti caratteristiche:
+			</p>
+
+			<ul class="list-unstyled">
+				<li><span class="text-muted">N. di posizioni richieste:</span> #{aziendaTirociniBean.doTirocini.numFigureProf}</li>
+				<li><span class="text-muted">Luogo di lavoro:</span> #{aziendaTirociniBean.doTirocini.deComune.denominazione}
+					#{aziendaTirociniBean.doTirocini.deProvincia.denominazione}</li>
+				<li><span class="text-muted">Area professionale:</span> #{aziendaTirociniBean.doTirocini.deQualificaSrq.descrizione}</li>
+				<li><span class="text-muted">#{ui['tirocini.titoloDiStudio']}:</span> #{aziendaTirociniBean.doTirocini.deTitolo.descrizione}</li>
+			</ul>
+			<p>
+				Richiede quindi che il Soggetto Promotore <u>#{aziendaTirociniBean.doTirocini.ragSocRif}</u> facente parte dell'elenco di cui
+				all'Allegato 3 della D.G.R . 985/2014, e da me autorizzato a effettuare le attivita' di preselezione per la ricerca indicata, riceva gli
+				elenchi dei Curricula dei giovani da Voi estratti secondo i parametri indicati.
+			</p>
+			<p>Si riportano di seguito, per completezza, i dati di riferimento del Soggetto promotore indicato:</p>
+
+			<ul class="list-unstyled">
+				<li><span class="text-muted">Ragione Sociale:</span> #{aziendaTirociniBean.doTirocini.ragSocRif}</li>
+				<li><span class="text-muted">Persona di riferimento:</span> #{aziendaTirociniBean.doTirocini.nomeRif}
+					#{aziendaTirociniBean.doTirocini.cognomeRif}</li>
+				<li><span class="text-muted">Indirizzo E-mail:</span> #{aziendaTirociniBean.doTirocini.emailRif}</li>
+			</ul>
+		</div>
+		<div class="col-md-2"></div>
+		<div class="clearfix"></div>
+
+		<div class="well text-center">
+			<p:commandLink id="inviaBtn" actionListener="#{aziendaTirociniBean.invia}" styleClass="btn btn-primary action-link"
+				update="@(.ui-message)" global="false" onstart="onActionStart()" oncomplete="onActionComplete(); onSendComplete()">
+				<i class="fa fa-check uk-margin-small-right"></i>#{ui['shared.invia']}
+			</p:commandLink>
+			<a href="list" class="ui-commandlink btn btn-primary action-link navYuri uk-margin-small-left"><i class="fa fa-arrow-left"></i>
+				#{ui['shared.back']}</a>
+		</div>
+
+	</h:panelGroup>
+</ui:composition>
+

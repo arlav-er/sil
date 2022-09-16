@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://mlps.gov.it/DataModels/InformationDelivery/VerificaRapportoLavoroAttivo/3.0" elementFormDefault="qualified" attributeFormDefault="qualified" xmlns="http://mlps.gov.it/DataModels/InformationDelivery/VerificaRapportoLavoroAttivo/3.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+           
+  <xs:simpleType name="CodiceFiscaleSoggettoFisico">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]"/>
+      <xs:minLength value="16"/>
+      <xs:maxLength value="16"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="Esito">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="4"/>
+      <xs:maxLength value="4"/>
+      <xs:enumeration value="E100"/> <!-- Operazione eseguita con successo -->
+      <xs:enumeration value="E101"/> <!-- CodiceFiscale Lavoratore mancante o non formalmente valido -->
+      <xs:enumeration value="E102"/> <!-- DataRiferimentoDal o DataRiferimentoAl mancanti o non valide -->
+      <xs:enumeration value="E103"/> <!-- Nessun risultato trovato -->
+      <xs:enumeration value="E104"/> <!-- Regione non autorizzata -->
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:element name="GetRapportoLavoroAttivo_Input" type="GetRapportoLavoroAttivo_Input"/>  
+  <xs:complexType name="GetRapportoLavoroAttivo_Input">
+    <xs:sequence>
+    	<xs:element name="CodiceFiscaleLavoratore" type="CodiceFiscaleSoggettoFisico" nillable="false" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="DataRiferimentoDal" type="xs:dateTime" nillable="false" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="DataRiferimentoAl" type="xs:dateTime" nillable="false" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Lavoratore">
+    <xs:sequence>
+    	<xs:element name="CodiceFiscaleLavoratore" type="CodiceFiscaleSoggettoFisico" nillable="false" minOccurs="1" maxOccurs="1"/>
+      	<xs:element name="Cognome" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="Nome" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+      	<xs:element name="Genere" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="CodiceCittadinanza" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="Cittadinanza" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="DataNascita" type="xs:dateTime" nillable="false" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="CodiceComuneNascita" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="ComuneNascita" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="DatoreLavoro">
+    <xs:sequence>
+    	<xs:element name="CodiceFiscaleDatore" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+      	<xs:element name="Denominazione" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="IndirizzoSedeLegale" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+      	<xs:element name="CodiceComuneSedeLegale" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="ComuneSedeLegale" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="CAPSedeLegale" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+      	<xs:element name="IndirizzoSedeLavoro" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+      	<xs:element name="CodiceComuneSedeLavoro" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="ComuneSedeLavoro" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="CAPSedeLavoro" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="RapportoLavoro">
+    <xs:sequence>
+    	<xs:element name="DataInizio" type="xs:dateTime" nillable="false" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="DataFine" type="xs:dateTime" nillable="true" minOccurs="1" maxOccurs="1"/>
+    	<xs:element name="CodiceTipologiaContrattuale" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+      	<xs:element name="TipologiaContrattuale" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+      	<xs:element name="TipologiaContrattualeTedesco" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="RapportoLavoroAttivo">
+    <xs:sequence>
+      	<xs:element name="Lavoratore" type="Lavoratore" nillable="true" minOccurs="0" maxOccurs="1"/>
+      	<xs:element name="DatoreLavoro" type="DatoreLavoro" nillable="true" minOccurs="0" maxOccurs="1"/>
+      	<xs:element name="RapportoLavoro" type="RapportoLavoro" nillable="true" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:element name="GetRapportoLavoroAttivo_Output" type="GetRapportoLavoroAttivo_Output"/>
+  <xs:complexType name="GetRapportoLavoroAttivo_Output">
+    <xs:sequence>
+      	<xs:element name="RapportoLavoroAttivo" type="RapportoLavoroAttivo" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      	<xs:element name="Esito" type="Esito" nillable="false" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+</xs:schema>

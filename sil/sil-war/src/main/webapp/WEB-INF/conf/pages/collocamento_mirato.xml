@@ -1,0 +1,680 @@
+<!-- PAGES/COLLOCAMENTO_MIRATO.XML -->
+
+<!-- ricerca convenzioni -->
+<PAGE distributed="false" name="CMConveRicercaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="CM_MULTI_LIST_CONVENZIONI" />
+		<MODULE name="CM_GET_PROVINCIA_ISCR" />		
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMConveRicercaPage" target="CM_MULTI_LIST_CONVENZIONI" />		
+		<DEPENDENCE source="CMConveRicercaPage" target="CM_GET_PROVINCIA_ISCR" />
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- lista convenzioni -->
+<PAGE distributed="false" name="CMConveListaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="CM_LISTA_CONVENZIONI" />					
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMConveListaPage" target="CM_LISTA_CONVENZIONI" />		
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- inserimento convenzione --> 
+<PAGE distributed="false" name="CMInsConvenzionePage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="CM_GetInfoUnitaAzienda" />
+		<MODULE keep="false" name="CM_NUMERO_CONV" />
+		<MODULE keep="false" name="CM_MULTI_LIST_CONVENZIONI" />
+		<MODULE keep="false" name="CM_MULTI_LIST_CONV_DOC" />	
+		<MODULE keep="false" name="CM_GET_PROVINCIA_ISCR" />			
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMInsConvenzionePage" target="CM_MULTI_LIST_CONVENZIONI" />
+		<DEPENDENCE source="CMInsConvenzionePage" target="CM_MULTI_LIST_CONV_DOC" />
+		<DEPENDENCE source="CMInsConvenzionePage" target="CM_GetInfoUnitaAzienda" >
+			<CONDITIONS>
+		       <PARAMETER name="prgAzienda" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		       <PARAMETER name="prgUnita" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+		</DEPENDENCE>		
+		<DEPENDENCE source="CMInsConvenzionePage" target="CM_NUMERO_CONV" />	
+		<DEPENDENCE source="CMInsConvenzionePage" target="CM_GET_PROVINCIA_ISCR" />					
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- dettaglio Dati Generali convenzioni -->
+<PAGE distributed="false" name="CMDatiGenConvPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="CM_NUMERO_CONV" />
+		<MODULE keep="false" name="CM_INS_CONVENZIONE" />
+		<MODULE keep="false" name="CM_UPD_DATIGEN_CONVENZIONI" />
+		<MODULE keep="false" name="CM_DETT_CONVENZIONI" />
+		<MODULE keep="false" name="CM_MULTI_LIST_CONVENZIONI" />
+		<MODULE keep="false" name="CM_MULTI_LIST_CONV_DOC" />
+		<MODULE name="M_GetProtocollazione" />	
+		<MODULE keep="false" name="CM_LOAD_CONV_DOC" />
+		<MODULE keep="false" name="CM_SALVA_CONV_DOC" />
+		<MODULE keep="false" name="M_Annullamento_Conv_E_Doc" />
+		<MODULE name="CM_GETANDRICALCOLARIEPILOGOPROSP" />
+		<MODULE name="CM_GET_PROVINCIA_ISCR"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMDatiGenConvPage" target="CM_GET_PROVINCIA_ISCR"/>		
+		<DEPENDENCE source="CMDatiGenConvPage" target="CM_NUMERO_CONV">
+			<CONDITIONS>
+		       <PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="CM_NUMERO_CONV" target="CM_INS_CONVENZIONE">
+			<CONDITIONS>
+		       <PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		    </CONDITIONS>
+		    <CONSEQUENCES>
+		    	<PARAMETER name="numero" type="RELATIVE" scope="SERVICE_RESPONSE" value="CM_NUMERO_CONV.ROWS.ROW.NUMCONVENZIONE"/>
+		    </CONSEQUENCES>		    
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="CM_INS_CONVENZIONE" target="CM_LOAD_CONV_DOC">
+			<CONDITIONS>
+				<PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>	
+		    </CONDITIONS>	
+		     <CONSEQUENCES>
+		    	<PARAMETER name="PRGCONV" type="RELATIVE" scope="SERVICE_RESPONSE" value="CM_INS_CONVENZIONE.ROWS.ROW.DO_NEXTVAL"/>
+		    </CONSEQUENCES>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="CM_INS_CONVENZIONE" target="CM_DETT_CONVENZIONI">
+			<CONDITIONS>
+				<PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_DEFINED"/>	
+		    </CONDITIONS>	
+		     <CONSEQUENCES>
+		    	<PARAMETER name="PRGCONV" type="RELATIVE" scope="SERVICE_RESPONSE" value="CM_INS_CONVENZIONE.ROWS.ROW.DO_NEXTVAL"/>
+		    </CONSEQUENCES>    
+		</DEPENDENCE>
+		
+		
+		<DEPENDENCE source="CMDatiGenConvPage" target="CM_UPD_DATIGEN_CONVENZIONI">
+			<CONDITIONS>
+		       <PARAMETER name="aggiorna" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		       <PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="0"/>
+		    </CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="CMDatiGenConvPage" target="CM_DETT_CONVENZIONI">
+			<CONDITIONS>
+		       <PARAMETER name="aggiorna" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		       <PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="0"/>
+		    </CONDITIONS>
+		</DEPENDENCE>
+    	
+    	<!-- update Doc -->
+		<DEPENDENCE source="CMDatiGenConvPage" target="CM_SALVA_CONV_DOC">
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDoc" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="0"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="CM_SALVA_CONV_DOC" target="CM_LOAD_CONV_DOC">
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDoc" type="RELATIVE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="0"/>
+			</CONDITIONS>
+		</DEPENDENCE>	
+		
+		<!-- annulla conv e doc -->
+		<DEPENDENCE source="CMDatiGenConvPage" target="M_Annullamento_Conv_E_Doc">
+			<CONDITIONS>
+				<PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="1"/>
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="M_Annullamento_Conv_E_Doc" target="CM_LOAD_CONV_DOC">
+			<CONDITIONS>
+				<PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="1"/>
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	    <DEPENDENCE source="M_Annullamento_Conv_E_Doc" target="CM_DETT_CONVENZIONI">
+			<CONDITIONS>
+				<PARAMETER name="annullamento" type="RELATIVE" scope="SERVICE_REQUEST" value="1"/>
+			</CONDITIONS>
+    	</DEPENDENCE>
+	
+		<DEPENDENCE source="CMDatiGenConvPage" target="CM_DETT_CONVENZIONI">
+			<CONDITIONS>
+				<PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>	
+		    </CONDITIONS>   		    
+		</DEPENDENCE>
+		<DEPENDENCE source="CMDatiGenConvPage" target="CM_LOAD_CONV_DOC">
+			<CONDITIONS>
+				<PARAMETER name="inserisci" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>	
+		    </CONDITIONS>   
+		</DEPENDENCE>		
+		<DEPENDENCE source="CM_LOAD_CONV_DOC" target="CM_MULTI_LIST_CONV_DOC" >
+			<CONDITIONS>	
+		    </CONDITIONS>
+		    <CONSEQUENCES>
+		    	<PARAMETER name="CODSTATOATTO" type="RELATIVE" scope="SERVICE_RESPONSE" value="CM_LOAD_CONV_DOC.ROWS.ROW.CODSTATOATTO"/>
+		    </CONSEQUENCES>
+		</DEPENDENCE>		
+		<DEPENDENCE source="CMDatiGenConvPage" target="CM_MULTI_LIST_CONVENZIONI" />
+		<DEPENDENCE source="CMDatiGenConvPage" target="M_GetProtocollazione"/>
+		<DEPENDENCE source="CM_DETT_CONVENZIONI" target="CM_GETANDRICALCOLARIEPILOGOPROSP" >
+			<CONDITIONS>	
+		    </CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="PRGAZIENDA" type="RELATIVE" scope="SERVICE_RESPONSE" value="CM_DETT_CONVENZIONI.ROWS.ROW.PRGAZIENDA"/>
+				<PARAMETER name="DATCONVENZIONE" type="RELATIVE" scope="SERVICE_RESPONSE" value="CM_DETT_CONVENZIONI.ROWS.ROW.DATCONVENZIONE"/>
+				<PARAMETER name="DATSCADENZA" type="RELATIVE" scope="SERVICE_RESPONSE" value="CM_DETT_CONVENZIONI.ROWS.ROW.DATSCADENZA"/>
+		    </CONSEQUENCES>
+		</DEPENDENCE>				    					
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Assunzioni convenzioni -->
+<PAGE name="CMAssunzConvPage" scope="REQUEST">
+
+  <MODULES>
+    <MODULE name="CM_LISTA_CONV_ASSUNZIONI"/>
+    <MODULE name="CM_LOAD_CONV_ASSUNZIONI"/>
+    <MODULE name="CM_DEL_CONV_ASSUNZIONI"/>
+    <MODULE name="CM_REITERA_CONV_ASSUNZIONI"/>
+    <MODULE name="CM_INS_CONV_ASSUNZIONI"/>
+    <MODULE name="CM_UPD_CONV_ASSUNZIONI"/>  
+		<!-- Moduli caricati sempre -->
+    <MODULE name="CM_INFO_AZ_DA_CONV"/>
+    <MODULE name="CM_COMBO_STATO_ASS"/>
+    <MODULE name="CM_COMBO_CONTRATTO_ASS"/> 
+    <MODULE name="CM_COMBO_AGEV_PRES"/>
+    <MODULE name="CM_COMBO_AGEVOLAZIONI"/>
+    <MODULE name="CM_LOAD_AGE_ASS"/>
+    <MODULE name="CM_DEL_AGE_ASS"/>   
+  </MODULES>
+
+  <DEPENDENCIES>
+
+    <DEPENDENCE source="CMAssunzConvPage" target="CM_INFO_AZ_DA_CONV">
+      <CONDITIONS/>
+    </DEPENDENCE>
+    <DEPENDENCE source="CMAssunzConvPage" target="CM_COMBO_STATO_ASS">
+      <CONDITIONS/>
+    </DEPENDENCE>
+    <DEPENDENCE source="CMAssunzConvPage" target="CM_COMBO_CONTRATTO_ASS">
+      <CONDITIONS/>
+    </DEPENDENCE>
+
+    <!-- Per prima cosa carica la lista delle assunzioni -->
+    <DEPENDENCE source="CMAssunzConvPage" target="CM_LISTA_CONV_ASSUNZIONI">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/> 
+      </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="CMAssunzConvPage" target="CM_LISTA_CONV_ASSUNZIONI">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_LISTA_CONV_ASSUNZIONI"/> 
+      </CONDITIONS>
+    </DEPENDENCE>    
+    
+    <!-- Elimina un'assunzione e ricarica la lista -->
+    <DEPENDENCE source="CMAssunzConvPage" target="CM_DEL_CONV_ASSUNZIONI">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_DEL_CONV_ASSUNZIONI"/> 
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="CM_DEL_CONV_ASSUNZIONI" target="CM_LISTA_CONV_ASSUNZIONI">
+      <CONDITIONS/>
+    </DEPENDENCE>
+
+	<!-- Reitera un'assunzione e ricarica la lista -->
+    <DEPENDENCE source="CMAssunzConvPage" target="CM_REITERA_CONV_ASSUNZIONI">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_REITERA_CONV_ASSUNZIONI"/> 
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="CM_REITERA_CONV_ASSUNZIONI" target="CM_LISTA_CONV_ASSUNZIONI">
+      <CONDITIONS/>
+    </DEPENDENCE>
+
+    <!-- Nella mainPage si vuole inserire una nuova assunzione,
+         dopo l'inserimento, ricarico l'ultimo inserimento in modo 
+         da visualizzarlo nel pannello "nuovo" 
+         e aggiorno la lista assunzioni -->
+    <DEPENDENCE source="CMAssunzConvPage" target="CM_INS_CONV_ASSUNZIONI">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_INS_CONV_ASSUNZIONI"/> 
+      </CONDITIONS>
+    </DEPENDENCE>             
+    <DEPENDENCE source="CM_INS_CONV_ASSUNZIONI" target="CM_LISTA_CONV_ASSUNZIONI">
+      <CONDITIONS/>
+    </DEPENDENCE>
+
+    <!-- Inserisce le agevolazioni associate all'assunzione per poi ricaricare l'assunzione -->
+    <DEPENDENCE source="CMAssunzConvPage" target="CM_LOAD_AGE_ASS">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_LOAD_AGE_ASS"/> 
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="CM_LOAD_AGE_ASS" target="CM_LOAD_CONV_ASSUNZIONI">
+      <CONDITIONS/>
+    </DEPENDENCE>    
+    
+    <!-- Elimina l'agevolazione associata all'assunzione per poi ricaricare l'assunzione -->
+    <DEPENDENCE source="CMAssunzConvPage" target="CM_DEL_AGE_ASS">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_DEL_AGE_ASS"/> 
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="CM_DEL_AGE_ASS" target="CM_LOAD_CONV_ASSUNZIONI">
+      <CONDITIONS/>
+    </DEPENDENCE>
+    
+    <!-- Carica una specifica assunzione per poterla vedere / modificare -->
+    <DEPENDENCE source="CMAssunzConvPage" target="CM_LOAD_CONV_ASSUNZIONI">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_LOAD_CONV_ASSUNZIONI"/> 
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="CM_LOAD_CONV_ASSUNZIONI" target="CM_COMBO_AGEV_PRES">
+      <CONDITIONS/>
+    </DEPENDENCE>
+    <DEPENDENCE source="CM_LOAD_CONV_ASSUNZIONI" target="CM_COMBO_AGEVOLAZIONI">
+      <CONDITIONS/>
+    </DEPENDENCE>
+    <DEPENDENCE source="CM_LOAD_CONV_ASSUNZIONI" target="CM_LISTA_CONV_ASSUNZIONI">
+      <CONDITIONS/>
+    </DEPENDENCE>
+
+    <!-- Dalla pagina di dettaglio esegue un update dei dati e,
+         se tutto è andato bene, torna alla mainPage -->
+    <DEPENDENCE source="CMAssunzConvPage" target="CM_UPD_CONV_ASSUNZIONI">
+      <CONDITIONS>
+        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_UPD_CONV_ASSUNZIONI"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="CM_UPD_CONV_ASSUNZIONI" target="CM_LISTA_CONV_ASSUNZIONI">
+       <CONDITIONS/> 
+    </DEPENDENCE>
+  
+  </DEPENDENCIES>
+
+</PAGE>
+
+<!-- lista avviamenti del lavoratore da poter associare all'assunzione -->
+<PAGE distributed="false" name="CMMovAssunzPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="CM_AVVIAMENTI_ASS" />					
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMMovAssunzPage" target="CM_AVVIAMENTI_ASS" />		
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- **********************************************************************************
+                  PAGE  ISCRIZIONI COLLOCAMENTO MIRATO
+     ********************************************************************************** -->
+<PAGE name="CMIscrizioniLavoratorePage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_ConfigStampaIscrizioneL68"/>
+	<MODULE name="CM_CHECK_CAN_ISCR" />
+	<MODULE name="CM_CHECK_CAN_ISCR_DECRYPT" />
+	<MODULE name="CM_LOAD_ISCRIZIONI" />
+   	<MODULE name="CM_GET_DETT_ISCR" />
+   	<MODULE name="CM_GET_DE_TIPO_ISCR_D" />
+   	<MODULE name="CM_GET_DE_TIPO_ISCR_A" />
+   	<MODULE name="CM_GET_DE_TIPO_INVAL" />
+   	<MODULE name="CM_GET_DE_ACC_SANIT" />
+   	<MODULE name="CM_GET_VERB_ACC" />
+   	<MODULE name="CM_GET_CPI_COMP" />
+   	<MODULE name="CM_SAVE_ISCR" />
+   	<MODULE name="COMBO_SPI_SCAD" />
+   	<MODULE name="CM_Motivo_Fine_Atto"/>
+   	<MODULE name="M_Select_PrgSPI_Da_CDNUT"/>
+   	<MODULE name="M_GetProtocollazione" />
+   	<MODULE name="COMBO_STATO_ATTO_ISCR_L68" />
+   	<MODULE name="CM_GET_DATANZIANITA68_ISCR_PREC_D" />
+   	<MODULE name="CM_GET_DATANZIANITA68_ISCR_PREC_A" />
+   	<MODULE name="CM_GetInfoDeDoc_IscrL68" />
+   	<MODULE name="CM_Storico_Mod_IscrL68" />
+   	<MODULE name="M_GetParamCmIsc1" />
+   	<MODULE name="M_Get_De_Cm_Annota" />
+   	<MODULE name="M_Get_Data_Anz_Disocc" />   	
+   	<!-- Add Ale 11/08/2010 - Prende la conf della graduatoria, stato occup, calcolo P presunto -->
+   	<MODULE name="M_GetConfigGraduatoria_cm"/>   	
+   	<MODULE name="M_Get_Stato_Occup"/>
+   	<MODULE name="M_Get_Prg_Ultima_Iscrizione_Lav_tipo"/>
+   	<MODULE name="M_Get_Last_Diagnosi_Funz"/>
+   	<MODULE name="M_CONFIG_ANZIANITA_ORDINARIA_CM"/>
+   	<MODULE name="CM_GET_PROVINCIA_ISCR" />
+  </MODULES>
+
+  <DEPENDENCIES>
+  	<DEPENDENCE source="CMIscrizioniLavoratorePage" target="M_ConfigStampaIscrizioneL68" />
+  	<DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_LOAD_ISCRIZIONI">   
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        </CONDITIONS>
+    </DEPENDENCE> 
+    
+    <DEPENDENCE source="CM_GET_DETT_ISCR" target="M_Get_Prg_Ultima_Iscrizione_Lav_tipo"/>
+    
+    <DEPENDENCE source="M_Get_Prg_Ultima_Iscrizione_Lav_tipo" target="M_Get_Last_Diagnosi_Funz"/>
+    
+    <DEPENDENCE source="CM_LOAD_ISCRIZIONI" target="CM_CHECK_CAN_ISCR">
+      <CONDITIONS>
+          <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_GET_DETT_ISCR">
+      <CONDITIONS>
+          <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="CM_GET_DETT_ISCR" target="CM_CHECK_CAN_ISCR_DECRYPT">
+      <CONDITIONS>
+          <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+      </CONDITIONS>
+	  <CONSEQUENCES/>
+	</DEPENDENCE>
+    
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_SAVE_ISCR">
+      <CONDITIONS>
+          <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_SAVE_ISCR"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="CM_SAVE_ISCR" target="CM_LOAD_ISCRIZIONI">
+      <CONDITIONS>
+          <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_SAVE_ISCR"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="CM_LOAD_ISCRIZIONI" target="CM_CHECK_CAN_ISCR">
+      <CONDITIONS>
+          <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_SAVE_ISCR"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_GET_DE_TIPO_ISCR_D">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_GET_DE_TIPO_ISCR_A">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_GET_DE_TIPO_INVAL">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+    
+   	<DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_GET_PROVINCIA_ISCR">
+
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_GET_DE_ACC_SANIT">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_GET_VERB_ACC">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+        
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_GET_CPI_COMP">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="M_Select_PrgSPI_Da_CDNUT">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="COMBO_SPI_SCAD">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+        
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_Motivo_Fine_Atto">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="M_GetProtocollazione">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="M_GetParamCmIsc1"/>
+    		
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="M_Get_De_Cm_Annota">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+
+	<DEPENDENCE source="CMIscrizioniLavoratorePage" target="M_Get_Data_Anz_Disocc">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="CM_CHECK_CAN_ISCR_DECRYPT" target="COMBO_STATO_ATTO_ISCR_L68">
+	  <CONDITIONS>
+          <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+      </CONDITIONS>
+      <CONSEQUENCES>
+		  <PARAMETER name="ISCRIZIONEPOSSIBILE" type="RELATIVE" scope="SERVICE_RESPONSE" value="CM_CHECK_CAN_ISCR_DECRYPT.IscrizionePossibile" />
+	  </CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_GET_DATANZIANITA68_ISCR_PREC_A">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        	<PARAMETER name="prgCMIscr" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        </CONDITIONS>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_GET_DATANZIANITA68_ISCR_PREC_D">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        	<PARAMETER name="prgCMIscr" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+        </CONDITIONS>
+    </DEPENDENCE>       
+
+  	<DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_GetInfoDeDoc_IscrL68">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        	<PARAMETER name="prgCMIscr" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+		</CONDITIONS>
+	</DEPENDENCE>
+	
+  	<DEPENDENCE source="CMIscrizioniLavoratorePage" target="CM_Storico_Mod_IscrL68">
+		<CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>
+        	<PARAMETER name="prgCMIscr" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		</CONDITIONS>
+	</DEPENDENCE>	
+	
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="M_GetConfigGraduatoria_cm"/>
+    <DEPENDENCE source="CMIscrizioniLavoratorePage" target="M_Get_Stato_Occup">
+    <CONDITIONS>
+        	<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="CM_GET_DETT_ISCR"/>        	
+        </CONDITIONS>
+    </DEPENDENCE>   
+
+	<DEPENDENCE source="CMIscrizioniLavoratorePage" target="M_CONFIG_ANZIANITA_ORDINARIA_CM"/>
+	         
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- numero mesi d'anzianita del lavoratore CM -->
+<PAGE distributed="false" name="CMMesiAnzianitaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="CM_CALCOLA_MESI_ANZ" />					
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMMesiAnzianitaPage" target="CM_CALCOLA_MESI_ANZ" />		
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Storico Modifiche Iscrizioni L68 CM -->
+<PAGE distributed="false" name="CMStoricoModIscrL68Page" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="CM_Storico_Mod_IscrL68" />
+		<MODULE name="M_GetParamCmIsc1" />
+		<MODULE name="CM_SAVE_ISCR" />
+		<MODULE name="CM_LISTA_ISCRIZIONI_DISABILI_L68" />			
+		<MODULE name="CM_GET_DE_TIPO_INVAL" />	
+		<MODULE name="CM_GET_DE_ACC_SANIT" />
+		<MODULE name="CM_GET_DE_TIPO_ISCR" />
+			
+	</MODULES>
+  	<DEPENDENCIES>
+  	    <DEPENDENCE source="CMStoricoModIscrL68Page" target="M_GetParamCmIsc1"/>
+	  	<DEPENDENCE source="CMStoricoModIscrL68Page" target="CM_Storico_Mod_IscrL68">
+			<CONDITIONS>
+	        	<PARAMETER name="CONTEXT" scope="SERVICE_REQUEST" value="LISTA"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="CMStoricoModIscrL68Page" target="CM_SAVE_ISCR">
+			<CONDITIONS>
+	        	<PARAMETER name="CONTEXT" scope="SERVICE_REQUEST" value="DIAGNOSI"/>
+	        	<PARAMETER name="AGGIORNA" scope="SERVICE_REQUEST" value="1"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="CMStoricoModIscrL68Page" target="CM_LISTA_ISCRIZIONI_DISABILI_L68">
+			<CONDITIONS>
+	        	<PARAMETER name="CONTEXT" scope="SERVICE_REQUEST" value="DIAGNOSI"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="CMStoricoModIscrL68Page" target="CM_GET_DE_TIPO_INVAL">
+			<CONDITIONS>
+	        	<PARAMETER name="CONTEXT" scope="SERVICE_REQUEST" value="DIAGNOSI"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="CMStoricoModIscrL68Page" target="CM_GET_DE_ACC_SANIT">
+			<CONDITIONS>
+	        	<PARAMETER name="CONTEXT" scope="SERVICE_REQUEST" value="DIAGNOSI"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="CMStoricoModIscrL68Page" target="CM_GET_DE_TIPO_ISCR">
+			<CONDITIONS>
+	        	<PARAMETER name="CONTEXT" scope="SERVICE_REQUEST" value="DIAGNOSI"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- ricerca assunzioni -->
+<PAGE distributed="false" name="CMRicercaAssunzioniPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="CM_COMBO_STATO_ASS" />	
+		<MODULE keep="false" name="CM_GET_PROVINCIA_ISCR" />					
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMRicercaAssunzioniPage" target="CM_COMBO_STATO_ASS" />	
+		<DEPENDENCE source="CMRicercaAssunzioniPage" target="CM_GET_PROVINCIA_ISCR" />		
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- lista assunzioni -->
+<PAGE distributed="false" name="CMListaAssunzioniPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="CM_LISTA_ASSUNZIONI" />					
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CMListaAssunzioniPage" target="CM_LISTA_ASSUNZIONI" />		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CMIscrittiRicercaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetDeCMTipoIscr" />
+    <MODULE name="M_GetDeCMTipoInvalidita" />
+    <MODULE name="M_GETSTATOATTOISCR"/>
+    <MODULE name="M_Combo_Suggerimenti"/>
+    <MODULE name="M_ListZone"/>
+    <MODULE name="M_GetIDOProvince"/>
+    <MODULE name="M_ELENCOCPI"/>
+    <MODULE name="CM_GET_PROVINCIA_ISCR" />
+  </MODULES>  
+  <DEPENDENCIES>
+    <DEPENDENCE source="CMIscrittiRicercaPage" target="M_GetDeCMTipoIscr"/>
+    <DEPENDENCE source="CMIscrittiRicercaPage" target="M_ELENCOCPI"/>
+    <DEPENDENCE source="CMIscrittiRicercaPage" target="M_GetDeCMTipoInvalidita"/>
+    <DEPENDENCE source="CMIscrittiRicercaPage" target="M_GETSTATOATTOISCR"/>
+    <DEPENDENCE source="CMIscrittiRicercaPage" target="M_ListZone"/>
+    <DEPENDENCE source="CMIscrittiRicercaPage" target="M_GetIDOProvince"/>
+    <DEPENDENCE source="CMIscrittiRicercaPage" target="M_Combo_Suggerimenti"/>
+    <DEPENDENCE source="CMIscrittiRicercaPage" target="CM_GET_PROVINCIA_ISCR"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CMListaIscrittiPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_CMListaIscritti"/>
+    <MODULE name="M_GetComune"/>
+    <MODULE name="M_GetZonaComune"/>
+    <MODULE name="M_GetDescProvincia" />
+    <MODULE name="M_GETDESCSTATOATTOISCR" />
+    <MODULE name="M_GetDescCMTipoIscr" />
+    <MODULE name="M_GetDescCMTipoInvalidita" />
+    <MODULE name="M_GetDescCittadinanza" />
+    <MODULE name="M_GetDescCMTitoloStudio" />
+    <MODULE name="M_GetProfiloDiagnosi" />
+  </MODULES>
+  
+  <DEPENDENCIES>
+    <DEPENDENCE source="CMListaIscrittiPage" target="M_CMListaIscritti"/>
+    <DEPENDENCE source="CMListaIscrittiPage" target="M_GetDescProvincia"/>
+    <DEPENDENCE source="CMListaIscrittiPage" target="M_GetComune"/>
+    <DEPENDENCE source="CMListaIscrittiPage" target="M_GETDESCSTATOATTOISCR"/>
+    <DEPENDENCE source="CMListaIscrittiPage" target="M_GetDescCMTipoIscr"/>
+    <DEPENDENCE source="CMListaIscrittiPage" target="M_GetDescCMTipoInvalidita"/>
+    <DEPENDENCE source="CMListaIscrittiPage" target="M_GetDescCittadinanza"/>
+    <DEPENDENCE source="CMListaIscrittiPage" target="M_GetDescCMTitoloStudio"/>
+    <DEPENDENCE source="CMListaIscrittiPage" target="M_GetZonaComune"/>
+    <DEPENDENCE source="CMListaIscrittiPage" target="M_GetProfiloDiagnosi"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!-- Punteggio Presunto  -->
+<PAGE name="P_CMIscrizioniLavCalcolaPunteggioPresunto" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_CMIscrizioniLavCalcolaPunteggioPresunto"/>    
+    <MODULE name="M_GetConfigGraduatoria_cm"/> 
+    
+  </MODULES>  
+  <DEPENDENCIES>
+      <DEPENDENCE source="P_CMIscrizioniLavCalcolaPunteggioPresunto" target="M_CMIscrizioniLavCalcolaPunteggioPresunto"/>    
+      <DEPENDENCE source="P_CMIscrizioniLavCalcolaPunteggioPresunto" target="M_GetConfigGraduatoria_cm"/>
+      
+  </DEPENDENCIES>
+</PAGE>
+

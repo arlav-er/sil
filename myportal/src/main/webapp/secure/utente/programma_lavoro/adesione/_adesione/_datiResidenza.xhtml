@@ -1,0 +1,96 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui">
+	
+	<ui:param name="bean" value="#{programmaLavoroBean}" />
+	
+	<fieldset legend="Dati domicilio e residenza">
+		<legend>Domicilio e residenza</legend>
+		<table style="border-spacing: 1.5em;">
+			<tr>
+				<td>
+					<p:outputLabel for="indirizzoDomInput" value="Indirizzo domicilio" />
+					<br />
+					<p:inputText id="indirizzoDomInput" required="true" maxLength="512"
+						value="#{bean.utenteCompletoDTO.utenteInfo.indirizzoDomicilio}"
+						requiredMessage="L'indirizzo di domicilio è obbligatorio">
+						<p:ajax event="blur" process="@this" update="@this" />
+					</p:inputText>
+					<br />
+					<p:message for="indirizzoDomInput" />
+				</td>
+				<td>
+					<p:outputLabel for="comuneDomInput" value="Comune domicilio" />
+					<br />
+					<p:autoComplete id="comuneDomInput" required="true" forceSelection="true"
+						value="#{bean.utenteCompletoDTO.utenteInfo.comuneDomicilio}"
+						completeMethod="#{bean.completeComuneDomicilio}" var="comDomicilio"
+						itemLabel="#{comDomicilio.descrizione}" itemValue="#{comDomicilio}"
+						converter="deComuneDTOConverter" requiredMessage="Il comune di domicilio è obbligatorio"
+						minQueryLength="2" maxResults="10" emptyMessage="Nessun comune trovato">
+						<p:ajax event="itemSelect" update="datiAdesionePanel" />
+					</p:autoComplete>
+					<br />
+					<p:message for="comuneDomInput" />
+				</td>
+				<td>
+					<p:outputLabel for="capDomInput" value="CAP domicilio" />
+					<br />
+					<p:inputMask id="capDomInput" required="true" mask="9?9999"
+						value="#{bean.utenteCompletoDTO.utenteInfo.capDomicilio}"
+						requiredMessage="Il CAP del domicilio è obbligatorio">
+						<p:ajax event="blur" process="@this" update="@this" />
+					</p:inputMask>
+					<br />
+					<p:message for="capDomInput" />
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td colspan="2">
+					<p:commandButton value="Copia dati domicilio in residenza" icon="ui-icon-carat-1-s"
+						process="@this" actionListener="#{bean.copiaDatiDomicilioInResidenza()}"
+						update="indirizzoResInput comuneResInput capResInput @(.ui-message)">
+					</p:commandButton>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p:outputLabel for="indirizzoResInput" value="Indirizzo residenza" />
+					<br />
+					<p:inputText id="indirizzoResInput" required="true" maxLength="100"
+						value="#{bean.utenteCompletoDTO.utenteInfo.indirizzoResidenza}"
+						requiredMessage="L'indirizzo di residenza è obbligatorio" />
+					<br />
+					<p:message for="indirizzoResInput" />
+				</td>
+				<td>
+					<p:outputLabel for="comuneResInput" value="Comune residenza" />
+					<br />
+					<p:autoComplete id="comuneResInput" required="true" forceSelection="true"
+						value="#{bean.utenteCompletoDTO.utenteInfo.comuneResidenza}"
+						completeMethod="#{bean.completeComuneDomicilio}" var="comResidenza"
+						itemLabel="#{comResidenza.descrizione}" itemValue="#{comResidenza}"
+						converter="deComuneDTOConverter" requiredMessage="Il comune di residenza è obbligatorio"
+						minQueryLength="2" maxResults="10" emptyMessage="Nessun comune trovato">
+						
+					</p:autoComplete>
+					<br />
+					<p:message for="comuneResInput" />
+				</td>
+				<td>
+					<p:outputLabel for="capResInput" value="CAP residenza" />
+					<br />
+					<p:inputMask id="capResInput" required="true" mask="9?9999"
+						value="#{bean.utenteCompletoDTO.utenteInfo.capResidenza}"
+						requiredMessage="Il CAP della residenza è obbligatorio" />
+					<br />
+					<p:message for="capResInput" />
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+</ui:composition>

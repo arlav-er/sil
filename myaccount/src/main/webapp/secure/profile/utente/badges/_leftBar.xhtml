@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:pretty="http://ocpsoft.com/prettyfaces">
+	<div class="profile-pic text-center">
+		<h:panelGroup id="userProfilePic">
+			<div class="badge-level #{badgesBean.userLivello.badgeClass}" data-toggle="tooltip" data-placement="bottom"
+				title="per il prossimo livello ti mancano #{badgesBean.getPunteggioForNextLevel()} punti">
+				<figure class="hexagon-outer">
+					<figure class="hexagon-mask"></figure>
+					<figure class="hexagon-inner #{badgesBean.userLivello.badgeClass}">
+						<i class="icon-video"></i>
+						<span class="ribbon">#{badgesBean.userLivello.id}</span>
+						<span class="punti">#{badgesBean.getUserPunteggio()} Punti</span>
+					</figure>
+					<span class="overlay"> </span>
+				</figure>
+
+			</div>
+			<h:panelGroup rendered="#{empty utenteViewBean.utenteInfo.foto}">
+				<h:graphicImage library="commons" name="images/profilePic.jpg"></h:graphicImage>
+			</h:panelGroup>
+			<h:panelGroup rendered="#{not empty utenteViewBean.utenteInfo.foto}">
+				<pretty:urlbuffer var="imgURL" mappingId="profilePicture">
+					<f:param id="type" value="utente" />
+					<f:param id="id" value="#{utenteViewBean.utenteInfo.pfPrincipal.idPfPrincipal}" />
+					<f:param id="username" value="#{utenteViewBean.utenteInfo.pfPrincipal.username}" />
+				</pretty:urlbuffer>
+				<img class="animated fadeInUp" src="#{imgURL}?#{utils.currentTimeMillis()}" />
+
+			</h:panelGroup>
+		</h:panelGroup>
+		<h3>
+			#{utenteViewBean.utenteInfo.pfPrincipal.nome} #{utenteViewBean.utenteInfo.pfPrincipal.cognome}
+			<br />
+		</h3>
+	</div>
+
+	<h:panelGroup id="percentageGroup" layout="block" styleClass="text-center">
+		<ui:fragment rendered="#{true}">
+
+		</ui:fragment>
+		<ui:fragment rendered="#{not empty badgesBean.visibleGpBadges}">
+			<div class="chart animated fadeInUp">
+				<div class="percentage" data-percent="#{badgesBean.completePercentage}">
+					<span>#{badgesBean.completePercentage}</span>
+					<sup>%</sup>
+				</div>
+				<div class="label">Riconoscimenti</div>
+			</div>
+		</ui:fragment>
+
+
+	</h:panelGroup>
+</ui:composition>

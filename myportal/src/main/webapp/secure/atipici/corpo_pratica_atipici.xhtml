@@ -1,0 +1,583 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<h:panelGroup>
+		<div
+			class="quesito_corpo_pratica_atipici accordion ui-accordion ui-widget ui-helper-reset ui-accordion-icons">
+
+			<h3 class="header_quesito_corpo_pratica_atipici"
+				style="display: #{readonly ? 'block' : 'none'}">
+				Dati quesito - inviato il
+				<h:outputText value="#{pratica.dtmIns}">
+					<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+				</h:outputText>
+			</h3>
+
+			<h:panelGrid columns="2" columnClasses="width20 width30"
+				styleClass="quesito_corpo_pratica_atipici#{readonly ? '_readonly' : ''}">
+				<h:outputLabel value="N° pratica (ID):" rendered="#{readonly}" />
+				<cc:inputText value="#{pratica.ticket}" required="true"
+					rendered="#{readonly}" editingMode="#{false}" />
+
+				<h:outputLabel value="Oggetto#{readonly ? '' : '*'}"
+					rendered="#{pratica.deTipoQuesito.id != 'LAVORO' and readonly}" />
+
+				<cc:selectOneMenu value="#{pratica.deTipoPratica.id}"
+					rendered="#{pratica.deTipoQuesito.id != 'LAVORO' and readonly}"
+					valueDescription="#{pratica.deTipoPratica.descrizione}"
+					required="true" disableInput="true" styleClass="width50"
+					editingMode="#{sessionBean.isProvincia() or not readonly}">
+					<f:selectItems
+						value="#{pratica.tipoConsulenza.id == 'ATIPICO' ? utilsBean.tipiPraticaAtipici : utilsBean.tipiPraticaPIva}" />
+				</cc:selectOneMenu>
+
+				<h:outputLabel value="Tipo lavoro"
+					rendered="#{readonly and pratica.deTipoQuesito.id != 'LAVORO'}" />
+				<cc:inputText editingMode="#{false}"
+					value="#{pratica.tipoConsulenza}"
+					rendered="#{readonly and pratica.deTipoQuesito.id != 'LAVORO'}" />
+
+				<h:panelGroup>
+					<h:outputLabel value="Titolo#{readonly ? '' : '*'}" />
+					<cc:helpButton
+						message="Descrivere sinteticamente l'oggetto della richiesta di consulenza."
+						rendered="#{not readonly}" />
+				</h:panelGroup>
+
+				<cc:inputText value="#{pratica.oggetto}" required="true"
+					styleClass="width50" editingMode="#{not readonly}" />
+
+				<h:outputLabel value="Quesito#{readonly ? '' : '*'}" />
+				<cc:inputTextarea maxlength="3000" styleClass="width50"
+					value="#{pratica.corpo}" richTextMode="false" rows="5"
+					required="true" editingMode="#{not readonly}" />
+			</h:panelGrid>
+		</div>
+		<br />
+
+		<h:panelGroup
+			class="accordion ui-accordion ui-widget ui-helper-reset ui-accordion-icons"
+			rendered="#{pratica.deTipoQuesito.id != 'LAVORO' and pratica.tipoConsulenza.id == 'ATIPICO'}">
+
+			<h3 style="display: #{readonly ? 'block' : 'none'}"
+				class="headingCollapse ui-helper-reset ui-state-default header_corpo_pratica_atipici">
+				<span class="ui-icon ui-icon-triangle-1-e"></span> Dati richiedente
+				- #{pratica.nome} #{pratica.cognome}
+			</h3>
+
+			<div class="dati_corpo_pratica_atipici#{readonly ? '_readonly' : ''}">
+				<h:panelGrid columns="2" columnClasses="width20 width30">
+
+					<h:panelGroup>
+						<h:outputLabel value="Contratto#{readonly ? '' : '*'}" />
+						<cc:helpButton
+							message="Scegliere dal menu a tendina il contratto in corso al momento della richiesta o l'ultimo contratto stipulato (se al momento della richiesta non si è occupati)}"
+							rendered="#{not readonly}" />
+					</h:panelGroup>
+
+					<h:panelGroup>
+						<cc:inputSuggestion size="70" rendered="#{not readonly}"
+							value="#{pratica.deAtpContrattoDTO.descrizione}"
+							valueCod="#{pratica.deAtpContrattoDTO.id}" required="true"
+							showButton="true" editingMode="#{not readonly}"
+							requiredMessage="Il contratto e' obbligatorio"
+							requiredMessageCod="E' necessario scegliere un contratto dalla lista a tendina"
+							suggestionPath="contrattiatipici" title="Contratto">
+							<f:validator validatorId="atpContrattoSuggestionValidator"
+								for="function" />
+						</cc:inputSuggestion>
+						<h:outputText
+							value="#{pratica.deAtpContrattoPadreDTO.descrizione} - #{pratica.deAtpContrattoDTO.descrizione}"
+							rendered="#{readonly}" />
+					</h:panelGroup>
+
+					<h:outputLabel value="Nome#{readonly ? '' : '*'}" />
+					<cc:inputText value="#{pratica.nome}" required="true"
+						styleClass="width50" editingMode="#{not readonly}" />
+
+					<h:outputLabel value="Cognome#{readonly ? '' : '*'}" />
+					<cc:inputText value="#{pratica.cognome}" required="true"
+						styleClass="width50" editingMode="#{not readonly}" />
+
+					<h:outputLabel value="Sesso#{readonly ? '' : '*'}" />
+					<cc:selectOneRadio value="#{pratica.codSesso}"
+						valueDescription="#{pratica.codSesso == '1' ? 'M' : 'F'}"
+						required="true" buttonset="true" editingMode="#{not readonly}">
+						<f:selectItem itemLabel="M" itemValue="1" />
+						<f:selectItem itemLabel="F" itemValue="2" />
+					</cc:selectOneRadio>
+
+					<h:outputLabel value="Età#{readonly ? '' : '*'}" />
+					<cc:selectOneMenu value="#{pratica.fasciaEta}" disableInput="true"
+						editingMode="#{not readonly}" styleClass="width50"
+						valueDescription="#{pratica.fasciaEta.label}">
+						<f:selectItems value="#{utilsBean.fascieEta}" />
+					</cc:selectOneMenu>
+
+					<h:outputLabel value="Titolo di studio#{readonly ? '' : '*'}" />
+					<cc:inputSuggestion size="70" valueCod="#{pratica.deTitolo.id}"
+						value="#{pratica.deTitolo.descrizione}" required="true"
+						showButton="true" editingMode="#{not readonly}"
+						requiredMessage="Il Titolo di studio e' obbligatorio"
+						requiredMessageCod="E' necessario scegliere un titolo dalla lista a tendina"
+						suggestionPath="titoliStudio" title="Titoli di studio">
+					</cc:inputSuggestion>
+
+					<h:outputLabel value="Settore lavorativo#{readonly ? '' : '*'}" />
+					<cc:selectOneMenu value="#{pratica.deAttivita.id}" required="true"
+						styleClass="width50"
+						valueDescription="#{pratica.deAttivita.descrizione}"
+						editingMode="#{not readonly}">
+						<f:selectItems value="#{utilsBean.attivita}" />
+					</cc:selectOneMenu>
+
+					<h:panelGroup>
+						<h:outputLabel value="Stato occupazionale#{readonly ? '' : '*'}" />
+						<cc:helpButton
+							message="#{msg['cittadino.servizi_atipico.tip.stato_occ']}"
+							rendered="#{not readonly}" />
+					</h:panelGroup>
+					<cc:selectOneMenu value="#{pratica.opzStatoOccupazionale}"
+						valueDescription="#{pratica.opzStatoOccupazionale == 'O' ? 'Occupato' : 'Disoccupato'}"
+						required="true" disableInput="true" editingMode="#{not readonly}"
+						styleClass="width50">
+						<f:selectItem itemLabel="" itemValue="" />
+						<f:selectItem itemLabel="Occupato" itemValue="O" />
+						<f:selectItem itemLabel="Disoccupato" itemValue="D" />
+					</cc:selectOneMenu>
+
+					<h:panelGroup>
+						<h:outputLabel value="Attività svolta#{readonly ? '' : '*'}" />
+						<cc:helpButton
+							message="Descrivere sinteticamente l'attività svolta abitualmente e significativa per orientare la consulenza."
+							rendered="#{not readonly}" />
+					</h:panelGroup>
+					<cc:inputText value="#{pratica.attivitaSvoltaTesto}"
+						styleClass="width50" required="true" editingMode="#{not readonly}" />
+					
+					<h:outputLabel value="E-mail#{readonly ? '' : '*'}" />
+					<cc:inputText required="true" editingMode="#{not readonly}"
+						value="#{pratica.email}" styleClass="width50">
+						<f:validator validatorId="emailValidator" for="function" />
+					</cc:inputText>
+
+					<h:outputLabel value="Comune di domicilio#{readonly ? '' : '*'}" />
+					<cc:inputSuggestion
+						valueCod="#{pratica.deComuneByCodComuneResidenza.id}"
+						editingMode="#{true}" rendered="#{not readonly}"
+						value="#{pratica.deComuneByCodComuneResidenza.descrizione}"
+						requiredMessage="Il comune di domicilio e' obbligatorio" size="55"
+						suggestionPath="comuni" required="true" styleClass="width50">
+						<f:validator validatorId="comuneSuggestionValidator"
+							for="function" />
+					</cc:inputSuggestion>
+					<cc:inputText editingMode="false"
+						value="#{utilsBean.getNomeComuneRegione(pratica.deComuneByCodComuneResidenza.id, pratica.deComuneByCodComuneResidenza.descrizione)}"
+						rendered="#{readonly}" />
+
+					<h:outputLabel value="Cap" />
+					<cc:inputText value="#{pratica.cap}" maxlength="5" size="10"
+						styleClass="width50" editingMode="#{not readonly}">
+						<f:validator validatorId="capValidator" for="function" />
+					</cc:inputText>
+
+					<h:outputLabel value="Tel/Fax" />
+					<cc:inputText value="#{pratica.telefonoFax}" maxlength="30"
+						styleClass="width50" editingMode="#{not readonly}">
+						<f:validator validatorId="numeroTelefonicoValidator"
+							for="function" />
+					</cc:inputText>
+
+					<h:outputLabel value="Comune di lavoro#{readonly ? '' : '*'}" />
+					<cc:inputSuggestion styleClass="width50"
+						valueCod="#{pratica.deComuneByCodComuneLavoro.id}"
+						rendered="#{not readonly}"
+						value="#{pratica.deComuneByCodComuneLavoro.descrizione}"
+						requiredMessage="Il comune di lavoro e' obbligatorio" size="55"
+						suggestionPath="comuni" required="true">
+						<f:validator validatorId="comuneSuggestionValidator"
+							for="function" />
+					</cc:inputSuggestion>
+					<cc:inputText editingMode="false"
+						value="#{utilsBean.getNomeComuneRegione(pratica.deComuneByCodComuneLavoro.id, pratica.deComuneByCodComuneLavoro.descrizione)}"
+						rendered="#{readonly}" />
+				</h:panelGrid>
+			</div>
+		</h:panelGroup>
+
+		<h:panelGroup
+			class="accordion ui-accordion ui-widget ui-helper-reset ui-accordion-icons"
+			rendered="#{pratica.deTipoQuesito.id != 'LAVORO' and pratica.tipoConsulenza.id != 'ATIPICO'}">
+
+			<h3 style="display: #{readonly ? 'block' : 'none'}"
+				class="headingCollapse ui-helper-reset ui-state-default header_corpo_pratica_atipici">
+				<span class="ui-icon ui-icon-triangle-1-e"></span> Dati richiedente
+				- #{pratica.nome} #{pratica.cognome}
+			</h3>
+
+			<div class="dati_corpo_pratica_atipici#{readonly ? '_readonly' : ''}">
+				<h:panelGrid columns="2" columnClasses="width20 width30">
+
+					<h:panelGroup>
+						<h:outputLabel value="Committenza#{readonly ? '' : '*'}" />
+						<cc:helpButton
+							message="#{msg['cittadino.servizi_atipico.tip.committenza']}"
+							rendered="#{not readonly}" />
+					</h:panelGroup>
+
+					<cc:selectOneMenu value="#{pratica.committenza}" required="true"
+						valueDescription="#{pratica.committenza}" disableInput="true"
+						styleClass="width50" editingMode="#{not readonly}">
+						<f:selectItem itemLabel="" itemValue="" />
+						<f:selectItem itemLabel="Mono" itemValue="mono" />
+						<f:selectItem itemLabel="Pluri" itemValue="pluri" />
+					</cc:selectOneMenu>
+
+					<h:outputLabel value="Nome#{readonly ? '' : '*'}" />
+					<cc:inputText value="#{pratica.nome}" required="true"
+						styleClass="width50" editingMode="#{not readonly}" />
+
+					<h:outputLabel value="Cognome#{readonly ? '' : '*'}" />
+					<cc:inputText value="#{pratica.cognome}" required="true"
+						styleClass="width50" editingMode="#{not readonly}" />
+
+					<h:outputLabel value="Sesso#{readonly ? '' : '*'}" />
+					<cc:selectOneRadio value="#{pratica.codSesso}"
+						valueDescription="#{pratica.codSesso == '1' ? 'M' : 'F'}"
+						required="true" buttonset="true" editingMode="#{not readonly}">
+						<f:selectItem itemLabel="M" itemValue="1" />
+						<f:selectItem itemLabel="F" itemValue="2" />
+					</cc:selectOneRadio>
+
+					<h:outputLabel value="Età#{readonly ? '' : '*'}" />
+					<cc:selectOneMenu value="#{pratica.fasciaEta}" styleClass="width50"
+						valueDescription="#{pratica.fasciaEta.label}" disableInput="true"
+						editingMode="#{not readonly}">
+						<f:selectItems value="#{utilsBean.fascieEta}" />
+					</cc:selectOneMenu>
+
+					<h:outputLabel value="Titolo di studio#{readonly ? '' : '*'}" />
+					<cc:inputSuggestion size="70" editingMode="#{not readonly}"
+						valueCod="#{pratica.deTitolo.id}"
+						value="#{pratica.deTitolo.descrizione}" required="true"
+						showButton="true"
+						requiredMessage="Il Titolo di studio e' obbligatorio"
+						requiredMessageCod="E' necessario scegliere un titolo dalla lista a tendina"
+						suggestionPath="titoliStudio" title="Titoli di studio">
+					</cc:inputSuggestion>
+
+					<h:outputLabel value="Settore lavorativo#{readonly ? '' : '*'}" />
+					<cc:selectOneMenu required="true" value="#{pratica.deAttivita.id}"
+						styleClass="width50"
+						valueDescription="#{pratica.deAttivita.descrizione}"
+						disableInput="true" editingMode="#{not readonly}">
+						<f:selectItems value="#{utilsBean.attivita}" />
+					</cc:selectOneMenu>
+
+					<h:panelGroup>
+						<h:outputLabel value="Attività svolta#{readonly ? '' : '*'}" />
+						<cc:helpButton
+							message="Descrivere sinteticamente l'attività svolta abitualmente e significativa per orientare la consulenza."
+							rendered="#{not readonly}" />
+					</h:panelGroup>
+					<cc:selectOneMenu required="true"
+						value="#{pratica.deAtpAttivitaSvolta.id}" styleClass="width50"
+						disableInput="true" editingMode="#{not readonly}"
+						valueDescription="#{pratica.deAtpAttivitaSvolta.descrizione}">
+						<f:selectItems value="#{utilsBean.tipiAttivitaSvolte}" />
+					</cc:selectOneMenu>
+
+					<h:outputLabel value="Iscritto ad un'associazione professionale?" />
+					<h:selectBooleanCheckbox
+						value="#{pratica.flagAssociazioneProfessionale}"
+						rendered="#{not readonly}" />
+					<h:outputText
+						value="#{pratica.flagAssociazioneProfessionale ? 'SI' : 'NO'}"
+						rendered="#{readonly}" />
+
+					<h:outputLabel value="Se si quale?" rendered="#{not readonly}" />
+					<h:outputLabel value="Associazione professionale"
+						rendered="#{readonly}" />
+					<cc:inputText value="#{pratica.associazioneProfessionale}"
+						editingMode="#{not readonly}" styleClass="width50" />
+						
+					<h:outputLabel value="Iscritto alla gestione separata INPS?#{readonly ? '' : '*'}" />
+					<cc:selectOneRadio valueDescription="#{pratica.flgSeparataInps == 'true' ? 'SI' : 'NO'}"
+						value="#{pratica.flgSeparataInps}"
+						required="true" buttonset="true" editingMode="#{not readonly}" rendered="#{not readonly}">
+						<f:selectItem itemLabel="SI" itemValue="true"/>
+						<f:selectItem itemLabel="NO" itemValue="false"/>
+					</cc:selectOneRadio>
+					<h:outputText
+						value="#{pratica.flgSeparataInps ? 'SI' : 'NO'}"
+						rendered="#{readonly}" />
+
+					<h:outputLabel value="E-mail#{readonly ? '' : '*'}" />
+					<cc:inputText required="true" editingMode="#{not readonly}"
+						styleClass="width50" value="#{pratica.email}">
+						<f:validator validatorId="emailValidator" for="function" />
+					</cc:inputText>
+
+					<h:outputLabel value="Comune di domicilio#{readonly ? '' : '*'}" />
+					<cc:inputSuggestion
+						valueCod="#{pratica.deComuneByCodComuneResidenza.id}"
+						rendered="#{not readonly}"
+						value="#{pratica.deComuneByCodComuneResidenza.descrizione}"
+						editingMode="#{not readonly}"
+						requiredMessage="Il comune di domicilio e' obbligatorio"
+						styleClass="width50"
+						requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+						suggestionPath="comuni" required="true">
+						<f:validator validatorId="comuneSuggestionValidator"
+							for="function" />
+					</cc:inputSuggestion>
+					<cc:inputText editingMode="false"
+						value="#{utilsBean.getNomeComuneRegione(pratica.deComuneByCodComuneResidenza.id, pratica.deComuneByCodComuneResidenza.descrizione)}"
+						rendered="#{readonly}" />
+
+					<h:outputLabel value="Cap" />
+					<cc:inputText value="#{pratica.cap}" maxlength="5" size="10"
+						styleClass="width50" editingMode="#{not readonly}">
+						<f:validator validatorId="capValidator" for="function" />
+					</cc:inputText>
+
+					<h:outputLabel value="Tel/Fax" />
+					<cc:inputText value="#{pratica.telefonoFax}" maxlength="30"
+						styleClass="width50" editingMode="#{not readonly}">
+						<f:validator validatorId="numeroTelefonicoValidator"
+							for="function" />
+					</cc:inputText>
+
+					<h:panelGroup>
+						<h:outputLabel
+							value="Principale area territoriale di lavoro#{readonly ? '' : '*'}" />
+						<cc:helpButton
+							message="#{msg['cittadino.servizi_atipico.tip.area_terr']}"
+							rendered="#{not readonly}" />
+					</h:panelGroup>
+					<cc:selectOneMenu value="#{pratica.deRegione.id}"
+						valueDescription="#{pratica.deRegione.descrizione}"
+						required="true" disableInput="true" styleClass="width50"
+						editingMode="#{not readonly}">
+						<f:selectItems value="#{utilsBean.regioni}" />
+					</cc:selectOneMenu>
+
+					<h:outputLabel value="Comune di lavoro#{readonly ? '' : '*'}" />
+					<cc:inputSuggestion
+						valueCod="#{pratica.deComuneByCodComuneLavoro.id}"
+						rendered="#{not readonly}"
+						value="#{pratica.deComuneByCodComuneLavoro.descrizione}"
+						editingMode="#{not readonly}"
+						requiredMessage="Il comune di lavoro e' obbligatorio"
+						styleClass="width50"
+						requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+						suggestionPath="comuni" required="true">
+						<f:validator validatorId="comuneSuggestionValidator"
+							for="function" />
+					</cc:inputSuggestion>
+					<cc:inputText editingMode="false"
+						value="#{utilsBean.getNomeComuneRegione(pratica.deComuneByCodComuneLavoro.id, pratica.deComuneByCodComuneLavoro.descrizione)}"
+						rendered="#{readonly}" />
+				</h:panelGrid>
+			</div>
+		</h:panelGroup>
+
+		<h:panelGroup
+			class="accordion ui-accordion ui-widget ui-helper-reset ui-accordion-icons"
+			rendered="#{pratica.deTipoQuesito.id == 'LAVORO'}">
+
+			<h3 style="display: #{readonly ? 'block' : 'none'}"
+				class="headingCollapse ui-helper-reset ui-state-default header_corpo_pratica_atipici">
+				<span class="ui-icon ui-icon-triangle-1-e"></span> Dati richiedente
+				- #{pratica.nome} #{pratica.cognome}
+			</h3>
+
+			<div class="dati_corpo_pratica_atipici#{readonly ? '_readonly' : ''}">
+				<h:panelGrid columns="2" columnClasses="width20 width30">
+
+					<h:outputLabel value="Nome#{readonly ? '' : '*'}" />
+					<cc:inputText value="#{pratica.nome}" required="true"
+						styleClass="width50" editingMode="#{not readonly}" />
+
+					<h:outputLabel value="Cognome#{readonly ? '' : '*'}" />
+					<cc:inputText value="#{pratica.cognome}" required="true"
+						styleClass="width50" editingMode="#{not readonly}" />
+
+					<h:outputLabel value="Sesso#{readonly ? '' : '*'}" />
+					<cc:selectOneRadio value="#{pratica.codSesso}"
+						valueDescription="#{pratica.codSesso == '1' ? 'M' : 'F'}"
+						required="true" buttonset="true" editingMode="#{not readonly}">
+						<f:selectItem itemLabel="M" itemValue="1" />
+						<f:selectItem itemLabel="F" itemValue="2" />
+					</cc:selectOneRadio>
+
+					<h:outputLabel value="Età#{readonly ? '' : '*'}" />
+					<cc:selectOneMenu value="#{pratica.fasciaEta}" disableInput="true"
+						styleClass="width50" editingMode="#{not readonly}"
+						valueDescription="#{pratica.fasciaEta.label}">
+						<f:selectItems value="#{utilsBean.fascieEta}" />
+					</cc:selectOneMenu>
+
+					<h:outputLabel value="Titolo di studio#{readonly ? '' : '*'}" />
+					<cc:inputSuggestion size="70" valueCod="#{pratica.deTitolo.id}"
+						value="#{pratica.deTitolo.descrizione}" required="true"
+						showButton="true" editingMode="#{not readonly}"
+						requiredMessage="Il Titolo di studio e' obbligatorio"
+						requiredMessageCod="E' necessario scegliere un titolo dalla lista a tendina"
+						suggestionPath="titoliStudio" title="Titoli di studio">
+					</cc:inputSuggestion>
+
+					<h:outputLabel value="E-mail#{readonly ? '' : '*'}" />
+					<cc:inputText required="true" editingMode="#{not readonly}"
+						styleClass="width50" value="#{pratica.email}">
+						<f:validator validatorId="emailValidator" for="function" />
+					</cc:inputText>
+
+					<h:outputLabel value="Comune di domicilio#{readonly ? '' : '*'}" />
+					<cc:inputSuggestion
+						valueCod="#{pratica.deComuneByCodComuneResidenza.id}"
+						rendered="#{not readonly}"
+						value="#{pratica.deComuneByCodComuneResidenza.descrizione}"
+						requiredMessage="Il comune di domicilio e' obbligatorio" size="55"
+						styleClass="width50"
+						requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+						suggestionPath="comuni" required="true">
+						<f:validator validatorId="comuneSuggestionValidator"
+							for="function" />
+					</cc:inputSuggestion>
+					<cc:inputText editingMode="false"
+						value="#{utilsBean.getNomeComuneRegione(pratica.deComuneByCodComuneResidenza.id, pratica.deComuneByCodComuneResidenza.descrizione)}"
+						rendered="#{readonly}" />
+
+					<h:outputLabel value="Cap" />
+					<cc:inputText value="#{pratica.cap}" maxlength="5" size="10"
+						editingMode="#{not readonly}">
+						<f:validator validatorId="capValidator" for="function" />
+					</cc:inputText>
+
+					<h:outputLabel value="Tel/Fax" />
+					<cc:inputText value="#{pratica.telefonoFax}" maxlength="30"
+						styleClass="width50" editingMode="#{not readonly}">
+						<f:validator validatorId="numeroTelefonicoValidator"
+							for="function" />
+					</cc:inputText>
+
+					<h:outputLabel
+						value="Sei iscritto ad un Centro per l'impiego dell'Emilia Romagna?" />
+					<h:selectBooleanCheckbox value="#{pratica.flagIscrittoCpi}"
+						rendered="#{not readonly}" />
+					<h:outputText value="#{pratica.flagIscrittoCpi ? 'SI' : 'NO'}"
+						rendered="#{readonly}" />
+
+					<h:outputLabel value="Se sì, indicare in quale comune"
+						rendered="#{not readonly}" />
+					<h:outputLabel value="Iscritto al Centro per l'impiego"
+						rendered="#{readonly}" />
+					<cc:inputSuggestion valueCod="#{pratica.comuneIscrizione.id}"
+						editingMode="#{not readonly}"
+						value="#{pratica.comuneIscrizione.descrizione}"
+						requiredMessage="Il comune di domicilio e' obbligatorio"
+						styleClass="width50"
+						requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+						suggestionPath="comunibyregione">
+						<f:validator validatorId="comuneSuggestionValidator"
+							for="function" />
+					</cc:inputSuggestion>
+
+					<h:panelGroup>
+						<h:outputLabel value="Ultimo contratto#{readonly ? '' : '*'}" />
+						<cc:helpButton
+							message="Scegliere dal menu a tendina il contratto in corso al momento della richiesta o l'ultimo contratto stipulato (se al momento della richiesta non si è occupati)"
+							rendered="#{not readonly}" />
+					</h:panelGroup>
+
+					<h:panelGroup>
+						<cc:inputSuggestion size="70" rendered="#{not readonly}"
+							value="#{pratica.deAtpContrattoUltimoDTO.descrizione}"
+							valueCod="#{pratica.deAtpContrattoUltimoDTO.id}" required="true"
+							showButton="true" editingMode="#{not readonly}"
+							requiredMessage="Il contratto e' obbligatorio"
+							requiredMessageCod="E' necessario scegliere un contratto dalla lista a tendina"
+							suggestionPath="contrattiatipici" title="Contratto">
+							<f:validator validatorId="atpContrattoSuggestionValidator"
+								for="function" />
+						</cc:inputSuggestion>
+						<h:outputText
+							value="#{pratica.deAtpContrattoPadreDTO.descrizione} - #{pratica.deAtpContrattoUltimoDTO.descrizione}"
+							rendered="#{readonly}" />
+					</h:panelGroup>
+
+					<h:outputLabel
+						value="Data fine ultimo contratto#{readonly ? '' : '*'}" />
+					<cc:inputText editingMode="#{not readonly}" erroreSotto="true"
+						value="#{pratica.dtFineUltimoContratto}" type="date"
+						required="true" requiredMessage="La data e' obbligatoria.">
+					</cc:inputText>
+
+					<h:outputLabel
+						value="Settore lavorativo ultimo contratto#{readonly ? '' : '*'}" />
+					<cc:selectOneMenu value="#{pratica.settoreUltimoContratto.id}"
+						styleClass="width50" required="true" disableInput="true"
+						editingMode="#{not readonly}"
+						valueDescription="#{pratica.deAttivita.descrizione}">
+						<f:selectItems value="#{utilsBean.attivita}" />
+					</cc:selectOneMenu>
+
+					<h:panelGroup>
+						<h:outputLabel value="Attività svolta#{readonly ? '' : '*'}" />
+						<cc:helpButton
+							message="Descrivere sinteticamente l'attività svolta abitualmente e significativa per orientare la consulenza."
+							rendered="#{not readonly}" />
+					</h:panelGroup>
+					<cc:inputText value="#{pratica.attivitaSvoltaTesto}"
+						styleClass="width50" required="true" editingMode="#{not readonly}" />
+
+					<h:panelGroup>
+						<h:outputLabel value="Provincia di lavoro" />
+						<cc:helpButton
+							message="Indicare la provincia in cui si svolge il prevalentemente il proprio lavoro."
+							rendered="#{not readonly}" />
+					</h:panelGroup>
+					<cc:inputSuggestion size="70" valueCod="#{pratica.deProvincia.id}"
+						value="#{pratica.deProvincia.descrizione}"
+						editingMode="#{not readonly}"
+						requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+						suggestionPath="provincie" title="Provincie">
+						<f:validator validatorId="provinciaSuggestionValidator"
+							for="function" />
+					</cc:inputSuggestion>
+				</h:panelGrid>
+				<br />
+
+				<h:panelGrid columns="2" columnClasses="width20"
+					rendered="#{readonly}">
+					<h:outputLabel value="Allegato" />
+					<h:panelGroup rendered="#{not empty pratica.allegati[0]}">
+						<cc:upload readonly="#{true}" label=""
+							tmpValue="#{pratica.allegati[0].filename}"
+							idAllegato="#{pratica.allegati[0].id}"
+							value="#{pratica.allegati[0].filename}" />
+					</h:panelGroup>
+				</h:panelGrid>
+
+				<h:panelGroup rendered="#{not readonly}">
+					<cc:upload label="Allega file" idAllegato=""
+						value="#{pratica.allegatoCvName}"
+						tmpValue="#{pratica.allegatoCvNameTmp}" />
+				</h:panelGroup>
+			</div>
+		</h:panelGroup>
+	</h:panelGroup>
+
+	<script>
+		//<![CDATA[ 
+ 		$(".headingCollapse").click(function() {				
+			$(".dati_corpo_pratica_atipici#{readonly ? '_readonly' : ''}").slideToggle(500)
+ 		})		
+		//]]>  		
+	</script>
+</ui:composition>

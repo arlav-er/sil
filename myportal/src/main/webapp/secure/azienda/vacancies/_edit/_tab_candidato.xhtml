@@ -1,0 +1,102 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/partial_tab.xhtml">
+
+	<ui:param name="form_id" value="form_candidato"></ui:param>
+	<ui:param name="tabBean" value="#{vaCandidatoBean}"></ui:param>
+	<ui:param name="deleteId" value="#{tabBean.data.idVaDatiVacancy}"></ui:param>
+
+	<ui:define name="form_data">
+		<div>
+			<h4>Esperienze</h4>
+			<h:panelGrid id="insert_form_esperienze" columns="3" cellspacing="10"
+				columnClasses=",,width50">
+				<h:panelGroup>
+					<label>Età</label><br />
+					<cc:inputText id="etaDa" value="#{tabBean.data.vaEsperienze.numDa}"
+						label="Da" maxlength="2" size="4" layout="inline"
+						editingMode="#{tabBean.editing}">
+					</cc:inputText>
+					<cc:inputText id="etaA" value="#{tabBean.data.vaEsperienze.numA}"
+						label="a" maxlength="2" size="4" layout="inline"
+						editingMode="#{tabBean.editing}">
+					</cc:inputText>
+				</h:panelGroup>
+			
+				<cc:selectOneMenu required="false" label="Motivo età"
+					value="#{tabBean.data.vaEsperienze.deMotivoEtaSil.id}"
+					editingMode="#{tabBean.editing}"
+					valueDescription="#{tabBean.data.vaEsperienze.deMotivoEtaSil.descrizione}">
+					<f:selectItems value="#{tabBean.deMotivoEtaSilList}" />
+					<f:ajax event="change" execute="@this" render=":form_candidato:textareaNoteMotivoEta" />
+				</cc:selectOneMenu>
+			
+				<cc:inputTextarea required="false" richTextMode="false" label="Note"
+					id="textareaNoteMotivoEta" editingMode="#{tabBean.editing}" maxlength="2000" rows="2"
+					disabled="#{tabBean.isNoteMotivoEtaDisabled()}"
+					value="#{tabBean.data.vaEsperienze.notaMotivoEta}">
+				</cc:inputTextarea>
+				
+				<cc:selectOneRadio id="esperienza" editingMode="#{tabBean.editing}"
+					valueDescription="#{tabBean.data.getOpzione(tabBean.data.vaEsperienze.opzEsperienza)}"
+					value="#{tabBean.data.vaEsperienze.opzEsperienza}" label="Con esperienza">
+					<f:selectItem itemLabel="Preferibile" itemValue="P" />
+					<f:selectItem itemLabel="Sì" itemValue="Y" />
+					<f:selectItem itemLabel="No" itemValue="N" />
+				</cc:selectOneRadio>
+				
+				<cc:inputText id="anniEsperienza" value="#{tabBean.data.vaEsperienze.numAnniEsperienza}"
+					label="Anni di esperienza" maxlength="2" size="4" 
+					editingMode="#{tabBean.editing}">
+				</cc:inputText>
+				
+				<h:panelGroup></h:panelGroup>
+				
+				<cc:selectOneRadio id="formazione" editingMode="#{tabBean.editing}"
+					valueDescription="#{tabBean.data.getOpzione(tabBean.data.vaEsperienze.opzFormazione)}"
+					value="#{tabBean.data.vaEsperienze.opzFormazione}" label="Formazione specifica per la mansione">
+					<f:selectItem itemLabel="Preferibile" itemValue="P" />
+					<f:selectItem itemLabel="Sì" itemValue="Y" />
+					<f:selectItem itemLabel="No" itemValue="N" />
+				</cc:selectOneRadio>
+				
+				<cc:inputTextarea required="false" richTextMode="false" label="Note formazione specifica"
+					id="textareaNoteFormazione" editingMode="#{tabBean.editing}" maxlength="2000" rows="2"
+					value="#{tabBean.data.vaEsperienze.notaEsperienza}">
+				</cc:inputTextarea>
+			</h:panelGrid>
+		</div>
+		<div>
+			<h4>Caratteristiche</h4>
+			<h:panelGrid id="insert_form_caratteristiche" columns="2" cellspacing="10">
+				<cc:inputTextarea required="false" richTextMode="false" label="Conoscenze"
+					editingMode="#{tabBean.editing}" maxlength="2000" rows="3"
+					value="#{tabBean.data.vaCaratteristiche.conoscenze}">
+				</cc:inputTextarea>
+				
+				<cc:inputTextarea required="false" richTextMode="false" label="Formazione"
+					editingMode="#{tabBean.editing}" maxlength="2000" rows="3"
+					value="#{tabBean.data.vaCaratteristiche.formazione}">
+				</cc:inputTextarea>
+				
+				<cc:inputTextarea required="false" richTextMode="false" label="Caratteristiche"
+					editingMode="#{tabBean.editing}" maxlength="2000" rows="3"
+					value="#{tabBean.data.vaCaratteristiche.caratteristiche}">
+				</cc:inputTextarea>
+			</h:panelGrid>
+		</div>
+	</ui:define>
+
+	<ui:define name="javascript_data">
+		<script type="text/javascript">
+			$(function() {
+				disegnaBottoni();
+				attachListener();
+				$('#Candidato a:visible:enabled:first').focus();
+			});
+		</script>
+	</ui:define>
+</ui:composition>

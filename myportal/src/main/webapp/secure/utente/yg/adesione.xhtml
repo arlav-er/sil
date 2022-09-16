@@ -1,0 +1,426 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+<h:head>
+
+</h:head>
+
+<f:metadata>
+	<f:event listener="#{ygAdesioneBean.checkViewPage()}"
+		type="preRenderView" />
+</f:metadata>
+
+<h:body>
+
+	<ui:composition template="../../template/main.xhtml">
+
+		<ui:define name="content">
+			<ui:fragment rendered="#{ygAdesioneBean.showMessaggioRer}">
+				<ui:include src="_headerRer.xhtml" />
+			</ui:fragment>
+			<ui:fragment rendered="#{ygAdesioneBean.showMessaggioUmbria}">
+				<ui:include src="_headerUmbria.xhtml" />
+			</ui:fragment>
+			<ui:fragment rendered="#{not ygAdesioneBean.showMessaggioUmbria and not ygAdesioneBean.showMessaggioRer}">
+				<ui:include src="_header.xhtml" />
+			</ui:fragment>
+
+			<div class="widget_container">
+				<div class="ui-widget-content ui-widget ui-corner-all">
+
+					<h:panelGrid columns="1" rendered="#{ygAdesioneBean.errore}">
+
+						<h:form id="informativa_error_form">
+
+							<cc:messages />
+
+							<h:panelGrid columns="1">
+								<center>
+									<h:outputText
+										value="#{txt['cittadino.yg.servizio_non_disponibile']}"
+										escape="false"
+										rendered="#{ygAdesioneBean.erroreServizioNonDisponibile}" />
+									<h:outputText value="#{txt['cittadino.yg.errore_generico']}"
+										escape="false" rendered="#{ygAdesioneBean.erroreGenerico}" />
+									<h:outputText
+										value="#{txt['cittadino.yg.errore_sap_non_presente']}"
+										escape="false"
+										rendered="#{ygAdesioneBean.erroreIdentificativoSapNonPresente}" />
+									<h:outputText
+										value="#{ygAdesioneBean.descrizioneErroreSpecifico}"
+										escape="false"
+										rendered="#{ygAdesioneBean.erroreAdesioneGiaPresenteLatoMinistero}" />
+								</center>
+								
+								<h:link rendered="true" styleClass="buttonStyle" outcome="home"
+									title="Torna alla scrivania">Torna alla scrivania</h:link>
+									
+								<h:link styleClass="buttonStyle" rendered="#{ygAdesioneBean.isMsgUmbria()}"
+									outcome="/secure/utente/yg/prenota_appuntamento.xhtml"
+									title="Prenota Appuntamento">Prenota Appuntamento</h:link>
+									
+							</h:panelGrid>
+
+						</h:form>
+
+					</h:panelGrid>
+
+					<h:panelGrid columns="1"
+						rendered="#{ygAdesioneBean.adesioneAttiva}">
+
+						<h:outputText value="#{txt['cittadino.yg.adesione_gia_presente']}"
+							escape="false"
+							rendered="#{ygAdesioneBean.esisteAdesione and ygAdesioneBean.currentAdesioneInviataDaMyPortal}" />
+						<h:outputText
+							value="${txt['cittadino.yg.adesione_inviata_da_portale']} ${ygAdesioneBean.dataAdesione}"
+							escape="false"
+							rendered="#{ygAdesioneBean.esisteAdesione and ygAdesioneBean.currentAdesioneInviataDaMyPortal}" />
+						<h:outputText
+							value="#{txt['cittadino.yg.adesione_inviata_non_da_portale']}"
+							escape="false"
+							rendered="#{ygAdesioneBean.esisteAdesione and not ygAdesioneBean.currentAdesioneInviataDaMyPortal}" />
+
+						<h:link rendered="true" styleClass="buttonStyle" outcome="home"
+							title="Torna alla scrivania">Torna alla scrivania</h:link>
+
+					</h:panelGrid>
+
+					<h:panelGrid columns="1"
+						rendered="#{not ygAdesioneBean.adesioneAttiva and not ygAdesioneBean.errore}">
+
+						<h:form id="dati_personali_form">
+
+							<cc:messages />
+
+							<h:panelGrid columns="2" cellspacing="10"
+								columnClasses="fifty-top, fifty-top">
+
+								<h:panelGrid columns="1">
+
+									<h:outputLabel id="codice_fiscale_label"
+										for="codice_fiscale_value" value="Codice Fiscale"
+										rendered="${ygAdesioneBean.codiceFiscaleReadOnly}" />
+									<h:outputText id="codice_fiscale_value"
+										value="#{ygAdesioneBean.utente.codiceFiscale}"
+										rendered="${ygAdesioneBean.codiceFiscaleReadOnly}" />
+
+									<cc:inputText id="codice_fiscale"
+										value="#{ygAdesioneBean.utente.codiceFiscale}"
+										label="Codice Fiscale" required="true" maxlength="16"
+										requiredMessage="Codice fiscale obbligatorio" size="30"
+										readonly="${ygAdesioneBean.codiceFiscaleReadOnly}"
+										rendered="${not ygAdesioneBean.codiceFiscaleReadOnly}">
+										<f:validator validatorId="codiceFiscaleValidator"
+											for="function" />
+									</cc:inputText>
+
+								</h:panelGrid>
+
+								<h:panelGrid columns="1"></h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<cc:inputText id="cognome"
+										value="#{ygAdesioneBean.utente.cognome}" label="Cognome"
+										required="true" maxlength="50"
+										requiredMessage="Cognome obbligatorio" size="30" />
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<cc:inputText id="nome" value="#{ygAdesioneBean.utente.nome}"
+										label="Nome" required="true" maxlength="50"
+										requiredMessage="Nome obbligatorio" size="30" />
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<cc:selectOneMenu label="Sesso" id="sesso" required="true"
+										value="#{ygAdesioneBean.utente.genere.id}">
+										<f:selectItems value="#{utilsBean.genere}" var="entry"
+											itemValue="#{entry.id}" itemLabel="#{entry.descrizione}" />
+										<f:ajax event="change" render="@form"
+											onevent="genereChanged()"
+											listener="#{ygAdesioneBean.onChangeGenere}"></f:ajax>
+									</cc:selectOneMenu>
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<cc:inputText id="data_nascita" label="Data di nascita"
+										type="dataNascita" required="true"
+										value="#{ygAdesioneBean.utente.dataNascita}"
+										editingMode="true" />
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<cc:inputSuggestion id="comune_nascita"
+										label="Comune o stato di nascita" required="true"
+										valueCod="#{ygAdesioneBean.utente.comuneNascita.id}"
+										value="#{ygAdesioneBean.utente.comuneNascita.descrizione}"
+										requiredMessage="Il comune di nascita è obbligatorio"
+										requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+										suggestionPath="comuni">
+										<f:validator validatorId="comuneSuggestionValidator"
+											for="function" />
+									</cc:inputSuggestion>
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<cc:inputSuggestion id="cittadinanza" label="Cittadinanza"
+										value="#{ygAdesioneBean.utente.cittadinanza.descrizione}"
+										valueCod="#{ygAdesioneBean.utente.cittadinanza.id}"
+										requiredMessage="La cittadinanza è obbligatoria"
+										requiredMessageCod="E' necessario scegliere una cittadinanza dalla lista a tendina"
+										suggestionPath="cittadinanza"
+										valueChangeListener="#{ygAdesioneBean.onChangeCittadinanza}"
+										required="true">
+										<f:validator validatorId="cittadinanzaSuggestionValidator"
+											for="function" />
+										<f:ajax event="change" render="@form"
+											onevent="cittadinanzaChanged()"></f:ajax>
+									</cc:inputSuggestion>
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<cc:inputText id="indirizzo_domicilio"
+										value="#{ygAdesioneBean.utente.indirizzoDomicilio}"
+										label="Indirizzo domicilio" required="true" maxlength="512"
+										requiredMessage="Indirizzo domicilio obbligatorio" size="30" />
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<cc:inputSuggestion id="comune_domicilio"
+										label="Comune domicilio"
+										value="#{ygAdesioneBean.utente.comuneDomicilio.descrizione}"
+										valueCod="#{ygAdesioneBean.utente.comuneDomicilio.id}"
+										requiredMessage="Il comune di domicilio e' obbligatorio"
+										requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+										suggestionPath="comuniValidi" required="true">
+										<f:validator validatorId="comuneValidiSuggestionValidator"
+											for="function" />
+										<f:ajax event="change" render="@form"
+											onevent="comuneChanged()"
+											listener="#{ygAdesioneBean.onChangeComuneDomicilio}"></f:ajax>
+									</cc:inputSuggestion>
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<cc:inputText id="cap_domicilio"
+										value="#{ygAdesioneBean.utente.capDomicilio}"
+										label="CAP domicilio" required="true" maxlength="5"
+										requiredMessage="CAP domicilio obbligatorio" size="5" />
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<h:commandLink
+										action="#{ygAdesioneBean.copiaDatiDomicilioInResidenza}"
+										class="buttonStyle">
+										<f:ajax
+											render=":dati_personali_form:cap_residenza :dati_personali_form:indirizzo_residenza :dati_personali_form:comune_residenza" />
+						    Copia dati Domicilio in Residenza
+						</h:commandLink>
+								</h:panelGrid>
+
+								<h:panelGrid id="provincia_riferimento_container" columns="1"
+									rendered="#{ygAdesioneBean.comuneDomicilioFuoriRegione}">
+									<cc:selectOneMenu label="Provincia di riferimento"
+										id="provincia_riferimento" required="true"
+										value="#{ygAdesioneBean.utente.provinciaRiferimento.id}"
+										requiredMessage="Indica la provincia di riferimento">
+										<f:selectItems value="#{utilsBean.province}" />
+										<f:ajax event="change" render="@form"
+											onevent="provinciaAdesioneChanged()"
+											listener="#{ygAdesioneBean.onChangeProvinciaAdesione}"></f:ajax>
+									</cc:selectOneMenu>
+									<h:outputText escape="false"
+										value="#{txt['preferences.provincia_rif']}" />
+								</h:panelGrid>
+
+								<h:panelGrid
+									rendered="#{ygAdesioneBean.comuneDomicilioFuoriRegione}"
+									columns="1">
+									<cc:selectOneMenu label="CPI di riferimento" id="cpi_adesione"
+										required="true" value="#{ygAdesioneBean.cpiAdesione.id}"
+										requiredMessage="Il CPI di riferimento e' obbligatorio">
+										<f:selectItems value="#{ygAdesioneBean.cpiSelectItems}" />
+										<f:ajax event="change" render="@form"
+											onevent="cpiAdesioneChanged()"
+											listener="#{ygAdesioneBean.onChangeCpiAdesione}"></f:ajax>
+									</cc:selectOneMenu>
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<cc:inputText id="indirizzo_residenza"
+										value="#{ygAdesioneBean.utente.indirizzoResidenza}"
+										label="Indirizzo residenza" required="true" maxlength="100"
+										requiredMessage="Indirizzo residenza obbligatorio" size="30" />
+								</h:panelGrid>
+
+								<cc:inputSuggestion id="comune_residenza"
+									label="Comune residenza" required="true"
+									valueCod="#{ygAdesioneBean.utente.comuneResidenza.id}"
+									value="#{ygAdesioneBean.utente.comuneResidenza.descrizione}"
+									requiredMessage="Il comune di residenza è obbligatorio"
+									requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+									suggestionPath="comuniValidi">
+									<f:validator validatorId="comuneValidiSuggestionValidator"
+										for="function" />
+									<f:ajax event="change"
+										listener="#{ygAdesioneBean.comuneResidenzaChanged()}"
+										render=":dati_personali_form:cap_residenza :dati_personali_form:comune_residenza"
+										execute=":dati_personali_form:comune_residenza" />
+								</cc:inputSuggestion>
+
+								<h:panelGrid columns="1">
+									<cc:inputText id="cap_residenza"
+										value="#{ygAdesioneBean.utente.capResidenza}"
+										label="CAP residenza" required="true" maxlength="5"
+										requiredMessage="CAP residenza obbligatorio" size="5" />
+								</h:panelGrid>
+
+								<h:panelGrid columns="1"></h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<h:outputLabel id="email_label" for="email" value="E-mail" />
+									<h:outputText id="email" value="#{ygAdesioneBean.utente.email}" />
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<cc:inputText id="telCasa"
+										value="${ygAdesioneBean.utente.telCasa}" label="Telefono"
+										required="false" maxlength="15"
+										requiredMessage="Telefono obbligatorio" size="30" />
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<cc:inputText id="cellulare"
+										value="#{ygAdesioneBean.utente.cellulare}" label="Cellulare"
+										required="false" maxlength="15"
+										requiredMessage="Cellulare obbligatorio" size="30" />
+								</h:panelGrid>
+
+								<h:panelGrid columns="1"></h:panelGrid>
+
+								<h:panelGrid columns="1" rendered="#{ygAdesioneBean.extraUE}">
+									<cc:inputSuggestion id="titolo_soggiorno"
+										label="Titolo di soggiorno"
+										rendered="#{ygAdesioneBean.extraUE}" required="true"
+										value="#{ygAdesioneBean.utente.documentoSoggiorno.descrizione}"
+										valueCod="#{ygAdesioneBean.utente.documentoSoggiorno.id}"
+										requiredMessage="Il titolo di soggiorno è obbligatorio"
+										requiredMessageCod="E' necessario scegliere un titolo di soggiorno dalla lista a tendina"
+										suggestionPath="titoloSoggiorno">
+										<f:validator validatorId="titoloSoggiornoSuggestionValidator"
+											for="function" />
+									</cc:inputSuggestion>
+								</h:panelGrid>
+
+								<h:panelGrid columns="1" rendered="#{ygAdesioneBean.extraUE}">
+									<cc:inputText id="numero_documento"
+										value="#{ygAdesioneBean.utente.numeroDocumento}"
+										label="Numero del documento" required="true" maxlength="15"
+										requiredMessage="Numero del documento obbligatorio" size="30" />
+								</h:panelGrid>
+
+								<h:panelGrid columns="1" rendered="#{ygAdesioneBean.extraUE}">
+									<cc:inputText id="data_scadenza" label="Data di scadenza"
+										type="date" required="true"
+										value="#{ygAdesioneBean.utente.dataScadenzaDocumento}" />
+								</h:panelGrid>
+
+								<h:panelGrid columns="1" rendered="#{ygAdesioneBean.extraUE}">
+									<cc:selectOneMenu label="Motivo Permesso"
+										value="#{ygAdesioneBean.utente.motivoPermesso.id}"
+										valueDescription="#{bean.richiesta.motivoPermesso.descrizione}"
+										disableInput="true" id="motivo_permesso" required="true">
+										<f:selectItems value="#{utilsBean.motivoPermesso}" var="entry"
+											itemValue="#{entry.id}" itemLabel="#{entry.descrizione}" />
+									</cc:selectOneMenu>
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<cc:selectOneRadio id="flg_consenso_sms"
+										value="#{ygAdesioneBean.utente.flgConsensoSms}"
+										valueDescription="#{ygAdesioneBean.utente.flgConsensoSms == 'true' ? 'SI' : 'NO'}"
+										buttonset="true"
+										label="Acconsento a ricevere messaggi SMS di notifica al numero indicato">
+										<f:selectItem itemLabel="SI" itemValue="true" />
+										<f:selectItem itemLabel="NO" itemValue="false" />
+									</cc:selectOneRadio>
+								</h:panelGrid>
+
+								<h:panelGrid columns="1"></h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<h:outputLabel id="data_adesione_yg_label"
+										for="data_adesione_yg" value="Data adesione" />
+									<h:outputText id="data_adesione_yg"
+										value="#{ygAdesioneBean.currentDate}">
+										<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</h:panelGrid>
+								
+								<h:panelGrid columns="1"></h:panelGrid>
+								
+							</h:panelGrid>
+
+							<h:outputText style="font-weight: bold;" value="Tutte le dichiarazioni sono rese e sottoscritte ai sensi degli artt. 45 e 46 del D.P.R. n. 445/2000"/>
+
+							<center>
+								<h:link rendered="true"
+									styleClass="buttonStyle backButtonStyle yg_margin_right"
+									outcome="home" title="Torna alla scrivania">Torna alla scrivania</h:link>
+								<h:commandLink action="#{ygAdesioneBean.inviaAdesione}" rendered="#{utilsBean.isUmbria()}"
+									value="Invia Adesione ad Umbriattiva Giovani e a Garanzia Giovani nazionale"
+									styleClass="updateButton" id="invia_adesione_btn">
+								</h:commandLink>
+								<h:commandLink action="#{ygAdesioneBean.inviaAdesione}" rendered="#{!utilsBean.isUmbria()}"
+									value="Invia Adesione Garanzia Giovani"
+									styleClass="updateButton" id="invia_adesione_btn2">
+								</h:commandLink>
+							</center>
+
+							<script type="text/javascript">
+				//<![CDATA[
+				function getCpiBySuggestionExtraParams() {
+					var extraParams = [['provincia','#{ygAdesioneBean.utente.provinciaRiferimento.id}']];
+					return extraParams;
+				}
+				function cittadinanzaChanged () {
+					disegnaBottoni();
+				}
+				function provinciaAdesioneChanged() {
+					disegnaBottoni();
+				}
+				function genereChanged() {
+					disegnaBottoni();
+				}
+				function cpiAdesioneChanged() {
+					disegnaBottoni();
+				}
+				disegnaBottoni();
+				//]]> 
+				</script>
+
+						</h:form>
+
+						<script type="text/javascript">
+			//<![CDATA[
+			function comuneChanged(data) {
+				disegnaBottoni();
+			}		
+			//]]> 
+			</script>
+
+					</h:panelGrid>
+
+				</div>
+			</div>
+
+		</ui:define>
+
+	</ui:composition>
+
+</h:body>
+
+</html>

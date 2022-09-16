@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" template="/WEB-INF/templates/#{utilsBean.bootstrapTemplate}/main.xhtml">
+
+	<ui:param name="pagetitle" value="Modifica il tuo Curriculum" />
+
+
+	<ui:define name="content">
+		<h:outputScript library="commons" name="js/components/eng.components.js"></h:outputScript>
+		<h:outputScript library="commons" name="js/components/treeAutoComplete.js"></h:outputScript>
+		<h:outputScript library="commons" name="js/jquery.history.js"></h:outputScript>
+		<h:outputScript library="commons" name="js/vendor/jConfirm.min.js" />
+		<h:outputScript library="commons" name="js/utente/curriculum/curriculum.form.js"></h:outputScript>
+		<div class="container-fluid curriculum-container">
+			<div class="container curriculum-inner-container">
+				<div class="row  curriculum-main-row">
+					<div class="col-xs-12 col-sm-12 col-md-3 curriculum-sidebar">
+						<ui:include src="_edit/pf/_nav.xhtml" />
+						<h:form id="remoteCommandsForm">
+							<p:remoteCommand name="updateSection" actionListener="#{curriculumVitaePfBean.updateSection}" process="@this"
+								update=":section" onstart="MyPortal.Curriculum.navigationStart()"
+								oncomplete="MyPortal.Curriculum.navigationComplete(args, xhr, status)" global="false"></p:remoteCommand>
+
+							<p:remoteCommand name="checkProgressValueRC" actionListener="#{curriculumVitaePfBean.checkProgressValue}"
+								oncomplete="MyPortal.Curriculum.checkProgressValueComplete(args)" process="@this" global="false" async="true" />
+							<ui:remove>
+								<!-- if you remove the selectCheckboxMenu component from here > YOU ARE FUCKED UP!
+                         This is used to tell PrimeFaces to load the scripts of the core.js even if there's no component in the main.xhtml
+                     Loading the scripts earlier makes sure the includes are working fine-->
+							</ui:remove>
+							<p:outputLabel for="finta" value="select" styleClass="hidden"></p:outputLabel>
+							<label for="remoteCommandsForm:finta_filter" class="hidden">#{ui['shared.filtro']}</label>
+							<p:selectCheckboxMenu id="finta" style="display:none" label="select" filter="false">
+							</p:selectCheckboxMenu>
+
+						</h:form>
+					</div>
+					<div class="col-xs-12 col-sm-12 col-md-9 curriculum-main-content">
+						<section class="main-content">
+							<h:panelGroup id="section" layout="block" styleClass="animate fadeIn">
+								<ui:include src="#{curriculumVitaePfBean.currentSection}"></ui:include>
+							</h:panelGroup>
+						</section>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<ui:include src="_edit/pf/_copyCurriculum.xhtml" />
+		<ui:include src="_edit/pf/_deleteCurriculum.xhtml" />
+		<script class="loadScript">
+            $(function() {
+                MyPortal.Curriculum.initForm();
+            });             
+        </script>
+	</ui:define>
+</ui:composition>

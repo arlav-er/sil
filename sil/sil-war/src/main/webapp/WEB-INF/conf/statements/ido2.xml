@@ -1,0 +1,2376 @@
+<!-- RICHIESTE -->
+<!-- comprende le modifiche per la VdA -->
+<STATEMENT
+        name="GET_TESTATA_RICHIESTA_OLD"
+        query="SELECT
+                  RIC.PRGRICHIESTAAZ,
+                  RIC.NUMANNO,
+                  RIC.NUMRICHIESTA, NVL(RIC.NUMRICHIESTAORIG, RIC.NUMRICHIESTA) NUMRICHIESTAVIS,
+                  RIC.NUMSTORICO,
+                  RIC.PRGAZIENDA,
+                  RIC.PRGUNITA,
+                  RIC.codCpi,
+                  TO_CHAR(DATRICHIESTA,'DD/MM/YYYY') DATRICHIESTA,
+                  RIC.FLGART16,
+                  TO_CHAR(DATSCADENZA,'DD/MM/YYYY') DATSCADENZA,
+                  RIC.NUMPROFRICHIESTI,
+                  RIC.STRLOCALITA,
+                  RIC.PRGSPI,
+                  RIC.STRCOGNOMERIFERIMENTO,
+                  RIC.STRNOMERIFERIMENTO, 
+                  RIC.STRTELRIFERIMENTO,
+                  RIC.STRFAXRIFERIMENTO,
+                  RIC.STREMAILRIFERIMENTO,
+                  RIC.FLGAUTOMUNITO,
+                  RIC.FLGMOTOMUNITO,
+                  RIC.FLGMILITE,
+                  RIC.CODTRASFERTA,
+                  RIC.FLGFUORISEDE,
+                  RIC.FLGVITTOALLOGGIO,
+                  RIC.STRSESSO,
+                  RIC.CODMOTGENERE,
+                  RIC.STRMOTIVSESSO,
+                  RIC.CODAREA,
+                  RIC.TXTNOTEOPERATORE,
+                  RIC.cdnUtins,
+                  TO_CHAR(RIC.DTMINS,'DD/MM/YYYY hh24:mi') DTMINS,
+                  RIC.cdnUtmod,
+                  TO_CHAR(RIC.DTMMOD,'DD/MM/YYYY hh24:mi') DTMMOD,                  
+                  RIC.NUMKLORICHIESTAAZ,
+                  DE_EVASIONE_RICH.FLGINCROCIO,
+                  DE_EVASIONE_RICH.FLGPUBBLICA,
+                  RIC.FLGPUBBLICATA,
+                  DO_EVASIONE.CDNSTATORICH,
+                  DO_EVASIONE.CODEVASIONE
+              FROM
+                  DO_RICHIESTA_AZ RIC
+                  LEFT OUTER JOIN DO_EVASIONE ON (RIC.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+                  LEFT OUTER JOIN DE_EVASIONE_RICH ON (DO_EVASIONE.CODEVASIONE=DE_EVASIONE_RICH.CODEVASIONE)
+              WHERE 
+                  RIC.PRGRICHIESTAAZ = ?
+                "/>
+
+<STATEMENT
+        name="GET_TESTATA_RICHIESTA"
+        query="SELECT
+                  RIC.PRGRICHIESTAAZ,
+                  RIC.NUMANNO,
+                  RIC.NUMRICHIESTA, NVL(RIC.NUMRICHIESTAORIG, RIC.NUMRICHIESTA) NUMRICHIESTAVIS,
+                  RIC.NUMSTORICO,
+                  RIC.PRGAZIENDA,
+                  RIC.PRGUNITA,
+                  RIC.codCpi,
+                  TO_CHAR(DATRICHIESTA,'DD/MM/YYYY') DATRICHIESTA,
+                  RIC.FLGART16,
+                  TO_CHAR(DATSCADENZA,'DD/MM/YYYY') DATSCADENZA,
+                  RIC.NUMPROFRICHIESTI,
+                  RIC.STRLOCALITA,
+                  RIC.PRGSPI,
+                  RIC.STRCOGNOMERIFERIMENTO,
+                  RIC.STRNOMERIFERIMENTO,
+                  RIC.STRTELRIFERIMENTO,
+                  RIC.STRFAXRIFERIMENTO,
+                  RIC.STREMAILRIFERIMENTO,
+                  RIC.FLGAUTOMUNITO,
+                  RIC.FLGMOTOMUNITO,
+                  RIC.FLGMILITE,
+                  RIC.CODTRASFERTA,
+                  RIC.FLGFUORISEDE,
+                  RIC.FLGVITTOALLOGGIO,
+                  RIC.FLGVITTO,
+                  RIC.FLGTURISMO,
+                  RIC.STRSESSO,
+                  RIC.CODMOTGENERE,
+                  RIC.STRMOTIVSESSO,
+                  RIC.CODAREA,
+                  RIC.TXTNOTEOPERATORE,
+                  RIC.cdnUtins,
+                  TO_CHAR(RIC.DTMINS,'DD/MM/YYYY hh24:mi') DTMINS,
+                  RIC.cdnUtmod,
+                  TO_CHAR(RIC.DTMMOD,'DD/MM/YYYY hh24:mi') DTMMOD,                  
+                  RIC.NUMKLORICHIESTAAZ,
+                  DE_EVASIONE_RICH.FLGINCROCIO,
+                  DE_EVASIONE_RICH.FLGGRADUATORIA,
+                  DE_EVASIONE_RICH.FLGPUBBLICA,
+                  DO_EVASIONE.CDNSTATORICH,
+                  DO_EVASIONE.CODEVASIONE,
+                  RIC.FLGPUBBLICATA,
+                  RIC.NUMPOSTOAS,
+                  RIC.NUMPOSTOLSU,
+                  RIC.NUMPOSTOMILITARE,                  
+                  RIC.NUMPOSTOMB,
+                  RIC.FLGRIUSOGRADUATORIA,                  
+                  RIC.CODTIPOLSU,
+                  DE_TIPO_LSU.STRDESCRIZIONE AS TIPOLSU,
+                  TO_CHAR(DATCHIAMATA,'DD/MM/YYYY') DATCHIAMATA,
+                  case   	   
+                       when RIC.NUMPOSTOAS &gt; 0			
+                            then '1' 	   
+                       when RIC.NUMPOSTOAS is null 			
+                            then '0' 	  
+                       else '0'  
+                  end  as check_num_as,   
+                   case   	   
+                       when RIC.NUMPOSTOLSU &gt; 0			
+                            then '1' 	   
+                       when RIC.NUMPOSTOLSU is null 			
+                            then '0' 	  
+                       else '0'  
+                  end  as check_num_lsu,   
+                   case   	   
+                       when RIC.NUMPOSTOMILITARE &gt; 0			
+                            then '1' 	   
+                       when RIC.NUMPOSTOMILITARE is null 			
+                            then '0' 	  
+                       else '0'  
+                  end  as check_num_militare,
+                  RIC.FLGSVANTAGGIATI,
+                  RIC.STRMOTSVANTAGGIATI,
+                  TO_CHAR(RIC.DATVERIFICASVAN,'DD/MM/YYYY') DATVERIFICASVAN,
+                  RIC.FLGDISNONISCR,
+                  RIC.STRMOTNONISCR,
+                  TO_CHAR(RIC.DATVERIFICADIS,'DD/MM/YYYY') DATVERIFICADIS,
+                   Do_Evasione.Flgpubbcresco,
+                   RIC.FLGASONLINE,
+                   TO_CHAR(RIC.DTMASONLINE, 'DD/MM/YYYY HH24:MI') DTMASONLINE
+              FROM
+                  DO_RICHIESTA_AZ RIC
+                  LEFT OUTER JOIN DO_EVASIONE ON (RIC.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+                  LEFT OUTER JOIN DE_EVASIONE_RICH ON (DO_EVASIONE.CODEVASIONE=DE_EVASIONE_RICH.CODEVASIONE)
+                  LEFT OUTER JOIN DE_TIPO_LSU ON (RIC.CODTIPOLSU=DE_TIPO_LSU.CODTIPOLSU)
+              WHERE 
+                  RIC.PRGRICHIESTAAZ = ?
+                "/>
+
+<!--modifica Esposito-->
+<STATEMENT
+        name="GET_TESTATA_RICHIESTA_CM"
+        query="SELECT
+                  RIC.PRGRICHIESTAAZ,
+                  RIC.NUMANNO,
+                  RIC.NUMRICHIESTA, NVL(RIC.NUMRICHIESTAORIG, RIC.NUMRICHIESTA) NUMRICHIESTAVIS,
+                  RIC.NUMSTORICO,
+                  RIC.PRGAZIENDA,
+                  RIC.PRGUNITA,
+                  RIC.codCpi,
+                  TO_CHAR(DATRICHIESTA,'DD/MM/YYYY') DATRICHIESTA,
+                  RIC.FLGART16,
+                  TO_CHAR(DATSCADENZA,'DD/MM/YYYY') DATSCADENZA,
+                  RIC.NUMPROFRICHIESTI,
+                  RIC.STRLOCALITA,
+                  RIC.PRGSPI,
+                  RIC.STRCOGNOMERIFERIMENTO,
+                  RIC.STRNOMERIFERIMENTO,
+                  RIC.STRTELRIFERIMENTO,
+                  RIC.STRFAXRIFERIMENTO,
+                  RIC.STREMAILRIFERIMENTO,
+                  RIC.FLGAUTOMUNITO,
+                  RIC.FLGMOTOMUNITO,
+                  RIC.FLGMILITE,
+                  RIC.CODTRASFERTA,
+                  RIC.FLGFUORISEDE,
+                  RIC.FLGVITTOALLOGGIO,
+                  RIC.FLGVITTO,
+                  RIC.FLGTURISMO,
+                  RIC.STRSESSO,
+                  RIC.CODMOTGENERE,
+                  RIC.STRMOTIVSESSO,
+                  RIC.CODAREA,
+                  RIC.TXTNOTEOPERATORE,
+                  RIC.cdnUtins,
+                  TO_CHAR(RIC.DTMINS,'DD/MM/YYYY hh24:mi') DTMINS,
+                  RIC.cdnUtmod,
+                  TO_CHAR(RIC.DTMMOD,'DD/MM/YYYY hh24:mi') DTMMOD,                  
+                  RIC.NUMKLORICHIESTAAZ,
+                  DE_EVASIONE_RICH.FLGINCROCIO,
+                  DE_EVASIONE_RICH.FLGGRADUATORIA,
+                  DE_EVASIONE_RICH.FLGPUBBLICA,
+                  DO_EVASIONE.CDNSTATORICH,
+                  DO_EVASIONE.CODEVASIONE,
+                  RIC.FLGPUBBLICATA,
+                  RIC.NUMPOSTOAS,
+                  RIC.NUMPOSTOLSU,
+                  RIC.NUMPOSTOMILITARE,                  
+                  RIC.NUMPOSTOMB,
+                  RIC.FLGRIUSOGRADUATORIA,                  
+                  RIC.CODTIPOLSU,
+                  DE_TIPO_LSU.STRDESCRIZIONE AS TIPOLSU,
+                  TO_CHAR(DATCHIAMATA,'DD/MM/YYYY') DATCHIAMATA,
+                  case   	   
+                       when RIC.NUMPOSTOAS &gt; 0			
+                            then '1' 	   
+                       when RIC.NUMPOSTOAS is null 			
+                            then '0' 	  
+                       else '0'  
+                  end  as check_num_as,   
+                   case   	   
+                       when RIC.NUMPOSTOLSU &gt; 0			
+                            then '1' 	   
+                       when RIC.NUMPOSTOLSU is null 			
+                            then '0' 	  
+                       else '0'  
+                  end  as check_num_lsu,   
+                   case   	   
+                       when RIC.NUMPOSTOMILITARE &gt; 0			
+                            then '1' 	   
+                       when RIC.NUMPOSTOMILITARE is null 			
+                            then '0' 	  
+                       else '0'  
+                  end  as check_num_militare,
+                  TO_CHAR(RIC.DATCHIAMATACM, 'DD/MM/YYYY') as DATCHIAMATACM,
+                  RIC.CODTIPOLISTA,
+                  De_Cm_Lista_Speciale.strDescrizione as descrLista, 
+                  RIC.CODMONOTIPOGRAD,
+                  RIC.NUMPOSTICM,
+                  RIC.NUMANNOREDDITOCM,
+                  RIC.CODMONOCMCATEGORIA,
+                  case   	   
+                       when RIC.NUMPOSTICM &gt; 0			
+                            then '1' 	   
+                       when RIC.NUMPOSTICM is null 			
+                            then '0' 	  
+                       else '0'  
+                  end  as check_num_posti_cm,
+                  RIC.FLGSVANTAGGIATI,
+                  RIC.STRMOTSVANTAGGIATI,
+                  TO_CHAR(RIC.DATVERIFICASVAN,'DD/MM/YYYY') DATVERIFICASVAN,
+                  RIC.FLGDISNONISCR,
+                  RIC.STRMOTNONISCR,
+                  TO_CHAR(RIC.DATVERIFICADIS,'DD/MM/YYYY') DATVERIFICADIS,
+                   Do_Evasione.Flgpubbcresco,
+                   RIC.FLGASONLINE,
+                   TO_CHAR(RIC.DTMASONLINE, 'DD/MM/YYYY HH24:MI') DTMASONLINE
+              FROM
+                  DO_RICHIESTA_AZ RIC
+                  LEFT OUTER JOIN DO_EVASIONE ON (RIC.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+                  LEFT OUTER JOIN DE_EVASIONE_RICH ON (DO_EVASIONE.CODEVASIONE=DE_EVASIONE_RICH.CODEVASIONE)
+                  LEFT OUTER JOIN DE_TIPO_LSU ON (RIC.CODTIPOLSU=DE_TIPO_LSU.CODTIPOLSU)
+				  LEFT OUTER JOIN De_Cm_Lista_Speciale ON (RIC.CODTIPOLISTA=De_Cm_Lista_Speciale.CODTIPOLISTA) 
+              WHERE 
+                  RIC.PRGRICHIESTAAZ = ?
+                "/>
+
+
+<STATEMENT
+        name="SAVE_TESTATA_RICHIESTA_OLD"
+        query="update do_richiesta_az set
+                  codcpi=?,
+                  datrichiesta=TO_DATE(?,'DD/MM/YYYY'),
+                  flgart16=?,
+                  datscadenza=TO_DATE(?,'DD/MM/YYYY'),
+                  numprofrichiesti=?,
+                  strlocalita=?,
+                  prgspi=?,
+                  strcognomeriferimento=?,
+                  strnomeriferimento=?,
+                  strtelriferimento=?,
+                  strfaxriferimento=?,
+                  stremailriferimento=?,
+                  flgautomunito=?,
+                  flgmilite=?,
+                  codtrasferta=?,
+                  flgfuorisede=?,
+                  txtnoteoperatore=?,  
+                  flgMotomunito=?,
+                  flgVittoAlloggio=?,
+                  strSesso=?,
+                  codMotGenere=?,
+                  strMotivSesso=?,
+                  codArea=?,
+                  cdnutmod=?,
+                  dtmmod=SYSDATE,                  
+                  numklorichiestaaz=?,
+                  FLGSVANTAGGIATI = ?,
+                  STRMOTSVANTAGGIATI = ?,
+                  DATVERIFICASVAN=TO_DATE(?,'DD/MM/YYYY'),
+                  FLGDISNONISCR = ?,
+                  STRMOTNONISCR = ?,
+                  DATVERIFICADIS = TO_DATE(?,'DD/MM/YYYY')
+               where
+                  prgrichiestaaz=?
+                  "/>
+
+<STATEMENT
+        name="SAVE_TESTATA_RICHIESTA"
+        query="update do_richiesta_az set
+                  codcpi=?,
+                  datrichiesta=TO_DATE(?,'DD/MM/YYYY'),
+                  flgart16=?,
+                  datscadenza=TO_DATE(?,'DD/MM/YYYY'),
+                  numprofrichiesti=?,
+                  strlocalita=?,
+                  prgspi=?,
+                  strcognomeriferimento=?,
+                  strnomeriferimento=?,
+                  strtelriferimento=?,
+                  strfaxriferimento=?,
+                  stremailriferimento=?,
+                  flgautomunito=?,
+                  flgmilite=?,
+                  codtrasferta=?,
+                  flgfuorisede=?,
+                  txtnoteoperatore=?,  
+                  flgMotomunito=?,
+                  flgVittoAlloggio=?,
+                  flgVitto=?,
+                  flgTurismo=?,
+                  strSesso=?,
+                  codMotGenere=?,
+                  strMotivSesso=?,
+                  codArea=?,
+                  cdnutmod=?,
+                  dtmmod=SYSDATE,                  
+                  numklorichiestaaz=?,
+                  NUMPOSTOAS=?,
+                  NUMPOSTOLSU=?,
+                  NUMPOSTOMILITARE=?,                  
+                  NUMPOSTOMB=?,
+                  FLGRIUSOGRADUATORIA=?,
+                  CODTIPOLSU = ?,
+                  DATCHIAMATA=TO_DATE(?,'DD/MM/YYYY'),
+                  FLGSVANTAGGIATI = ?,
+                  STRMOTSVANTAGGIATI = ?,
+                  DATVERIFICASVAN=TO_DATE(?,'DD/MM/YYYY'),
+                  FLGDISNONISCR = ?,
+				  STRMOTNONISCR = ?,
+				  DATVERIFICADIS = TO_DATE(?,'DD/MM/YYYY')
+               where
+                  prgrichiestaaz=?
+                  "/>
+<!--modifica Esposito-->
+<STATEMENT
+        name="SAVE_TESTATA_RICHIESTA_CM"
+        query="update do_richiesta_az set
+                  codcpi=?,
+                  datrichiesta=TO_DATE(?,'DD/MM/YYYY'),
+                  flgart16=?,
+                  datscadenza=TO_DATE(?,'DD/MM/YYYY'),
+                  numprofrichiesti=?,
+                  strlocalita=?,
+                  prgspi=?,
+                  strcognomeriferimento=?,
+                  strnomeriferimento=?,
+                  strtelriferimento=?,
+                  strfaxriferimento=?,
+                  stremailriferimento=?,
+                  flgautomunito=?,
+                  flgmilite=?,
+                  codtrasferta=?,
+                  flgfuorisede=?,
+                  txtnoteoperatore=?,  
+                  flgMotomunito=?,
+                  flgVittoAlloggio=?,
+                  flgVitto=?,
+                  flgTurismo=?,
+                  strSesso=?,
+                  codMotGenere=?,
+                  strMotivSesso=?,
+                  codArea=?,
+                  cdnutmod=?,
+                  dtmmod=SYSDATE,                  
+                  numklorichiestaaz=?,
+                  NUMPOSTOAS=?,
+                  NUMPOSTOLSU=?,
+                  NUMPOSTOMILITARE=?,                  
+                  NUMPOSTOMB=?,
+                  FLGRIUSOGRADUATORIA=?,
+                  CODTIPOLSU = ?,
+                  DATCHIAMATA=TO_DATE(?,'DD/MM/YYYY'),
+                  CODMONOTIPOGRAD=?,
+                  NUMPOSTICM=?,
+                  NUMANNOREDDITOCM=?,
+                  CODMONOCMCATEGORIA=?,
+                  DATCHIAMATACM=TO_DATE(?,'DD/MM/YYYY'),
+                  CODTIPOLISTA=?,
+                  FLGSVANTAGGIATI = ?,
+                  STRMOTSVANTAGGIATI = ?,
+                  DATVERIFICASVAN=TO_DATE(?,'DD/MM/YYYY'),
+                  FLGDISNONISCR = ?,
+				  STRMOTNONISCR = ?,
+				  DATVERIFICADIS = TO_DATE(?,'DD/MM/YYYY')
+               where
+                  prgrichiestaaz=?
+                  "/>
+
+<STATEMENT name="AS_CHECK_TIPO_ROSA"
+          query="{ call ?:=PG_INCROCIO.AScheckTipoRosa(?, ?, ?) }"/>   
+
+<!-- TURNI -->                  
+<STATEMENT
+        name="GET_TURNI_RICHIESTA"
+        query="SELECT 
+                  DO_TURNO.prgTurno,
+                  DO_TURNO.codTurno,
+                  de.strDescrizione,
+                  DO_TURNO.prgRichiestaAz,
+                  DO_TURNO.cdnUtIns,
+                  TO_CHAR(DO_TURNO.dtmIns,'DD/MM/YYYY') DTMINS,
+                  DO_TURNO.cdnUtMod,
+                  TO_CHAR(DO_TURNO.dtmMod,'DD/MM/YYYY') DTMMOD,
+        				  STRCOGNOME || ' ' || STRNOME || ' - ' || TO_CHAR(DO_TURNO.DTMINS,'DD/MM/YYYY') AS STRINSERIMENTO
+                FROM
+                  do_turno JOIN TS_UTENTE ON (TS_UTENTE.CDNUT = DO_TURNO.CDNUTINS),
+                  de_turno de
+                WHERE
+                   DO_TURNO.prgRichiestaAz = ? AND
+                   DO_TURNO.codTurno = de.codTurno	
+                  "/>
+
+<STATEMENT
+        name="DELETE_TURNO_RICHIESTA"
+        query="DELETE FROM
+                  do_turno
+                WHERE
+                   prgTurno = ? AND
+                   prgRichiestaAz = ?                   
+                  "/>
+
+<STATEMENT name="InsertTurniRichiesta"
+            query="INSERT INTO DO_TURNO (
+                     PRGTURNO, CODTURNO, PRGRICHIESTAAZ, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)
+                VALUES (S_DO_TURNO.nextval, ?, ?, ?, sysdate, ?, sysdate)"/>
+
+<STATEMENT name="SelectUniqueTurno"
+            query="SELECT PRGTURNO
+                   FROM DO_TURNO
+                   WHERE CODTURNO=?
+                   AND PRGRICHIESTAAZ=?"/>
+
+<STATEMENT name="GET_InfUnitaAzienda"
+            query="SELECT
+                      AZ.STRRAGIONESOCIALE AS RAGIONESOCIALE,
+                      AZ.STRCODICEFISCALE AS CODICEFISCALE,
+                      AZ.STRPARTITAIVA AS PIVA,
+                      U.STRINDIRIZZO || ', ' || U.STRLOCALITA AS INDIRIZZO,
+                      C.STRDENOMINAZIONE AS DENOMINAZIONE,
+                      U.CODCCNL AS CCNLAZ,
+                      NATGIUR.STRDESCRIZIONE DESCRNATGIURAZ, 
+                      U.STRTEL STRTELAZ,
+                      U.STRFAX STRFAXAZ,
+                      C.STRCAP STRCAPAZ,
+                      DECCNL.STRDESCRIZIONE AS DESCRCCNL,
+                      AZ.CODTIPOAZIENDA AS CODTIPOAZ,
+                      TIPOAZ.STRDESCRIZIONE AS DESCRTIPOAZ,
+                      AZ.STRNUMALBOINTERINALI AS STRNUMALBOINT,
+                      U.STRNUMREGISTROCOMMITT AS STRNUMREGCOMM,
+                      U.CODATECO CODATECO,
+                      ATT.STRDESCRIZIONE DESCRATECO,
+                      AZ.CODNATGIURIDICA CODNATGIURIDICA,
+                      AZ.FLGDATIOK FLGDATIOK
+                  FROM
+                    AN_AZIENDA AZ,
+                    AN_UNITA_AZIENDA U,
+                    DE_COMUNE C,
+                    DE_CONTRATTO_COLLETTIVO DECCNL,
+                    DE_TIPO_AZIENDA TIPOAZ,
+                    DE_ATTIVITA ATT,
+                    DE_NAT_GIURIDICA NATGIUR
+                  WHERE	 
+                     U.PRGAZIENDA = ? AND
+                     U.PRGUNITA = ? AND
+                     AZ.PRGAZIENDA = U.PRGAZIENDA AND
+                     U.CODCCNL = DECCNL.CODCCNL(+) AND
+                     AZ.CODTIPOAZIENDA = TIPOAZ.CODTIPOAZIENDA AND
+                     C.CODCOM = U.CODCOM AND
+                     U.CODATECO = ATT.CODATECO AND
+                     AZ.CODNATGIURIDICA = NATGIUR.CODNATGIURIDICA (+)" />
+
+
+<STATEMENT name="GET_InfPrgRichiesta"
+            query="select  (numrichiesta || '/' || numanno) as annoRichiesta, numStorico,
+            			(nvl(numrichiestaorig, numrichiesta) || '/' || numanno) as annoRichiestaVis
+					from do_richiesta_az
+					where prgrichiestaaz=?" />
+
+
+
+<STATEMENT name="GET_ListaRichiestePerUnita"
+            query="select
+                      raz.prgRichiestaAz,
+                      az.STRRAGIONESOCIALE,
+                      uaz.strIndirizzo,
+                      com.strDenominazione desComune,
+                      p.strIstat provincia,
+                      TO_CHAR(raz.DATRICHIESTA, 'DD/MM/YYYY') as DATRICHIESTA,
+                      TO_CHAR(raz.datScadenza,'DD/MM/YYYY') as datScadenza,
+                      raz.prgAzienda as prgAzienda,
+                      raz.prgUnita as prgUnita, decode(raz.numrichiestaorig, null, 1, 0) numrichiestaorigordinamento,
+                      nvl(paz.strtarga, '1') strtargaordinamento, nvl(raz.numrichiestaorig, raz.numrichiesta) numrichiestaordinamento
+                  from
+                    do_richiesta_az raz
+                    inner join an_azienda az on az.prgAzienda=raz.prgAzienda
+                    inner join an_unita_azienda uaz on (uaz.prgUnita=raz.prgUnita and uaz.prgAzienda=raz.prgAzienda)
+                    inner join de_comune com on uaz.codcom=com.codcom
+                    inner join de_provincia p on com.codprovincia=p.codprovincia
+                    left join de_provincia paz on (raz.codprovinciaprov = paz.codprovincia) 
+                  where
+                     raz.prgAzienda = ? and
+                     raz.prgUnita = ?
+                  order by raz.numanno desc, decode(raz.numrichiestaorig, null, 1, 0) desc, 
+                  nvl(raz.numrichiestaorig, raz.numrichiesta) desc, nvl(paz.strtarga, '1') asc"/>
+
+
+<STATEMENT
+        name="SELECT_DO_RICHIESTA_AZ_SEQUENCE"
+        query="SELECT
+               S_DO_RICHIESTA_AZ.nextval AS prgRichiestaAz
+              FROM DUAL"/>
+<!--<STATEMENT
+        name="GET_LAST_RICHIESTA"
+        query=" SELECT s_do_richiesta_az.nextval as prgRichiestaAz from dual"/>
+
+<STATEMENT
+        name="GET_LAST_RICHIESTA"
+        query=" SELECT MAX(prgRichiestaAz) as prgRichiestaAz FROM DO_RICHIESTA_AZ"/>
+        -->
+        
+<STATEMENT
+        name="INSERT_DO_RICHIESTA_AZ_OLD"
+        query="INSERT INTO DO_RICHIESTA_AZ
+                  (PRGRICHIESTAAZ,
+                  PRGAZIENDA,
+                  PRGUNITA,
+                  codCpi,
+                  NUMANNO,
+                  NUMRICHIESTA,
+                  NUMSTORICO,
+                  DATRICHIESTA,
+                  FLGART16,
+                  DATSCADENZA,
+                  NUMPROFRICHIESTI,
+                  STRLOCALITA,
+                  PRGSPI,
+                  STRCOGNOMERIFERIMENTO,
+                  STRNOMERIFERIMENTO,
+                  STRTELRIFERIMENTO,
+                  STRFAXRIFERIMENTO,
+                  STREMAILRIFERIMENTO,
+                  FLGAUTOMUNITO,
+                  FLGMILITE,
+                  CODTRASFERTA,
+                  FLGFUORISEDE,
+                  TXTNOTEOPERATORE,
+                  flgMotomunito,
+                  flgVittoAlloggio,
+                  strSesso,
+                  codMotGenere,
+                  strMotivSesso,
+                  codArea,
+                  cdnUtins,
+                  DTMINS,
+                  cdnUtmod,
+                  DTMMOD,                  
+                  NUMKLORICHIESTAAZ,
+                  CDNGRUPPO)
+                  VALUES 
+                  (?, ?, ?, ?, ?, ?, ?,
+                   TO_DATE(?,'DD/MM/YYYY'), 
+                   ?, 
+                   TO_DATE(?,'DD/MM/YYYY'),
+                   ?,?,?,?,?,?,?,?,?,?,?,?,?,
+                   ?,?,?,?,?,?,
+                   ?,
+                   SYSDATE,
+                   ?,
+                   SYSDATE,
+                   null,
+                   ?)"/>        
+                   
+                   
+<STATEMENT
+        name="INSERT_DO_RICHIESTA_AZ"
+        query="INSERT INTO DO_RICHIESTA_AZ
+                  (PRGRICHIESTAAZ,
+                  PRGAZIENDA,
+                  PRGUNITA,
+                  codCpi,
+                  NUMANNO,
+                  NUMRICHIESTA,
+                  NUMSTORICO,
+                  DATRICHIESTA,
+                  FLGART16,
+                  DATSCADENZA,
+                  NUMPROFRICHIESTI,
+                  STRLOCALITA,
+                  PRGSPI,
+                  STRCOGNOMERIFERIMENTO,
+                  STRNOMERIFERIMENTO,
+                  STRTELRIFERIMENTO,
+                  STRFAXRIFERIMENTO,
+                  STREMAILRIFERIMENTO,
+                  FLGAUTOMUNITO,
+                  FLGMILITE,
+                  CODTRASFERTA,
+                  FLGFUORISEDE,
+                  TXTNOTEOPERATORE,
+                  flgMotomunito,
+                  flgVittoAlloggio,
+                  flgVitto,
+                  flgTurismo,
+                  strSesso,
+                  codMotGenere,
+                  strMotivSesso,
+                  codArea,
+                  cdnUtins,
+                  DTMINS,
+                  cdnUtmod,
+                  DTMMOD,                  
+                  NUMKLORICHIESTAAZ,
+                  CDNGRUPPO,
+                  NUMPOSTOAS,
+                  NUMPOSTOLSU,
+                  NUMPOSTOMILITARE,                  
+                  NUMPOSTOMB,
+                  FLGRIUSOGRADUATORIA,
+                  DATCHIAMATA,
+                  CODTIPOLSU,
+                  FLGSVANTAGGIATI,
+				  STRMOTSVANTAGGIATI,
+				  DATVERIFICASVAN,
+				  FLGDISNONISCR,
+				  STRMOTNONISCR,
+				  DATVERIFICADIS 
+                  )
+                  VALUES 
+                  (?, ?, ?, ?, ?, ?, ?,
+                   TO_DATE(?,'DD/MM/YYYY'), 
+                   ?, 
+                   TO_DATE(?,'DD/MM/YYYY'),
+                   ?,?,?,?,?,?,?,?,?,?,?,?,?,
+                   ?,?,?,?,?,?,?,?,
+                   ?,
+                   SYSDATE,
+                   ?,
+                   SYSDATE,
+                   null,
+                   ?,
+                   ?,?,?,?,?,TO_DATE(?,'DD/MM/YYYY'),
+                   ?,?,?,TO_DATE(?,'DD/MM/YYYY'),?,?,TO_DATE(?,'DD/MM/YYYY')
+                   )"/>      
+<!--modifica Esposito-->             
+<STATEMENT
+        name="INSERT_DO_RICHIESTA_AZ_CM"
+        query="INSERT INTO DO_RICHIESTA_AZ
+                  (PRGRICHIESTAAZ,
+                  PRGAZIENDA,
+                  PRGUNITA,
+                  codCpi,
+                  NUMANNO,
+                  NUMRICHIESTA,
+                  NUMSTORICO,
+                  DATRICHIESTA,
+                  FLGART16,
+                  DATSCADENZA,
+                  NUMPROFRICHIESTI,
+                  STRLOCALITA,
+                  PRGSPI,
+                  STRCOGNOMERIFERIMENTO,
+                  STRNOMERIFERIMENTO,
+                  STRTELRIFERIMENTO,
+                  STRFAXRIFERIMENTO,
+                  STREMAILRIFERIMENTO,
+                  FLGAUTOMUNITO,
+                  FLGMILITE,
+                  CODTRASFERTA,
+                  FLGFUORISEDE,
+                  TXTNOTEOPERATORE,
+                  flgMotomunito,
+                  flgVittoAlloggio,
+                  flgVitto,
+                  flgTurismo,
+                  strSesso,
+                  codMotGenere,
+                  strMotivSesso,
+                  codArea,
+                  cdnUtins,
+                  DTMINS,
+                  cdnUtmod,
+                  DTMMOD,                  
+                  NUMKLORICHIESTAAZ,
+                  CDNGRUPPO,
+                  NUMPOSTOAS,
+                  NUMPOSTOLSU,
+                  NUMPOSTOMILITARE,                  
+                  NUMPOSTOMB,
+                  FLGRIUSOGRADUATORIA,
+                  DATCHIAMATA,
+                  CODTIPOLSU,
+                  CODMONOTIPOGRAD,
+                  NUMPOSTICM,
+                  NUMANNOREDDITOCM,
+                  DATCHIAMATACM,
+                  CODTIPOLISTA,
+                  FLGSVANTAGGIATI,
+                  STRMOTSVANTAGGIATI,
+                  DATVERIFICASVAN,
+                  FLGDISNONISCR,
+				  STRMOTNONISCR,
+				  DATVERIFICADIS
+                  )
+                  VALUES 
+                  (?, ?, ?, ?, ?, ?, ?,
+                   TO_DATE(?,'DD/MM/YYYY'), 
+                   ?, 
+                   TO_DATE(?,'DD/MM/YYYY'),
+                   ?,?,?,?,?,?,?,?,?,?,?,?,?,
+                   ?,?,?,?,?,?,?,?,
+                   ?,
+                   SYSDATE,
+                   ?,
+                   SYSDATE,
+                   null,
+                   ?,
+                   ?,?,?,?,?,TO_DATE(?,'DD/MM/YYYY'),
+                   ?,
+                   ?,?,?,TO_DATE(?,'DD/MM/YYYY'),?,?,?,TO_DATE(?,'DD/MM/YYYY'),
+                   ?,?,TO_DATE(?,'DD/MM/YYYY')
+                   )"/>                                
+
+<STATEMENT
+        name="SELECT_DO_NUMERO_RICHIESTA"
+        query="SELECT NVL(MAX(NUMRICHIESTA),0)+1 AS NUMERORICHIESTA 
+               FROM do_richiesta_az
+               WHERE NUMANNO=?"/>
+                   
+<STATEMENT
+        name="DELETE_RICHIESTA"
+        query="DELETE FROM
+                  do_richiesta_az
+                WHERE
+                   prgRichiestaAz = ?                   
+                  "/>
+
+
+<STATEMENT name="ListaStudiRichiesta"
+            query="SELECT
+                          DO.PRGSTUDIO AS PRGSTUDIO,
+                          DE.STRDESCRIZIONE AS DESCTITOLO,
+                          DO.STRSPECIFICA AS SPECIFICA,
+                          DECODE (DO.FLGCONSEGUITO,'S','SI','N','NO') AS CONSEGUITO,
+                          DECODE (DO.FLGINDISPENSABILE,'S','SI','N','NO') AS INDISPENSABILE,
+                          DO.CODTITOLO AS CODTITOLO
+                   FROM
+                          DO_STUDIO DO,
+                          DE_TITOLO DE
+                  WHERE
+                          DO.CODTITOLO = DE.CODTITOLO AND
+                          DO.PRGRICHIESTAAZ = ? AND
+                          DO.PRGALTERNATIVA = ?"/>
+
+
+<STATEMENT name="DeleteStudioRichiesta"
+            query="DELETE FROM DO_STUDIO
+                          WHERE DO_STUDIO.PRGSTUDIO=?"/>
+                          
+<STATEMENT
+        name="InsertStudioRichiesta"
+        query="INSERT INTO DO_STUDIO
+                  (PRGSTUDIO,
+                  PRGRICHIESTAAZ,
+                  PRGALTERNATIVA,
+                  CODTITOLO,
+                  STRSPECIFICA,
+                  FLGCONSEGUITO,
+                  FLGINDISPENSABILE,
+                  cdnUtins,
+                  DTMINS,
+                  cdnUtmod,
+                  DTMMOD)
+                  VALUES 
+                  ( S_DO_STUDIO.nextval,
+                    ?, ?, ?, ?, ?,
+                    ?, ?,
+                   SYSDATE,
+                   ?,
+                   SYSDATE
+                   )"/>
+
+
+<STATEMENT name="SelectUniqueStudio"
+            query="SELECT PRGSTUDIO
+                   FROM DO_STUDIO
+                   WHERE 
+                   PRGRICHIESTAAZ=? AND
+                   PRGALTERNATIVA=? AND
+                   CODTITOLO=?"/>
+
+
+<STATEMENT name="DettaglioStudioRichiesta"
+            query="SELECT 
+                    DO.PRGSTUDIO as PRGSTUDIO,
+                    DO.PRGRICHIESTAAZ AS PRGRICHIESTAAZ,
+                    DO.PRGALTERNATIVA AS PRGALTERNATIVA, 
+                    DO.CODTITOLO AS CODTITOLO,
+                    TIT.STRDESCRIZIONE AS DESCRIZIONE,
+                    TIT_P.STRDESCRIZIONE AS DESCRIZIONE_P,
+                    DO.STRSPECIFICA AS SPECIFICA,
+                    DO.FLGCONSEGUITO AS CONSEGUITO,
+                    DO.FLGINDISPENSABILE AS INDISPENSABILE,
+                    DO.CDNUTINS,
+                    TO_CHAR(DO.DTMINS, 'DD/MM/YYYY hh24:mi')  AS DTMINS,
+                    DO.CDNUTMOD, 
+                    TO_CHAR(DO.DTMMOD, 'DD/MM/YYYY hh24:mi') AS DTMMOD
+                  FROM 
+                    DO_STUDIO DO INNER JOIN DE_TITOLO TIT ON DO.CODTITOLO = TIT.CODTITOLO 
+                    inner join de_titolo tit_p on tit_p.codtitolo=substr(tit.codTitolo, 0, 2) || '000000'
+                  WHERE 
+                   DO.PRGSTUDIO=? "/>
+
+<STATEMENT
+        name="SalvaStudioRichiesta"
+        query="update do_studio set
+                  codtitolo=?,
+                  strspecifica=?,
+                  flgconseguito=?,
+                  flgindispensabile=?,
+                  cdnutmod=?,
+                  dtmmod=SYSDATE
+               where
+                  prgstudio=?
+                  "/>                   
+
+<!-- DAVIDE -->
+<!-- Reitera la richiesta di una azienda invocando la stored procedure REITERARICHAZIENDA che si occupa di replicare
+     i report opportuni nelle tabelle conivolte nella richiesta -->
+<!--modifica Esposito-->
+<STATEMENT name="IDO_REITERARICHAZ"
+          query="{call ? := PG_IDO.REITERARICHAZIENDA(?,?,?,?,?,?,?,?,  ?,?,?,?,?,?,?,?,?,  ?,?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?,?, ?,?, ?,?,?,?,?,?,?,?, ?,?,?,?,?,?,?,?,?,?,?,?, ? ) }"/>
+
+<!-- Query utilizzate per visualizzar lo stato di elaborazione di una richiesta -->
+<STATEMENT name="IDO_STATOELABRICHAZ"
+          query="SELECT DO_RICHIESTA_AZ.FLGPUBBLICATA, 
+          				DO_RICHIESTA_AZ.CODMONOCMCATEGORIA,
+                        TO_CHAR(DO_RICHIESTA_AZ.DATPUBBLICAZIONE, 'DD/MM/YYYY') DATPUBBLICAZIONE,
+                        TO_CHAR(DO_RICHIESTA_AZ.DATSCADENZAPUBBLICAZIONE, 'DD/MM/YYYY') DATSCADENZAPUBBLICAZIONE,
+                        decode(upper(FLGPUBBLICATA),'S',decode( greatest(SYSDATE,DATSCADENZAPUBBLICAZIONE), SYSDATE, 'Scaduta',
+                                                                decode(greatest(SYSDATE,DATPUBBLICAZIONE),DATPUBBLICAZIONE,'Da pubblicare','In pubblicazione')
+                                                              ),'No pubblicazione'
+                              ) STATOPUBBLICAZIONE,
+                        TO_CHAR(DO_RICHIESTA_AZ.DATULTIMOINVIOVACANCY, 'DD/MM/YYYY HH24:MI') DATULTIMOINVIOVACANCY,
+						DO_RICHIESTA_AZ.NUMSTORICO,
+                        DO_EVASIONE.PRGRICHIESTAAZ,
+                        DO_EVASIONE.CODEVASIONE,
+						DO_EVASIONE.STRMOTVOCHIUSURA,
+						TO_CHAR(DO_EVASIONE.DATCHIUSURA,'DD/MM/YYYY') DATCHIUSURA,
+                        DO_EVASIONE.CDNSTATORICH,
+                        DO_EVASIONE.CODMONOSTATORICH,
+                        DO_EVASIONE.FLGPUBBBACHECA,
+                        DO_EVASIONE.FLGPUBBWEB,
+                        DO_EVASIONE.FLGPUBBGIORNALI,
+                        DO_EVASIONE.CDNUTINS,
+                        TO_CHAR(DO_EVASIONE.DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS,
+                        DO_EVASIONE.CDNUTMOD,
+                        TO_CHAR(DO_EVASIONE.DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD,
+                        DO_EVASIONE.CODMOTIVOCHIUSURARICH CODMOTIVOCHIUSURA,
+                        DERICH.FLGSOLODIFF FLGSOLODIFF,
+                        DO_EVASIONE.CODESITORICHIESTA,
+                        DO_EVASIONE.FLGPUBBCRESCO,
+                        DO_EVASIONE.FLG_CANDIDATURA
+                   FROM DO_EVASIONE, DO_RICHIESTA_AZ, DE_STATO_EV_RICH DERICH
+                  WHERE DO_EVASIONE.PRGRICHIESTAAZ = DO_RICHIESTA_AZ.PRGRICHIESTAAZ
+                  	AND DO_EVASIONE.CDNSTATORICH = DERICH.CDNSTATORICH
+				    AND DO_EVASIONE.PRGRICHIESTAAZ = ?"/>
+
+<!-- Query utilizzate per visualizzar lo stato di elaborazione dell'originale (numStorico=0) di una richiesta -->
+<STATEMENT name="IDO_STATOELABRICHAZORIG"
+          query="SELECT DO_EVASIONE.CDNSTATORICH,
+          				DO_RICHIESTA_AZ.PRGRICHIESTAAZ
+                   FROM DO_EVASIONE, DO_RICHIESTA_AZ
+                  WHERE DO_EVASIONE.PRGRICHIESTAAZ = DO_RICHIESTA_AZ.PRGRICHIESTAAZ
+				    AND DO_RICHIESTA_AZ.NUMANNO = TO_NUMBER(?)
+				    AND DO_RICHIESTA_AZ.NUMRICHIESTA = TO_NUMBER(?)
+				    AND DO_RICHIESTA_AZ.NUMSTORICO = 0"/>
+
+<STATEMENT name="IDO_GETAZIENDAUNITA"
+          query="SELECT DO_RICHIESTA_AZ.PRGAZIENDA,
+                        DO_RICHIESTA_AZ.PRGUNITA
+                   FROM DO_RICHIESTA_AZ
+                  WHERE DO_RICHIESTA_AZ.PRGRICHIESTAAZ = ?"/>
+
+          
+<STATEMENT name="IDO_DEEVASIONERICH"
+          query="SELECT DE_.CODEVASIONE CODICE,
+                        DE_.STRDESCRIZIONE ||
+                            DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                            LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                            ''
+                                   ) AS DESCRIZIONE,
+                        decode(de_.codevasione, 'DFD',1,'DPR',2,'PRE',3,'DFA',4,'DRA',5, 'SEL',6, 'AS', 7) as ordine_b475
+                   FROM DE_EVASIONE_RICH DE_ ORDER BY ordine_b475, DESCRIZIONE"/>
+
+<STATEMENT name="IDO_DESTATOEVRICH"
+          query="SELECT DE_.CDNSTATORICH CODICE,
+                        DE_.STRDESCRIZIONE ||
+                            DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                            LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                            ''
+                                   ) AS DESCRIZIONE,
+						            DE_.FLGSOLODIFF
+                   FROM DE_STATO_EV_RICH DE_ ORDER BY STRDESCRIZIONE"/>
+
+<STATEMENT name="IDO_DESTATORICH"
+          query="SELECT DE_.CODMONOSTATORICH CODICE,
+                        DE_.STRDESCRIZIONE ||
+                            DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                            LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                            ''
+                                   ) AS DESCRIZIONE
+                   FROM DE_STATO_RICHIESTA DE_ ORDER BY STRDESCRIZIONE"/>
+
+<STATEMENT name="IDO_DEMOTIVOCHIUSURARICH"
+          query="SELECT DE_.CODMOTIVOCHIUSURARICH CODICE,
+                        DE_.STRDESCRIZIONE ||
+                            DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                            LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                            ''
+                                   ) AS DESCRIZIONE
+                   FROM DE_MOTIVO_CHIUSURARICH DE_"/>
+
+<STATEMENT name="IDO_INSSTATORICHAZ"
+          query="INSERT INTO DO_EVASIONE
+                      ( DO_EVASIONE.PRGRICHIESTAAZ,
+                        DO_EVASIONE.CODEVASIONE,
+                        DO_EVASIONE.CDNSTATORICH,
+						DO_EVASIONE.STRMOTVOCHIUSURA,
+						DO_EVASIONE.DATCHIUSURA,
+                        DO_EVASIONE.CODMONOSTATORICH,
+                        DO_EVASIONE.CDNUTINS,
+                        DO_EVASIONE.CDNUTMOD,
+                        DO_EVASIONE.DTMINS,
+                        DO_EVASIONE.DTMMOD,
+                        DO_EVASIONE.CODMOTIVOCHIUSURARICH,
+                        DO_EVASIONE.CODESITORICHIESTA
+                      )
+               VALUES (?, ?, ?, ?, to_date(?,'DD/MM/YYYY'),
+                       ?, ?, ?, SYSDATE, SYSDATE,?,? )"/>
+
+<STATEMENT name="IDO_SAVESTATORICHAZ"
+          query="UPDATE DO_EVASIONE 
+                    SET DO_EVASIONE.CODEVASIONE = ?,
+                        DO_EVASIONE.CDNSTATORICH = ?,
+						DO_EVASIONE.STRMOTVOCHIUSURA = ?,
+						DO_EVASIONE.DATCHIUSURA = to_date(?,'DD/MM/YYYY'),
+                        DO_EVASIONE.CODMONOSTATORICH = ?,
+                        DO_EVASIONE.CDNUTMOD = ?,
+                        DO_EVASIONE.DTMMOD = SYSDATE,
+                        DO_EVASIONE.CODMOTIVOCHIUSURARICH=?,
+                        DO_EVASIONE.CODESITORICHIESTA=?
+                  WHERE DO_EVASIONE.PRGRICHIESTAAZ = ?"/>
+
+<STATEMENT name="IDO_PREVALCATCM"
+          query="UPDATE DO_RICHIESTA_AZ
+          			SET CODMONOCMCATEGORIA = 'E',
+          				NUMKLORICHIESTAAZ = NUMKLORICHIESTAAZ + 1
+          		  WHERE PRGRICHIESTAAZ = ?"/>
+
+<STATEMENT
+        name="IDO_CHECK_DATA_CHIAMATA"
+        query="SELECT
+                  TO_CHAR(DATCHIAMATA,'DD/MM/YYYY') DATCHIAMATA
+              FROM
+                  DO_RICHIESTA_AZ RIC                
+              WHERE 
+                  RIC.PRGRICHIESTAAZ = ?
+                "/>
+
+<STATEMENT name="AS_MATCH_CREA_ROSA_NOMINATIVA"
+           query="{ call ? := PG_INCROCIO.AScreaRosaNomGrezza(?, ?, ?, ?, ?, ?) }"
+/>
+
+<STATEMENT
+        name="IDO_CHECK_DATI_CM"
+        query="SELECT
+        		  CODMONOTIPOGRAD, NUMPOSTICM, 
+                  TO_CHAR(DATCHIAMATACM,'DD/MM/YYYY') as DATCHIAMATACM,
+                  CODTIPOLISTA
+              FROM
+                  DO_RICHIESTA_AZ RIC                
+              WHERE 
+                  RIC.PRGRICHIESTAAZ = ?
+                "/>
+
+<STATEMENT name="CM_MATCH_CREA_ROSA_NOMINATIVA"
+           query="{ call ? := PG_COLL_MIRATO.CMcreaRosaNomGrezza(?, ?, ?, ?, ?, ?, ?) }"
+/>
+
+<!-- Statement che reperiscono le informazioni relative ai filtri applicati alla rosa dei candidati IDO-->
+<STATEMENT name="IDO_GETRICHIESTAAZ"
+          query="SELECT DO_INCROCIO.PRGRICHIESTAAZ,
+                        DO_INCROCIO.PRGALTERNATIVA
+                   FROM DO_INCROCIO,DO_ROSA
+                  WHERE DO_INCROCIO.PRGINCROCIO = DO_ROSA.PRGINCROCIO
+                    AND DO_ROSA.PRGROSA = ?"/>
+
+<STATEMENT name="IDO_GETGIAFILTRATA"
+          query="SELECT DO_ROSA.FLGVALIDACANC,
+                        DO_ROSA.FLGFILTRICMAATTIVATI, 
+                        DO_ROSA.STRVALIDACANC,
+                        DO_ROSA.NUMKLOROSA
+                   FROM DO_ROSA
+                  WHERE DO_ROSA.PRGROSA = ?"/>
+
+<STATEMENT name="IDO_GETFILTROXSESSO"
+          query="SELECT DO_RICHIESTA_AZ.STRSESSO FILTRO,
+          				DO_RICHIESTA_AZ.CODMOTGENERE,
+                        DO_RICHIESTA_AZ.STRMOTIVSESSO MOTIVO
+                   FROM DO_RICHIESTA_AZ
+                  WHERE DO_RICHIESTA_AZ.PRGRICHIESTAAZ = ?"/>
+
+<STATEMENT name="IDO_GETFILTROXETA"
+          query="SELECT DO_ALTERNATIVA.NUMDA FILTROETAMIN,
+                        DO_ALTERNATIVA.NUMA  FILTROETAMAX,
+                        DO_ALTERNATIVA.CODMOTETA,
+                        DO_ALTERNATIVA.STRMOTIVETA MOTIVO
+                   FROM DO_ALTERNATIVA
+                  WHERE DO_ALTERNATIVA.PRGRICHIESTAAZ = ?
+                    AND DO_ALTERNATIVA.PRGALTERNATIVA = ?"/>
+
+<STATEMENT name="IDO_GETFILTROXNAZIONE"
+          query="SELECT DO_CITTADINANZA.CODCITTADINANZA FILTRO,
+                        DE_CITTADINANZA.STRDESCRIZIONE CITTADINANZA ,
+                        DO_CITTADINANZA.CODMOTNAZIONALITA,
+                        DO_CITTADINANZA.STRMOTIVAZIONE MOTIVO
+                   FROM DO_CITTADINANZA, DE_CITTADINANZA
+                  WHERE DO_CITTADINANZA.CODCITTADINANZA = DE_CITTADINANZA.CODCITTADINANZA 
+                    AND DO_CITTADINANZA.PRGRICHIESTAAZ = ?"/>
+
+<STATEMENT name="IDO_APPLICAFILTRO"
+          query="UPDATE DO_ROSA
+                    SET DO_ROSA.FLGVALIDACANC = 'S',
+                        DO_ROSA.STRVALIDACANC = ?,
+                        DO_ROSA.NUMKLOROSA = ?+1,
+                        DO_ROSA.FLGFILTROAISCR = ?
+                  WHERE DO_ROSA.PRGROSA = ?"/>
+
+<STATEMENT name="IDO_FILTRAXSESSO"
+          query="update do_nominativo
+                    set codTipoCanc = &apos;D&apos;,
+                        strMotivoCanc = ?,
+                        cdnUtCanc = ?,
+                        dtmCanc = SYSDATE,
+                        NUMKLONOMINATIVO = NUMKLONOMINATIVO+1   
+                  where cdnlavoratore in 
+                        (select an_lavoratore.cdnlavoratore
+                          from an_lavoratore, do_nominativo dn
+                          where STRSESSO &lt;&gt; ?
+                          and (an_lavoratore.CDNLAVORATORE=dn.CDNLAVORATORE)
+                          and dn.prgrosa=do_nominativo.prgrosa
+                        )
+                    and PRGROSA = ?
+                    and codTipoCanc is null "/>
+
+
+<!-- Inseriscono la data inizio nella tabella DO_ROSA-->
+<STATEMENT name="IDO_UPDATE_DATA_ROSA"
+          query="UPDATE DO_ROSA
+                    SET DO_ROSA.DATINVIO = TO_DATE(?,'DD/MM/YYYY'),
+					    DO_ROSA.CDNUTMOD = ?,
+						DO_ROSA.DTMMOD   = SYSDATE,
+                        DO_ROSA.NUMKLOROSA = TO_NUMBER(?) + 1
+                  WHERE DO_ROSA.PRGROSA = ?"/>
+
+
+
+<STATEMENT name="IDO_UPDATE_DATA_TUTTEROSE"
+          query="{call PG_INCROCIO.insDataInvioRosa(?,?,?,?,?,?) }"/>
+
+
+<STATEMENT name="IDO_CLOSE_RICHAZ"
+		   query="UPDATE DO_EVASIONE SET
+		   			CDNSTATORICH = 4, 
+		   			CODMOTIVOCHIUSURARICH = 'C1',
+		   			CDNUTMOD = ?,
+		   			DTMMOD = SYSDATE 
+		   			WHERE PRGRICHIESTAAZ = TO_NUMBER(?)"/>
+
+
+
+
+
+<!-- Esito del match domanda offerta -->
+<STATEMENT name="IDO_GETESITOPRGRICHAZ"
+          query="SELECT DO_RICHIESTA_AZ.PRGRICHIESTAAZ ESITOPRGRICHIESTAAZ
+                   FROM DO_RICHIESTA_AZ 
+                  WHERE DO_RICHIESTA_AZ.NUMSTORICO = 0
+                    AND DO_RICHIESTA_AZ.NUMRICHIESTA = (SELECT DOA.NUMRICHIESTA FROM DO_RICHIESTA_AZ DOA WHERE DOA.PRGRICHIESTAAZ = ?)
+                    AND DO_RICHIESTA_AZ.NUMANNO      = (SELECT DOA.NUMANNO      FROM DO_RICHIESTA_AZ DOA WHERE DOA.PRGRICHIESTAAZ = ?)"/>
+
+<STATEMENT name="IDO_GETESITOMATCH"
+           query="SELECT TO_CHAR(DO_ESITO_CANDIDATO.DATCONTATTO,'DD/MM/YYYY') DATCONTATTO,
+                         DO_ESITO_CANDIDATO.CODESITODAAZIENDA,
+                         DO_ESITO_CANDIDATO.STRMOTIVAZIONE,
+                         DO_ESITO_CANDIDATO.CODESITODACANDIDATO,
+                         DO_ESITO_CANDIDATO.STRREFERENTE,
+                         DO_ESITO_CANDIDATO.STRTEL,
+                         DO_ESITO_CANDIDATO.STRFAX,
+                         DO_ESITO_CANDIDATO.STREMAIL,
+                         DO_ESITO_CANDIDATO.CDNUTINS,
+                         to_char(DO_ESITO_CANDIDATO.DTMINS,'dd/mm/yyyy hh24:mi') DTMINS,
+                         DO_ESITO_CANDIDATO.CDNUTMOD,
+                         to_char(DO_ESITO_CANDIDATO.DTMMOD,'dd/mm/yyyy hh24:mi') DTMMOD
+                      FROM DO_ESITO_CANDIDATO
+                     WHERE DO_ESITO_CANDIDATO.PRGRICHIESTAAZ = ?
+					             AND DO_ESITO_CANDIDATO.CDNLAVORATORE  = ?"/>
+
+<STATEMENT name="IDO_DESCESITOXAZIENDA"
+           query="SELECT DE_ESITO_ROSA.STRDESCRIZIONE ||
+                         DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                  LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                  ''
+                         ) AS DESCRIZIONE,
+                         DE_ESITO_ROSA.CODESITOROSA CODICE
+                    FROM DE_ESITO_ROSA
+                   WHERE DE_ESITO_ROSA.CODTIPO = 'A'"/>
+
+<STATEMENT name="IDO_DESCESITOXCANDIDATO"
+           query="SELECT DE_ESITO_ROSA.STRDESCRIZIONE ||
+                         DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                  LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                  ''
+                         ) AS DESCRIZIONE,
+                         DE_ESITO_ROSA.CODESITOROSA CODICE
+                    FROM DE_ESITO_ROSA
+                   WHERE DE_ESITO_ROSA.CODTIPO = 'L'"/>
+
+<STATEMENT name="IDO_INSERISCIESITO"
+           query="INSERT INTO DO_ESITO_CANDIDATO
+                       ( DO_ESITO_CANDIDATO.CDNLAVORATORE,
+				                 DO_ESITO_CANDIDATO.PRGRICHIESTAAZ,
+						             DO_ESITO_CANDIDATO.DATCONTATTO,
+                         DO_ESITO_CANDIDATO.CODESITODAAZIENDA,
+                         DO_ESITO_CANDIDATO.STRMOTIVAZIONE,
+                         DO_ESITO_CANDIDATO.CODESITODACANDIDATO,
+                         DO_ESITO_CANDIDATO.STRREFERENTE,
+                         DO_ESITO_CANDIDATO.STRTEL,
+                         DO_ESITO_CANDIDATO.STRFAX,
+                         DO_ESITO_CANDIDATO.STREMAIL,
+                         DO_ESITO_CANDIDATO.CDNUTINS,
+                         DO_ESITO_CANDIDATO.DTMINS,
+                         DO_ESITO_CANDIDATO.CDNUTMOD,
+                         DO_ESITO_CANDIDATO.DTMMOD
+                       )
+					      VALUES (?,?,
+                        TO_DATE(?,'DD/MM/YYYY'),?,?,?,?,?,?,?,
+								        ?,SYSDATE,?,SYSDATE)"/>
+
+<STATEMENT name="IDO_AGGIORNAESITO"
+          query="UPDATE DO_ESITO_CANDIDATO
+                    SET DO_ESITO_CANDIDATO.DATCONTATTO = TO_DATE(?,'DD/MM/YYYY'),
+                        DO_ESITO_CANDIDATO.CODESITODAAZIENDA = ?,
+                        DO_ESITO_CANDIDATO.STRMOTIVAZIONE = ?,
+                        DO_ESITO_CANDIDATO.CODESITODACANDIDATO = ?,
+                        DO_ESITO_CANDIDATO.STRREFERENTE = ?,
+                        DO_ESITO_CANDIDATO.STRTEL = ?,
+                        DO_ESITO_CANDIDATO.STRFAX = ?,
+                        DO_ESITO_CANDIDATO.STREMAIL = ?,
+					              DO_ESITO_CANDIDATO.CDNUTMOD = ?,
+						            DO_ESITO_CANDIDATO.DTMMOD   = SYSDATE
+                  WHERE DO_ESITO_CANDIDATO.CDNLAVORATORE  = ?
+				    AND DO_ESITO_CANDIDATO.PRGRICHIESTAAZ = ?"/>
+
+<STATEMENT name="GET_PAR_OPZ_INCROCIO"
+          query="Select dp.prgincrocio,
+                        TO_CHAR(NVL(dp.datstatolav, di.dtmins),'DD/MM/YYYY') datstatolav,
+                       dp.flgpreferibile,
+                       dp.flgnonindispensabile,
+                       dp.flgsolodisoccupato,
+                       di.prgalternativa,
+                       dr.numrichiesta, nvl(dr.numrichiestaorig, dr.numrichiesta) numrichiestavis,
+                       dr.numanno,
+                       dp.FLGNOMANSIONE,
+                       dp.FLGINCROCIOMIRATO,
+                       dr.flgfiltricmaattivati,
+                       dp.codmonocmcategoria,
+                       dp.flgGaranziaGiovani 	   
+                  from   do_richiesta_az dr,
+				  		 do_parametri_incrocio dp,
+                       	 do_incrocio di,
+                       	 do_rosa dr						 
+                  where  di.prgrichiestaaz=dr.prgrichiestaaz and
+                         dr.prgincrocio=di.prgincrocio and
+				  		 di.prgincrocio=dp.prgincrocio and
+                       	 dp.prgincrocio= ?
+"/>
+
+<!-- get numgg per data pubblicata -->
+<STATEMENT name="GET_NumGGPubb"
+          query="select num
+                 from ts_config_loc
+                 where codtipoconfig= 'VPUBB' 
+                 and strcodrif = (select codprovinciasil from ts_generale)"/>
+<!-- get numgg per data richiesta -->
+<STATEMENT name="GET_NumGGRich"
+          query="select num
+                 from ts_config_loc
+                 where codtipoconfig= 'VRICH'
+                 and strcodrif = (select codprovinciasil from ts_generale)"/>
+
+<STATEMENT name="GET_REFERENTI_AZIENDA"
+          query="  SELECT 
+                  PRGAZREFERENTE, 
+                  PRGAZIENDA, 
+                  PRGUNITA, 
+                  STRCOGNOME, 
+                  STRNOME, 
+                  de_ruolo_az.strdescrizione as descrizione, 
+                  STRTELEFONO, 
+                  STRFAX, 
+                  STREMAIL, 
+                  CDNUTINS, 
+                  DTMINS, 
+                  CDNUTMOD, 
+                  DTMMOD
+              FROM 
+                 AN_AZ_REFERENTE, de_ruolo_az
+              WHERE 
+                PRGAZIENDA= ? and PRGUNITA= ? and AN_AZ_REFERENTE.CODRUOLOAZ= de_ruolo_az.CODRUOLOAZ
+				and  de_ruolo_az.CODRUOLOAZ = 'RRH'"/>
+
+
+<STATEMENT name="IDO_GET_ANNONUMRICHIESTA"
+           query="SELECT DO_RICHIESTA_AZ.NUMANNO,
+                         NVL(DO_RICHIESTA_AZ.NUMRICHIESTAORIG, DO_RICHIESTA_AZ.NUMRICHIESTA) AS NUMRICHIESTA
+                    FROM DO_RICHIESTA_AZ
+                   WHERE DO_RICHIESTA_AZ.PRGRICHIESTAAZ = ?"/>
+
+<STATEMENT name="IDO_GET_PRGSPIUT"
+           query="select prgspi from ts_utente where cdnut = ?"/>
+
+<!-- Accorpamento Unita -->
+<STATEMENT name="IDO_GET_UNITA_AZIENDA_ACCORPAMENTO"
+           query="select  un.prgunita, un.strIndirizzo, un.strLocalita, un.codCom, com.strDenominazione, un.strCap, 
+                       un.flgMezziPub, trim(p.strIstat) as provincia, un.codAzStato,
+                       un.codAteco,
+                       DECODE( GREATEST(LENGTH(att.strdescrizione),45) , 45, 
+                               att.STRDESCRIZIONE, SUBSTR(att.strdescrizione, 1, 45) || '...' ) 
+                               as strdesateco,
+                       DECODE( GREATEST(LENGTH(att2.strdescrizione),45) , 45, 
+                               att2.STRDESCRIZIONE, 
+                               SUBSTR(att2.strdescrizione, 1, 45) || '...' ) as tipo_ateco,
+                       un.strResponsabile, un.strReferente, un.strTel, un.strFax, un.strEmail,
+                       TO_CHAR(un.datInizio, 'DD/MM/YYYY') as datInizio,TO_CHAR(un.datFine, 'DD/MM/YYYY')as datFine, 
+                       un.strNote, un.flgSede,
+                       un.cdnUtIns, TO_CHAR(un.DTMINS, 'DD/MM/YYYY') DTMINS, un.cdnUtMod, TO_CHAR(un.dtmMod, 'DD/MM/YYYY') dtmMod, 
+					             un.strREA, 
+                       un.strnumeroinps,
+                       un.numkloUnitaAzienda,
+                       un.strNumRegistroCommitt,
+                       TO_CHAR (un.DATREGISTROCOMMIT,'DD/MM/YYYY') as DATREGISTROCOMMIT,
+                       un.STRRIFERIMENTOSARE,
+                       un.STRREPARTOINPS,
+                       un.CODCCNL,
+                       CCNL.CODPADRE AS TIPOCCNL,
+                       CCNL.STRDESCRIZIONE AS DESCCNL,
+					   un2.prgunita as prgUnita_2, un2.strIndirizzo as strIndirizzo_2, un2.strLocalita as strLocalita_2, 
+					   un2.codCom as codCom_2, com_2.strDenominazione as strDenominazione_2, un2.strCap as strCap_2, 
+                       un2.flgMezziPub as flgMezziPub_2, trim(p_2.strIstat) as provincia_2, un2.codAzStato as codAzStato_2,
+                       un2.codAteco as codAteco_2,
+                       DECODE( GREATEST(LENGTH(att_2.strdescrizione),45) , 45, 
+                               att_2.STRDESCRIZIONE, SUBSTR(att_2.strdescrizione, 1, 45) || '...' ) 
+                               as strdesateco_2,
+                       DECODE( GREATEST(LENGTH(att2_2.strdescrizione),45) , 45, 
+                               att2_2.STRDESCRIZIONE, 
+                               SUBSTR(att2_2.strdescrizione, 1, 45) || '...' ) as tipo_ateco_2,
+                       un2.strResponsabile as strResponsabile_2, un2.strReferente as strReferente_2, un2.strTel as strTel_2, 
+					   un2.strFax as strFax_2, un2.strEmail as strEmail_2,
+                       TO_CHAR(un2.datInizio, 'DD/MM/YYYY') as datInizio_2,TO_CHAR(un2.datFine, 'DD/MM/YYYY')as datFine_2, 
+                       un2.strNote as strNote_2, un2.flgSede as flgSede_2,
+                       un2.cdnUtIns as cdnUtIns_2, TO_CHAR(un2.DTMINS, 'DD/MM/YYYY') as DTMINS_2, un2.cdnUtMod as cdnUtMod_2, 
+					   TO_CHAR(un2.dtmMod, 'DD/MM/YYYY') as dtmMod_2, 
+					             un2.strREA as strREA_2, 
+                       un2.strnumeroinps as strNumeroInps_2,
+                       un2.numkloUnitaAzienda as numKloUnitaAzienda_2,
+                       un2.strNumRegistroCommitt as strNumRegistroCommitt_2,
+                       TO_CHAR (un2.DATREGISTROCOMMIT,'DD/MM/YYYY') as DATREGISTROCOMMIT_2,
+                       un2.STRRIFERIMENTOSARE as strRiferimentoSare_2,
+                       un2.STRREPARTOINPS as strRepartoINPS_2,
+                       un2.CODCCNL AS CODCCNL_2,
+                       CCNL2.CODPADRE AS TIPOCCNL_2,
+                       CCNL2.STRDESCRIZIONE AS DESCCNL_2
+                FROM (an_unita_azienda un
+                LEFT JOIN de_comune com on com.codcom=un.codcom
+                LEFT JOIN de_attivita att on att.codateco=un.codateco
+                LEFT JOIN de_attivita att2 on att2.codateco=att.codpadre
+                LEFT JOIN DE_CONTRATTO_COLLETTIVO CCNL ON CCNL.CODCCNL = un.CODCCNL
+                LEFT JOIN de_provincia p on com.codProvincia= p.codProvincia),
+				(an_unita_azienda un2
+                LEFT JOIN de_comune com_2 on com_2.codcom=un2.codcom
+                LEFT JOIN de_attivita att_2 on att_2.codateco=un2.codateco
+                LEFT JOIN de_attivita att2_2 on att2_2.codateco=att_2.codpadre
+                LEFT JOIN DE_CONTRATTO_COLLETTIVO CCNL2 ON CCNL2.CODCCNL = un2.CODCCNL
+                LEFT JOIN de_provincia p_2 on com_2.codProvincia= p_2.codProvincia)
+                WHERE un.prgAzienda=?
+                AND un.prgUnita=?
+				and un2.prgAzienda=un.prgAzienda
+				and un2.prgUnita=?"/>
+
+
+<STATEMENT name="IDO_DO_ACCORPAMENTO"
+          query="{ call ?:=PG_ACCORPAMENTO.AccorpaUnitaAziende(?, ?, ?, ?) }"/>
+
+<!-- /Accorpamento Unita -->
+
+<!-- Accorpamento Testata -->
+<STATEMENT name="SELECT_TESTATA_ACCORPTESTATE"
+          query="select AZ.prgAzienda, 
+                 az.strCodiceFiscale, 
+                 az.strPartitaIva, 
+                 az.strRagioneSociale, 
+                 az.codNatGiuridica, 
+                 az.codTipoAzienda, 
+                 de_tipo_azienda.strdescrizione as descTipoAzienda,
+                 az.strSitoInternet, 
+                 de_nat_giuridica.strdescrizione as descNatGiuridica,
+                 az.strDescAttivita, 
+                 az.numSoci, 
+                 az.numDipendenti, 
+                 az.numCollaboratori, 
+                 az.numAltraPosizione,
+                 TO_CHAR(az.datInizio, 'DD/MM/YYYY') as datInizio,TO_CHAR(az.datFine, 'DD/MM/YYYY')as datFine, 
+                 az.strNote,
+                 az.strpatinail,
+                 az.flgdatiok,
+                 az.cdnUtIns, TO_CHAR(az.DTMINS, 'DD/MM/YYYY hh24:mi') as DTMINS,
+                 az.cdnUtMod, TO_CHAR(az.dtmMod, 'DD/MM/YYYY hh24:mi') as DTMMOD, 
+                 az.numkloAzienda,
+                 az.strNumAlboInterinali,
+                 az.strRepartoInail,
+                 TO_CHAR(az.DATAGGINFORMAZIONE, 'DD/MM/YYYY') as datAggInformazione
+           from an_azienda az
+                 INNER JOIN de_tipo_azienda on de_tipo_azienda.codtipoazienda = az.codtipoazienda
+                 LEFT JOIN de_nat_giuridica on de_nat_giuridica.codnatgiuridica = az.codnatgiuridica                  
+           where az.prgAzienda = ?" />
+
+<STATEMENT name="SELECT_UNITA_ACCORPTESTATE"
+          query="select u.prgUnita, u.strIndirizzo, u.strLocalita, 
+                      u.codcom, c.strdenominazione || ' (' ||trim(p.strIstat)||')' as descomune,  
+                  	  u.codAzStato, s.StrDescrizione desStato, u.strTel, u.strFax, u.strEmail, 
+                      decode(u.flgsede,'S','SI','N','NO','') as flgsede  
+               from an_unita_azienda u
+               inner join de_comune c on c.codcom=u.codcom
+               inner join de_provincia p on c.codprovincia=p.codprovincia
+               left join de_az_stato s on s.codAzStato=u.codAzStato
+               where prgAzienda = ?
+               order by decode(flgSede, 'S',0), prgUnita" />
+
+<STATEMENT name="IDO_DO_ACCORPAMENTO_TESTATA"
+          query="{ call ?:=PG_ACCORPAMENTO.AccorpaTestateAziende(?, ?, ?) }"/>
+          
+<!-- /Accorpamento Testata -->
+
+
+
+<!-- Pubblicazione richieste - Lato operatore  -->
+
+<STATEMENT
+        name="GET_TESTATA_RICHIESTA_PUBB"
+        query="SELECT
+                  RIC.PRGRICHIESTAAZ, NVL(RIC.NUMRICHIESTAORIG, RIC.NUMRICHIESTA) NUMRICHIESTAVIS,
+                  RIC.PRGAZIENDA,
+                  RIC.PRGUNITA,
+                  RIC.FLGPUBBLICATA,
+                  RIC.NUMSTORICO,
+                  TO_CHAR(DATPUBBLICAZIONE,'DD/MM/YYYY') DATPUBBLICAZIONE,
+                  TO_CHAR(DATSCADENZAPUBBLICAZIONE,'DD/MM/YYYY') DATSCADENZAPUBBLICAZIONE,
+        				  RIC.STRCOGNOMERIFPUBB,
+                  RIC.STRNOMERIFPUBB,
+                  RIC.STRTELRIFPUBB,
+                  RIC.STRFAXRIFPUBB,
+                  RIC.STREMAILRIFPUBB,                  
+                  RIC.STRDATIAZIENDAPUBB,
+                  RIC.STRMANSIONEPUBB,				  
+                  RIC.TXTFIGURAPROFESSIONALE,
+                  RIC.STRLUOGOLAVORO,
+                  RIC.STRFORMAZIONEPUBB,
+                  RIC.TXTCONDCONTRATTUALE,
+        				  RIC.STRCONOSCENZEPUBB,				  
+                  RIC.TXTCARATTERISTFIGPROF,
+                  RIC.STRNOTEORARIOPUBB,
+                  RIC.STRRIFCANDIDATURAPUBB,              
+        				  RIC.cdnUtins,
+                  TO_CHAR(RIC.DTMINS,'DD/MM/YYYY hh24:mi') DTMINS,
+                  RIC.cdnUtmod,
+                  TO_CHAR(RIC.DTMMOD,'DD/MM/YYYY hh24:mi') DTMMOD,                  
+                  RIC.NUMKLORICHIESTAAZ,
+                  DE_EVASIONE_RICH.FLGPUBBLICA,				  
+                  DO_EVASIONE.CDNSTATORICH,
+         				  RIC.CODQUALIFICA,
+                  RIC.CODCPI,
+                  TO_CHAR(DATCHIAMATA,'DD/MM/YYYY') DATCHIAMATA,
+                  RIC.CODMONOCMCATPUBB,
+                  RIC.CODRAPPORTOLAV,
+                  RIC.FLGNULLAOSTA
+              FROM
+                  DO_RICHIESTA_AZ RIC
+                  LEFT OUTER JOIN DO_EVASIONE ON (RIC.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+                  LEFT OUTER JOIN DE_EVASIONE_RICH ON (DO_EVASIONE.CODEVASIONE=DE_EVASIONE_RICH.CODEVASIONE)
+              WHERE 
+                  RIC.PRGRICHIESTAAZ = ?"/>
+
+
+<STATEMENT
+        name="GET_INFO_CPI"
+        query="SELECT 
+                  CPI.STRDESCRIZIONE,
+                  CPI.STRINDIRIZZO,
+                  CPI.STREMAIL,
+                  CPI.STRFAX
+              FROM DE_CPI CPI
+              WHERE CPI.CODCPI = ?
+"/>
+
+
+<STATEMENT
+        name="SAVE_TESTATA_RICHIESTA_PUBB"
+        query="update do_richiesta_az set
+                flgpubblicata=?,
+                datpubblicazione=TO_DATE(?,'DD/MM/YYYY'),
+                datscadenzapubblicazione=TO_DATE(?,'DD/MM/YYYY'),
+                strcognomerifpubb=?,
+                strnomerifpubb=?,
+                strtelrifpubb=?,
+                strfaxrifpubb=?,
+                stremailrifpubb=?,
+                codmonocmcatpubb=?,
+                strdatiaziendapubb=?,
+                strmansionepubb=?,
+                txtfiguraprofessionale=?,
+                strluogolavoro=?,
+                strformazionepubb=?,
+                txtcondcontrattuale=?,
+                strconoscenzepubb=?,
+                txtcaratteristfigprof=?,
+                strnoteorariopubb=?,
+                strrifcandidaturapubb=?,
+                codqualifica=?,
+                cdnutmod=?,
+                dtmmod=SYSDATE,                  
+                numklorichiestaaz=?,
+                codrapportolav = ?,
+                flgnullaosta = ?
+              where
+                prgrichiestaaz=?"/>
+
+
+
+<STATEMENT
+        name="SAVE_EVASIONE_PUBB"
+        query="update do_evasione set
+                flgpubbweb=?,
+                flgpubbgiornali=?,
+                flgpubbbacheca=?,
+                flgpubbcresco=?,
+                FLG_CANDIDATURA=?,
+                cdnutmod=?,
+                dtmmod=SYSDATE                  
+               where
+                prgrichiestaaz=?"/>
+
+
+<STATEMENT
+        name="GET_REFERENTI_AZIENDA_RICHIESTA_PUBB"
+        query="SELECT 
+                az_ref.PRGAZREFERENTE,
+                az_ref.PRGAZIENDA,
+                az_ref.PRGUNITA,
+                az_ref.STRCOGNOME,
+                az_ref.STRNOME,
+                ruoaz.strdescrizione as descrizione,
+                az_ref.STRTELEFONO,
+                az_ref.STRFAX,
+                az_ref.STREMAIL,
+                az_ref.CDNUTINS,
+                az_ref.DTMINS,
+                az_ref.CDNUTMOD,
+                az_ref.DTMMOD
+              FROM 
+                AN_AZ_REFERENTE az_ref,
+                de_ruolo_az ruoaz
+                inner join do_richiesta_az raz on raz.prgRichiestaAz=?
+              WHERE 
+                az_ref.PRGAZIENDA= raz.PRGAZIENDA and
+                az_ref.PRGUNITA= raz.PRGUNITA and
+                az_ref.CODRUOLOAZ= ruoaz.CODRUOLOAZ and
+                ruoaz.CODRUOLOAZ = 'RRH'
+"/>
+
+
+<STATEMENT
+        name="GET_InfPrgEvasione"
+        query="select	ev_rich.strdescrizione modEvasione, st_ev_rich.strdescrizione statoEvasione
+      					from do_evasione ev, de_evasione_rich ev_rich, de_stato_ev_rich st_ev_rich
+              		where   
+                    ev_rich.codevasione = ev.codevasione and
+                    st_ev_rich.cdnstatorich = ev.cdnstatorich and 
+                    prgrichiestaaz=?
+"/>
+                
+
+<!-- Gestione esito richiesta -->
+<STATEMENT
+        name="IDO_DERELEVASMOTIVO"
+        query="SELECT 
+                ri.CODEVASIONE,
+                ri.CODMOTIVOCHIUSURARICH,
+                ri.CODESITORICHIESTA,
+                di.STRDESCRIZIONE || DECODE(SYSDATE,
+                                            GREATEST(SYSDATE,
+                                            di.DATINIZIOVAL,
+                                            di.DATFINEVAL),
+                                            ' (scaduto)',
+                                            LEAST(SYSDATE,
+                                            di.DATINIZIOVAL,
+                                            di.DATFINEVAL),
+                                            ' (scaduto)',
+                                            '') AS DESCRIZIONE
+              FROM 
+                DE_REL_EVAS_MOTIVO ri,
+                DE_ESITO_RICHIESTA di
+              WHERE 
+                ri.CODESITORICHIESTA=di.CODESITORICHIESTA
+"/>
+
+
+<STATEMENT
+        name="IDO_DEESITORICHIESTA"
+        query="SELECT DE_.CODESITORICHIESTA AS CODICE,
+                  	  DE_.STRDESCRIZIONE ||
+                           DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                          LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                          '') AS DESCRIZIONE
+					FROM DE_ESITO_RICHIESTA DE_ ORDER BY STRDESCRIZIONE				  
+"/>
+
+
+<STATEMENT name="RESETCOPIARICHIESTA"
+           query="{ call ? := PG_IDO.resetCopiaRichiesta(?) }"
+/>
+
+<STATEMENT
+        name="IDO_GET_SPI"
+        query=" SELECT 
+				        a.prgspi, 
+				        a.strcognome, 
+				        a.strnome, 
+				        a.strcodicefiscale, 
+				        a.strsesso,
+				       	a.datnasc, 
+				       	a.strsiglaoperatore
+				  	FROM 
+				  		an_spi a, 
+				  		ts_utente u
+				 	WHERE u.prgspi = a.prgspi AND cdnut = ? "
+/>
+
+<STATEMENT name="ASListaAdesioniLavoratore"
+            query="select 
+						prgrichiestaaz,
+						prgtipoincrocio,
+						viewBtn,
+						prgnominativo,
+						prgrosa,
+						numrichiesta, 
+						numanno,
+						prgalternativa,
+						richiesta,
+						ente,
+						posti,
+						descrInc,
+						descr_rosa,
+						rapp,
+						qual,
+						dataChiam,
+						dataPubb,
+						cpi,
+						datchiamata,
+						cdnlavoratore,
+						viewBtnDel,
+						viewBtnPunteggio,
+						utente,
+						datChPb 
+					from
+						(select 
+							raz.prgrichiestaaz, inc.prgtipoincrocio, 
+							decode(inc.prgtipoincrocio, 7, '1','0') as viewBtn, 
+							r.prgrosa, n.prgnominativo, n.cdnlavoratore,
+							raz.numrichiesta, raz.numanno, a.prgalternativa,  
+							nvl(raz.numrichiestaorig, raz.numrichiesta) ||'/'|| raz.numanno ||'/'|| a.prgalternativa  as richiesta,  
+							az.strragionesociale as ente,  
+							case   	   when inc.prgtipoincrocio = 5 			then raz.numpostoas 	   when inc.prgtipoincrocio = 6 			then raz.numpostomilitare 	   when inc.prgtipoincrocio = 7 			then raz.numpostolsu 	   else 0  end  as posti,   
+							PG_IDO.WebStrContrattiProfilo(raz.prgrichiestaaz, a.prgalternativa) as rapp,
+							PG_IDO.WebStrMansioniProfilo(raz.prgrichiestaaz, a.prgalternativa) as qual, 							
+							TO_CHAR(raz.datchiamata,'DD/MM/YYYY') as dataChiam, 
+							TO_CHAR(raz.datpubblicazione,'DD/MM/YYYY') as dataPubb,  
+							(select de_cpi.strdescrizione from de_cpi where de_cpi.codcpi = raz.codcpi) as cpi,  
+							raz.datchiamata,
+							dti.strdescrizione as descrInc,
+							tr.strdescrizione as descr_rosa,
+							decode(r.prgtiporosa, 3, '0','1') as viewBtnDel,
+							CASE
+        						WHEN inc.prgtipoincrocio &lt;&gt; 7 THEN
+            						decode(ev.codevasione, 'AS', '1', '0')
+        						ELSE
+            					'0'
+    						 END AS viewbtnpunteggio,
+							(select u.strcognome || ' ' || u.strnome from ts_utente u where cdnut =n.cdnutins) ||' - '|| TO_CHAR(n.dtmins, 'DD/MM/YYYY hh24:mi') as utente,
+							(TO_CHAR(raz.datchiamata,'DD/MM/YYYY') || ' &lt;BR&gt; ' || TO_CHAR(raz.datpubblicazione,'DD/MM/YYYY')) as datChPb 								
+						from do_richiesta_az raz    
+							inner join do_incrocio inc on inc.prgrichiestaaz =raz.prgrichiestaaz  
+							inner join do_rosa r on r.prgincrocio = inc.prgincrocio  
+							inner join an_azienda az on az.prgazienda = raz.prgazienda  
+							inner join do_nominativo n on n.prgrosa = r.prgrosa  
+							inner join do_alternativa a on a.prgrichiestaaz = raz.prgrichiestaaz and a.prgalternativa = inc.prgalternativa  							
+							inner join de_tipo_incrocio dti on dti.prgtipoincrocio = inc.prgtipoincrocio
+							inner join de_tipo_rosa tr on tr.prgtiporosa = r.prgtiporosa
+							left join do_evasione ev on ev.prgrichiestaaz = raz.prgrichiestaaz
+						where 1=1
+						    and n.codtipocanc is null
+							and inc.prgtipoincrocio in  
+							(SELECT ti.prgTipoIncrocio AS prgTipoIncrocio FROM De_Tipo_Incrocio ti	WHERE ti.prgtipoincrocio IN (5,6,7))  							
+							and r.prgrosafiglia is null
+							and n.cdnlavoratore = ? 
+						)  
+					where posti is not null
+					ORDER BY datchiamata DESC, ente, numanno DESC, numrichiesta, prgalternativa, prgtipoincrocio "/>
+					
+
+<STATEMENT name="AS_INSERT_ADESIONE"
+           query="{ call ? := PG_INCROCIO.ASInsertAdesioneLavoratore(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }"
+/>	
+
+<STATEMENT name="AS_DELETE_ADESIONE"
+           query="{ call ? := PG_INCROCIO.ASDeleteAdesioneLavoratore(?, ?, ?, ?) }"
+/>
+
+<!-- AS PUBBLLICAZIONE DELLE NOTE ART.16 -->
+
+<STATEMENT name="AS_UPDATE_PUBB"
+           query=" 	UPDATE DO_RICHIESTA_AZ
+					SET    STRNOTAAVVISOPUBB	= ?,
+					       STRNOTAGRADDEF       = ?,
+					       STRNOTAGRADENTE      = ?,
+					       CDNUTINS				= ?,
+       					   DTMINS				= SYSDATE,
+       					   CDNUTMOD				= ?,
+       					   DTMMOD				= SYSDATE,      						
+       					   NUMKLORICHIESTAAZ 	= NUMKLORICHIESTAAZ + 1
+					WHERE  PRGRICHIESTAAZ       = ?"
+/>
+
+<STATEMENT name="AS_GET_PUBB"
+           query=" 	SELECT 
+           				   STRNOTAAVVISOPUBB,	
+					       STRNOTAGRADDEF,      
+					       STRNOTAGRADENTE,
+					       FLGPUBBLICATA,
+					       CDNUTINS,
+       					   TO_CHAR(DTMINS,'dd/mm/yyyy') DTMINS,
+       					   CDNUTMOD,
+       					   TO_CHAR(DTMMOD,'dd/mm/yyyy')DTMMOD,
+       					   PRGAZIENDA,
+       					   PRGUNITA,
+       					   PRGRICHIESTAAZ    
+					FROM   DO_RICHIESTA_AZ
+					WHERE  PRGRICHIESTAAZ  = ?"
+/>
+
+<STATEMENT name="AS_GET_DATA_CHIAM_PUBB"
+           query=" 	SELECT 
+           				   TO_CHAR(DATCHIAMATA,'DD/MM/YYYY') DATCHIAMATA
+              		FROM
+                 		   DO_RICHIESTA_AZ
+					WHERE  PRGRICHIESTAAZ  = ?"
+/>
+
+<!--Modulo per la riapertura della richiesta - Art. 16-->
+
+<STATEMENT name="AS_MOTIVO_RIAPERTURA"
+           query=" 	SELECT 
+           				   DE_MOTIVO_APERTURARICH.CODMOTIVOAPERTURARICH AS CODICE,
+                  	  	   DE_MOTIVO_APERTURARICH.STRDESCRIZIONE ||
+                           DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                          LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                          '') AS DESCRIZIONE
+					FROM DE_MOTIVO_APERTURARICH ORDER BY STRDESCRIZIONE "
+/>
+
+<STATEMENT name="UPDATE_RICHIESTA_RIAPERTURA"
+           query="UPDATE DO_EVASIONE
+				  SET    CODEVASIONE           = 'AS',
+					     CDNSTATORICH          = 7,
+					     CDNUTMOD              = ?,
+					     DTMMOD                = sysdate       
+				  WHERE  PRGRICHIESTAAZ        = ? 	"
+           				   
+/>
+
+<STATEMENT name="INSERT_MOTIVO_RIAPERTURA"
+           query="INSERT 
+           			INTO AS_MOTIVO_APERTURARICH (
+					   		PRGMOTIVOAPERTURARICH, 
+					   		CODMOTIVOAPERTURARICH, 
+					   		STRALTROMOTIVOAPERTURARICH, 
+					   		DTMINS, 
+					   		PRGRICHIESTAAZ, 
+					   		CDNUTINS) 
+					VALUES( 
+							S_AS_MOTIVO_APERTURARICH.nextval,
+							?,
+							?,
+					    	sysdate,
+							?,
+							?)"           				   
+/>
+
+<STATEMENT name="AS_GET_MOTIVO_RIAPERTURA"
+           query="SELECT PRGMOTIVOAPERTURARICH, 
+           				 TO_CHAR(DTMINS,'DD/MM/YYYY') AS DTMINS,
+           				 CODMOTIVOAPERTURARICH, 
+           				 STRALTROMOTIVOAPERTURARICH,   						 
+   						 PRGRICHIESTAAZ, 
+   						 CDNUTINS
+					FROM AS_MOTIVO_APERTURARICH
+				   WHERE PRGRICHIESTAAZ = ?"          				   
+/>
+
+<!--InvioSMS da ROSA GREZZA-->
+<STATEMENT name="GET_IDO_CONTATTO_ROSAGREZZA"
+	query="	SELECT  an_lavoratore.STRCELL,
+					an_lavoratore.STRCOGNOME,
+					an_lavoratore.STRNOME,
+					an_lavoratore.STRCODICEFISCALE,
+					an_lavoratore.CDNLAVORATORE									
+			FROM
+					an_lavoratore, do_nominativo
+			WHERE
+					an_lavoratore.CDNLAVORATORE = do_nominativo.CDNLAVORATORE 
+			AND		prgNominativo = ?"
+/>
+
+<STATEMENT name="GET_IDO_TESTO_SMS"
+	query="	SELECT 	CODTIPOSMS,
+					STR30MSG1,
+					STR30MSG2,
+					STR30MSG3,
+					STR30MSG4 
+			FROM 	TS_SMS 
+			WHERE 	CODTIPOSMS='ROSAGREZ'"
+/>
+					
+<STATEMENT name="GET_CPI_SMS"
+	query="	SELECT  STRDESCRIZIONE,
+	   				STRTEL,
+	   				STRRIFSMS  
+			FROM   	DE_CPI
+			WHERE   CODCPI = ?" 
+/>
+				
+<STATEMENT name="SELECT_COMBO_TIPO_LSU"
+          query="SELECT DE_.CODTIPOLSU AS CODICE,
+                        DE_.STRDESCRIZIONE AS DESCRIZIONE
+                   FROM de_tipo_lsu DE_"/>		
+                   
+<STATEMENT name="IDO_APPLICAFILTRO_CM"
+          query="UPDATE DO_ROSA
+                    SET DO_ROSA.FLGFILTRICMAATTIVATI = 'S',                        
+                        DO_ROSA.NUMKLOROSA = ?+1
+                  WHERE DO_ROSA.PRGROSA = ?"/>                   			
+
+<STATEMENT name="IDO_ROSA_GETFILTRICM"
+          query="SELECT P.CODMONOTIPOAZIENDA, P.CODMONOCAP_MR5,
+						P.CODMONOCAP_IN2, P.CODMONOCAP_PO1, P.CODMONOCAP_PO2,
+						P.CODMONOCAP_PO6, P.CODMONOCAP_PO7, P.CODMONOCAP_LO2, P.CODMONOCAP_LO3,
+						P.CODMONOCAP_MV1, P.CODMONOCAP_MV2, P.CODMONOCAP_MV3,
+						P.CODMONOCAP_MV4, P.CODMONOCAP_AC1, P.CODMONOCAP_FA2,
+						P.CODMONOCAP_FA3, P.CODMONOCAP_SL1, P.CODMONOCAP_SL2,
+						P.FLGESCFISICA, P.FLGESCPSICHICA, 
+						P.FLGESCSENSORIALE, P.FLGESCINTELLETTIVA, P.FLGESCNONDETERMINATO 
+                   FROM DO_PARAMETRI_INCROCIO P
+                   WHERE P.PRGROSA = ? "/>		
+                   
+<STATEMENT name="SELECT_COMBO_GRADO_FILTRI_CM"
+           query="
+           		select c.codgradocapacita as codice, 
+           		c.strdescrizione as descrizione
+				from de_grado_capacita c
+				where c.codgradocapacita IN ('3', '4', '5')
+				ORDER BY codgradocapacita "/>       
+
+<STATEMENT name="SELECT_DESC_CAPAC_FILTRI_CM"
+           query="select t.codcapacita, t.strdescrizione, t.codmonotipogrado
+				from de_capacita t
+				where t.codcapacita 
+				IN (
+				'MR5', 'IN2', 'PO1', 'PO2', 'PO6',
+				'PO7', 'LO2', 'LO3', 'MV1', 'MV2', 'MV3',
+				'MV4', 'AC1', 'FA2', 'FA3', 'SL1',
+				'SL2'
+				)
+				order by codcapacita "/>          
+
+<STATEMENT name="UPDATE_ROSA_PARAM_CM"
+           query="{ call ? := PG_INCROCIO.updateRosaParamCM(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) }"
+/>
+
+<STATEMENT name="GetDiagnosiCM"
+           query="SELECT df.PRGDIAGNOSIFUNZIONALE as prgDiagnosi
+           		  from an_lavoratore l, 
+	   			       cm_diagnosi_funzionale df
+	     		  where  l.CDNLAVORATORE = DECRYPT(df.CDNLAVORATORE,?) 
+		 		         and df.DATFINE is null and l.CDNLAVORATORE = ? "/>  
+
+
+<STATEMENT name="SELECT_COMBO_LISTE_SPECIALI_CM"
+           query="select t.codtipolista as codice, 
+           		  t.strdescrizione || DECODE(SYSDATE,
+                                            GREATEST(SYSDATE,
+                                            t.DATINIZIOVAL,
+                                            t.DATFINEVAL),
+                                            ' (scaduto)',
+                                            LEAST(SYSDATE,
+                                            t.DATINIZIOVAL,
+                                            t.DATFINEVAL),
+                                            ' (scaduto)',
+                                            '') AS DESCRIZIONE
+           		  from de_cm_lista_speciale t
+           		  "/>  
+
+<!-- richieste collocamento mirato -->
+
+<STATEMENT name="CMListaAdesioniLavoratore"
+            query="select 
+						prgrichiestaaz,
+						prgtipoincrocio,						
+						prgnominativo,
+						prgrosa,
+						numrichiesta, 
+						numanno,
+						prgalternativa,
+						richiesta,
+						ente,
+						codiceAdesione,
+						posti,
+						descrInc,
+						descr_rosa,
+						rapp,
+						qual,
+						dataChiam,
+						dataPubb,
+						cpi,
+						datchiamatacm,
+						cdnlavoratore,
+						strpriorita,
+						viewBtnDel,
+						utente,
+						datChPb 
+					from
+						(select 
+							raz.prgrichiestaaz, inc.prgtipoincrocio, 							
+							r.prgrosa, n.prgnominativo, n.cdnlavoratore, n.strpriorita,
+							raz.numrichiesta, raz.numanno, a.prgalternativa,  
+							nvl(raz.numrichiestaorig, raz.numrichiesta) ||'/'|| raz.numanno ||'/'|| a.prgalternativa  as richiesta,  
+							az.strragionesociale as ente,  
+							nvl(provraz.strtarga, ' ') || n.cdnlavoratore as codiceAdesione,
+							case   	   
+				              when inc.prgtipoincrocio = 10 			
+				              then raz.numposticm	   
+				              when inc.prgtipoincrocio = 11			
+				              then raz.numposticm 	     
+				              else 0  
+				              end as posti,   
+											PG_IDO.WebStrContrattiProfilo(raz.prgrichiestaaz, a.prgalternativa) as rapp,
+											PG_IDO.WebStrMansioniProfilo(raz.prgrichiestaaz, a.prgalternativa) as qual, 							
+											TO_CHAR(raz.datchiamataCM,'DD/MM/YYYY') as dataChiam, 
+											TO_CHAR(raz.datpubblicazione,'DD/MM/YYYY') as dataPubb,  
+											(select de_cpi.strdescrizione from de_cpi where de_cpi.codcpi = raz.codcpi) as cpi,  
+											raz.datchiamatacm,
+											dti.strdescrizione as descrInc,
+											tr.strdescrizione as descr_rosa,
+											decode(r.prgtiporosa, 3, '0','1') as viewBtnDel,
+											(select u.strcognome || ' ' || u.strnome from ts_utente u where cdnut =n.cdnutins) ||' - '|| TO_CHAR(n.dtmins, 'DD/MM/YYYY hh24:mi') as utente,
+											(TO_CHAR(raz.datchiamatacm,'DD/MM/YYYY') || ' &lt;BR&gt; ' || TO_CHAR(raz.datpubblicazione,'DD/MM/YYYY')) as datChPb 								
+										from do_richiesta_az raz    
+											inner join do_incrocio inc on inc.prgrichiestaaz =raz.prgrichiestaaz  
+											inner join do_rosa r on r.prgincrocio = inc.prgincrocio  
+											inner join an_azienda az on az.prgazienda = raz.prgazienda  
+											inner join do_nominativo n on n.prgrosa = r.prgrosa  
+											inner join do_alternativa a on a.prgrichiestaaz = raz.prgrichiestaaz and a.prgalternativa = inc.prgalternativa  							
+											inner join de_tipo_incrocio dti on dti.prgtipoincrocio = inc.prgtipoincrocio
+											inner join de_tipo_rosa tr on tr.prgtiporosa = r.prgtiporosa
+											inner join de_cpi cpiraz on raz.codcpi = cpiraz.codcpi
+											left join de_comune comraz on cpiraz.codcom = comraz.codcom
+											left join de_provincia provraz on comraz.codprovincia = provraz.codprovincia
+										where 1=1
+											and inc.prgtipoincrocio in  
+											(SELECT ti.prgTipoIncrocio AS prgTipoIncrocio 
+				              FROM De_Tipo_Incrocio ti	WHERE ti.prgtipoincrocio IN (10,11))  							
+											and r.prgrosafiglia is null
+											and n.cdnlavoratore = ? 
+										)  
+									where posti is not null
+									ORDER BY datchiamatacm DESC, ente, numanno DESC, numrichiesta, prgalternativa, prgtipoincrocio "/>
+					
+
+<STATEMENT name="CM_INSERT_ADESIONE" 
+           query="{ call ? := PG_COLL_MIRATO.CMInsertAdesioneLavoratore(?, ?, ?, ?, ?, ?, ?, ?, ?) }"
+/>	
+
+<STATEMENT name="CM_DELETE_ADESIONE"
+           query="{ call ? := PG_COLL_MIRATO.CMDeleteAdesioneLavoratore(?, ?, ?, ?) }"
+/>
+				
+<STATEMENT name="CM_GET_DATA_CHIAM_PUBB"
+           query=" 	SELECT 
+           				   TO_CHAR(DATCHIAMATACM,'DD/MM/YYYY') DATCHIAMATA
+              		FROM
+                 		   DO_RICHIESTA_AZ
+					WHERE  PRGRICHIESTAAZ  = ?"
+/>
+
+<STATEMENT name="CM_GET_PRIORITA"
+           query="SELECT 
+           			n.strpriorita, 
+           			n.strnota,
+           			r.prgtiporosa,
+           			n.cdnutins,
+           			TO_CHAR(n.dtmins,'DD/MM/YYYY hh24:mi') dtmins,
+           			n.cdnutmodcm,
+           			TO_CHAR(n.dtmmodcm,'DD/MM/YYYY hh24:mi') dtmmodcm,
+           			n.NUMKLONOMINATIVO NUMKLONOMINATIVO
+           		  FROM 
+           		    DO_NOMINATIVO n
+           		  INNER JOIN
+           		  	DO_ROSA r ON r.prgrosa = n.prgrosa
+           		  WHERE 
+           		  	n.prgnominativo=?"/>
+
+<STATEMENT name="CM_UPDATE_PRIORITA"
+		   query="UPDATE 
+		   			DO_NOMINATIVO 
+		   		  SET 
+		   		    STRPRIORITA = ?, 
+		   		    STRNOTA = ?, 
+		   		    DTMMODCM = sysdate,
+		   		    CDNUTMODCM = ?,
+		   		    NUMKLONOMINATIVO = ? + 1 
+		   		  WHERE 
+		   		  	PRGNOMINATIVO = ?"/>
+
+<STATEMENT name="GET_PRGUNITA"
+           query="select prgUnita from (
+	   					select prgUnita from an_unita_azienda where prgAzienda = ? 
+					) 
+				where rownum = 1 "
+/>
+
+<STATEMENT name="GET_STATO_PROSP_AZI_ACC"
+           query="select p1.PRGPROSPETTOINF,
+		   		 		 CASE  
+							WHEN p1.codmonocategoria = 'A'                
+			  					THEN 'piu'' di 50 dipendenti' 
+							WHEN p1.codmonocategoria = 'B'           
+			  					THEN 'da 36 a 50 dipendenti' 
+							WHEN p1.codmonocategoria = 'C' 
+			  					THEN 'da 15 a 35 dipendenti' 
+						END as fascia,
+						p1.numannorifprospetto as anno,
+						CASE 
+		   					WHEN p1.codmonostatoprospetto = 'A'              
+			 					THEN 'In corso d'' anno' 
+		   					WHEN p1.codmonostatoprospetto = 'S'         
+		     					THEN 'Storicizzato' 
+		   					WHEN p1.codmonostatoprospetto = 'V' 
+		     					THEN 'SARE: storicizzato' 
+		   					WHEN p1.codmonostatoprospetto = 'N' 
+		     					THEN 'Annullato' 
+		     				WHEN p1.codmonostatoprospetto = 'U' 
+		     					THEN 'Storicizzato:uscita dall'' obbligo'
+		 				END as stato,
+		 				p1.codprovincia as prov,
+		 				dp.strdenominazione as provincia,
+						( decode(to_char(p1.datprospetto, 'DD/MM/YYYY'),NULL,'&lt;BR/&gt;',to_char(p1.datprospetto, 'DD/MM/YYYY')) || '&lt;BR/&gt;' || to_char(p1.datConsegnaProspetto, 'DD/MM/YYYY') ) as datprospCons,
+						p1.NUMDIPENDENTITOT lavAz1, p2.NUMDIPENDENTITOT lavAz2,
+						p1.NUMBASECOMPUTO bcAzi1, p2.NUMBASECOMPUTO bcAzi2 
+				  from cm_prospetto_inf p1, cm_prospetto_inf p2, de_provincia dp
+				  where p1.prgazienda = ? and p2.PRGAZIENDA = ?
+	  					and p1.DATPROSPETTO = p2.DATPROSPETTO 
+	  					and p1.NUMANNORIFPROSPETTO = p2.NUMANNORIFPROSPETTO 
+	  					and p1.CODMONOCATEGORIA = p2.CODMONOCATEGORIA
+	  					and p1.CODMONOSTATOPROSPETTO IN ('A','S','U')
+	  					and p1.CODMONOSTATOPROSPETTO = p2.CODMONOSTATOPROSPETTO
+	  					and p1.CODPROVINCIA = p2.CODPROVINCIA
+	  					and dp.codprovincia = p1.codprovincia "/>
+	  					
+<STATEMENT name="IDO_GETFILTROXSV"
+           query="SELECT DO_RICHIESTA_AZ.FLGSVANTAGGIATI,
+            			 DO_RICHIESTA_AZ.STRMOTSVANTAGGIATI,
+            			 TO_CHAR(DO_RICHIESTA_AZ.DATVERIFICASVAN,'DD/MM/YYYY') DATVERIFICASVAN
+				 FROM DO_RICHIESTA_AZ
+				 WHERE DO_RICHIESTA_AZ.PRGRICHIESTAAZ = ?"/>  					
+
+<STATEMENT name="IDO_GETFILTROXDISABILI"
+           query="SELECT DO_RICHIESTA_AZ.FLGDISNONISCR,
+            			 DO_RICHIESTA_AZ.STRMOTNONISCR,
+            			 TO_CHAR(DO_RICHIESTA_AZ.DATVERIFICADIS,'DD/MM/YYYY') DATVERIFICADIS
+				 FROM DO_RICHIESTA_AZ
+				 WHERE DO_RICHIESTA_AZ.PRGRICHIESTAAZ = ?"/> 
+	  					
+<STATEMENT name="IDO_FILTRAXISCRIZIONI"
+           query="update do_nominativo set
+                            codTipoCanc = 'D',
+                            strMotivoCanc = ?,
+                            cdnUtCanc = ?,
+                            dtmCanc = SYSDATE,
+                            NUMKLONOMINATIVO = NUMKLONOMINATIVO+1  
+                  where cdnlavoratore NOT IN (select iscr.cdnlavoratore
+                                              from am_altra_iscr iscr, do_nominativo dn
+                                              where iscr.cdnlavoratore=dn.cdnlavoratore
+                                                    and iscr.codtipoiscr = 'SV'
+                                                    and to_date(?,'dd/mm/yyyy') between trunc(iscr.datinizio) and nvl(trunc(iscr.datfine), to_date(?,'dd/mm/yyyy') )  
+                                                    and dn.prgrosa=do_nominativo.prgrosa)
+                 	   and PRGROSA = ? and codTipoCanc is null  "/> 
+                 	   
+                 	   
+<STATEMENT name="IDO_FILTRAXDISABILI"
+           query="update do_nominativo set
+                            codTipoCanc = 'D',
+                            strMotivoCanc = ?,
+                            cdnUtCanc = ?,
+                            dtmCanc = SYSDATE,
+                            NUMKLONOMINATIVO = NUMKLONOMINATIVO+1  
+                  where cdnlavoratore NOT IN (select iscr.cdnlavoratore
+                                              from am_altra_iscr iscr, do_nominativo dn
+                                              where iscr.cdnlavoratore=dn.cdnlavoratore
+                                                    and iscr.codtipoiscr = 'DN'
+                                                    and to_date(?,'dd/mm/yyyy') between trunc(iscr.datinizio) and nvl(trunc(iscr.datfine), to_date(?,'dd/mm/yyyy') )  
+                                                    and dn.prgrosa=do_nominativo.prgrosa)
+                 	   and PRGROSA = ? and codTipoCanc is null  "/> 
+
+<STATEMENT name="IDO_FILTRAXALTREISCRIZIONI"
+           query="update do_nominativo set
+                            codTipoCanc = 'D',
+                            strMotivoCanc = ?,
+                            cdnUtCanc = ?,
+                            dtmCanc = SYSDATE,
+                            NUMKLONOMINATIVO = NUMKLONOMINATIVO+1  
+                  where cdnlavoratore NOT IN (select iscr.cdnlavoratore
+                                              from am_altra_iscr iscr, do_nominativo dn
+                                              where iscr.cdnlavoratore=dn.cdnlavoratore
+                                                    and iscr.codtipoiscr in (select filtro.codtipoiscr from do_filtro_aiscr filtro where filtro.prgrosa = ?)
+                                                    and trunc(sysdate) between trunc(iscr.datinizio) and nvl(trunc(iscr.datfine), trunc(sysdate) )  
+                                                    and dn.prgrosa=do_nominativo.prgrosa)
+                 	   and PRGROSA = ? and codTipoCanc is null  "/>
+                 	   
+<STATEMENT name="IDO_INS_FILTRO_ALTREISCRIZIONI"
+            query="INSERT INTO DO_FILTRO_AISCR (PRGROSA, CODTIPOISCR)
+                	VALUES (?, ?)"/>
+                 	   
+<STATEMENT name="GET_DATI_CLIC_LAVORO"
+           query="SELECT 
+					VAC.PRGVACANCY,	
+					VAC.PRGRICHIESTAAZ,	
+					VAC.CODTIPOCOMUNICAZIONECL,	
+					VAC.CODCPI,
+					VAC.STRPROFILORICHIESTO,
+					TO_CHAR(VAC.DATINVIO,'DD/MM/YYYY') AS DATINVIO,	
+					TO_CHAR(VAC.DATSCADENZA,'DD/MM/YYYY') AS DATSCADENZA,	
+					VAC.CODOFFERTA,	
+					VAC.CODOFFERTAINTERM,	
+					VAC.CODSTATOINVIOCL,
+					STATO.STRDESCRIZIONE AS DESCRIZIONESTATOINVIOCL
+				FROM CL_VACANCY VAC, DE_CPI CPI, DE_STATO_INVIO_CL STATO
+				WHERE VAC.CODCPI = CPI.CODCPI
+					AND STATO.CODSTATOINVIOCL = VAC.CODSTATOINVIOCL
+					AND VAC.PRGRICHIESTAAZ = ? 
+					AND VAC.CODTIPOCOMUNICAZIONECL = ?" />	 
+					
+	 	
+					
+<STATEMENT name="GET_DATI_AZIENDA_CLIC_LAVORO"
+           query="SELECT 
+           			az.PRGRICHIESTAAZ,
+				    az.CODCPI,
+				    unit.PRGAZIENDA,
+				    unit.PRGUNITA,
+				    unit.CODATECO
+			    FROM
+			        DO_RICHIESTA_AZ az,
+			        AN_UNITA_AZIENDA unit
+			    WHERE
+			        az.PRGUNITA = unit.PRGUNITA
+			        and unit.PRGAZIENDA = az.PRGAZIENDA
+			        and az.NUMSTORICO = 0
+			        and az.PRGRICHIESTAAZ = ? " />		
+			        
+<STATEMENT name="GET_LISTA_MANSIONI_CLIC_LAVORO"
+           query=" Select De.Codmansionedot As Codmansionedato, 
+		 				  De.Strdescrizione As desmansione
+				   From Do_Richiesta_Az Dra
+				   Join Do_Alternativa Da On Dra.Prgrichiestaaz = Da.Prgrichiestaaz
+				   Join  Do_Mansione Dm On (Da.Prgrichiestaaz = Dm.Prgrichiestaaz
+                                            And Da.Prgalternativa = Dm.Prgalternativa)                 
+                   join de_mansione De On (Dm.Codmansione = De.Codmansione 
+		      			 				   And Sysdate Between De.Datinizioval And De.Datfineval)
+                 Where Dra.Prgrichiestaaz = ?
+                   and da.prgalternativa = 1
+		   		   And Dm.Flginviocl = 'S' 
+                   and de.codmansionedot is not null" />		
+			        
+<STATEMENT name="GET_LISTA_RAPPORTI_CLIC_LAVORO"
+           query="Select Dc.Prgcontratto, 
+				       dc.codcontratto,
+				       Deco.Strdescrizione,
+				          tu.strcognome
+				       || ' '
+				       || tu.strnome
+				       || ' - '
+				       || TO_CHAR (dc.dtmins, 'DD/MM/YYYY') AS strinserimento,
+				       dc.Flginviocl
+				  From Do_Contratto Dc
+				  Join Ts_Utente Tu On (tu.Cdnut = dc.Cdnutins)
+				  Join De_Contratto Deco On (Dc.Codcontratto = Deco.Codcontratto)
+				  Join Ma_Rapporto_Lav Mrl On (Mrl.Codcontratto = Dc.Codcontratto
+				                           and sysdate between deco.datinizioval and deco.datfineval)
+				 Where 
+				 dc.Prgrichiestaaz = ? " />	
+				   
+<STATEMENT name="GET_LISTA_COMUNI_RICHIESTA_CLIC_LAVORO"
+            query="SELECT dc.PRGCOMUNE,
+					        dc.CODCOM,
+					        dc.PRGRICHIESTAAZ,
+					        DEco.STRDENOMINAZIONE,
+					        Depr.Strtarga As Provincia,
+					        tu.Strcognome || ' ' || tu.Strnome || ' - ' || To_Char(dc.Dtmins,'DD/MM/YYYY') As Strinserimento
+					From Do_Comune Dc
+					     Join Ts_Utente Tu On (Tu.Cdnut = Dc.Cdnutins)
+					     Join De_Comune Deco On (Dc.Codcom=Deco.Codcom
+					                             and sysdate between deco.datinizioval and deco.datfineval)
+					     join DE_PROVINCIA depr on (depr.CODPROVINCIA=deco.CODPROVINCIA)
+					Where Dc.Flginviocl = 'S' 
+                          and dc.PRGRICHIESTAAZ = ? "/>		
+                                
+<STATEMENT name="InsertClicLavoro"
+            query="INSERT INTO CL_VACANCY (
+					  PRGVACANCY, PRGRICHIESTAAZ, CODTIPOCOMUNICAZIONECL, CODCPI, STRPROFILORICHIESTO, DATINVIO, DATSCADENZA, CODOFFERTA,
+					  			CODOFFERTAINTERM, CODSTATOINVIOCL, DTMINS, CDNUTINS, DTMMOD, CDNUTMOD, TXTTRACCIATOXML)
+					  VALUES (S_CL_VACANCY.nextval, ?, '01', ?, ?, TO_DATE(?,'DD/MM/YYYY'), TO_DATE(?,'DD/MM/YYYY'), ?,
+					                ((select numrichiesta from do_richiesta_az where prgrichiestaaz = ?)||'_'||(select numanno from do_richiesta_az where prgrichiestaaz = ?)), ?, sysdate, ?, sysdate, ?, ?) "/>            
+
+<STATEMENT name="InsertBlen"
+            query="INSERT INTO CL_VACANCY (
+					  PRGVACANCY, PRGRICHIESTAAZ, CODTIPOCOMUNICAZIONECL, CODCPI, STRPROFILORICHIESTO, DATINVIO, DATSCADENZA, CODOFFERTA,
+					  			CODOFFERTAINTERM, CODSTATOINVIOCL, DTMINS, CDNUTINS, DTMMOD, CDNUTMOD, TXTTRACCIATOXML)
+					  VALUES (S_CL_VACANCY.nextval, ?, '01_BLEN', ?, ?, TO_DATE(?,'DD/MM/YYYY'), TO_DATE(?,'DD/MM/YYYY'), ?,
+					                ((select numrichiesta from do_richiesta_az where prgrichiestaaz = ?)||'_'||(select numanno from do_richiesta_az where prgrichiestaaz = ?)), ?, sysdate, ?, sysdate, ?, ?) "/>            
+	
+<STATEMENT name="UpdateClicLavoro"
+            query="UPDATE CL_VACANCY 
+            		SET
+            			STRPROFILORICHIESTO = ?,
+            			DATINVIO = TO_DATE(?,'DD/MM/YYYY'),
+            			DATSCADENZA = TO_DATE(?,'DD/MM/YYYY'),
+            			CODSTATOINVIOCL = ?,
+            			NUMKLOVACANCY = NUMKLOVACANCY + 1,
+            			DTMMOD = SYSDATE,
+            			CDNUTMOD = ?,
+           				CODCPI = ?,
+           				TXTTRACCIATOXML = ?
+					WHERE       
+						PRGVACANCY = ? "/>
+						
+<STATEMENT name="CAPACITA_FILTRI_CM_VDA"
+           query="select t.codcapacita, t.strdescrizione, t.codmonotipogrado
+                  from de_capacita t
+                  where t.codcapacita IN ('IN4', 'IN5', 'IN6', 'PO8', 'PO9','PO10','PO11','PO12','PO13','PO14','LO4',
+                  						  'LO5', 'LO6', 'MV5', 'MV6', 'MV7','AC5','AC6', 'FA7', 'FA8', 'SL5','SL6','SL7','SL8',
+                  						  'SL9','CA1','CA2','CA3','CA4')
+                  order by codcapacita  "/>
+                  
+<STATEMENT name="COMBO_FILTRI_CM_SINO"
+           query="select c.codgradocapacita as codice, 
+                   	     c.strdescrizione as descrizione
+                  from de_grado_capacita c
+                  where c.codgradocapacita IN ('S','N')
+                  ORDER BY codgradocapacita desc  "/>
+                  
+<STATEMENT name="COMBO_FILTRI_CM_ARTI"
+           query="select c.codgradocapacita as codice, 
+                   	     c.strdescrizione as descrizione
+                  from de_grado_capacita c
+                  where c.codgradocapacita IN ('6','7','8','9')
+                  ORDER BY codgradocapacita  "/>
+                  
+<STATEMENT name="IDO_ROSA_GETFILTRICMVDA"
+          query="SELECT P.CODMONOTIPOAZIENDA, P.CODMONOCAP_IN4,
+                        P.CODMONOCAP_IN5, P.CODMONOCAP_IN6, P.CODMONOCAP_PO8,
+                        P.CODMONOCAP_PO9, P.CODMONOCAP_PO10, P.CODMONOCAP_PO11, P.CODMONOCAP_PO12,
+                        P.CODMONOCAP_PO13, P.CODMONOCAP_PO14, P.CODMONOCAP_LO4,
+                        P.CODMONOCAP_LO5, P.CODMONOCAP_LO6, P.CODMONOCAP_MV5,
+                        P.CODMONOCAP_MV6,P.CODMONOCAP_MV7,P.CODMONOCAP_AC5,P.CODMONOCAP_AC6,P.CODMONOCAP_FA7,
+                        P.CODMONOCAP_FA8,P.CODMONOCAP_SL5,P.CODMONOCAP_SL6,P.CODMONOCAP_SL7,P.CODMONOCAP_SL8,
+                        P.CODMONOCAP_SL9,P.CODMONOCAP_CA1,P.CODMONOCAP_CA2,P.CODMONOCAP_CA3,P.CODMONOCAP_CA4,
+                        P.FLGESCFISICA, P.FLGESCPSICHICA, 
+                        P.FLGESCSENSORIALE, P.FLGESCINTELLETTIVA, P.FLGESCNONDETERMINATO 
+                   FROM DO_PARAMETRI_INCROCIO P
+                   WHERE P.PRGROSA = ? "/>
+                   
+<STATEMENT name="UPDATE_ROSA_PARAM_CM_VDA"
+           query="{ call ? := PG_INCROCIO.updateRosaParamCMVDA(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,
+           													   ?,?,?,?,?,?,?,?,?,?,?,?) }" />  
+
+<STATEMENT name="SELECT_COMBO_RAPPORTO_LAV"
+           query="select 
+					codrapportolav as codice,
+					strdescrizione as descrizione
+                  from 	de_rapporto_lav
+                  where trunc(sysdate) BETWEEN trunc(datinizioval) and trunc(datfineval) 
+                  ORDER BY strdescrizione" />
+                  
+<STATEMENT name="IDO_LOAD_FILTRO_ROSA_ALTRE_ISCR"
+           query="select filtro.prgrosa, filtro.codtipoiscr AS CODICE,
+           			iscr.strdescrizione || DECODE(SYSDATE, GREATEST(SYSDATE, iscr.DATINIZIOVAL, 
+						  iscr.DATFINEVAL),&apos; (scaduto) &apos;,
+						  LEAST(SYSDATE, iscr.DATINIZIOVAL, iscr.DATFINEVAL),&apos; (scaduto) &apos;,
+						  &apos;&apos;) AS DESCRIZIONE
+                  from do_filtro_aiscr filtro
+                  inner join de_tipo_iscr iscr on (filtro.codtipoiscr = iscr.codtipoiscr)
+                  where prgrosa = ? " />
+                  
+<STATEMENT name="CHECK_INVIO_VACANCY_SIL"
+           query="SELECT DISTINCT DO_RICHIESTA_AZ.PRGRICHIESTAAZ, DO_RICHIESTA_AZ.NUMANNO, DO_RICHIESTA_AZ.NUMRICHIESTA,
+    TO_CHAR(NVL(DO_RICHIESTA_AZ.DATSCADENZA, TO_DATE('01/01/2000', 'DD/MM/YYYY')), 'DD/MM/YYYY') DATSCADENZA,
+    TO_CHAR(NVL(DO_RICHIESTA_AZ.DATSCADENZAPUBBLICAZIONE, TO_DATE('01/01/2000', 'DD/MM/YYYY')), 'DD/MM/YYYY') DATSCADENZAPUBBLICAZIONE,
+    DO_RICHIESTA_AZ.NUMSTORICO,
+    DEEV.CODEVASIONE, DEEV.FLGPUBBLICA, TO_CHAR(DO_EVASIONE.CDNSTATORICH) CDNSTATORICH, DO_RICHIESTA_AZ.FLGPUBBLICATA, DO_EVASIONE.FLGPUBBWEB, 
+    DO_MANSIONE.FLGINVIOCL MFLGINVIOCL,
+    DO_COMUNE.FLGINVIOCL CFLGINVIOCL, DO_RICHIESTA_AZ.STRMANSIONEPUBB, DO_RICHIESTA_AZ.TXTFIGURAPROFESSIONALE,
+    Do_Evasione.Flg_Candidatura, do_richiesta_az.STREMAILRIFPUBB,
+    azref.strnome as nomeRifSare,  azref.strcognome as cognomeRifSare, azref.stremail as emailRifSare, 
+    do_richiesta_az.stremailriferimento,do_richiesta_az.strnomeriferimento, do_richiesta_az.strcognomeriferimento
+    FROM DO_RICHIESTA_AZ
+    INNER JOIN DO_ALTERNATIVA ON (DO_RICHIESTA_AZ.PRGRICHIESTAAZ = DO_ALTERNATIVA.PRGRICHIESTAAZ)
+    INNER JOIN DO_EVASIONE ON (DO_RICHIESTA_AZ.PRGRICHIESTAAZ = DO_EVASIONE.PRGRICHIESTAAZ)
+    INNER JOIN DE_EVASIONE_RICH DEEV ON (DEEV.CODEVASIONE = DO_EVASIONE.CODEVASIONE)
+    INNER JOIN AN_AZIENDA AZ ON (DO_RICHIESTA_AZ.PRGAZIENDA = AZ.PRGAZIENDA)
+    INNER JOIN AN_UNITA_AZIENDA UAZ ON (AZ.PRGAZIENDA = UAZ.PRGAZIENDA AND DO_RICHIESTA_AZ.PRGUNITA = UAZ.PRGUNITA)
+    INNER JOIN DO_MANSIONE ON (DO_RICHIESTA_AZ.PRGRICHIESTAAZ = DO_MANSIONE.PRGRICHIESTAAZ AND DO_ALTERNATIVA.PRGALTERNATIVA = DO_MANSIONE.PRGALTERNATIVA)
+    INNER JOIN DO_COMUNE ON (DO_COMUNE.PRGRICHIESTAAZ = DO_RICHIESTA_AZ.PRGRICHIESTAAZ)
+    INNER JOIN DE_CPI ON (DO_RICHIESTA_AZ.CODCPI = DE_CPI.CODCPI)
+    LEFT JOIN DO_ABILITAZIONE_GEN ON (DO_RICHIESTA_AZ.PRGRICHIESTAAZ = DO_ABILITAZIONE_GEN.PRGRICHIESTAAZ)
+    LEFT JOIN DO_LINGUA ON (DO_ALTERNATIVA.PRGRICHIESTAAZ = DO_LINGUA.PRGRICHIESTAAZ  AND DO_ALTERNATIVA.PRGALTERNATIVA = DO_LINGUA.PRGALTERNATIVA)
+    LEFT JOIN DO_ORARIO ON (DO_RICHIESTA_AZ.PRGRICHIESTAAZ = DO_ORARIO.PRGRICHIESTAAZ)
+    LEFT JOIN DO_INFO ON (DO_ALTERNATIVA.PRGRICHIESTAAZ = DO_INFO.PRGRICHIESTAAZ  AND DO_ALTERNATIVA.PRGALTERNATIVA = DO_INFO.PRGALTERNATIVA)
+    LEFT JOIN DO_COMPETENZA ON (DO_ALTERNATIVA.PRGRICHIESTAAZ = DO_COMPETENZA.PRGRICHIESTAAZ  AND DO_ALTERNATIVA.PRGALTERNATIVA = DO_COMPETENZA.PRGALTERNATIVA)
+    LEFT JOIN DO_STUDIO ON (DO_ALTERNATIVA.PRGRICHIESTAAZ = DO_STUDIO.PRGRICHIESTAAZ  AND DO_ALTERNATIVA.PRGALTERNATIVA = DO_STUDIO.PRGALTERNATIVA)
+    LEFT JOIN DO_CONTRATTO ON (DO_ALTERNATIVA.PRGRICHIESTAAZ = DO_CONTRATTO.PRGRICHIESTAAZ  AND DO_ALTERNATIVA.PRGALTERNATIVA = DO_CONTRATTO.PRGALTERNATIVA)
+    LEFT JOIN an_az_referente azref on (DO_RICHIESTA_AZ.prgazienda = azref.prgazienda and DO_RICHIESTA_AZ.prgunita = azref.prgunita and azref.codruoloaz = 'RSA')
+    WHERE DO_RICHIESTA_AZ.NUMSTORICO = 0 AND DO_ALTERNATIVA.PRGALTERNATIVA = 1
+    AND DEEV.FLGPUBBLICA = 'S'
+    AND do_richiesta_az.prgrichiestaaz NOT IN (SELECT PRGRICHIESTAAZ FROM CL_VACANCY CLVAC WHERE do_richiesta_az.prgrichiestaaz = clvac.prgrichiestaaz)
+    AND DO_RICHIESTA_AZ.PRGRICHIESTAAZ = ? 
+    order by decode(DO_MANSIONE.FLGINVIOCL, 'S', 1, 0) desc, decode( DO_COMUNE.FLGINVIOCL, 'S', 1, 0) desc
+" />
+       
+<STATEMENT name="VAC_GET_TITOLI_STUDIO_ANTEPRIMA"
+           query="SELECT  CODTITOLO AS codice,  strdescrizione ||
+           			DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                     LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                     '')  as descrizione FROM    de_titolo where  flgmin = 'S'" />    
+        
+       
+<STATEMENT name="VAC_GET_SPECIFICA_TITOLI_STUDIO_ANTEPRIMA"
+           query="select distinct ds.CODTITOLO as codcie,
+					nvl(ds.STRSPECIFICA, ' ') as descrizione
+       			 	From Do_Studio Ds
+        			inner join de_titolo dt on (ds.codtitolo = dt.codtitolo) where  flgmin = 'S'" /> 
+      
+<STATEMENT name="VAC_GET_LINGUA_ANTEPRIMA"
+           query="SELECT  codlingua AS codice,  Strdenominazione ||
+           			DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                     LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                     '')  as descrizione FROM    de_lingua  " />  
+    				 
+<STATEMENT name="VAC_GET_GRADO_LINGUA_ANTEPRIMA"
+           query="select cdngrado as codice, Strdescrizione ||
+           			DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                     LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                     '')  as descrizione from De_Grado_Lin  " />   
+    				
+<STATEMENT name="VAC_GET_ORARIO_ANTEPRIMA"
+			query="select distinct codorario as codice, Strdescrizione ||
+				DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+				LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)',
+				'') as descrizione from de_orario order by descrizione " />
+      
+<STATEMENT name="VAC_GET_AGEVOLAZIONE_ANTEPRIMA"
+			query="select distinct Codagevolazione as codice, Strdescrizione ||
+				DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+				LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)',
+				'') as descrizione from De_Agevolazione order by descrizione" />
+		
+<STATEMENT name="VAC_GET_TURNI_ANTEPRIMA"
+           query= "select distinct Codturno  as codice, Strdescrizione ||
+           			DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                    LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                     '') as descrizione  from de_turno" /> 
+   
+<STATEMENT name="VAC_GET_CONTRATTO_ANTEPRIMA"
+           query= "select distinct Codcontratto as codice, Strdescrizione ||
+           			DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                    LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                     '') as descrizione from De_Contratto" /> 
+			 
+<STATEMENT name="VAC_GET_ALBO_ANTEPRIMA"
+           query= "select distinct codabilitazionegen  as codice, Strdescrizione ||
+           			DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                    LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                     '') as descrizione  
+                    from de_abilitazione_gen where codtipoabilitazionegen = 'AL'" /> 
+			 
+<STATEMENT name="VAC_GET_PATENTI_ANTEPRIMA"
+           query= "select distinct  Codabilitazionegen as codice,  Strdescrizione ||
+           			DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                    LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                     '') as descrizione
+	      From De_Abilitazione_Gen where codtipoabilitazionegen = 'PG'" /> 
+			 
+<STATEMENT name="VAC_GET_PATENTINI_ANTEPRIMA"
+           query= "select distinct  Codabilitazionegen as codice , Strdescrizione ||
+           			DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                    LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                     '') as descrizione
+		      from De_Abilitazione_Gen where codtipoabilitazionegen = 'PT'" /> 
+		      
+<STATEMENT name="VAC_GET_AREA_ANTEPRIMA"
+           query= "select codarea  as codice, Strdescrizione ||
+           			DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                    LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                     '') as descrizione   from De_Area  " /> 
+ 
+ <STATEMENT name="VAC_GET_TRASFERTA_ANTEPRIMA"
+           query= "select distinct Codtrasferta  as codice, Strdescrizione ||
+           			DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                    LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                     '') as descrizione   from De_Trasferta  " /> 
+                 
+  <STATEMENT name="VAC_GET_MOT_ETA_ANTEPRIMA"
+           query= "select distinct Codmoteta  as codice, Strdescrizione ||
+           			DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                    LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                     '') as descrizione   from De_Mot_Eta  " />
+            
+<STATEMENT
+        name="UPDATE_DATA_INVIO_VACANCY_PUBB"
+        query="update do_richiesta_az set
+                datUltimoInvioVacancy=SYSDATE,
+                cdnutmod=?,
+                dtmmod=SYSDATE,                  
+                numklorichiestaaz=to_number(?)
+              where
+                prgrichiestaaz=?"/>
+                
+  <STATEMENT name="VAC_GET_SETTORE_ANTEPRIMA"
+           query= "select distinct Codateco  as codice, Strdescrizione ||
+           			DECODE(SYSDATE,GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                    LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                     '') as descrizione   from DE_ATTIVITA  " />

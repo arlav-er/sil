@@ -1,0 +1,543 @@
+<!-- **********************************************************************************
+                                     Documenti Associati
+     **********************************************************************************  
+-->
+
+<!-- Modulo utilizzato dalla pagina di ricerca generica di documenti -->
+<MODULE name="M_GetListDocumenti"
+		class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" title="" rows="10">
+		<QUERIES>
+			<SELECT_QUERY>   
+				<STATEMENT_PROVIDER CLASS="it.eng.sil.module.documenti.documentiList"/>
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRINFRIFAZILAV" label="Cognome Nome / Rag.Sociale"/>
+			<!-- tolta 24-01-05: COLUMN name="STRINFRIFAZILAV_CF" label="Codice Fiscale"/ -->
+			<COLUMN name="DATACQRIL" label="Acq./Ril."/>
+			<COLUMN name="STRDESCRIZIONETIPODOC" label="Tipo di documento"/>
+			<COLUMN name="STRDESCRIZIONEDOC" label="Descrizione"/>
+			<COLUMN name="INFOPROTOCOLLO" label="Protocollo"/>
+			<!-- tolta 24-01-05: COLUMN name="STRDESCRIZIONEAMBITO" label="Riferim."/ -->
+			<COLUMN name="STRENTERILASCIO" label="Ente di rilascio(IN) / destinatario(OUT)"/>
+			<COLUMN name="CODCPI_DESC" label="CPI di riferim."/>
+			<!-- COLUMN name="STRNOMEDOC" label="Nome del file"/ -->
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+				<PARAMETER name="PAGE"               type="ABSOLUTE" value="DettagliDocumentoPage" />
+				<PARAMETER name="prgdocumento"       type="RELATIVE" scope="LOCAL"           value="prgdocumento" />
+				<PARAMETER name="cdnLavoratore"      type="RELATIVE" scope="LOCAL"           value="cdnLavoratore" />
+				<PARAMETER name="prgAzienda"         type="RELATIVE" scope="LOCAL"           value="prgAzienda" />
+				<PARAMETER name="prgUnita"           type="RELATIVE" scope="LOCAL"           value="prgUnita" />
+				<PARAMETER name="lookLavoratore"     type="RELATIVE" scope="SERVICE_REQUEST" value="lookLavoratore" />
+				<PARAMETER name="lookAzienda"        type="RELATIVE" scope="SERVICE_REQUEST" value="lookAzienda" />
+				<PARAMETER name="contesto"           type="RELATIVE" scope="SERVICE_REQUEST" value="contesto" />
+				<PARAMETER name="cdnFunzione"        type="RELATIVE" scope="SERVICE_REQUEST" value="cdnFunzione" />
+				<PARAMETER name="pagina"             type="RELATIVE" scope="SERVICE_REQUEST" value="pagina" />
+				<PARAMETER name="popUp"              type="RELATIVE" scope="SERVICE_REQUEST" value="popUp" />
+				<PARAMETER name="goBackListPage"     type="ABSOLUTE" value="ListaDocumentiPage" />
+				<PARAMETER name="DOCUMENTTYPE"       type="RELATIVE" scope="SERVICE_REQUEST" value="TIPODOCUMENTO" />
+				<!-- POPUP EVIDENZE -->
+				<PARAMETER name="APRI_EV" type="ABSOLUTE" value="1" scope=""/>
+			</SELECT_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE> 
+
+
+<!-- Documenti Get Lista Lavoratori -->
+<MODULE name="M_DocumentiGetListaLavoratori"
+	    class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" rows="15" title="Lista Lavoratori">
+		<QUERIES>
+			<SELECT_QUERY>
+				<STATEMENT_PROVIDER class="it.eng.sil.module.documenti.DynListSelezLavoratori"/>
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRCODICEFISCALE" label="Codice Fiscale"/>
+			<COLUMN name="STRCOGNOME" label="Cognome"/>
+			<COLUMN name="STRNOME" label="Nome"/>
+			<COLUMN name="DATNASC" label="Data di nascita" />
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/add.gif" confirm="FALSE" label="Aggiungi Lavoratore">
+				<PARAMETER name="PAGE"          type="ABSOLUTE" value="DocumentiRicercaRefreshPage" />
+				<PARAMETER name="AGG_FUNZ"      type="RELATIVE" scope="SERVICE_REQUEST" value="AGG_FUNZ"/>
+				<PARAMETER name="cdnFunzione"   type="RELATIVE" scope="SERVICE_REQUEST" value="cdnFunzione"/>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="LOCAL" value="cdnLavoratore"/>
+				<PARAMETER name="strCodFiscLav" type="RELATIVE" scope="LOCAL" value="strCodiceFiscale"/>
+				<PARAMETER name="strCognome"    type="RELATIVE" scope="LOCAL" value="strCognome"/>
+				<PARAMETER name="strNome"       type="RELATIVE" scope="LOCAL" value="strNome"/>
+				<PARAMETER name="datNasc"       type="RELATIVE" scope="LOCAL" value="datNasc"/>
+			</SELECT_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+
+<!-- Documenti Get Lista Aziende -->
+<MODULE name="M_DocumentiGetListaAziende"
+	    class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" rows="15" title="Lista Aziende">
+		<QUERIES>
+			<SELECT_QUERY>
+				<STATEMENT_PROVIDER class="it.eng.sil.module.documenti.DynListSelezAziende"/>
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRCODICEFISCALE" label="CF"/>
+			<COLUMN name="STRPARTITAIVA" label="P.Iva"/>
+			<COLUMN name="STRRAGIONESOCIALE" label="Ragione Sociale"/>
+			<COLUMN name="STRINDIRIZZO" label="Indirizzo"/>
+			<COLUMN name="COMUNE_AZ" label="Comune"/>
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/add.gif" confirm="FALSE" label="Aggiungi Azienda">
+				<PARAMETER name="PAGE"          type="ABSOLUTE" value="DocumentiRicercaRefreshPage" />
+				<PARAMETER name="AGG_FUNZ"      type="RELATIVE" scope="SERVICE_REQUEST" value="AGG_FUNZ"/>
+				<PARAMETER name="cdnFunzione"   type="RELATIVE" scope="SERVICE_REQUEST" value="cdnFunzione"/>
+				<PARAMETER name="prgAzienda"    type="RELATIVE" scope="LOCAL" value="prgAzienda"/>
+				<PARAMETER name="prgUnita"      type="RELATIVE" scope="LOCAL" value="prgUnita"/>
+				<PARAMETER name="strCodFiscAzi" type="RELATIVE" scope="LOCAL" value="STRCODICEFISCALE"/>
+				<PARAMETER name="strPartitaIva" type="RELATIVE" scope="LOCAL" value="STRPARTITAIVA"/>
+				<PARAMETER name="strRagioneSociale" type="RELATIVE" scope="LOCAL" value="STRRAGIONESOCIALE"/>
+				<PARAMETER name="strIndirizzo"  type="RELATIVE" scope="LOCAL" value="STRINDIRIZZO"/>
+				<PARAMETER name="strTel"        type="RELATIVE" scope="LOCAL" value="STRTEL"/>
+				<PARAMETER name="comuneAzi"     type="RELATIVE" scope="LOCAL" value="COMUNE_AZ"/>
+			</SELECT_CAPTION>
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_GetDocAssociati"
+		class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" title="" rows="10">
+		<QUERIES>
+			<SELECT_QUERY>   
+				<STATEMENT_PROVIDER CLASS="it.eng.sil.module.documenti.documentiList"/>
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRINFRIFAZILAV" label="Cognome Nome / Rag.Sociale"/>
+			<!-- tolta 24-01-05: COLUMN name="STRINFRIFAZILAV_CF" label="Codice Fiscale"/ -->
+			<COLUMN name="DATACQRIL" label="Acq./Ril."/>
+			<COLUMN name="STRDESCRIZIONETIPODOC" label="Tipo di documento"/>
+			<COLUMN name="STRDESCRIZIONEDOC" label="Descrizione"/>
+			<COLUMN name="INFOPROTOCOLLO" label="Protocollo"/>
+			<!-- tolta 24-01-05: COLUMN name="STRDESCRIZIONEAMBITO" label="Riferim."/ -->
+			<COLUMN name="STRENTERILASCIO" label="Ente di rilascio(IN) / destinatario(OUT)"/>
+			<COLUMN name="CODCPI_DESC" label="CPI di riferim."/>
+			<!-- COLUMN name="STRNOMEDOC" label="Nome del file"/ -->
+		</COLUMNS>
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+				<PARAMETER name="PAGE"               type="ABSOLUTE" value="DettagliDocumentoPage" />
+				<PARAMETER name="prgdocumento"       type="RELATIVE" scope="LOCAL"           value="prgdocumento" />
+				<PARAMETER name="cdnLavoratore"      type="RELATIVE" scope="LOCAL"           value="cdnLavoratore" />
+				<PARAMETER name="prgAzienda"         type="RELATIVE" scope="LOCAL"           value="prgAzienda" />
+				<PARAMETER name="prgUnita"           type="RELATIVE" scope="LOCAL"           value="prgUnita" />
+				<PARAMETER name="CODSTATOATTO"   	 type="RELATIVE" scope="LOCAL"           value="CODSTATOATTO" />
+				<PARAMETER name="DOCUMENTTYPE"       type="RELATIVE" scope="LOCAL"           value="CODTIPODOCUMENTO" />
+				<PARAMETER name="annoprotNum"        type="RELATIVE" scope="LOCAL"           value="annoprotNum" />
+				<PARAMETER name="lookLavoratore"     type="RELATIVE" scope="SERVICE_REQUEST" value="lookLavoratore" />
+				<PARAMETER name="lookAzienda"        type="RELATIVE" scope="SERVICE_REQUEST" value="lookAzienda" />
+				<PARAMETER name="contesto"           type="RELATIVE" scope="SERVICE_REQUEST" value="contesto" />
+				<PARAMETER name="cdnFunzione"        type="RELATIVE" scope="SERVICE_REQUEST" value="cdnFunzione" />
+				<PARAMETER name="pagina"             type="RELATIVE" scope="SERVICE_REQUEST" value="pagina" />
+				<PARAMETER name="popUp"              type="RELATIVE" scope="SERVICE_REQUEST" value="popUp" />
+				<PARAMETER name="strChiaveTabella"   type="RELATIVE" scope="SERVICE_REQUEST" value="strChiaveTabella" />
+				<PARAMETER name="infStoriche"        type="RELATIVE" scope="SERVICE_REQUEST" value="infStoriche" />
+				<PARAMETER name="goBackListPage"     type="ABSOLUTE" value="DocumentiAssociatiPage" />
+				<!-- POPUP EVIDENZE -->
+				<PARAMETER name="APRI_EV" type="ABSOLUTE" value="1" scope=""/>
+			</SELECT_CAPTION>
+			<!--
+			<DELETE_CAPTION confirm="TRUE" label="Cancella">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="ProfCancellaUtentePage" />
+				<PARAMETER name="CDUT" type="RELATIVE" value="CDUT" scope="LOCAL"/>                
+			</DELETE_CAPTION>
+			-->
+		</CAPTIONS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetDocAssociatiL68"	class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" title="" rows="10">
+		<QUERIES>
+			<SELECT_QUERY>   
+				<STATEMENT_PROVIDER CLASS="it.eng.sil.module.documenti.documentiListL68"/>
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="SEDE" label="Sede"/>
+			<COLUMN name="STRINFRIFAZILAV" label="Cognome Nome / Rag.Sociale"/>
+			<COLUMN name="DATACQRIL" label="Acq./Ril."/>
+			<COLUMN name="STRDESCRIZIONETIPODOC" label="Tipo di documento"/>
+			<COLUMN name="STRDESCRIZIONEDOC" label="Descrizione"/>
+			<COLUMN name="INFOPROTOCOLLO" label="Protocollo"/>
+			<COLUMN name="STRENTERILASCIO" label="Ente di rilascio(IN) / destinatario(OUT)"/>
+			<COLUMN name="CODCPI_DESC" label="CPI di riferim."/>
+		</COLUMNS>
+		<!--
+		<CAPTIONS>
+			<SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+				<PARAMETER name="PAGE"               type="ABSOLUTE" value="DettagliDocumentoPage" />
+				<PARAMETER name="prgdocumento"       type="RELATIVE" scope="LOCAL"           value="prgdocumento" />
+				<PARAMETER name="cdnLavoratore"      type="RELATIVE" scope="LOCAL"           value="cdnLavoratore" />
+				<PARAMETER name="prgAzienda"         type="RELATIVE" scope="LOCAL"           value="prgAzienda" />
+				<PARAMETER name="prgUnita"           type="RELATIVE" scope="LOCAL"           value="prgUnita" />
+				<PARAMETER name="lookLavoratore"     type="RELATIVE" scope="SERVICE_REQUEST" value="lookLavoratore" />
+				<PARAMETER name="lookAzienda"        type="RELATIVE" scope="SERVICE_REQUEST" value="lookAzienda" />
+				<PARAMETER name="contesto"           type="RELATIVE" scope="SERVICE_REQUEST" value="contesto" />
+				<PARAMETER name="cdnFunzione"        type="RELATIVE" scope="SERVICE_REQUEST" value="cdnFunzione" />
+				<PARAMETER name="pagina"             type="RELATIVE" scope="SERVICE_REQUEST" value="pagina" />
+				<PARAMETER name="popUp"              type="RELATIVE" scope="SERVICE_REQUEST" value="popUp" />
+				<PARAMETER name="strChiaveTabella"   type="RELATIVE" scope="SERVICE_REQUEST" value="strChiaveTabella" />
+				<PARAMETER name="infStoriche"        type="RELATIVE" scope="SERVICE_REQUEST" value="infStoriche" />
+				<PARAMETER name="goBackListPage"     type="ABSOLUTE" value="DocumentiAssociatiPage" />
+				<PARAMETER name="APRI_EV" type="ABSOLUTE" value="1" scope=""/>
+			</SELECT_CAPTION>
+			
+			<DELETE_CAPTION confirm="TRUE" label="Cancella">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="ProfCancellaUtentePage" />
+				<PARAMETER name="CDUT" type="RELATIVE" value="CDUT" scope="LOCAL"/>                
+			</DELETE_CAPTION>
+		</CAPTIONS>
+		-->
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_GetDocAssociatiPi3"
+		class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule">
+	<CONFIG pool="SIL_DATI" title="" rows="10">
+		<QUERIES>
+			<SELECT_QUERY>   
+				<STATEMENT_PROVIDER CLASS="it.eng.sil.module.documenti.documentiListPi3"/>
+			</SELECT_QUERY>
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="STRDESCRIZIONETIPODOC" label="Nome"/>
+			<COLUMN name="STRDESCRIZIONEDOC" label="Descrizione"/>
+			<COLUMN name="INFOPROTOCOLLO" label="Protocollo"/>
+		</COLUMNS>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="RedoFirmaDocumenti"   class="it.eng.sil.module.documenti.RedoFirmaDocumenti">
+	<CONFIG pool="SIL_DATI">
+		<QUERY_IS_STAMPE_PARAM statement="IS_DOCUMENT_A_STAMPA_PARAM">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="prgDocumento" />
+		</QUERY_IS_STAMPE_PARAM>
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_isDocAStampeParam"   class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="IS_DOCUMENT_A_STAMPA_PARAM">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="prgDocumento" />
+		</QUERY>
+	</CONFIG>
+</MODULE> 
+
+<MODULE name="DettagliDocumento"   class="it.eng.sil.module.documenti.DettagliDocumento" />
+
+<MODULE name="SalvaDocumento"   class="it.eng.sil.module.documenti.SalvaDocumento" />
+
+<MODULE name="NuovoDocumento"   class="it.eng.sil.module.documenti.NuovoDocumento" />
+
+<MODULE name="M_RefreshDocumento"   class="it.eng.sil.module.documenti.RefreshDocumento" />
+
+<MODULE name="M_GetCodMonoGestDoc"   class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="ST_GetCodMonoGestDoc">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="prgDocumento" />
+		</QUERY>
+	</CONFIG>
+</MODULE> 
+
+
+<MODULE name="M_GetCpiDocumento" class="it.eng.sil.module.documenti.GetCpiDocumento">
+	<CONFIG pool="SIL_DATI">
+		<QUERY statement="GET_CPI_DOCUMENTO">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="codCpi" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetCpiPoloProvinciale" class="it.eng.sil.module.ComboGenerica">
+	<CONFIG pool="SIL_DATI">
+		<QUERIES>
+			<SELECT_QUERY statement="GET_CPI_POLO_PROVINCIALE_VALIDI" />
+		</QUERIES>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="ComboAmbito" class="it.eng.sil.module.ComboGenerica">
+ <CONFIG pool="SIL_DATI">
+      <QUERIES>
+        <SELECT_QUERY statement="COMBO_AMBITO">
+        </SELECT_QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE>
+
+<MODULE name="ComboTipoDocumento"   class="it.eng.sil.module.ComboGenerica">
+	<CONFIG pool="SIL_DATI">
+		<QUERIES>
+			<SELECT_QUERY statement="COMBO_TIPO_DOCUMENTO" />
+		</QUERIES>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="ComboAmbitoPatronato" class="it.eng.sil.module.ComboGenerica">
+ <CONFIG pool="SIL_DATI">
+      <QUERIES>
+        <SELECT_QUERY statement="COMBO_AMBITO_PATRONATO">
+        </SELECT_QUERY>
+      </QUERIES>
+    </CONFIG>
+</MODULE>
+
+<MODULE name="ComboTipoDocumentoPatronato"   class="it.eng.sil.module.ComboGenerica">
+	<CONFIG pool="SIL_DATI">
+		<QUERIES>
+			<SELECT_QUERY statement="COMBO_TIPO_DOCUMENTO_PATRONATO" />
+		</QUERIES>
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_getMotivoAnnullamentoDoc"   class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI">
+		<QUERY statement="GET_MOT_ANNULLAMENTO_DOC"/>
+	</CONFIG>
+</MODULE>
+<MODULE name="M_getMotivoAnnullamentoDocFiltrata"   class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI">
+		<QUERY statement="GET_MOT_ANNULLAMENTO_DOC_FILTRATA"/>
+	</CONFIG>
+</MODULE>
+<MODULE name="M_getTuttiMotiviAnnullamentoDoc" class="it.eng.sil.module.doSelectModule">
+	<CONFIG pool="SIL_DATI">
+		<QUERY statement="GET_TUTTI_MOT_ANNULLAMENTO_DOC"/>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetCdnComponente"   class="it.eng.sil.module.documenti.GenericSelect">
+  <CONFIG pool="SIL_DATI" title="" rows="15">
+    <QUERY statement="GET_CDNCOMPONENTE">
+      <PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="pagina"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+
+<!-- controllo esistenza storico -->
+<MODULE name="M_Doc_HasInfoStoriche" class="it.eng.sil.module.documenti.DocHasInfoStoriche">
+	<CONFIG pool="SIL_DATI">
+		<QUERY>
+			<STATEMENT_PROVIDER
+				CLASS="it.eng.sil.module.documenti.DocHasInfoStoricheDyn" />
+		</QUERY>
+		<!--
+			<QUERY statement="DOC_HAS_INFO_STORICHE" > <PARAMETER
+			scope="SERVICE_REQUEST" type="RELATIVE" value="cdnLavoratore"/>
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE"
+			value="cdnLavoratore"/> <PARAMETER scope="SERVICE_REQUEST"
+			type="RELATIVE" value="cdnLavoratore"/> <PARAMETER
+			scope="SERVICE_REQUEST" type="RELATIVE" value="prgAzienda"/>
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE"
+			value="prgAzienda"/> <PARAMETER scope="SERVICE_REQUEST"
+			type="RELATIVE" value="prgAzienda"/> <PARAMETER
+			scope="SERVICE_REQUEST" type="RELATIVE" value="prgUnita"/> <PARAMETER
+			scope="SERVICE_REQUEST" type="RELATIVE" value="pagina"/> <PARAMETER
+			scope="SERVICE_REQUEST" type="RELATIVE" value="pagina"/> <PARAMETER
+			scope="SERVICE_REQUEST" type="RELATIVE" value="pagina"/> </QUERY>
+		-->
+	</CONFIG>
+</MODULE> 
+
+<!-- ***************************************************************************
+                         Gestione Stato Documenti
+      - vuoi Protocollare, Salvare, solo Lettura?
+     *************************************************************************** -->
+
+<MODULE name="M_GetTipoDoc" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="">
+		<QUERY statement="GET_TIPODOC">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="tipoDoc" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<!-- Utilizzato per recuperare se si tratta di un doc. di I. o O. -->
+<MODULE name="M_GetValoreDoc" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="">
+		<QUERY statement="GET_VALOREDOC">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="tipoDoc" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetProtocollazione" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="">
+		<QUERY statement="GET_PROTOCOLLAZIONE"/>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetEstFileProt" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="">
+		<QUERY statement="GET_ESTFILEPROT"/>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ExistDocument" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="">
+		<QUERY statement="EXIST_DOCUMENT">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="cdnLavoratore" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="tipoDoc" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ExistDocumentPerAzienda" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="">
+		<QUERY statement="EXIST_DOCUMENT_PER_AZIENDA">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="prgAzienda" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="prgUnita" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="tipoDoc" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="pagina" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ExistDocumentPerChiave" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="">
+		<QUERY statement="EXIST_DOCUMENTO_CHIAVE">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="cdnLavoratore" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="tipoDoc" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="strchiavetabella" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+
+<!-- ***************************************************************************
+                         Gestione Rosa dei candidati DOC
+        - vuoi Salvare, solo Lettura, etc.
+     *************************************************************************** -->
+<MODULE name="M_GetDataInvioRosae" class="it.eng.sil.module.ido.GetDataInvioRosae">
+	<CONFIG pool="SIL_DATI">
+		<QUERY>
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.ido.DynGetDataInvioRosae"/>
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_FiltraEta" class="it.eng.sil.module.ido.FiltraEta">
+	<CONFIG pool="SIL_DATI">
+		<QUERY_UPDATE>
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.ido.DynFiltraEta"/>
+		</QUERY_UPDATE>
+	</CONFIG>
+</MODULE>
+
+
+<!-- ***************************************************************************
+                         Stampe relative al lavoratore
+     *************************************************************************** -->
+<MODULE name="StampePresel" class="it.eng.sil.module.documenti.StampePresel" />
+
+<MODULE name="M_StampeGetCPItit" class="it.eng.sil.module.documenti.GetCPItit">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="STAMPE_GETCPITIT">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="cdnLavoratore" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="codCpi" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+
+<!-- Bisogna creare le due classi -->
+<MODULE name="COMBO_STATO_ATTO_DOC"
+	    class="it.eng.sil.module.documenti.ComboStatoAttoDoc">
+	<CONFIG pool="SIL_DATI" >
+		<QUERY> 
+       		<STATEMENT_PROVIDER CLASS="it.eng.sil.module.documenti.DynComboStatoAttoDoc"/>
+   		</QUERY> 
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_IdoGetSpi" class="it.eng.sil.module.ido.GenericSelect">
+  <CONFIG pool="SIL_DATI">
+    <QUERY statement="IDO_GET_SPI">    	
+    	<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="CDNUT"/>
+    </QUERY>
+  </CONFIG>
+</MODULE>
+
+<MODULE name="M_ExistGenericDocument" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="">
+		<QUERY statement="EXIST_GENERIC_DOCUMENT">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="cdnLavoratore" />			
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="tipoDoc" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="STRCHIAVETABELLA" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="STRCHIAVETABELLA2" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetStatoProspetto" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="">
+		<QUERY statement="GET_STATO_PROSPETTO">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="prgdocumento" />			
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GetDocAllegatoMBO" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="">
+		<QUERY statement="GET_DOCUMENTO_ALLEGATO_MBO">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="CDNLAV" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="CDNLAV" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="CHIAVE" />
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="PAGECOMP" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_GET_PRG_CONFIG_PROT" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="">
+		<QUERY statement="GET_PRG_CONFIG_PROT">
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="DOCUMENTTYPE" />			
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_ExistDocumentiPi3" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="" rows="">
+		<QUERY statement="EXIST_DOCUMENT_PI3" >
+			<PARAMETER type="RELATIVE" scope="SERVICE_REQUEST" value="annoprotNum" />
+		</QUERY>
+	</CONFIG>
+</MODULE>
+
+<MODULE name="M_CheckPrendiTitolarieta" class="it.eng.sil.module.anag.CheckPrendiTitolarieta" />
+
+<MODULE name="M_InviaSapPrendiTitolarieta" class="it.eng.sil.module.anag.InviaSapPrendiTitolarieta" />
+
+<MODULE name="M_InviaSapSoloTitolarieta" class="it.eng.sil.module.anag.InviaSapSoloTitolarieta" />
+
+<MODULE name="M_ConfigStampaSituazioneLavorativa" class="it.eng.sil.module.documenti.GenericSelect">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="ST_GetConfig_Generica">
+			<PARAMETER name="CODTIPOCONFIG" type="ABSOLUTE" value="STAMPSSL" scope=""/>
+      	</QUERY>
+   	</CONFIG>
+</MODULE>

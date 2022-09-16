@@ -1,0 +1,1290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment xmlns="http://xml.apache.org/axis/wsdd/"
+	xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+	<globalConfiguration>
+		<parameter name="sendMultiRefs" value="true" />
+		<parameter name="disablePrettyXML" value="true" />
+		<parameter name="adminPassword" value="admin" />
+		<!--
+			NON NECESSARIO <parameter name="attachments.Directory"
+			value="C:\Progetti\SILDEV\sviluppo\applicazioni\sil\web\WEB-INF\attachments"/>
+		-->
+		<parameter name="dotNetSoapEncFix" value="true" />
+		<parameter name="enableNamespacePrefixOptimization" value="true" />
+		<parameter name="sendXMLDeclaration" value="true" />
+		<parameter name="attachments.implementation"
+			value="org.apache.axis.attachments.AttachmentsImpl" />
+		<parameter name="sendXsiTypes" value="true" />
+		<!--
+			NON NECESSARIO <requestFlow> <handler
+			type="java:org.apache.axis.handlers.JWSHandler"> <parameter
+			name="scope" value="session"/> </handler> <handler
+			type="java:org.apache.axis.handlers.JWSHandler"> <parameter
+			name="scope" value="request"/> <parameter name="extension"
+			value=".jwr"/> </handler> <handler
+			type="java:it.eng.sil.security.handlers.SILAuthenticationHandler"/>
+			</requestFlow>
+		-->
+	</globalConfiguration>
+	<handler name="URLMapper" type="java:org.apache.axis.handlers.http.URLMapper" />
+	<handler name="LocalResponder"
+		type="java:org.apache.axis.transport.local.LocalResponder" />
+	<handler name="Authenticate"
+		type="java:org.apache.axis.handlers.SimpleAuthenticationHandler" />
+	<handler name="SILAuthenticate"
+		type="java:it.eng.sil.security.handlers.SILAuthenticationHandler" />
+	<handler name="ReqServerLogHandler"
+		type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+	<handler name="ResServerLogHandler"
+		type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+	<handler name="ReqServiceServerLogHandler"
+		type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+	<handler name="ResServiceServerLogHandler"
+		type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+	<handler name="SILExtAuthenticate"
+		type="java:it.eng.sil.security.handlers.SILExtAuthenticationHandler" />
+
+	<!--
+		NON NECESSARIO <service name="AdminService" provider="java:MSG">
+		<parameter name="allowedMethods" value="AdminService"/> <parameter
+		name="enableRemoteAdmin" value="false"/> <parameter name="className"
+		value="org.apache.axis.utils.Admin"/>
+		<namespace>http://xml.apache.org/axis/wsdd/</namespace> </service>
+	-->
+	<!--
+		NON NECESSARIO <service name="Version" provider="java:RPC"> <parameter
+		name="allowedMethods" value="getVersion"/> <parameter name="className"
+		value="org.apache.axis.Version"/> </service>
+	-->
+
+	<service name="NotificheLavoratore" provider="java:RPC">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.SILAuthenticationHandler" />
+			<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+		</requestFlow>
+
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+		</responseFlow>
+
+		<parameter name="allowedMethods" value="*" />
+		<parameter name="wsdlServicePort" value="NotificheLavoratore" />
+		<parameter name="className"
+			value="it.eng.sil.coop.webservices.notificheLavoratore.NotificheLavoratore" />
+	</service>
+
+	<service name="MessageReceiver" provider="java:RPC">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.SILAuthenticationHandler" />
+			<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+		</responseFlow>
+		<parameter name="allowedMethods" value="*" />
+		<parameter name="wsdlServicePort" value="MessageReceiver" />
+		<parameter name="className"
+			value="it.eng.sil.coop.webservices.messageReceiver.MessageReceiver" />
+	</service>
+
+	<service name="SchedaLavoratore" provider="java:RPC">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.SILAuthenticationHandler" />
+			<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+		</responseFlow>
+		<parameter name="allowedMethods" value="*" />
+		<parameter name="wsdlServicePort" value="SchedaLavoratore" />
+		<parameter name="className"
+			value="it.eng.sil.coop.webservices.schedaLavoratore.SchedaLavoratore" />
+	</service>
+
+	<service name="SilMadreperla" provider="java:RPC">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+		</responseFlow>
+		<parameter name="allowedMethods" value="coopSilMadreperla" />
+		<parameter name="wsdlServicePort" value="SilMadreperla" />
+		<parameter name="className"
+			value="it.eng.sil.coop.webservices.madreperla.servizi.Madreperla" />
+		<namespace>http://eng.it/sil/services/madreperla/</namespace>
+	</service>
+
+	<service name="corsoCIGService" provider="java:RPC">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+		</responseFlow>
+
+
+		<parameter name="allowedMethods" value="corsoCIGService" />
+		<parameter name="wsdlServicePort" value="corsoCIGService" />
+		<parameter name="className"
+			value="it.eng.sil.coop.webservices.corsoCIG.CorsoCIG" />
+		<namespace>http://regione.emilia-romagna.it/sare/cig/corsi</namespace>
+	</service>
+
+	<service name="InfoSilPerServSoc" provider="java:RPC" style="document"
+		use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler">
+				<!--  <parameter name="TABELLA" value="XXXXXXXXXXXXXX"/> -->
+			</handler>
+		</requestFlow>
+
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+		</responseFlow>
+
+		<parameter name="allowedMethods" value="getInfoLavoratore" />
+		<parameter name="className"
+			value="it.eng.sil.coop.webservices.infosilperservsoc.SILWSSOAPImplSoapBindingImpl" />
+		<parameter name="wsdlServicePort" value="SilWs" />
+
+		<parameter name="wsdlTargetNamespace" value="http://sil.eng.it/SILWS/" />
+		<parameter name="wsdlServiceElement" value="SILWSService" />
+		<parameter name="schemaQualified" value="http://sil.eng.it/SILWS/" />
+		<parameter name="wsdlPortType" value="SILWSImpl" />
+		<parameter name="typeMappingVersion" value="1.1" />
+
+		<operation name="getInfoLavoratore" qname="ns:getInfoLavoratore"
+			returnQName="ns:getInfoLavoratoreResponse" xmlns:ns="http://sil.eng.it/SILWS/"
+			returnType="ns:getInfoLavoratoreResponse">
+			<parameter qname="pns:req" xmlns:pns="http://sil.eng.it/SILWS/"
+				type="tns:Request" mode="IN" />
+		</operation>
+
+		<namespace>http://sil.eng.it/SILWS/</namespace>
+		<typeMapping xmlns:ns="http://sil.eng.it/SILWS/" qname="ns:Request"
+			type="java:it.eng.sil.coop.webservices.infosilperservsoc.Request"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" />
+		<typeMapping xmlns:ns="http://sil.eng.it/SILWS/" qname="ns:Response"
+			type="java:it.eng.sil.coop.webservices.infosilperservsoc.Response"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" />
+	</service>
+
+	<service name="SILERService" provider="java:RPC" style="document"
+		use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.SILAuthenticationHandler" />
+			<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+		</responseFlow>
+		<parameter name="wsdlTargetNamespace" value="http://adapter.coap.welfare.it" />
+		<parameter name="wsdlServiceElement" value="AdapterWSService" />
+		<parameter name="schemaQualified" value="http://adapter.coap.welfare.it" />
+		<parameter name="wsdlServicePort" value="AdapterWS" />
+		<parameter name="className"
+			value="it.eng.sil.coordinamento.webservices.ServizioCoordinamento" />
+		<parameter name="wsdlPortType" value="AdapterWS" />
+		<parameter name="typeMappingVersion" value="1.1" />
+		<operation name="execute" qname="execute" returnQName="retNS:executeResponse"
+			xmlns:retNS="http://adapter.coap.welfare.it" returnType="rtns:>executeResponse"
+			xmlns:rtns="http://adapter.coap.welfare.it" soapAction="">
+			<parameter qname="pns:execute" xmlns:pns="http://adapter.coap.welfare.it"
+				type="tns:>execute" xmlns:tns="http://adapter.coap.welfare.it" />
+		</operation>
+		<parameter name="allowedMethods" value="execute" />
+
+		<typeMapping xmlns:ns="http://adapter.coap.welfare.it"
+			qname="ns:>executeResponse" type="java:it.eng.sil.coordinamento.wsClient.np.ExecuteResponse"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" />
+		<typeMapping xmlns:ns="http://adapter.coap.welfare.it"
+			qname="ns:>execute" type="java:it.eng.sil.coordinamento.wsClient.np.Execute"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" />
+	</service>
+
+
+
+	<!-- Nuovi webServices per la provincia di Piacenza -->
+
+<!-- 
+	<service name="MovimentiDaValidare" provider="java:RPC" style="wrapped"
+		use="literal">
+
+
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.SILExtAuthenticationHandler" />
+		</requestFlow>
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+		</responseFlow>
+
+		<parameter name="wsdlTargetNamespace"
+			value="http://movimentiDaValidare.webservices.coop.sil.eng.it" />
+		<parameter name="wsdlServiceElement" value="MovimentiDaValidareService" />
+		<parameter name="schemaQualified"
+			value="http://movimentiDaValidare.webservices.coop.sil.eng.it" />
+		<parameter name="wsdlServicePort" value="MovimentiDaValidare" />
+		<parameter name="className"
+			value="it.eng.sil.coop.webservices.movimentiDaValidare.MovimentiDaValidare" />
+		<parameter name="wsdlPortType" value="MovimentiDaValidare" />
+		<parameter name="typeMappingVersion" value="1.2" />
+		<operation xmlns:operNS="http://movimentiDaValidare.webservices.coop.sil.eng.it"
+			xmlns:retNS="http://movimentiDaValidare.webservices.coop.sil.eng.it"
+			xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getMovimentiDaValidare"
+			qname="operNS:getMovimentiDaValidare" returnQName="retNS:getMovimentiDaValidareReturn"
+			returnType="rtns:string" soapAction="">
+			<parameter xmlns:pns="http://movimentiDaValidare.webservices.coop.sil.eng.it"
+				xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:xmlIn" type="tns:string" />
+			<fault xmlns:fns="http://movimentiDaValidare.webservices.coop.sil.eng.it"
+				xmlns:tns="http://movimentiDaValidare.webservices.coop.sil.eng.it"
+				name="MovimentiDaValidareException" qname="fns:fault"
+				class="it.eng.sil.coop.webservices.movimentiDaValidare.MovimentiDaValidareException"
+				type="tns:MovimentiDaValidareException" />
+		</operation>
+		<parameter name="allowedMethods" value="getMovimentiDaValidare" />
+
+		<typeMapping xmlns:ns="http://movimentiDaValidare.webservices.coop.sil.eng.it"
+			qname="ns:MovimentiDaValidareException"
+			type="java:it.eng.sil.coop.webservices.movimentiDaValidare.MovimentiDaValidareException"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" />
+	</service>
+
+	<service name="SchedaAnagrafica" provider="java:RPC" style="wrapped"
+		use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.SILExtAuthenticationHandler" />
+		</requestFlow>
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+		</responseFlow>
+
+		<parameter name="wsdlTargetNamespace"
+			value="http://schedaAnagrafica.webservices.coop.sil.eng.it" />
+		<parameter name="wsdlServiceElement" value="SchedaAnagraficaService" />
+		<parameter name="schemaQualified"
+			value="http://schedaAnagrafica.webservices.coop.sil.eng.it" />
+		<parameter name="wsdlServicePort" value="SchedaAnagrafica" />
+		<parameter name="className"
+			value="it.eng.sil.coop.webservices.schedaAnagrafica.SchedaAnagrafica" />
+		<parameter name="wsdlPortType" value="SchedaAnagrafica" />
+		<parameter name="typeMappingVersion" value="1.2" />
+		<operation xmlns:operNS="http://schedaAnagrafica.webservices.coop.sil.eng.it"
+			xmlns:retNS="http://schedaAnagrafica.webservices.coop.sil.eng.it"
+			xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getSchedaAnagrafica"
+			qname="operNS:getSchedaAnagrafica" returnQName="retNS:getSchedaAnagraficaReturn"
+			returnType="rtns:string" soapAction="">
+			<parameter xmlns:pns="http://schedaAnagrafica.webservices.coop.sil.eng.it"
+				xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:xmlIn" type="tns:string" />
+			<fault xmlns:fns="http://schedaAnagrafica.webservices.coop.sil.eng.it"
+				xmlns:tns="http://schedaAnagrafica.webservices.coop.sil.eng.it"
+				name="SchedaAnagraficaException" qname="fns:fault"
+				class="it.eng.sil.coop.webservices.schedaAnagrafica.SchedaAnagraficaException"
+				type="tns:SchedaAnagraficaException" />
+		</operation>
+		<parameter name="allowedMethods" value="getSchedaAnagrafica" />
+
+		<typeMapping xmlns:ns="http://schedaAnagrafica.webservices.coop.sil.eng.it"
+			qname="ns:SchedaAnagraficaException"
+			type="java:it.eng.sil.coop.webservices.schedaAnagrafica.SchedaAnagraficaException"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" />
+	</service>
+-->	
+	
+	<!-- Nuovi webServices per la provincia di Trento -->
+	<service name="SpilAslWs" provider="java:RPC" style="document"
+		use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+		</responseFlow>
+		<parameter name="wsdlTargetNamespace" value="http://asl.webservices.coop.sil.eng.it" />
+		<parameter name="wsdlServiceElement" value="ServizioAslWSService" />
+		<parameter name="schemaQualified" value="http://asl.webservices.coop.sil.eng.it" />
+		<parameter name="wsdlServicePort" value="SpilAslWs" />
+		<parameter name="className" value="it.eng.sil.coop.webservices.asl.SpilAslWsSoapBindingImpl" />
+		<parameter name="wsdlPortType" value="SILASLWSImpl" />
+		<parameter name="typeMappingVersion" value="1.1" />
+		<operation name="getInfoLavoratore" qname="getInfoLavoratore" 
+			returnQName="ns:getInfoLavoratoreResponse" xmlns:ns="http://asl.webservices.coop.sil.eng.it" 
+			returnType="ns:getInfoLavoratoreResponse">
+			<parameter qname="pns:req" xmlns:pns="http://asl.webservices.coop.sil.eng.it"
+				type="tns:request" mode="IN" />
+		</operation>
+		
+		<namespace>http://asl.webservices.coop.sil.eng.it</namespace>
+
+		<typeMapping xmlns:ns="http://asl.webservices.coop.sil.eng.it" qname="ns:request"
+			type="java:it.eng.sil.coop.webservices.asl.Request"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" />
+		<typeMapping xmlns:ns="http://asl.webservices.coop.sil.eng.it" qname="ns:getInfoLavoratoreResponse"
+			type="java:it.eng.sil.coop.webservices.asl.GetInfoLavoratoreResponse"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" />
+	</service>
+
+	<!-- Nuovi webServices per AssistER (fragility) -->
+	<service name="GetLavoratoreAssister" provider="java:RPC" style="document"
+		use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+		</responseFlow>
+		<parameter name="wsdlTargetNamespace" value="http://assister.webservices.coop.sil.eng.it" />
+		<parameter name="wsdlServiceElement" value="AssistErWSService" />
+		<parameter name="schemaQualified" value="http://assister.webservices.coop.sil.eng.it" />
+		<parameter name="wsdlServicePort" value="GetLavoratoreAssister" />
+		<parameter name="className" value="it.eng.sil.coop.webservices.assister.AssistErWsSoapBindingImpl" />
+		<parameter name="wsdlPortType" value="AssistErWsImpl" />
+		<parameter name="typeMappingVersion" value="1.1" />
+		<operation name="getInfoLavoratore" qname="getInfoLavoratore" 
+			returnQName="ns:getInfoLavoratoreResponse" xmlns:ns="http://assister.webservices.coop.sil.eng.it" 
+			returnType="ns:getInfoLavoratoreResponse">
+			<parameter qname="pns:req" xmlns:pns="http://assister.webservices.coop.sil.eng.it"
+				type="tns:request" mode="IN" />
+		</operation>
+		
+		<namespace>http://assister.webservices.coop.sil.eng.it</namespace>
+
+		<typeMapping xmlns:ns="http://assister.webservices.coop.sil.eng.it" qname="ns:request"
+			type="java:it.eng.sil.coop.webservices.assister.GetLavoratoreRequest"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" />
+		<typeMapping xmlns:ns="http://assister.webservices.coop.sil.eng.it" qname="ns:getInfoLavoratoreResponse"
+			type="java:it.eng.sil.coop.webservices.assister.GetLavoratoreResponse"
+			serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+			deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+			encodingStyle="" />
+	</service>
+	
+	
+	<!-- Services from StipulaDidService WSDL service -->
+
+	<service name="StipulaDid" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+			<handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+		<parameter name="wsdlTargetNamespace" value="http://did.webservices.coop.sil.eng.it"/>
+		<parameter name="wsdlServiceElement" value="StipulaDidService"/>
+		<parameter name="schemaQualified" value="http://did.webservices.coop.sil.eng.it"/>
+		<parameter name="wsdlServicePort" value="StipulaDid"/>
+		<parameter name="className" value="it.eng.sil.coop.webservices.did.StipulaDid"/>
+		<parameter name="wsdlPortType" value="StipulaDid"/>
+		<parameter name="typeMappingVersion" value="1.2"/>
+		<operation xmlns:operNS="http://did.webservices.coop.sil.eng.it" xmlns:retNS="http://did.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="putCreaDID" qname="operNS:putCreaDID" returnQName="retNS:putCreaDIDReturn" returnType="rtns:string" soapAction="">
+			<parameter xmlns:pns="http://did.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+		</operation>
+		<parameter name="allowedMethods" value="putCreaDID"/>
+	</service>
+	
+	<!-- Services from AttivaVoucherService WSDL service -->
+	
+  	<service name="AttivaVoucher" provider="java:RPC" style="wrapped" use="literal">
+  		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+			<handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+    	<parameter name="wsdlTargetNamespace" value="http://voucher.webservices.coop.sil.eng.it"/>
+      	<parameter name="wsdlServiceElement" value="AttivaVoucherService"/>
+      	<parameter name="schemaQualified" value="http://voucher.webservices.coop.sil.eng.it"/>
+      	<parameter name="wsdlServicePort" value="AttivaVoucher"/>
+      	<parameter name="className" value="it.eng.sil.coop.webservices.voucher.AttivaVoucher"/>
+      	<parameter name="wsdlPortType" value="AttivaVoucher"/>
+      	<parameter name="typeMappingVersion" value="1.2"/>
+      	<operation xmlns:operNS="http://voucher.webservices.coop.sil.eng.it" xmlns:retNS="http://voucher.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="attivaVoucher" qname="operNS:attivaVoucher" returnQName="retNS:attivaVoucherReturn" returnType="rtns:string" soapAction="">
+        	<parameter xmlns:pns="http://voucher.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:cfEnte" type="tns:string"/>
+        	<parameter xmlns:pns="http://voucher.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:sedeEnte" type="tns:string"/>
+        	<parameter xmlns:pns="http://voucher.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:cfLavoratore" type="tns:string"/>
+        	<parameter xmlns:pns="http://voucher.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:codiceAttivazione" type="tns:string"/>
+      	</operation>
+      	<parameter name="allowedMethods" value="attivaVoucher"/>
+  	</service>
+	
+	<service name="SanaMovimento" provider="java:RPC" style="wrapped" use="literal">
+	  	<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+			<handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+      	<parameter name="wsdlTargetNamespace" value="http://sanatoria.webservices.coop.sil.eng.it"/>
+      	<parameter name="wsdlServiceElement" value="SanaMovimentoService"/>
+      	<parameter name="schemaQualified" value="http://sanatoria.webservices.coop.sil.eng.it"/>
+      	<parameter name="wsdlServicePort" value="SanaMovimento"/>
+      	<parameter name="className" value="it.eng.sil.coop.webservices.sanatoria.SanaMovimento"/>
+      	<parameter name="wsdlPortType" value="SanaMovimento"/>
+      	<parameter name="typeMappingVersion" value="1.2"/>
+      	<operation xmlns:operNS="http://sanatoria.webservices.coop.sil.eng.it" xmlns:retNS="http://sanatoria.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="putSanatoriaReddito" qname="operNS:putSanatoriaReddito" returnQName="retNS:putSanatoriaRedditoReturn" returnType="rtns:string" soapAction="">
+        	<parameter xmlns:pns="http://sanatoria.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+      	</operation>
+      	<parameter name="allowedMethods" value="putSanatoriaReddito"/>
+	</service>
+
+	<service name="GetStatoOccupazionale" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+			<handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+      <parameter name="wsdlTargetNamespace" value="http://statooccupazionale.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="GetStatoOccupazionaleService"/>
+      <parameter name="schemaUnqualified" value="http://statooccupazionale.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="GetStatoOccupazionale"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.statooccupazionale.GetStatoOccupazionale"/>
+      <parameter name="wsdlPortType" value="GetStatoOccupazionale"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation xmlns:operNS="http://statooccupazionale.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getStatoOccupazionale" qname="operNS:getStatoOccupazionale" returnQName="getStatoOccupazionaleReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://statooccupazionale.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>     
+      </operation>
+      <operation xmlns:operNS="http://statooccupazionale.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getStampaStatoOccupazionale" qname="operNS:getStampaStatoOccupazionale" returnQName="getStampaStatoOccupazionaleReturn" returnType="rtns:anyType" soapAction="">
+        <parameter xmlns:pns="http://statooccupazionale.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+        <fault xmlns:fns="http://statooccupazionale.webservices.coop.sil.eng.it" xmlns:tns="http://statooccupazionale.webservices.coop.sil.eng.it" name="InputValidationException" qname="fns:fault" class="it.eng.sil.coop.webservices.statooccupazionale.InputValidationException" type="tns:InputValidationException"/>
+        <fault xmlns:fns="http://statooccupazionale.webservices.coop.sil.eng.it" xmlns:tns="http://statooccupazionale.webservices.coop.sil.eng.it" name="GetStatoOccupazionaleException" qname="fns:fault" class="it.eng.sil.coop.webservices.statooccupazionale.GetStatoOccupazionaleException" type="tns:GetStatoOccupazionaleException"/>
+      </operation>
+      <parameter name="allowedMethods" value="getStatoOccupazionale getStampaStatoOccupazionale"/>
+
+      <typeMapping xmlns:ns="http://statooccupazionale.webservices.coop.sil.eng.it" qname="ns:InputValidationException" type="java:it.eng.sil.coop.webservices.statooccupazionale.InputValidationException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      <typeMapping xmlns:ns="http://statooccupazionale.webservices.coop.sil.eng.it" qname="ns:GetStatoOccupazionaleException" type="java:it.eng.sil.coop.webservices.statooccupazionale.GetStatoOccupazionaleException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+  </service>
+  
+  <service name="APAPIService" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+			<handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+      <parameter name="wsdlTargetNamespace" value="http://APAPIService.apapi.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="StatoOccupazionaleService"/>
+      <parameter name="schemaUnqualified" value="http://APAPIService.apapi.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="APAPIService"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.apapi.APAPIService"/>
+      <parameter name="wsdlPortType" value="StatoOccupazionaleAPAPI"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      
+      <operation 
+      			xmlns:operNS="http://APAPIService.apapi.webservices.coop.sil.eng.it" 
+      			xmlns:rtns="http://www.w3.org/2001/XMLSchema" 
+      			name="getStatoOccupazionaleAPAPI" 
+      			qname="operNS:getStatoOccupazionaleAPAPI" 
+      			returnQName="getStatoOccupazionaleAPAPIReturn" 
+      			returnType="rtns:string" 
+      			soapAction="">
+        <parameter 
+        	xmlns:pns="http://APAPIService.apapi.webservices.coop.sil.eng.it" 
+        	xmlns:tns="http://www.w3.org/2001/XMLSchema" 
+        	qname="pns:inputXML" 
+        	type="tns:string"/>     
+      </operation>
+      
+      <operation 
+      			xmlns:operNS="http://APAPIService.apapi.webservices.coop.sil.eng.it" 
+      			xmlns:rtns="http://www.w3.org/2001/XMLSchema" 
+      			name="getUltimoMovimentoAPAPI" 
+      			qname="operNS:getUltimoMovimentoAPAPI" 
+      			returnQName="getUltimoMovimentoAPAPIReturn" 
+      			returnType="rtns:string" 
+      			soapAction="">
+        <parameter 
+        	xmlns:pns="http://APAPIService.apapi.webservices.coop.sil.eng.it" 
+        	xmlns:tns="http://www.w3.org/2001/XMLSchema" 
+        	qname="pns:inputXML" 
+        	type="tns:string"/>
+        
+      </operation>
+      <parameter name="allowedMethods" value="getStatoOccupazionaleAPAPI getUltimoMovimentoAPAPI"/>
+
+  </service>
+		
+	<service name="GetPercorsoLavoratore" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+			  <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+      <parameter name="wsdlTargetNamespace" value="http://percorsoLavoratore.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="GetPercorsoLavoratoreService"/>
+      <parameter name="schemaQualified" value="http://percorsoLavoratore.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="GetPercorsoLavoratore"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.percorsoLavoratore.GetPercorsoLavoratore"/>
+      <parameter name="wsdlPortType" value="GetPercorsoLavoratore"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation xmlns:operNS="http://percorsoLavoratore.webservices.coop.sil.eng.it" xmlns:retNS="http://percorsoLavoratore.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getPercorsoLavoratore" qname="operNS:getPercorsoLavoratore" returnQName="retNS:getPercorsoLavoratoreReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://percorsoLavoratore.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+      </operation>
+      <operation xmlns:operNS="http://percorsoLavoratore.webservices.coop.sil.eng.it" xmlns:retNS="http://percorsoLavoratore.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getStampaPercorsoLavoratore" qname="operNS:getStampaPercorsoLavoratore" returnQName="retNS:getStampaPercorsoLavoratoreReturn" returnType="rtns:anyType" soapAction="">
+        <parameter xmlns:pns="http://percorsoLavoratore.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+        <fault xmlns:fns="http://percorsoLavoratore.webservices.coop.sil.eng.it" xmlns:tns="http://percorsoLavoratore.webservices.coop.sil.eng.it" name="GetPercorsoLavoratoreException" qname="fns:fault1" class="it.eng.sil.coop.webservices.percorsoLavoratore.GetPercorsoLavoratoreException" type="tns:GetPercorsoLavoratoreException"/>
+        <fault xmlns:fns="http://percorsoLavoratore.webservices.coop.sil.eng.it" xmlns:tns="http://percorsoLavoratore.webservices.coop.sil.eng.it" name="InputValidationException" qname="fns:fault" class="it.eng.sil.coop.webservices.percorsoLavoratore.InputValidationException" type="tns:InputValidationException"/>
+      </operation>
+      <parameter name="allowedMethods" value="getPercorsoLavoratore getStampaPercorsoLavoratore"/>
+
+      <typeMapping xmlns:ns="http://percorsoLavoratore.webservices.coop.sil.eng.it" qname="ns:GetPercorsoLavoratoreException" type="java:it.eng.sil.coop.webservices.percorsoLavoratore.GetPercorsoLavoratoreException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""/>
+      <typeMapping xmlns:ns="http://percorsoLavoratore.webservices.coop.sil.eng.it" qname="ns:InputValidationException" type="java:it.eng.sil.coop.webservices.percorsoLavoratore.InputValidationException" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""/>
+  </service>
+  
+  <service name="GetTabellaDecodifica" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+			<handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+      <parameter name="wsdlTargetNamespace" value="http://tabelleDecodifica.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="GetTabellaDecodificaService"/>
+      <parameter name="schemaQualified" value="http://tabelleDecodifica.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="GetTabellaDecodifica"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.tabelleDecodifica.GetTabellaDecodifica"/>
+      <parameter name="wsdlPortType" value="GetTabellaDecodifica"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation xmlns:operNS="http://tabelleDecodifica.webservices.coop.sil.eng.it" xmlns:retNS="http://tabelleDecodifica.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getTabellaDecodifica" qname="operNS:getTabellaDecodifica" returnQName="retNS:getTabellaDecodificaReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://tabelleDecodifica.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+      </operation>
+      <parameter name="allowedMethods" value="getTabellaDecodifica"/>
+
+  </service>
+	
+  <service name="GetUltimoMovimento" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+			<handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+      <parameter name="wsdlTargetNamespace" value="http://movimenti.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="GetUltimoMovimentoService"/>
+      <parameter name="schemaQualified" value="http://movimenti.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="GetUltimoMovimento"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.movimenti.GetUltimoMovimento"/>
+      <parameter name="wsdlPortType" value="GetUltimoMovimento"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation xmlns:operNS="http://movimenti.webservices.coop.sil.eng.it" xmlns:retNS="http://movimenti.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getUltimoMovimento" qname="operNS:getUltimoMovimento" returnQName="retNS:getUltimoMovimentoReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://movimenti.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+      </operation>
+	  <operation xmlns:operNS="http://movimenti.webservices.coop.sil.eng.it" xmlns:retNS="http://movimenti.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="putComunicaCessazione" qname="operNS:putComunicaCessazione" returnQName="retNS:putComunicaCessazioneReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://movimenti.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+      </operation>	 
+	  <operation xmlns:operNS="http://movimenti.webservices.coop.sil.eng.it" xmlns:retNS="http://movimenti.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="putComunicaUniLav" qname="operNS:putComunicaUniLav" returnQName="retNS:putComunicaUniLavReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://movimenti.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+      </operation>
+	  <operation xmlns:operNS="http://movimenti.webservices.coop.sil.eng.it" xmlns:retNS="http://movimenti.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="putComunicaUniSomm" qname="operNS:putComunicaUniSomm" returnQName="retNS:putComunicaUniSommReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://movimenti.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+      </operation>  
+	  <parameter name="allowedMethods" value="getUltimoMovimento putComunicaCessazione putComunicaUniLav putComunicaUniSomm"/>	  
+	 <!--  <parameter name="allowedMethods" value="getUltimoMovimento putComunicaCessazione"/>  -->
+	  
+  </service>	
+  
+  <service name="ControlloLavoratoreBlen" provider="java:RPC" style="rpc" use="literal">
+      <parameter name="wsdlTargetNamespace" value="http://blen.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="ControlloLavoratoreService"/>
+      <parameter name="wsdlServicePort" value="ControlloLavoratore"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.blen.ControlloLavoratore"/>
+      <parameter name="wsdlPortType" value="ControlloLavoratore"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation xmlns:operNS="http://blen.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getControlloLavoratore" qname="operNS:getControlloLavoratore" returnQName="getControlloLavoratoreReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="in0" type="tns:string"/>
+      </operation>
+      <parameter name="allowedMethods" value="getControlloLavoratore"/>
+
+  </service>
+    
+	
+  <service name="Matching" provider="java:RPC" style="wrapped" use="literal">
+      <parameter name="wsdlTargetNamespace" value="http://blen.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="MatchingService"/>
+      <parameter name="schemaQualified" value="http://blen.webservices.coop.sil.eng.it,http://blen.bean.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="Matching"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.blen.Matching"/>
+      <parameter name="wsdlPortType" value="Matching"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation xmlns:operNS="http://blen.webservices.coop.sil.eng.it" xmlns:retNS="http://blen.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="addMatching" qname="operNS:addMatching" returnQName="retNS:addMatchingReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://blen.webservices.coop.sil.eng.it" xmlns:tns="http://blen.bean.coop.sil.eng.it" qname="pns:match" type="tns:Match"/>
+      </operation>
+      <parameter name="allowedMethods" value="addMatching"/>
+
+      <typeMapping xmlns:ns="http://blen.bean.coop.sil.eng.it" qname="ns:Match" type="java:it.eng.sil.coop.bean.blen.Match" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""/>
+      <typeMapping xmlns:ns="http://blen.bean.coop.sil.eng.it" qname="ns:CandidaturaEstesa" type="java:it.eng.sil.coop.bean.blen.CandidaturaEstesa" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""/>
+      <arrayMapping xmlns:ns="http://blen.webservices.coop.sil.eng.it" xmlns:cmp-ns="http://blen.bean.coop.sil.eng.it" qname="ns:ArrayOf_tns1_CandidaturaEstesa" type="java:it.eng.sil.coop.bean.blen.CandidaturaEstesa[]" innerType="cmp-ns:CandidaturaEstesa" encodingStyle=""/>
+  </service>
+  
+  <service name="AppuntamentoService" provider="java:RPC" style="wrapped" use="literal">
+  
+		  <requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+			  <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow> 
+  
+      <parameter name="wsdlTargetNamespace" value="http://appuntamento.agenda.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="AppuntamentoServiceService"/>
+      <parameter name="schemaQualified" value="http://appuntamento.agenda.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="AppuntamentoService"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.agenda.appuntamento.AppuntamentoService"/>
+      <parameter name="wsdlPortType" value="AppuntamentoService"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+     
+      <operation xmlns:operNS="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:retNS="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="fissaAppuntamento" qname="operNS:fissaAppuntamento" returnQName="retNS:fissaAppuntamentoReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXml" type="tns:string"/>
+      </operation>
+      <operation xmlns:operNS="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:retNS="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getDispAppuntamento" qname="operNS:getDispAppuntamento" returnQName="retNS:getDispAppuntamentoReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXml" type="tns:string"/>
+      </operation>
+      <operation xmlns:operNS="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:retNS="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="verificaAppuntamento" qname="operNS:verificaAppuntamento" returnQName="retNS:verificaAppuntamentoReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXml" type="tns:string"/>
+      </operation>
+      <operation xmlns:operNS="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:retNS="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="annullaAppuntamento" qname="operNS:annullaAppuntamento" returnQName="retNS:annullaAppuntamentoReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXml" type="tns:string"/>
+      </operation>      
+      <operation xmlns:operNS="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:retNS="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getPrenotazioni" qname="operNS:getPrenotazioni" returnQName="retNS:getPrenotazioni" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://appuntamento.agenda.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXml" type="tns:string"/>
+      </operation>
+      <parameter name="allowedMethods" value="fissaAppuntamento getDispAppuntamento verificaAppuntamento annullaAppuntamento getPrenotazioni"/>
+
+  </service>
+  
+  <service name="GetConfermaPeriodica" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+			<handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+      <parameter name="wsdlTargetNamespace" value="http://confermaPeriodica.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="GetConfermaPeriodicaService"/>
+      <parameter name="schemaQualified" value="http://confermaPeriodica.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="GetConfermaPeriodica"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.confermaPeriodica.GetConfermaPeriodica"/>
+      <parameter name="wsdlPortType" value="GetConfermaPeriodica"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation xmlns:operNS="http://confermaPeriodica.webservices.coop.sil.eng.it" xmlns:retNS="http://confermaPeriodica.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getConfermaPeriodica" qname="operNS:getConfermaPeriodica" returnQName="retNS:getConfermaPeriodicaReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://confermaPeriodica.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+      </operation>
+      <parameter name="allowedMethods" value="getConfermaPeriodica"/>
+
+  </service>
+  
+  <service name="GetMovimentoTirocinio" provider="java:RPC" style="wrapped" use="literal">
+	  	<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+			<handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+      	<parameter name="wsdlTargetNamespace" value="http://mystage.webservices.coop.sil.eng.it"/>
+      	<parameter name="wsdlServiceElement" value="GetMovimentoTirocinioService"/>
+      	<parameter name="schemaQualified" value="http://mystage.webservices.coop.sil.eng.it"/>
+      	<parameter name="wsdlServicePort" value="GetMovimentoTirocinio"/>
+      	<parameter name="className" value="it.eng.sil.coop.webservices.mystage.GetMovimentoTirocinio"/>
+      	<parameter name="wsdlPortType" value="GetMovimentoTirocinio"/>
+      	<parameter name="typeMappingVersion" value="1.2"/>
+      	<operation xmlns:operNS="http://mystage.webservices.coop.sil.eng.it" xmlns:retNS="http://mystage.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getTirocinio" qname="operNS:getTirocinio" returnQName="retNS:getTirocinioReturn" returnType="rtns:string" soapAction="">
+        	<parameter xmlns:pns="http://mystage.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+      	</operation>
+      	<parameter name="allowedMethods" value="getTirocinio"/>
+  </service>
+  
+  
+  <service name="RicezioneSif" provider="java:RPC" style="wrapped" use="literal">
+ 	<requestFlow>
+		<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+	</requestFlow>
+	<responseFlow>
+		<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+	</responseFlow>
+      <parameter name="wsdlTargetNamespace" value="http://sif.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="RicezioneSifService"/>
+      <parameter name="schemaQualified" value="http://sifer.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="RicezioneSif"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.sifer.RicezioneSif"/>
+      <parameter name="wsdlPortType" value="RicezioneSif"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation xmlns:operNS="http://sif.webservices.coop.sil.eng.it" xmlns:retNS="http://sif.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getDatiSif" qname="getDatiSif" returnQName="retNS:getDatiSifReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://sif.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:userName" type="tns:string"/>
+        <parameter xmlns:pns="http://sif.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:password" type="tns:string"/>
+        <parameter xmlns:pns="http://sif.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:datiXml" type="tns:string"/>
+      </operation>
+      <parameter name="allowedMethods" value="getDatiSif"/>
+  </service>
+
+  
+  <service name="GetPattoLavoratoreMyStage" provider="java:RPC" style="wrapped" use="literal">
+  	 <requestFlow>
+		<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+	</requestFlow>
+	<responseFlow>
+		<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+	</responseFlow>
+      <parameter name="wsdlTargetNamespace" value="http://patto.mystage.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="GetPattoLavoratoreMyStageService"/>
+      <parameter name="schemaQualified" value="http://patto.mystage.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="GetPattoLavoratoreMyStage"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.mystage.patto.GetPattoLavoratoreMyStage"/>
+      <parameter name="wsdlPortType" value="GetPattoLavoratoreMyStage"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation xmlns:operNS="http://patto.mystage.webservices.coop.sil.eng.it" xmlns:retNS="http://patto.mystage.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getDati" qname="operNS:getDati" returnQName="retNS:getDatiReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://patto.mystage.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:userName" type="tns:string"/>
+        <parameter xmlns:pns="http://patto.mystage.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:password" type="tns:string"/>        
+        <parameter xmlns:pns="http://patto.mystage.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:codiceFiscale" type="tns:string"/>
+        <parameter xmlns:pns="http://patto.mystage.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:dataInizioTirocinio" type="tns:string"/>
+      </operation>
+      <parameter name="allowedMethods" value="getDati"/>
+
+  </service>
+  
+  
+  <service name="GetPattoLavoratore" provider="java:RPC" style="wrapped" use="literal">
+  	  <requestFlow>
+		<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+	  </requestFlow>
+	  <responseFlow>
+		<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+	  </responseFlow>
+      <parameter name="wsdlTargetNamespace" value="http://custom.patto.mystage.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="GetPattoLavoratoreService"/>
+      <parameter name="schemaQualified" value="http://custom.patto.mystage.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="GetPattoLavoratore"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.mystage.patto.custom.GetPattoLavoratore"/>
+      <parameter name="wsdlPortType" value="GetPattoLavoratore"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation xmlns:operNS="http://custom.patto.mystage.webservices.coop.sil.eng.it" xmlns:retNS="http://custom.patto.mystage.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getDati" qname="operNS:getDati" returnQName="retNS:getDatiReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://custom.patto.mystage.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:userName" type="tns:string"/>
+        <parameter xmlns:pns="http://custom.patto.mystage.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:password" type="tns:string"/>
+        <parameter xmlns:pns="http://custom.patto.mystage.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:codiceFiscale" type="tns:string"/>
+        <parameter xmlns:pns="http://custom.patto.mystage.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:dataInizioTirocinio" type="tns:string"/>
+      </operation>
+      <parameter name="allowedMethods" value="getDati"/>
+  </service>
+  
+  
+  <service name="RinnovaPatto" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+			<handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+		<parameter name="wsdlTargetNamespace" value="http://rinnovaPatto.webservices.coop.sil.eng.it"/>
+		<parameter name="wsdlServiceElement" value="RinnovaPattoService"/>
+		<parameter name="schemaQualified" value="http://rinnovaPatto.webservices.coop.sil.eng.it"/>
+		<parameter name="wsdlServicePort" value="RinnovaPatto"/>
+		<parameter name="className" value="it.eng.sil.coop.webservices.rinnovaPatto.RinnovaPatto"/>
+		<parameter name="wsdlPortType" value="RinnovaPatto"/>
+		<parameter name="typeMappingVersion" value="1.2"/>
+		<operation xmlns:operNS="http://rinnovaPatto.webservices.coop.sil.eng.it" xmlns:retNS="http://rinnovaPatto.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="putRinnovaPatto" qname="operNS:putRinnovaPatto" returnQName="retNS:putRinnovaPattoReturn" returnType="rtns:string" soapAction="">
+			<parameter xmlns:pns="http://rinnovaPatto.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+		</operation>
+		<parameter name="allowedMethods" value="putRinnovaPatto"/>
+	</service>
+  
+	<service name="GetMovimentiAgricoltura" provider="java:RPC" style="wrapped" use="literal">
+	 	<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+		</responseFlow>
+	     	<parameter name="wsdlTargetNamespace" value="http://agricoltura.webservices.coop.sil.eng.it"/>
+	     	<parameter name="wsdlServiceElement" value="GetMovimentiAgricolturaService"/>
+	     	<parameter name="schemaQualified" value="http://agricoltura.webservices.coop.sil.eng.it"/>
+	     	<parameter name="wsdlServicePort" value="GetMovimentiAgricoltura"/>
+	     	<parameter name="className" value="it.eng.sil.coop.webservices.agricoltura.GetMovimentiAgricoltura"/>
+	     	<parameter name="wsdlPortType" value="GetMovimentiAgricoltura"/>
+	     	<parameter name="typeMappingVersion" value="1.2"/>
+	     	<operation xmlns:operNS="http://agricoltura.webservices.coop.sil.eng.it" xmlns:retNS="http://agricoltura.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getMovimentiAgricoltura" qname="operNS:getMovimentiAgricoltura" returnQName="retNS:getMovimentiAgricolturaReturn" returnType="rtns:string" soapAction="">
+	       		<parameter xmlns:pns="http://agricoltura.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:username" type="tns:string"/>
+	       		<parameter xmlns:pns="http://agricoltura.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:password" type="tns:string"/>
+	       		<parameter xmlns:pns="http://agricoltura.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:codiceFiscale" type="tns:string"/>
+	     	</operation>
+	    	 <parameter name="allowedMethods" value="getMovimentiAgricoltura"/>
+	</service>
+
+	<service name="RicezioneDomandeRA" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.BasicAuthenticationHandler" />
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+		<parameter name="wsdlTargetNamespace" value="http://ricezioneDomandeRA.webservices.coop.sil.eng.it"/>
+		<parameter name="wsdlServiceElement" value="RicezioneDomandeRAService"/>
+		<parameter name="schemaQualified" value="http://ricezioneDomandeRA.webservices.coop.sil.eng.it"/>
+		<parameter name="wsdlServicePort" value="RicezioneDomandeRA"/>
+		<parameter name="className" value="it.eng.sil.coop.webservices.ricezioneDomandeRA.RicezioneDomandeRA"/>
+		<parameter name="wsdlPortType" value="RicezioneDomandeRA"/>
+		<parameter name="typeMappingVersion" value="1.2"/>
+		<operation xmlns:operNS="http://ricezioneDomandeRA.webservices.coop.sil.eng.it" xmlns:retNS="http://ricezioneDomandeRA.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="processDomanda" qname="operNS:processDomanda" returnQName="retNS:processDomandaReturn" returnType="rtns:string" soapAction="">
+			<parameter xmlns:pns="http://ricezioneDomandeRA.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+		</operation>
+		<parameter name="allowedMethods" value="processDomanda"/>
+	</service>
+	
+  
+	<service name="AcquisizioneFM" provider="java:RPC" style="wrapped" use="literal">
+	
+ 	  <requestFlow>
+		<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+	  </requestFlow>
+	  <responseFlow>
+		<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+	  </responseFlow>
+
+      <parameter name="wsdlTargetNamespace" value="http://firmagrafometrica.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="AcquisizioneFirmaGrafometricaService"/>
+      <parameter name="schemaQualified" value="http://ws-i.org/profiles/basic/1.1/xsd,http://firmagrafometrica.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="AcquisizioneFM"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.firmagrafometrica.AcquisizioneFMSoapBindingSkeleton"/>
+      <parameter name="wsdlPortType" value="AcquisizioneFirmaGrafometrica"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <parameter name="allowedMethods" value="*"/>
+
+      <typeMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:SetValueMapping"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.SetValueMapping"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://ws-i.org/profiles/basic/1.1/xsd"
+        qname="ns:swaRef"
+        type="java:org.apache.axis.types.URI"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:OrFilter"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.OrFilter"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:>uploadDocFirmatoResponse"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.UploadDocFirmatoResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:BLOB"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.BLOB"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:ConditionEnum"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.ConditionEnum"
+        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:FormDataTypeInstance"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.FormDataTypeInstance"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:PurgeFilter"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.PurgeFilter"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:MyArrayOf_xsd_anyType"
+        type="java:java.lang.Object[]"
+        innerType="cmp-ns:anyType" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:ConditionFilter"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.ConditionFilter"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:AndFilter"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.AndFilter"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:MyMapOf_xsd_string_To_xsd_anyType_Item"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.MyMapOf_xsd_string_To_xsd_anyType_Item"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:MyMapOf_xsd_string_To_xsd_anyType"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.MyMapOf_xsd_string_To_xsd_anyType_Item[]"
+        innerType="cmp-ns:MyMapOf_xsd_string_To_xsd_anyType_Item" xmlns:cmp-ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:>uploadDocFirmato"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.UploadDocFirmato"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:FormInstanceBase"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.FormInstanceBase"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://firmagrafometrica.webservices.coop.sil.eng.it"
+        qname="ns:XML"
+        type="java:it.eng.sil.coop.webservices.firmagrafometrica.XML"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+  </service>
+  
+ 	<transport name="http">
+		<requestFlow>
+			<handler type="URLMapper" />
+			<handler type="java:org.apache.axis.handlers.http.HTTPAuthHandler" />
+		</requestFlow>
+		<parameter name="qs:list"
+			value="org.apache.axis.transport.http.QSListHandler" />
+		<parameter name="qs:wsdl"
+			value="org.apache.axis.transport.http.QSWSDLHandler" />
+		<parameter name="qs.list"
+			value="org.apache.axis.transport.http.QSListHandler" />
+		<parameter name="qs.method"
+			value="org.apache.axis.transport.http.QSMethodHandler" />
+		<parameter name="qs:method"
+			value="org.apache.axis.transport.http.QSMethodHandler" />
+		<parameter name="qs.wsdl"
+			value="org.apache.axis.transport.http.QSWSDLHandler" />
+	</transport>
+	<transport name="local">
+		<responseFlow>
+			<handler type="LocalResponder" />
+		</responseFlow>
+	</transport>
+	
+	
+	<!--	Services from RequisitiGaranziaOverService WSDL service -->
+	<service name="VerificaRequisitiGaranziaOver" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			 <handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandlerNoXML" />
+			 <handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler"/>
+			 <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+	
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandlerNoXML"/>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler"/>
+		</responseFlow>
+		
+      	<parameter name="wsdlTargetNamespace" value="http://requisitiAdesione.webservices.coop.sil.eng.it"/>
+      	<parameter name="wsdlServiceElement" value="VerificaRequisitiGaranziaOverService"/>
+      	<parameter name="schemaQualified" value="http://requisitiAdesione.webservices.coop.sil.eng.it"/>
+      	<parameter name="wsdlServicePort" value="VerificaRequisitiGaranziaOver"/>
+      	<parameter name="className" value="it.eng.sil.coop.webservices.requisitiAdesione.VerificaRequisitiGaranziaOver"/>
+      	<parameter name="wsdlPortType" value="VerificaRequisitiGaranziaOver"/>
+      	<parameter name="typeMappingVersion" value="1.2"/>
+      	<operation xmlns:operNS="http://requisitiAdesione.webservices.coop.sil.eng.it" xmlns:retNS="http://requisitiAdesione.webservices.coop.sil.eng.it" xmlns:rtns="http://requisitiAdesione.webservices.coop.sil.eng.it" name="getVerificaRequisitiGaranziaOver" qname="operNS:getVerificaRequisitiGaranziaOver" returnQName="retNS:getVerificaRequisitiGaranziaOverReturn" returnType="rtns:VerificaRequisitiGaranziaOverResponse" soapAction="">
+        	<parameter xmlns:pns="http://requisitiAdesione.webservices.coop.sil.eng.it" xmlns:tns="http://requisitiAdesione.webservices.coop.sil.eng.it" qname="pns:req" type="tns:VerificaRequisitiGaranziaOverRequest"/>
+      	</operation>
+      	<parameter name="allowedMethods" value="getVerificaRequisitiGaranziaOver"/>
+
+      	<typeMapping xmlns:ns="http://requisitiAdesione.webservices.coop.sil.eng.it" qname="ns:VerificaRequisitiGaranziaOverRequest" type="java:it.eng.sil.coop.webservices.requisitiAdesione.VerificaRequisitiGaranziaOverRequest" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""/>
+      	<typeMapping xmlns:ns="http://requisitiAdesione.webservices.coop.sil.eng.it" qname="ns:VerificaRequisitiGaranziaOverResponse" type="java:it.eng.sil.coop.webservices.requisitiAdesione.VerificaRequisitiGaranziaOverResponse" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle=""/>
+	</service>
+	
+
+    <service name="RicezionePattoL14" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.BasicAuthenticationHandler" />
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+      	<parameter name="wsdlTargetNamespace" value="http://assisterL14.webservices.coop.sil.eng.it"/>
+      	<parameter name="wsdlServiceElement" value="RicezionePattoL14Service"/>
+      	<parameter name="schemaQualified" value="http://assisterL14.webservices.coop.sil.eng.it"/>
+      	<parameter name="wsdlServicePort" value="RicezionePattoL14"/>
+      	<parameter name="className" value="it.eng.sil.coop.webservices.assisterL14.RicezionePattoL14"/>
+      	<parameter name="wsdlPortType" value="RicezionePattoL14"/>
+      	<parameter name="typeMappingVersion" value="1.2"/>
+      	<operation xmlns:operNS="http://assisterL14.webservices.coop.sil.eng.it" xmlns:retNS="http://assisterL14.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="processPattoL14" qname="operNS:processPattoL14" returnQName="retNS:processPattoL14Return" returnType="rtns:string" soapAction="">
+        	<parameter xmlns:pns="http://assisterL14.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+      	</operation>
+      	<parameter name="allowedMethods" value="processPattoL14"/>
+  	</service>
+  	
+	<service name="GetAdesioneReimpiego" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+			<handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+      <parameter name="wsdlTargetNamespace" value="http://adesionereimpiego.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="GetAdesioneReimpiegoService"/>
+      <parameter name="schemaUnqualified" value="http://adesionereimpiego.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="GetAdesioneReimpiego"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.adesioneReimpiego.GetAdesioneReimpiego"/>
+      <parameter name="wsdlPortType" value="GetAdesioneReimpiego"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation xmlns:operNS="http://adesionereimpiego.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getAdesioneReimpiego" qname="operNS:getAdesioneReimpiego" returnQName="getAdesioneReimpiegoReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://adesionereimpiego.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>     
+      </operation>
+      <parameter name="allowedMethods" value="getAdesioneReimpiego"/>
+	</service>  	
+  		 
+
+
+     <service name="RicezioneDomandaDote" provider="java:RPC" style="wrapped" use="literal">
+		<requestFlow>
+			<handler type="java:it.eng.sil.security.handlers.BasicAuthenticationHandler" />
+			<handler type="java:it.eng.sil.security.handlers.services.ReqServiceServerLogHandler" />
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.services.ResServiceServerLogHandler" />
+		</responseFlow>
+      	<parameter name="wsdlTargetNamespace" value="http://doteCMS.webservices.coop.sil.eng.it"/>
+      	<parameter name="wsdlServiceElement" value="RicezioneDomandaDoteService"/>
+      	<parameter name="schemaQualified" value="http://doteCMS.webservices.coop.sil.eng.it"/>
+      	<parameter name="wsdlServicePort" value="RicezioneDomandaDote"/>
+      	<parameter name="className" value="it.eng.sil.coop.webservices.doteCMS.RicezioneDomandaDote"/>
+      	<parameter name="wsdlPortType" value="RicezioneDomandaDote"/>
+      	<parameter name="typeMappingVersion" value="1.2"/>
+      	<operation xmlns:operNS="http://doteCMS.webservices.coop.sil.eng.it" xmlns:retNS="http://doteCMS.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="processDomandaDote" qname="operNS:processDomandaDote" returnQName="retNS:processDomandaDoteReturn" returnType="rtns:string" soapAction="">
+        	<parameter xmlns:pns="http://doteCMS.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:inputXML" type="tns:string"/>
+      	</operation>
+      	<parameter name="allowedMethods" value="processDomandaDote"/>
+  	</service>
+  	
+  	
+  	
+  <service name="GetProgrammiApertiPattoLavoratore" provider="java:RPC" style="wrapped" use="literal">
+  	 <requestFlow>
+		<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler" />
+	</requestFlow>
+	<responseFlow>
+		<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+	</responseFlow>
+      <parameter name="wsdlTargetNamespace" value="http://programmi.patto.mystage.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="GetProgrammiApertiPattoLavoratoreService"/>
+      <parameter name="schemaQualified" value="http://programmi.patto.mystage.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="GetProgrammiApertiPattoLavoratore"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.mystage.patto.programmi.GetProgrammiApertiPattoLavoratore"/>
+      <parameter name="wsdlPortType" value="GetProgrammiApertiPattoLavoratore"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <operation xmlns:operNS="http://programmi.patto.mystage.webservices.coop.sil.eng.it" xmlns:retNS="http://programmi.patto.mystage.webservices.coop.sil.eng.it" xmlns:rtns="http://www.w3.org/2001/XMLSchema" name="getDati" qname="operNS:getDati" returnQName="retNS:getDatiReturn" returnType="rtns:string" soapAction="">
+        <parameter xmlns:pns="http://programmi.patto.mystage.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:userName" type="tns:string"/>
+        <parameter xmlns:pns="http://programmi.patto.mystage.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:password" type="tns:string"/>        
+        <parameter xmlns:pns="http://programmi.patto.mystage.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:codiceFiscale" type="tns:string"/>
+        <parameter xmlns:pns="http://programmi.patto.mystage.webservices.coop.sil.eng.it" xmlns:tns="http://www.w3.org/2001/XMLSchema" qname="pns:dataInizioTirocinio" type="tns:string"/>
+      </operation>
+      <parameter name="allowedMethods" value="getDati"/>
+
+  </service>
+	
+	
+	<service name="TrasmettiPatto" provider="java:RPC" style="document" use="literal">
+		<requestFlow>
+  			<handler type="java:it.eng.sil.security.handlers.ReqServerLogHandler"/>
+			<handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
+				<parameter name="action" value="UsernameToken"/>
+				<parameter name="passwordType" value="PasswordDigest" />
+				<parameter name="passwordCallbackClass" value="it.eng.sil.security.handlers.SILWss4jAuthenticationHandler"/>								
+			</handler>
+		</requestFlow>
+		<responseFlow>
+			<handler type="java:it.eng.sil.security.handlers.ResServerLogHandler" />
+		</responseFlow>
+      <parameter name="wsdlTargetNamespace" value="http://pattoonlinenew.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServiceElement" value="TrasmettiPattoService"/>
+      <parameter name="schemaQualified" value="http://pattoonlinenew.webservices.coop.sil.eng.it"/>
+      <parameter name="wsdlServicePort" value="TrasmettiPatto"/>
+      <parameter name="className" value="it.eng.sil.coop.webservices.pattoonlinenew.TrasmettiPattoSoapBindingSkeleton"/>
+      <parameter name="wsdlPortType" value="TrasmettiPatto"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <parameter name="allowedMethods" value="*"/>
+
+      <typeMapping
+        xmlns:ns="http://pattoonlinenew.webservices.coop.sil.eng.it"
+        qname="ns:pattoType"
+        type="java:it.eng.sil.coop.webservices.pattoonlinenew.PattoType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://pattoonlinenew.webservices.coop.sil.eng.it"
+        qname="ns:>accettazionePattoType>tipoAccettazione"
+        type="java:it.eng.sil.coop.webservices.pattoonlinenew.AccettazionePattoTypeTipoAccettazione"
+        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://pattoonlinenew.webservices.coop.sil.eng.it"
+        qname="ns:>pattoAccettatoType"
+        type="java:it.eng.sil.coop.webservices.pattoonlinenew.PattoAccettatoType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://pattoonlinenew.webservices.coop.sil.eng.it"
+        qname="ns:>esitoType"
+        type="java:it.eng.sil.coop.webservices.pattoonlinenew.EsitoType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://pattoonlinenew.webservices.coop.sil.eng.it"
+        qname="ns:>>esitoType>esito"
+        type="java:it.eng.sil.coop.webservices.pattoonlinenew.EsitoTypeEsito"
+        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://pattoonlinenew.webservices.coop.sil.eng.it"
+        qname="ns:accettazionePattoType"
+        type="java:it.eng.sil.coop.webservices.pattoonlinenew.AccettazionePattoType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+  </service>
+
+</deployment>

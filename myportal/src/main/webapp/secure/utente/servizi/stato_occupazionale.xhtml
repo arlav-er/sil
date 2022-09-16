@@ -1,0 +1,143 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/main.xhtml">
+
+	<ui:define name="title">
+		<h:outputText value="#{msg['cittadino.servizi.stato_occupazionale.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+		<ui:fragment rendered="#{utilsBean.isUmbria()}">
+			<p>
+				Il percorso lavoratore è un documento che certifica tutte le esperienze lavorative
+				e le attività intercorse col Centro per l'Impiego.
+			</p>
+			<p>
+				Il documento che verrà rilasciato, sulla base di informazioni presenti nel database
+				dei Centri per l'Impiego, è predisposto in modalità Autocertificazione. Dovrai
+				pertanto stamparlo e firmarlo per poterlo presentare come documento valido.
+			</p>
+		</ui:fragment>
+
+		<div class="violet_panel"></div>
+
+		<div id="answer" class="answer">
+			<div class="wait">
+				<h:graphicImage value="/resources/images/ajax-loader-blue.gif"
+					alt="ajax-loader" />
+				<br /> <b>Stiamo richiedendo i dati al Centro per l'impiego di
+					tua competenza...</b>
+			</div>
+			<div class="ok" style="display: none">
+				<h:graphicImage value="/resources/images/check.gif" alt="ok" />
+				<b>Dati recuperati con successo</b>
+			</div>
+			<div class="error" style="display: none">
+				<h:graphicImage value="/resources/images/error.png" alt="error" />
+				<br /> <b>Impossibile elaborare la richiesta.</b><br />
+			</div>
+			<table style="display: none" class="shadow-box">
+				<tbody>
+					<tr>
+						<td>Codice fiscale</td>
+						<td class="codiceFiscale bold"></td>
+
+					</tr>
+					<tr>
+						<td>Cognome</td>
+						<td class="cognome bold"></td>
+					</tr>
+					<tr>
+						<td>Nome</td>
+						<td class="nome bold"></td>
+					</tr>
+					<tr>
+						<td>Data di nascita</td>
+						<td class="dataNascita bold"></td>
+					</tr>
+					<tr>
+						<td>Comune o stato di nascita</td>
+						<td class="comuneNascita bold"></td>
+					</tr>
+					<tr>
+						<td>Comune di residenza</td>
+						<td class="comuneResidenza bold"></td>
+					</tr>
+					<tr>
+						<td>Indirizzo di residenza</td>
+						<td class="indirizzoResidenza bold"></td>
+					</tr>
+					<tr>
+						<td>Comune di domicilio</td>
+						<td class="comuneDomicilio bold"></td>
+					</tr>
+					<tr>
+						<td>Indirizzo di domicilio</td>
+						<td class="indirizzoDomicilio bold"></td>
+					</tr>
+					<tr>
+						<td>Stato occupazionale</td>
+						<td class="statoOcc bold"></td>
+						<td class="codStatoOcc bold"></td>
+					</tr>
+					<tr id="mesiAnzianita">
+						<td>Mesi di anzianità</td>
+						<td class="mesiAnzianita bold"></td>
+					</tr>
+					<tr>
+						<td>Data DID</td>
+						<td class="dataDid bold"></td>
+					</tr>
+				</tbody>
+			</table>
+			<div style="text-align: center;">
+				<a href="#" class="buttonStyle printButton"
+					style="display: none; margin-top: 15px;"
+					onclick="return openStampaDialog();">Stampa</a> <br />
+
+			</div>
+		</div>
+
+
+		<cc:modalDialog id="stampa_dialog"
+			title="Informativa al cittadino sul servizio di stampa Stato Occupazionale"
+			submitLabel="Stampa" eventAjax="printStatoOccupazionale" actionSubmit="#{statoOccupazionaleBean.methodVoid}">
+			<h:outputText
+				value="Attenzione! 
+		        I dati forniti potrebbero non essere allineati con la tua situazione 
+		        lavorativa attuale. Nel caso in cui rilevi un’incongruenza, ti invitiamo
+		         a recarti al tuo Centro per l'impiego competente per verificare i dati.
+		         La verifica dei requisiti per la concessione di eventuali benefici contributivi, fiscali o di altra natura conseguenti allo stato di disoccupazione sarà effettuata dagli Enti pubblici competenti alla concessione del beneficio." />
+		</cc:modalDialog>
+
+		<script type="text/javascript">
+
+			function openStampaDialog() {
+				var d = document.getElementById('stampa_dialog');
+				d.open(null,this); 
+				return false;
+			}
+		
+			function printStatoOccupazionale(data) {				
+				//if (data.status == 'begin') {					
+					fetchStampaStatoOccupazionale(#{sessionBean.connectedUtente.id});
+					return false;
+				//}
+			}
+			$(function() {
+				//in realtà questo controllo è fake. serve solo per caricare il BackingBean della pagina
+				//e verificare che l'utente sia abilitato ai servizi
+				//la variabile canLoadService è sempre true se è stato possibile costruire il Bean
+				if (#{statoOccupazionaleBean.canLoadService}) {
+					setTimeout("fetchStatoOccupazionale(#{sessionBean.connectedUtente.id})",2000);
+				}
+			});
+		</script>
+		<h:link class="backButtonStyle" style="display:none;"
+			value="Torna indietro" title="Torna alla pagina dei servizi"
+			outcome="/secure/utente/servizi/index.xhtml" />
+	</ui:define>
+</ui:composition>

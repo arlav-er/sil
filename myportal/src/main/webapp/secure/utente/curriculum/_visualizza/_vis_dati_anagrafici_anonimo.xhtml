@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+	<ui:fragment rendered="#{not visCvBean.cvVisualizzaDTO.testataVisible}">
+		<h3 class="dati_anagrafici_anonimo_titolo headingCollapse ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
+			<span class="dati_anagrafici_anonimo_brake_titolo ui-icon ui-icon-triangle-1-e"></span>
+			<a href="#">Dati Anagrafici</a>
+		</h3>
+		<div
+			class="contentCollapse ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom">
+			<h:panelGrid columns="2">
+				<h:panelGroup>
+					<h:panelGrid id="dati_anagrafici_panel" columns="1" layout="block"
+						style="width:100%">
+
+						<h:outputText rendered="#{visCvBean.cvVisualizzaDTO.cvDatiPersonaliDTO.intermediato}" id="dati_anagrafici_messaggio_intermediato"
+							value="#{msg['cittadino.dati_anagrafici.anonimo_intermediato']} #{visCvBean.cvVisualizzaDTO.cvDatiPersonaliDTO.denominazioneIntermediario}" escape="false" />
+						<h:outputText rendered="#{not visCvBean.cvVisualizzaDTO.cvDatiPersonaliDTO.intermediato}" id="dati_anagrafici_messaggio_non_intermediato"
+							value="#{msg['cittadino.dati_anagrafici.anonimo_non_intermediato']}" escape="false"/>
+						<br />
+
+						<h:panelGrid id="dati_anagrafici_anonimo_panel" columns="2"
+							columnClasses="visualizza_left,visualizza_right" layout="block"
+							style="width:100%">
+							<h:outputLabel for="filename" value="Allegato"
+								rendered="#{not empty visCvBean.cvVisualizzaDTO.cvDatiPersonaliDTO.filename}" />
+							<h:outputLink id="filename"
+								onclick="fetchStampa('#{request.contextPath}/secure/rest/services/getAllegatoCv?idCvAllegato='+#{visCvBean.cvVisualizzaDTO.cvDatiPersonaliDTO.idCvAllegato});return false;"
+								title="#{visCvBean.cvVisualizzaDTO.cvDatiPersonaliDTO.filename}"
+								rendered="#{not empty visCvBean.cvVisualizzaDTO.cvDatiPersonaliDTO.filename}">
+								<h:outputText
+									value="#{visCvBean.cvVisualizzaDTO.cvDatiPersonaliDTO.filename}" />
+							</h:outputLink>
+						</h:panelGrid>
+						<br />
+					</h:panelGrid>
+				</h:panelGroup>
+				<h:panelGroup
+					rendered="#{sessionBean.azienda and not empty visCvBean.idAcCandidatura}">
+					<h:form>
+						<h:panelGrid columns="2">
+							<cc:selectOneMenu id="valutazione"
+								label="Valuta curriculum vitae"
+								value="#{visCvBean.codIdoneitaCandidatura}">
+								<f:selectItems value="#{visCvBean.livelliValutazione}" />
+							</cc:selectOneMenu>
+
+							<h:commandLink styleClass="buttonStyle"
+								action="#{visCvBean.assegnaValutazione}"
+								value="Assegna valutazione">
+								<f:ajax execute="@form" render=":valutazione_messages_anonimo" />
+							</h:commandLink>
+						</h:panelGrid>
+					</h:form>
+
+					<cc:messages id="valutazione_messages_anonimo" />
+				</h:panelGroup>
+			</h:panelGrid>
+		</div>
+	</ui:fragment>
+
+</ui:composition>

@@ -1,0 +1,307 @@
+<STATEMENT name="SELECT_AN_LAVORATORE_FROM_CDNLAV"
+           query="
+	SELECT lav.cdnlavoratore, lav.strcodicefiscale, lav.strcognome, lav.strnome,
+	       TO_CHAR (lav.datnasc, 'dd/mm/yyyy') AS datnasc, lav.codcomnas, de_cpi.codcpimin,
+	       inf.codcpitit, inf.codcpiorig, inf.codmonotipocpi, de_regione.codmin,
+	       (select max(elenco.prgelencoanagrafico) from am_elenco_anagrafico elenco where elenco.cdnlavoratore = ?) prgelencoanagrafico
+	  FROM an_lavoratore lav, an_lav_storia_inf inf,
+	  de_cpi, ts_generale, de_regione
+	 WHERE lav.cdnlavoratore = inf.cdnlavoratore
+	   AND inf.datfine IS NULL
+	   AND inf.codcpitit = de_cpi.codcpi
+	   AND ts_generale.codregionesil = de_regione.codregione
+	   AND lav.cdnlavoratore = ?
+" />
+
+<STATEMENT name="GET_AZIONE_PRESA_CARICO_150"
+           query="
+	select prgpercorso, prgcolloquio, datavvioazione 
+	from
+	(select per.prgpercorso, per.prgcolloquio, to_char(per.datavvioazione, 'dd/mm/yyyy') datavvioazione
+	from or_percorso_concordato per 
+	inner join or_colloquio coll on (per.prgcolloquio = coll.prgcolloquio)
+	inner join de_azione az on (per.prgazioni = az.prgazioni)
+	inner join ma_azione_tipoattivita att on (az.prgazioni = att.prgazioni)
+	where (coll.cdnlavoratore = ?) and (att.codtipoattivita = 'A02') and (az.codprogetto = '05') 
+	and (per.codesito = 'AVV')
+	and (
+	(trunc(per.datstimata) = to_date(?, 'dd/mm/yyyy') and trunc(per.dateffettiva) = to_date(?, 'dd/mm/yyyy')
+	and trunc(per.datavvioazione) = to_date(?, 'dd/mm/yyyy')) or
+	(trunc(per.datdichiarazione) = to_date(?, 'dd/mm/yyyy') and trunc(per.datavvioazione) = trunc(per.dateffettiva))
+	)
+	order by per.prgpercorso desc)
+	where rownum = 1
+" />
+
+<STATEMENT name="GET_COLLOQUIO_CONFERIMENTO_DID"
+           query="
+	select prgcolloquio from (
+	select coll.prgcolloquio 
+	from or_colloquio coll
+	where coll.cdnlavoratore = ? and trunc(coll.datcolloquio) = to_date(?, 'dd/mm/yyyy')
+	and coll.codservizio = 'DID150'
+	order by coll.prgcolloquio desc)
+	where rownum = 1
+" />
+
+<STATEMENT name="GET_COLLOQUIO_SERVIZIO_CONFERIMENTO_DID"
+           query="
+	select prgcolloquio, to_char(datcolloquio, 'dd/mm/yyyy') datacolloquio from (
+	select coll.prgcolloquio prgcolloquio, coll.datcolloquio datcolloquio
+	from or_colloquio coll
+	where coll.cdnlavoratore = ?
+	and coll.codservizio = ? and coll.datfineprogramma is null
+	order by coll.prgcolloquio desc)
+	where rownum = 1
+" />
+
+<STATEMENT name="SELECT_AZIONE_CONFERIMENTO_DID" 
+	query="select ma_azione.prgazioni
+	from ma_azione_tipoattivita ma_azione
+	inner join de_azione az on (ma_azione.prgazioni = az.prgazioni)
+	where ma_azione.codtipoattivita = ? and az.codprogetto = ?
+" />
+
+
+<STATEMENT name="SELECT_CODSERVIZIO_CONFERIMENTO_DID" 
+	query=" select dar.CODSERVIZIO from DE_AZIONE_RAGG dar where 
+ 	dar.PRGAZIONIRAGG in (
+	select az.PRGAZIONERAGG from de_azione az
+	where az.PRGAZIONI = ?)
+" />
+
+<STATEMENT name="INSERISCI_AZIONE_CONFERIMENTO_DID"
+	query="
+	insert into or_percorso_concordato(prgPercorso, prgColloquio, datStimata, datEffettiva, prgAzioni, codEsito, codesitorendicont, datavvioazione,
+					prgspiproposta, prgspiavvio, cdnUtIns, dtmIns, cdnUtMod, dtmMod, datdichiarazione) 
+		values(?, ?, to_date(?,'dd/mm/yyyy'), to_date(?,'dd/mm/yyyy'), ?, ?, ?, to_date(?,'dd/mm/yyyy'), ?, ?, ?, sysdate, ?, sysdate, to_date(?,'dd/mm/yyyy'))
+"/>
+
+<STATEMENT name="UPDATE_AM_CONF_DID_ESITO"
+	query="
+	UPDATE AM_CONFERIMENTO_DID 
+	set NUMKLOCONFDID = ?,
+	DTMINVIO = sysdate,
+	CODMONOSTATOINVIO = ? 
+	WHERE PRGCONFERIMENTODID = ?" />
+
+<STATEMENT name="SELECT_ESITO_CONFERIMENTO_DID" 
+	query="select codesito, strdescrizione
+	from mn_esito_confdid
+	where codesito = ?
+" />
+
+<STATEMENT name="GET_NEW_TRACCIAMENTO_PRGCONFDID"
+	query="SELECT S_TS_TRACCIAMENTO_CONFDID.nextVal as newKey from dual" />
+
+<STATEMENT name="CDD_INSERT_TRACCIAMENTO_CONF_DID"
+	query="
+	INSERT INTO TS_TRACCIAMENTO_CONFDID (
+  		PRGTRACCIAMENTOCONFDID,
+		CDNLAVORATORE,
+		PRGCONFERIMENTODID,
+		DTMINVIO,
+		STRXMLREQUEST,
+		CODESITOMIN,
+		STRXMLRESPONSE
+	) VALUES	(
+		?,
+		?,
+		?,
+		sysdate,
+		?,
+		?,
+		?
+	)" />
+
+<STATEMENT name="GET_CDNLAVORATORE_FROM_DID"
+	query="select lav.cdnlavoratore, lav.strcodicefiscale 
+			from an_lavoratore lav 
+			inner join am_elenco_anagrafico el on (lav.cdnlavoratore = el.cdnlavoratore)
+			where el.prgelencoanagrafico = 
+			(select did.prgelencoanagrafico from am_dich_disponibilita did where did.prgdichdisponibilita = ?)
+" />
+
+<STATEMENT name="GET_AZIONE_PRESA_CARICO_150_CHIUSURA_DID"
+           query="
+		select count(*) as numazioni
+		from or_percorso_concordato per 
+		inner join or_colloquio coll on (per.prgcolloquio = coll.prgcolloquio)
+		inner join de_azione az on (per.prgazioni = az.prgazioni)
+		inner join ma_azione_tipoattivita att on (az.prgazioni = att.prgazioni)
+		where (coll.cdnlavoratore = ?) and (att.codtipoattivita = 'A02') and (az.codprogetto = '05') 
+		and (per.codesito = 'AVV')
+		and (
+		(trunc(coll.datcolloquio) = to_date(?, 'dd/mm/yyyy')) or (trunc(per.datdichiarazione) = to_date(?, 'dd/mm/yyyy'))
+		)
+" />
+
+<STATEMENT name="CHIUDI_AZIONE_PRESA_CARICO_150_CHIUSURA_DID"
+           query="
+    update or_percorso_concordato set codesito = 'FC', codesitorendicont = 'E', dateffettiva = trunc(sysdate),
+    		cdnutmod = ?, dtmmod = sysdate
+    where prgpercorso in (
+		select per.prgpercorso
+		from or_percorso_concordato per 
+		inner join or_colloquio coll on (per.prgcolloquio = coll.prgcolloquio)
+		inner join de_azione az on (per.prgazioni = az.prgazioni)
+		inner join ma_azione_tipoattivita att on (az.prgazioni = att.prgazioni)
+		where (coll.cdnlavoratore = ?) and (att.codtipoattivita = 'A02') and (az.codprogetto = '05') 
+		and (per.codesito = 'AVV')
+		and (
+		(trunc(coll.datcolloquio) = to_date(?, 'dd/mm/yyyy')) or (trunc(per.datdichiarazione) = to_date(?, 'dd/mm/yyyy'))
+		)
+	)
+" />
+
+<STATEMENT name="GET_AZIONE_PRESA_CARICO_150_RIAPRI_DID"
+           query="
+		select count(*) as numazioni
+		from or_percorso_concordato per 
+		inner join or_colloquio coll on (per.prgcolloquio = coll.prgcolloquio)
+		inner join de_azione az on (per.prgazioni = az.prgazioni)
+		inner join ma_azione_tipoattivita att on (az.prgazioni = att.prgazioni)
+		where (coll.cdnlavoratore = ?) and (att.codtipoattivita = 'A02') and (az.codprogetto = '05') 
+		and (per.codesito = 'FC')
+		and (
+		(trunc(coll.datcolloquio) = to_date(?, 'dd/mm/yyyy')) or (trunc(per.datdichiarazione) = to_date(?, 'dd/mm/yyyy'))
+		)
+" />
+
+<STATEMENT name="RIAPRI_AZIONE_PRESA_CARICO_150_RIAPRI_DID"
+           query="
+    update or_percorso_concordato set codesito = 'AVV', codesitorendicont = 'E', dateffettiva = datavvioazione,
+    		cdnutmod = ?, dtmmod = sysdate
+    where prgpercorso in (
+		select per.prgpercorso
+		from or_percorso_concordato per 
+		inner join or_colloquio coll on (per.prgcolloquio = coll.prgcolloquio)
+		inner join de_azione az on (per.prgazioni = az.prgazioni)
+		inner join ma_azione_tipoattivita att on (az.prgazioni = att.prgazioni)
+		where (coll.cdnlavoratore = ?) and (att.codtipoattivita = 'A02') and (az.codprogetto = '05') 
+		and (per.codesito = 'FC') and (per.codesitorendicont = 'E')
+		and (
+		(trunc(coll.datcolloquio) = to_date(?, 'dd/mm/yyyy')) or (trunc(per.datdichiarazione) = to_date(?, 'dd/mm/yyyy'))
+		)
+	)
+" />
+
+<STATEMENT name="GET_NUM_INVIO_AUT_SAP_DA_PROCESSARE"
+           query="
+		select count(*) as numinvio
+		from ts_invio_aut_sap
+		where cdnlavoratore = ?
+		and upper(strcodicefiscale) = upper(?)
+		and datinvio is null
+" />
+
+<STATEMENT name="INSERT_INVIO_AUT_SAP_DA_AUTOMATISMO"
+	query="
+	INSERT INTO TS_INVIO_AUT_SAP (PRGINVIOAUTSAP, CDNLAVORATORE, STRCODICEFISCALE, DATSELEZIONE) 
+		VALUES (S_TS_INVIO_AUT_SAP.nextval, ?, upper(?), sysdate)
+"/>
+
+<STATEMENT name="GET_EVIDENZA_GENERICA_VALIDA"
+           query="
+		select count(*) as numevidenze
+		from an_evidenza
+		where cdnlavoratore = ?
+		and prgtipoevidenza = (select prgtipoevidenza from de_tipo_evidenza where codtipoevidenza = ?)
+		and trunc(sysdate) &lt;= trunc(datdatascad)
+" />
+
+<STATEMENT name="INSERT_EVIDENZA_GENERICA"
+	query="
+	insert into AN_EVIDENZA (
+      prgevidenza,
+      cdnlavoratore,
+      datdatascad,
+      strevidenza,
+      cdnutins,
+      dtmins,
+      cdnutmod,
+      dtmmod,
+      prgtipoevidenza
+    ) values (
+      S_AN_EVIDENZA.nextval,
+      ?,
+      trunc(sysdate) + ?,
+      ?,
+      ?,
+      sysdate,
+      ?,
+      sysdate,
+      (select prgtipoevidenza from de_tipo_evidenza where codtipoevidenza = ?)
+    )
+" />
+
+<STATEMENT name="GET_DID_ANNULLATA"
+	query="select did.prgdichdisponibilita
+			from am_dich_disponibilita did
+			inner join am_elenco_anagrafico el on (did.prgelencoanagrafico = el.prgelencoanagrafico and el.datcan is null)
+			where el.cdnlavoratore = ? and trunc(did.datdichiarazione) = to_date(?, 'dd/mm/yyyy')
+			and did.codstatoatto in ('AN', 'AU')
+			and did.datfine is null and not exists (
+				select 1 from am_dich_disponibilita did1
+				inner join am_elenco_anagrafico el1 on (did1.prgelencoanagrafico = el1.prgelencoanagrafico)
+				where (el1.cdnlavoratore = el.cdnlavoratore) and (did1.prgdichdisponibilita != did.prgdichdisponibilita)
+				and (did1.codstatoatto = 'PR') and (did1.datfine is null or 
+												   	trunc(did1.datdichiarazione) &gt;= trunc(did.datdichiarazione))
+			)
+"/>
+<STATEMENT name="SELECT_DATA_REVOCA_A02_05"
+	query="select to_char(max(Per.Dateffettiva), 'dd/mm/yyyy') as dataFineAzione
+		from or_percorso_concordato per 
+		inner join or_colloquio coll on (per.prgcolloquio = coll.prgcolloquio)
+		inner join de_azione az on (per.prgazioni = az.prgazioni)
+		inner join ma_azione_tipoattivita att on (az.prgazioni = att.prgazioni)
+		where (coll.cdnlavoratore = ?)
+		and (att.codtipoattivita = 'A02') and (az.codprogetto = '05') and (per.codesito = 'FC')
+	 	and (
+	 		trunc(coll.datcolloquio) = to_date(?, 'dd/mm/yyyy') or trunc(per.datdichiarazione) = to_date(?, 'dd/mm/yyyy')
+	 	)
+   		and trunc(Per.Dateffettiva) &gt; trunc (Per.Datavvioazione)"
+/>
+
+<STATEMENT name="SELECT_PRESA_IN_CARICO_A02_05"
+	query="SELECT MA_AZIONE_TIPOATTIVITA.CODTIPOATTIVITA, MN_YG_TIPO_ATTIVITA.STRDESCRIZIONE,
+      TO_CHAR(CONC.DATSTIMATA, 'YYYY-MM-DD') DATSTIMATA,
+	  TO_CHAR(CONC.DATAVVIOAZIONE, 'DD/MM/YYYY') DATAVVIOAZIONE,
+      TO_CHAR(COLL.DATCOLLOQUIO, 'DD/MM/YYYY') DATCOLLOQUIO,
+      TO_CHAR(CONC.DATEFFETTIVA, 'DD/MM/YYYY') DATEFFETTIVA,
+	  CONC.DATSTIMATA DTDATSTIMATA, CONC.DATAVVIOAZIONE DTDATAVVIOAZIONE,
+      CONC.STRCFDATORELAVORO as STRCFDATORELAVORO,	    
+      DE_CPI.CODCPIMIN, NVL(DE_AZIONE_RAGG.FLG_MISURAYEI, 'N') FLG_MISURAYEI,
+	  CONC.CODESITO, CONC.codesitorendicont, NVL(CONC.FLGPOLITICAFSE, 'N') FLGPOLITICAFSE, DE_AZIONE.CODPROGETTO,
+	  DE_AZIONE.STRDESCRIZIONE DESCRIZIONEAZIONE, DE_AZIONE_RAGG.STRDESCRIZIONE DESCRIZIONEAZIONERAGG
+    FROM OR_COLLOQUIO COLL
+      INNER JOIN OR_PERCORSO_CONCORDATO CONC ON (CONC.PRGCOLLOQUIO = COLL.PRGCOLLOQUIO)
+      INNER JOIN MA_AZIONE_TIPOATTIVITA ON (CONC.PRGAZIONI = MA_AZIONE_TIPOATTIVITA.PRGAZIONI)
+      INNER JOIN DE_AZIONE ON (CONC.PRGAZIONI = DE_AZIONE.PRGAZIONI)
+      INNER JOIN DE_AZIONE_RAGG ON (DE_AZIONE.PRGAZIONERAGG = DE_AZIONE_RAGG.PRGAZIONIRAGG)
+      INNER JOIN MN_YG_TIPO_ATTIVITA ON (MA_AZIONE_TIPOATTIVITA.CODTIPOATTIVITA = MN_YG_TIPO_ATTIVITA.CODTIPOATTIVITA)
+      INNER JOIN DE_CPI_VALIDITA_MIN DE_CPI ON (COLL.CODCPI = DE_CPI.CODCPISIL)
+    WHERE (CONC.PRGPERCORSO = ?) and (CONC.PRGCOLLOQUIO = ?)"
+/>
+
+<STATEMENT name="GET_CCD_AZIONE_PRESA_CARICO_150"
+           query="
+	select prgpercorso, prgcolloquio, datavvioazione, dateffettiva, datcolloquio, descresito, descrcpi
+	from
+	(select per.prgpercorso, per.prgcolloquio, to_char(per.datavvioazione, 'dd/mm/yyyy') datavvioazione, 
+		to_char(per.dateffettiva, 'dd/mm/yyyy') dateffettiva, to_char(coll.datcolloquio, 'dd/mm/yyyy') datcolloquio,
+		de_esito.strdescrizione descresito,
+		de_cpi.strdescrizione || ' - ' || de_cpi.codcpi || ' (min. ' || de_cpi.codcpimin || ')' descrcpi
+	from or_percorso_concordato per 
+	inner join or_colloquio coll on (per.prgcolloquio = coll.prgcolloquio)
+	inner join de_azione az on (per.prgazioni = az.prgazioni)
+	inner join ma_azione_tipoattivita att on (az.prgazioni = att.prgazioni)
+	inner join de_esito on (per.codesito = de_esito.codesito)
+	inner join de_cpi on (coll.codcpi = de_cpi.codcpi)
+	where (coll.cdnlavoratore = ?) and (att.codtipoattivita = 'A02') and (az.codprogetto = '05')
+	and (trunc(coll.datcolloquio) = to_date(?, 'dd/mm/yyyy') or trunc(per.datdichiarazione) = to_date(?, 'dd/mm/yyyy'))
+	order by per.prgpercorso desc)
+	where rownum = 1
+" />
+<STATEMENT name="SELECT_DATA_CONF_DID" 
+	query=" select trunc(sysdate) - trunc(DATCONFDID) as datediff from ts_generale"/> 

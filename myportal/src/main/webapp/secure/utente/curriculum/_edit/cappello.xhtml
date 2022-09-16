@@ -1,0 +1,433 @@
+<ui:component xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	template="../../template/main.xhtml"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<ui:param name="form_id" value="cappello" />
+	<ui:param name="numCol" value="3" />
+
+	<h:form id="#{form_id}" styleClass="fix_margin">
+		<div class="widget_container">
+			<div id="accordion">
+				<h3 id="cappello_titolo" aria-controls="cappello_content">
+					<a href="#">#{curriculumVitaeBean.data.descrizione}</a>
+				</h3>
+
+				<div id="cappello_content">
+					<!-- parametro hidden per memorizzare la descrizione originale del cv -->
+					<h:inputHidden id="descrizioneHidden"
+						value="#{curriculumVitaeBean.data.descrizione}" />
+
+					<h:inputHidden id="isEditingHidden"
+						value="#{curriculumVitaeBean.editing}" />
+
+					<h:panelGrid columns="#{numCol}"
+						columnClasses="fix_cappello_columns_width">
+
+						<cc:inputText id="descrizione"
+							editingMode="#{curriculumVitaeBean.editing}"
+							value="#{curriculumVitaeBean.data.descrizione}" label="Nome CV"
+							required="true" maxlength="100"
+							requiredMessage="La descrizione del curriculum e' obbligatoria."
+							erroreSotto="true">
+							<f:validateLength for="function" maximum="100" />
+						</cc:inputText>
+						
+						<h:panelGroup rendered="#{curriculumVitaeBean.usaDecodificheSil()}">
+							<h:outputLabel for="titolo" value="Titolo *" />
+							<div class="helpPanelToggleButton" style="display: inline-block"
+								title="Il titolo inserito sarà visualizzato dalle aziende, si consiglia di non usare dati personali" />
+							<cc:inputText id="titolo" editingMode="#{curriculumVitaeBean.editing}"
+								disabled="#{not curriculumVitaeBean.editing}" required="true"
+								value="#{curriculumVitaeBean.data.titolo}"
+								erroreSotto="true" maxlength="100">
+								<f:validateLength for="function" maximum="100" />
+							</cc:inputText>
+						</h:panelGroup>
+
+						<cc:inputText id="data_nascita"
+							editingMode="#{curriculumVitaeBean.editing}" erroreSotto="true"
+							value="#{curriculumVitaeBean.data.dtNascita}"
+							label="Data di nascita" type="dataNascita" required="true"
+							requiredMessage="La data di nascita e' obbligatoria.">
+							<f:validator validatorId="dateNotFutureValidator" for="function" />
+						</cc:inputText>
+
+						<cc:inputSuggestion id="comune_nascita"
+							editingMode="#{curriculumVitaeBean.editing}"
+							label="Comune o stato di nascita" required="true"
+							erroreSotto="true"
+							valueCod="#{curriculumVitaeBean.data.codComNascita}"
+							value="#{curriculumVitaeBean.data.strComNascita}"
+							disabled="#{not curriculumVitaeBean.editing}"
+							requiredMessage="Il comune di nascita e' obbligatorio"
+							requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+							suggestionPath="comuni">
+							<f:validator validatorId="comuneSuggestionValidator"
+								for="function" />
+						</cc:inputSuggestion>
+
+						<cc:inputSuggestion id="comune_domicilio"
+							editingMode="#{curriculumVitaeBean.editing}" erroreSotto="true"
+							label="Comune di domicilio" required="true"
+							valueCod="#{curriculumVitaeBean.data.codComDomicilio}"
+							value="#{curriculumVitaeBean.data.strComDomicilio}"
+							disabled="#{not curriculumVitaeBean.editing}"
+							requiredMessage="Il comune di domicilio e' obbligatorio"
+							requiredMessageCod="E' necessario scegliere un comune dalla lista a tendina"
+							suggestionPath="comuni">
+							<f:validator validatorId="comuneSuggestionValidator"
+								for="function" />
+						</cc:inputSuggestion>
+
+						<cc:inputText id="indirizzoDomicilio"
+							editingMode="#{curriculumVitaeBean.editing}"
+							disabled="#{not curriculumVitaeBean.editing}" required="true"
+							maxlength="512"
+							requiredMessage="l'indirizzo Domicilio principale e' obbligatorio"
+							label="Indirizzo di domicilio"
+							value="#{curriculumVitaeBean.data.indirizzoDomicilio}"
+							erroreSotto="true">
+							<f:validator validatorId="numeroTelefonicoValidator"
+								for="indirizzoDomicilio" />
+							<f:validateLength for="function" maximum="512" />
+						</cc:inputText>
+
+						<cc:inputText id="email"
+							editingMode="#{curriculumVitaeBean.editing}" maxlength="255"
+							disabled="#{not curriculumVitaeBean.editing}" required="true"
+							label="E-mail" value="#{curriculumVitaeBean.data.email}"
+							erroreSotto="true">
+							<f:validator validatorId="emailValidator" for="email" />
+						</cc:inputText>
+
+						<cc:inputText id="tel1"
+							editingMode="#{curriculumVitaeBean.editing}"
+							disabled="#{not curriculumVitaeBean.editing}" required="true"
+							maxlength="15"
+							requiredMessage="Il Telefono principale e' obbligatorio"
+							label="Telefono" value="#{curriculumVitaeBean.data.tel1}"
+							erroreSotto="true">
+							<f:validator validatorId="numeroTelefonicoValidator" for="tel1" />
+							<f:validateLength for="function" maximum="15" />
+						</cc:inputText>
+
+						<cc:inputText id="tel2"
+							editingMode="#{curriculumVitaeBean.editing}" maxlength="15"
+							disabled="#{not curriculumVitaeBean.editing}" required="false"
+							label="Cellulare" value="#{curriculumVitaeBean.data.tel2}"
+							erroreSotto="true">
+							<f:validator validatorId="numeroTelefonicoValidator" for="tel2" />
+							<f:validateLength for="function" maximum="15" />
+						</cc:inputText>
+					</h:panelGrid>
+						
+					<h:panelGrid columns="1" rendered="#{curriculumVitaeBean.usaDecodificheSil()}">
+						<cc:inputTextarea id="descrizioneCv" editingMode="#{curriculumVitaeBean.editing}"
+							disabled="#{not curriculumVitaeBean.editing}" richTextMode="false"
+							label="Descrizione" value="#{curriculumVitaeBean.data.descrizioneCv}"
+							erroreSotto="true" maxlength="4000">
+							<f:validateLength for="function" maximum="4000" />
+						</cc:inputTextarea>
+					</h:panelGrid>
+
+					<h:panelGrid columns="#{numCol}"
+						columnClasses="fix_cappello_columns_width">
+						<cc:selectOneRadio id="cliclavoro"
+							rendered="#{curriculumVitaeBean.checkAbilitazioneVisibile('cliclavoro')}"
+							helpMessage="#{msg['cittadino.info.cv.clicklavoro']}"
+							editingMode="#{curriculumVitaeBean.editing}"
+							value="#{curriculumVitaeBean.data.deAmbitoDiffusione.id}"
+							valueDescription="#{curriculumVitaeBean.data.deAmbitoDiffusione.descrizione}"
+							label="Ambito diffusione cv">
+							<f:selectItem id="noCliclavoro" itemLabel="Regionale"
+								itemValue="01" />
+							<f:selectItem id="SiNazionale" itemLabel="Nazionale"
+								itemValue="02" />
+							<f:selectItem id="SiEuropeo" itemLabel="Europeo" itemValue="03" />
+						</cc:selectOneRadio>
+
+						<cc:selectFlagCheckbox id="ricercabilita"
+							style="border:0px !important;background-image:none !important"
+							rendered="#{curriculumVitaeBean.data.provenienzaCurriculum.id == 'MYPORTAL' and curriculumVitaeBean.data.idPfPrincipal == sessionBean.connectedUtente.pfPrincipalDTO.id}"
+							helpMessage="#{msg['cittadino.info.cv.ricercabilita']}"
+							value="#{curriculumVitaeBean.data.ricercabile}"
+							label="Rendi visibile alle aziende">
+						</cc:selectFlagCheckbox>
+					</h:panelGrid>
+					<br />
+
+					<h:panelGroup>
+						<h:commandLink action="#{curriculumVitaeBean.update}"
+							value="Aggiorna" styleClass="marginButton updateButton"
+							rendered="#{curriculumVitaeBean.saved and curriculumVitaeBean.editing}"
+							id="updateButton">
+							<f:ajax execute="@form" render="@form" onevent="spostaInformative" />
+						</h:commandLink>
+						<h:commandLink action="#{curriculumVitaeBean.dontedit}"
+							value="Annulla" immediate="true"
+							styleClass="marginButton secondButton noteditButton"
+							rendered="#{curriculumVitaeBean.saved and curriculumVitaeBean.editing}"
+							id="noteditButton">
+							<f:ajax render="@form" onevent="cancelCallback" />
+						</h:commandLink>
+
+						<h:panelGroup id="attachFileNamePanelGroup">
+							<h:commandLink id="dialog_attach_opener" value="Allega file"
+								name="Allega file" title="Allega file"
+								styleClass="marginButton buttonStyle documentButton"
+								onclick="$('#dialog_attach').dialog('open'); return false;">
+							</h:commandLink>
+							<ui:fragment
+								rendered="#{not empty curriculumVitaeBean.data.idCvAllegato}">
+								<h:outputLink id="attachFileName" style="margin:10px;" value=""
+									onclick="fetchStampa('#{request.contextPath}/secure/rest/services/getAllegatoCv?idCvAllegato='+#{curriculumVitaeBean.data.idCvAllegato});return false;"
+									title="#{curriculumVitaeBean.data.filename}"
+									rendered="#{not empty curriculumVitaeBean.data.filename}">
+								#{curriculumVitaeBean.data.filename}
+								</h:outputLink>
+								<h:commandLink value="Rimuovi" immediate="true"
+									onclick="return $('#delete_allegato').dialog('open');"
+									styleClass="marginButton deleteButton secondButton"
+									rendered="#{curriculumVitaeBean.saved and curriculumVitaeBean.editing}"
+									id="removeAttachBtn">
+									<f:ajax render=":cappello:attachFileNamePanelGroup"
+										onevent="showPanelCallbackAndRefresh" />
+								</h:commandLink>
+							</ui:fragment>
+						</h:panelGroup>
+						<h:commandLink value="Visualizza" immediate="true" id="view"
+							onclick="view()" styleClass="marginButton updateButton"
+							rendered="#{curriculumVitaeBean.saved and curriculumVitaeBean.editing}">
+							<f:ajax render="@none" />
+						</h:commandLink>
+
+						<h:panelGroup style="float: right;"
+							rendered="#{curriculumVitaeBean.mostraDatiCliclavoro}">
+
+							<h:link id="datiInvioClilavoro"
+								styleClass="buttonStyle allineaDx"
+								value="Mostra dati Cliclavoro" title="Mostra dati Cliclavoro"
+								onclick="fetchDatiInvioClCV(#{curriculumVitaeBean.data.id});return false;" />
+						</h:panelGroup>
+					</h:panelGroup>
+
+
+
+					<cc:messages id="messages" />
+
+					<script type="text/javascript">
+					//<![CDATA[
+						disegnaBottoni();
+						
+						function view() {
+							if(valueChanged) 
+								$("#dialog-view-check").dialog("open")
+							else
+								if(window.ActiveXObject) {
+									var lk = document.createElement("a")
+									lk.href = (location + "").replace("edit.xhtml", "view.xhtml")				
+									document.body.appendChild(lk)
+									lk.click()
+								} 
+								else 
+									location = (location + "").replace("edit.xhtml", "view.xhtml")						
+						}
+
+						
+						$(function() {
+						$("#dialog-view-check").dialog({
+							autoOpen : false,
+							resizable : false,
+							modal : true,
+							close: function() { disegnaBottoni() },
+							buttons : [ {
+								text : "Si. Salva prima le modifiche.",
+								click : function() {
+									var stab, tab, bt
+									
+									tab 	= $("#tabs").tabs("option", "selected")
+									stab	= $("#tabs > div:eq(" + tab + ")")									
+									btn 	= stab.find("[id*=\\:currentButton]")[0]
+									if(!btn) btn = stab.find("[id*=\\:updateButton]")
+									
+									btn.click()
+									$(this).dialog("close")
+																	
+									setTimeout(function(){$("#view").blur(), disegnaBottoni()	},0)
+									
+									return false
+								}
+							}, {
+								text : "No.Procedi senza salvare le modifiche",
+								click : function() {
+									if(window.ActiveXObject) {
+										var lk = document.createElement("a")
+										lk.href = (location + "").replace("edit.xhtml", "view.xhtml")				
+										document.body.appendChild(lk)
+										//ie patch
+										setTimeout(function(){lk.click()},0)
+									} 
+									else 
+										location = (location + "").replace("edit.xhtml", "view.xhtml")						
+										
+									$(this).dialog("close")
+								}
+							}]
+						})})			
+						
+						var prevVal = $('[name="cappello:cliclavoro:inputRadio"]:checked').val();
+						var numProfDesiderate = #{curriculumVitaeBean.numProfessioniDesiderate};
+
+						$(function() {
+							$('[id$=descrizione\\:inputText]').keyup(function() {
+								$('#cappello_titolo a').text($('[id$=descrizione\\:inputText]').val());
+							});
+						});
+						
+						function cancelCallback(data) {
+							if (data.status == 'success') {
+								//ripristino il valore iniziale della descrizione del CV
+								$('#cappello_titolo a').text($(jq('cappello:descrizioneHidden')).val());
+							}
+
+							spostaInformative();
+						}
+						//]]>						
+					</script>
+					<div style="display: none;">
+						<h:commandLink id="hidden_btn"
+							action="#{curriculumVitaeBean.refresh}" value="Refresh">
+							<f:ajax
+								render=":cappello:num_vacancy_compatibili :cappello:attachFileNamePanelGroup"
+								onevent="disegnaBottoni" />
+						</h:commandLink>
+					</div>
+				</div>
+			</div>
+			<br />
+			<div style="display: none"
+				class="widget_container ui-widget ui-helper-reset ui-widget-content">
+				<b> <h:link id="num_vacancy_compatibili"
+						outcome="/secure/utente/curriculum/vacancy_compatibili.xhtml"
+						title="Lista Offerte di lavoro compatibili">
+						<f:param name="id" value="#{curriculumVitaeBean.data.id}" />
+			Con i dati inseriti son già state trovate #{curriculumVitaeBean.numVacancyCompatibili} offerte di lavoro compatibili.
+		</h:link></b>
+			</div>
+		</div>
+		<script type="text/javascript">	
+			initAccordion = function() {
+				var edit = $(jq('cappello:isEditingHidden')).prop('value');
+				$('#accordion').accordion({autoHeight:false, collapsible:true});
+				if (edit=='false') {
+					$('#accordion').accordion('activate',false);
+				}		
+			};
+			$(initAccordion);
+		</script>
+	</h:form>
+
+	<!-- Modale per la scelta della foto -->
+	<div id="dialog_attach" title="Seleziona un file da allegare">
+		<form name="cvAttachUpload" id="cvAttachUpload"
+			enctype="multipart/form-data"
+			action="#{request.contextPath}/secure/rest/uploadFileService/uploadAttachCV"
+			method="post">
+			<label for="fileupload" title="Attach"> Allegato </label> <input
+				type="file" name="fileupload" title="Carica un allegato" size="20"
+				id="fileupload" /> <input type="hidden" name="curriculumId"
+				id="curriculumId" value="#{curriculumVitaeBean.data.id}" /> <br />
+			<button type="submit" id="cvAttachUUploadBtn" title="Carica"
+				class="buttonStyle">Carica</button>
+		</form>
+	</div>
+
+	<!-- modale per l'eliminazione dell'allegato -->
+	<div id="delete_allegato" title="Elimina l'allegato">
+		<h:form id="delete_allegato_form">
+			<span class="message_content" />
+			<h:outputText value="Sei sicuro di voler eliminare l'allegato?" />
+			<br />
+			<br />
+			<h:panelGrid columns="2">
+				<h:commandLink action="#{curriculumVitaeBean.removeCvAttach()}"
+					styleClass="buttonStyle" value="Elimina">
+					<f:ajax execute="@form"
+						render=":cappello:num_vacancy_compatibili :cappello:attachFileNamePanelGroup"
+						onevent="closeDeleteAllegatoDialog" />
+				</h:commandLink>
+
+				<h:commandLink styleClass="buttonStyle" value="Annulla"
+					title="Annulla" tabindex="0">
+					<f:ajax execute="@this" render="@none"
+						onevent="closeDeleteAllegatoDialog" />
+				</h:commandLink>
+			</h:panelGrid>
+		</h:form>
+	</div>
+
+	<div id="dialog-view-check" title="Salvare le modifiche apportate">
+		<p>
+			<span class="ui-icon ui-icon-alert"
+				style="float: left; margin: 0 7px 20px 0;"></span>Vuoi salvare le
+			modifiche apportate alla tab corrente?
+		</p>
+	</div>
+
+	<ui:include src="./_cliclavoro.xhtml" />
+
+	<script type="text/javascript"> 
+		function showResponse(responseJson, statusText, xhr, $form)  {  
+			btn=$(jq('cappello:hidden_btn'));
+			btn.click();
+		    $( "#dialog_attach" ).dialog('close');
+		    //$(jq('dati_personali_form:nome:inputText')).focus();
+		}
+
+		function closeDeleteAllegatoDialog() {
+			$('#delete_allegato').dialog('close');
+			disegnaBottoni();
+		}
+		
+		$(function() {
+			$('#dialog_attach').dialog({
+				width: 270,
+				height: 'auto',				
+				autoOpen: false,
+				modal: true
+			});
+
+			$("##{form_id}").find(":input").change(function() {
+				setValueChanged()
+			})
+			
+			$('#delete_allegato').dialog({
+				width: 270,
+				height: 'auto',				
+				autoOpen: false,
+				modal: true
+			});
+
+			var options = {
+				success:       showResponse,  // post-submit callback 
+			}; 
+
+			$('#cvAttachUpload').ajaxForm(options);
+
+			spostaInformative();
+		});
+
+		function spostaInformative() {
+            //sposta il div dell'informativa dell'ambito di diffusione piu' in alto
+            $('[id$=cliclavoro] > .field-help').css('left', '50px');
+            $('[id$=cliclavoro] > .field-help').css('bottom', '120px');
+
+            //sposta il div dell'informativa della ricercabilita' piu' in alto
+            $('[id$=ricercabilita] > .field-help').css('left', '350px');
+            $('[id$=ricercabilita] > .field-help').css('bottom', '107px');			
+		}
+	</script>
+</ui:component>

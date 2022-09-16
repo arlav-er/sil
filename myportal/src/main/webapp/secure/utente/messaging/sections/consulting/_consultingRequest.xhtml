@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+		
+	<h:form styleClass="form-horizontal" enctype="multipart/form-data">
+		<p:remoteCommand name="initRequestConsulting" actionListener="#{utenteMessagingBean.initRequestConsulting()}" autoRun="true"
+			process="@this" update="tema"></p:remoteCommand>
+
+		<div class="panel panel-default">
+			<div class="panel-heading">#{ui['messaging.newRequestTitle']}</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<p:outputLabel for="subject" value="#{ui['shared.subject']}" styleClass="col-md-2 control-label" />
+					<div class="col-md-6">
+						<p:inputText id="subject" required="true" maxlength="250" label="#{ui['shared.subject']}" styleClass="form-control"
+							requiredMessage="Campo obbligatorio">
+						</p:inputText>
+						<p:message id="subjectMessage" for="subject"></p:message>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<p:outputLabel for="tema" value="#{ui['messaging.tema']}" styleClass="col-md-2 control-label" />
+					<div class="col-md-6">
+						<p:selectOneMenu id="tema" converter="deTemaConsulenzaConverter" styleClass="form-control">
+							<f:selectItems value="#{utenteMessagingBean.deTemaConsulenzaList}" var="deTemaConsulenza" itemLabel="#{deTemaConsulenza.descrizione}"
+								itemValue="#{deTemaConsulenza}" />
+						</p:selectOneMenu>
+						<p:message id="temaMessage" for="tema"></p:message>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<p:outputLabel for="richiesta" value="#{ui['messaging.richiesta']}" styleClass="col-md-2 control-label" />
+					<div class="col-md-6">
+						<p:inputTextarea id="richiesta" counter="display" maxlength="3000" counterTemplate="{0} Caratteri diponibili."
+							styleClass="form-control" autoResize="true" required="true" requiredMessage="Campo obbligatorio" />
+						<h:outputText id="display" />
+						<p:message id="richiestaMessage" for="richiesta"></p:message>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="panel-footer">
+				<p class="text-center">
+					<p:remoteCommand name="sendRichiestaRC" actionListener="#{utenteMessagingBean.sendRichiesta(utenteMessagingBean.typeConsulting)}"
+						update="@form"></p:remoteCommand>
+					<p:commandLink id="inviaBtn" styleClass="btn ui-button btn-primary" onclick="sendRichiestaRC()"
+						oncomplete="sendRichiestaComplete(xhr, status, args)">
+						<i class="fa fa-paper-plane"></i> #{ui['shared.invia']}
+					</p:commandLink>
+				</p>
+			</div>
+		</div>
+	</h:form>
+</ui:composition>
+

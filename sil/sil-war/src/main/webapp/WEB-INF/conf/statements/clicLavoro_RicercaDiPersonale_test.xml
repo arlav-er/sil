@@ -1,0 +1,137 @@
+
+<STATEMENT
+	name="RP_GET_TESTCASES"
+	query="Select Dra.Prgrichiestaaz,Da.Prgalternativa
+     from do_richiesta_az dra 
+     join do_alternativa da on dra.prgrichiestaaz = da.prgrichiestaaz
+     join an_unita_azienda aua on (dra.prgazienda = aua.prgazienda and dra.prgunita = aua.prgunita)
+     Join De_Attivita Mn On Aua.Codateco = Mn.Codateco  
+     join do_contratto doc on (doc.prgrichiestaaz = da.prgrichiestaaz and doc.prgalternativa = da.prgalternativa)
+     join  do_mansione dm on (da.prgrichiestaaz = dm.prgrichiestaaz
+		                 	  and da.prgalternativa = dm.prgalternativa)
+	 join de_mansione De On Dm.Codmansione = De.Codmansione	
+	 Join Do_Comune Dcom On Dra.Prgrichiestaaz = Dcom.Prgrichiestaaz                 	                 
+     where dra.prgrichiestaaz &gt;= ? 
+     and dra.prgrichiestaaz &lt;= ?	  	   
+     and dra.datpubblicazione is not null
+     and mn.codatecodot is not null
+     and doc.codcontratto is not null
+     and de.codmansionedot is not null
+     and dm.flginviocl = 'S'
+     and dcom.flginviocl is not null
+ Order By Dra.Prgrichiestaaz,Da.Prgalternativa "/>
+	       
+<STATEMENT
+	name="RP_GET_TESTCASES_2"
+	query="select dra.prgrichiestaaz,da.prgalternativa
+		   from do_richiesta_az dra 
+		   join do_alternativa da on dra.prgrichiestaaz = da.prgrichiestaaz		   
+		   where dra.prgrichiestaaz &gt;= ? 
+	  	   and dra.prgrichiestaaz &lt;= ?	  	   
+	       order by dra.prgrichiestaaz,da.prgalternativa"/>	       
+	       
+	       
+<STATEMENT
+	name="RP_INSERT_LINGUA"
+	query="Insert Into Do_Lingua(Cdngradoletto,Cdngradoparlato,Cdngradoscritto,Cdnutins,Cdnutmod,Codlingua,Dtmins,Dtmmod,Flgindispensabile,Prgalternativa,Prglingua,Prgrichiestaaz)
+Values(?,?,?,
+       ?,?,?,
+       Sysdate,Sysdate,
+       'S',?,
+       S_Do_Lingua.Nextval,
+       ?)" />
+       
+<STATEMENT
+	name="RP_INSERT_ORARIO"
+	query="Insert Into
+			Do_Orario(Cdnutins,Cdnutmod,Codorario,Dtmins,Dtmmod,Prgorario,Prgrichiestaaz)
+			values(100,100,'TP2',sysdate,sysdate,s_do_orario.nextval,?)" />
+
+<STATEMENT
+	name="RP_DELETE_ORARIO"
+	query="delete from do_orario where prgrichiestaaz = ?" />
+
+<STATEMENT
+	name="RP_SELECT_RANDOM_ORARIO_TEST_CASE"
+	query="Select Prgrichiestaaz,Prgalternativa
+FROM (
+Select Dra.Prgrichiestaaz,Da.Prgalternativa
+     from do_richiesta_az dra 
+     join do_alternativa da on dra.prgrichiestaaz = da.prgrichiestaaz
+     join an_unita_azienda aua on (dra.prgazienda = aua.prgazienda and dra.prgunita = aua.prgunita)
+     Join De_Attivita Mn On Aua.Codateco = Mn.Codateco  
+     join do_contratto doc on (doc.prgrichiestaaz = da.prgrichiestaaz and doc.prgalternativa = da.prgalternativa)
+     join  do_mansione dm on (da.prgrichiestaaz = dm.prgrichiestaaz
+		                 	  and da.prgalternativa = dm.prgalternativa)
+	 join de_mansione De On Dm.Codmansione = De.Codmansione	
+	 Join Do_Comune Dcom On Dra.Prgrichiestaaz = Dcom.Prgrichiestaaz               
+     where	   
+     dra.datpubblicazione is not null
+     and mn.codatecodot is not null
+     and doc.codcontratto is not null
+     and de.codmansionedot is not null
+     and dm.flginviocl = 'S'
+     And Dcom.Flginviocl Is Not Null
+     and dra.prgrichiestaaz in (Select distinct Do.Prgrichiestaaz
+                                From Do_Orario Do Join De_Orario Deor on do.codorario = deor.codorario
+                                Where Deor.Codmonoorario = 'P'
+                                And Not exists (
+                                  Select Do2.Prgorario
+                                  From Do_Orario Do2 Join De_Orario Deor2 on do2.codorario = deor2.codorario
+                                  Where Do.Prgrichiestaaz = Do2.Prgrichiestaaz
+                                  And Do.Prgorario != Do2.Prgorario
+                                  And Deor2.Codmonoorario = 'T'
+                                ))     
+ Order By Dbms_Random.Value)
+ where rownum = 1" />
+       
+<STATEMENT
+	name="RP_SELECT_RANDOM_GRADO_LINGUA"
+	query="Select Cdngrado, codice From
+		( Select L.Cdngrado as cdngrado, ma.cod_conoscenza as codice
+		  From De_Grado_Lin L join Ma_GRADO_CONSC_LIN ma on l.cdngrado = ma.cdngrado
+		Where Sysdate Between l.Datinizioval And l.Datfineval
+		Order By Dbms_Random.Value )
+		WHERE rownum = 1" />
+		
+<STATEMENT
+	name="RP_SELECT_RANDOM_COD_LINGUA"
+	query="Select Codlingua 
+			From (Select Codlingua 
+			      From De_Lingua
+			      Where Sysdate Between Datinizioval And Datfineval
+			      and codlingua not in (select codlingua from do_lingua where prgrichiestaaz = ? and prgalternativa = ?)
+			      Order By Dbms_Random.Value )
+			Where Rownum = 1" />
+			
+		
+<STATEMENT
+	name="RP_SELECT_RANDOM_COD_LINGUA_NOT_VALID"
+	query="Select Codlingua 
+			From (Select Codlingua 
+			      From De_Lingua
+			      Where Sysdate not Between Datinizioval And Datfineval
+			      and codlingua not in (select codlingua from do_lingua where prgrichiestaaz = ? and prgalternativa = ?)
+			      Order By Dbms_Random.Value )
+			Where Rownum = 1" />			
+			
+<!--Restituisce un prgazienda e prgunita di un'unità aziendale con un codatecodot valido  -->			
+<STATEMENT
+	name="RP_SELECT_RANDOM_PRGAZIENDA_PRGUNITA"
+	query="Select Prgazienda,Prgunita
+ From (Select Aua.Prgazienda, Aua.Prgunita
+       From An_Unita_Azienda aua
+       Join De_Attivita Mn On Aua.Codateco = Mn.Codateco
+       where mn.codatecodot is not null
+       Order By Dbms_Random.Value )
+	Where Rownum = 1" />
+			
+<STATEMENT
+	name="RP_GET_CPI"			
+	query="select de_cpi.codcpi as codcpi
+			From De_Cpi 
+     		Join De_Provincia On (De_Cpi.Codcpi = De_Provincia.Codcpicapoluogo) 
+     		join ts_generale on (de_provincia.codprovincia = ts_generale.CODPROVINCIASIL)" />
+     		
+     		
+     		

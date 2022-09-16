@@ -1,0 +1,721 @@
+<!-- SEZIONE BEAN DOCUMENTI -->	
+
+	<STATEMENT name="DETAIL_DOCUMENTI"
+				query="SELECT 
+					DOC.CODICE, 
+					DOC.CODICEPROCEDURA, 
+					DOC.CODICETIPODOCUMENTO, 
+					DOC.DESCRIZIONE, 
+					DOC.UTENTEINSERIMENTO, 
+					DOC.NOMEFILE,
+					TO_CHAR (DOC.DATAINSERIMENTO, 'DD/MM/YYYY') DATAINSERIMENTO,
+					DOC.UTENTEMODIFICA, 
+					TO_CHAR (DOC.DATAMODIFICA, 'DD/MM/YYYY') DATAMODIFICA,
+					TDOC.NOMINATIVO NOMINATIVOTIPIDOCUMENTO
+				FROM DOCUMENTI DOC, TIPIDOCUMENTO TDOC
+				WHERE DOC.CODICE = ?
+				AND   TDOC.CODICE (+)= DOC.CODICETIPODOCUMENTO" />
+
+	<STATEMENT name="INSERT_AM_DOCUMENTO"
+				query="insert into am_documento
+							(prgdocumento, codcpi, cdnlavoratore, prgazienda, prgunita, codtipodocumento, flgautocertificazione, strdescrizione, 
+							 flgdocamm, flgdocidentifp, datinizio, strnumdoc, strenterilascio, codmonoio, datacqril, codmodalitaacqril, codtipofile, 
+							 strnomedoc, datfine, numannoprot, numprotocollo, strnote, cdnutins, dtmins, cdnutmod, dtmmod,DATPROTOCOLLO, codStatoAtto)
+							values
+							( ?, ?, ?, ?, ?, ?, ?, ?, 
+							 ?, ?, TO_DATE( ?,'DD/MM/YYYY') , ?, ?, ?, TO_DATE( ?,'DD/MM/YYYY'), ?, ?, 
+							 ?, TO_DATE( ?,'DD/MM/YYYY'), ?, ?, ?, ?, SYSDATE, ?, SYSDATE,  TO_DATE( ?,'DD/MM/YYYY HH24:MI'),? 
+							) " />
+
+	<STATEMENT name="UPDATE_ONLY_NUM_PROT"
+				query="UPDATE am_documento D
+					   set D.numprotocollo=?, D.NUMKLODOCUMENTO=D.NUMKLODOCUMENTO+1
+					   where prgdocumento=?
+				 " />
+
+
+
+	<STATEMENT name="NEXT_S_AM_DOCUMENTO"
+				query="SELECT S_AM_DOCUMENTO.NEXTVAL KEY FROM DUAL"/>		
+
+
+	<STATEMENT name="INSERT_AM_DOCUMENTO_BLOB"
+				query="insert into am_documento_blob
+							(prgdocumentoblob, prgdocumento, blbfile)
+						values
+							(?, ?, empty_blob()) "/>
+
+	<STATEMENT name="NEXT_S_AM_DOCUMENTO_BLOB"
+				query="SELECT S_AM_DOCUMENTO_BLOB.NEXTVAL KEY FROM DUAL"/>		
+
+
+	<STATEMENT name="INSERT_AM_DOCUMENTO_COLL"
+				query="insert into am_documento_coll
+							(prgdocumentocoll, prgdocumento, cdncomponente, strchiavetabella)
+						values
+							(?, ?, ?,?) "/>
+
+	<STATEMENT name="NEXT_S_AM_DOCUMENTO_COLL"
+				query="SELECT S_AM_DOCUMENTO_COLL.NEXTVAL KEY FROM DUAL"/>		
+
+  <!-- Le seguenti query sono utilizzate in it.eng.sil.bean.Documento
+       per aggiornare la tabella che tiene traccia della protocollazione -->
+       
+  <STATEMENT name="GET_KEYLOCK_NUMPR"
+            query="SELECT AM_PROTOCOLLO.NUMPROTOCOLLO+1 NUMPROTOCOLLO,
+                          AM_PROTOCOLLO.NUMKLOPROTOCOLLO
+                     FROM AM_PROTOCOLLO
+                    WHERE AM_PROTOCOLLO.NUMANNOPROT = ?"/>
+            
+  <STATEMENT name="UPDATE_AM_PROTOCOLLO" 
+            query="UPDATE AM_PROTOCOLLO 
+                     SET AM_PROTOCOLLO.NUMPROTOCOLLO    = ? ,
+                         AM_PROTOCOLLO.NUMKLOPROTOCOLLO = ?  
+                   WHERE AM_PROTOCOLLO.NUMANNOPROT      = ?"/>
+
+  <STATEMENT name="INSERT_AM_PROTOCOLLO" 
+            query="INSERT INTO AM_PROTOCOLLO 
+                          ( AM_PROTOCOLLO.NUMPROTOCOLLO,
+                            AM_PROTOCOLLO.NUMKLOPROTOCOLLO,  
+                            AM_PROTOCOLLO.NUMANNOPROT
+                          )
+                          VALUES
+                          (?,?,?)"/>
+                          
+  <!-- <STATEMENT name="INSERT_AM_PROTOCOLLO" 
+            query="UPDATE AM_PROTOCOLLO 
+                     SET AM_PROTOCOLLO.NUMPROTOCOLLO    = ? ,
+                         AM_PROTOCOLLO.NUMKLOPROTOCOLLO = ?  
+                   WHERE AM_PROTOCOLLO.NUMANNOPROT      = ?"/> -->
+
+
+	<!-- UPLOAD e download di Documenti -->			
+	<STATEMENT name="AM_DOCUMENTO_BLOB_UPLOAD"
+				query="SELECT BLBFILE
+						FROM AM_DOCUMENTO_BLOB DOC_B
+						WHERE doc_B.PrgDocumento=?
+						FOR UPDATE " />
+				
+	<STATEMENT name="DOCUMENTI_DOWNLOAD" 
+			   query="select DOC_B.blbfile BLOBDOCUMENTO
+						from am_documento DOC,
+							 am_documento_blob DOC_B
+						where DOC.prgdocumento = DOC_B.prgdocumento
+						and   doc.prgdocumento = ? " />
+
+	<STATEMENT name="AM_DOCUMENTO_SELECT"
+				query="SELECT doc.prgdocumento,
+						       doc.codcpi,
+						       doc.cdnlavoratore,
+						       doc.prgazienda,
+						       doc.prgunita,
+						       doc.codtipodocumento,
+						       doc.flgautocertificazione,
+						       doc.strdescrizione,
+						       doc.flgdocamm,
+						       doc.flgdocidentifp,
+						       to_char(doc.datinizio, 'dd/mm/yyyy') as datinizio,
+						       doc.strnumdoc,
+						       doc.strenterilascio,
+						       doc.codmonoio,
+						       to_char(doc.datacqril, 'dd/mm/yyyy') as datacqril, 
+						       doc.codmodalitaacqril,
+						       doc.codtipofile,
+						       doc.strnomedoc,
+						       to_char(doc.datfine, 'dd/mm/yyyy') as datfine,
+						       doc.numannoprot,
+						       doc.numprotocollo,
+						       doc.strnote,
+						       doc.cdnutins,
+						       to_char(doc.dtmins, 'dd/mm/yyyy hh24:mi') as dtmins,
+						       doc.cdnutmod,
+						       to_char(doc.dtmmod, 'dd/mm/yyyy hh24:mi') as dtmmod,
+						       doc.numklodocumento,
+						       doc_blob.prgdocumentoblob,
+						       TO_CHAR(DOC.DATPROTOCOLLO,'DD/MM/YYYY HH24:MI:SS') as DATPROTOCOLLO,
+						       nvl(dbms_lob.getlength(doc_blob.BLBFILE),0) as existBlob,
+						       td.strdescrizione || DECODE (td.codambitodoc, 'MV', ' - ' || sa.strdescrizione, '') as STRTIPODOC,
+						       doc.CODSTATOATTO CODSTATOATTO,
+						       doc.codMotAnnullamentoAtto,
+						       doc_coll.strChiaveTabella,
+						       td.flgAnnullDaDocumento
+						 FROM  am_documento doc,
+						       am_documento_blob doc_blob,
+							   am_documento_coll doc_coll,
+							   am_movimento mov,
+							   de_stato_atto sa,
+							   de_doc_tipo td		
+						 WHERE doc_blob.prgdocumento = doc.prgdocumento 
+						 and   doc_coll.PRGDOCUMENTO(+) = doc.prgdocumento
+   				         AND   mov.prgmovimento(+) = doc_coll.strchiavetabella
+						 AND   sa.codstatoatto(+) = mov.codstatoatto
+						 and   td.CODTIPODOCUMENTO = doc.CODTIPODOCUMENTO					 
+						 AND   doc.prgdocumento = ? " />
+
+
+
+	<STATEMENT name="DELETE_DOCUMENTI" query="DELETE FROM am_documento  WHERE prgdocumento="/>
+
+	<STATEMENT name="UPDATE_AM_DOCUMENTO" 
+			query="update am_documento
+				   set codcpi =?,
+				       cdnlavoratore =?,
+				       prgazienda =?,
+				       prgunita =?,
+				       codtipodocumento =?,
+				       flgautocertificazione =?,
+				       strdescrizione =?,
+				       flgdocamm =?,
+				       flgdocidentifp =?,
+				       datinizio =  to_date (?, 'dd/mm/yyyy'), 
+				       strnumdoc =?,
+				       strenterilascio =?,
+				       codmonoio =?,
+				       datacqril = to_date (?, 'dd/mm/yyyy'), 
+				       codmodalitaacqril =?,
+				       codtipofile =?,
+				       strnomedoc =?,
+				       datfine = to_date (?, 'dd/mm/yyyy'), 
+				       numannoprot =?,
+				       numprotocollo =?,
+				       strnote =?,
+				       cdnutmod =?,
+				       dtmmod = SYSDATE,
+                       datProtocollo = to_date(?,'dd/mm/yyyy HH24:MI:SS'),
+				       numklodocumento =?,
+				       codStatoAtto=?,
+				       codMotAnnullamentoAtto = ?
+				 where prgdocumento = ? "/>	
+
+
+	<STATEMENT name="LISTA_DOC_AMM"
+				query="select DOC.prgdocumento prgdocumento,
+					       DOC.cdnlavoratore cdnlavoratore,
+					 
+					       pg_utils.trunc_desc(DOC.strdescrizione, 30, '..') strdescrizione,
+					       DOC.strnomedoc strnomedoc,
+					       DOC.numprotocollo numprotocollo,
+					       to_char(DOC.datacqril, 'DD/MM/YYYY') datacqril,
+					 
+					       DOC.codtipodocumento codtipodocumento,
+					       pg_utils.trunc_desc(AMB.strdescrizione, 20, '...') || '&lt;BR&gt;' || 
+					       pg_utils.trunc_desc(TD.strdescrizione, 20, '...') strdescrizionetipodoc,
+					
+					       DOC.codtipofile codtipofile,
+					       TF.strdescrizione strdescrizionetipofile
+					      
+					  from am_documento DOC,
+					       de_doc_tipo_file TF,
+					       de_doc_tipo TD,
+					       de_doc_ambito AMB
+                 
+					 where DOC.codtipofile = TF.codtipofile(+)
+					       and TD.codtipodocumento = DOC.codtipodocumento
+					       and TD.CODAMBITODOC = AMB.CODAMBITODOC
+					       and DECODE(DOC.DATFINE, NULL, 'S','N') = 'S'		/* ottimizzazione di AND DOC.DATFINE IS NULL */
+					       and DOC.CDNLAVORATORE = ? 
+					 order by AMB.CODAMBITODOC, DOC.datacqril DESC" />
+
+	<STATEMENT name="COMBO_TIPO_DOC" 
+		query="select codtipodocumento codice, strdescrizione descrizione from de_doc_tipo" />
+
+	<STATEMENT name="COMBO_TIPO_FILE" 
+		query="select codtipofile codice, strdescrizione descrizione from de_doc_tipo_file" />
+
+	<STATEMENT name="GET_TIPO_DOC" 
+		query="select strdescrizione descrizione from de_doc_tipo where codtipodocumento = ? " />
+
+
+	<STATEMENT name="GET_CODPROVINCIASIL_PER_LOGO"
+			query="SELECT CODPROVINCIASIL FROM TS_GENERALE" />
+
+<!-- FINE SEZIONE BEAN DOCUMENTI -->
+
+
+<!-- restituisce i documenti associati ad una data componente (Pagina JSP) -->
+<STATEMENT name="LISTA_DOC_ASS"
+		query="select DOC.prgdocumento prgdocumento,
+		               DOC.cdnlavoratore cdnlavoratore,
+							 
+		               pg_utils.trunc_desc(DOC.strdescrizione, 30, '..') strdescrizione,
+		               DOC.strnomedoc strnomedoc,
+		               DOC.numprotocollo numprotocollo,
+		               to_char(DOC.datacqril, 'DD/MM/YYYY') datacqril,
+							 
+		               DOC.codtipodocumento codtipodocumento,
+		               pg_utils.trunc_desc(AMB.strdescrizione, 20, '...') || '&lt;BR&gt;' || 
+		               pg_utils.trunc_desc(TD.strdescrizione, 20, '...') strdescrizionetipodoc,
+							
+		               DOC.codtipofile codtipofile,
+		               TF.strdescrizione strdescrizionetipofile
+							      
+		          from am_documento DOC, am_documento_coll DOC_COLL,
+		               de_doc_tipo_file TF,
+		               de_doc_tipo TD,
+		               de_doc_ambito AMB
+		                 
+		         where DOC.codtipofile = TF.codtipofile(+)
+		               and TD.codtipodocumento = DOC.codtipodocumento
+		               and TD.CODAMBITODOC = AMB.CODAMBITODOC
+		               and DOC.PRGDOCUMENTO = DOC_COLL.PRGDOCUMENTOCOLL
+		               and DECODE(DOC.DATFINE, NULL, 'S','N') = 'S'   /* ottimizzazione di AND DOC.DATFINE IS NULL */
+		               and DOC.CDNLAVORATORE = ?
+		               and DOC_COLL.CDNCOMPONENTE = ?
+		         order by AMB.CODAMBITODOC, DOC.datacqril DESC" />
+
+<STATEMENT name="GET_CDNCOMPONENTE"
+          query="SELECT TS_COMPONENTE.CDNCOMPONENTE CDNCOMPONENTE
+                   FROM TS_COMPONENTE 
+                  WHERE UPPER(TS_COMPONENTE.STRPAGE) LIKE UPPER(?)"/>
+
+                  
+<STATEMENT name="COMBO_AMBITO"
+          query="select
+                      codambitodoc as codice,
+                      strdescrizione ||
+ 				      DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+				                      LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+				                      ''
+				             ) as descrizione	   
+                  from de_doc_ambito order by decode(codambitodoc,'AL',1,0), strdescrizione"/>
+
+<STATEMENT name="COMBO_TIPO_DOCUMENTO"
+          query="select
+                    codtipodocumento as codice,
+                    strdescrizione ||
+				    DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+				                    LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+				                    ''
+				           ) as descrizione,
+                    codambitodoc
+                from de_doc_tipo order by strdescrizione"/>                  
+
+<STATEMENT name="COMBO_AMBITO_PATRONATO"
+          query="select
+                      codambitodoc as codice,
+                      strdescrizione ||
+ 				      DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+				                      LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+				                      ''
+				             ) as descrizione	   
+                  from de_doc_ambito 
+                  where flgpatronato = 'S' 
+                  order by decode(codambitodoc,'AL',1,0), strdescrizione"/>
+
+<STATEMENT name="COMBO_TIPO_DOCUMENTO_PATRONATO"
+          query="select
+                    codtipodocumento as codice,
+                    strdescrizione ||
+				    DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+				                    LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+				                    ''
+				           ) as descrizione,
+                    codambitodoc
+                from de_doc_tipo 
+                where flgpatronato = 'S'
+                order by strdescrizione"/>
+
+<STATEMENT name="GET_CPI_DOCUMENTO"
+          query="SELECT
+						CODCPI, STRDESCRIZIONE, STRINDIRIZZO
+					FROM DE_CPI
+					WHERE CODCPI = ? " />
+
+<STATEMENT name="GET_CPI_POLO_PROVINCIALE"
+          query="SELECT DISTINCT
+					CPI.CODCPI AS CODICE,
+					CPI.STRDESCRIZIONE || ' - ' || CPI.CODCPI AS DESCRIZIONE
+				FROM DE_CPI CPI, TS_GENERALE GEN, DE_COMUNE COM
+				WHERE CPI.CODPROVINCIA = GEN.CODPROVINCIASIL
+				AND   CPI.CODCPI = COM.CODCPI
+				ORDER BY DESCRIZIONE " />
+
+<STATEMENT name="GET_CPI_POLO_PROVINCIALE_VALIDI"
+          query="SELECT CODICE, DESCRIZIONE FROM (
+          		SELECT DISTINCT
+					CPI.CODCPI AS CODICE,
+					CPI.STRDESCRIZIONE || ' - ' || CPI.CODCPI AS DESCRIZIONE
+				FROM DE_CPI CPI, TS_GENERALE GEN, DE_COMUNE COM
+				WHERE CPI.CODPROVINCIA = GEN.CODPROVINCIASIL
+				AND   CPI.CODCPI = COM.CODCPI
+				AND   TRUNC(SYSDATE) &lt;= TRUNC(CPI.DATFINEVAL)
+				UNION
+				SELECT DISTINCT
+					CPI.CODCPI AS CODICE,
+					CPI.STRDESCRIZIONE || ' - ' || CPI.CODCPI || ' (SCADUTO)' AS DESCRIZIONE
+				FROM DE_CPI CPI, TS_GENERALE GEN
+				WHERE CPI.CODPROVINCIA = GEN.CODPROVINCIASIL
+				AND  TRUNC(CPI.DATFINEVAL) &lt;= TRUNC(SYSDATE) 
+       		    AND trunc(CPI.DATFINEVAL) &gt;= (select trunc(datscadcpi) from ts_generale)
+				)			
+				ORDER BY DESCRIZIONE " />
+
+<!-- ***************************************************************************
+                         Gestione Stato Documenti
+      - vuoi Protocollare, Salvare, solo Lettura?
+     *************************************************************************** -->
+
+<!-- Reperisce il tipo di documento che si sta gestendo. Serve per il titolo nella jsp GestioneStatoDpc-->
+<STATEMENT name="GET_TIPODOC"
+          query="SELECT DE_DOC_TIPO.CODTIPODOCUMENTO CODICE,
+                        DE_DOC_TIPO.STRDESCRIZIONE DESCRIZIONE,
+                        DE_DOC_TIPO.STRIO,
+			DE_DOC_AMBITO.STRDESCRIZIONE RIFERIMENTO
+                   FROM DE_DOC_TIPO, DE_DOC_AMBITO
+                  WHERE DE_DOC_TIPO.CODAMBITODOC =DE_DOC_AMBITO.CODAMBITODOC
+		    AND DE_DOC_TIPO.CODTIPODOCUMENTO = UPPER(?)"/>
+
+
+<STATEMENT name="GET_VALOREDOC"
+          query="SELECT DE_DOC_TIPO.STRIO STRIO
+                   FROM DE_DOC_TIPO
+                  WHERE DE_DOC_TIPO.CODTIPODOCUMENTO = UPPER(?)"/>
+          
+<!-- Verifica se la protocolazione deve avvenire in maniera automantica o semiautomatica e
+     recupera il numero di protocollo incrementato di 1. In questo modo in caso di protocollazione
+     automatica viene mostrato il numero con cui verra' protocollato il documento 
+     
+     DOCAREA 11/04/2007: con la introduzione della protocollazione in docarea le informazioni sul tipo di protocollo 
+     (locale automatico, locale manuale, docarea tipo sare, docarea versione 1.6.1 registrazione documentale)
+     vengono registrate nella tabella TS_CONFIG_LOC. Il campo TS_GENERALE.flgprotocolloaut non viene piu' utilizzato.
+     Per i valori possibili del tipo di protocollo vedere TS_CONFIG_LOC.STRDESCRIZIONE
+     Il campo imp_doc_prot indica se i movimenti importati da sare sono gia' protocollati in docarea
+-->
+<STATEMENT name="GET_PROTOCOLLAZIONE"
+          query="
+SELECT DECODE (ts_config_loc.decvalore, 2, 'S', 'N') flgprotocolloaut,
+       ts_generale.codtipofileestreport, (am_protocollo.numprotocollo + 1) numprotocollo,
+       am_protocollo.numannoprot, am_protocollo.numkloprotocollo,
+       TO_CHAR (SYSDATE, 'dd/mm/yyyy hh24:mi') AS dataoraprot,
+       ts_config_loc.decvalore tipo_registrazione_doc,
+	   ts_config_loc_2.STRVALORE imp_doc_prot
+  FROM ts_generale, am_protocollo, ts_config_loc, ts_config_loc ts_config_loc_2 
+ WHERE am_protocollo.numannoprot = TO_CHAR (SYSDATE, 'yyyy')
+   AND ts_config_loc.strcodrif = ts_generale.codprovinciasil
+   AND ts_config_loc.codtipoconfig = 'TIPOPROT'
+   AND ts_config_loc.decvalore IN (2, 3)
+   AND ts_config_loc_2.strcodrif = ts_generale.codprovinciasil
+   AND ts_config_loc_2.codtipoconfig = 'IMP_D_PR'
+UNION
+SELECT 'S' flgprotocolloaut, ts_generale.codtipofileestreport, 0 numprotocollo,
+       TO_NUMBER (TO_CHAR (SYSDATE, 'yyyy')) numannoprot, 0 numkloprotocollo,
+       TO_CHAR (SYSDATE, 'dd/mm/yyyy hh24:mi') AS dataoraprot,
+       ts_config_loc.decvalore tipo_registrazione_doc,
+	   ts_config_loc_2.STRVALORE imp_doc_prot
+  FROM ts_generale, ts_config_loc, ts_config_loc ts_config_loc_2 
+ WHERE ts_config_loc.strcodrif = ts_generale.codprovinciasil
+   AND ts_config_loc.codtipoconfig = 'TIPOPROT'
+   AND ts_config_loc.decvalore IN (0, 1)
+   AND ts_config_loc_2.strcodrif = ts_generale.codprovinciasil
+   AND ts_config_loc_2.codtipoconfig = 'IMP_D_PR'
+"/> 
+
+<!-- Recupera i formati in cui il file può essere salvato:
+      - file PDF
+      - documento WORD
+      - foglio di calcolo 
+      - .......-->
+<STATEMENT name="GET_ESTFILEPROT"
+          query="SELECT DE_DOC_TIPO_FILE_EST.CODTIPOFILEEST CODICE,
+                        DE_DOC_TIPO_FILE_EST.STRDESCRIZIONE DESCRIZIONE
+                   FROM DE_DOC_TIPO_FILE_EST
+                  WHERE DE_DOC_TIPO_FILE_EST.FLGREPORT ='S'"/>
+
+<!-- Verifica se esiste già un file(BLOB) associato al documento-->
+<STATEMENT name="EXIST_DOCUMENT"
+          query="SELECT AM_DOCUMENTO.PRGDOCUMENTO,
+                        AM_DOCUMENTO.CODTIPODOCUMENTO,
+                        AM_DOCUMENTO_BLOB.PRGDOCUMENTO PRGBLOB,
+                        AM_DOCUMENTO.STRNOMEDOC,
+                        AM_DOCUMENTO.NUMPROTOCOLLO,
+                        AM_DOCUMENTO.NUMANNOPROT,
+                        (case
+							when AM_DOCUMENTO.DATPROTOCOLLO IS NOT NULL then to_char(AM_DOCUMENTO.DATPROTOCOLLO,'dd/mm/yyyy')
+							else to_char(AM_DOCUMENTO.DTMINS,'dd/mm/yyyy')
+						end) dataProt,
+						(case
+							when AM_DOCUMENTO.DATPROTOCOLLO IS NOT NULL then to_char(AM_DOCUMENTO.DATPROTOCOLLO,'hh24:mi')
+							else to_char(AM_DOCUMENTO.DTMINS,'hh24:mi')
+						end) oraProt
+                   FROM AM_DOCUMENTO,  AM_DOCUMENTO_BLOB
+                  WHERE AM_DOCUMENTO.PRGDOCUMENTO = AM_DOCUMENTO_BLOB.PRGDOCUMENTO
+				    AND nvl(dbms_lob.getlength(AM_DOCUMENTO_BLOB.BLBFILE),0) > 0
+				    and AM_DOCUMENTO.PRGDOCUMENTO = ( select max(amd_.PRGDOCUMENTO) 
+                                                from AM_DOCUMENTO amd_ 
+                                               where amd_.CDNLAVORATORE = ?
+                                                 and UPPER(amd_.CODTIPODOCUMENTO) = UPPER(?) 
+						                                 )"/>
+
+
+<STATEMENT name="EXIST_DOCUMENT_PER_AZIENDA"
+          query="SELECT DOC.PRGDOCUMENTO,
+                        DOC.CODTIPODOCUMENTO,
+                        BLO.PRGDOCUMENTO PRGBLOB,
+                        DOC.STRNOMEDOC,
+                        DOC.NUMPROTOCOLLO,
+                        DOC.NUMANNOPROT
+                   FROM AM_DOCUMENTO DOC, AM_DOCUMENTO_BLOB BLO
+                  WHERE DOC.PRGDOCUMENTO = BLO.PRGDOCUMENTO
+				    AND nvl(dbms_lob.getlength(BLO.BLBFILE),0) > 0
+				    and DOC.PRGDOCUMENTO = (  SELECT MAX(DOC2.PRGDOCUMENTO) 
+											  FROM AM_DOCUMENTO DOC2, AM_DOCUMENTO_COLL COL, TS_COMPONENTE COM
+											  WHERE COL.PRGDOCUMENTO  = DOC2.PRGDOCUMENTO
+											  AND   COM.CDNCOMPONENTE = COL.CDNCOMPONENTE 
+											  AND   DOC2.PRGAZIENDA = ?
+											  AND   DOC2.PRGUNITA   = ?
+											  AND   UPPER(DOC2.CODTIPODOCUMENTO) = UPPER(?)
+											  AND   UPPER(COM.STRPAGE) LIKE UPPER(?)
+											) "/>
+
+<!-- Verifica se esiste già un file(BLOB) ed un movimento collegayo associato al documento e alla chiave tabella-->
+<STATEMENT name="EXIST_DOCUMENTO_CHIAVE"
+          query="SELECT AM_DOCUMENTO.PRGDOCUMENTO,
+                        AM_DOCUMENTO.CODTIPODOCUMENTO,
+                        AM_DOCUMENTO_BLOB.PRGDOCUMENTO PRGBLOB,
+                        AM_DOCUMENTO.STRNOMEDOC,
+                        AM_DOCUMENTO.NUMPROTOCOLLO,
+                        AM_DOCUMENTO.NUMANNOPROT,
+                        (case
+							when AM_DOCUMENTO.DATPROTOCOLLO IS NOT NULL then to_char(AM_DOCUMENTO.DATPROTOCOLLO,'dd/mm/yyyy')
+							else to_char(AM_DOCUMENTO.DTMINS,'dd/mm/yyyy')
+						end) dataProt,
+						(case
+							when AM_DOCUMENTO.DATPROTOCOLLO IS NOT NULL then to_char(AM_DOCUMENTO.DATPROTOCOLLO,'hh24:mi')
+							else to_char(AM_DOCUMENTO.DTMINS,'hh24:mi')
+						end) oraProt
+                   FROM AM_DOCUMENTO,  AM_DOCUMENTO_BLOB
+                  WHERE AM_DOCUMENTO.PRGDOCUMENTO = AM_DOCUMENTO_BLOB.PRGDOCUMENTO
+				    AND nvl(dbms_lob.getlength(AM_DOCUMENTO_BLOB.BLBFILE),0) > 0
+				    and AM_DOCUMENTO.PRGDOCUMENTO = ( select max(amd_.PRGDOCUMENTO) 
+                                                from AM_DOCUMENTO amd_ , AM_DOCUMENTO_COLL amdc_
+                                               where amd_.prgdocumento = amdc_.prgdocumento
+                                                 and amd_.CDNLAVORATORE = ?
+                                                 and UPPER(amd_.CODTIPODOCUMENTO) = UPPER(?) 
+                                                 AND amdc_.STRCHIAVETABELLA = ?)"/>
+
+<!-- ***************************************************************************
+                         Stampe relative il lavoratore
+     *************************************************************************** -->
+<STATEMENT name="STAMPE_GETCPITIT"
+           query="SELECT
+					DECODE( SIGN(COUNT(PRGLAVSTORIAINF)), 1, 'S', 'N')
+						AS E_STATO_COMPETENTE,
+					DECODE( SIGN(COUNT(PRGLAVSTORIAINF)-COUNT(DATFINE)), 1, 'S', 'N')
+						AS E_ORA_COMPETENTE
+				FROM AN_LAV_STORIA_INF
+				WHERE CODMONOTIPOCPI = 'C'
+				AND   CDNLAVORATORE = ?
+				AND   CODCPITIT = ? "/>
+
+<!--
+    ***************************************************************************
+    STATEMENT PER IL RECUPERO DEL CODMONOGESTDOC PER SAPERE SE SUL DOCUMENTO CHE
+    SI STA ANALIZZANDO E' POSSIBILE MODOFICARE LA DATA DI FINE VALIDITA'
+    ***************************************************************************
+-->
+<STATEMENT name="ST_GetCodMonoGestDoc"
+			query="SELECT DOCTIP.CODMONOGESTDOC 
+					FROM de_doc_tipo DOCTIP
+						inner join am_documento DOC on (DOC.CODTIPODOCUMENTO = DOCTIP.CODTIPODOCUMENTO)
+					WHERE DOC.PRGDOCUMENTO = ?" />
+
+
+<!-- controllo esistenza storico -->
+<STATEMENT name="DOC_HAS_INFO_STORICHE"
+			query="SELECT DOC.PRGDOCUMENTO
+					FROM AM_DOCUMENTO DOC, AM_DOCUMENTO_COLL DOCCOL, TS_COMPONENTE COM
+					WHERE DOCCOL.PRGDOCUMENTO (+)= DOC.PRGDOCUMENTO
+					AND   COM.CDNCOMPONENTE   (+)= DOCCOL.CDNCOMPONENTE
+					/* CDNLAVORATORE */
+					AND   ( ? IS NULL  OR  (? IS NOT NULL  AND  DOC.CDNLAVORATORE = ?) )
+					/* PRGAZIENDA */
+					AND   ( ? IS NULL  OR  (? IS NOT NULL  AND  DOC.PRGAZIENDA = ? AND DOC.PRGUNITA = ?) ) 
+					/* PAGINA */
+					AND   ( ? IS NULL  OR  (? IS NOT NULL  AND  COM.STRPAGE = ?) )
+					AND   ( DECODE(DOC.DATFINE, NULL, 'S','N') = 'N'  AND  DOC.DATFINE &lt; TRUNC(SYSDATE) ) " />
+					
+<STATEMENT  name="GET_MOT_ANNULLAMENTO_DOC"
+			query="
+	select ann.codmotannullamentoatto as codice, ann.strdescrizione as descrizione
+    from de_mot_annullamento_atto ann inner join de_mot_annull_atto_lst_tab mot on ann.codmotannullamentoatto = mot.codmotannullamentoatto    			
+	where mot.codlsttab = 'AM_DOC'
+"/>
+<STATEMENT  name="GET_MOT_ANNULLAMENTO_DOC_FILTRATA"
+			query="
+	select ann.codmotannullamentoatto as codice, ann.strdescrizione as descrizione
+    from de_mot_annullamento_atto ann inner join de_mot_annull_atto_lst_tab mot on ann.codmotannullamentoatto = mot.codmotannullamentoatto    			
+	where (ann.codmonoriaperchius = 'C' or ann.codmonoriaperchius = 'E')
+		and mot.codlsttab = 'AM_DOC'
+"/>
+<STATEMENT  name="GET_TUTTI_MOT_ANNULLAMENTO_DOC"
+			query="
+	select ann.codmotannullamentoatto as codice, ann.strdescrizione as descrizione
+    from de_mot_annullamento_atto ann
+"/>
+
+<STATEMENT  name="GET_DOCUMENTO_DOPPIO_DID"
+			query="
+	select doc.prgDocumento
+    from am_documento doc, am_documento_coll coll
+	where doc.prgdocumento = coll.prgdocumento and
+		  doc.codStatoAtto = 'PR' and
+		  doc.codTipoDocumento = ? and
+		  coll.cdnComponente = ? and
+		  coll.strChiaveTabella = ?
+"/>
+
+<STATEMENT  name="GET_DOCUMENTO_DOPPIO_PATTO"
+			query="
+	select doc.prgDocumento
+    from am_documento doc, am_documento_coll coll
+	where doc.prgdocumento = coll.prgdocumento and
+		  doc.codStatoAtto = 'PR' and
+		  doc.codTipoDocumento = ? and
+		  coll.cdnComponente = ? and
+		  coll.strChiaveTabella = ?
+"/>
+
+<STATEMENT  name="GET_DOCUMENTO_PATTO_X_RISTAMPA"
+			query="
+	select doc.prgDocumento, doc.numklodocumento, doc.NUMPROTOCOLLO, doc.NUMANNOPROT, 
+	TO_CHAR (doc.DATPROTOCOLLO, 'dd/mm/yyyy hh24:mi') AS dataoraprot
+    from am_documento doc, am_documento_coll coll
+	where doc.prgdocumento = coll.prgdocumento and
+		  doc.codStatoAtto = 'PR' and
+		  doc.codTipoDocumento = ? and
+		  coll.cdnComponente = ? and
+		  coll.strChiaveTabella = ?
+"/>
+
+<STATEMENT  name="ANNULLA_DOCUMENTO_PATTO_RISTAMPA"
+			query="
+		update am_documento
+		set codstatoatto = 'AU', codmotannullamentoatto = 'RIS',
+		numklodocumento = ?, cdnutmod = ?, dtmmod = sysdate, datfine = 
+		(case
+			when trunc(sysdate) &lt; trunc(datInizio) then datInizio
+			else trunc(sysdate)
+		end)
+		where prgdocumento = ?
+"/>
+
+<STATEMENT  name="GET_UTENTE_DOCAREA"
+			query="
+SELECT STRLOGIN, STRPASSWORD, STRCOGNOME FROM TS_UTENTE WHERE STRCOGNOME = ?
+"/>
+
+<STATEMENT name="EXIST_GENERIC_DOCUMENT"
+          query="SELECT AM_DOCUMENTO.PRGDOCUMENTO,
+                        AM_DOCUMENTO.CODTIPODOCUMENTO,
+                        AM_DOCUMENTO_BLOB.PRGDOCUMENTO PRGBLOB,
+                        AM_DOCUMENTO.STRNOMEDOC,
+                        AM_DOCUMENTO.NUMPROTOCOLLO, 
+                        AM_DOCUMENTO.NUMANNOPROT
+                   FROM AM_DOCUMENTO,  AM_DOCUMENTO_BLOB
+                  WHERE AM_DOCUMENTO.PRGDOCUMENTO = AM_DOCUMENTO_BLOB.PRGDOCUMENTO            
+				    AND nvl(dbms_lob.getlength(AM_DOCUMENTO_BLOB.BLBFILE),0) > 0
+				    and AM_DOCUMENTO.PRGDOCUMENTO = ( select max(amd_.PRGDOCUMENTO) 
+                                                from AM_DOCUMENTO amd_ 
+                                                inner join AM_DOCUMENTO_COLL coll on coll.prgdocumento = amd_.prgdocumento                                                
+                                               where amd_.CDNLAVORATORE = ?
+                                                 and UPPER(amd_.CODTIPODOCUMENTO) = UPPER(?)
+                                                 and (coll.strchiavetabella = ? OR coll.strchiavetabella is null)
+                                                 and (coll.strchiavetabella2 = ? OR coll.strchiavetabella2 is null)
+						                                 )"/>
+
+<STATEMENT  name="GET_STATO_PROSPETTO"
+		   query="select inf.CODMONOSTATOPROSPETTO statoProspetto
+				  from cm_prospetto_inf inf 
+				  inner join AM_DOCUMENTO_COLL coll ON (inf.PRGPROSPETTOINF = to_number(coll.STRCHIAVETABELLA))
+				  inner join AM_DOCUMENTO doc ON (doc.PRGDOCUMENTO = coll.PRGDOCUMENTO)
+				  where doc.CODTIPODOCUMENTO = 'PINF' and doc.PRGDOCUMENTO = ? "/>
+
+<STATEMENT name="EXIST_GENERIC_DOCUMENT_COMPONENTE_KEY"
+          query="SELECT AM_DOCUMENTO.PRGDOCUMENTO,
+                        AM_DOCUMENTO.CODTIPODOCUMENTO,
+                        AM_DOCUMENTO_BLOB.PRGDOCUMENTO PRGBLOB,
+                        AM_DOCUMENTO.STRNOMEDOC,
+                        AM_DOCUMENTO.NUMPROTOCOLLO, 
+                        AM_DOCUMENTO.NUMANNOPROT
+                   FROM AM_DOCUMENTO, AM_DOCUMENTO_BLOB
+                  WHERE AM_DOCUMENTO.PRGDOCUMENTO = AM_DOCUMENTO_BLOB.PRGDOCUMENTO AND
+                  AM_DOCUMENTO.CDNLAVORATORE = ? AND
+                  nvl(dbms_lob.getlength(AM_DOCUMENTO_BLOB.BLBFILE),0) > 0 AND
+                  AM_DOCUMENTO.PRGDOCUMENTO = (SELECT MAX(AM_DOC.PRGDOCUMENTO)
+                  							   FROM AM_DOCUMENTO AM_DOC
+                  							   INNER JOIN AM_DOCUMENTO_COLL AM_COLL ON (AM_COLL.PRGDOCUMENTO = AM_DOC.PRGDOCUMENTO)
+                  							   WHERE AM_DOC.CDNLAVORATORE = ? AND
+                  							   (UPPER(AM_DOC.CODTIPODOCUMENTO) = ? OR UPPER(AM_DOC.CODTIPODOCUMENTO) = ?) AND
+                  							   AM_COLL.STRCHIAVETABELLA = ? AND
+                  							   AM_DOC.CODSTATOATTO = 'PR' AND
+                  							   AM_COLL.CDNCOMPONENTE = (SELECT CDNCOMPONENTE FROM TS_COMPONENTE WHERE UPPER(STRPAGE) = ?)
+                  							   ) "/>
+                  							   
+<STATEMENT name="GET_DOCUMENTO_ALLEGATO_MBO"
+          query="SELECT AM_DOCUMENTO.PRGDOCUMENTO
+                   FROM AM_DOCUMENTO, AM_DOCUMENTO_BLOB
+                  WHERE AM_DOCUMENTO.PRGDOCUMENTO = AM_DOCUMENTO_BLOB.PRGDOCUMENTO AND
+                  AM_DOCUMENTO.CDNLAVORATORE = ? AND
+                  nvl(dbms_lob.getlength(AM_DOCUMENTO_BLOB.BLBFILE),0) > 0 AND
+                  AM_DOCUMENTO.PRGDOCUMENTO = (SELECT MAX(AM_DOC.PRGDOCUMENTO)
+                  							   FROM AM_DOCUMENTO AM_DOC
+                  							   INNER JOIN AM_DOCUMENTO_COLL AM_COLL ON (AM_COLL.PRGDOCUMENTO = AM_DOC.PRGDOCUMENTO)
+                  							   WHERE AM_DOC.CDNLAVORATORE = ? AND
+                  							   UPPER(AM_DOC.CODTIPODOCUMENTO) IN ('MREAAO', 'MREABO') AND
+                  							   AM_COLL.STRCHIAVETABELLA = ? AND
+                  							   AM_DOC.CODSTATOATTO = 'PR' AND 
+                  							   AM_COLL.CDNCOMPONENTE = (SELECT CDNCOMPONENTE FROM TS_COMPONENTE WHERE UPPER(STRPAGE) = ?)
+                  							   ) "/>
+
+<!-- PER PROTOCOLLAZIONE PI3 -->
+<STATEMENT name="GET_DOC_IDENTIFICAZIONE_ASSOCIATO_STM"
+	query="SELECT doc.prgdocumento
+			FROM am_documento doc, am_documento_coll coll, de_doc_tipo det
+			WHERE doc.cdnlavoratore = ?
+			AND doc.CODTIPODOCUMENTO = det.CODTIPODOCUMENTO
+			AND doc.PRGDOCUMENTO = coll.PRGDOCUMENTO
+			AND det.CODAMBITODOC = 'ID'
+			AND doc.flgdocidentifp = 'S'
+			AND trunc(nvl(doc.datfine, sysdate))&gt;=trunc(sysdate)
+			AND doc.CODSTATOATTO = 'PR'
+			AND TO_NUMBER(coll.strchiavetabella) = ?
+			ORDER BY doc.dtmins DESC" />
+			
+			
+<STATEMENT name="EXIST_DOCUMENT_PI3"
+          query="SELECT pi3.STRNUMPRATICA,pi3.strsegnatura,pi3.PRGTITOLARIO PRGTITOLARIO, TO_CHAR (pi3.datprot, 'DD/MM/YYYY') datprot, TO_CHAR (docpi3.datinvio, 'DD/MM/YYYY') datinvio,docpi3.CODSTATODOC
+			  FROM am_protocollo_pitre pi3
+			  inner join am_protocollo_documento_pitre docpi3 on (docpi3.PRGPROTPITRE = pi3.PRGPROTPITRE)
+			  WHERE (pi3.STRNUMPRATICA = ? )
+			  and docpi3.FLGPRINCIPALE = 'S' and 
+			   docpi3.CODSTATODOC in('PRO', 'PRE', 'REP', 'RSDF', 'APR', 'ERR','TIM')" />
+              
+                 
+<STATEMENT name="UPDATE_ONLY_NOME_DOC"
+			query="UPDATE am_documento D
+				   set D.strnomedoc=?, D.NUMKLODOCUMENTO=D.NUMKLODOCUMENTO+1
+				   where prgdocumento=?
+			 " />
+ 
+ <STATEMENT name="IS_DOCUMENT_A_STAMPA_PARAM"
+           query="SELECT prgtemplatestampa FROM AM_DOCUMENTO WHERE PRGDOCUMENTO = ?" />
+           
+<STATEMENT  name="GET_DOCUMENTO_DOPPIO_X_BONIFICA"
+			query="select doc.prgDocumento, doc.numklodocumento
+					from am_documento doc, am_documento_coll coll
+					where doc.prgdocumento = coll.prgdocumento 
+					  and doc.codStatoAtto = 'PR' 
+					  and doc.codTipoDocumento = ? 
+					  and coll.cdnComponente = ? 
+					  and coll.strChiaveTabella = ?
+					order by doc.prgDocumento desc
+			"/>          
+
+<STATEMENT name="BONIFICA_DOCUMENTO_DOPPIO"
+			query="UPDATE am_documento
+				   set CODSTATOATTO=?, NUMKLODOCUMENTO=?, codmotannullamentoatto = ?, dtmmod=sysdate
+				   where prgdocumento=?
+			 " />			
+			
+			 
+                  

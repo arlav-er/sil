@@ -1,0 +1,165 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:p="http://primefaces.org/ui">
+	<div class="modal fade confermaCandidaturaView-modal" id="confermaCandidaturaView-modal" tabindex="-1" role="dialog"
+		aria-labelledby="confermaCandidaturaView-modal" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header-background">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&#215;</span>
+					</button>
+					<h4 class="modal-title">Conferma candidatura</h4>
+				</div>
+				<h:form id="uploadForm" styleClass="form-horizontal" enctype="multipart/form-data">
+					<h:panelGroup id="confermaGroup">
+						<div class="modal-body ">
+							<div class="row">
+								<ui:fragment rendered="#{not vacancyViewBean.vacancy.fromClicLavoro}">
+									<div class="col-md-12">
+
+										<div class="form-group">
+											<p:outputLabel for="curriculum" value="Seleziona un Curriculum" styleClass="col-md-3 control-label"></p:outputLabel>
+											<div class="col-md-9">
+												<p:selectOneMenu id="curriculum" styleClass="form-control" style="width: 100%;"
+													value="#{vacancyViewBean.candidatura.idCvDatiPersonali}" filter="true" filterMatchMode="startsWith">
+													<f:selectItems value="#{vacancyViewBean.myCurricula}" />
+												</p:selectOneMenu>
+												<p:message id="curriculumMessage" for="curriculum"></p:message>
+											</div>
+										</div>
+									</div>
+								</ui:fragment>
+								<ui:fragment rendered="#{vacancyViewBean.vacancy.fromClicLavoro}">
+									<div class="col-md-12">
+										<div class="form-group">
+											<p:outputLabel for="curriculum" value="Seleziona un Curriculum" styleClass="col-md-3 control-label"></p:outputLabel>
+											<div class="col-md-9">
+												<p:selectOneMenu id="cv_cl_vacancy" styleClass="form-control"
+													value="#{vacancyViewBean.candidatura.idCvDatiPersonaliCl}" filter="true" filterMatchMode="startsWith"
+													style="width: 100%;">
+													<f:selectItems value="#{vacancyViewBean.myClicLavoroCurricula}" />
+												</p:selectOneMenu>
+											</div>
+										</div>
+									</div>
+								</ui:fragment>
+								<ui:fragment rendered="#{not vacancyViewBean.vacancy.fromClicLavoro}">
+									<div class="col-md-12">
+										<div class="form-group">
+											<p:outputLabel for="lettere_vacancy" value="Seleziona una lettera di presentazione"
+												styleClass="col-md-3 control-label"></p:outputLabel>
+											<div class="col-md-9">
+
+												<p:selectOneMenu id="lettere_vacancy" styleClass="form-control"
+													value="#{vacancyViewBean.candidatura.idCvLetteraAcc}" filter="true" filterMatchMode="startsWith"
+													style="width: 100%;">
+													<f:selectItems value="#{vacancyViewBean.myLettere}" />
+												</p:selectOneMenu>
+												<p:message id="lettere_vacancyMessage" for="lettere_vacancy"></p:message>
+												<br />
+											</div>
+										</div>
+									</div>
+								</ui:fragment>
+								<div class="col-md-12">
+									<div class="form-group">
+										<p:outputLabel for="allegato" value="Allegato" styleClass="col-md-3 control-label"></p:outputLabel>
+										<div class="col-md-9">
+											<p:fileUpload value="#{vacancyViewBean.file}" id="allegato" mode="advanced" auto="true"
+												fileUploadListener="#{vacancyViewBean.handleFileUpload}" styleClass="datiPrinAllegato form-control"
+												update="uploadForm:uploadedFile" process="@this" label="Inserisci un allegato" />
+											<p:message for="allegato" id="allegaFileUploadMessages" />
+											<h:panelGrid id="uploadedFile">
+												<h:panelGrid rendered="#{not empty vacancyViewBean.file }" columns="2">
+													<h:outputText value="#{vacancyViewBean.file.getFileName()}" />
+													<p:commandLink process="@this" styleClass="form-control" actionListener="#{vacancyViewBean.deleteFile()}"
+														update="uploadForm:uploadedFile">Delete</p:commandLink>
+												</h:panelGrid>
+											</h:panelGrid>
+										</div>
+									</div>
+								</div>
+								<ui:remove>
+									<div class="col-md-12">
+										<div class="form-group">
+											<div class="col-md-3">
+												<p:fileUpload value="#{vacancyViewBean.file}" mode="advanced" auto="true"
+													fileUploadListener="#{vacancyViewBean.handleFileUpload}" styleClass="form-control"
+													update="uploadForm:uploadedFile" process="@this" label="Inserisci un allegato"
+													style="max-width: 600px;border-style:none;" />
+											</div>
+											<div class="col-md-9">
+												<h:panelGrid id="uploadedFile">
+													<h:panelGrid rendered="#{not empty vacancyViewBean.file }" columns="2">
+														<h:outputText value="#{vacancyViewBean.file.getFileName()}" />
+														<p:commandLink process="@this" styleClass="form-control" actionListener="#{vacancyViewBean.deleteFile()}"
+															update="uploadForm:uploadedFile">Delete</p:commandLink>
+													</h:panelGrid>
+												</h:panelGrid>
+											</div>
+										</div>
+									</div>
+								</ui:remove>
+								<div class="col-md-12">
+									<div class="form-group">
+
+										<b>
+											<h:outputText value="A seguito della candidatura sarà inviato un messaggio all'azienda interessata." />
+											<br />
+											<h:outputText value="Occorre pertanto compilare la sezione sottostante. " />
+										</b>
+
+									</div>
+								</div>
+								<div class="col-md-12">
+									<div class="form-group">
+
+										<p:outputLabel for="letter" value="Testo del messaggio" styleClass="col-md-3 control-label"></p:outputLabel>
+										<div class="col-md-9">
+
+											<p:inputTextarea id="letter" value="#{vacancyViewBean.candidatura.commento}" styleClass="form-control"
+												style="background-color:#fff" rows="5" cols="60" counter="counter" maxlength="2000"
+												counterTemplate="Caratteri disponibili {0}" autoResize="false" required="true"
+												requiredMessage="Campo obbligatorio" >
+											</p:inputTextarea>	
+											<h:outputText id="counter" />
+											<p:message id="letterMessage" for="letter" />
+										</div>
+
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">						
+						   <button type="button" class="btn btn-search btn-grey pull-left" data-dismiss="modal">Annulla</button>
+						
+						    <ui:remove>
+							 <p:commandLink id="annullaBtn" styleClass="btn ui-button btn-primary btn-grey pull-left" action="#" 
+								onclick="$('#confermaCandidaturaView-modal').modal('hide')" global="false">							
+								<p:ajax update=":uploadForm:confermaGroup :form_pulsanti:gruppoPulsanti :form_numTotCand" listener="#{vacancyViewBean.cancelEditConfermaCandidatura()}" resetValues="true" />								
+								Annulla</p:commandLink>
+						    </ui:remove>
+							<p:commandLink rendered="#{vacancyViewBean.chekRER()}"
+								styleClass="btn ui-button btn-primary"
+								update=":form_pulsanti :form_numTotCand uploadForm"
+								actionListener="#{vacancyViewBean.inviaCandidaturaNoDTO}"
+								value="Invia"
+								onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+								oncomplete="MyPortal.VacancyView.onInviaCandidaturaVacancyComplete(args);MyPortal.disableLoadingButton(this);"
+								process="@this, uploadForm" global="true" />
+							<p:commandButton rendered="#{!vacancyViewBean.chekRER()}" styleClass="btn ui-button btn-primary"
+								actionListener="#{vacancyViewBean.inviaCandidatura}" value="Invia"
+								onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+								oncomplete="MyPortal.VacancyView.onInviaCandidaturaVacancyComplete(args);MyPortal.disableLoadingButton(this); "
+								update=":form_pulsanti:gruppoPulsanti" global="true" />
+
+
+						</div>
+					</h:panelGroup>
+				  <p:remoteCommand name="refresh" actionListener="#{vacancyViewBean.refresh}" process="@this"></p:remoteCommand>
+				</h:form>
+			</div>
+		</div>
+	</div>
+</ui:composition>

@@ -1,0 +1,265 @@
+<!-- Istanze Art. 16 Online -->
+<STATEMENT name="AS_CONFIG_ASONLINE"
+ query="SELECT
+    ts_config_loc.num as NUMVALORECONFIG
+FROM
+    ts_config_loc
+    INNER JOIN de_tipo_config ON ( ts_config_loc.codtipoconfig = de_tipo_config.codtipoconfig )
+WHERE
+    ts_config_loc.strcodrif = (
+        SELECT
+            ts_generale.codprovinciasil
+        FROM
+            ts_generale
+        WHERE
+            prggenerale = 1
+    )
+    AND de_tipo_config.codtipoconfig = 'ASONLINE'
+    AND trunc(sysdate) BETWEEN trunc(de_tipo_config.datinizioval) AND trunc(de_tipo_config.datfineval)"
+ />
+ 
+<STATEMENT
+        name="UPDATE_AN_LAVORATORE_ASONLINE"
+        query="UPDATE AN_LAVORATORE
+               SET CODCOMRES=?, 
+                   STRINDIRIZZORES=?, 
+                   STRCAPRES=?, 
+                   CDNUTMOD=?, 
+                   DTMMOD=SYSDATE, 
+                   NUMKLOLAVORATORE= ?,
+                   STRTELALTRO=?, 
+                   STRCELL=?, 
+                   STREMAIL=? 
+                WHERE CDNLAVORATORE=?"
+/>
+
+<STATEMENT
+        name="GET_NEW_DO_CARICA_ISTANZA"
+        query="SELECT S_DO_CARICA_ISTANZA.nextval as PRGISTANZA from dual"
+/>
+
+<STATEMENT name="INSERT_DO_CARICA_ISTANZA"
+	query=" INSERT
+    INTO DO_CARICA_ISTANZA
+      (
+        PRGISTANZA ,
+        NUMCANDIDATI ,
+        CODMONOSTATO ,
+        CDNUTMOD ,
+        CDNUTINS ,
+        DTMMOD ,
+        DTMINS ,
+        PRGROSA ,
+        TXTLISTACANDIDATURA
+      )
+      VALUES
+      (
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        ? ,
+        sysdate ,
+        sysdate ,
+        ? ,
+        EMPTY_BLOB()
+      )"
+/>	
+	 		
+<STATEMENT name="DO_CARICA_ISTANZA_UPLOAD"
+				query="SELECT TXTLISTACANDIDATURA
+						FROM DO_CARICA_ISTANZA
+						WHERE PRGISTANZA=?
+						FOR UPDATE " 
+/>
+
+<STATEMENT
+        name="GET_NEW_DO_RISULTATO_ISTANZA"
+        query="SELECT S_DO_RISULTATO_ISTANZA.nextval as PRGRISULTATO from dual"
+/>
+
+<STATEMENT name="INSERT_DO_RISULTATO_ISTANZA"
+	query="  INSERT
+    INTO DO_RISULTATO_ISTANZA
+      (
+        PRGISTANZA ,
+        CODESITO ,
+        PRGRISULTATO ,
+        STRXMLCANDIDATURA,
+        STRCODICEFISCALE
+      )
+      VALUES
+      (
+        ? ,
+        ? ,
+        ? ,
+        TO_CLOB(?),
+        ?
+      )"
+/>	
+
+<STATEMENT name="UPDATE_DO_CARICA_ISTANZA"
+	query=" UPDATE DO_CARICA_ISTANZA
+       set
+        CODMONOSTATO =?,
+        CDNUTMOD =?,
+        DTMMOD = sysdate
+      where PRGISTANZA = ?  "
+/>
+
+<STATEMENT name="GET_DO_RISULTATO_ISTANZA_DA_ELAB"
+	query="SELECT PRGISTANZA,PRGRISULTATO, CODESITO, to_char(STRXMLCANDIDATURA) as XMLCANDIDATURA
+		FROM DO_CARICA_ISTANZA
+      where PRGISTANZA = ? AND CODESITO ='-1' ORDER BY PRGRISULTATO ASC  "
+/>
+
+<STATEMENT name="COUNT_ISTANZA_IN_CORSO_DA_PRGROSA"
+	query=" SELECT COUNT(PRGISTANZA) AS NUMELABORAZIONI FROM  DO_CARICA_ISTANZA
+    		  where PRGROSA = ? AND CODMONOSTATO = 'I' "
+/>
+
+<STATEMENT name="COUNT_ISTANZE_DA_PRGROSA"
+	query=" SELECT COUNT(PRGISTANZA) AS NUMELABORAZIONI FROM  DO_CARICA_ISTANZA
+    		  where PRGROSA = ? AND CODMONOSTATO = 'T'  "
+/>
+
+<STATEMENT nmae="GET_ISTANZA_IN_CORSO_DA_PRGROSA"
+	query=" SELECT ist.PRGISTANZA ,
+				ist.NUMCANDIDATI,
+				ris.PRGRISULTATO ,
+		        ris.CODESITO ,
+		        to_char(ris.STRXMLCANDIDATURA) as strCandidatura,
+		        ris.STRCODICEFISCALE
+		      from DO_RISULTATO_ISTANZA ris
+		      inner join DO_CARICA_ISTANZA ist on (ist.PRGISTANZA = ris.PRGISTANZA)
+    		  where ist.PRGROSA = ? AND ist.CODMONOSTATO = 'I'
+    		  order by ris.STRCODICEFISCALE  "
+/>
+
+<STATEMENT name="GET_CANDIDATURE_ISTANZA"
+	query=" SELECT ist.PRGISTANZA ,
+				ris.PRGRISULTATO ,
+		        
+            case when ris.CODESITO = 'OK' then ' &lt;img src=&quot;../../img/luceVerde.gif&quot; border=&quot;0&quot; title=&quot;elaborazione ok &quot;&gt; ' ||   ris.CODESITO || ' - ' || 'Candidatura caricata con successo'
+              when ris.CODESITO = '01' then ' &lt;img src=&quot;../../img/luceRossa.gif&quot; border=&quot;0&quot; title=&quot;elaborazione errata &quot;&gt; ' ||   ris.CODESITO || ' - ' || 'Anagrafica non inseribile'
+              when ris.CODESITO = '02' then ' &lt;img src=&quot;../../img/luceGialla.gif&quot; border=&quot;0&quot; title=&quot;elaborazione warning &quot;&gt; ' ||   ris.CODESITO || ' - ' || 'Aggiornamento anagrafica non riuscito'
+              when ris.CODESITO = '03' then ' &lt;img src=&quot;../../img/luceGialla.gif&quot; border=&quot;0&quot; title=&quot;elaborazione warning &quot;&gt; ' ||   ris.CODESITO || ' - ' || 'Aggiornamento dati ISEE non riuscito'
+              when ris.CODESITO = '04' then ' &lt;img src=&quot;../../img/luceRossa.gif&quot; border=&quot;0&quot; title=&quot;elaborazione errata &quot;&gt; ' ||   ris.CODESITO || ' - ' || 'Errore aggiornamento dati graduatoria'
+              when ris.CODESITO = '99' then ' &lt;img src=&quot;../../img/luceRossa.gif&quot; border=&quot;0&quot; title=&quot;elaborazione errata &quot;&gt; ' ||   ris.CODESITO || ' - ' || 'Errore generico'
+            end as esitoDescrizione,
+		        ris.STRCODICEFISCALE
+		      from DO_RISULTATO_ISTANZA ris
+		      inner join DO_CARICA_ISTANZA ist on (ist.PRGISTANZA = ris.PRGISTANZA AND ist.PRGISTANZA = ?) 
+    		  order by ris.PRGRISULTATO DESC "
+/>
+
+<STATEMENT name="UPDATE_IDO_DTMASONLINE"
+          query="UPDATE DO_RICHIESTA_AZ
+          			SET DTMASONLINE = sysdate, 
+          				cdnutmod=?,
+               			dtmmod=SYSDATE,  
+          				NUMKLORICHIESTAAZ = NUMKLORICHIESTAAZ + 1
+          		  WHERE PRGRICHIESTAAZ = ?"
+/>
+
+<STATEMENT name="GET_INFO_AM_STATO_OCCUPAZ" 
+	query="select numklostatooccupaz, prgstatooccupaz 
+	from am_stato_occupaz where cdnlavoratore = ? and datfine is null"
+/>
+
+<STATEMENT name="GET_DATAINIZIO_FROM_RICH"
+	query="SELECT
+			  CASE
+			    WHEN trunc(nvl(DATPUBBLICAZIONE, datrichiesta)) &lt; trunc(datrichiesta)
+			    THEN to_char(trunc(nvl(DATPUBBLICAZIONE, datrichiesta)), 'dd/mm/yyyy')
+			    ELSE to_char(trunc(datrichiesta), 'dd/mm/yyyy')
+			  END  AS valore
+			FROM do_richiesta_az 
+		  WHERE prgrichiestaaz=?"
+/>
+
+<STATEMENT name="UPDATE_DATINIZIO_STATO_OCCUPAZ"
+ query="UPDATE am_stato_occupaz
+		SET DATINIZIO = to_date(?, 'dd/mm/yyyy'),
+		  NUMKLOSTATOOCCUPAZ  = to_number(?)+1 
+		WHERE prgstatooccupaz = ? "
+/>
+
+<STATEMENT name="GET_ISTANZE_DA_PRGROSA"
+	query=" SELECT ist.PRGISTANZA ,
+			  ist.PRGROSA,
+			  CASE 
+			  	WHEN ist.CODMONOSTATO = &apos;I&apos;
+			  	THEN &apos;Elaborazione in corso&apos;
+			  	ELSE &apos;Elaborazione terminata&apos;
+			  END  AS strDescElaborazione,
+			 ist.CODMONOSTATO, 
+			 ist.NUMCANDIDATI ,
+			 to_char(ist.DTMINS, &apos;dd/mm/yyyy hh24:mi&apos;) as dataInizio,
+			 to_char(ist.DTMMOD, &apos;dd/mm/yyyy hh24:mi&apos;) as dataFine,
+			 ist.DTMMOD,
+			  ' &lt;img src=&quot;../../img/luceVerde.gif&quot; border=&quot;0&quot; title=&quot;elaborazioni ok &quot;&gt; ' || SUM(case when ris.codesito ='OK' then 1 else 0 end) || ' ' ||
+ ' &lt;img src=&quot;../../img/luceGialla.gif&quot; border=&quot;0&quot; title=&quot;elaborazioni in warning &quot;&gt; ' || SUM(case when ris.codesito in ('02','03') then 1 else 0 end)  || ' ' ||
+  ' &lt;img src=&quot;../../img/luceRossa.gif&quot; border=&quot;0&quot; title=&quot;elaborazioni errate &quot;&gt; ' || SUM(case when ris.codesito in ('01','04','99') then 1 else 0 end)   as esitoCandidature
+      from DO_CARICA_ISTANZA ist     
+      left outer join DO_RISULTATO_ISTANZA ris on (ris.prgistanza = ist.prgistanza)
+    		  where ist.PRGROSA = ?  
+    		  group by ist.PRGISTANZA, ist.PRGROSA,  ist.CODMONOSTATO, 
+			 ist.NUMCANDIDATI , to_char(ist.DTMINS, 'dd/mm/yyyy hh24:mi'), to_char(ist.DTMMOD, 'dd/mm/yyyy hh24:mi') , ist.DTMMOD
+    		 order by ist.DTMMOD DESC  "
+/>
+
+<STATEMENT name="GET_ISTANZA_IN_CORSO_DA_PRGISTANZA"
+	query="  SELECT ist.PRGISTANZA ,
+			  ist.PRGROSA,
+			  CASE 
+			  	WHEN ist.CODMONOSTATO = &apos;I&apos;
+			  	THEN &apos;Elaborazione in corso&apos;
+			  	ELSE &apos;Elaborazione terminata&apos;
+			  END  AS strDescElaborazione,
+			 ist.CODMONOSTATO, 
+			 ist.NUMCANDIDATI ,
+			 to_char(ist.DTMINS, &apos;dd/mm/yyyy hh24:mi&apos;) as dataInizio,
+			 to_char(ist.DTMMOD, &apos;dd/mm/yyyy hh24:mi&apos;) as dataFine,
+			 ist.DTMMOD,
+			  ' &lt;img src=&quot;../../img/luceVerde.gif&quot; border=&quot;0&quot; title=&quot;elaborazioni ok &quot;&gt; ' || SUM(case when ris.codesito ='OK' then 1 else 0 end) || ' ' ||
+ ' &lt;img src=&quot;../../img/luceGialla.gif&quot; border=&quot;0&quot; title=&quot;elaborazioni in warning &quot;&gt; ' || SUM(case when ris.codesito in ('02','03') then 1 else 0 end)  || ' ' ||
+  ' &lt;img src=&quot;../../img/luceRossa.gif&quot; border=&quot;0&quot; title=&quot;elaborazioni errate &quot;&gt; ' || SUM(case when ris.codesito in ('01','04','99') then 1 else 0 end)   as esitoCandidature
+      from DO_CARICA_ISTANZA ist     
+      left outer join DO_RISULTATO_ISTANZA ris on (ris.prgistanza = ist.prgistanza)
+    		  where ist.prgistanza = ?  
+    		  group by ist.PRGISTANZA, ist.PRGROSA,  ist.CODMONOSTATO, 
+			 ist.NUMCANDIDATI , to_char(ist.DTMINS, 'dd/mm/yyyy hh24:mi'), to_char(ist.DTMMOD, 'dd/mm/yyyy hh24:mi') , ist.DTMMOD
+    		 order by ist.DTMMOD DESC  "
+/>
+
+<STATEMENT name="GET_DETTAGLIO_CANDIDATURA"
+	query=" SELECT ris.PRGISTANZA ,
+				ris.PRGRISULTATO ,
+				ris.CODESITO,
+		         ris.STRXMLCANDIDATURA as strCandidatura,
+		        ris.STRCODICEFISCALE
+		      from DO_RISULTATO_ISTANZA ris
+		      where ris.PRGRISULTATO =?  "
+/>
+
+<STATEMENT name="GetDatiIstanzaDoNominativo"
+	query=" SELECT r.STRIDISTANZA,
+				  r.STRPROTISTANZA,
+				  r.NUMANNOPROTISTANZA,
+				  upper(an.STRCOGNOME || ' ' || an.STRNOME) as cognomeNome
+		      from DO_NOMINATIVO r
+		      INNER JOIN an_lavoratore an ON (r.CDNLAVORATORE = an.CDNLAVORATORE)
+		      where r.PRGNOMINATIVO =?"
+/>
+
+<STATEMENT name="GET_AS_ISEE_STORICO_SCARTI"
+	query=" SELECT  nvl(az.Numrichiesta, az.numrichiestaorig) ||'/'||AZ.NUMANNO AS NUMRICH,
+				   to_char(ISEE.DATRIFERIMENTO, 'DD/MM/YYYY') AS DATRIFERIMENTO,
+				   ISEE.NUMVALOREISEE AS NUMVALOREISEE,
+				   ISEE.NUMANNO AS NUMANNO
+			FROM AS_ISEE_SCARTO ISEE
+			INNER JOIN DO_RICHIESTA_AZ AZ ON (ISEE.PRGRICHIESTAAZ = AZ.PRGRICHIESTAAZ)
+			WHERE ISEE.CDNLAVORATORE = ?
+			ORDER BY ISEE.PRGRICHIESTAAZ DESC, AZ.NUMANNO DESC  "
+/>

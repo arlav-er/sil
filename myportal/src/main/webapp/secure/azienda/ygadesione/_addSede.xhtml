@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog widgetVar="addSedeWV"
+		header="#{(ygAdesioneAziendaBean.editSede)?'Modifica Sede':'Nuova Sede'}"
+		width="600" modal="true" id="addSedeDialog" draggable="false"
+		resizable="false">
+		<h:form id="newSedeForm">
+			<h:panelGrid columns="2">
+				<p:selectBooleanCheckbox id="sedeLegale" label="Sede Legale"
+					value="#{ygAdesioneAziendaBean.newSede.flgSedeLegale}"
+					disabled="#{ygAdesioneAziendaBean.disableSedeLegale()}"></p:selectBooleanCheckbox>
+				<p:outputLabel for="sedeLegale" value="Sede Legale"></p:outputLabel>
+			</h:panelGrid>
+			<ui:remove>
+				<!-- this has been removed by the request of the ragione ER (Email from Angela Tagliaferro_
+								     in case they want it back otherwise it would be deleted.
+								     11/07/2014
+								 -->
+				<h:panelGrid columns="2">
+					<p:selectBooleanCheckbox id="tirocinioFlg"
+						label="Disponibilità ad ospitare tirocinio"
+						value="#{ygAdesioneAziendaBean.newSede.flgTirocinio}"
+						disabled="#{ygAdesioneAziendaBean.disableTirocinio}"></p:selectBooleanCheckbox>
+					<p:outputLabel for="tirocinioFlg"
+						value="Disponibilità ad ospitare tirocinio"></p:outputLabel>
+				</h:panelGrid>
+				<p:message id="tirocinioFlgMessage" for="tirocinioFlg"></p:message>
+			</ui:remove>
+
+			
+			<h:panelGrid columns="2">
+				<h:panelGrid columns="3">
+					<h:panelGrid columns="1">
+						<p:outputLabel for="indirizzo" value="Indirizzo"></p:outputLabel>
+						<p:inputText id="indirizzo" required="true"
+							value="#{ygAdesioneAziendaBean.newSede.indirizzo}"
+							maxlength="255" requiredMessage="L'indirizzo è obbligatorio"></p:inputText>
+					</h:panelGrid>
+					<h:panelGrid columns="1">
+						<p:outputLabel for="comune" value="Comune"></p:outputLabel>
+						<p:autoComplete id="comune" required="true" var="comuneVar"
+							converter="deComuneDTOConverter"
+							completeMethod="#{ygAdesioneAziendaBean.completeComune}"
+							itemLabel="#{comuneVar.descrizione}" itemValue="#{comuneVar}"
+							value="#{ygAdesioneAziendaBean.newSede.deComuneDTO}"
+							requiredMessage="Il comune è obbligatorio" forceSelection="true">							
+						</p:autoComplete>
+					</h:panelGrid>
+					<h:panelGrid columns="1">
+						<p:outputLabel for="cap" value="Cap"></p:outputLabel>
+						<p:inputText id="cap" required="true"
+							value="#{ygAdesioneAziendaBean.newSede.cap}" maxlength="5"
+							requiredMessage="Il cap è obbligatorio">
+							<f:convertNumber maxIntegerDigits="5" groupingUsed="false"/>
+						</p:inputText>
+
+					</h:panelGrid>
+					<h:panelGrid columns="1">
+						<p:outputLabel for="telefono" value="Telefono"></p:outputLabel>
+						<p:inputText id="telefono"
+							value="#{ygAdesioneAziendaBean.newSede.telefono}" maxlength="50"></p:inputText>
+					</h:panelGrid>
+					<h:panelGrid columns="1">
+						<p:outputLabel for="fax" value="Fax"></p:outputLabel>
+						<p:inputText id="fax" value="#{ygAdesioneAziendaBean.newSede.fax}"
+							maxlength="50"></p:inputText>
+					</h:panelGrid>
+				</h:panelGrid>
+			</h:panelGrid>
+			<h:panelGrid columns="1">
+				<p:message for="indirizzo"></p:message>
+				<p:message for="comune"></p:message>
+				<p:message for="cap"></p:message>
+			</h:panelGrid>
+			<h:panelGrid columns="2" style="margin: 0 auto;">
+				<p:commandButton value="Annulla" onclick="PF('addSedeWV').hide()"></p:commandButton>
+				<p:commandButton
+					value="#{(ygAdesioneAziendaBean.editSede)?'Modifica Sede':'Aggiungi Sede'}"
+					actionListener="#{ygAdesioneAziendaBean.addNewSedeToList}"
+					update="@form :adesioneForm:sediTable"
+					oncomplete="addSedeOnComplete(args)"></p:commandButton>
+			</h:panelGrid>
+			<script>
+				function addSedeOnComplete(args) {
+					if (!args.validationFailed) {
+						PF('addSedeWV').hide();
+				    }
+				}
+			</script>
+		</h:form>
+	</p:dialog>
+
+</ui:composition>

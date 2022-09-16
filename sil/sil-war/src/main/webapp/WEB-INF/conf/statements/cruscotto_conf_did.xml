@@ -1,0 +1,316 @@
+ <STATEMENT
+        name="CCD_SELECT_LAST_ACTIVE_DID"
+        query="select to_char(Did.Datdichiarazione,'dd/mm/yyyy') dataDid, did.Prgdichdisponibilita,
+        		nvl(did.flglavoroautonomo, 'N') as FLGLAVOROAUTONOMO
+        		from Am_Dich_Disponibilita did 
+				inner join am_elenco_anagrafico elenco on (Did.Prgelencoanagrafico = elenco.Prgelencoanagrafico) 
+				where codstatoatto = 'PR' and DATFINE is null and elenco.cdnlavoratore = ?"/>
+<STATEMENT
+        name="CCD_SELECT_LAST_ACTIVE_PATTO"
+        query="select to_char(Datstipula ,'dd/mm/yyyy') dataPatto, Flgpatto297, 
+        		decode(Flgpatto297, 'S', 'Patto 150', 'Accordo generico') tipoPatto,  
+        		to_char(Numindicesvantaggio150) profilingPatto, Numindicesvantaggio150 profilingPattoNum,
+        		Prgpattolavoratore 
+        		from am_patto_lavoratore 
+				where codstatoatto = 'PR' and DATFINE is null and cdnlavoratore = ?"/>     
+<STATEMENT
+        name="CCD_SELECT_Conferimento_Did"
+        query="select conf.PRGCONFERIMENTODID, lav.strcodicefiscale,
+        		to_char(conf.PRGCONFERIMENTODID) as strPrgConfDid,
+        		conf.CDNLAVORATORE, to_char(conf.DATDID, 'dd/mm/yyyy') as datdid, conf.CODPFTIPOEVENTO,
+        		decode(conf.Codmonostatoinvio, 'D', 'Da Inviare','I', 'Inviato', '') strCodMonoStatoInvio,
+        		conf.CODENTETIT, mn_st_cpi.codcpimin || ' - ' ||  mn_st_cpi.strdenominazione as entePromotore,
+        		conf.NUMETA, conf.STRSESSO, conf.CODPFCITTADINANZA, conf.CODTITOLO, tit.strdescrizione as descrTitolo, conf.CODPFCONDOCCUP,
+        		conf.NUMMESIDISOCC, conf.NUMMESIRICERCALAV, conf.CODPFISCRCORSO, conf.CODPROVINCIARES, prov.codmin || ' - ' || prov.strdenominazione as provincia,
+        		conf.CODPFPRESENZAIT, conf.FLGESPLAVORO, conf.CODPFPOSIZIONEPROF, conf.NUMNUCLEOFAM, prov.codmin as codprovinciamin,
+        		conf.FLGFIGLIACARICO, conf.FLGFIGLIMINORENNI, to_char(conf.DTMINVIO, 'dd/mm/yyyy') as DTMINVIO, 
+        		conf.CODMONOSTATOINVIO, conf.IDSPROFILING, conf.CODPFCONDOCCUP_CALC, conf.NUMMESIDISOCC_CALC, conf.DECPROFILING,
+        		to_char(conf.DATPROFILING, 'dd/mm/yyyy') as DATPROFILING, conf.NUMKLOCONFDID
+        		from Am_Conferimento_Did conf 
+        		inner join an_lavoratore lav on (conf.CDNLAVORATORE = lav.CDNLAVORATORE) 
+        		left join de_provincia prov on (conf.CODPROVINCIARES = prov.codprovincia)
+        		left join DE_TITOLO tit on (conf.CODTITOLO = tit.codtitolo)
+        		left join mn_st_cpi on (conf.CODENTETIT = mn_st_cpi.codcpimin)
+				where conf.cdnlavoratore = ? and upper(conf.Codmonostatoinvio) = 'I'
+				order by conf.PRGCONFERIMENTODID desc"/>  
+				
+<STATEMENT
+        name="CCD_SELECT_Conferimento_Did_FROM_PRG"
+        query="select conf.PRGCONFERIMENTODID, lav.strcodicefiscale,
+        		to_char(conf.PRGCONFERIMENTODID) as strPrgConfDid,
+        		conf.CDNLAVORATORE, to_char(conf.DATDID, 'dd/mm/yyyy') as datdid, conf.CODPFTIPOEVENTO,
+        		decode(conf.Codmonostatoinvio, 'D', 'Da Inviare','I', 'Inviato', '') strCodMonoStatoInvio,
+        		conf.CODENTETIT, mn_st_cpi.codcpimin || ' - ' ||  mn_st_cpi.strdenominazione as entePromotore, 
+        		conf.NUMETA, conf.STRSESSO, conf.CODPFCITTADINANZA, conf.CODTITOLO,
+        		tit.STRDESCRIZIONEPARLANTE || DECODE(SYSDATE,    
+             	GREATEST(SYSDATE, tit.DATINIZIOVAL, tit.DATFINEVAL),' (scaduto)',
+                LEAST(SYSDATE, tit.DATINIZIOVAL, tit.DATFINEVAL),' (scaduto)', 
+               '') as descrTitolo, conf.CODPFCONDOCCUP,
+        		conf.NUMMESIDISOCC, conf.NUMMESIRICERCALAV, conf.CODPFISCRCORSO, conf.CODPROVINCIARES, prov.codmin || ' - ' || prov.strdenominazione as provincia,
+        		conf.CODPFPRESENZAIT, conf.FLGESPLAVORO, conf.CODPFPOSIZIONEPROF, conf.NUMNUCLEOFAM, prov.codmin as codprovinciamin,
+        		conf.FLGFIGLIACARICO, conf.FLGFIGLIMINORENNI, to_char(conf.DTMINVIO, 'dd/mm/yyyy') as DTMINVIO, 
+        		conf.CODMONOSTATOINVIO, conf.IDSPROFILING, conf.CODPFCONDOCCUP_CALC, conf.NUMMESIDISOCC_CALC, conf.DECPROFILING,
+        		to_char(conf.DATPROFILING, 'dd/mm/yyyy') as DATPROFILING, conf.NUMKLOCONFDID
+        		from Am_Conferimento_Did conf
+        		inner join an_lavoratore lav on (conf.CDNLAVORATORE = lav.CDNLAVORATORE) 
+        		left join de_provincia prov on (conf.CODPROVINCIARES = prov.codprovincia)
+        		left join DE_TITOLO tit on (conf.CODTITOLO = tit.codtitolo)
+        		left join mn_st_cpi on (conf.CODENTETIT = mn_st_cpi.codcpimin)
+				where conf.PRGCONFERIMENTODID = ?"/>  
+<STATEMENT
+        name="CCD_SELECT_LAST_DID_INPS"
+        query="SELECT PRGDIDINPS, DATDICHIARAZIONE,
+            Datricezione, datricezioneord, CODMONOTIPOOPERAZIONE
+            from (
+			SELECT PRGDIDINPS,to_char(DATDICHIARAZIONE, 'dd/mm/yyyy') AS DATDICHIARAZIONE,
+			                to_char(Datricezione, 'dd/mm/yyyy') AS Datricezione, DATRICEZIONE as datricezioneord,
+			                DECODE(CODMONOTIPOOPERAZIONE, 'D', 'Cancellazione','I', 'Inserimento','U','Modifica', CODMONOTIPOOPERAZIONE) AS CODMONOTIPOOPERAZIONE
+			          FROM AM_DID_INPS WHERE CDNLAVORATORE = ?
+			                ORDER BY datricezioneord DESC)
+			where ROWNUM = 1"/>
+<STATEMENT 
+	name="CCD_COMBO_MN_PF_TIPO_EVENTO"
+	query="select CODPFTIPOEVENTO as CODICE, 
+                  STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                    '') AS DESCRIZIONE
+                  from MN_PF_TIPO_EVENTO"/>  
+<STATEMENT 
+	name="CCD_ENTE_PROMOTORE_FROM_CDNLAV"
+	query="select codcpimin as codice, strdescrizionemin || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                    '') as descrizione 
+			from an_lav_storia_inf, de_cpi 
+			where  An_Lav_Storia_Inf.codcpitit = De_Cpi.codcpi
+			and An_Lav_Storia_Inf.Cdnlavoratore = ? and  An_Lav_Storia_Inf.datfine is null"/> 
+<STATEMENT 
+	name="CCD_COMBO_MN_PF_CITTADINANZA"
+	query="select Codpfcittadinanza as CODICE, 
+                  Codpfcittadinanza || ' - ' || STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                    '') AS DESCRIZIONE
+                  from MN_PF_CITTADINANZA"/>  
+ <STATEMENT 
+	name="CCD_COMBO_MN_PF_PRESENZAIT"
+	query="select Codpfpresenzait as CODICE, 
+                  Codpfpresenzait || ' - ' || STRDESCRIZIONE || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                    '') AS DESCRIZIONE
+                  from Mn_Pf_Presenzait "/>
+ <STATEMENT 
+	name="CCD_GET_NASCITA_ESTERO"
+	query="select pr.codregione as codiceEstero
+			from  de_provincia pr, de_comune com, an_lavoratore lav 
+			where com.codcom = Lav.Codcomnas 
+			and com.codprovincia = pr.codprovincia  
+			and cdnlavoratore = ?"/>
+			
+<STATEMENT name="CCD_CERCA_TITOLOSTUDIO_CODTITOLO"
+	query="select tit.codtitolo, tit.strdescrizione, tit_p.strDescrizione as desTipologia, DECODE(tit.flglaurea,NULL,'N',tit.flglaurea) AS flglaurea
+                   from de_titolo tit
+                   inner join de_titolo tit_p on tit_p.codtitolo=substr(tit.codTitolo, 0, 2) || '000000'
+                   where  Tit.Flgpfconfdid = 'S'
+                   and lower(tit.codTitolo) like lower(?) || '%'
+                   order by strdescrizione" />
+
+<STATEMENT name="CCD_CERCA_TITOLOSTUDIO_DESTITOLO"
+	query="select tit.codtitolo, tit.strdescrizione, tit_p.strDescrizione as desTipologia, DECODE(tit.flglaurea,NULL,'N',tit.flglaurea) AS flglaurea
+                   from de_titolo tit
+                   inner join de_titolo tit_p on tit_p.codtitolo=substr(tit.codTitolo, 0, 2) || '000000'
+                   where Tit.Flgpfconfdid = 'S'
+                   and lower(tit.strdescrizione) like '%' || lower(?) || '%' 
+                   order by strdescrizione" />
+               
+<STATEMENT name="CCD_GET_TIPO_TITOLI"
+	query=" SELECT codtitolo as codice, strdescrizione as descrizione, DECODE(flgLaurea,NULL,'N',flglaurea) AS flgLaurea
+                from DE_TITOLO
+                where cdnLivello=0 
+                and Flgpfconfdid ='S' 
+                order by codice" />
+                
+<STATEMENT name="CDD_GET_PROVINCIA_RES"
+	query="SELECT (
+		  CASE
+		    WHEN prres.codprovincia IN ('254','255')
+		    THEN prdom.codmin
+		    ELSE prres.codmin
+		  END) AS codprovincia,
+		  (
+		  CASE
+		    WHEN prres.codprovincia IN ('254','255')
+		    THEN prdom.codmin
+		      || ' - '
+		      || prdom.strdenominazione
+		    ELSE prres.codmin
+		      || ' - '
+		      || prres.strdenominazione
+		  END) AS provincia,
+		  (
+		  CASE
+		    WHEN prres.codprovincia IN ('254','255')
+		    THEN prdom.codprovincia
+		    ELSE prres.codprovincia
+		  END) AS codprovinciasil
+		FROM de_provincia prdom,
+		  de_provincia prres,
+		  de_comune comres,
+		  de_comune comdom,
+		  an_lavoratore an
+		WHERE an.codcomdom  = comdom.codcom
+		AND comdom.codprovincia = prdom.codprovincia
+		AND an.codcomres        = comres.codcom
+		AND comres.codprovincia = prres.codprovincia
+	   AND An.Cdnlavoratore  = ?"  />
+			
+<STATEMENT name="CDD_COMBO_PF_OCCUP"
+	query="select Codpfcondoccup as codice, 
+           Codpfcondoccup || ' - ' || Strdescrizione || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                    '') as descrizione 
+           from Mn_Pf_Condoccup" />
+           
+<STATEMENT name="CDD_COMBO_PF_POSIZIONE"
+	query="select Codpfposizioneprof as codice, 
+           Codpfposizioneprof || ' - ' || Strdescrizione || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                    '') as descrizione  
+           from Mn_Pf_Posizioneprof" />
+           
+<STATEMENT name="CDD_COMBO_PF_ISCRCORSO"
+	query="select Codpfiscrcorso as codice, 
+           Codpfiscrcorso || ' - ' || Strdescrizione || DECODE(SYSDATE,    
+                                    GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)',
+                                    LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),' (scaduto)', 
+                                    '') as descrizione  
+           from Mn_Pf_Iscrcorso" />
+ 
+<STATEMENT name="CDD_INSERT_AM_CONF_DID"
+	query="
+	INSERT INTO AM_CONFERIMENTO_DID (
+  		PRGCONFERIMENTODID  ,
+		CDNLAVORATORE , 
+		DATDID , 
+		CODPFTIPOEVENTO,   
+		CODENTETIT ,  
+		CODMONOSTATOINVIO, 
+		NUMETA  ,
+		STRSESSO ,    
+		CODPFCITTADINANZA , 
+		CODTITOLO  , 
+		CODPFCONDOCCUP  , 
+		NUMMESIDISOCC , 
+		NUMMESIRICERCALAV  , 
+		CODPFISCRCORSO  , 
+		CODPROVINCIARES , 
+		CODPFPRESENZAIT , 
+		FLGESPLAVORO  , 
+		CODPFPOSIZIONEPROF  , 
+		NUMNUCLEOFAM  , 
+		FLGFIGLIACARICO  , 
+		FLGFIGLIMINORENNI
+	)VALUES	(
+		?,
+		?,
+		to_date(?, 'dd/mm/yyyy'),
+		?,
+		?,
+		?,
+		to_number(?),
+		?,
+		?,
+		?,
+		?,
+		to_number(?),
+		to_number(?),
+		?,
+		?,
+		?,
+		?,
+		?,
+		to_number(?),
+		?,
+		?
+	)" />
+	
+	
+<STATEMENT name="GET_NEW_PRGCONFERIMENTODID"
+	query="SELECT S_AM_CONFERIMENTO_DID.nextVal as PRGCONFERIMENTODID from dual" />
+
+<STATEMENT name="GET_NUMKLOCONFDID"
+	query="SELECT NUMKLOCONFDID FROM AM_CONFERIMENTO_DID WHERE PRGCONFERIMENTODID = ?" />
+
+<STATEMENT name="CDD_UPDATE_AM_CONF_DID"
+	query="
+	UPDATE AM_CONFERIMENTO_DID 
+	set NUMKLOCONFDID = to_number(?) + 1,
+	DTMINVIO = sysdate,
+	CODMONOSTATOINVIO = ?, 
+	IDSPROFILING = ?,
+	CODPFCONDOCCUP_CALC = ?,
+	NUMMESIDISOCC_CALC = to_number(?), 
+	DECPROFILING = to_number(?, '9.9999999999'), 
+	DATPROFILING = to_date(?, 'dd/mm/yyyy') 
+	WHERE PRGCONFERIMENTODID = ?" />
+	
+<STATEMENT name="CDD_UPDATE_AM_CONF_DID_PROFILING"
+	query="
+	UPDATE AM_CONFERIMENTO_DID set 
+		NUMKLOCONFDID = to_number(?) + 1,
+		DTMINVIO = sysdate,
+		CODMONOSTATOINVIO = ?, 
+		IDSPROFILING = ?,
+		CODPFCONDOCCUP_CALC = ?,
+		NUMMESIDISOCC_CALC = to_number(?), 
+		DECPROFILING = to_number(?, '9.9999999999'), 
+		DATPROFILING = to_date(?, 'dd/mm/yyyy'), 
+   		NUMETA = to_number(?),
+		STRSESSO = ?,    
+		CODPFCITTADINANZA = ?, 
+		CODTITOLO  = ?, 
+		CODPFCONDOCCUP  = ?, 
+		NUMMESIDISOCC =to_number(?), 
+		NUMMESIRICERCALAV =to_number(?) , 
+		CODPFISCRCORSO  = ?, 
+		CODPROVINCIARES = ?, 
+		CODPFPRESENZAIT = ?, 
+		FLGESPLAVORO  = ?, 
+		CODPFPOSIZIONEPROF  = ?, 
+		NUMNUCLEOFAM  =to_number(?), 
+		FLGFIGLIACARICO  = ?, 
+		FLGFIGLIMINORENNI = ?
+	WHERE PRGCONFERIMENTODID = ?" />
+	
+<STATEMENT name="ST_CONFIG_CONF_DID" 
+	query=" select strvalore, ts_generale.codprovinciasil
+				from ts_config_loc, de_tipo_config, ts_generale
+				where ts_generale.codprovinciasil = ts_config_loc.strcodrif
+				and de_tipo_config.codtipoconfig = ts_config_loc.codtipoconfig
+				and ts_config_loc.codtipoconfig = 'DTCNFDID'  "/>
+				
+	
+<STATEMENT name="CDD_GET_PROVINCIA_FROM_MIN" 
+	query=" select codprovincia 
+			from de_provincia 
+			where codmin = ? "/>
+			
+			
+			
+<STATEMENT name="GET_ELENCO_CONFERIMENTI_DID_INVIATE" 
+           query="SELECT TO_CHAR(did.PRGCONFERIMENTODID) PRGCONFERIMENTODID, pfte.STRDESCRIZIONE TIPO_CONFERIMENTO, 
+           				 TO_CHAR(did.DTMINVIO, 'DD/MM/YYYY') DATA_INVIO, (cpi.CODCPIMIN || ' - ' || cpi.STRDENOMINAZIONE) CPI, 
+                         did.DECPROFILING PROFILING, did.CDNLAVORATORE, TO_CHAR(did.Datprofiling, 'DD/MM/YYYY') DATA_PROFILING
+				  FROM AM_CONFERIMENTO_DID did, MN_PF_TIPO_EVENTO pfte, MN_ST_CPI cpi
+				  WHERE    did.CODPFTIPOEVENTO = pfte.CODPFTIPOEVENTO 
+				  AND      did.CODENTETIT = cpi.CODCPIMIN
+				  AND      TRUNC(did.DATDID) = TO_DATE(?, 'DD/MM/YYYY')
+				  AND      did.CDNLAVORATORE = ?
+				  AND      did.CODMONOSTATOINVIO = 'I'
+				  ORDER BY did.PRGCONFERIMENTODID DESC "/>
+				  
+				  

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema  targetNamespace="http://anpal.gov.it/DataModels/InformationDelivery/ConferimentoDID/1.0" elementFormDefault="qualified" attributeFormDefault="qualified" xmlns="http://anpal.gov.it/DataModels/InformationDelivery/ConferimentoDID/1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+           
+  <!-- Modificato da Marianna Borriello in intestazione (xsi) -->         
+  <!-- ################################################################################################### -->
+  <!-- ################################     DEFINIZIONE TIPI ELEMENTI     ################################ -->
+  <!-- ################################################################################################### -->
+  
+  <xs:simpleType name="Esito">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="4"/>
+      <xs:maxLength value="4"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="CodiceFiscaleClassico">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]"/>
+      <xs:minLength value="16"/>
+      <xs:maxLength value="16"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="CodiceFiscaleProvvisorio">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]{11}"/>
+      <xs:minLength value="11"/>
+      <xs:maxLength value="11"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="CodiceFiscale">
+    <xs:union memberTypes="CodiceFiscaleClassico CodiceFiscaleProvvisorio"/>
+  </xs:simpleType>
+   
+  <xs:simpleType name="Genere">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="M"/>
+      <xs:enumeration value="F"/>
+      <!-- 
+        <? M = Maschile ?>
+        <? F = Femminile ?> 
+      -->
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="Eta">
+    <xs:restriction base="xs:int"> 
+      <xs:minInclusive value="15"/>
+    </xs:restriction> 
+  </xs:simpleType>
+  
+  <xs:simpleType name="DurataDisoccupazione">
+    <xs:restriction base="xs:int"> 
+      <xs:minInclusive value="0"/> 
+    </xs:restriction> 
+  </xs:simpleType>
+  
+  <xs:simpleType name="DurataRicercaLavoro">
+    <xs:restriction base="xs:int"> 
+      <xs:minInclusive value="0"/> 
+      <!-- 
+        <? se la durataRicercaLavoro indicata dal soggetto è minore di un mese, il valore accettato è 0 ?>
+        <? se la durataRicercaLavoro indicata dal soggetto è maggiore o uguale a un mese, il valore accettato è esattamente la durata specificata (maggiore di 0) ?>
+      -->
+    </xs:restriction> 
+  </xs:simpleType>
+  
+  <xs:simpleType name="TipoEvento">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="I"/>
+      <xs:enumeration value="C"/>
+      <xs:enumeration value="S"/>
+      <xs:enumeration value="R"/>
+	  <xs:enumeration value="A"/>
+      <!-- 
+        <? I = Inserimento ?>
+        <? C = Convalida ?> 
+        <? S = Sospensione ?> 
+        <? R = Revoca ?> 
+		<? A = Annulla ?> 
+      -->
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="Applicazione">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NCN"/>
+      <xs:enumeration value="BAT"/>
+      <xs:enumeration value="WEB"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  
+  <!-- ################################################################################################### -->
+  <!-- ##################### DEFINIZIONE STRUTTURE INPUT/OUTPUT PER OGNI OPERAZIONE ###################### -->
+  <!-- ################################################################################################### -->
+  
+  
+  <!-- ########################################### GestisciDID ########################################### -->
+  
+  <!-- ############################################## INPUT ############################################## -->
+  
+  <xs:element name="GestisciDID_Input" type="GestisciDID_Input" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+  <xs:complexType name="GestisciDID_Input">
+    <xs:sequence>
+      <xs:element name="VariabiliDiProfiling" type="VariabiliDiProfiling" nillable="true" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="InformazioniDID" type="InformazioniDID" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="GUIDOperatore" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="CodiceFiscaleOperatore" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="Applicazione" type="Applicazione" nillable="false" minOccurs="1" maxOccurs="1"/>    
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="VariabiliDiProfiling">
+    <xs:sequence>
+       <xs:element name="Eta" type="Eta" nillable="true" minOccurs="1" maxOccurs="1"/>
+       <xs:element name="Genere" type="Genere" nillable="true" minOccurs="1" maxOccurs="1"/>
+       <xs:element name="Cittadinanza" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+       <xs:element name="DurataPresenzaInItalia" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+       <xs:element name="TitoloDiStudio" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+       <xs:element name="ProvinciaDiResidenza" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>  
+       <xs:element name="HaMaiAvutoUnLavoro" type="xs:boolean" nillable="true" minOccurs="1" maxOccurs="1"/>
+       <xs:element name="CondizioneOccupazionaleUnAnnoPrima" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>      
+       <xs:element name="DaQuantiMesiConclusoUltimoRappLavoro" type="DurataDisoccupazione" nillable="true" minOccurs="1" maxOccurs="1"/>
+       <xs:element name="PosizioneProfessioneUltimaOccupazione" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>       
+       <xs:element name="DaQuantiMesiStaCercandoLavoro" type="DurataRicercaLavoro" nillable="true" minOccurs="1" maxOccurs="1"/> 
+       <xs:element name="AttualmenteIscrittoScuolaUniversitaOCorsoFormazione" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/> 
+       <xs:element name="NumeroComponentiFamiglia" type="xs:int" nillable="true" minOccurs="1" maxOccurs="1"/>          
+       <xs:element name="PresenzaFigliACarico" type="xs:boolean" nillable="true" minOccurs="1" maxOccurs="1"/>          
+       <xs:element name="PresenzaFigliACaricoMeno18Anni" type="xs:boolean" nillable="true" minOccurs="1" maxOccurs="1"/> 
+       <xs:element name="CondizioneOccupazionaleAnnoPrecedenteCalcolata" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+       <xs:element name="DurataDisoccupazioneCalcolata" type="DurataDisoccupazione" nillable="true" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="InformazioniDID">
+    <xs:sequence>
+      <xs:element name="CodiceFiscale" type="CodiceFiscale" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="TipoEvento" type="TipoEvento" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="DataEvento" type="xs:dateTime" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="DataDID" type="xs:dateTime" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="CodiceEntePromotore" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>      
+    </xs:sequence>
+  </xs:complexType>
+  
+  
+  <!-- ############################################# OUTPUT ############################################## -->
+  
+  <xs:element name="GestisciDID_Output" type="GestisciDID_Output"/>
+  <xs:complexType name="GestisciDID_Output">
+    <xs:sequence>
+      <xs:element name="Profiling" type="Profiling" nillable="true" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="InformazioniDID" type="InformazioniDID" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="Esito" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="Profiling">
+    <xs:sequence>
+     <xs:element name="IDSProfiling" type="xs:long" nillable="false" minOccurs="1" maxOccurs="1"/>
+     <xs:element name="CodiceFiscale" type="CodiceFiscale" nillable="false" minOccurs="1" maxOccurs="1"/>
+     <xs:element name="Eta" type="Eta" nillable="false" minOccurs="1" maxOccurs="1"/>
+     <xs:element name="Genere" type="Genere" nillable="false" minOccurs="1" maxOccurs="1"/>
+     <xs:element name="Cittadinanza" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+     <xs:element name="DurataPresenzaInItalia" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+     <xs:element name="TitoloDiStudio" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+     <xs:element name="ProvinciaDiResidenza" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/> 
+     <xs:element name="RegioneDiResidenza" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/> 
+     <xs:element name="HaLavoratoAlmenoUnaVolta" type="xs:boolean" nillable="false" minOccurs="1" maxOccurs="1"/>
+     <xs:element name="CondizioneProfessionaleAnnoPrecedente" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+     <xs:element name="DurataDellaDisoccupazione" type="DurataDisoccupazione" nillable="true" minOccurs="1" maxOccurs="1"/>
+     <xs:element name="PosizioneUltimaOccupazione" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>       
+     <xs:element name="DurataRicercaLavoro" type="DurataRicercaLavoro" nillable="false" minOccurs="1" maxOccurs="1"/> 
+     <xs:element name="AttualmenteIscrittoScuolaUniversitaOCorsoFormazione" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/> 
+     <xs:element name="NumeroComponentiFamiglia" type="xs:int" nillable="false" minOccurs="1" maxOccurs="1"/>          
+     <xs:element name="PresenzaFigliACarico" type="xs:boolean" nillable="false" minOccurs="1" maxOccurs="1"/>          
+     <xs:element name="PresenzaFigliMinoriACarico" type="xs:boolean" nillable="true" minOccurs="1" maxOccurs="1"/> 
+     <xs:element name="Probabilita" type="xs:decimal" nillable="false" minOccurs="1" maxOccurs="1"/> 
+     <xs:element name="DataInserimento" type="xs:dateTime" nillable="false" minOccurs="1" maxOccurs="1"/> 
+     <xs:element name="CondizioneOccupazionaleAnnoPrecedenteCalcolata" type="xs:string" nillable="true" minOccurs="1" maxOccurs="1"/>
+     <xs:element name="DurataDisoccupazioneCalcolata" type="DurataDisoccupazione" nillable="true" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+   </xs:complexType>
+  
+</xs:schema>

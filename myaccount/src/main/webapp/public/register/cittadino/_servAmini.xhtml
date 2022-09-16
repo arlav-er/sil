@@ -1,0 +1,188 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<h5>
+		<p:selectBooleanCheckbox id="enableServAmiCheck" value="#{registerCittadino.untenteInfo.pfPrincipal.flagAbilitatoServizi}"
+			widgetVar="enableServAmiCheckWV">
+			<p:ajax event="change" listener="#{registerCittadino.canAbilitatoServizi}" 
+				process="@this" update="@this servAmini comuneResidenza comuneResidenzaLabel" oncomplete="pop()" />
+		</p:selectBooleanCheckbox>
+		#{ui['regCit.efetServAmini']}
+	</h5>
+	<p>#{ui['regCit.efetServAminiDes']}</p>
+	
+	<h:panelGroup id="servAmini">
+		<h:panelGroup rendered="#{registerCittadino.untenteInfo.pfPrincipal.flagAbilitatoServizi}">
+			<div class="uk-panel uk-panel-box">
+				<p><h:outputText value="#{ui['regCit.servAminiTip1']}" escape="false" rendered="#{not utils.isUmbria()}"/></p>
+				<p><h:outputText value="#{ui['regCit.servAminiTipUM1']}" rendered="#{utils.isUmbria()}"/></p>
+				<p><h:outputText value="#{ui['regCit.servAminiTip2']}" escape="false" rendered="#{not utils.isUmbria()}"/></p>
+				<p><h:outputText value="#{ui['regCit.servAminiTipUM2']}" escape="false" rendered="#{utils.isUmbria()}"/></p>
+				<p><h:outputText value="#{ui['regCit.servAminiTip3']}" escape="false" rendered="#{not utils.isUmbria()}"/></p>
+			</div>
+			
+			<div class="form-group">
+				<p:outputLabel value="#{ui['prof.abilitaPec']}" for="abilitaPecRadio" 
+					styleClass="col-md-8 control-label text-muted"  rendered="#{not utils.isUmbria()}"/>
+				<div class="col-md-4">
+					<p:selectOneRadio id="abilitaPecRadio" required="#{not utils.isUmbria()}" rendered="#{not utils.isUmbria()}"
+						requiredMessage="#{ui['prof.abilitaPecRequired']}"
+						value="#{registerCittadino.untenteInfo.pfPrincipal.flagAbilitaPec}" >
+						<p:ajax event="change" process="@this" oncomplete="pop()"
+							update="servAmini"></p:ajax>
+						<f:selectItem itemLabel="#{ui['shared.si']}" itemValue="true" />
+						<f:selectItem itemLabel="#{ui['shared.no']}" itemValue="false" />
+					</p:selectOneRadio>
+				</div>
+				<p:message id="abilitaPecMessage" for="abilitaPecRadio" />
+			</div>
+			
+			<h:panelGroup rendered="#{not empty registerCittadino.untenteInfo.pfPrincipal.flagAbilitaPec}">
+				<ui:fragment rendered="#{registerCittadino.untenteInfo.pfPrincipal.flagAbilitaPec}">
+					<div class="form-group">
+						<p:outputLabel value="#{ui['regCit.emailPec']}" styleClass="col-lg-2 control-label" for="emailPec" />
+						<div class="col-lg-10">
+							<p:inputText id="emailPec" value="#{registerCittadino.untenteInfo.emailPEC}" validator="uniqueEmailValidator" maxlength="80"
+								styleClass="form-control" widgetVar="emailPecWV" required="true">
+								<f:attribute name="pec" value="true" />
+								<o:validator validatorId="javax.faces.RegularExpression" pattern="#{validation['pattern.email']}"
+									message="#{validation['message.email']}" />
+							</p:inputText>
+							<p:message id="emailPecMessage" for="emailPec"></p:message>
+						</div>
+					</div>
+				</ui:fragment>
+			<h:panelGroup rendered="#{registerCittadino.cfObbligatorio() == false}">
+				<div class="form-group">
+					<p:outputLabel value="#{ui['shared.cf']}" styleClass="col-lg-2 control-label" for="codiceFiscale" />
+					<div class="col-lg-10">
+						<p:inputText id="codiceFiscale" value="#{registerCittadino.untenteInfo.codiceFiscale}" maxlength="16" required="true"
+							styleClass="form-control" validator="codiceFiscaleValidator" widgetVar="codiceFiscaleWV">
+							<f:attribute name="type" value="persona"></f:attribute>
+						</p:inputText>
+						<p:message id="codiceFiscaleMessage" for="codiceFiscale"></p:message>
+					</div>
+				</div>
+			</h:panelGroup>
+				<div class="form-group">
+					<p:outputLabel value="#{ui['shared.dataNascita']}" styleClass="col-lg-2 control-label" for="dataNascita" />
+					<div class="col-lg-10">
+						<p:calendar id="dataNascita" mindate="#{utils.minCalendarDate}" maxdate="#{utils.maxCalendarDate}" pagedate="#{utils.calendarDate}"
+							label="#{ui['shared.dataNascita']}" navigator="true" pattern="#{ui['shared.dateFormat']}"
+							value="#{registerCittadino.untenteInfo.dtNascita}" converterMessage="#{ui['shared.dateNotValid']}" size="20" required="true"
+							styleClass="form-control" widgetVar="dataNascitaWV" locale="it" validator="dateValidator">
+							<f:convertDateTime type="date" pattern="#{ui['shared.dateFormat']}" />
+						</p:calendar>
+						<p:message id="dataNascitaMessage" for="dataNascita"></p:message>
+						<span class="help-block m-b-none">#{ui['shared.example']}: <h:outputFormat value="#{utils.calendarDate}">
+								<f:convertDateTime type="date" pattern="#{ui['shared.dateFormat']}" />
+							</h:outputFormat>
+						</span>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<p:outputLabel value="#{ui['shared.cittadinanza']}" styleClass="col-lg-2 control-label" for="cittadinanza" />
+					<div class="col-lg-10">
+						<p:autoComplete id="cittadinanza" required="true" value="#{registerCittadino.untenteInfo.deCittadinanza}"
+							converter="deCittadinanzaConverter" forceSelection="true" var="cittadinanza" itemLabel="#{cittadinanza.descrizione}"
+							itemValue="#{cittadinanza}" completeMethod="#{decodificheAutoComplete.completeCittadinanza}" size="55"
+							emptyMessage="#{ui['shared.emptyAutoComplete']}" styleClass="form-control" minQueryLength="3" widgetVar="cittadinanzaWV">
+							<p:ajax event="itemSelect" update="documents" />
+						</p:autoComplete>
+						<p:message id="cittadinanzaMessage" for="cittadinanza"></p:message>
+					</div>
+				</div>
+
+				<h:panelGroup id="documents">
+					<h:panelGroup rendered="#{registerCittadino.untenteInfo.deCittadinanza.flgCee == 'S'}">
+						<div class="form-group">
+							<p:outputLabel value="#{ui['regCit.documentoIdentita']}" styleClass="col-lg-2 control-label" for="documentoIdentita" />
+							<div class="col-lg-10">
+								<p:inputText id="documentoIdentita" value="#{registerCittadino.untenteInfo.documentoIdentita}" required="true"
+									label="#{ui['regCit.documentoIdentita']}" styleClass="form-control" widgetVar="documentoIdentitaWV">
+								</p:inputText>
+								<p:message id="documentoIdentitaMessage" for="documentoIdentita" />
+							</div>
+						</div>
+					</h:panelGroup>
+		
+					<h:panelGroup rendered="#{registerCittadino.untenteInfo.deCittadinanza.flgCee == 'N'}">
+						<div class="form-group">
+							<p:outputLabel value="#{ui['regCit.titoloSoggiorno']}" styleClass="col-lg-2 control-label" for="documentoSoggiorno" />
+							<div class="col-lg-10">
+								<p:selectOneMenu id="documentoSoggiorno" value="#{registerCittadino.untenteInfo.documentoSoggiorno}"
+									converter="deTitoloSoggiornoConverter" required="true" styleClass="form-control" style="width: 100%;"
+									widgetVar="documentoSoggiornoWV">
+									<f:selectItem itemLabel="" itemValue="" />
+									<f:selectItems value="#{decodificheBean.deTitoloSoggiorni}" var="titolo" itemLabel="#{titolo.descrizione}" itemValue="#{titolo}" />
+									<p:ajax update="groupAssicurata docSoggTip" listener="#{registerCittadino.titoloSoggiornoChanged}" />
+								</p:selectOneMenu>
+								<p:message for="documentoSoggiorno" id="documentoSoggiornoMessage" />
+								<h:panelGroup id="docSoggTip">
+									<h:panelGroup rendered="#{registerCittadino.inRinnovoTip}">
+										<span class="help-block m-b-none"> #{ui['regCit.inRinnovoTip']} </span>
+									</h:panelGroup>
+									<h:panelGroup rendered="#{registerCittadino.inAttesaPerTip}">
+										<span class="help-block m-b-none"> #{ui['regCit.inAttesaPerTip']} </span>
+									</h:panelGroup>
+									<h:panelGroup rendered="#{registerCittadino.cartaPerTip}">
+										<span class="help-block m-b-none"> #{ui['regCit.cartaPerTip']} </span>
+									</h:panelGroup>
+								</h:panelGroup>
+							</div>
+						</div>
+					</h:panelGroup>
+				</h:panelGroup>
+	
+				<div class="form-group">
+					<p:outputLabel value="#{ui['shared.numeroDocumento']}" styleClass="col-lg-2 control-label" for="numeroDocumento" />
+					<div class="col-lg-10">
+						<p:inputText id="numeroDocumento" value="#{registerCittadino.untenteInfo.numeroDocumento}" required="true" styleClass="form-control"
+							widgetVar="numeroDocumentoWV" />
+						<p:message for="numeroDocumento" id="numeroDocumentoMessage" />
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<p:outputLabel value="#{ui['shared.dataScadenza']}" styleClass="col-lg-2 control-label" for="dataScadenza" />
+					<div class="col-lg-10">
+						<p:calendar id="dataScadenza" value="#{registerCittadino.untenteInfo.dataScadenzaDocumento}"
+							converterMessage="#{ui['shared.dateNotValid']}" size="20" required="true" styleClass="form-control" navigator="true"
+							pattern="#{ui['shared.dateFormat']}" label="#{ui['shared.dataScadenza']}" widgetVar="dataScadenzaWV" locale="it"
+							validator="dateValidator">
+							<f:convertDateTime type="date" pattern="#{ui['shared.dateFormat']}" />
+						</p:calendar>
+						<p:message for="dataScadenza" id="dataScadenzaMessage" />
+					</div>
+				</div>
+
+				<h:panelGroup id="groupAssicurata">
+					<h:panelGroup rendered="#{registerCittadino.rinnovoTitoloSoggiorno}">
+						<div class="form-group">
+							<p:outputLabel value="#{ui['regCit.numeroassicurataRaccomandata']}" styleClass="col-lg-2 control-label" for="numeroAssicurata" />
+							<div class="col-lg-10">
+								<p:inputText id="numeroAssicurata" value="#{registerCittadino.untenteInfo.numeroAssicurata}"
+									label="#{ui['regCit.numeroassicurataRaccomandata']}" required="true" styleClass="form-control">
+								</p:inputText>
+								<p:message id="numeroAssicurataMessage" for="numeroAssicurata" />
+							</div>
+						</div>
+		
+						<div class="form-group">
+							<p:outputLabel value="#{ui['regCit.dataAssicurataRaccomandata']}" for="dataAssicurata" styleClass="col-lg-2 control-label" />
+							<div class="col-lg-10">
+								<p:calendar id="dataAssicurata" value="#{registerCittadino.untenteInfo.dataAssicurata}"
+									converterMessage="#{ui['shared.dateNotValid']}" size="20" required="true" styleClass="form-control" navigator="true"
+									pattern="#{ui['shared.dateFormat']}" label="#{ui['regCit.dataAssicurataRaccomandata']}" locale="it" validator="dateValidator">
+									<f:convertDateTime type="date" pattern="#{ui['shared.dateFormat']}" />
+								</p:calendar>
+								<p:message id="dataAssicurataMessage" for="dataAssicurata" />
+							</div>
+						</div>
+					</h:panelGroup>
+				</h:panelGroup>
+			</h:panelGroup>
+		</h:panelGroup>
+	</h:panelGroup>
+</ui:composition>

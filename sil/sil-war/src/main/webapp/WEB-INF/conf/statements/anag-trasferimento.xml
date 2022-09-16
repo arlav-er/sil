@@ -1,0 +1,123 @@
+<STATEMENT
+   name="DE_STATO_PRESA_ATTO"
+   query="SELECT codstatopresaatto AS codice,
+                 strdescrizione
+                    || DECODE (SYSDATE,
+                           GREATEST (SYSDATE, datinizioval, datfineval), '(scaduto)',
+                           LEAST (SYSDATE, datinizioval, datfineval), '(scaduto)',
+                           ''
+                          ) AS descrizione
+            FROM de_stato_presa_atto
+"/>
+
+
+<STATEMENT
+   name="RICHIESTA_PRESA_ATTO"
+   query="
+SELECT TO_CHAR (prgpresaatto) AS prgpresaatto, TO_CHAR (cdnlavoratore) AS cdnlavoratore,
+       strcodicefiscale, strcognome, strnome, TO_CHAR (datnasc, 'dd/mm/yyyy') AS datnasc,
+       TO_CHAR (dattrasferimento, 'dd/mm/yyyy') AS dattrasferimento, codcpirich, codstatopresaatto,
+       codComDom, strIndirizzoDom, de_comune.strdenominazione || ' ('||de_provincia.strtarga||')'AS desccomdom,
+       de_cpi.strdescrizione as descCpiRich, de_comune.STRCAP
+  FROM ca_presa_atto, de_cpi, de_comune, de_provincia
+ WHERE prgpresaatto = ?
+   AND ca_presa_atto.codcomdom = de_comune.codcom
+   AND de_comune.codprovincia = de_provincia.codprovincia
+   AND de_cpi.codCpi = codCpiRich
+"/>
+
+<!-- potrebbero esserci trasferimenti con la stessa data. In questo caso bisogna prendere quello inserito per ultimo -->
+<STATEMENT
+   name="ULTIMA_RICHIESTA_PRESA_ATTO"
+   query="
+SELECT TO_CHAR (prgpresaatto) AS prgpresaatto, TO_CHAR (cdnlavoratore) AS cdnlavoratore,
+       strcodicefiscale, strcognome, strnome, TO_CHAR (datnasc, 'dd/mm/yyyy') AS datnasc,
+       TO_CHAR (dattrasferimento, 'dd/mm/yyyy') AS dattrasferimento, codcpirich, codstatopresaatto,
+       codComDom, strIndirizzoDom, de_comune.strdenominazione || ' ('||de_provincia.strtarga||')'AS desccomdom,
+       de_cpi.strdescrizione as descCpiRich, de_comune.STRCAP
+  FROM ca_presa_atto, de_cpi, de_comune, de_provincia
+ WHERE cdnlavoratore = ?
+   AND de_cpi.codCpi = codCpiRich
+   AND ca_presa_atto.codcomdom = de_comune.codcom
+   AND de_comune.codprovincia = de_provincia.codprovincia
+   AND prgpresaatto =
+          (SELECT c2.prgpresaatto
+             FROM (SELECT   c1.prgpresaatto
+                       FROM ca_presa_atto c1
+                      WHERE c1.cdnlavoratore = ? AND c1.codstatopresaatto='AT'
+                   ORDER BY c1.dattrasferimento DESC, c1.dtmins DESC) c2
+            WHERE ROWNUM = 1)
+"/>
+
+<STATEMENT
+   name="LISTA_RICHIESTE_PRESA_ATTO_LAV"
+   query="
+SELECT TO_CHAR (prgpresaatto) AS prgpresaatto, TO_CHAR (cdnlavoratore) AS cdnlavoratore,
+       strcodicefiscale, strcognome, strnome, TO_CHAR (datnasc, 'dd/mm/yyyy') AS datnasc,
+       TO_CHAR (dattrasferimento, 'dd/mm/yyyy') AS dattrasferimento, codcpirich, codstatopresaatto,
+       codComDom, strIndirizzoDom, de_comune.strdenominazione as descComDom,       
+       numklopresaatto, de_cpi.codprovincia
+  FROM ca_presa_atto, de_cpi, de_comune
+ WHERE cdnlavoratore = ? AND codcpirich = de_cpi.codcpi AND codstatopresaatto = 'AT'
+   AND ca_presa_atto.codcomdom = de_comune.codcom
+"/>
+
+<STATEMENT
+   name="ANNULLA_RICHIESTA_PRESA_ATTO"
+   query="
+update ca_presa_atto set numKloPresaAtto = ?, codstatopresaatto = 'AN' where prgpresaatto = ?
+"/>
+<!-- TODO da cancellare -->
+<STATEMENT
+   name="INFO_CPI_LOCALE"
+   query="
+select codcpicapoluogo, strdenominazione from ts_generale, de_provincia where codprovinciasil = codprovincia
+"/>
+
+<STATEMENT
+   name="INFO_DE_CPI"
+   query="
+select codcpi, strdescrizione from de_cpi where codcpi = ?
+"/>
+<STATEMENT
+   name="COD_PROVINCIA_CPI"
+   query="
+select de_cpi.CODCPI, de_provincia.codprovincia, de_provincia.strdenominazione as provincia from de_cpi, de_provincia 
+ where codcpi = ?
+   and de_cpi.codprovincia = de_provincia.codprovincia
+"/>
+<STATEMENT
+   name="GET_CA_INFO_TRASFERIMENTO" 
+   query="
+SELECT prginfotrasferimento,strcodicefiscale, strnome,strcognome,
+	   decode(ca_info_trasferimento.codstatooccupaz,null,null,
+          ca_info_trasferimento.codstatooccupaz
+       || ' - '
+       || de_stato_occupaz.strdescrizione) AS statooccupazionale,
+       TO_CHAR (datanzianitadisoc, 'dd/mm/yyyy') AS datanzianitadisoc, nummesianzianita,
+       nummesisosp, 
+       to_char(DATDATAINIZIO68_1, 'dd/mm/yyyy') DATDATAINIZIO68_1, to_char(DATANZIANITA68_1, 'dd/mm/yyyy') DATANZIANITA68_1, 
+       CASE when ma1.cod_categoria is not null
+            then (cm1.STRDESCRIZIONE || ' (Min: ' || mn1.des_categoria || ')')	     
+          else cm1.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+       end as cmTipoIscr_1,
+       to_char(DATDATAINIZIO68_2, 'dd/mm/yyyy') DATDATAINIZIO68_2, to_char(DATANZIANITA68_2, 'dd/mm/yyyy') DATANZIANITA68_2, 
+       CASE
+       when ma2.cod_categoria != '0'
+            then (cm2.STRDESCRIZIONE || ' (Min: ' || mn2.des_categoria || ')')	     
+          else cm2.STRDESCRIZIONE
+       end as cmTipoIscr_2,
+       cdnutins, cdnutmod, TO_CHAR (dtmins, 'dd/mm/yyyy hh24:mi') AS dtmins,
+       TO_CHAR (dtmmod, 'dd/mm/yyyy hh24:mi') AS dtmmod
+  FROM ca_info_trasferimento, de_stato_occupaz, 
+       DE_CM_TIPO_ISCR cm1, ma_cat_protette ma1, mn_cat_protette mn1,
+       DE_CM_TIPO_ISCR cm2, ma_cat_protette ma2, mn_cat_protette mn2
+ WHERE ca_info_trasferimento.codstatooccupaz = de_stato_occupaz.codstatooccupaz(+)
+   AND ca_info_trasferimento.CODCMTIPOISCR68_1 = cm1.CODCMTIPOISCR(+)
+   AND ca_info_trasferimento.CODCMTIPOISCR68_2 = cm2.CODCMTIPOISCR(+)
+   and cm1.Codcmtipoiscr = ma1.codcmtipoiscr (+)
+   and ma1.cod_categoria = mn1.cod_categoria (+)
+   and cm2.Codcmtipoiscr = ma2.codcmtipoiscr (+)
+   and ma2.cod_categoria = mn2.cod_categoria (+)
+   AND prginfotrasferimento = ?
+"/>

@@ -1,0 +1,220 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core" xmlns:o="http://omnifaces.org/ui">
+	<h3 class="uk-margin-large-bottom">
+		#{ui['tirocini.title']} <br /> <small>#{ui['tirocini.subtitle']}</small>
+		<div class="pull-right">
+			<a href="list" class="btn ui-button btn-primary btn-grey uk-padding-large-left uk-padding-large-right navYuri pull-right"
+				title="#{ui['shared.back']}"> <i class="fa fa-arrow-left"></i>
+			</a>
+		</div>
+	</h3>
+
+	<h:form>
+		<p:remoteCommand name="initCreate" actionListener="#{aziendaTirociniBean.initCreate()}" autoRun="true" update=":mainForm" process="@this" oncomplete="comeToYuri()"></p:remoteCommand>
+		<p:remoteCommand name="initEdit" actionListener="#{aziendaTirociniBean.initEdit()}" update=":mainForm" process="@this" oncomplete="comeToYuri()"></p:remoteCommand>
+	</h:form>
+	<h:form id="mainForm" styleClass="form-horizontal">
+
+		<div class="row">
+			<!-- dati offerta -->
+			<div class="col-md-6">
+				<div class="panel panel-warning">
+					<div class="panel-heading">#{ui['tirocini.datiOfferta']}</div>
+					<div class="panel-body">
+						<div class="form-group">
+							<p:outputLabel for="numFigProf" value="#{ui['tirocini.numFigProf']}" styleClass="col-md-3 control-label" />
+							<div class="col-md-9">
+								<p:inputMask id="numFigProf" value="#{aziendaTirociniBean.doTirocini.numFigureProf}" mask="9?9999" required="true"
+									label="#{ui['tirocini.numFigProf']}" maxlength="5" styleClass="form-control" slotChar="" requiredMessage="Campo obbligatorio" />
+								<p:message id="numFigProfMessage" for="numFigProf"></p:message>
+							</div>
+						</div>
+						<div class="form-group">
+							<p:outputLabel for="dataRichiesta" value="#{ui['tirocini.dataRichiesta']}" styleClass="col-md-3 control-label" />
+							<div class="col-md-9">
+								<p:calendar id="dataRichiesta" value="#{aziendaTirociniBean.doTirocini.dataRichiesta}" label="#{ui['tirocini.dataRichiesta']}"
+									navigator="true" pattern="#{ui['shared.dateFormat']}" converterMessage="#{ui['shared.dateNotValid']}" size="20" required="true"
+									styleClass="form-control" locale="it" validator="dateValidator" requiredMessage="Campo obbligatorio">
+									<f:convertDateTime type="date" pattern="#{ui['shared.dateFormat']}" />
+								</p:calendar>
+								<p:message id="dataRichiestaMessage" for="dataRichiesta"></p:message>
+							</div>
+						</div>
+
+						<legend> #{ui['tirocini.rifAzienda']} </legend>
+						<div class="form-group">
+							<p:outputLabel value="#{ui['shared.name']}" styleClass="col-md-3 control-label" />
+							<div class="col-md-9">
+								<div class="form-control-static">#{aziendaTirociniBean.pfPrincipal.aziendaInfo.nomeRic}</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<p:outputLabel value="#{ui['shared.lastname']}" styleClass="col-md-3 control-label" />
+							<div class="col-md-9">
+								<div class="form-control-static">#{aziendaTirociniBean.pfPrincipal.aziendaInfo.cognomeRic}</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<p:outputLabel value="#{ui['shared.delegato']}" styleClass="col-md-3 control-label" for="delegato" />
+							<div class="col-md-9">
+								<p:inputText id="delegato" value="#{aziendaTirociniBean.doTirocini.tipoDelegatoRifAzienda}" styleClass="form-control" required="true"
+									maxlength="100" requiredMessage="Campo obbligatorio"/>
+								<p:message id="delegatoMessage" for="delegato"></p:message>
+							</div>
+						</div>
+
+						<legend> #{ui['tirocini.rif']} </legend>
+						<div class="form-group">
+							<p:outputLabel value="#{ui['shared.cfPiva']}" styleClass="col-md-3 control-label" for="cfRif" />
+							<div class="col-md-9">
+								<p:inputText id="cfRif" value="#{aziendaTirociniBean.doTirocini.cfRif}" validator="codiceFiscaleValidator" styleClass="form-control"
+									maxlength="16" required="true" requiredMessage="Campo obbligatorio" />
+								<p:message id="cfRifMessage" for="cfRif"></p:message>
+							</div>
+						</div>
+						<div class="form-group">
+							<p:outputLabel value="#{ui['shared.ragSoc']}" styleClass="col-md-3 control-label" for="ragSocRif" />
+							<div class="col-md-9">
+								<p:inputText id="ragSocRif" value="#{aziendaTirociniBean.doTirocini.ragSocRif}" styleClass="form-control" maxlength="100"
+									required="true" requiredMessage="Campo obbligatorio" />
+								<p:message id="ragSocRifMessage" for="ragSocRif"></p:message>
+							</div>
+						</div>
+						<div class="form-group">
+							<p:outputLabel value="#{ui['shared.name']}" styleClass="col-md-3 control-label" for="nomeRif" />
+							<div class="col-md-9">
+								<p:inputText id="nomeRif" value="#{aziendaTirociniBean.doTirocini.nomeRif}" styleClass="form-control" maxlength="100" />
+								<p:message id="nomeRifMessage" for="nomeRif"></p:message>
+							</div>
+						</div>
+						<div class="form-group">
+							<p:outputLabel value="#{ui['shared.lastname']}" styleClass="col-md-3 control-label" for="cognomeRif" />
+							<div class="col-md-9">
+								<p:inputText id="cognomeRif" value="#{aziendaTirociniBean.doTirocini.cognomeRif}" styleClass="form-control" maxlength="100" />
+								<p:message id="cognomeRifMessage" for="cognomeRif"></p:message>
+							</div>
+						</div>
+						<div class="form-group">
+							<p:outputLabel value="#{ui['shared.email']}" styleClass="col-md-3 control-label" for="email" />
+							<div class="col-md-9">
+								<p:inputText id="email" value="#{aziendaTirociniBean.doTirocini.emailRif}" styleClass="form-control" label="Email" required="true" requiredMessage="Campo obbligatorio">
+									<o:validator validatorId="javax.faces.RegularExpression"
+										pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-+]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" message="Email non valida." />
+								</p:inputText>
+								<p:message id="emailMessage" for="email"></p:message>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- luogoDiLavoro -->
+			<div class="col-md-6">
+				<div class="panel panel-warning">
+					<div class="panel-heading">#{ui['tirocini.luogoDiLavoro']}</div>
+					<div class="panel-body">
+						<div class="form-group">
+							<p:outputLabel value="#{ui['shared.comune']}" styleClass="col-md-3 control-label" for="comune" />
+							<div class="col-md-9">
+								<p:autoComplete id="comune" value="#{aziendaTirociniBean.doTirocini.deComune}" converter="deComuneConverter" forceSelection="true"
+									var="comune" itemLabel="#{comune.strDenominazioneConTarga}" itemValue="#{comune}" emptyMessage="#{ui['shared.emptyAutoComplete']}"
+									completeMethod="#{autoCompleteBean.completeComune}" minQueryLength="2" styleClass="form-control" />
+								<p:message id="comuneMessage" for="comune"></p:message>
+							</div>
+						</div>
+						<div class="form-group">
+							<p:outputLabel value="#{ui['shared.provincia']}" styleClass="col-md-3 control-label" for="provincia" />
+							<div class="col-md-9">
+								<p:autoComplete id="provincia" value="#{aziendaTirociniBean.doTirocini.deProvincia}" converter="deProvinciaConverter"
+									forceSelection="true" var="provincia" itemLabel="#{provincia.denominazione}" itemValue="#{provincia}"
+									emptyMessage="#{ui['shared.emptyAutoComplete']}" completeMethod="#{autoCompleteBean.completeProvincia}" minQueryLength="2"
+									styleClass="form-control" />
+								<p:message id="provinciaMessage" for="provincia"></p:message>
+								<p:message for="oneOrMore" />
+							</div>
+						</div>
+						<o:validateOneOrMore id="oneOrMore" components="provincia comune" message="è necessario indicare almeno un comune o una provincia" />
+						<div class="form-group">
+							<p:outputLabel value="#{ui['tirocini.cpi']}" styleClass="col-md-3 control-label" for="cpi" />
+							<div class="col-md-9">
+								<p:selectOneMenu id="cpi" value="#{aziendaTirociniBean.doTirocini.deCpi}" style="width: 100%;" styleClass="form-control"
+									converter="deCpiConverter" filter="true" filterMatchMode="contains" required="true" requiredMessage="Campo obbligatorio">
+									<f:selectItem itemLabel="" itemValue="" />
+									<f:selectItems value="#{decodificheBean.findCpiActiveByCurrentRegione()}" var="cpi" itemLabel="#{cpi.descrizione}" itemValue="#{cpi}" />
+								</p:selectOneMenu>
+								<span class="help-block m-b-none">#{ui['tirocini.cpiTip']}</span>
+								<p:message id="cpiMessage" for="cpi"></p:message>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-6">
+				<div class="panel panel-warning">
+					<div class="panel-heading">#{ui['tirocini.ambitoProf']}</div>
+					<div class="panel-body">
+					
+						<div class="form-group">
+							<p:outputLabel value="#{ui['tirocini.qualifSRQ']}" styleClass="col-md-3 control-label" for="qualifSRQ" />
+							<div class="col-md-9">
+								<p:autoComplete id="qualifSRQ" value="#{aziendaTirociniBean.doTirocini.deQualificaSrq}" required="true" forceSelection="true"
+									var="deQualificaSrq" itemLabel="#{deQualificaSrq.descrizione}" itemValue="#{deQualificaSrq}"
+									emptyMessage="#{ui['shared.emptyAutoComplete']}" converter="deQualificaSrqConverter"
+									completeMethod="#{autoCompleteBean.completeQualificaSrq}" styleClass="form-control" requiredMessage="Campo obbligatorio"
+									groupBy="#{autoCompleteBean.completeQualificaSrqGroupBy(deQualificaSrq)}" scrollHeight="200" />
+								<p:message id="qualifSRQMessage" for="qualifSRQ"></p:message>
+							</div>
+						</div>
+						<div class="form-group">
+							<p:outputLabel value="#{ui['tirocini.grupProf']}" styleClass="col-md-3 control-label" for="grupProf" />
+							<div class="col-md-9">
+								<p:autoComplete id="grupProf" value="#{aziendaTirociniBean.doTirocini.deMansione}" required="false" forceSelection="true"
+									var="mansione" itemLabel="#{mansione.descrizione}" itemValue="#{mansione}" emptyMessage="#{ui['shared.emptyAutoComplete']}"
+									converter="deMansioneConverter" completeMethod="#{autoCompleteBean.completeMansione}" styleClass="form-control"
+									requiredMessage="Campo obbligatorio" groupBy="#{autoCompleteBean.completeMansioneGroupBy(mansione)}">
+									<p:ajax event="itemSelect" update="qualifISTAT" process="@this"></p:ajax>
+								</p:autoComplete>								
+								<p:message id="grupProfMessage" for="grupProf"></p:message>
+							</div>
+						</div>
+						<div class="form-group">
+							<p:outputLabel value="#{ui['tirocini.qualifISTAT']}" styleClass="col-md-3 control-label" for="qualifISTAT" />
+							<div class="col-md-9">
+								<p:selectOneMenu id="qualifISTAT" value="#{aziendaTirociniBean.doTirocini.deMansioneMin}" required="false" style="width: 100%"
+									styleClass="form-control" requiredMessage="Campo obbligatorio" converter="deMansioneMinConverter" filter="true"
+									filterMatchMode="contains">
+									<f:selectItem itemLabel="#{empty aziendaTirociniBean.mansioneMinList?'Selezionare prima il Gruppo professionale':''}" itemValue="" />
+									<f:selectItems value="#{aziendaTirociniBean.mansioneMinList}" var="mansioneMin" itemLabel="#{mansioneMin.descrizione}"
+										itemValue="#{mansioneMin}" />
+								</p:selectOneMenu>
+								<span class="help-block m-b-none">#{ui['tirocini.qualifISTATTip']}</span>
+								<p:message id="qualifISTATMessage" for="qualifISTAT"></p:message>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<p:outputLabel value="#{ui['tirocini.titoloDiStudio']}" styleClass="col-md-3 control-label" for="titoloDiStudio" />
+							<div class="col-md-9">
+								<p:autoComplete id="titoloDiStudio" value="#{aziendaTirociniBean.doTirocini.deTitolo}" forceSelection="true" var="titolo"
+									itemLabel="#{titolo.descrizioneParlante}" itemValue="#{titolo}" emptyMessage="#{ui['shared.emptyAutoComplete']}"
+									completeMethod="#{autoCompleteBean.completeTitolo}" minQueryLength="2" styleClass="form-control" converter="deTitoloConverter"
+									groupBy="#{autoCompleteBean.completeTitoloGroupBy(titolo)}" />
+								<p:message id="titoloDiStudioMessage" for="titoloDiStudio"></p:message>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="well text-center">
+			<p:commandLink id="saveBtn" actionListener="#{aziendaTirociniBean.sync}" styleClass="btn btn-primary action-link" update="@(.ui-message)"
+				global="false" onstart="onActionStart()" oncomplete="onActionComplete(); onSyncComplete(xhr, status, args)">
+				<i class="fa fa-check uk-margin-small-right"></i> #{ui['shared.avanti']}
+			</p:commandLink>
+			<a href="list" class="ui-commandlink btn btn-primary action-link navYuri uk-margin-small-left"><i class="fa fa-arrow-left"></i> #{ui['shared.back']}</a>
+		</div>
+	</h:form>
+</ui:composition>
+

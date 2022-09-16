@@ -1,0 +1,180 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:eng="http://java.sun.com/jsf/composite/components">
+
+	<div class="form-group">
+		<p:outputLabel for="gruppoProfessionale:autocomplete" value="Gruppo professionale" styleClass="col-sm-3 control-label">
+			<span class="ui-outputlabel-rfi">*</span>
+		</p:outputLabel>
+		<div class="col-md-9 col-lg-9">
+			<eng:treeAutoComplete id="gruppoProfessionale"
+				value="#{curriculumVitaePfBean.cvEsperienzeProfSection.esperienzaAttiva.deBpMansione}"
+				converter="deBpMansioneConverter" forceSelection="true" var="deMansione" itemLabel="#{deMansione.descrizione}"
+				label="#{ui['sap.gruppoProfessionale']}" itemValue="#{deMansione}" emptyMessage="#{ui['shared.emptyAutoComplete']}"
+				completeMethod="#{curriculumVitaePfBean.decodificheBean.completeDeBpMansioneLevel4Only}" size="55"
+				minQueryLength="2" styleClass="form-control" cache="true" required="true" ajaxEvent="itemSelect"
+				treeValue="#{mansioniSessionBean.deMansioneTreeNode}" bean="#{curriculumVitaePfBean.cvEsperienzeProfSection}"
+				treeSelectListener="gruppoProfessionaleNodeSelected" requiredMessage="La professione è obbligatoria"></eng:treeAutoComplete>
+			<p:message id="gruppoProfessionaleMessage" for="gruppoProfessionale:autocomplete"></p:message>
+		</div>
+	</div>
+
+
+	<div class="form-group">
+		<p:outputLabel for="qualificaSvolta" value="Mansione Svolta" styleClass="col-sm-3 control-label">
+		</p:outputLabel>
+		<div class="col-md-9 col-lg-9">
+			<p:inputText id="qualificaSvolta" required="true"
+				value="#{curriculumVitaePfBean.cvEsperienzeProfSection.esperienzaAttiva.professione}" styleClass="form-control"
+				label="Datore di lavoro" requiredMessage="La Mansione Svolta è obbligatoria" widgetVar="qualificaSvoltaWV"
+				maxlength="250">
+			</p:inputText>
+			<p:message id="qualificaSvoltaMessage" for="qualificaSvolta"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel for="descMansione" value="Descrizione Mansione Svolta" styleClass="col-sm-3 control-label">
+		</p:outputLabel>
+		<div class="col-md-9 col-lg-9">
+			<p:inputTextarea id="descMansione" required="true"
+				value="#{curriculumVitaePfBean.cvEsperienzeProfSection.esperienzaAttiva.attivitaResponsabilita}"
+				styleClass="form-control compact-textarea" autoResize="false" counter="descMansioneCount"
+				counterTemplate="{0} caratteri rimanenti" requiredMessage="La Descrizione della mansione svolta è obbligatoria"
+				widgetVar="descMansioneWV" maxlength="4000">
+			</p:inputTextarea>
+			<p:message id="descMansioneMessage" for="descMansione"></p:message>
+			<h:outputText id="descMansioneCount" />
+		</div>
+
+	</div>
+
+
+
+	<div class="form-group">
+		<p:outputLabel for="datoreLavoro" value="Datore di lavoro" styleClass="col-sm-3 control-label" />
+		<div class="col-md-9 col-lg-9">
+			<p:inputText id="datoreLavoro" value="#{curriculumVitaePfBean.cvEsperienzeProfSection.esperienzaAttiva.datoreLavoro}"
+				required="true" styleClass="form-control" label="Datore di lavoro"
+				requiredMessage="Il Datore di lavoro è obbligatorio" widgetVar="datoreLavoroWV" maxlength="100">
+			</p:inputText>
+			<p:message id="datoreLavoroMessage" for="datoreLavoro"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel for="luogoLavoro" value="Luogo di lavoro" styleClass="col-sm-3 control-label" />
+		<div class="col-md-9 col-lg-9">
+			<p:autoComplete id="luogoLavoro" converter="deComuneConverter" forceSelection="true"
+				completeMethod="#{curriculumVitaePfBean.autoCompleteBean.completeComune}" itemLabel="#{comuneVar.denominazione}"
+				itemValue="#{comuneVar}" filter="true" filterMatchMode="contains" required="false"
+				requiredMessage="Il luogo di lavoro e' obbligatorio"
+				value="#{curriculumVitaePfBean.cvEsperienzeProfSection.esperienzaAttiva.deComLavoro}" var="comuneVar"
+				styleClass="form-control">
+			</p:autoComplete>
+			<p:message for="luogoLavoro" />
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel for="sitoWebDatore" value="Sito Web aziendale" styleClass="col-sm-3 control-label" />
+		<div class="col-md-9 col-lg-9">
+			<p:inputText id="sitoWebDatore"
+				value="#{curriculumVitaePfBean.cvEsperienzeProfSection.esperienzaAttiva.sitoWebAziendale }"
+				styleClass="form-control" label="Datore di lavoro" widgetVar="datoreLavoroWV" maxlength="100">
+			</p:inputText>
+			<p:message id="sitoWebDatoreMessage" for="sitoWebDatore"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel value="Data Inizio" for="dtInizio" styleClass="col-sm-3 control-label" />
+		<div class="col-md-9 col-lg-9">
+			<p:calendar id="dtInizio" label="Data Inizio" navigator="true" pattern="dd/MM/yyyy" requiredMessage="Data Inizio Obbligatoria"
+				value="#{curriculumVitaePfBean.cvEsperienzeProfSection.esperienzaAttiva.da}" converterMessage="Data non valida!"
+				maxdate="#{curriculumVitaePfBean.cvEsperienzeProfSection.getCurrentDate()}" required="true"
+				styleClass="form-control" locale="it" validator="dateValidator" widgetVar="dtInizioWV" mask="true">
+				<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				<f:attribute name="limitDate" value="#{curriculumVitaePfBean.cvEsperienzeProfSection.getCurrentDate()}" />
+				<f:validator validatorId="dateLimitValidator" for="function" />
+			</p:calendar>
+			Inserisci la data con il formato gg/mm/aaaa
+			<p:message id="dtInizioMessage" for="dtInizio"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel for="inCorso" value="In corso" styleClass="col-sm-3 control-label">
+		</p:outputLabel>
+		<div class="col-md-9 col-lg-9">
+			<p:selectBooleanCheckbox id="inCorso" styleClass="form-control"
+				value="#{curriculumVitaePfBean.cvEsperienzeProfSection.esperienzaAttiva.flgInCorso}">
+				<p:ajax update="dtFine" process="@this" listener="#{curriculumVitaePfBean.cvEsperienzeProfSection.cleanDataFine}" />
+			</p:selectBooleanCheckbox>
+			<p:message for="inCorso" />
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel value="Data Fine" for="dtFine" styleClass="col-sm-3 control-label" />
+		<div class="col-md-9 col-lg-9">
+			<p:calendar id="dtFine" label="Data Fine" navigator="true" pattern="dd/MM/yyyy"
+				required="#{!curriculumVitaePfBean.cvEsperienzeProfSection.esperienzaAttiva.flgInCorso}"
+				value="#{curriculumVitaePfBean.cvEsperienzeProfSection.esperienzaAttiva.a}"
+				disabled="#{curriculumVitaePfBean.cvEsperienzeProfSection.esperienzaAttiva.flgInCorso}"
+				maxdate="#{curriculumVitaePfBean.cvEsperienzeProfSection.getCurrentDate()}" converterMessage="Data non valida!"
+				styleClass="form-control" locale="it" validator="dateValidator" widgetVar="dtFineWV"
+				requiredMessage="Data Fine Obbligatoria se non In corso" mask="true">
+				<f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+				<f:attribute name="limitDate" value="#{curriculumVitaePfBean.cvEsperienzeProfSection.getCurrentDate()}" />
+				<f:validator validatorId="dateLimitValidator" for="function" />
+			</p:calendar>
+			Inserisci la data con il formato gg/mm/aaaa
+			<p:message id="dtFineMessage" for="dtFine"></p:message>
+			<p:message id="rangeDateMessage" for="rangeDate"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel for="tipologiaContratto" value="Tipologia contratto" styleClass="col-sm-3 control-label">
+		</p:outputLabel>
+		<div class="col-md-9 col-lg-9">
+			<p:selectOneMenu id="tipologiaContratto" styleClass="form-control" forceSelection="true"
+				converter="deContrattoSilConverter" style="width: 100%;"
+				value="#{curriculumVitaePfBean.cvEsperienzeProfSection.esperienzaAttiva.deContrattoSil}">
+				<f:selectItem itemLabel="" itemValue="" />
+				<f:selectItems var="deContratto" value="#{decodificheBean.getTipolgoiaContrattoSilFlagIdoByTirocinio(true)}"
+					itemLabel="#{deContratto.descrizione}" itemValue="#{deContratto}" />
+			</p:selectOneMenu>
+		</div>
+	</div>
+
+	<o:validateOrder id="rangeDate" type="lte" components="dtInizio dtFine"
+		message="La data di fine deve essere maggiore/uguale della data inizio." />
+
+
+
+
+	<div class="text-center">
+		<p:defaultCommand target="syncOneEsperienzaProf"></p:defaultCommand>
+		<p:commandLink id="syncOneEsperienzaProf" actionListener="#{curriculumVitaePfBean.cvEsperienzeProfSection.sync()}"
+			styleClass="btn btn-primary ui-button baby-btn uk-margin-top"
+			onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+			oncomplete="MyPortal.Curriculum.syncArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+			update="@(.ui-message)" process="@this, syncForm">
+            #{ui['shared.save']}
+        </p:commandLink>
+
+		<p:commandLink id="annulla" styleClass="btn btn-primary ui-button baby-btn uk-margin-top uk-margin-left"
+			onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+			oncomplete="MyPortal.Curriculum.cancelArticleComplete(args, xhr, status);MyPortal.disableLoadingButton(this);"
+			process="@this">
+            Annulla
+            <p:ajax update="syncForm, :esperienzeProfForm:articles"
+				listener="#{curriculumVitaePfBean.cvEsperienzeProfSection.cancelEditEsperienzaProf()}" resetValues="true" />
+		</p:commandLink>
+
+		<p:remoteCommand name="updateArticles" update=":esperienzeProfForm:articles" process="@this"></p:remoteCommand>
+
+	</div>
+</ui:composition>

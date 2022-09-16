@@ -1,0 +1,1691 @@
+<!-- DETTAGLIO MATCHING ROSA -->
+
+<STATEMENT
+        name="ST_GETDATI_LAV_ROSA"
+        query="select DO_NOMINATIVO.CDNLAVORATORE,DO_NOMINATIVO.DECINDICEVICINANZA, 
+               DO_NOMINATIVO.NUMPESOTITOLO,
+               DO_NOMINATIVO.NUMPESOINFO, DO_NOMINATIVO.NUMPESOLINGUA,DO_NOMINATIVO.NUMPESOETA,
+               do_nominativo.NUMPESOMANSIONE, do_nominativo.NUMPESOESP,   
+               to_char(AN_LAVORATORE.DATNASC,'DD/MM/YYYY') DATNASC
+               FROM DO_NOMINATIVO 
+               INNER JOIN AN_LAVORATORE ON DO_NOMINATIVO.CDNLAVORATORE=AN_LAVORATORE.CDNLAVORATORE
+			         WHERE DO_NOMINATIVO.PRGNOMINATIVO=?" />
+<!-- STUDI -->
+<STATEMENT name="ST_GETDATI_STUDI_ROSA"
+           query="select
+                       PR_STUDIO.CODTITOLO, 
+                       PR_STUDIO.CODTIPOTITOLO, 
+                       DE_TITOLO.STRDESCRIZIONE DENOMINAZIONE,                
+                       ALS_PR_STUDIO.STRDESCRIZIONE DESCRIZIONE
+                  from PR_STUDIO 
+                     inner join do_nominativo ON (DO_NOMINATIVO.CDNLAVORATORE=PR_STUDIO.CDNLAVORATORE)              
+                     LEFT JOIN DE_TITOLO ALS_PR_STUDIO ON PR_STUDIO.CODTITOLO=ALS_PR_STUDIO.CODTITOLO               
+                     LEFT JOIN DE_TITOLO ON PR_STUDIO.CODTIPOTITOLO=DE_TITOLO.CODTITOLO
+                  WHERE DO_NOMINATIVO.PRGNOMINATIVO=?" />
+<STATEMENT   
+          name="ST_GETDATI_STUDIRIC_ROSA"
+          query="select DO_INCROCIO.PRGRICHIESTAAZ, DO_INCROCIO.PRGALTERNATIVA,
+            	   DO_STUDIO.CODTITOLO,DE_TITOLO.CODPADRE, DE_TITOLO.STRDESCRIZIONE SPECIFICO,AD.STRDESCRIZIONE GENERICO
+	               FROM DO_STUDIO INNER JOIN DO_INCROCIO 
+                 ON (DO_STUDIO.PRGALTERNATIVA=DO_INCROCIO.PRGALTERNATIVA AND DO_STUDIO.PRGRICHIESTAAZ=DO_INCROCIO.PRGRICHIESTAAZ)
+                 INNER JOIN DE_TITOLO AD ON AD.CODTITOLO = (SUBSTR(DO_STUDIO.CODTITOLO,1,2) || '000000')  
+	               INNER JOIN DE_TITOLO ON DE_TITOLO.CODTITOLO = DO_STUDIO.CODTITOLO
+                 WHERE DO_INCROCIO.PRGINCROCIO=?" />               
+<!-- CONOSCENZE INFORMATICHE -->
+<STATEMENT
+        name="ST_GETDATI_INFORM_ROSA"
+        query="SELECT DO_NOMINATIVO.CDNLAVORATORE, PR_INFO.CODDETTINFO,PR_INFO.CDNGRADO,
+		               DE_DETT_INFO.STRDESCRIZIONE || decode(mn_consc_inf.des_conoscenza,'',' (Min: nessuna corrispondenza)', null, ' (Min: nessuna corrispondenza)','(Min: '|| mn_consc_inf.des_conoscenza || ')') AS DESCRIZIONE, 
+					   DE_GRADO_INFO.STRDESCRIZIONE || decode(mn_grado_consc_inf.des_gradoconosc,'',' (Min: nessuna corrispondenza)',null,' (Min: nessuna corrispondenza)','(Min: '|| mn_grado_consc_inf.des_gradoconosc || ')') AS GRADO
+		               FROM PR_INFO INNER JOIN DO_NOMINATIVO ON PR_INFO.CDNLAVORATORE=DO_NOMINATIVO.CDNLAVORATORE
+					   		   INNER JOIN DE_DETT_INFO ON PR_INFO.CODDETTINFO =DE_DETT_INFO.CODDETTINFO
+					   	     INNER JOIN DE_GRADO_INFO ON PR_INFO.CDNGRADO=DE_GRADO_INFO.CDNGRADO
+		               INNER JOIN DE_TIPO_INFO ON PR_INFO.CODTIPOINFO=DE_TIPO_INFO.CODTIPOINFO
+					   LEFT JOIN ma_consc_inf ON (PR_INFO.coddettinfo = ma_consc_inf.coddettinfo)
+				 LEFT JOIN mn_consc_inf ON (ma_consc_inf.cod_conoscenza = mn_consc_inf.cod_conoscenza) 
+				 LEFT JOIN ma_grado_consc_inf ON (PR_INFO.cdngrado = ma_grado_consc_inf.cdngrado)
+				 LEFT JOIN mn_grado_consc_inf ON (ma_grado_consc_inf.cod_gradoconosc = mn_grado_consc_inf.cod_gradoconosc)
+				 WHERE DO_NOMINATIVO.PRGNOMINATIVO=?
+		               ORDER BY DE_TIPO_INFO.STRDESCRIZIONE" />
+
+<!-- RRECUPERA I DATI PER LE CONOSCENZE INFORMATICHE DELLA RICHIESTA -->
+<STATEMENT
+        name="ST_GETDATI_INFORMRIC_ROSA"
+        query="select DO_INCROCIO.PRGRICHIESTAAZ, DO_INCROCIO.PRGALTERNATIVA,
+		          	   DO_INFO.CODDETTINFO,
+		          	   DE_DETT_INFO.STRDESCRIZIONE || decode(mn_consc_inf.des_conoscenza,'',' (Min: nessuna corrispondenza)',null,' (Min: nessuna corrispondenza)','(Min: '|| mn_consc_inf.des_conoscenza || ')') AS DESCRIZIONE,
+		               DO_INFO.CDNGRADO,
+		               DE_GRADO_INFO.STRDESCRIZIONE || decode(mn_grado_consc_inf.des_gradoconosc,'',' (Min: nessuna corrispondenza)',null,' (Min: nessuna corrispondenza)','(Min: '|| mn_grado_consc_inf.des_gradoconosc || ')') AS GRADO,
+		               DO_ALTERNATIVA.NUMDA,DO_ALTERNATIVA.NUMA
+		               FROM DO_INCROCIO inner JOIN DO_INFO ON (DO_INFO.PRGALTERNATIVA=DO_INCROCIO.PRGALTERNATIVA AND DO_INFO.PRGRICHIESTAAZ=DO_INCROCIO.PRGRICHIESTAAZ)
+		               left  JOIN DE_DETT_INFO ON DO_INFO.CODDETTINFO =DE_DETT_INFO.CODDETTINFO
+		         	   left JOIN DE_GRADO_INFO ON DO_INFO.CDNGRADO=DE_GRADO_INFO.CDNGRADO
+		               left JOIN DE_TIPO_INFO ON DO_INFO.CODTIPOINFO=DE_TIPO_INFO.CODTIPOINFO
+		               inner JOIN DO_ALTERNATIVA ON (DO_ALTERNATIVA.PRGALTERNATIVA=DO_INCROCIO.PRGALTERNATIVA AND DO_ALTERNATIVA.PRGRICHIESTAAZ=DO_INCROCIO.PRGRICHIESTAAZ)
+					   LEFT JOIN ma_consc_inf ON (do_info.coddettinfo = ma_consc_inf.coddettinfo)
+				 LEFT JOIN mn_consc_inf ON (ma_consc_inf.cod_conoscenza = mn_consc_inf.cod_conoscenza) 
+				 LEFT JOIN ma_grado_consc_inf ON (do_info.cdngrado = ma_grado_consc_inf.cdngrado)
+				 LEFT JOIN mn_grado_consc_inf ON (ma_grado_consc_inf.cod_gradoconosc = mn_grado_consc_inf.cod_gradoconosc) 
+		               WHERE DO_INCROCIO.PRGINCROCIO=?
+		               ORDER BY DE_TIPO_INFO.STRDESCRIZIONE" />
+
+<!-- LINGUA -->
+<STATEMENT 
+          name="ST_GET_LINGUA_LAV"
+          query="select DE_LINGUA.CODLINGUA, DE_LINGUA.STRDENOMINAZIONE, 
+                case   	   
+        				    when mal.cod_conoscenza is not null
+        				         then (DE_GRADO_LIN.STRDESCRIZIONE || ' (Min: ' || mnl.des_conoscenza|| ')')	     
+        				    else DE_GRADO_LIN.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+        				end as LETTO,
+                case   	   
+        				    when mas.cod_conoscenza is not null
+        				         then (SCR.STRDESCRIZIONE || ' (Min: ' || mns.des_conoscenza|| ')')	     
+        				    else SCR.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+        				end as SCRITTO,
+            	  case   	   
+        				    when map.cod_conoscenza is not null
+        				         then (PAR.STRDESCRIZIONE || ' (Min: ' || mnp.des_conoscenza|| ')')	     
+        				    else PAR.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+        				end as PARLATO
+                 FROM PR_LINGUA INNER JOIN DO_NOMINATIVO ON PR_LINGUA.CDNLAVORATORE=DO_NOMINATIVO.CDNLAVORATORE
+            	   INNER JOIN DE_LINGUA ON PR_LINGUA.CODLINGUA=DE_LINGUA.CODLINGUA            	   
+                 LEFT JOIN DE_GRADO_LIN ON DE_GRADO_LIN.CDNGRADO=PR_LINGUA.CDNGRADOLETTO
+                 inner join ma_grado_consc_lin mal on mal.cdngrado = DE_GRADO_LIN.CDNGRADO
+                 left join mn_grado_consc_lin mnl on mnl.cod_conoscenza = mal.cod_conoscenza
+            	   LEFT JOIN DE_GRADO_LIN SCR ON SCR.CDNGRADO=PR_LINGUA.CDNGRADOSCRITTO
+                 inner join ma_grado_consc_lin mas on mas.cdngrado = SCR.CDNGRADO
+                 left join mn_grado_consc_lin mns on mns.cod_conoscenza = mas.cod_conoscenza
+            	   LEFT JOIN DE_GRADO_LIN PAR ON PAR.CDNGRADO=PR_LINGUA.CDNGRADOPARLATO
+                 inner join ma_grado_consc_lin map on map.cdngrado = PAR.CDNGRADO
+                 left join mn_grado_consc_lin mnp on mnp.cod_conoscenza = map.cod_conoscenza
+            	   WHERE DO_NOMINATIVO.PRGNOMINATIVO=?
+            	   ORDER BY DE_LINGUA.STRDENOMINAZIONE" />
+
+<STATEMENT 
+          name="ST_GET_LINGUA_RIC"
+          query="select DE_LINGUA.STRDENOMINAZIONE, 
+          	      case   	   
+        				    when mal.cod_conoscenza is not null
+        				         then (DE_GRADO_LIN.STRDESCRIZIONE || ' (Min: ' || mnl.des_conoscenza|| ')')	     
+        				    else DE_GRADO_LIN.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+        				end as LETTO,
+                  case   	   
+        				    when mas.cod_conoscenza is not null
+        				         then (SCR.STRDESCRIZIONE || ' (Min: ' || mns.des_conoscenza|| ')')	     
+        				    else SCR.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+        				end as SCRITTO,
+            	  case   	   
+        				    when map.cod_conoscenza is not null
+        				         then (PAR.STRDESCRIZIONE || ' (Min: ' || mnp.des_conoscenza|| ')')	     
+        				    else PAR.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+        				end as PARLATO
+            	   FROM DO_LINGUA 
+                   INNER JOIN DO_INCROCIO ON (DO_LINGUA.PRGRICHIESTAAZ=DO_INCROCIO.PRGRICHIESTAAZ and DO_LINGUA.PRGALTERNATIVA=DO_INCROCIO.PRGALTERNATIVA)
+            	   INNER JOIN DE_LINGUA ON DO_LINGUA.CODLINGUA=DE_LINGUA.CODLINGUA
+            	   LEFT JOIN DE_GRADO_LIN ON DE_GRADO_LIN.CDNGRADO=DO_LINGUA.CDNGRADOLETTO
+            	   inner join ma_grado_consc_lin mal on mal.cdngrado = DE_GRADO_LIN.CDNGRADO
+                   left join mn_grado_consc_lin mnl on mnl.cod_conoscenza = mal.cod_conoscenza
+            	   LEFT JOIN DE_GRADO_LIN SCR ON SCR.CDNGRADO=DO_LINGUA.CDNGRADOSCRITTO
+            	   inner join ma_grado_consc_lin mas on mas.cdngrado = SCR.CDNGRADO
+                   left join mn_grado_consc_lin mns on mns.cod_conoscenza = mas.cod_conoscenza
+            	   LEFT JOIN DE_GRADO_LIN PAR ON PAR.CDNGRADO=DO_LINGUA.CDNGRADOPARLATO
+            	   inner join ma_grado_consc_lin map on map.cdngrado = PAR.CDNGRADO
+                   left join mn_grado_consc_lin mnp on mnp.cod_conoscenza = map.cod_conoscenza
+            	   WHERE DO_INCROCIO.PRGINCROCIO=?
+            	   ORDER BY DE_LINGUA.STRDENOMINAZIONE" />          
+
+<!-- MANSIONI -->
+<STATEMENT 
+          name="ST_GET_MANSIONE_LAV"
+          query="select DE_MANSIONE.STRDESCRIZIONE,PR_MANSIONE.CODMANSIONE,PR_MANSIONE.FLGDISPONIBILE,PR_MANSIONE.FLGESPERIENZA,
+            	   PR_MANSIONE.FLGESPFORM	   
+            	   FROM PR_MANSIONE LEFT JOIN DO_NOMINATIVO
+            	   ON PR_MANSIONE.CDNLAVORATORE=DO_NOMINATIVO.CDNLAVORATORE
+            	   INNER JOIN DE_MANSIONE ON PR_MANSIONE.CODMANSIONE=DE_MANSIONE.CODMANSIONE
+            	   WHERE DO_NOMINATIVO.PRGNOMINATIVO=?
+            	   ORDER BY PR_MANSIONE.FLGDISPONIBILE" />
+
+<STATEMENT 
+          name="ST_GET_MANSIONE_RIC"
+          query="select DE_MANSIONE.STRDESCRIZIONE,DO_MANSIONE.CODMANSIONE,DO_ALTERNATIVA.FLGESPERIENZA,
+            	   DO_ALTERNATIVA.FLGFORMAZIONEPROF
+            	   FROM DO_MANSIONE 
+                 INNER JOIN DO_INCROCIO ON (DO_MANSIONE.PRGRICHIESTAAZ=DO_INCROCIO.PRGRICHIESTAAZ and DO_MANSIONE.PRGALTERNATIVA=DO_INCROCIO.PRGALTERNATIVA)
+            	   INNER JOIN DE_MANSIONE ON DO_MANSIONE.CODMANSIONE=DE_MANSIONE.CODMANSIONE
+            	   INNER JOIN DO_ALTERNATIVA ON (DO_INCROCIO.PRGRICHIESTAAZ=DO_ALTERNATIVA.PRGRICHIESTAAZ AND DO_INCROCIO.PRGALTERNATIVA=DO_ALTERNATIVA.PRGALTERNATIVA)
+            	   WHERE DO_INCROCIO.PRGINCROCIO=?" />          
+
+<STATEMENT 
+          name="GET_PAR_INCROCIO"
+          query="SELECT 
+                   NUMPFASCIAETAESATTA, 
+                   NUMPFASCIAETAPRIMA, 
+                   NUMPFASCIAETASEC, 
+                   NUMPSTUDIO, 
+                   NUMPSTUDIOGRUPPO, 
+                   NUMPSTUDIOALIAS, 
+                   NUMPMANSIONE, 
+                   NUMPMANSIONEGRUPPO, 
+                   NUMPMANSIONEALIAS, 
+                   NUMPESPERIENZA, 
+                   NUMPNOESPERIENZA, 
+                   NUMPESPERIENZAALIAS, 
+                   NUMPINFO, NUMPINFOMIN, 
+                   NUMPINFOGRUPPO, 
+                   NUMPINFOGRUPPOMIN, 
+                   NUMPLINGUA, 
+                   NUMPLINGUAINF, 
+                   DECSOGLIARICHIESTA,    
+                   PRGALTERNATIVA ,
+                   dp.FLGINCROCIOMIRATO, 
+                   TO_CHAR(NVL(DATSTATOLAV, di.dtmins),'DD/MM/YYYY')  DATSTATOLAV,
+                   dr.flgfiltricmaattivati,
+                   dp.codmonocmcategoria
+                FROM 
+                  do_incrocio di,
+                  do_parametri_incrocio dp,
+                  do_rosa dr
+                WHERE 
+                  dp.prgincrocio = di.prgincrocio and
+                  dr.prgincrocio = di.prgincrocio and
+                  di.prgincrocio= ?" />
+
+<STATEMENT 
+          name="GET_MANSIONI_RIC"
+          query=" SELECT DO_MANSIONE.CODMANSIONE, DE_MANSIONE.STRDESCRIZIONE, 
+          				 DO_MANSIONE.PRGRICHIESTAAZ 
+          		  FROM   DE_MANSIONE DE_MANSIONE, 
+          				 DO_MANSIONE DO_MANSIONE
+				  WHERE  DE_MANSIONE.CODMANSIONE=DO_MANSIONE.CODMANSIONE
+				  AND 	 DO_MANSIONE.PRGALTERNATIVA=1 AND DO_MANSIONE.PRGRICHIESTAAZ=?" />          
+
+<!-- ***************************************************************************
+     Gestione del modello di stampa per la lettera di convocazione del lavoratore
+-->
+<STATEMENT name="IDO_GETMODELLO"
+          query="SELECT ST_MODELLO_STAMPA.PRGMODELLOSTAMPA,
+                        ST_MODELLO_STAMPA.STRDESCRIZIONE,
+                        to_char(ST_MODELLO_STAMPA.DATINIZIOVAL,'dd/mm/yyyy') DATINIZIOVAL,
+                        to_char(ST_MODELLO_STAMPA.DATFINEVAL,'dd/mm/yyyy') DATFINEVAL
+                   FROM ST_MODELLO_STAMPA"/>
+
+
+<STATEMENT name="IDO_GET_SPECIFICOMODELLO"
+          query="SELECT ST_MODELLO_STAMPA.PRGMODELLOSTAMPA,
+                        ST_MODELLO_STAMPA.STRDESCRIZIONE,
+                        ST_MODELLO_STAMPA.CODOGGETTOMODELLO,
+                        ST_MODELLO_STAMPA.PRGTIPOMODELLO,
+                        ST_MODELLO_STAMPA.STRCORPOMESSAGGIO,
+                        ST_MODELLO_STAMPA.STRNOTE,
+                        ST_MODELLO_STAMPA.STRRIFERIMENTODACONTATTARE,
+                        to_char(ST_MODELLO_STAMPA.DATINIZIOVAL,'dd/mm/yyyy') DATINIZIOVAL,
+                        to_char(ST_MODELLO_STAMPA.DATFINEVAL,'dd/mm/yyyy') DATFINEVAL
+                   FROM ST_MODELLO_STAMPA
+				          WHERE ST_MODELLO_STAMPA.PRGMODELLOSTAMPA = ?"/>
+
+<STATEMENT name="IDO_GET_TIPOMODELLO"
+           query="SELECT DE_TIPO_MODELLO.STRDESCRIZIONE ||
+                          DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                          LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                          ''
+                                 ) AS DESCRIZIONE,
+                         DE_TIPO_MODELLO.PRGTIPOMODELLO CODICE,
+                         DE_TIPO_MODELLO.DATINIZIOVAL,
+                         DE_TIPO_MODELLO.DATFINEVAL
+                    FROM DE_TIPO_MODELLO"/>
+
+<STATEMENT name="IDO_GET_OGGETTOMODELLO"
+           query="SELECT DE_OGGETTO_MODELLO.STRDESCRIZIONE ||
+                           DECODE(SYSDATE, GREATEST(SYSDATE, DATFINEVAL),' (scaduto)',
+                                           LEAST(SYSDATE, DATINIZIOVAL), ' (scaduto)', 
+                                           ''
+                                 ) AS DESCRIZIONE,
+                         DE_OGGETTO_MODELLO.CODOGGETTOMODELLO CODICE,
+                         DE_OGGETTO_MODELLO.DATINIZIOVAL,
+                         DE_OGGETTO_MODELLO.DATFINEVAL
+                      FROM DE_OGGETTO_MODELLO 
+            ORDER BY STRDESCRIZIONE"/>
+
+<STATEMENT name="IDO_SALVA_MODELLO"
+           query="UPDATE ST_MODELLO_STAMPA SET
+                         ST_MODELLO_STAMPA.STRDESCRIZIONE = ?,
+                         ST_MODELLO_STAMPA.CODOGGETTOMODELLO = ?,
+                         ST_MODELLO_STAMPA.PRGTIPOMODELLO = ?,
+                         ST_MODELLO_STAMPA.STRCORPOMESSAGGIO = ?,
+                         ST_MODELLO_STAMPA.STRNOTE = ?,
+                         ST_MODELLO_STAMPA.STRRIFERIMENTODACONTATTARE = ?,
+                         ST_MODELLO_STAMPA.DATINIZIOVAL = to_date(?,'dd/mm/yyyy'),
+                         ST_MODELLO_STAMPA.DATFINEVAL = to_date(?,'dd/mm/yyyy')
+                   WHERE ST_MODELLO_STAMPA.PRGMODELLOSTAMPA = ?"/>
+
+
+<STATEMENT name="IDO_MODELLO_NEXTVAL"
+           query="SELECT S_ST_MODELLO_STAMPA.NEXTVAL PRGMODELLOSTAMPA FROM DUAL"/>
+           
+<STATEMENT name="IDO_INSERISCI_MODELLO"
+           query="INSERT INTO ST_MODELLO_STAMPA
+                       ( ST_MODELLO_STAMPA.PRGMODELLOSTAMPA,
+                         ST_MODELLO_STAMPA.STRDESCRIZIONE,
+                         ST_MODELLO_STAMPA.CODOGGETTOMODELLO,
+                         ST_MODELLO_STAMPA.PRGTIPOMODELLO,
+                         ST_MODELLO_STAMPA.STRCORPOMESSAGGIO,
+                         ST_MODELLO_STAMPA.STRNOTE,      
+                         ST_MODELLO_STAMPA.STRRIFERIMENTODACONTATTARE,
+                         ST_MODELLO_STAMPA.DATINIZIOVAL,
+                         ST_MODELLO_STAMPA.DATFINEVAL
+                       )
+                VALUES (?,
+                        ?,?,?,?,?,?,
+                        to_date(?,'dd/mm/yyyy'),
+                        to_date(?,'dd/mm/yyyy')
+                       )"/>
+
+   
+
+<STATEMENT name="IDO_DEL_MODELLO"
+          query="delete from ST_MODELLO_STAMPA
+                       where ST_MODELLO_STAMPA.PRGMODELLOSTAMPA = ?"/>
+
+
+<STATEMENT name="AS_MATCH_ELENCO_GRADUATORIE"
+           query="select 
+					r.prgrosa as id_grad,
+					i.prgrichiestaaz,
+					i.prgtipoincrocio, 
+					rich.prgazienda,
+          			rich.prgunita, 
+          			DO_EVASIONE.CDNSTATORICH,         
+					r.prgTipoRosa as prgTipoRosa,
+					ti.strdescrizione as descr_incr,
+					tr.strdescrizione as descr_rosa,
+					i.prgalternativa as id_profilo,
+					decode(i.PRGALTERNATIVA, null,'','Profilo n. ' || i.PRGALTERNATIVA) as DESCR_PROFILO,
+					to_char(r.CDNUTMOD) as CDNUTMOD, 
+					to_char(r.DATINVIO,'dd/mm/yyyy') as DATINVIO,
+					DE_CPI.CODCPI AS CODCPI,
+					DE_CPI.STRDESCRIZIONE AS DESCRIZIONE,
+					(Initcap(tu.STRCOGNOME) || ' ' || InitCap(tu.STRNOME) || ' - ' || to_char(r.DTMMOD, 'DD/MM/YYYY hh24:mi')) as ultimaModifica  
+				   from do_richiesta_az rich
+           			inner join do_incrocio i on i.prgrichiestaaz = rich.prgrichiestaaz
+					inner join do_rosa r on i.prgincrocio = r.prgincrocio
+					inner join de_tipo_incrocio ti on ti.prgtipoincrocio = i.prgtipoincrocio
+					inner join de_tipo_rosa tr on tr.prgtiporosa = r.prgtiporosa
+					inner join ts_utente tu on r.CDNUTMOD = tu.CDNUT
+					LEFT OUTER JOIN DO_EVASIONE ON (rich.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+                    LEFT OUTER JOIN DE_EVASIONE_RICH ON (DO_EVASIONE.CODEVASIONE=DE_EVASIONE_RICH.CODEVASIONE)
+                    INNER JOIN DE_CPI ON (rich.CODCPI = DE_CPI.CODCPI)
+				   where rich.prgrichiestaaz = ?
+					and r.prgRosaFiglia is null
+					and (r.prgTipoRosa=2 or r.prgTipoRosa=3) 
+					and (i.prgTipoIncrocio=5 or i.prgTipoIncrocio=6 or i.prgTipoIncrocio=7 or i.prgTipoIncrocio=8 or i.prgTipoIncrocio=9 or i.prgTipoIncrocio=13 or i.prgTipoIncrocio=14) 
+				   order by descr_rosa, prgTipoIncrocio, prgalternativa "/> 
+				   
+<STATEMENT name="AS_MATCH_ELENCO_CANDIDATI_GRD"
+		   query="select
+		        r.PRGNOMINATIVO, 
+				r.CDNLAVORATORE, 
+				r.numordine, 
+				rich1.prgrichiestaaz,
+				do_rosa.PRGINCROCIO,
+				DO_EVASIONE.CDNSTATORICH, 
+				do_incrocio.prgtipoincrocio, 	
+				ti.strdescrizione as descr_incr,
+				tr.strdescrizione as descr_rosa,				
+				rich1.datchiamata,
+				rich1.datpubblicazione,
+				decode(DO_EVASIONE.codevasione, 'AS', '1', '0') AS viewBtnPunteggio,
+				Initcap(an.STRCOGNOME) || ' ' || Initcap(an.STRNOME) as strCognomeNome,
+				to_char(an.DATNASC, 'dd/mm/yyyy') as DatNasc, 
+				r.numpunteggio as punteggio, 
+				((select dr.strdescrizione||':'||dso.strdescrizione from as_storia_stato_occ ss
+		        inner join de_stato_occupaz dso on dso.codstatooccupaz = ss.codstatooccupaz 
+		        inner join de_stato_occupaz_ragg dr on dr.codstatooccupazragg = dso.codstatooccupazragg
+		        where ss.cdnlavoratore = r.CDNLAVORATORE   
+		        and ss.prgincrocio = do_incrocio.prgincrocio)   
+						|| '/ ' ||   
+						   (select dr.strdescrizione||':'||dso.strdescrizione from am_stato_occupaz aso 
+						    inner join de_stato_occupaz dso on dso.codstatooccupaz = aso.codstatooccupaz     
+		            inner join de_stato_occupaz_ragg dr on dr.codstatooccupazragg = dso.codstatooccupazragg  
+						    where aso.cdnlavoratore = r.CDNLAVORATORE
+						    and aso.datinizio &lt;= rich1.datpubblicazione
+						    and rich1.datpubblicazione &lt;= NVL(aso.datfine, SYSDATE)
+						    and rich1.datpubblicazione is not null
+						    )
+						|| '/ ' ||
+						   (select dr.strdescrizione||':'||dso.strdescrizione from am_stato_occupaz aso 
+						    inner join de_stato_occupaz dso on dso.codstatooccupaz = aso.codstatooccupaz
+		            inner join de_stato_occupaz_ragg dr on dr.codstatooccupazragg = dso.codstatooccupazragg
+						    where aso.cdnlavoratore = r.CDNLAVORATORE
+						    and aso.datinizio &lt;= rich1.datchiamata
+						    and rich1.datchiamata &lt;= NVL(aso.datfine, SYSDATE) 
+						   and rich1.datchiamata is not null
+						   )) 				
+				 as stato_occup,								
+				Initcap(dt2.strdescrizione) || &apos;&amp;nbsp;&apos; || Initcap(dt.strdescrizione)
+				as titolo_studio,
+				(select vi.numvaloreisee  from as_valore_isee vi 
+				  where vi.cdnlavoratore = r.CDNLAVORATORE
+				    and rich1.datchiamata &gt;= vi.datinizioval
+				    and (rich1.datchiamata &lt;= vi.datfineval or vi.datfineval is null)   
+				) as valore_isee, 
+				r.numvaloreisee valore_isee_storico,
+				case when r.numvaloreisee != (nvl((select round(vi.numvaloreisee, 0)  from as_valore_isee vi 
+									                  where vi.cdnlavoratore = r.CDNLAVORATORE
+									                  and rich1.datchiamata &gt;= vi.datinizioval
+									                  and (rich1.datchiamata &lt;= vi.datfineval or vi.datfineval is null)   
+									                  ) 
+									             ,'-1')      
+									          ) 
+				then '1'
+				else '0' 
+				end 
+				as hiddenIconaIsee,				
+				decode(an.STRINDIRIZZODOM,null,' ',Initcap(an.STRINDIRIZZODOM) || ' ') || Initcap(dom.STRDENOMINAZIONE) || '(' || pr.STRTARGA || ')' as Domicilio,
+				to_char(mob.datiniziomov, 'dd/mm/yyyy') as datiniziomov,
+				 to_char(mob.datinizio, 'dd/mm/yyyy') || ' &lt;BR&gt; ' || to_char(mob.datfine, 'dd/mm/yyyy') as datfine,
+				man.strdescrizione as descrMansione,
+				(select 
+		        case   	   
+		        when ma.codlistespec is not null
+		          then (T.STRDESCRIZIONE || ' (Min: ' || mn.des_listespec|| ')' )	     
+		          else T.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+		        end as DESCRIZIONE 
+		        from de_mb_tipo t
+		        inner join ma_listespeciali ma on ma.codmbtipo= t.codmbtipo
+		        left join mn_listespeciali mn on mn.cod_listespec= ma.codlistespec
+		        where t.codmbtipo = mbtipo.codmbtipo) as descrTipoMob,
+		        decode(DO_ROSA.FLGASONLINE, 'S', '1', '0') AS viewBtnDocumentiIstanza			
+				from do_nominativo r 
+				inner join an_lavoratore an on (r.CDNLAVORATORE=an.CDNLAVORATORE) 
+				inner join do_rosa on (r.PRGROSA=do_rosa.PRGROSA) 
+				inner join de_comune dom on (an.CODCOMDOM=dom.CODCOM) 
+				inner join de_provincia pr on (dom.CODPROVINCIA=pr.CODPROVINCIA) 
+				left outer join de_cpi on (r.CODCPITIT=de_cpi.CODCPI) 
+				inner join do_incrocio on (do_rosa.PRGINCROCIO=do_incrocio.PRGINCROCIO) 
+				inner join do_richiesta_az rich1 on (do_incrocio.PRGRICHIESTAAZ=rich1.PRGRICHIESTAAZ) 
+				inner join de_tipo_incrocio ti on ti.prgtipoincrocio = do_incrocio.prgtipoincrocio
+				inner join de_tipo_rosa tr on tr.prgtiporosa = do_rosa.prgtiporosa
+				left outer join pr_studio ps on ps.cdnlavoratore = an.cdnlavoratore and ps.flgprincipale = 'S'
+				left outer join de_titolo dt on dt.codtitolo = ps.codtitolo
+				left outer join de_titolo dt2 on dt2.codtitolo = ps.codtipotitolo
+				LEFT OUTER JOIN DO_EVASIONE ON (rich1.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+        		LEFT OUTER JOIN DE_EVASIONE_RICH ON (DO_EVASIONE.CODEVASIONE=DE_EVASIONE_RICH.CODEVASIONE)
+        		left join am_mobilita_iscr mob on mob.cdnlavoratore = r.cdnlavoratore and (mob.datinizio &lt;= to_date(to_char(rich1.datpubblicazione, 'dd/mm/yyyy'), 'dd/mm/yyyy') 
+                and (mob.datfine &gt;= to_date(to_char(rich1.datpubblicazione, 'dd/mm/yyyy'), 'dd/mm/yyyy') 
+                or mob.datfine is null)) 
+				left join de_mansione man on man.codmansione = mob.codmansione
+				left join DE_MB_TIPO mbtipo on mbtipo.codmbtipo = mob.codtipomob
+				where do_rosa.prgrosa=? 
+				and r.CODTIPOCANC is null 				
+				order by numordine
+				"/> 
+
+<STATEMENT name="DEL_FISICA_LAV_GRADUATORIA"
+          query="delete from do_nominativo
+				where do_nominativo.CDNLAVORATORE = ?
+					  and do_nominativo.PRGROSA = ? "/>
+
+<STATEMENT name="DEL_PUNTEGGIO_LAV_GRADUATORIA"
+          query="delete from as_punteggio 
+				where prgnominativo = (select n.prgnominativo
+										from do_nominativo n
+										where n.CDNLAVORATORE = ?
+										and n.PRGROSA = ?) "/>
+					  
+<STATEMENT name="AS_UPDATE_SET_DEFINITIVA_GRD"
+          query="{ call ? := PG_INCROCIO.ASSetGraduatoriaDefinitiva(?,?) }"
+/>
+
+<STATEMENT name="AS_UPDATE_SET_DEFINITIVA_GRD_ONLINE"
+          query="{ call ? := PG_INCROCIO.ASSetGraduatoriaDefOnline(?,?) }"
+/>
+
+<STATEMENT name="AS_MATCH_STATO_RICH_ORIG"
+		   query="SELECT to_char(do_evasione.CDNSTATORICH) as CDNSTATORICH,
+		   				 DE_STATO_EV_RICH.strDescrizione as STATORICHORIG,
+		   				 de_evasione_rich.FLGINCROCIO, de_evasione_rich.FLGGRADUATORIA,
+		   				  (select count(r.prgTipoRosa)
+			               from do_incrocio i 
+			               inner join do_rosa r on r.prgincrocio = i.prgincrocio
+			               where i.prgrichiestaaz = ?
+			               and r.prgRosaFiglia is null
+								     and (r.prgTipoRosa=2 or r.prgTipoRosa=3) 
+								     and (i.prgTipoIncrocio=5 or i.prgTipoIncrocio=6 or i.prgTipoIncrocio=7 or i.prgTipoIncrocio=8 or i.prgTipoIncrocio=9 or i.prgTipoIncrocio=13 or i.prgTipoIncrocio=14) 
+			               ) as tot_graduatorie,   
+			               (select count(r.prgTipoRosa) 
+			               from do_incrocio i 
+			               inner join do_rosa r on r.prgincrocio = i.prgincrocio
+			               where i.prgrichiestaaz = ?
+			               and r.prgRosaFiglia is null
+								     and r.prgTipoRosa=3 
+								     and (i.prgTipoIncrocio=5 or i.prgTipoIncrocio=6 or i.prgTipoIncrocio=7 or i.prgTipoIncrocio=8 or i.prgTipoIncrocio=9 or i.prgTipoIncrocio=13 or i.prgTipoIncrocio=14) 
+			               ) as tot_graduatorie_definitive,
+			               (select count(r.prgRosa) 
+			               from do_incrocio i 
+			               inner join do_rosa r on r.prgincrocio = i.prgincrocio
+			               where i.prgrichiestaaz = DO_RICHIESTA_AZ.PRGRICHIESTAAZ
+			               and r.prgRosaFiglia is not null
+								     and r.prgTipoRosa=3 
+								     and (i.prgTipoIncrocio=5 or i.prgTipoIncrocio=6 or i.prgTipoIncrocio=7 or i.prgTipoIncrocio=8 or i.prgTipoIncrocio=9 or i.prgTipoIncrocio=13 or i.prgTipoIncrocio=14) 
+			               ) as checkStorico			              
+	 			  FROM DO_RICHIESTA_AZ, DO_EVASIONE, de_stato_ev_rich, de_evasione_rich
+				  WHERE (DO_RICHIESTA_AZ.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+				  		and (DO_EVASIONE.cdnStatoRich=DE_STATO_EV_RICH.cdnStatoRich)
+				  		and de_evasione_rich.codEvasione(+) = do_evasione.codEvasione
+    	 			    AND DO_RICHIESTA_AZ.PRGRICHIESTAAZ=(SELECT RICH2.PRGRICHIESTAAZ 
+	 												  FROM DO_RICHIESTA_AZ RICH1
+	      	  										  INNER JOIN DO_RICHIESTA_AZ RICH2 
+	      	  										  ON (rich1.NUMANNO=rich2.NUMANNO and rich1.NUMRICHIESTA=rich2.NUMRICHIESTA and rich2.NUMSTORICO=0)
+     												  WHERE RICH1.PRGRICHIESTAAZ =  ?
+     					)
+"/>	
+                 
+<STATEMENT name="AS_MATCH_DETTAGLIO_ROSA"
+           query="select 
+                       do_rosa.PRGROSA, 
+                       to_char(do_rosa.NUMKLOROSA) as NUMKLOROSA,
+                       to_char(do_rosa.NUMORDPROVINCIA) as NUMORDPROVINCIA,
+                       to_char(do_rosa.PRGINCROCIO) as PRGINCROCIO,
+                       to_char(do_rosa.PRGTIPOROSA) AS PRGTIPOROSA,
+                       to_char(do_incrocio.PRGTIPOINCROCIO) as PRGTIPOINCROCIO,
+                       de_tipo_incrocio.STRDESCRIZIONE as tipoIncrocio,
+                       do_incrocio.PRGRICHIESTAAZ,
+                       to_char(do_incrocio.PRGALTERNATIVA) as PRGALTERNATIVA,
+                       to_char(do_rosa.CDNUTMOD) as CDNUTMOD, 
+                       (Initcap(ts_utente.STRCOGNOME) || &apos; &apos; || InitCap(ts_utente.STRNOME) || &apos; - &apos; || to_char(do_rosa.DTMMOD, &apos;dd/mm/yyyy&apos;)) as ultimaModifica,
+                       to_char(rich1.NUMRICHIESTA) as NUMRICHIESTA, to_char(nvl(rich1.NUMRICHIESTAORIG, rich1.NUMRICHIESTA)) as NUMRICHIESTAORIG,
+                       to_char(rich2.NUMANNO) as NUMANNO,
+                       de_tipo_rosa.STRDESCRIZIONE as tipoRosa
+                       , to_char(rich2.prgRichiestaAz) as prgRichiestaOrig
+                       , to_char(rich3.prgRichiestaAz) as prgCopia1,
+                       do_rosa.prgRosaFiglia,
+                       (select max(to_char(appgr.datpubblicazionegrad, 'dd/mm/yyyy'))
+                       from as_approvazione_grad appgr
+                       inner join do_rosa ros on ros.prgapprovazionegrad = appgr.prgapprovazionegrad 
+                       inner join do_incrocio incro on incro.prgincrocio = ros.prgincrocio                       
+                       where ros.prgrosafiglia is null
+                       and incro.prgrichiestaaz = rich1.prgrichiestaaz
+                       and incro.prgtipoincrocio = do_incrocio.prgtipoincrocio)
+                       as dataPubb,
+                       (select trunc(sysdate) - (trunc(add_months(max(appgr.datpubblicazionegrad), 6))-1)
+                       from as_approvazione_grad appgr
+                       inner join do_rosa ros on ros.prgapprovazionegrad = appgr.prgapprovazionegrad 
+                       inner join do_incrocio incro on incro.prgincrocio = ros.prgincrocio                       
+                       where ros.prgrosafiglia is null
+                       and incro.prgrichiestaaz = rich1.prgrichiestaaz
+                       and incro.prgtipoincrocio = do_incrocio.prgtipoincrocio)
+                       as checkDataAvv,
+                       eva.codEvasione,
+                       do_rosa.FLGASONLINE, to_char(rich1.DTMASONLINE, 'dd/mm/yyyy hh24:mi') as strDatAsOnline
+                  from do_rosa
+                     inner join de_tipo_rosa on (do_rosa.PRGTIPOROSA=de_tipo_rosa.PRGTIPOROSA)
+                     inner join do_incrocio on (do_rosa.PRGINCROCIO=do_incrocio.PRGINCROCIO)
+                     inner join de_tipo_incrocio on (do_incrocio.PRGTIPOINCROCIO=de_tipo_incrocio.PRGTIPOINCROCIO)
+                     inner join ts_utente on (do_rosa.CDNUTMOD=ts_utente.CDNUT)
+                     inner join do_richiesta_az rich1 on (do_incrocio.PRGRICHIESTAAZ=rich1.PRGRICHIESTAAZ)
+                     left join do_richiesta_az rich2 on (rich1.NUMANNO=rich2.NUMANNO and rich1.NUMRICHIESTA=rich2.NUMRICHIESTA and rich2.NUMSTORICO=0)
+                     left join do_richiesta_az rich3 on (rich1.NUMANNO=rich3.NUMANNO and rich1.NUMRICHIESTA=rich3.NUMRICHIESTA and rich3.NUMSTORICO=1)
+                     left join do_evasione eva on (rich1.prgrichiestaaz = eva.prgrichiestaaz)
+                  where prgRosa=?"
+/>
+
+<STATEMENT name="ASListaAdesioniLavoratoreView"
+            query="select 
+						prgrichiestaaz,
+						prgtipoincrocio,
+						viewBtn,
+						prgnominativo,
+						prgrosa,
+						numrichiesta, 
+						numanno,
+						prgalternativa,
+						richiesta,
+						ente,
+						posti,
+						descrInc,
+						descr_rosa,
+						rapp,
+						qual,
+						dataChiam,
+						dataPubb,
+						cpi,
+						datchiamata,
+						cdnlavoratore,
+						utente,
+						datChPb
+					from
+						(select 
+							raz.prgrichiestaaz, inc.prgtipoincrocio, 
+							decode(inc.prgtipoincrocio, 7, '1','0') as viewBtn, 
+							r.prgrosa, n.prgnominativo, n.cdnlavoratore,
+							raz.numrichiesta, raz.numanno, a.prgalternativa,  
+							nvl(raz.numrichiestaorig, raz.numrichiesta) ||'/'|| raz.numanno ||'/'|| a.prgalternativa  as richiesta,  
+							az.strragionesociale as ente,  
+							case   	   when inc.prgtipoincrocio = 5 			then raz.numpostoas 	   when inc.prgtipoincrocio = 6 			then raz.numpostomilitare 	   when inc.prgtipoincrocio = 7 			then raz.numpostolsu 	   else 0  end  as posti,   
+							PG_IDO.WebStrContrattiProfilo(raz.prgrichiestaaz, a.prgalternativa) as rapp,
+							PG_IDO.WebStrMansioniProfilo(raz.prgrichiestaaz, a.prgalternativa) as qual, 							
+							TO_CHAR(raz.datchiamata,'DD/MM/YYYY') as dataChiam, 
+							TO_CHAR(raz.datpubblicazione,'DD/MM/YYYY') as dataPubb,  
+							(select de_cpi.strdescrizione from de_cpi where de_cpi.codcpi = raz.codcpi) as cpi,  
+							raz.datchiamata,
+							dti.strdescrizione as descrInc,
+							tr.strdescrizione as descr_rosa,
+							(select u.strcognome || ' ' || u.strnome from ts_utente u where cdnut =n.cdnutins) ||' - '|| TO_CHAR(n.dtmins, 'DD/MM/YYYY hh24:mi') as utente,
+							(TO_CHAR(raz.datchiamata,'DD/MM/YYYY') || ' &lt;BR&gt; ' || TO_CHAR(raz.datpubblicazione,'DD/MM/YYYY')) as datChPb
+						from do_richiesta_az raz  
+							inner join do_incrocio inc on inc.prgrichiestaaz =raz.prgrichiestaaz  
+							inner join do_rosa r on r.prgincrocio = inc.prgincrocio  
+							inner join an_azienda az on az.prgazienda = raz.prgazienda  
+							inner join do_nominativo n on n.prgrosa = r.prgrosa  
+							inner join do_alternativa a on a.prgrichiestaaz = raz.prgrichiestaaz and a.prgalternativa = inc.prgalternativa  							
+							inner join de_tipo_incrocio dti on dti.prgtipoincrocio = inc.prgtipoincrocio
+							inner join de_tipo_rosa tr on tr.prgtiporosa = r.prgtiporosa
+						where 1=1
+							and n.codtipocanc is null
+							and inc.prgtipoincrocio in  
+							(SELECT ti.prgTipoIncrocio AS prgTipoIncrocio FROM De_Tipo_Incrocio ti	WHERE ti.prgtipoincrocio IN (5,6,7))  														
+							and r.prgrosafiglia is null
+							and n.cdnlavoratore = ? 
+						)  
+					where posti is not null
+					ORDER BY datchiamata DESC, ente, numanno DESC, numrichiesta, prgalternativa, prgtipoincrocio "/>
+					
+
+<!--
+<STATEMENT name="AS_RIAPRI_GRADUATORIA"
+           query="{ call ? := PG_INCROCIO.ASRiaperturaGraduatoria(?,?,?,?,?,?,?) }"
+/>                 
+-->
+<STATEMENT name="AS_RIAPRI_GRADUATORIA"
+           query="{ call ? := PG_INCROCIO.ASRiapriGraduatorie(?,?,?,?,?,?,?,?) }"
+/> 
+
+<STATEMENT name="SELECT_COMBO_ALTERNATIVA"
+          query="select r.prgrosa as codice,
+			 	decode(i.PRGALTERNATIVA, null,'Nessun profilo','Profilo n. ' || i.PRGALTERNATIVA) as DESCRIZIONE
+				from do_richiesta_az rich
+				inner join do_incrocio i on i.prgrichiestaaz = rich.prgrichiestaaz
+				inner join do_rosa r on i.prgincrocio = r.prgincrocio				
+				where rich.prgrichiestaaz = ? 
+				and r.prgTipoRosa = 3
+				and i.prgtipoincrocio = ? 
+				and r.prgrosafiglia is null
+				order by prgalternativa  "/>
+
+<STATEMENT name="SELECT_NUM_MAX_CANDIDATI"				
+		  query="select count(r.PRGNOMINATIVO) as maxCandidati
+				from do_nominativo r 				
+				inner join do_rosa on (r.PRGROSA=do_rosa.PRGROSA) 			
+				inner join do_incrocio on (do_rosa.PRGINCROCIO=do_incrocio.PRGINCROCIO) 
+				inner join do_richiesta_az rich1 on (do_incrocio.PRGRICHIESTAAZ=rich1.PRGRICHIESTAAZ) 				
+        		where rich1.prgrichiestaaz = ?
+				and do_rosa.prgTipoRosa = 3
+				and do_incrocio.prgtipoincrocio = ? 
+				and do_rosa.prgrosafiglia is null
+				and r.CODTIPOCANC is null"/>	
+
+<STATEMENT name="AS_AVVIA_PRIMI_N_CANDIDATI"
+           query="{ call ? := PG_INCROCIO.ASAVVIAPRIMINCANDIDATI(?,?,?,?,?,?) }"
+/>
+							
+<STATEMENT name="AS_SELECT_CANDIDATI_AVVIATI_GRADUATORIA"
+          query="select avv.cdnlavoratore 
+          		 from as_avv_selezione avv
+          		 where avv.prgrichiestaaz = ? "/>							
+							
+<STATEMENT name="AS_CALCOLO_PUNTEGGIO"
+           query="{ call ? := PG_INCROCIO.calcoloPunteggioLavoratore(?,?,?,?,?,?) }"
+/>
+				 
+<STATEMENT name="AS_DATI_LSU_NOMINATIVO"
+          query="select n.NUMANZIANITALSU, n.FLGPROFESSIONALITA, n.NUMCARICOFAM
+				 from do_nominativo n				 
+				 where n.prgnominativo = ? "/>		
+
+<STATEMENT name="AS_SALVA_DATI_LSU"
+          query="update do_nominativo
+          		 set numklonominativo = numklonominativo+1,
+          		 numanzianitalsu = ?, 
+          		 numcaricofam = ?,
+          		 flgprofessionalita = ?          		                    
+                 where prgNominativo = ? "/>
+                 
+<STATEMENT name="AS_CALCOLO_POSIZIONE"
+           query="{ call ? := PG_INCROCIO.ASCalcolaPosizione(?,?) }"
+/>                 				 		 			 
+				  					 					  
+<STATEMENT name="AS_ELENCO_STORICO_GRADUATORIE"
+           query="select 
+					r.prgrosa as id_grad,
+					i.prgrichiestaaz,
+					i.prgtipoincrocio, 
+					rich.prgazienda,
+          			rich.prgunita, 
+          			DO_EVASIONE.CDNSTATORICH,         
+					r.prgTipoRosa as prgTipoRosa,
+					ti.strdescrizione as descr_incr,
+					tr.strdescrizione as descr_rosa,
+					i.prgalternativa as id_profilo,
+					decode(i.PRGALTERNATIVA, null,'','Profilo n. ' || i.PRGALTERNATIVA) as DESCR_PROFILO,
+					to_char(r.CDNUTMOD) as CDNUTMOD, 
+					to_char(r.DATINVIO,'dd/mm/yyyy') as DATINVIO,
+					(Initcap(tu.STRCOGNOME) || ' ' || InitCap(tu.STRNOME) || ' - ' || to_char(r.DTMMOD, 'dd/mm/yyyy')) as ultimaModifica,
+					(SELECT codmonotipogradcm FROM TS_GENERALE) as codmonotipogradcm
+				   from do_richiesta_az rich
+           			inner join do_incrocio i on i.prgrichiestaaz = rich.prgrichiestaaz
+					inner join do_rosa r on i.prgincrocio = r.prgincrocio
+					inner join de_tipo_incrocio ti on ti.prgtipoincrocio = i.prgtipoincrocio
+					inner join de_tipo_rosa tr on tr.prgtiporosa = r.prgtiporosa
+					inner join ts_utente tu on r.CDNUTMOD = tu.CDNUT
+					LEFT OUTER JOIN DO_EVASIONE ON (rich.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+                    LEFT OUTER JOIN DE_EVASIONE_RICH ON (DO_EVASIONE.CODEVASIONE=DE_EVASIONE_RICH.CODEVASIONE)
+				   where rich.prgrichiestaaz = ?
+					and r.prgRosaFiglia is not null
+					and (r.prgTipoRosa=2 or r.prgTipoRosa=3) 
+					and (i.prgTipoIncrocio=5 or i.prgTipoIncrocio=6 or i.prgTipoIncrocio=7 or i.prgTipoIncrocio=8 or i.prgTipoIncrocio=9 or i.prgTipoIncrocio=13 or i.prgTipoIncrocio=14) 
+				   order by prgtiporosa, prgalternativa "/>
+
+<STATEMENT name="SELECT_MOTIVO_APERTURAGRAD"
+          query="select m.strmotivo, m.cdnutins, to_char(m.dtmins, 'dd/mm/yyyy') as dtmins 
+          		from as_motivo_aperturagrad m
+                inner join do_rosa r on r.prgmotivoaperturagrad = m.prgmotivoaperturagrad
+                where r.prgrosa = ? 
+                "/>					
+
+<STATEMENT name="SELECT_APPROVAZ_GRADUATORIA"
+          query="select app.numdetermina as numDetermina, to_char(app.datpubblicazionegrad, 'dd/mm/yyyy') as datPubblicazione, 
+				       to_char(app.datprotocollo, 'dd/mm/yyyy') as datProtocollazione,
+				       app.cdnutins, to_char(app.dtmins, 'dd/mm/yyyy') as dtmins, app.cdnutmod, to_char(app.dtmmod, 'dd/mm/yyyy') as dtmmod
+				from as_approvazione_grad app
+				inner join do_rosa r on r.prgapprovazionegrad = app.prgapprovazionegrad
+				where r.prgrosa = ? 
+                "/>	 
+
+<STATEMENT name="AS_SALVA_APPROVAZ"
+           query="{ call ? := PG_INCROCIO.ASSalvaApprovazGrad(?,?,?,?,?,?,?) }"
+/> 
+
+<STATEMENT name="AS_UPD_DOC_AVVIO"
+          query="update as_avvio
+            	 set numkloavvio = numkloavvio+1,          		 
+          		 prgDocumento = 
+          		 (select doc.prgdocumento
+				 from am_documento doc 
+				 where (doc.codtipodocumento = 'ALSEVO' OR doc.codtipodocumento = 'ALL68O')
+				 and doc.numprotocollo = ? 
+				 and doc.numannoprot = ? )          		                    
+                 where prgAvvio = ? " />            
+                 
+<STATEMENT name="AS_INS_REL_DOC_RICH"
+           query="{ call ? := PG_IDO.ASINSRELDOCRICH(?,?,?,?,?) }"
+/>   
+
+<STATEMENT name="DEL_STORIA_STATO_OCC"
+          query="delete from as_storia_stato_occ c
+		         where c.cdnlavoratore = ?
+		         and c.prgincrocio = ?"/>          
+
+<STATEMENT name="GET_DESCRCPI_STAMPA"
+          query="select cp.strdescrizione 
+				 from DE_CPI cp
+				 where cp.codcpi = ? "/>				         
+
+<!-- gestione graduatorie collocamento mirato -->
+<STATEMENT name="CM_MATCH_STATO_RICH_ORIG"
+		   query="SELECT to_char(do_evasione.CDNSTATORICH) as CDNSTATORICH,
+		   				 DE_STATO_EV_RICH.strDescrizione as STATORICHORIG,
+		   				 de_evasione_rich.FLGINCROCIO, de_evasione_rich.FLGGRADUATORIA,
+		   				  (select count(r.prgTipoRosa)
+			               from do_incrocio i 
+			               inner join do_rosa r on r.prgincrocio = i.prgincrocio
+			               where i.prgrichiestaaz = ?
+			               and r.prgRosaFiglia is null
+								     and (r.prgTipoRosa=2 or r.prgTipoRosa=3) 
+								     and (i.prgTipoIncrocio=10) 
+			               ) as tot_graduatorie_art8, 
+			               (select count(r.prgTipoRosa)
+			               from do_incrocio i 
+			               inner join do_rosa r on r.prgincrocio = i.prgincrocio
+			               where i.prgrichiestaaz = ?
+			               and r.prgRosaFiglia is null
+								     and (r.prgTipoRosa=2 or r.prgTipoRosa=3) 
+								     and (i.prgTipoIncrocio=11) 
+			               ) as tot_graduatorie_art18, 
+			               (select count(r.prgTipoRosa)
+			               from do_incrocio i 
+			               inner join do_rosa r on r.prgincrocio = i.prgincrocio
+			               where i.prgrichiestaaz = ?
+			               and r.prgRosaFiglia is null
+								     and (r.prgTipoRosa=2 or r.prgTipoRosa=3) 
+								     and (i.prgTipoIncrocio=12) 
+			               ) as tot_graduatorie_art1,  
+			               (select count(r.prgTipoRosa) 
+			               from do_incrocio i 
+			               inner join do_rosa r on r.prgincrocio = i.prgincrocio
+			               where i.prgrichiestaaz = ?
+			               and r.prgRosaFiglia is null
+								     and r.prgTipoRosa=3 
+								     and (i.prgTipoIncrocio=10) 
+			               ) as tot_graduatorie_def_art8,
+			               (select count(r.prgTipoRosa) 
+			               from do_incrocio i 
+			               inner join do_rosa r on r.prgincrocio = i.prgincrocio
+			               where i.prgrichiestaaz = ?
+			               and r.prgRosaFiglia is null
+								     and r.prgTipoRosa=3 
+								     and (i.prgTipoIncrocio=11) 
+			               ) as tot_graduatorie_def_art18,
+			               (select count(r.prgTipoRosa) 
+			               from do_incrocio i 
+			               inner join do_rosa r on r.prgincrocio = i.prgincrocio
+			               where i.prgrichiestaaz = ?
+			               and r.prgRosaFiglia is null
+								     and r.prgTipoRosa=3 
+								     and (i.prgTipoIncrocio=12) 
+			               ) as tot_graduatorie_def_art1,
+			               (select count(r.prgRosa) 
+			               from do_incrocio i 
+			               inner join do_rosa r on r.prgincrocio = i.prgincrocio
+			               where i.prgrichiestaaz = DO_RICHIESTA_AZ.PRGRICHIESTAAZ
+			               and r.prgRosaFiglia is not null
+								     and r.prgTipoRosa=3 
+								     and (i.prgTipoIncrocio=10 or i.prgTipoIncrocio=11 or i.prgTipoIncrocio=12) 
+			               ) as checkStorico,
+			               de_cm_lista_speciale.strdescrizione as descrTipoLista,
+			               de_cm_lista_speciale.codtipolista			              
+	 			  FROM DO_RICHIESTA_AZ, DO_EVASIONE, de_stato_ev_rich, de_evasione_rich, de_cm_lista_speciale
+				  WHERE (DO_RICHIESTA_AZ.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+				  		and (DO_EVASIONE.cdnStatoRich=DE_STATO_EV_RICH.cdnStatoRich)
+				  		and de_evasione_rich.codEvasione(+) = do_evasione.codEvasione
+				  		and de_cm_lista_speciale.codtipolista(+) = DO_RICHIESTA_AZ.Codtipolista
+    	 			    AND DO_RICHIESTA_AZ.PRGRICHIESTAAZ=(SELECT RICH2.PRGRICHIESTAAZ 
+	 												  FROM DO_RICHIESTA_AZ RICH1
+	      	  										  INNER JOIN DO_RICHIESTA_AZ RICH2 
+	      	  										  ON (rich1.NUMANNO=rich2.NUMANNO and rich1.NUMRICHIESTA=rich2.NUMRICHIESTA and rich2.NUMSTORICO=0)
+     												  WHERE RICH1.PRGRICHIESTAAZ =  ?
+     					)
+"/>			                                  
+
+<STATEMENT name="CM_MATCH_ELENCO_GRADUATORIE"
+           query="select 
+					r.prgrosa as id_grad,
+					i.prgrichiestaaz,
+					i.prgtipoincrocio, 
+					rich.prgazienda,
+          			rich.prgunita, 
+          			DO_EVASIONE.CDNSTATORICH,         
+					r.prgTipoRosa as prgTipoRosa,
+					ti.strdescrizione as descr_incr,
+					tr.strdescrizione as descr_rosa,
+					i.prgalternativa as id_profilo,
+					decode(i.PRGALTERNATIVA, null,'','Profilo n. ' || i.PRGALTERNATIVA) as DESCR_PROFILO,
+					to_char(r.CDNUTMOD) as CDNUTMOD, 
+					to_char(r.DATINVIO,'dd/mm/yyyy') as DATINVIO,
+					DE_CPI.CODCPI AS CODCPI,
+					DE_CPI.STRDESCRIZIONE AS DESCRIZIONE,
+					(Initcap(tu.STRCOGNOME) || ' ' || InitCap(tu.STRNOME) || ' - ' || to_char(r.DTMMOD, 'DD/MM/YYYY hh24:mi')) as ultimaModifica,
+					(SELECT codmonotipogradcm FROM TS_GENERALE) as codmonotipogradcm
+				   from do_richiesta_az rich
+           			inner join do_incrocio i on i.prgrichiestaaz = rich.prgrichiestaaz
+					inner join do_rosa r on i.prgincrocio = r.prgincrocio
+					inner join de_tipo_incrocio ti on ti.prgtipoincrocio = i.prgtipoincrocio
+					inner join de_tipo_rosa tr on tr.prgtiporosa = r.prgtiporosa
+					inner join ts_utente tu on r.CDNUTMOD = tu.CDNUT
+					LEFT OUTER JOIN DO_EVASIONE ON (rich.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+                    LEFT OUTER JOIN DE_EVASIONE_RICH ON (DO_EVASIONE.CODEVASIONE=DE_EVASIONE_RICH.CODEVASIONE)
+                    INNER JOIN DE_CPI ON (rich.CODCPI = DE_CPI.CODCPI)
+				   where rich.prgrichiestaaz = ?
+					and r.prgRosaFiglia is null
+					and (r.prgTipoRosa=2 or r.prgTipoRosa=3) 
+					and (i.prgTipoIncrocio=10 or i.prgTipoIncrocio=11 or i.prgTipoIncrocio=12) 
+					and i.prgtipoincrocio = DECODE(rich.CODMONOTIPOGRAD, 'D', 10, 'A', 11, 'G', 12)  
+				   order by prgTipoIncrocio, prgalternativa "/>
+
+<STATEMENT name="CM_MATCH_DETTAGLIO_ROSA"
+           query="select 
+                       do_rosa.PRGROSA, 
+                       to_char(do_rosa.NUMKLOROSA) as NUMKLOROSA,
+                       to_char(do_rosa.NUMORDPROVINCIA) as NUMORDPROVINCIA,
+                       to_char(do_rosa.PRGINCROCIO) as PRGINCROCIO,
+                       to_char(do_rosa.PRGTIPOROSA) AS PRGTIPOROSA,
+                       to_char(do_incrocio.PRGTIPOINCROCIO) as PRGTIPOINCROCIO,
+                       de_tipo_incrocio.STRDESCRIZIONE as tipoIncrocio,
+                       do_incrocio.PRGRICHIESTAAZ,
+                       to_char(do_incrocio.PRGALTERNATIVA) as PRGALTERNATIVA,
+                       to_char(do_rosa.CDNUTMOD) as CDNUTMOD, 
+                       (Initcap(ts_utente.STRCOGNOME) || &apos; &apos; || InitCap(ts_utente.STRNOME) || &apos; - &apos; || to_char(do_rosa.DTMMOD, &apos;dd/mm/yyyy&apos;)) as ultimaModifica,
+                       to_char(rich1.NUMRICHIESTA) as NUMRICHIESTA, to_char(nvl(rich1.NUMRICHIESTAORIG, rich1.NUMRICHIESTA)) as NUMRICHIESTAORIG, 
+                       to_char(rich2.NUMANNO) as NUMANNO,
+                       de_tipo_rosa.STRDESCRIZIONE as tipoRosa
+                       , to_char(rich2.prgRichiestaAz) as prgRichiestaOrig
+                       , to_char(rich3.prgRichiestaAz) as prgCopia1,
+                       do_rosa.prgRosaFiglia,
+                       (select max(to_char(appgr.datpubblicazionegrad, 'dd/mm/yyyy'))
+                       from as_approvazione_grad appgr
+                       inner join do_rosa ros on ros.prgapprovazionegrad = appgr.prgapprovazionegrad 
+                       inner join do_incrocio incro on incro.prgincrocio = ros.prgincrocio                       
+                       where ros.prgrosafiglia is null
+                       and incro.prgrichiestaaz = rich1.prgrichiestaaz
+                       and incro.prgtipoincrocio = do_incrocio.prgtipoincrocio)
+                       as dataPubb,
+                       (select to_date(sysdate, 'dd/mm/yy') - (to_date(add_months(max(appgr.datpubblicazionegrad), 6), 'dd/mm/yy')-1)
+                       from as_approvazione_grad appgr
+                       inner join do_rosa ros on ros.prgapprovazionegrad = appgr.prgapprovazionegrad 
+                       inner join do_incrocio incro on incro.prgincrocio = ros.prgincrocio                       
+                       where ros.prgrosafiglia is null
+                       and incro.prgrichiestaaz = rich1.prgrichiestaaz
+                       and incro.prgtipoincrocio = do_incrocio.prgtipoincrocio)
+                       as checkDataAvv
+                  from do_rosa
+                     inner join de_tipo_rosa on (do_rosa.PRGTIPOROSA=de_tipo_rosa.PRGTIPOROSA)
+                     inner join do_incrocio on (do_rosa.PRGINCROCIO=do_incrocio.PRGINCROCIO)
+                     inner join de_tipo_incrocio on (do_incrocio.PRGTIPOINCROCIO=de_tipo_incrocio.PRGTIPOINCROCIO)
+                     inner join ts_utente on (do_rosa.CDNUTMOD=ts_utente.CDNUT)
+                     inner join do_richiesta_az rich1 on (do_incrocio.PRGRICHIESTAAZ=rich1.PRGRICHIESTAAZ)
+                     left join do_richiesta_az rich2 on (rich1.NUMANNO=rich2.NUMANNO and rich1.NUMRICHIESTA=rich2.NUMRICHIESTA and rich2.NUMSTORICO=0)
+                     left join do_richiesta_az rich3 on (rich1.NUMANNO=rich3.NUMANNO and rich1.NUMRICHIESTA=rich3.NUMRICHIESTA and rich3.NUMSTORICO=1)
+                  where prgRosa=?"
+/>				   
+
+<STATEMENT name="CM_MATCH_ELENCO_CANDIDATI_GRD"
+		   query="select r.PRGNOMINATIVO, 
+				r.CDNLAVORATORE, 
+				r.numordine, 
+				rich1.prgrichiestaaz,
+				do_rosa.PRGINCROCIO,
+				DO_EVASIONE.CDNSTATORICH, 
+				do_incrocio.prgtipoincrocio, 	
+				ti.strdescrizione as descr_incr,
+				tr.strdescrizione as descr_rosa,				
+				rich1.datchiamata,
+				rich1.datpubblicazione,
+				Initcap(an.STRCOGNOME) || ' ' || Initcap(an.STRNOME) as strCognomeNome,
+				to_char(an.DATNASC, 'dd/mm/yyyy') as DatNasc, 
+				r.numpunteggio as punteggio, 
+				r.numpunteggiopres as punteggiopres, 
+				r.NUMANNOPUNTART1 as annoPunteggioArt1,	
+				r.strpriorita,
+				to_char(r.DATISCRART1, 'dd/mm/yyyy') as datIscrAlboArt1,
+				case 
+             when (select codmonotipogradcm from ts_generale) = 4 
+                then  
+                       (select v.numvaloreisee 
+          from AS_VALORE_ISEE v 
+                where v.cdnlavoratore = r.CDNLAVORATORE 
+                and v.datinizioval &lt;= rich1.datchiamatacm 
+               and v.numanno = rich1.numannoredditocm 
+              and v.datinizioval &gt;= add_months(rich1.datchiamatacm, -12) 
+               and (v.datfineval &gt;= rich1.datchiamatacm 
+               or v.datfineval is null)) 
+                else 
+                (select red.numreddito
+                from cm_lav_reddito red 
+                where red.cdnlavoratore = r.CDNLAVORATORE
+                      and (red.datfineval is null or red.datfineval &gt;= sysdate)
+                      and red.numanno = 
+                          (select max(red.numanno)
+                           from cm_lav_reddito red 
+                           where red.cdnlavoratore = r.CDNLAVORATORE
+                           and (red.datfineval is null or red.datfineval &gt;= sysdate))) 
+               end as reddito,												
+		(select car.numpersone
+		         from cm_lav_carico car   
+		         where car.cdnlavoratore = r.CDNLAVORATORE)
+		        as carico,
+		(select to_char(i.datdatainizio, 'dd/mm/yyyy')
+		        from am_cm_iscr i
+		        inner join de_cm_tipo_iscr t on t.codcmtipoiscr = i.codcmtipoiscr 
+		        inner join AM_DOCUMENTO_COLL COLL on COLL.STRCHIAVETABELLA = I.PRGCMISCR 
+				inner join AM_DOCUMENTO DOC on DOC.PRGDOCUMENTO = COLL.PRGDOCUMENTO 
+		        where DECRYPT(i.cdnlavoratore,?) = r.CDNLAVORATORE
+		        and i.datdatafine is null
+		        and t.codmonotiporagg = DECODE(do_incrocio.prgtipoincrocio, 10, 'D', 11, 'A')
+		        AND I.PRGCMISCR = COLL.STRCHIAVETABELLA 
+				AND DOC.CODTIPODOCUMENTO = 'L68'
+				AND DOC.CDNLAVORATORE = r.CDNLAVORATORE 
+				AND DOC.CODSTATOATTO = 'PR')        
+		         as dataIscrCM,
+		(select to_char(i.datanzianita68, 'dd/mm/yyyy')
+		        from am_cm_iscr i
+		        inner join de_cm_tipo_iscr t on t.codcmtipoiscr = i.codcmtipoiscr 
+		        inner join AM_DOCUMENTO_COLL COLL on COLL.STRCHIAVETABELLA = I.PRGCMISCR 
+				inner join AM_DOCUMENTO DOC on DOC.PRGDOCUMENTO = COLL.PRGDOCUMENTO 
+		        where DECRYPT(i.cdnlavoratore,?) = r.CDNLAVORATORE
+		        and i.datdatafine is null
+		        and t.codmonotiporagg = DECODE(do_incrocio.prgtipoincrocio, 10, 'D', 11, 'A')
+		        AND I.PRGCMISCR = COLL.STRCHIAVETABELLA 
+				AND DOC.CODTIPODOCUMENTO = 'L68'
+				AND DOC.CDNLAVORATORE = r.CDNLAVORATORE 
+				AND DOC.CODSTATOATTO = 'PR')        
+		         as dataAnzCM,		  
+				decode(an.STRINDIRIZZODOM,null,' ',Initcap(an.STRINDIRIZZODOM) || ' ') || Initcap(dom.STRDENOMINAZIONE) || '(' || pr.STRTARGA || ')' as Domicilio,
+		(select 
+				to_char(ia.datiscrlistaprov, 'dd/mm/yyyy') 
+				from CM_ISCR_ART1 ia		
+				inner join am_documento_coll dc on dc.strchiavetabella = ia.prgiscrart1
+       			inner join am_documento ad on ad.prgdocumento = dc.prgdocumento		
+				where ia.datfine is null
+				AND ad.codtipodocumento = 'ILS'        
+	  			AND ad.CODSTATOATTO != 'AN'	
+				and ia.codtipolista = rich1.codtipolista
+        		and ia.cdnlavoratore = r.CDNLAVORATORE) as dataAnzArt1,
+        (select 
+				to_char(ia.datiscralbo, 'dd/mm/yyyy') 
+				from CM_ISCR_ART1 ia
+				inner join am_documento_coll dc on dc.strchiavetabella = ia.prgiscrart1
+    	    	inner join am_documento ad on ad.prgdocumento = dc.prgdocumento				
+				where ia.datfine is null
+				AND ad.codtipodocumento = 'ILS'        
+	  			AND ad.CODSTATOATTO != 'AN'	
+				and ia.codtipolista = rich1.codtipolista
+        		and ia.cdnlavoratore = r.CDNLAVORATORE) as dataIscrArt1,
+        (select 
+				ia.numannopunteggio 
+				from CM_ISCR_ART1 ia	
+				inner join am_documento_coll dc on dc.strchiavetabella = ia.prgiscrart1
+	        	inner join am_documento ad on ad.prgdocumento = dc.prgdocumento			
+				where ia.datfine is null
+				AND ad.codtipodocumento = 'ILS'        
+	  			AND ad.CODSTATOATTO != 'AN'	
+				and ia.codtipolista = rich1.codtipolista
+       			and ia.cdnlavoratore = r.CDNLAVORATORE) as numannopunteggioArt1,
+        (select 
+				ia.numpunteggio
+				from CM_ISCR_ART1 ia	
+				inner join am_documento_coll dc on dc.strchiavetabella = ia.prgiscrart1
+		        inner join am_documento ad on ad.prgdocumento = dc.prgdocumento			
+				where ia.datfine is null
+				AND ad.codtipodocumento = 'ILS'        
+	  			AND ad.CODSTATOATTO != 'AN'	
+				and ia.codtipolista = rich1.codtipolista
+        		and ia.cdnlavoratore = r.CDNLAVORATORE) as numpunteggioArt1,
+        (select 
+				pc.strdenominazione
+				from CM_ISCR_ART1 ia		
+				inner join am_documento_coll dc on dc.strchiavetabella = ia.prgiscrart1
+		        inner join am_documento ad on ad.prgdocumento = dc.prgdocumento
+        		inner join an_lav_storia_inf ai on (ia.cdnLavoratore=ai.cdnLavoratore and ai.datFine is null)
+        		left join de_cpi cpi on (ai.codCpiTit=cpi.codCpi) 
+				left join de_cpi cpiO on (ai.codCpiOrig=cpiO.codCpi) 
+				left join de_provincia pc on (cpi.CODPROVINCIA=pc.codProvincia)		
+				where ia.datfine is null
+				AND ad.codtipodocumento = 'ILS'        
+	  			AND ad.CODSTATOATTO != 'AN'	
+				and ia.codtipolista = rich1.codtipolista
+        		and ia.cdnlavoratore = r.CDNLAVORATORE) as descrProvCpiComp,
+        		
+		        (SELECT 			       
+			     tab.codTipoMov || ' - ' || TO_CHAR (tab.datiniziomov, 'dd/mm/yyyy')
+			  FROM am_movimento tab, de_contratto con
+			 WHERE tab.cdnlavoratore = r.CDNLAVORATORE
+			   AND tab.codstatoatto = 'PR'
+			   AND (       (   (    tab.datfinemovEffettiva IS NULL
+			                    AND tab.datiniziomov =
+			                           (SELECT MAX (tab1.datiniziomov)
+			                              FROM am_movimento tab1
+			                             WHERE tab1.datfinemovEffettiva IS NULL
+			                               AND tab1.cdnlavoratore = tab.cdnlavoratore
+			                               AND tab1.codstatoatto = 'PR'
+			                               AND tab1.codtipomov &lt;&gt; 'CES')
+			                   )
+			                OR (    NOT EXISTS (
+			                           SELECT tab1.datiniziomov
+			                             FROM am_movimento tab1
+			                            WHERE tab1.datfinemovEffettiva IS NULL
+			                              AND tab1.cdnlavoratore = tab.cdnlavoratore
+			                              AND tab1.codstatoatto = 'PR'
+			                              AND tab1.codtipomov &lt;&gt; 'CES')
+			                    AND tab.datfinemovEffettiva =
+			                           (SELECT MAX (tab1.datfinemovEffettiva)
+			                              FROM am_movimento tab1
+			                             WHERE NOT tab1.datfinemovEffettiva IS NULL
+			                               AND tab1.cdnlavoratore = tab.cdnlavoratore
+			                               AND tab1.codstatoatto = 'PR'
+			                               AND tab1.codtipomov &lt;&gt; 'CES')
+			                   )
+			               )
+			           AND tab.codtipomov &lt;&gt; 'CES'
+			        OR (    NOT EXISTS (
+			                   SELECT tab1.datiniziomov
+			                     FROM am_movimento tab1
+			                    WHERE tab1.cdnlavoratore = tab.cdnlavoratore
+			                      AND tab1.codstatoatto = 'PR'
+			                      AND tab1.codtipomov &lt;&gt; 'CES')
+			            AND tab.datiniziomov =
+			                   (SELECT MAX (tab1.datiniziomov)
+			                      FROM am_movimento tab1
+			                     WHERE tab1.cdnlavoratore = tab.cdnlavoratore
+			                       AND tab1.codstatoatto = 'PR'
+			                       AND tab1.codtipomov = 'CES')
+			            AND tab.codtipomov = 'CES'
+			           )
+			       )
+			   AND tab.codcontratto = con.codcontratto(+)
+			   AND ROWNUM = 1) as ultMov,
+		        DQ.STRDESCRIZIONE as QUALIFICATO
+				from do_nominativo r 
+				inner join an_lavoratore an on (r.CDNLAVORATORE=an.CDNLAVORATORE) 
+				inner join do_rosa on (r.PRGROSA=do_rosa.PRGROSA) 
+				inner join de_comune dom on (an.CODCOMDOM=dom.CODCOM) 
+				inner join de_provincia pr on (dom.CODPROVINCIA=pr.CODPROVINCIA) 
+				left outer join de_cpi on (r.CODCPITIT=de_cpi.CODCPI) 
+				inner join do_incrocio on (do_rosa.PRGINCROCIO=do_incrocio.PRGINCROCIO) 
+				inner join do_richiesta_az rich1 on (do_incrocio.PRGRICHIESTAAZ=rich1.PRGRICHIESTAAZ) 
+				inner join de_tipo_incrocio ti on ti.prgtipoincrocio = do_incrocio.prgtipoincrocio
+				inner join de_tipo_rosa tr on tr.prgtiporosa = do_rosa.prgtiporosa
+				LEFT OUTER JOIN DO_EVASIONE ON (rich1.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+        		LEFT OUTER JOIN DE_EVASIONE_RICH ON (DO_EVASIONE.CODEVASIONE=DE_EVASIONE_RICH.CODEVASIONE)
+        		LEFT OUTER JOIN DE_QUALIFICATO DQ ON (DQ.CDNQUALIFICATO=r.CDNQUALIFICATO)
+				where r.prgrosa=?
+				and r.CODTIPOCANC is null 				
+				order by numordine
+				"/>    
+
+<STATEMENT name="CM_UPDATE_SET_DEFINITIVA_GRD"
+          query="{ call ? := PG_COLL_MIRATO.CMSetGraduatoriaDefinitiva(?,?,?) }"
+/>
+
+<STATEMENT name="CM_RIAPRI_GRADUATORIA"
+           query="{ call ? := PG_COLL_MIRATO.CMRiapriGraduatorie(?,?,?,?,?,?,?,?) }"
+/> 		
+
+<STATEMENT name="CM_SELECT_CANDIDATI_AVVIATI_GRADUATORIA"
+          query="select avv.cdnlavoratore 
+          		 from as_avv_selezione avv
+          		 where avv.prgrichiestaaz = ? "/>		
+
+<STATEMENT name="CM_CALCOLO_PUNTEGGIO"
+           query="{ call ? := PG_COLL_MIRATO.calcoloPunteggioLavoratore(?,?,?,?,?,?) }"
+/>
+
+<STATEMENT name="CM_CALCOLO_POSIZIONE"
+           query="{ call ? := PG_COLL_MIRATO.CMCalcolaPosizione(?,?,?) }"
+/>            		 
+
+<STATEMENT name="CMListaAdesioniLavoratoreView"
+            query="select 
+						prgrichiestaaz,
+						prgtipoincrocio,						
+						prgnominativo,
+						prgrosa,
+						numrichiesta, 
+						numanno,
+						prgalternativa,
+						richiesta,
+						ente,
+						posti,
+						descrInc,
+						descr_rosa,
+						rapp,
+						qual,
+						dataChiam,
+						dataPubb,
+						cpi,
+						datchiamatacm,
+						cdnlavoratore,
+						viewBtnDel,
+						utente,
+						datChPb 
+					from
+						(select 
+							raz.prgrichiestaaz, inc.prgtipoincrocio, 							
+							r.prgrosa, n.prgnominativo, n.cdnlavoratore,
+							raz.numrichiesta, raz.numanno, a.prgalternativa,  
+							nvl(raz.numrichiestaorig, raz.numrichiesta) ||'/'|| raz.numanno ||'/'|| a.prgalternativa  as richiesta, 
+							az.strragionesociale as ente,  
+							case   	   
+				              when inc.prgtipoincrocio = 10 			
+				              then raz.numposticm	   
+				              when inc.prgtipoincrocio = 11			
+				              then raz.numposticm 	     
+				              else 0  
+				              end as posti,   
+											PG_IDO.WebStrContrattiProfilo(raz.prgrichiestaaz, a.prgalternativa) as rapp,
+											PG_IDO.WebStrMansioniProfilo(raz.prgrichiestaaz, a.prgalternativa) as qual, 							
+											TO_CHAR(raz.datchiamataCM,'DD/MM/YYYY') as dataChiam, 
+											TO_CHAR(raz.datpubblicazione,'DD/MM/YYYY') as dataPubb,  
+											(select de_cpi.strdescrizione from de_cpi where de_cpi.codcpi = raz.codcpi) as cpi,  
+											raz.datchiamatacm,
+											dti.strdescrizione as descrInc,
+											tr.strdescrizione as descr_rosa,
+											decode(r.prgtiporosa, 3, '0','1') as viewBtnDel,
+											(select u.strcognome || ' ' || u.strnome from ts_utente u where cdnut =n.cdnutins) ||' - '|| TO_CHAR(n.dtmins, 'DD/MM/YYYY hh24:mi') as utente,
+											(TO_CHAR(raz.datchiamatacm,'DD/MM/YYYY') || ' &lt;BR&gt; ' || TO_CHAR(raz.datpubblicazione,'DD/MM/YYYY')) as datChPb 								
+										from do_richiesta_az raz    
+											inner join do_incrocio inc on inc.prgrichiestaaz =raz.prgrichiestaaz  
+											inner join do_rosa r on r.prgincrocio = inc.prgincrocio  
+											inner join an_azienda az on az.prgazienda = raz.prgazienda  
+											inner join do_nominativo n on n.prgrosa = r.prgrosa  
+											inner join do_alternativa a on a.prgrichiestaaz = raz.prgrichiestaaz and a.prgalternativa = inc.prgalternativa  							
+											inner join de_tipo_incrocio dti on dti.prgtipoincrocio = inc.prgtipoincrocio
+											inner join de_tipo_rosa tr on tr.prgtiporosa = r.prgtiporosa
+										where 1=1
+											and inc.prgtipoincrocio in  
+											(SELECT ti.prgTipoIncrocio AS prgTipoIncrocio 
+				        FROM De_Tipo_Incrocio ti	WHERE ti.prgtipoincrocio IN (10,11))  							
+											and r.prgrosafiglia is null
+											and n.cdnlavoratore = ? 
+										)  
+									where posti is not null
+						ORDER BY datchiamatacm DESC, ente, numanno DESC, numrichiesta, prgalternativa, prgtipoincrocio"
+/>
+
+<!--  vecchia gestione prima del flag in ts_generale
+<STATEMENT name="CMListaPunteggioLavoratore"
+          query="select p.decpunteggio as punteggio, cp.strdescrizione as desc_punteggio
+				 from cm_punteggio p
+				 inner join ts_config_punteggio cp on cp.prgconfigpunteggio = p.prgconfigpunteggio
+				 where p.prgnominativo = ? 
+				 order by cp.prgconfigpunteggio "/>	
+-->
+
+<STATEMENT name="CMListaPunteggioLavoratore"
+          query="select 
+		            CASE
+		            WHEN cp.strdescrizione like '%carico%'
+		               THEN ' - '  || p.decpunteggio
+		            WHEN cp.strdescrizione like '%reddito%'
+		               THEN 
+		                    case 
+		                         when (select codmonotipogradcm from ts_generale) = 4
+		                         then ' - '  || p.decpunteggio  
+		                    else
+		                       ' + '  || p.decpunteggio   
+		                    end
+		            WHEN cp.strdescrizione like '%anzianit%'
+		               THEN
+		                    case 
+		                         when (select codmonotipogradcm from ts_generale) = 2
+		                         then
+		                            case 
+		                                 when n.datanzianita68 &lt; to_date('30/04/1988','dd/mm/yyyy')
+		                                  then ' - '  || p.decpunteggio  
+		                                 when n.datanzianita68 &gt; to_date('30/04/1988','dd/mm/yyyy')
+		                                  then ' + '  || p.decpunteggio  
+		                            end                 
+		                         when (select codmonotipogradcm from ts_generale) = 3
+		                         then ' + '  || p.decpunteggio  
+		                         when (select codmonotipogradcm from ts_generale) = 4
+		                         then ' + '  || p.decpunteggio 
+		                         else
+		                         ' - '  || p.decpunteggio  
+		                    end
+		            WHEN cp.strdescrizione like '%invalidit%'
+		               THEN 
+		                    case 
+		                     when (select codmonotipogradcm from ts_generale) = 3
+		                         then ' + '  || p.decpunteggio 
+		                     when (select codmonotipogradcm from ts_generale) = 4
+		                         then ' + '  || p.decpunteggio 
+		                     else
+		                         ' - '  || p.decpunteggio  
+		                    end                          
+		            WHEN cp.strdescrizione like '%locomozione%'
+		               THEN ' - '  || p.decpunteggio  
+		            WHEN cp.strdescrizione like '%patente%'
+		               THEN 
+		                    case 
+		                         when n.flgpatente = 'N'
+		                          then ' - '  || p.decpunteggio 
+		                         when n.flgpatente = 'S'
+		                          then ' + '  || p.decpunteggio  
+		                    end   
+		            WHEN upper(cp.strvalore) like upper('%DISOCC_TI%')
+		                     THEN ' + '  || p.decpunteggio 
+		            WHEN cp.strdescrizione like '%annota%'
+		               THEN ' + '  || p.decpunteggio                     
+		            ELSE '' || p.decpunteggio  
+		            END as punteggio, 
+		            cp.strdescrizione as desc_punteggio
+		            from cm_punteggio p
+		            inner join ts_config_punteggio cp on cp.prgconfigpunteggio = p.prgconfigpunteggio
+		            inner join do_nominativo n on n.prgnominativo = p.prgnominativo  
+		            where p.prgnominativo = ?
+		            order by cp.prgconfigpunteggio "/>				 
+
+<STATEMENT name="CM_SALVA_APPROVAZ"
+           query="{ call ? := PG_COLL_MIRATO.CMSalvaApprovazGrad(?,?,?,?,?,?,?) }"
+/> 					
+
+<STATEMENT name="CM_ELENCO_STORICO_GRADUATORIE"
+           query="select 
+					r.prgrosa as id_grad,
+					i.prgrichiestaaz,
+					i.prgtipoincrocio, 
+					rich.prgazienda,
+          			rich.prgunita, 
+          			DO_EVASIONE.CDNSTATORICH,         
+					r.prgTipoRosa as prgTipoRosa,
+					ti.strdescrizione as descr_incr,
+					tr.strdescrizione as descr_rosa,
+					i.prgalternativa as id_profilo,
+					decode(i.PRGALTERNATIVA, null,'','Profilo n. ' || i.PRGALTERNATIVA) as DESCR_PROFILO,
+					to_char(r.CDNUTMOD) as CDNUTMOD, 
+					to_char(r.DATINVIO,'dd/mm/yyyy') as DATINVIO,
+					(Initcap(tu.STRCOGNOME) || ' ' || InitCap(tu.STRNOME) || ' - ' || to_char(r.DTMMOD, 'dd/mm/yyyy')) as ultimaModifica,
+					(SELECT codmonotipogradcm FROM TS_GENERALE) as codmonotipogradcm  
+				   from do_richiesta_az rich
+           			inner join do_incrocio i on i.prgrichiestaaz = rich.prgrichiestaaz
+					inner join do_rosa r on i.prgincrocio = r.prgincrocio
+					inner join de_tipo_incrocio ti on ti.prgtipoincrocio = i.prgtipoincrocio
+					inner join de_tipo_rosa tr on tr.prgtiporosa = r.prgtiporosa
+					inner join ts_utente tu on r.CDNUTMOD = tu.CDNUT
+					LEFT OUTER JOIN DO_EVASIONE ON (rich.PRGRICHIESTAAZ=DO_EVASIONE.PRGRICHIESTAAZ)
+                    LEFT OUTER JOIN DE_EVASIONE_RICH ON (DO_EVASIONE.CODEVASIONE=DE_EVASIONE_RICH.CODEVASIONE)
+				   where rich.prgrichiestaaz = ?
+					and r.prgRosaFiglia is not null
+					and (r.prgTipoRosa=2 or r.prgTipoRosa=3) 
+					and (i.prgTipoIncrocio=10 or i.prgTipoIncrocio=11 or i.prgTipoIncrocio=12 ) 
+				   order by prgtiporosa, prgalternativa "/>      
+
+<STATEMENT name="CM_ELENCO_LAVORATORI_ART1"
+          query="select ia.cdnlavoratore, ia.prgiscrart1,
+                l.strcodicefiscale, l.strcognome, l.strnome,
+				to_char(l.datnasc, 'dd/mm/yyyy') as dataNascita, 
+				to_char(ia.datiscralbo, 'dd/mm/yyyy') as dataAnzianita,
+				to_char(ia.datiscrlistaprov, 'dd/mm/yyyy') as dataIscrArt1,
+				ia.numpunteggio, 
+				ia.numannopunteggio,
+				TO_CHAR (ia.DATMODIFPUNTEGGIO, 'dd/mm/yyyy') AS DATMODIFPUNTEGGIO, 
+				pc.strdenominazione PROVINCIA_ISCR
+				from CM_ISCR_ART1 ia
+				inner join an_lavoratore l on l.cdnlavoratore = ia.cdnlavoratore
+				inner join an_lav_storia_inf ai on (l.cdnLavoratore=ai.cdnLavoratore and ai.datFine is null) 
+				left join de_provincia pc on (ia.CODPROVINCIA=pc.codProvincia)
+                inner join am_documento_coll dc on dc.strchiavetabella = ia.prgiscrart1
+                inner join am_documento ad on ad.prgdocumento = dc.prgdocumento
+				where ia.datfine is null
+				and ia.codtipolista = ?         
+			    AND ad.codtipodocumento = 'ILS'        
+  			    AND ad.CODSTATOATTO != 'AN'				
+				and ia.cdnlavoratore NOT IN 
+		        (select n.cdnlavoratore from do_nominativo n
+		        where n.prgrosa = ? ) 
+		        and  ia.codprovincia = ( select comuneraz.codprovincia
+										from do_richiesta_az raz
+										inner join de_cpi cpiraz on raz.codcpi = cpiraz.codcpi
+										inner join de_comune comuneraz on cpiraz.codcom = comuneraz.codcom
+										where raz.prgrichiestaaz = ?
+									   ) 
+		        order by ia.numpunteggio asc "/>	
+
+<STATEMENT name="GET_StrTipoLista"
+           query=" select lista.codtipolista, lista.strdescrizione
+					 from de_cm_lista_speciale lista
+					where lista.codtipolista = ? "
+/> 
+
+
+<STATEMENT name="CM_INSERT_LAV_ART1"
+           query="{ call ? := PG_COLL_MIRATO.CMInsertLavArt1(?,?,?,?) }"
+/> 
+				   
+<STATEMENT name="CM_GET_DATI_ISCRIZIONE"
+          query="select to_char(ci.datdatainizio, 'dd/mm/yyyy') as datdatainizio,
+					ci.cdnlavoratore, 
+					decode(ci.datanzianita68, null, to_char(ci.datdatainizio, 'dd/mm/yyyy'), to_char(ci.datanzianita68, 'dd/mm/yyyy')) as datanzianita68, 
+					to_char(ci.datanzordpregressa, 'dd/mm/yyyy') as datanzordpregressa,
+					to_char(ci.datsospensione, 'dd/mm/yyyy') as datsospensione, 
+          			ci.nummesisospesterni, 
+          			deisc.codmonotiporagg, nvl(deisc.FLGESCLUDIDAAUTCM, 'N') FLGESCLUDIDAAUTCM
+					from am_cm_iscr ci
+					inner join de_cm_tipo_iscr deisc on deisc.codcmtipoiscr = ci.codcmtipoiscr
+					INNER JOIN AM_DOCUMENTO_COLL COLL ON (CI.PRGCMISCR = COLL.STRCHIAVETABELLA)
+    				INNER JOIN AM_DOCUMENTO DOC ON (COLL.PRGDOCUMENTO = DOC.PRGDOCUMENTO AND DOC.CODTIPODOCUMENTO = 'L68')
+    				WHERE DOC.CODSTATOATTO = 'PR'
+    				and deisc.codmonotiporagg = DECODE((select i.prgtipoincrocio 
+                                                		from do_incrocio i
+                                                		inner join do_rosa r on r.prgincrocio = i.prgincrocio
+                                                		where r.prgrosa = ?), 
+                                                		10, 'D', 11, 'A')  
+					and ci.cdnlavoratore = ENCRYPT(?,?) 
+					and doc.cdnlavoratore = ?
+					and ci.datdatafine is null"
+/>		   
+
+<STATEMENT name="DEL_PUNTEGGIO_LAV_CM"
+          query="delete from cm_punteggio 
+				where prgnominativo = (select n.prgnominativo
+										from do_nominativo n
+										where n.CDNLAVORATORE = ?
+										and n.PRGROSA = ?) "/>
+										
+<STATEMENT name="CM_GET_DATAPUBBLICAZIONE_RICHIESTA"
+           query="select 					
+					to_char(raz.DATPUBBLICAZIONE, 'DD/MM/YYYY') as DATPUBBLICAZIONE,
+					to_char(raz.DATCHIAMATACM, 'DD/MM/YYYY') as DATCHIAMATACM
+					from do_richiesta_az raz 						
+				    where raz.PRGRICHIESTAAZ = ? "
+/> 			
+
+<STATEMENT name="CM_GET_DATAPUBBLICAZIONE_RICHIESTA_DA_ROSA"
+           query="select 
+					to_char(raz.DATPUBBLICAZIONE, 'DD/MM/YYYY') as DATPUBBLICAZIONE,
+					to_char(raz.DATCHIAMATACM, 'DD/MM/YYYY') as DATCHIAMATACM					
+					from do_rosa r 
+					inner join do_incrocio i on i.prgincrocio = r.prgincrocio
+					inner join do_richiesta_az raz on raz.prgrichiestaaz = i.prgrichiestaaz			
+				    where r.prgrosa = ? "  
+/> 
+
+<STATEMENT name="COMBO_MOTIVO_CANC_GRAD"
+          query="select mc.codmotcancgrad as codice, 
+       			mc.strdescrizione as descrizione
+				from de_mot_canc_grad	mc
+				order by mc.strdescrizione"/>					
+
+<STATEMENT name="CM_DETT_CANC_LAV_GRAD"
+          query="select c.prgcancgrad, 
+		        c.prgrosa, c.cdnlavoratore,
+		        c.codmotcancgrad, c.strspecifica, 
+		        c.cdncanc, c.dtmcanc,
+		        c.numordine, c.numpunteggio,
+		        d.strdescrizione as descrmotivocanc
+				from cm_canc_grad c 
+        		inner join de_mot_canc_grad d on d.codmotcancgrad = c.codmotcancgrad
+				where c.prgcancgrad = ?"/>					
+
+<STATEMENT name="INS_MOTIVO_CANC_GRAD"
+           query="INSERT INTO Cm_Canc_Grad
+                      (prgcancgrad,                        
+                      cdnlavoratore,
+                      prgrosa, 
+                      codmotcancgrad, 
+                      strspecifica,                       
+                      numordine, 
+                      numpunteggio,
+                      cdncanc, 
+                      dtmcanc
+                       )
+                VALUES (s_cm_canc_grad.nextval,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        (select numordine from do_nominativo where prgnominativo = ?),
+                        (select numpunteggio from do_nominativo where prgnominativo = ?),
+                        ?,
+                        sysdate
+                       )"
+/> 	
+
+<STATEMENT name="CM_LISTA_LAV_CANCELLATI_GRAD"
+          query="select c.prgcancgrad, 
+		        c.prgrosa, c.cdnlavoratore,
+		        c.codmotcancgrad, 
+		        c.strspecifica, 
+		        DECODE( GREATEST(LENGTH(c.strspecifica),100) , 100, 
+                               c.strspecifica, SUBSTR(c.strspecifica, 1, 100))  as nota,
+		        c.cdncanc, c.dtmcanc,
+		        c.numordine, c.numpunteggio,
+		        d.strdescrizione as descrmotivocanc,
+		        l.strcodicefiscale as codiceFiscale, 
+		        Initcap(l.STRCOGNOME) || ' ' || Initcap(l.STRNOME) as strCognomeNome,
+            	Initcap(tu.strcognome) || ' ' || Initcap(tu.strnome) || ' ' || to_char(c.dtmcanc, 'dd/mm/yyyy') as utente
+				from cm_canc_grad c 
+        		inner join de_mot_canc_grad d on d.codmotcancgrad = c.codmotcancgrad
+        		inner join an_lavoratore l on l.cdnLavoratore = c.cdnlavoratore 
+        		inner join ts_utente tu on c.CDNCANC = tu.CDNUT
+				where c.prgrosa = ?"/>	
+				       		 
+<STATEMENT name="CM_CALCOLO_PUNTEGGIO_PRESUNTO"
+           query="{ call ? := PG_COLL_MIRATO.calcoloPunteggioPresLavoratore(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) }"
+/>
+
+<STATEMENT name="CM_ELENCO_CANDIDATI_GRD"
+		   query="select r.PRGNOMINATIVO, 
+				r.CDNLAVORATORE				
+				from do_nominativo r 				
+				where r.prgrosa=?				
+				and r.CODTIPOCANC is null 				
+				order by numordine
+				"/>
+
+<STATEMENT name="CMListaPunteggioPresLavoratore"
+          query="select to_char(n.datanzianita68, 'DD/MM/YYYY') as datanzianita68, 
+          		   n.nummesianz,
+			       n.codcmtipoiscr, n.numpercinvalidita,
+			       decode(n.numpersone, null, '', n.numpersone || ' del ' || to_char(n.datdichcarico, 'DD/MM/YYYY'))
+			        as carico, 
+			       n.numreddito, to_char(n.dtmpunteggio, 'DD/MM/YYYY hh24:mi') as dataPunteggio,
+			       dc.strdescrizione as descrTipoIscr,
+			       decode(n.flgpatente, null, 'Patente assente', 'N', 'Patente assente', 'S', 'Patente presente' ) as flgpatente,
+		           (select dg.strdescrizione from de_grado_capacita dg where dg.codgradocapacita = n.codgradocapacitaloc) as codgradocapacitaloc,
+		           decode(n.flgdisoccti, null, 'No', 'N', 'No', 'S', 'Si' ) as flgdisocti,
+		           (select dc.strdescrizione from de_cm_annota dc where dc.codcmannota = n.codcmannota) as codcmannota 
+				   from do_nominativo n
+			       left join de_cm_tipo_iscr dc on dc.codcmtipoiscr = n.codcmtipoiscr
+				   where n.prgnominativo = ?"/>	   				
+			
+<STATEMENT  name="GET_DE_CM_TIPO_ISCR"
+            query="SELECT T.CODCMTIPOISCR CODICE,
+	               case   	   
+	        				when ma.cod_categoria is not null
+	        				     then (T.STRDESCRIZIONE || ' (Min: ' || mn.des_categoria || ')' ||
+	                                DECODE(SYSDATE, GREATEST(SYSDATE, T.DATFINEVAL),  ' (scaduto)',
+	                                                                   LEAST   (SYSDATE, T.DATINIZIOVAL),' (scaduto)', 
+	                                                                   ''
+	                                                         ))	     
+	        				     else T.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)' ||
+	                                DECODE(SYSDATE, GREATEST(SYSDATE, T.DATFINEVAL),  ' (scaduto)',
+	                                                                   LEAST   (SYSDATE, T.DATINIZIOVAL),' (scaduto)', 
+	                                                                   ''
+	                                                         )
+	        				end as DESCRIZIONE
+	               FROM DE_CM_TIPO_ISCR T
+	               inner join ma_cat_protette ma on ma.codcmtipoiscr= t.codcmtipoiscr
+				   left join mn_cat_protette mn on mn.cod_categoria= ma.cod_categoria
+	               ORDER BY DESCRIZIONE"/>
+
+<!-- elimanta la join con il documento per l'iscrizione al CM -->
+<STATEMENT name="CM_GET_DATI_ISCRIZIONE_NEW"
+          query="select to_char(ci.datdatainizio, 'dd/mm/yyyy') as datdatainizio,
+					ci.cdnlavoratore, 
+					decode(ci.datanzianita68, null, to_char(ci.datdatainizio, 'dd/mm/yyyy'), to_char(ci.datanzianita68, 'dd/mm/yyyy')) as datanzianita68, 
+					to_char(ci.datanzordpregressa, 'dd/mm/yyyy') as datanzordpregressa,
+					to_char(ci.datsospensione, 'dd/mm/yyyy') as datsospensione, 
+          			ci.nummesisospesterni, 
+          			deisc.codmonotiporagg, nvl(deisc.FLGESCLUDIDAAUTCM, 'N') FLGESCLUDIDAAUTCM
+					from am_cm_iscr ci
+					inner join de_cm_tipo_iscr deisc on deisc.codcmtipoiscr = ci.codcmtipoiscr					
+    				WHERE ci.CODSTATOATTO = 'PR'
+    				and deisc.codmonotiporagg = DECODE((select i.prgtipoincrocio 
+                                                		from do_incrocio i
+                                                		inner join do_rosa r on r.prgincrocio = i.prgincrocio
+                                                		where r.prgrosa = ?), 
+                                                		10, 'D', 11, 'A')  
+					and ci.cdnlavoratore = ENCRYPT(?,?) 
+					and ci.datdatafine is null"
+/>
+		
+<STATEMENT  name="CM_UPDATE_PUNTEGGIO_PRES"
+            query="update do_nominativo
+			     set
+			     numpunteggiopres = null, 
+			     numklonominativo = numklonominativo+1
+			     where
+			     prgnominativo = ? "/>
+
+<STATEMENT  name="CHECK_VERSIONE_GRADUATORIA"
+            query="SELECT codmonotipogradcm FROM TS_GENERALE"/>
+               			
+<STATEMENT name="CANC_LAVORAT_GRAD"
+           query="DELETE from Cm_Canc_Grad
+                      where cdnlavoratore = ?
+                      and prgrosa = ? " /> 			
+
+<STATEMENT name="GET_COMBO_DE_QUALIFICATO"
+          query="select cdnqualificato as codice, 
+       			strdescrizione as descrizione
+				from de_qualificato	
+				order by cdnqualificato"/>	                      
+                      		       		     
+<STATEMENT name="UPDATE_QUALIFICATO_ADESIONE"
+          query="update do_nominativo
+			     set			     
+			     cdnqualificato = ?,			     
+			     numklonominativo = numklonominativo+1
+			     where
+			     prgnominativo = ?"/>	      
+			                 		       		 
+<STATEMENT name="SELECT_CM_QUALIFICATO"
+          query="select n.cdnqualificato, 
+		       	n.cdnutins,
+		       	n.cdnutmodcm,
+		       	n.dtmins,
+		       	n.dtmmodcm     
+		        from do_nominativo n	
+				where n.prgnominativo = ?"/>	
+				
+<STATEMENT name="ASListaPunteggioLavoratore"
+          query="select CASE WHEN (instr(upper(cp.strdescrizione), 'DID') &gt;0 and dn.stranzianita IS NOT NULL  AND ( LENGTH(dn.stranzianita) &gt;0 )) 
+                        THEN cp.strdescrizione || ' (anz. ' || substr(dn.stranzianita, 1, instr(dn.stranzianita, '-', 1) - 1)
+			                  || ' mesi - ' || substr(dn.stranzianita, instr(dn.stranzianita, '-', 1) + 1) || ' giorni)'
+			            ELSE cp.strdescrizione END as desc_punteggio,     
+		                p.numpunteggio ||
+		                case when  (p.numpunteggio = 25 or INSTR(upper(cp.strdescrizione), 'ISEE')&gt;0) and 
+		                           dn.numvaloreisee is not null and 
+		                           dn.numvaloreisee != round(vi.numvaloreisee, 0)
+		                     then  ' &lt;img src=&quot;../../img/warning_trasp.gif&quot; border=&quot;0&quot; title=&quot;ISEE diverso da ISEE Storico &quot;&gt; valore ISEE punteggio: '||decode(nvl(dn.numvaloreisee,'-20'), '-1','nessuno',dn.numvaloreisee) ||', valore ISEE attuale a data chiamata: ' ||vi.numvaloreisee  
+		                 end 
+		                 as punteggio
+				 from as_punteggio p                    
+         		 inner join do_nominativo dn on dn.prgnominativo = p.prgnominativo 
+				 inner join ts_config_punteggio cp on cp.prgconfigpunteggio = p.prgconfigpunteggio 
+				 inner join do_rosa dr on dn.prgrosa = dr.prgrosa
+				 inner join do_incrocio inc on dr.prgincrocio = inc.prgincrocio
+				 inner join do_richiesta_az ric on inc.prgrichiestaaz = ric.prgrichiestaaz         
+				 left join as_valore_isee vi on (vi.cdnlavoratore = dn.cdnlavoratore          
+				                                 and trunc(ric.datchiamata) &gt;= trunc(vi.datinizioval)
+				                                 and (vi.datfineval is null or trunc(ric.datchiamata) &lt;= trunc(vi.datfineval) ) )  
+				 where p.prgnominativo = ? 
+				 order by cp.prgconfigpunteggio "/>	
+				
+<!-- INIZIO Gestione Formazione Professionale nell'alternativa della Richiesta-->
+
+<STATEMENT name="ListaCorsiRichiesta"
+            query="SELECT
+					    do_formazione_prof.prgformprof AS PRGFORMPROF,
+					    do_formazione_prof.codcorso AS CODCORSO,
+					    do_formazione_prof.prgrichiestaaz AS PRGRICHIESTAAZ,
+					    de_corso.strdescrizione,
+					    decode(de_corso.numanno, 0, null, de_corso.numanno) as numanno,
+					    DECODE(upper(do_formazione_prof.FLGINDISPENSABILE), 'S', 'Si', 'N', 'No', 'No') FLGINDISPENSABILE
+					FROM
+					    do_formazione_prof,
+					    de_corso
+					WHERE
+					    do_formazione_prof.codcorso = de_corso.codcorso
+					    AND do_formazione_prof.prgrichiestaaz = ?
+					    order by dtmmod desc, codcorso"/>		
+					    
+<STATEMENT name="CERCA_CORSI_CODCORSO"
+	query="select corso.codcorso, corso.strdescrizione, decode(corso.numanno, 0, null, corso.numanno) as numanno
+                   from de_corso corso
+                   where lower(corso.codcorso) like '%' ||  lower(?) || '%'
+                   order by strdescrizione" />
+
+<STATEMENT name="CERCA_CORSI_DESCORSO"
+	query="select corso.codcorso, corso.strdescrizione, decode(corso.numanno, 0, null, corso.numanno) as numanno
+                   from de_corso corso
+                   where lower(corso.strdescrizione) like '%' || lower(?) || '%' 
+                   order by strdescrizione" />	
+                   
+<STATEMENT name="DettaglioFormProf"
+            query="SELECT 
+                    do.prgformprof AS 	PRGFORMPROF,
+					do.codcorso AS CODCORDO,
+					do.prgrichiestaaz AS PRGRICHIESTAAZ,
+                    do.PRGALTERNATIVA AS PRGALTERNATIVA, 
+                    do.codcorso AS CODCORSO,
+                    cor.STRDESCRIZIONE AS DESCRIZIONE,
+                    DO.FLGINDISPENSABILE AS INDISPENSABILE,
+                    DO.CDNUTINS,
+                    TO_CHAR(DO.DTMINS, 'DD/MM/YYYY hh24:mi')  AS DTMINS,
+                    DO.CDNUTMOD, 
+                    TO_CHAR(DO.DTMMOD, 'DD/MM/YYYY hh24:mi') AS DTMMOD
+                  FROM 
+                    do_formazione_prof do INNER JOIN DE_CORSO COR ON DO.codcorso = cor.codcorso 
+                  WHERE 
+                   do.prgformprof=? "/>        
+
+<STATEMENT name="GET_DESC_CORSI"
+	query=" SELECT codcorso as codice, strdescrizione as descrizione
+                from DE_corso
+                order by codice" />     
+                
+<STATEMENT
+        name="InsertFormazioneProfessionale"
+        query="INSERT INTO do_formazione_prof
+                  (PRGFORMPROF,
+                  PRGRICHIESTAAZ,
+                  PRGALTERNATIVA,
+                  CODCORSO,
+                  FLGINDISPENSABILE,
+                  cdnUtins,
+                  DTMINS,
+                  cdnUtmod,
+                  DTMMOD)
+                  VALUES 
+                  ( S_DO_FORMAZIONE_PROF.nextval,
+                    ?, ?, ?, ?, ?,
+                   SYSDATE,
+                   ?,
+                   SYSDATE
+                   )"/>    	
+          
+<STATEMENT
+        name="SalvaFormProf"
+        query="update do_formazione_prof set
+                  codcorso=?,
+                  flgindispensabile=?,
+                  cdnutmod=?,
+                  dtmmod=SYSDATE
+               where
+                  PRGFORMPROF=?
+                  "/>     
+                  
+<STATEMENT name="DeleteFormProf"
+            query="DELETE FROM do_formazione_prof
+                          WHERE do_formazione_prof.PRGFORMPROF=?"/>
+                          
+
+<STATEMENT name="SelectUniqueCorso"
+            query="SELECT PRGFORMPROF
+                   FROM do_formazione_prof
+                   WHERE codcorso=?
+                   AND PRGRICHIESTAAZ=?
+                   and PRGALTERNATIVA=? "/>      
+                   
+<STATEMENT name="SelectUniqueCorsoMod"
+            query="SELECT PRGFORMPROF
+                   FROM do_formazione_prof
+                   WHERE codcorso=?
+                   AND PRGRICHIESTAAZ=?
+                   and PRGALTERNATIVA=?
+                   and prgformprof &lt;&gt; ? "/>                                            
+
+<!-- FINE Gestione Formazione Professionale nell'alternativa della Richiesta-->
+<STATEMENT name="ASESCLUDI_DA_ROSA"
+           query="Update DO_NOMINATIVO 
+                  SET STRMOTIVOCANC=?,
+                  CDNUTCANC=?,
+                  NUMKLONOMINATIVO=?+1,
+                  CODTIPOCANC='M',
+                  DTMCANC=SYSDATE,
+                  CDNUTMODCM = ?,
+                  DTMMODCM = sysdate
+                  WHERE PRGNOMINATIVO=?"/>
+
+<STATEMENT name="GET_ISEE_ADESIONE_CM"
+	query="select v.numvaloreisee, to_char(v.datinizioval, 'dd/mm/yyyy') datainizioval
+			from do_nominativo r 
+				inner join AS_VALORE_ISEE v on (r.CDNLAVORATORE=v.CDNLAVORATORE) 
+				inner join do_rosa on (r.PRGROSA=do_rosa.PRGROSA) 
+				inner join do_incrocio on (do_rosa.PRGINCROCIO=do_incrocio.PRGINCROCIO) 
+				inner join do_richiesta_az rich1 on (do_incrocio.PRGRICHIESTAAZ=rich1.PRGRICHIESTAAZ) 
+                where v.cdnlavoratore = ? and rich1.prgrichiestaaz = ?
+                and v.datinizioval &lt;= rich1.datchiamatacm
+              and v.datinizioval &gt;= add_months(rich1.datchiamatacm, -12) 
+               and (v.datfineval is null or v.datfineval &gt;= rich1.datchiamatacm) "/>

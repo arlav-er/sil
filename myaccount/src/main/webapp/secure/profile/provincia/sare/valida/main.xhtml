@@ -1,0 +1,97 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/templates/#{godfatherBean.theme}/main.xhtml">
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{sessionLogger.grantAccessFor(sessionLogger.getProvinciaAccess())}" />
+	</f:metadata>
+	<ui:param name="pagetitle" value="#{ui['valida.title']}" />
+	<ui:define name="content">
+		<div class="container-fluid">
+			<h3>
+				#{ui['valida.title']} <br /> <small>#{ui['valida.desc']}</small>
+			</h3>
+			
+			<h:form id="searchForm" styleClass="form-horizontal">
+				<!-- START row-->
+				<div class="row animated fadeIn">
+					<div class="col-sm-12">
+						<!-- START panel-->
+						<div class="panel panel-warning">
+							<div class="panel-heading">#{ui['valida.formDesc']}</div>
+							<div class="panel-body">
+								<ui:include src="_searchInputs.xhtml" />
+							</div>
+						</div>
+						<!-- END panel-->
+					</div>
+				</div>
+			</h:form>
+
+			<h:form id="searchResults">
+				<h:panelGroup rendered="#{not empty validaUtentiSareBean.lazyDataModel}">
+					<!-- START row-->
+					<div class="row animated fadeIn">
+						<div class="col-sm-12">
+							<!-- START panel-->
+							<div class="well sticky">
+								<div class="text-center">
+									<p:commandLink actionListener="#{validaUtentiSareBean.sync}" styleClass="ui-button btn btn-primary action-link"
+										onclick="onActionStart()" oncomplete="onActionComplete()" global="false">
+										<i class="fa fa-edit"></i> #{ui['shared.modifica']}
+									</p:commandLink>
+									<p:commandLink ajax="false" styleClass="ui-button btn btn-primary action-link uk-margin-small-left">
+										<p:fileDownload value="#{validaUtentiSareBean.downloadCSV()}" />
+										<i class="fa fa-download"></i> #{ui['shared.export']}
+									</p:commandLink>
+									<h:graphicImage styleClass="action-loader" library="#{godfatherBean.theme}" name="images/loader.gif" alt="loader" style="display: none" />
+								</div>
+							</div>
+							<div class="well">
+								<ui:include src="_searchResults.xhtml" />
+							</div>
+							<!-- END panel-->
+						</div>
+					</div>
+				</h:panelGroup>
+			</h:form>
+			<!-- END row-->
+		</div>
+		
+		<script>
+				function onSearchActionStart() {
+					$('.action-search-link').hide();
+					$('.action-search-loader').show();
+				}
+
+				function onSearchActionComplete() {
+					$('.action-search-link').show();
+					$('.action-search-loader').hide();
+				}
+
+				function onActionStart() {
+					$('.action-link').hide();
+					$('.action-loader').show();
+				}
+
+				function onActionComplete() {
+					$('.action-link').show();
+					$('.action-loader').hide();
+				}
+
+				function onSearchStart() {
+					onSearchActionStart();
+					if(PF('usersTableWV')){
+						PF('usersTableWV').paginator.setPage(0);
+					}
+				}
+
+				function onSearchComplete() {
+					$.UIkit.sticky($('.sticky'), {top:0}); 
+					$.UIkit.sticky($('.ui-paginator-top'), {top:75}); 
+					onSearchActionComplete();
+				}
+			</script>
+	</ui:define>
+</ui:composition>
+</html>

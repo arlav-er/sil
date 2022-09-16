@@ -1,0 +1,160 @@
+<STATEMENT
+        name="S_MovListaConvenzione"
+        query="SELECT NUMANNOCONV, NUMCONVENZIONE, to_char(DATCONVENZIONE, 'dd/mm/yyyy') datconvenzione, substr(strnote, 0, 100) strnote,
+	   		  		  CODSTATORICHIESTA,DE_STATO_ATTO.STRDESCRIZIONE statoRich
+			   FROM CM_CONVENZIONE,DE_STATO_ATTO
+			   WHERE CM_CONVENZIONE.CODSTATORICHIESTA = DE_STATO_ATTO.CODSTATOATTO
+	  				 AND CODSTATORICHIESTA NOT IN ('AN') AND PRGAZIENDA = ?
+			   ORDER BY CM_CONVENZIONE.DATCONVENZIONE DESC, NUMANNOCONV DESC, NUMCONVENZIONE DESC"/>
+				
+
+<STATEMENT
+        name="Get_MovListaNullaOsta"
+        query="select to_char(am_documento.DATPROTOCOLLO,'dd/mm/yyyy') as dataProt,
+	   				  am_documento.NUMPROTOCOLLO as numProt,
+        			  am_documento.NUMPROTOCOLLO || ' - ' || to_char(am_documento.DATPROTOCOLLO,'dd/mm/yyyy') as numData,
+	   				  to_char(cm_nulla_osta.DATINIZIO,'dd/mm/yyyy') as DATAINIZIO,
+	   				  decode(cm_nulla_osta.CODMONOTIPO,NULL,'','M','Nominativa','R','Numerica') as TIPOLOGIA,
+	   				  decode(cm_nulla_osta.CODMONOCATEGORIA,NULL,'','D','Disabile','A','Categoria protetta ex art.18') as CATEGORIA
+			  from cm_nulla_osta 
+			  inner join am_documento_coll on (cm_nulla_osta.PRGNULLAOSTA = to_number(am_documento_coll.STRCHIAVETABELLA)) 
+			  inner join am_documento on (am_documento.PRGDOCUMENTO = am_documento_coll.PRGDOCUMENTO) 
+			  where am_documento.CODTIPODOCUMENTO = 'NULOST' and am_documento.CODSTATOATTO = 'PR' 
+			  		and cm_nulla_osta.PRGAZIENDA = ? and cm_nulla_osta.CDNLAVORATORE = ? "/>
+			  		
+			  		
+<STATEMENT
+        name="GET_RICHIESTA_INCENTIVI_MAIL"
+        query="select stroggetto,
+  strcorpoemail,
+  stremailmittente,
+  strdestinatari,
+  strdestcc,
+  strdestccn
+from ts_email
+where codtipoemail='INCENTIV'" />
+ 
+<STATEMENT
+        name="GET_RICHIESTA_INCENTIVI_PARAMETRI_MAIL"
+        query="select stroggetto,
+       strcorpoemail,
+       stremailmittente
+  from ts_email
+ where codtipoemail='MIGRAZ' " />
+
+<!-- NON in USO!! -->
+<STATEMENT
+        name="GET_TITOLO_SOGGIORNO"
+        query="SELECT *
+FROM
+  (SELECT de_status_straniero.codstatus,
+  de_status_straniero.strdescrizione AS cod_status_descrizione,
+  t_sogg.strnumdocumento,
+  de_ex_motivo_ril.codmotivoril,
+  de_ex_motivo_ril.strdescrizione AS mot_ril_descrizione,
+  TO_CHAR(t_sogg.datscadenza, 'yyyy-mm-dd') datscadenza,
+  de_questura.codquestura,
+  de_questura.strdescrizione AS quest_descrizione
+FROM am_ex_perm_sogg t_sogg
+INNER JOIN de_ex_motivo_ril
+ON t_sogg.codmotivoril = de_ex_motivo_ril.codmotivoril
+LEFT JOIN de_status_straniero
+ON t_sogg.codstatus = de_status_straniero.codstatus
+LEFT JOIN de_questura
+ON t_sogg.codquestura      = de_questura.codquestura
+WHERE t_sogg.cdnlavoratore = ?
+ORDER BY t_sogg.datscadenza DESC
+  )
+WHERE rownum =1"/>
+
+<STATEMENT
+        name="GET_TITOLO_STUDIO_PRINCIPALE_RICH_INCENTIVI"
+        query="SELECT *
+FROM
+  (SELECT titl.*
+  FROM pr_studio stud
+  INNER JOIN de_titolo titl
+  ON titl.codtitolo        = stud.codtitolo
+  WHERE stud.cdnlavoratore = ?
+  AND stud.flgprincipale   ='S'
+  ORDER BY titl.codtitolo DESC
+  )
+WHERE rownum =1"/>
+        
+
+<STATEMENT
+        name="GET_RICHIESTA_INCENTIVI"
+        query="SELECT mov.prgmovimento,
+    mov.cdnlavoratore,
+    az.strcodicefiscale,
+    az.strragionesociale,
+    lra.strcognome AS cognome_lra,
+    lra.strnome AS nome_lra,
+    az.codtipoazienda,
+    s_leg.codateco,
+    s_leg.codcom,
+    s_leg.strcap,
+    s_leg.strindirizzo,
+    s_leg.strtel,
+    s_leg.strfax,
+    s_leg.stremail,
+    uaz.codcom           AS s_lav_codcom,
+    uaz.strcap           AS s_lav_strcap,
+    uaz.strindirizzo     AS s_lav_strindirizzo,
+    uaz.strtel           AS s_lav_strtel,
+    uaz.strfax           AS s_lav_strfax,
+    uaz.stremail         AS s_lav_stremail,
+    lav.strcodicefiscale AS lav_strcodicefiscale,
+    lav.strcognome       AS lav_strcognome,
+    lav.strnome          AS lav_strnome,
+    lav.strsesso         AS lav_strsesso,
+    to_char(lav.datnasc, 'yyyy-mm-dd') lav_datnasc,
+    lav.codcomnas       AS lav_codcomnas,
+    lav.codcittadinanza AS lav_codcittadinanza,
+    lav.codcomres       AS lav_codcomres,
+    lav.strcapres       AS lav_strcapres,
+    lav.strindirizzores AS lav_strindirizzores,
+    mov.codtipomov,
+    mov.codtipotrasf,
+    trasf.strdescrizione AS trasf_descrizione,
+    to_char(mov.datiniziomov, 'yyyy-mm-dd') dat_inizio_mov,
+    to_char( mov.datinizioavv, 'yyyy-mm-dd') dat_inizio_avv,
+    ente_prev.codente,
+    ente_prev.strdescrizione AS ente_prev_descrizione,
+    mov.strcodiceenteprev,
+    mov.strpatinail,
+    mov.codcontratto,
+    t_contr.strdescrizione AS t_contr_strdescrizione,
+    mov.flgsocio,
+    orario.codorario,
+    orario.strdescrizione AS orario_descrizione,
+    mov.numoresett,
+    mov.codqualificasrq,
+    contr_coll.codccnl,
+    contr_coll.strdescrizione AS contr_coll_descrizione,
+    mov.decretribuzionemen, mov.decretribuzioneann
+  FROM am_movimento mov
+  INNER JOIN an_lavoratore lav
+  ON lav.cdnlavoratore = mov.cdnlavoratore
+  INNER JOIN an_azienda az
+  ON mov.prgazienda = az.prgazienda
+  INNER JOIN an_unita_azienda uaz
+  ON uaz.prgazienda = mov.prgazienda
+  AND uaz.prgunita  = mov.prgunita
+  LEFT JOIN an_unita_azienda s_leg
+  ON s_leg.prgazienda = mov.prgazienda
+  AND s_leg.flgsede   = 'S'
+  LEFT JOIN an_az_referente lra
+  ON lra.prgazienda  = az.prgazienda
+  AND lra.codruoloaz = 'LRA'
+  LEFT JOIN de_tipo_trasf trasf
+  ON trasf.codtipotrasf = mov.codtipotrasf
+  LEFT JOIN de_ente_previdenziale ente_prev
+  ON mov.codente = ente_prev.codente
+  LEFT JOIN de_orario orario
+  ON orario.codorario = mov.codorario
+  LEFT JOIN de_contratto_collettivo contr_coll
+  ON mov.codccnl = contr_coll.codccnl
+  LEFT JOIN de_contratto t_contr
+  ON mov.codcontratto   = t_contr.codcontratto
+WHERE mov.prgmovimento=?"/>

@@ -1,0 +1,198 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<composite:interface componentType="InputSuggestion">
+		<composite:attribute name="autocomplete" default="on"
+			shortDescription="Disabilita l'autocompletamento del browser. Il default è on." />
+		<composite:attribute name="label"
+			shortDescription="Etichetta da applicare al campo di input." />
+		<composite:attribute name="subLabel"
+			shortDescription="Sotto-etichetta da applicare al campo di input." />
+		<composite:attribute name="underLabel"
+			shortDescription="Sotto-sotto-etichetta da applicare al campo di input." />
+		<composite:attribute name="value" required="false" 
+			shortDescription="Valore del campo di input" />
+		<composite:attribute name="valueCod" required="true"
+			shortDescription="Effettua il binding del campo 'codice' associato alla tabella" />
+		<composite:attribute name="disabled" type="java.lang.Boolean" />
+		<composite:attribute name="disableAjax" default="true"
+			shortDescription="Disabilita la funzione Ajax 'blur' agganciata al campo 'input'" />
+		<composite:attribute name="disableLabel" default="false" />
+		<composite:attribute name="editingMode" default="true"
+			type="java.lang.Boolean" />
+		<composite:attribute name="readonly" type="java.lang.Boolean" />
+		<composite:attribute name="showButton" type="java.lang.Boolean"
+			default="false"
+			shortDescription="Attiva un bottone che permette di ricercare il valore all'interno di un albero" />
+		<composite:attribute name="required" default="false" />
+		<composite:attribute name="erroreSotto" default="false" />
+		<composite:attribute name="requiredMessage"
+			default="Campo obbligatorio" />
+		<composite:attribute name="requiredMessageCod"
+			default="Immettere tre lettere per ottenere un suggerimento"
+			shortDescription="Messaggio della suggestion" />
+		<composite:attribute name="converterMessage" default="Formato errato"
+			shortDescription="Messaggio di errore del Converter" />
+		<composite:attribute name="maxlength"
+			default="#{const['inputText.maxLength']}" />
+		<composite:attribute name="size" default="#{const['inputText.size']}" />
+		<composite:attribute name="onSelectF" default=""		
+			shortDescription="una funziona javascript che viene invocata quando viene selezionato un elemento." />
+		<composite:attribute name="extraParamF" default=""		
+			shortDescription="una funziona javascript che viene invocata per richiedere ulteriori parametri" />	
+
+		<composite:attribute name="infoUrl" default="" />
+		
+		<composite:attribute name="filter" default="" />
+		<!-- style che si applica al panelGroup -->
+		<composite:attribute name="style"
+			shortDescription="Stile applicato all'intero componente" />
+
+		<composite:attribute name="styleClass" default="inner-shadow" />
+		<composite:attribute name="layout" default="block" />
+		<composite:attribute name="title"
+			shortDescription="Il titolo che compare nel dialog di aiuto. Se non viene indicato viene utilizzata la label del componente."
+			default="#{cc.attrs.label}" />
+		<composite:attribute name="suggestionPath"
+			shortDescription="Indica a quale indirizzo risponde il servizio REST che fornisce i dati. Il servizio deve essere in ascolto su 'rest/#{suggestionPath}/suggestion'. Nel caso si fornisse il pulsante per il suggerimento tramite modale il servizio REST deve rispondere anche su 'rest/#{suggestionPath}/albero'" />
+
+		<composite:attribute name="helpMessage"
+			shortDescription="Un suggerimento fornito all'utente quando seleziona il campo di input." />
+
+		<composite:attribute name="helpPosition" default="right"
+			shortDescription="I valori ammessi sono: top, bottom, left, right" />
+
+		<composite:attribute name="visListener" default="false" />
+		<composite:attribute name="onlyLeaves" default="false" />
+		<composite:attribute name="valueChangeListener"
+			method-signature="void (javax.faces.event.ValueChangeEvent)"
+			targets="inputText" />
+		<composite:editableValueHolder name="function" targets="inputText" />
+		<composite:editableValueHolder name="hidden" targets="inputHidden" />
+		<composite:clientBehavior name="change" event="change"
+			targets="inputText" />
+		<composite:clientBehavior name="blur" event="blur" targets="inputText" />
+	</composite:interface>
+
+	<composite:implementation>
+		<f:loadBundle basename="conf.const" var="const" />
+
+		<span id="#{cc.clientId}" layout="#{cc.attrs.layout}">
+
+			<h:outputLabel id="label" for="inputText"
+				rendered="#{not cc.attrs.disableLabel}">
+				
+				<h:outputText value="#{cc.attrs.label}" />
+				<h:outputText value=" *"
+					rendered="#{not empty cc.attrs.label and cc.attrs.required and cc.attrs.editingMode}" />
+				<cc:helpButton rendered="#{not empty cc.attrs.helpMessage}" message="#{cc.attrs.helpMessage}"/>
+			</h:outputLabel>
+			
+			<h:panelGroup id="sublabel" layout="#{cc.attrs.layout}">
+				<h:outputText value="#{cc.attrs.subLabel}" />
+			</h:panelGroup>
+
+			<h:panelGroup id="inputblock" layout="#{cc.attrs.layout}"
+				styleClass="input100 #{cc.attrs.showButton ? 'fixInput' : ''}"
+				rendered="#{cc.attrs.editingMode}">
+
+
+				<h:inputText id="inputText" styleClass="#{cc.attrs.styleClass}"
+					style="#{cc.attrs.style}"
+					value="#{cc.attrs.value}" autocomplete="#{cc.attrs.autocomplete}"
+					readonly="#{cc.attrs.readonly}" disabled="#{cc.attrs.disabled}"
+					size="#{cc.attrs.size}" maxlength="#{cc.attrs.maxlength}"
+					title="#{cc.attrs.title}" required="#{cc.attrs.required}"
+					requiredMessage="#{cc.attrs.requiredMessage}"
+					converterMessage="#{cc.attrs.converterMessage}">
+					<f:ajax execute="inputText inputHidden" event="blur"
+						disabled="#{cc.attrs.disableAjax}" render="effect" />
+				</h:inputText>
+
+				<h:commandLink rendered="#{cc.attrs.showButton}" id="cerca"
+					styleClass="buttonStyle modalAutocomplete yellowButton"
+					onclick="$(jq('#{cc.clientId}:dialog')).dialog('open');return false;"
+					onkeypress="if (event.keyCode==13) {$(jq('#{cc.clientId}:dialog')).dialog('open');}">
+					<span class="ui-icon ui-icon-search fix_icon" />
+				</h:commandLink>
+				
+				<h:commandLink rendered="#{not empty cc.attrs.infoUrl and cc.attrs.editingMode}"
+					style="margin-left:2px" 
+					styleClass="buttonStyle modalAutocomplete yellowButton"
+					onclick="$(jq('#{cc.clientId}'))[0].openInfo('#{cc.attrs.infoUrl}');return false;"
+					onkeypress="if (event.keyCode==13) myportal.inputSuggestion.openInfo('#{cc.attrs.infoUrl}')">
+					<span class="ui-icon ui-icon-info fix_icon" />
+				</h:commandLink>
+				
+				<h:inputHidden id="inputHidden" value="#{cc.attrs.valueCod}" 
+					tabindex="-1" />
+				<h:panelGroup id="underlabel" layout="#{cc.attrs.layout}">
+					<h:outputText value="#{cc.attrs.underLabel}" style="color:red;" />
+				</h:panelGroup>
+				<h:outputText value="&lt;br /&gt;" escape="false"
+					rendered="#{cc.attrs.erroreSotto}" />
+
+				<h:panelGroup id="effect" class="toggler" style="display:none;">
+					<h:message id="message" for="inputText"
+						errorClass="ui-state-error ui-corner-all" />
+					<h:message id="messageSuggestion" for="inputHidden"
+						errorClass="ui-state-error ui-corner-all" />
+					<script type="text/javascript">
+					//<![CDATA[
+						$(function() {
+							me = document.getElementById("#{cc.clientId}")
+							if (!me.isOpen || !me.itemSelected) {									
+								runEffectError(jq('#{cc.clientId}:effect'));
+							}							
+							me.isOpen = false;								
+						}); 
+
+						
+							
+					//]]> 
+					</script>
+				</h:panelGroup>
+				<script type="text/javascript">
+					$(function() {
+						myportal.inputSuggestion.init(
+								'#{cc.clientId}',
+								'#{request.contextPath}',
+								'#{cc.attrs.suggestionPath}',
+								'#{cc.attrs.helpMessage}',
+								'#{cc.attrs.helpPosition}',
+								'#{cc.attrs.showButton}',
+								'#{cc.attrs.title}',
+								'#{cc.attrs.onSelectF}',
+								'#{cc.attrs.onlyLeaves}',
+								'#{cc.attrs.filter}',
+								'#{cc.attrs.extraParamF}',
+								'#{cc.attrs.infoUrl}'
+						);
+					});
+				</script>
+			</h:panelGroup>
+
+			<h:panelGroup id="outputblock" layout="#{cc.attrs.layout}" style="width:100%"
+				rendered="#{not cc.attrs.editingMode}">
+				<h:outputText id="outputText" styleClass="inputTextOutput"
+					style="#{cc.attrs.style}" value="#{cc.attrs.value}">
+				</h:outputText>
+			</h:panelGroup>
+
+			<h:panelGroup id="dialog" layout="#{cc.attrs.layout}"
+				rendered="#{cc.attrs.showButton}">
+				<h:panelGroup id="tree" layout="#{cc.attrs.layout}" />
+			</h:panelGroup>
+			
+			<h:panelGroup id="info" layout="#{cc.attrs.layout}" styleClass="info"
+				rendered="#{not empty cc.attrs.infoUrl}">
+				<h:panelGroup id="info_content" layout="#{cc.attrs.layout}" />
+			</h:panelGroup>
+			
+		</span>
+	</composite:implementation>
+</ui:composition>

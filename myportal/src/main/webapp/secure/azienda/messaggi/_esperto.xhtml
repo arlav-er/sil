@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+	
+	<h:outputText escape="false"
+		value="#{msg['azienda.messaggi.consulenza.descrizione']}" />
+	
+	<cc:messages id="espertoMessages" />
+		
+	<h:form id="espertoForm">
+		<ui:fragment rendered="#{empty espertoBean.list}">
+			<h3 class="nessun_elemento_trovato">Nessuna richiesta presente</h3>
+		</ui:fragment>
+		
+		<ui:fragment rendered="#{not empty espertoBean.list}">
+			<div style="display: none;">
+				<h:inputHidden id="pageValue" value="#{espertoBean.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{espertoBean.changePage}" value="DUMMY FOR PAGINATION">
+					<f:ajax execute=":espertoForm:pageValue" render=":espertoForm:tabella :espertoDetailForm" />
+				</h:commandButton>
+			</div>
+			
+			<script type="text/javascript">				
+				$(jq("espertoForm:paginationBar")).pagination({							    
+					pages: #{espertoBean.paginationHandler.pages()},						       
+					cssStyle: 'light-theme',
+					prevText: 'Prec.',
+					nextText: 'Succ.',
+					onPageClick: function (pageNumber, event) {
+						document.getElementById("espertoForm:pageValue").value = pageNumber;
+						document.getElementById("espertoForm:pageCommand").click();
+						$(jq("espertoDetailForm")).hide();
+						$(jq("espertoForm:tabella")).hide();					            
+						$(jq("espertoForm:paginationLoader")).show();
+					}
+				});
+			</script>
+			
+			<h:panelGroup layout="block" id="paginationBar" 
+				class="widget_container ui-tabs ui-widget-content ui-corner-all" />
+			<br />
+			
+			<cc:waiting id="paginationLoader" hidden="true" waitMessage="Caricamento..." />	
+			
+			<h:panelGroup layout="block" id="tabella" class="dataTables_wrapper">	
+				<table class="dataTable">
+					<tr>
+						<th class="ui-state-default"></th>
+						<th class="ui-state-default">Mittente</th>
+						<th class="ui-state-default">Oggetto</th>
+						<th class="ui-state-default">Data</th>
+					</tr>
+					
+					<ui:repeat value="#{espertoBean.list}" var="messaggio" varStatus="status">
+						<tr>
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{espertoBean.view}">
+									<h:panelGroup styleClass="ui-icon ui-icon-arrowreturnthick-1-w fix-icon"
+										rendered="#{!sessionBean.isProprietary(messaggio.last)}" />
+									<span class="ui-icon #{messaggio.letto ? 'ui-icon-mail-open' 
+										: 'ui-icon-mail-closed'} fix_icon" />
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":espertoForm:tabella :espertoDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{espertoBean.view}">
+									<h:outputText value="#{messaggio.mittente} &nbsp;"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}" />
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":espertoForm:tabella :espertoDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+					
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{espertoBean.view}">
+									<h:outputText value="#{messaggio.ticket} - #{messaggio.oggetto} 
+										- #{messaggio.temaConsulenza.descrizione} &nbsp;"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}" />
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":espertoForm:tabella :espertoDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+							
+							<td class="clickable-td">
+								<h:commandLink immediate="true" action="#{espertoBean.view}">
+									<h:outputText value="#{empty messaggio.dtmIns ? '&nbsp;' : messaggio.dtmIns}"
+										styleClass="#{messaggio.letto ? '' : 'boldText'}">
+										<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+									</h:outputText>
+									<f:param name="id" value="#{messaggio.id}" />
+									<f:ajax execute="@this" render=":espertoForm:tabella :espertoDetailForm"
+										onevent="onShowDetail" />
+								</h:commandLink>
+							</td>
+						</tr>
+					</ui:repeat>
+				</table>
+				<script type="text/javascript">
+					$(jq("espertoForm:paginationLoader")).hide();
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+		</ui:fragment>
+	</h:form>
+	<br />
+	
+	<cc:waiting id="espertoDetailLoader" hidden="true" waitMessage="Caricamento..." />
+	<cc:waiting id="espertoInviaLoader" hidden="true" waitMessage="Invio in corso..." />
+	
+	<h:form id="espertoDetailForm">
+		<h:panelGroup layout="block" rendered="#{not espertoBean.showPanel}">
+			<h:commandLink id="inviaRichiestaBtn" styleClass="personButton"
+				value="Invia una richiesta" action="#{espertoBean.showInsertPanel}">
+				<f:ajax execute="@this" render=":espertoDetailForm" onevent="onShowDetail" />
+			</h:commandLink>
+		</h:panelGroup>
+		
+		<h:commandLink style="display: none;" id="richiediAssistenzaTecnicaBtn" 
+			styleClass="personButton" value="Invia una richiesta"
+			action="#{espertoBean.richiediAssistenzaTecnica}">
+			<f:ajax execute="@this" render=":espertoDetailForm" onevent="onShowDetail" />
+		</h:commandLink>
+
+		<h:panelGroup styleClass="insertPanel" layout="block" rendered="#{espertoBean.showPanel}">
+			<h:panelGrid columns="2" cellspacing="10">
+				<h:panelGroup />
+				
+				<cc:inputText value="#{espertoBean.data.ticket}"
+					rendered="#{not empty espertoBean.data.ticket}" label="Ticket n°:"
+					editingMode="false" />
+				
+				<cc:inputText type="date" value="#{espertoBean.data.dtmIns}"
+					label="Data invio" editingMode="false" />
+				
+				<cc:inputText value="#{espertoBean.data.oggetto}" label="Oggetto"
+					required="true" editingMode="#{espertoBean.editing}"
+					maxlength="250" />
+				
+				<h:panelGroup />
+				
+				<cc:selectOneMenu id="categoria"
+					editingMode="#{espertoBean.editing}"
+					styleClass="selectOneMenuLong" label="Tema" required="true"
+					value="#{espertoBean.data.temaConsulenza.id}"
+					valueDescription="#{espertoBean.data.temaConsulenza.descrizione}">
+					<f:selectItems value="#{espertoBean.temi}" />
+				</cc:selectOneMenu>
+				
+				<h:panelGroup />
+				
+				<cc:selectOneMenu id="settore" rendered="false"
+					editingMode="#{espertoBean.editing}" label="Settore"
+					value="#{espertoBean.data.settore.id}"
+					valueDescription="#{espertoBean.data.settore.descrizione}">
+					<f:selectItems value="#{espertoBean.settori}" />
+				</cc:selectOneMenu>
+				
+				<h:panelGroup />
+			</h:panelGrid>
+			
+			<h:panelGrid columns="1">
+				<h:panelGroup layout="block" styleClass="messageDiv"
+					rendered="#{not espertoBean.editing}">
+					<h:outputText
+						value="Richiesta di #{espertoBean.data.mittente} - inviata il "
+						styleClass="mittente" />
+					<h:outputText value="#{espertoBean.data.dtmIns}"
+						styleClass="mittente">
+						<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+					</h:outputText>
+					<br />
+					
+					<div class="corpo">
+						#{espertoBean.data.corpo}
+					</div>
+				</h:panelGroup>
+				
+				<h:panelGroup layout="block" rendered="#{not espertoBean.editing}">
+					<ui:repeat var="risposta" value="#{espertoBean.data.risposte}">
+						<div class="messageDiv">
+							<h:outputText
+								value="Risposta di #{risposta.mittente} - inviata il "
+								styleClass="mittente" />
+							<h:outputText value="#{risposta.dtmIns}" styleClass="mittente">
+								<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+							</h:outputText>
+							<br />
+							
+							<div class="corpo">
+								#{risposta.corpo}
+							</div>
+						</div>
+					</ui:repeat>
+				</h:panelGroup>
+				
+				<cc:inputTextarea style="width:81%" maxlength="3000"
+					required="true" rendered="#{espertoBean.editing}"
+					label="Richiesta:" value="#{espertoBean.data.corpo}"
+					richTextMode="false" />
+			</h:panelGrid>
+
+			<div>
+				<h:commandLink styleClass="marginButton commentButton" action="#{espertoBean.save}" 
+					value="Invia" rendered="#{espertoBean.editing}">
+					<f:ajax execute=":espertoDetailForm" render=":espertoDetailForm :espertoForm :espertoMessages"
+						onevent="onInvia" />
+				</h:commandLink>
+				
+				<h:commandLink action="#{espertoBean.dontedit}" value="Chiudi" immediate="true"
+					styleClass="marginButton closeButton #{espertoBean.editing ? 'secondButton' : ''}" >
+					<f:ajax execute="@this" render=":espertoDetailForm" 
+						onevent="onHideDetail"/>
+				</h:commandLink>
+			</div>
+		</h:panelGroup>
+		<script type="text/javascript">
+			disegnaBottoni();
+		</script>
+	</h:form>
+
+	<script type="text/javascript">
+		function onHideDetail(data) {
+			if (data.status == 'begin') {
+				PrimeFaces.scrollTo('espertoForm');
+			}
+		}
+		
+		function onShowDetail(data) {
+			if (data.status == 'begin') {
+				$(jq("espertoDetailForm")).hide();
+				$(jq("espertoDetailLoader")).show();
+			} else if (data.status == 'success') {
+				$(jq("espertoDetailLoader")).hide();
+				PrimeFaces.scrollTo('espertoDetailForm');
+			}
+		}
+		
+		function onInvia(data) {
+			if (data.status == 'begin') {
+				$(jq("espertoDetailForm")).hide();
+				$(jq("espertoInviaLoader")).show();
+			} else if (data.status == 'success') {
+				$(jq("espertoInviaLoader")).hide();
+			}
+		}
+		
+		function checkSezione() {
+			if ('#{sessionBean.assistenzaTecnica}' == 'true') {
+				// apro il form di inserimento richiesta con prevalorizzato
+				// il tema ad "ASSISTENZA TECNICA"
+				$(jq("espertoDetailForm:richiediAssistenzaTecnicaBtn")).click();
+				// nasconde il pulsante "Invia una richiesta"
+				$(jq("espertoDetailForm:inviaRichiestaBtn")).hide();
+			}
+		}
+		
+		checkSezione();
+	</script>
+</ui:composition>

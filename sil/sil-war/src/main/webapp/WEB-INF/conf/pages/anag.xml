@@ -1,0 +1,1451 @@
+<!-- page di test da cancellare -->
+<!-- <PAGE name="PaginaAlbero" scope="REQUEST"> <MODULES> <MODULE name="ModuloAlbero"/> 
+	</MODULES> <DEPENDENCIES> <DEPENDENCE source="PaginaAlbero" target="ModuloAlbero"> 
+	<CONDITIONS> </CONDITIONS> <CONSEQUENCES/> </DEPENDENCE> </DEPENDENCIES> 
+	</PAGE> -->
+<!-- /page di test -->
+
+<!-- Anagrafica -->
+
+<PAGE distributed="false" name="AnagMainPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_AnagMain" />
+		<MODULE keep="false" name="ProfDettaglioUtenteSession" />
+		<MODULE keep="false" name="M_ConfigConvezioneNoce" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AnagMainPage" target="M_AnagMain">
+			<CONDITIONS>
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="AnagMainPage" target="ProfDettaglioUtenteSession" />
+		<DEPENDENCE source="AnagMainPage" target="M_ConfigConvezioneNoce" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="RicercaRedditiAttivazionePage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetStatoRA" />
+		<MODULE name="M_GetFileDaAutorizzare"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaRedditiAttivazionePage" target="M_GetStatoRA"/>
+		<DEPENDENCE source="RicercaRedditiAttivazionePage" target="M_GetFileDaAutorizzare"/>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ListaRedditiAttivazionePage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_DynamicListaRA" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaRedditiAttivazionePage" target="M_DynamicListaRA">
+			<CONDITIONS />
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="DettaglioRAPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetDettaglioRA" />
+		<MODULE keep="false" name="M_UpdDettaglioRA" />
+		<MODULE keep="false" name="M_GetStatoRA" />
+		<MODULE keep="false" name="M_GetMotVerificaRA" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DettaglioRAPage" target="M_GetDettaglioRA">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_GetDettaglioRA"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="DettaglioRAPage" target="M_UpdDettaglioRA">
+			<CONDITIONS>
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_UpdDettaglioRA"/>
+			</CONDITIONS>
+		</DEPENDENCE>	
+		<DEPENDENCE source="M_UpdDettaglioRA" target="M_GetDettaglioRA" />			
+		<DEPENDENCE source="M_GetDettaglioRA" target="M_GetStatoRA" />
+		<DEPENDENCE source="DettaglioRAPage" target="M_GetMotVerificaRA" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="listaDidInpsPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_ELENCOCPI" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="listaDidInpsPage" target="M_ELENCOCPI">
+			<CONDITIONS>
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DidInpsRicercaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_DynamicRicercaDidInps" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DidInpsRicercaPage" target="M_DynamicRicercaDidInps">
+			<CONDITIONS>
+				<PARAMETER name="cerca" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DidInpsListaByLavPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_DidInps_takeLav" />
+		<MODULE keep="false" name="M_DidInpsByLav" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DidInpsListaByLavPage" target="M_DidInps_takeLav" />
+		<DEPENDENCE source="M_DidInps_takeLav" target="M_DidInpsByLav" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="DidInpsDettaglioPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetDidInps" />
+		<MODULE name="COMBO_ENTETIT" />
+		<MODULE name="M_DidInps_takeLav" />
+		<MODULE name="M_DidInps_LinkLav" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DidInpsDettaglioPage" target="M_GetDidInps" />
+		<DEPENDENCE source="M_GetDidInps" target="M_DidInps_takeLav">
+			<CONDITIONS>
+				<PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST"
+					value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="strcodicefiscale" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GetDidInps.ROWS.ROW.STRCODICEFISCALELAV" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_DidInps_takeLav" target="M_DidInps_LinkLav">
+			<CONDITIONS>
+				<PARAMETER name="M_DidInps_takeLav.ROWS.ROW.CDNLAVORATORE"
+					scope="SERVICE_RESPONSE" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="strcodicefiscale" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GetDidInps.ROWS.ROW.STRCODICEFISCALELAV" />
+				<PARAMETER name="NUMKLODIDINPS" type="RELATIVE" scope="SERVICE_RESPONSE"
+                    value="M_GetDidInps.ROWS.ROW.NUMKLODIDINPS" />
+				<PARAMETER name="CDNLAVORATORE" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_DidInps_takeLav.ROWS.ROW.CDNLAVORATORE" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="DidInpsDettaglioPage" target="COMBO_ENTETIT" />
+
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="DidInpsDettaglioScarnoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetDidInps" />
+		<MODULE name="COMBO_ENTETIT" />
+		<MODULE name="M_DidInps_takeLav" />
+		<MODULE name="M_DidInps_LinkLav" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DidInpsDettaglioScarnoPage" target="COMBO_ENTETIT" />
+		<DEPENDENCE source="DidInpsDettaglioScarnoPage" target="M_GetDidInps" />
+		<DEPENDENCE source="M_GetDidInps" target="M_DidInps_takeLav">
+			<CONDITIONS>
+				<PARAMETER name="CDNLAVORATORE" scope="SERVICE_REQUEST"
+					value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="strcodicefiscale" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GetDidInps.ROWS.ROW.STRCODICEFISCALELAV" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_DidInps_takeLav" target="M_DidInps_LinkLav">
+			<CONDITIONS>
+				<PARAMETER name="M_DidInps_takeLav.ROWS.ROW.CDNLAVORATORE"
+					scope="SERVICE_RESPONSE" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="strcodicefiscale" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GetDidInps.ROWS.ROW.STRCODICEFISCALELAV" />
+				<PARAMETER name="NUMKLODIDINPS" type="RELATIVE" scope="SERVICE_RESPONSE"
+                    value="M_GetDidInps.ROWS.ROW.NUMKLODIDINPS" />
+				<PARAMETER name="CDNLAVORATORE" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_DidInps_takeLav.ROWS.ROW.CDNLAVORATORE" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+
+
+<PAGE distributed="false" name="AnagRicercaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_DynamicRicerca" />
+		<MODULE keep="false" name="M_COOP_GetLavoratoreIR" />
+		<MODULE keep="false" name="M_SapCallVerificaEsistenzaSapPortale" />
+		<MODULE keep="false" name="M_CONFIG_IMPORTAZIONE_SAP" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AnagRicercaPage" target="M_CONFIG_IMPORTAZIONE_SAP" />
+		<DEPENDENCE source="AnagRicercaPage" target="M_DynamicRicerca">
+			<CONDITIONS>
+				<PARAMETER name="cerca" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_DynamicRicerca" target="M_COOP_GetLavoratoreIR">
+			<CONDITIONS>
+				<PARAMETER name="M_DynamicRicerca.ROWS.ROW" scope="SERVICE_RESPONSE"
+					type="relative" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="M_DynamicRicerca" target="M_SapCallVerificaEsistenzaSapPortale">
+			<CONDITIONS>
+				<PARAMETER name="M_DynamicRicerca.ROWS.ROW" scope="SERVICE_RESPONSE"
+					type="relative" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="CalcolaDataComunePageAnag" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_InsertDataEComune" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CalcolaDataComunePageAnag" target="M_InsertDataEComune" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="AnagDettaglioPageAnag" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_CONFIG_INVIO_CURRICULUM" />
+		<MODULE name="M_GetLavoratoreAnag" />
+		<MODULE name="M_GetStatiCivili" />
+		<MODULE name="M_GetConfigValue" />
+		<MODULE name="M_SaveLavoratoreAnag" />
+		<MODULE name="M_GetProssimoLavoratore" />
+		<MODULE name="M_InsertLavoratore" />
+		<MODULE name="M_DeleteLavoratore" />
+		<MODULE name="M_GetCpiLavoratore" />
+		<MODULE name="M_COOP_PutLavoratoreIR" />
+		<MODULE name="M_COOP_RibadisciPutLavoratoreIR" />
+		<MODULE name="M_COOP_MODIFICACODICEFISCALEIR" />
+		<MODULE name="M_COOP_MODIFICAANAGRAFICALAVORATOREIR" />
+		<MODULE name="M_AccountAssociato" />
+		<MODULE name="M_CHECK_CODICEFISCALE" />
+	</MODULES>
+
+	<DEPENDENCIES>
+		<DEPENDENCE source="AnagDettaglioPageAnag" target="M_CONFIG_INVIO_CURRICULUM" />
+
+		<DEPENDENCE source="AnagDettaglioPageAnag" target="M_GetConfigValue">
+			<CONDITIONS>
+				<PARAMETER name="COD_TIPO_CONFIG" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="AnagDettaglioPageAnag" target="M_GetLavoratoreAnag">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="AnagDettaglioPageAnag" target="M_GetCpiLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+
+		<!-- <DEPENDENCE source="M_GetConfigValue" target="M_SaveLavoratoreAnag"> 
+			<CONDITIONS/> <CONSEQUENCES/> </DEPENDENCE> -->
+
+		<DEPENDENCE source="M_GetCpiLavoratore" target="M_SaveLavoratoreAnag">
+			<CONDITIONS>
+				<PARAMETER name="salva" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER scope="SERVICE_RESPONSE" type="RELATIVE"
+					value="M_GetConfigValue"></PARAMETER>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="M_SaveLavoratoreAnag" target="M_COOP_MODIFICACODICEFISCALEIR">
+			<CONDITIONS>
+				<PARAMETER name="M_SaveLavoratoreAnag.UPDATE_OK" scope="SERVICE_RESPONSE"
+					value="TRUE" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<!-- passo tutto il source bean: il parametro name non serve -->
+				<PARAMETER scope="SERVICE_RESPONSE" type="RELATIVE"
+					value="M_GETCPILAVORATORE" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_COOP_MODIFICACODICEFISCALEIR" target="M_COOP_MODIFICAANAGRAFICALAVORATOREIR">
+			<CONDITIONS>
+				<!-- se il servizio di modifica codice fiscale e' stato chiamato non 
+					chiamo quello di modifica anagrafica -->
+				<PARAMETER name="M_COOP_MODIFICACODICEFISCALEIR.SERVIZIO_CHIAMATO"
+					scope="SERVICE_RESPONSE" value="FALSE" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<!-- passo tutto il source bean: il parametro name non serve -->
+				<PARAMETER scope="SERVICE_RESPONSE" type="RELATIVE"
+					value="M_GetLavoratoreAnag" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="AnagDettaglioPageAnag" target="M_GetProssimoLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="insert_lavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="AnagDettaglioPageAnag" target="M_GetStatiCivili">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="AnagDettaglioPageAnag" target="M_DeleteLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="cancella" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="M_GetProssimoLavoratore" target="M_InsertLavoratore">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="M_InsertLavoratore" target="M_GetLavoratoreAnag">
+			<CONDITIONS>
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="M_SaveLavoratoreAnag" target="M_GetLavoratoreAnag">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+
+		<!-- PERCORSO INSERIMENTO IN COOPERAZIONE APPLICATIVA -->
+
+		<DEPENDENCE source="AnagDettaglioPageAnag" target="M_COOP_PutLavoratoreIR">
+			<CONDITIONS>
+				<PARAMETER name="insert_lavoratore_coop" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="AnagDettaglioPageAnag" target="M_COOP_RibadisciPutLavoratoreIR">
+			<CONDITIONS>
+				<PARAMETER name="ribadisci_insert_lav_coop" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="M_COOP_RibadisciPutLavoratoreIR"
+			target="M_GetProssimoLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="insert_lavoratore_coop" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+				<PARAMETER name="M_COOP_RIBADISCIPUTLAVORATOREIR.retCode"
+					scope="SERVICE_RESPONSE" type="RELATIVE" value="0" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="M_COOP_PutLavoratoreIR" target="M_GetProssimoLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="insert_lavoratore_coop" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+				<PARAMETER name="M_COOP_PUTLAVORATOREIR.retCode" scope="SERVICE_RESPONSE"
+					type="RELATIVE" value="0" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+
+		<!-- [M_GetProssimoLavoratore -> M_InsertLavoratore segue il percorso standard 
+			(vedi sopra)] -->
+
+		<DEPENDENCE source="AnagDettaglioPageAnag" target="M_AccountAssociato" />
+		<!-- aNDsAV 30/08/2006 se si proviene dall'inserimento/aggiornamento della 
+			scheda lavoratore in coop bisogna mostrare se il codice fiscale e' valido 
+			o meno -->
+		<DEPENDENCE source="M_GetLavoratoreAnag" target="M_CHECK_CODICEFISCALE">
+			<CONDITIONS>
+				<PARAMETER name="PROVENIENZA" scope="SERVICE_REQUEST"
+					value="SCHEDA_LAVORATORE_COOP" type="RELATIVE" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER type="RELATIVE" scope="SERVICE_RESPONSE" value="M_GetLavoratoreAnag" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Nuova Page per l'inserimento dei dati del lavoratore, se viene chiamata 
+	dalla validazione strae i dati dalla tabella di appoggio dei movimenti -->
+<PAGE name="AnagDettaglioPageAnagIns" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetStatiCivili" />
+		<MODULE name="M_MovGetDettMovApp" />
+		<MODULE name="M_MobilitaGetDettaglioMobApp" />
+	</MODULES>
+
+	<DEPENDENCIES>
+		<DEPENDENCE source="AnagDettaglioPageAnagIns" target="M_GetStatiCivili">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="AnagDettaglioPageAnagIns" target="M_MovGetDettMovApp">
+			<CONDITIONS>
+				<PARAMETER name="VALIDAMOV" scope="SERVICE_REQUEST" type="RELATIVE"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="AnagDettaglioPageAnagIns" target="M_MobilitaGetDettaglioMobApp">
+			<CONDITIONS>
+				<PARAMETER name="VALIDAMOBILITA" scope="SERVICE_REQUEST"
+					type="RELATIVE" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+<!-- Nuova Page per l'inserimento degli indirizzi del lavoratore, se viene 
+	chiamata dalla validazione strae i dati dalla tabella di appoggio dei movimenti -->
+<PAGE name="AnagDettaglioPageIndirizziIns" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetProssimoLavoratore" />
+		<MODULE name="M_InsertLavoratoreAnagIndirizzi" />
+		<MODULE name="M_MovGetDettMovApp" />
+		<MODULE name="M_MobilitaGetDettaglioMobApp" />
+		<MODULE name="M_COOP_PutLavoratoreIR" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AnagDettaglioPageIndirizziIns" target="M_GetProssimoLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="inserimentoLav" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+				<PARAMETER name="PROVENIENZA" scope="SERVICE_REQUEST"
+					value="MOVIMENTI" />
+				<PARAMETER name="AGG_FUNZ" scope="SERVICE_REQUEST" value="aggiornaLavoratore" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="AnagDettaglioPageIndirizziIns" target="M_GetProssimoLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="inserimentoLav" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+				<PARAMETER name="PROVENIENZA" scope="SERVICE_REQUEST"
+					value="MOVIMENTI" />
+				<PARAMETER name="AGG_FUNZ" scope="SERVICE_REQUEST" value="aggLav" />
+			</CONDITIONS>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="M_GetProssimoLavoratore" target="M_InsertLavoratoreAnagIndirizzi">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="M_InsertLavoratoreAnagIndirizzi"
+			target="M_COOP_PutLavoratoreIR">
+			<CONDITIONS>
+				<PARAMETER name="insert_lavoratore_coop" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="AnagDettaglioPageIndirizziIns" target="M_MovGetDettMovApp">
+			<CONDITIONS>
+				<PARAMETER name="VALIDAMOV" scope="SERVICE_REQUEST" type="RELATIVE"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="AnagDettaglioPageIndirizziIns" target="M_MobilitaGetDettaglioMobApp">
+			<CONDITIONS>
+				<PARAMETER name="VALIDAMOBILITA" scope="SERVICE_REQUEST"
+					type="RELATIVE" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- Nuova Page per gli indirizzi -->
+<PAGE name="AnagDettaglioPageIndirizziGenerale" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetLavoratoreAnag" />
+		<MODULE name="M_GetStatiCivili" />
+		<MODULE name="M_GetProssimoLavoratore" />
+		<MODULE name="M_InsertLavoratoreAnagIndirizzi" />
+		<!--<MODULE name="M_SaveLavoratoreIndirizzi_DOM_uguale_RES"/> -->
+
+		<!-- moduli per la cooperazione applicativa -->
+		<!-- MODULE name="M_COOP_GetLavoratoreIR"/ -->
+		<MODULE name="M_COOP_PutLavoratoreIR" />
+	</MODULES>
+	<DEPENDENCIES>
+
+
+		<DEPENDENCE source="AnagDettaglioPageIndirizziGenerale"
+			target="M_GetProssimoLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="salva" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<!-- suddivido i casi di chiamata di M_InsertLavoratoreAnagIndirizzi per 
+			evitare che in fase di inserimento venga chiamato prima il modulo di cooperazione 
+			e poi quello di inserimento in provincia -->
+		<DEPENDENCE source="M_GetProssimoLavoratore" target="M_InsertLavoratoreAnagIndirizzi">
+			<CONDITIONS>
+				<PARAMETER name="salva" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+
+		<!-- <DEPENDENCE source="M_InsertLavoratoreAnagIndirizzi" target="M_SaveLavoratoreIndirizzi_DOM_uguale_RES"> 
+			<CONDITIONS> <PARAMETER name="codComdom" scope="SERVICE_REQUEST" value=""/> 
+			</CONDITIONS> <CONSEQUENCES> <PARAMETER name="cdnLavoratore" type="RELATIVE" 
+			scope="SERVICE_RESPONSE" value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore"/> 
+			</CONSEQUENCES> </DEPENDENCE> -->
+		<!-- <DEPENDENCE source="M_SaveLavoratoreIndirizzi_DOM_uguale_RES" target="M_GetLavoratoreAnag"> 
+			<CONDITIONS> <PARAMETER name="codComdom" scope="SERVICE_REQUEST" value=""/> 
+			</CONDITIONS> <CONSEQUENCES> <PARAMETER name="cdnLavoratore" type="RELATIVE" 
+			scope="SERVICE_RESPONSE" value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore"/> 
+			</CONSEQUENCES> </DEPENDENCE> -->
+
+
+
+
+		<!-- PERCORSO INSERIMENTO IN COOPERAZIONE APPLICATIVA -->
+		<!--DEPENDENCE source="AnagDettaglioPageIndirizziGenerale" target="M_COOP_GetLavoratoreIR"> 
+			<CONDITIONS> <PARAMETER name="insert_lavoratore_coop" scope="SERVICE_REQUEST" 
+			value="AF_DEFINED"/> </CONDITIONS> <CONSEQUENCES/> </DEPENDENCE> <DEPENDENCE 
+			source="M_COOP_GetLavoratoreIR" target="M_COOP_PutLavoratoreIR" > <CONDITIONS> 
+			<PARAMETER name="insert_lavoratore_coop" scope="SERVICE_REQUEST" value="AF_DEFINED"/> 
+			<PARAMETER name="M_COOP_GetLavoratoreIR.ROWS.ROW.codiceFiscale" scope="SERVICE_RESPONSE" 
+			value="AF_NOT_DEFINED"/> </CONDITIONS> <CONSEQUENCES/> </DEPENDENCE -->
+		<DEPENDENCE source="AnagDettaglioPageIndirizziGenerale"
+			target="M_GetProssimoLavoratore">
+			<CONDITIONS>
+				<PARAMETER name="insert_lavoratore_coop" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetProssimoLavoratore" target="M_InsertLavoratoreAnagIndirizzi">
+			<CONDITIONS>
+				<PARAMETER name="insert_lavoratore_coop" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_InsertLavoratoreAnagIndirizzi"
+			target="M_COOP_PutLavoratoreIR">
+			<CONDITIONS>
+				<PARAMETER name="insert_lavoratore_coop" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+				<PARAMETER name="M_INSERTLAVORATOREANAGINDIRIZZI.operationResult"
+					scope="SERVICE_RESPONSE" value="SUCCESS" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+		<!-- /PERCORSO INSERIMENTO IN COOPERAZIONE APPLICATIVA -->
+		<DEPENDENCE source="M_InsertLavoratoreAnagIndirizzi"
+			target="M_GetLavoratoreAnag">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="cdnLavoratore" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GETPROSSIMOLAVORATORE.ROW.cdnLavoratore" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+
+		<!-- moduli da chiamare SEMPRE -->
+
+		<DEPENDENCE source="AnagDettaglioPageIndirizziGenerale"
+			target="M_GetStatiCivili">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+
+
+
+
+	</DEPENDENCIES>
+
+
+</PAGE>
+<!-- Fine -->
+<!-- fine Page per l'inserimento dei dati del lavoratore -->
+
+
+<PAGE name="AnagDettaglioPageIndirizzi" scope="REQUEST">
+	<MODULES>
+	    <MODULE name="M_ConfigStampaTrasferimentoLavoratore"/>
+		<MODULE keep="false" name="SELECT_AN_LAVORATORE_X_IR" />
+		<MODULE keep="false" name="M_AggiornaCpi" />
+		<MODULE name="M_GetLavoratoreIndirizzi" />
+		<MODULE name="M_SaveLavoratoreIndirizzi" />
+		<MODULE name="M_TrasferimentiStoricoElenco" />
+		<!--<MODULE name="M_SaveLavoratoreIndirizzi_DOM_uguale_RES"/> -->
+		<!--<MODULE name="M_ElencoCPI"/> -->
+
+		<!-- aNDsAV modifica cpi (forzatura) in cooperazione -->
+		<MODULE name="M_COOP_ModificaCpiCompetente" />
+		
+		<!-- 
+		<MODULE name="M_CONFIG_CONSENSOFIRMA" /> 
+		<MODULE name="M_VerificaAmConsensoFirma" />		
+		<MODULE name="M_VerificaFileFirmabile" />				
+		 -->
+		
+	</MODULES>
+	<DEPENDENCIES>
+	    <DEPENDENCE source="AnagDettaglioPageIndirizzi" target="M_ConfigStampaTrasferimentoLavoratore" /> 
+		<DEPENDENCE source="AnagDettaglioPageIndirizzi" target="SELECT_AN_LAVORATORE_X_IR">
+			<!-- necessario per conoscere i dati del lavoratore prima della modifica 
+				del cpi -->
+			<CONDITIONS>
+				<PARAMETER name="aggiornaCpi" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="SELECT_AN_LAVORATORE_X_IR" target="M_AggiornaCpi">
+			<CONDITIONS>
+				<PARAMETER name="SELECT_AN_LAVORATORE_X_IR.SELECT_OK"
+					scope="SERVICE_RESPONSE" value="TRUE" />
+			</CONDITIONS>
+			<!-- <CONDITIONS> <PARAMETER name="aggiornaCpi" scope="SERVICE_REQUEST" 
+				value="AF_DEFINED"/> </CONDITIONS> -->
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="M_AggiornaCpi" target="M_COOP_ModificaCpiCompetente">
+			<CONDITIONS>
+				<PARAMETER name="M_AggiornaCpi.UPDATE_OK" scope="SERVICE_RESPONSE"
+					value="TRUE" />
+			</CONDITIONS>
+
+			<CONSEQUENCES>
+				<!-- il parametro name non serve perche' l'oggetto da inserire nella 
+					request e' un SourceBean -->
+				<PARAMETER type="RELAVIVE" scope="SERVICE_RESPONSE"
+					value="SELECT_AN_LAVORATORE_X_IR" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="AnagDettaglioPageIndirizzi" target="M_GetLavoratoreIndirizzi">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="AnagDettaglioPageIndirizzi" target="M_SaveLavoratoreIndirizzi">
+			<CONDITIONS>
+				<PARAMETER name="salva" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<!-- <DEPENDENCE source="M_SaveLavoratoreIndirizzi" target="M_SaveLavoratoreIndirizzi_DOM_uguale_RES"> 
+			<CONDITIONS> <PARAMETER name="codComdom" scope="SERVICE_REQUEST" value=""/> 
+			</CONDITIONS> <CONSEQUENCES/> </DEPENDENCE> -->
+
+		<DEPENDENCE source="M_SaveLavoratoreIndirizzi" target="M_GetLavoratoreIndirizzi">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<!--<DEPENDENCE source="AnagDettaglioPageIndirizzi" target="M_ElencoCPI"> 
+			<CONDITIONS> </CONDITIONS> <CONSEQUENCES/> </DEPENDENCE> -->
+
+		<DEPENDENCE source="AnagDettaglioPageIndirizzi" target="M_TrasferimentiStoricoElenco" />
+		
+		
+		<!-- firma -->
+		<!-- 
+		<DEPENDENCE source="ConfermaAnnualeDidPage" target="M_CONFIG_CONSENSOFIRMA" />
+		<DEPENDENCE source="M_CONFIG_CONSENSOFIRMA" target="M_VerificaFileFirmabile">
+		    <CONDITIONS>
+		        <PARAMETER name="M_CONFIG_CONSENSOFIRMA.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1" />
+		    </CONDITIONS>
+		    <CONSEQUENCES>
+				<PARAMETER name="DOCUMENTTYPE" type="ABSOLUTE" scope="" value="TRCPI" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_VerificaFileFirmabile" target="M_VerificaAmConsensoFirma">
+		    <CONDITIONS>
+		        <PARAMETER name="M_VerificaFileFirmabile.FLGFIRMAGRAFO" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="S" />
+		    </CONDITIONS>
+		</DEPENDENCE>
+		 -->
+	</DEPENDENCIES>
+
+</PAGE>
+
+<!-- pagina lista account Portale -->
+<PAGE name="AnagDettaglioPageAccount" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetLavoratoreAccount" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AnagDettaglioPageAccount" target="M_GetLavoratoreAccount">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<!-- pagina dettaglio account e nuovo account -->
+<PAGE distributed="false" name="AnagDettaglioPageAccountDettaglio"
+	scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetLavoratoreAnag" />
+		<MODULE name="M_GetLavoratoreIndirizzi" />
+		<MODULE name="M_GetLavoratoreAccountDettaglioSil" />
+		<MODULE name="M_GetLavoratoreAccountDettaglio" />
+		<MODULE name="M_InserisciNuovoAccountPortale" />
+		<MODULE name="M_AggiornaDatiPortale" />
+		<MODULE name="M_AggiornaAnagLavAccountSil" />
+		<MODULE name="M_AggiornaExPermSoggAccountSil" />
+		<MODULE name="M_ReinoltraMailAccount" />
+	</MODULES>
+
+	<DEPENDENCIES>
+
+		<DEPENDENCE source="AnagDettaglioPageAccountDettaglio"
+			target="M_GetLavoratoreAnag">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="AnagDettaglioPageAccountDettaglio"
+			target="M_GetLavoratoreIndirizzi">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="AnagDettaglioPageAccountDettaglio"
+			target="M_GetLavoratoreAccountDettaglioSil">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="AnagDettaglioPageAccountDettaglio"
+			target="M_GetLavoratoreAccountDettaglio">
+			<CONDITIONS>
+				<PARAMETER name="idPfPrincipal" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="AnagDettaglioPageAccountDettaglio"
+			target="M_InserisciNuovoAccountPortale">
+			<CONDITIONS>
+				<PARAMETER name="INSERISCI" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="AnagDettaglioPageAccountDettaglio"
+			target="M_AggiornaDatiPortale">
+			<CONDITIONS>
+				<PARAMETER name="SALVAPORTALE" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="AnagDettaglioPageAccountDettaglio"
+			target="M_AggiornaAnagLavAccountSil">
+			<CONDITIONS>
+				<PARAMETER name="SALVASIL" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="AnagDettaglioPageAccountDettaglio"
+			target="M_ReinoltraMailAccount">
+			<CONDITIONS>
+				<PARAMETER name="REINOLTRAMAIL" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+		<DEPENDENCE source="M_AggiornaAnagLavAccountSil" target="M_AggiornaExPermSoggAccountSil">
+			<CONDITIONS>
+				<PARAMETER name="M_AggiornaAnagLavAccountSil.operationResult"
+					scope="SERVICE_RESPONSE" value="SUCCESS" />
+				<PARAMETER name="M_AggiornaAnagLavAccountSil.CITTADINANZAEXTRACEE"
+					scope="SERVICE_RESPONSE" value="AF_DEFINED" />
+				<PARAMETER name="STATUS_STRANIERO" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE name="AnagDettaglioPageRecapiti" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetLavoratoreRecapiti" />
+		<MODULE name="M_SaveLavoratoreRecapiti" />
+		<MODULE name="M_GetLavoratoreIndirizzi" />
+		<MODULE name="M_SaveLavoratoreRecapitiREC_uguale_DOM" />
+	</MODULES>
+	<DEPENDENCIES>
+
+
+		<DEPENDENCE source="AnagDettaglioPageRecapiti" target="M_GetLavoratoreRecapiti">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+
+		<DEPENDENCE source="AnagDettaglioPageRecapiti" target="M_SaveLavoratoreRecapiti">
+			<CONDITIONS>
+				<PARAMETER name="salva" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+
+
+		<DEPENDENCE source="M_SaveLavoratoreRecapiti" target="M_GetLavoratoreIndirizzi">
+			<CONDITIONS>
+				<PARAMETER name="codComRec" scope="SERVICE_REQUEST" value="" />
+				<PARAMETER name="salva" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+		<DEPENDENCE source="M_GetLavoratoreIndirizzi" target="M_SaveLavoratoreRecapitiREC_uguale_DOM">
+			<CONDITIONS>
+				<PARAMETER name="codComRec" scope="SERVICE_REQUEST" value="" />
+				<PARAMETER name="M_GetLavoratoreIndirizzi.ROW.STRINDIRIZZODOM"
+					scope="SERVICE_RESPONSE" type="RELATIVE" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="strIndirizzoRec" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GetLavoratoreIndirizzi.ROW.STRINDIRIZZODOM" />
+				<PARAMETER name="strLocalitaRec" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GetLavoratoreIndirizzi.ROW.strLocalitaDom" />
+				<PARAMETER name="STRCapRec" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GetLavoratoreIndirizzi.ROW.STRCapDom" />
+				<PARAMETER name="CODCOMRec" type="RELATIVE" scope="SERVICE_RESPONSE"
+					value="M_GetLavoratoreIndirizzi.ROW.CODCOMDOM" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+
+
+		<DEPENDENCE source="M_SaveLavoratoreRecapiti" target="M_GetLavoratoreRecapiti">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+
+
+
+
+
+</PAGE>
+
+<PAGE name="AnagDeletePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_DeleteLavoratore" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AnagDeletePage" target="M_DeleteLavoratore">
+			<CONDITIONS>
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+
+</PAGE>
+
+
+
+<PAGE name="RicercaComunePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_RicercaComuneStato" />
+		<!--MODULE name="M_RicercaCodComune"/> <MODULE name="M_RicercaDesComune"/> 
+			<MODULE name="M_RicercaStato_Precisa"/> <MODULE name="M_RicercaStato_Approssimata"/ -->
+	</MODULES>
+
+	<DEPENDENCIES>
+		<!--<DEPENDENCE source="RicercaComunePage" target="M_RicercaStato_Precisa"> 
+			<CONDITIONS> <PARAMETER name="strdenominazione" scope="SERVICE_REQUEST" value="AF_DEFINED"/> 
+			<PARAMETER name="tipo" scope="SERVICE_REQUEST" value="STATI"/> </CONDITIONS> 
+			<CONSEQUENCES/> </DEPENDENCE> <DEPENDENCE source="M_RicercaStato_Precisa" 
+			target="M_RicercaStato_Approssimata"> <CONDITIONS> <PARAMETER name="M_RicercaStato_Precisa.ROWS.ROW.codcom" 
+			scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED"/> <PARAMETER name="tipo" 
+			scope="SERVICE_REQUEST" value="STATI"/> </CONDITIONS> <CONSEQUENCES/> </DEPENDENCE> 
+			<DEPENDENCE source="RicercaComunePage" target="M_RicercaCodComune"> <CONDITIONS> 
+			<PARAMETER name="codcom" scope="SERVICE_REQUEST" value="AF_DEFINED"/> </CONDITIONS> 
+			<CONSEQUENCES/> </DEPENDENCE> -->
+
+		<DEPENDENCE source="RicercaComunePage" target="M_RicercaComuneStato">
+			<!--CONDITIONS> <PARAMETER name="strdenominazione" scope="SERVICE_REQUEST" 
+				value="AF_DEFINED"/> </CONDITIONS> <CONSEQUENCES/ -->
+		</DEPENDENCE>
+
+		<!--DEPENDENCE source="M_RicercaDesComunePrecisa" target="M_RicercaDesComune"> 
+			<CONDITIONS> <PARAMETER name="strdenominazione" scope="SERVICE_REQUEST" value="AF_DEFINED"/> 
+			<PARAMETER name="M_RICERCADESCOMUNEPRECISA.ROWS.ROW.codcom" scope="SERVICE_RESPONSE" 
+			value="AF_NOT_DEFINED"/> <PARAMETER name="tipo" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/> 
+			</CONDITIONS> <CONSEQUENCES/> </DEPENDENCE -->
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="RicercaSpecificoComunePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_RicercaComuneStato" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaSpecificoComunePage" target="M_RicercaComuneStato">
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="RicercaCittadinanzaPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_RicercaCittadinanza" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaCittadinanzaPage" target="M_RicercaCittadinanza">
+			<CONDITIONS>
+				<PARAMETER name="nazione" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+
+</PAGE>
+
+
+<!--Pagine per il wizard -->
+<!-- <PAGE name="AnagWizardPrimeInformazioni" scope="REQUEST"> <MODULES> 
+	<MODULE name="M_AnagWizardPrimeInformazioni"/> </MODULES> <DEPENDENCIES> 
+	<DEPENDENCE source="AnagWizardPrimeInformazioni" target="M_AnagWizardPrimeInformazioni"> 
+	<CONDITIONS/> <CONSEQUENCES/> </DEPENDENCE> </DEPENDENCIES> </PAGE> <PAGE 
+	name="AnagWizardLista" scope="REQUEST"> <MODULES> <MODULE name="M_COOP_GetLavoratoreIR"/> 
+	</MODULES> <DEPENDENCIES> <DEPENDENCE source="AnagWizardLista" target="M_COOP_GetLavoratoreIR"> 
+	<CONDITIONS/> <CONSEQUENCES/> </DEPENDENCE> </DEPENDENCIES> </PAGE> -->
+
+
+
+<!--**************************************************************************** 
+	Page utilizzata per il controllo del codice fiscale ( serve per richiamare 
+	una jsp al cui interno viene utilizzata la classe "it.eng.sil.util.grabber.PersonaFiscale" 
+	che provvede al controllo del CF) **************************************************************************** -->
+<PAGE name="ControllaCodiceFiscalePage" scope="REQUEST" />
+
+
+<!--Pagine per il trasferimento di competenza amministrativa -->
+<PAGE name="TrasferimentoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_CHECKSTESSAPROVINCIA" />
+		<MODULE name="M_GetDatiLav" />
+		<MODULE name="M_COOP_GetCpiMasterIR" />
+		<MODULE name="M_CommonGetDescrCpi" />
+		<MODULE name="M_COOP_CheckProvinciaAttiva" />
+		<MODULE name="M_TraGetDettTrasf" />
+		<MODULE name="M_TraGetKloElencoAnagTrasf" />
+		<MODULE name="M_TraGetKloPattoTrasf" />
+		<MODULE name="M_TraGetDescrCpiUser" />
+		<MODULE name="M_GETDESTATOOCC" />
+		<MODULE name="M_GetStatoOccupazionale" />
+		<MODULE name="M_TraGetDataDID" />
+		<MODULE name="M_TraGetListComPerCPI" />
+		<!-- si prelevano i dati per poter eseguire la stampa e la protocollazione 
+			al di fuori della operazione standard -->
+		<MODULE name="M_GetProtocollazione" />
+		<MODULE name="M_GetTipoDoc" />
+		<MODULE name="M_SELECTREGIONECPIUSER" />
+		<MODULE name="M_SELECTREGIONECPIORIG" />
+		<MODULE name="M_AutPrivacy" />
+		<MODULE name="M_GetObbligoFormativo" />
+		<MODULE name="M_GetCartaIdentitaValida" />
+		<MODULE name="M_CONFIG_CONSENSOFIRMA" />	
+		<MODULE name="M_VerificaAmConsensoFirma" />
+		<MODULE name="M_CONFIG_DATA_NORMATIVA_297"/>	
+	</MODULES>
+	<DEPENDENCIES>
+		
+		<DEPENDENCE source="TrasferimentoPage" target="M_CONFIG_CONSENSOFIRMA" />
+		<DEPENDENCE source="M_CONFIG_CONSENSOFIRMA" target="M_VerificaAmConsensoFirma">
+		    <CONDITIONS>
+		        <PARAMETER name="M_CONFIG_CONSENSOFIRMA.ROWS.ROW.NUM" scope="SERVICE_RESPONSE" type="ABSOLUTE" value="1" />
+		    </CONDITIONS>
+		</DEPENDENCE>
+	
+		<DEPENDENCE source="TrasferimentoPage" target="M_CHECKSTESSAPROVINCIA">
+			<CONDITIONS>
+				<PARAMETER name="REFRESH" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CHECKSTESSAPROVINCIA" target="M_GetDatiLav">
+			<CONDITIONS>
+				<PARAMETER name="M_CHECKSTESSAPROVINCIA.IntraProvinciale"
+					type="RELATIVE" scope="SERVICE_RESPONSE" value="false" />
+				<PARAMETER name="M_CHECKSTESSAPROVINCIA.coopAttiva" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="true" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_GetDatiLav" target="M_COOP_GetCpiMasterIR">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="STRCODICEFISCALE" scope="SERVICE_RESPONSE"
+					type="RELATIVE" value="M_GetDatiLav.ROWS.ROW.STRCODICEFISCALE" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_COOP_GetCpiMasterIR" target="M_CommonGetDescrCpi">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="codCpi" scope="SERVICE_RESPONSE" type="RELATIVE"
+					value="M_COOP_GetCpiMasterIR.ROWS.ROW.codCpiMaster" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CommonGetDescrCpi" target="M_COOP_CheckProvinciaAttiva">
+			<CONDITIONS />
+			<CONSEQUENCES>
+				<PARAMETER name="CodProvCpi" scope="SERVICE_RESPONSE"
+					type="RELATIVE" value="M_CommonGetDescrCpi.ROWS.ROW.CODPROVCPI" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferimentoPage" target="M_CommonGetDescrCpi">
+			<CONDITIONS>
+				<PARAMETER name="REFRESH" scope="SERVICE_REQUEST" type="RELATIVE"
+					value="Y" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="codCpi" scope="SERVICE_REQUEST" type="RELATIVE"
+					value="CODCPIORIG" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferimentoPage" target="M_TraGetDettTrasf" />
+		<DEPENDENCE source="TrasferimentoPage" target="M_TraGetKloElencoAnagTrasf">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferimentoPage" target="M_TraGetKloPattoTrasf">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferimentoPage" target="M_TraGetDescrCpiUser">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferimentoPage" target="M_GETDESTATOOCC">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferimentoPage" target="M_GetStatoOccupazionale">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferimentoPage" target="M_TraGetDataDID">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferimentoPage" target="M_TraGetListComPerCPI">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferimentoPage" target="M_GetProtocollazione" />
+		<DEPENDENCE source="TrasferimentoPage" target="M_GetTipoDoc">
+			<CONSEQUENCES>
+				<!-- TRCPI il codice documento del report di trasferimento intraprovinciale 
+					del lavoratore -->
+				<PARAMETER name="tipoDoc" type="ABSOLUTE" value="TRCPI" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferimentoPage" target="M_AutPrivacy" />
+		<DEPENDENCE source="TrasferimentoPage" target="M_GetObbligoFormativo" />
+		<DEPENDENCE source="TrasferimentoPage" target="M_GetCartaIdentitaValida" />
+		<DEPENDENCE source="TrasferimentoPage" target="M_CONFIG_DATA_NORMATIVA_297" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="TrasferisciPage" scope="REQUEST">
+	<MODULES>
+		<!--MODULE name="M_TraIntraProvinciale"/ -->
+		<!--<MODULE name="M_COOP_AggiornaCompetenzaIR" / -->
+		<MODULE name="M_TraGetDettTrasf" />
+		<MODULE name="M_TraGetKloElencoAnagTrasf" />
+		<MODULE name="M_TraGetKloPattoTrasf" />
+		<MODULE name="M_GETDESTATOOCC" />
+		<MODULE name="M_GetStatoOccupazionale" />
+		<MODULE name="M_CONFIG_DATA_NORMATIVA_297"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<!-- <DEPENDENCE source="TrasferisciPage" target="M_TraIntraProvinciale"> 
+			<CONDITIONS/> <CONSEQUENCES/> </DEPENDENCE> <DEPENDENCE source="M_TraIntraProvinciale" 
+			target="M_COOP_AggiornaCompetenzaIR"> <CONDITIONS> <PARAMETER name="avanti_coop" 
+			scope="SERVICE_REQUEST" value="AF_DEFINED"/> <PARAMETER name="M_TRAINTRAPROVINCIALE.trasferito" 
+			type="ABSOLUTE" scope="SERVICE_RESPONSE" value="True"/> </CONDITIONS> <CONSEQUENCES/> 
+			</DEPENDENCE> -->
+		<!-- <DEPENDENCE source="M_TraIntraProvinciale" target="M_TraGetDettTrasf"> 
+			<CONDITIONS/> <CONSEQUENCES/> </DEPENDENCE> <DEPENDENCE source="M_TraIntraProvinciale" 
+			target="M_TraGetKloElencoAnagTrasf"> <CONDITIONS/> <CONSEQUENCES/> </DEPENDENCE> 
+			<DEPENDENCE source="M_TraIntraProvinciale" target="M_TraGetKloPattoTrasf"> 
+			<CONDITIONS/> <CONSEQUENCES/> </DEPENDENCE> <DEPENDENCE source="TrasferisciPage" 
+			target="M_GETDESTATOOCC"> <CONDITIONS/> <CONSEQUENCES/> </DEPENDENCE> <DEPENDENCE 
+			source="TrasferisciPage" target="M_GetStatoOccupazionale"> <CONDITIONS/> 
+			<CONSEQUENCES/> </DEPENDENCE> -->
+		<DEPENDENCE source="TrasferisciPage" target="M_TraGetDettTrasf">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferisciPage" target="M_TraGetKloElencoAnagTrasf">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferisciPage" target="M_TraGetKloPattoTrasf">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferisciPage" target="M_GETDESTATOOCC">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="TrasferisciPage" target="M_GetStatoOccupazionale">
+			<CONDITIONS />
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="TrasferisciPage" target="M_CONFIG_DATA_NORMATIVA_297" />
+		
+	</DEPENDENCIES>
+</PAGE>
+<PAGE name="REPORTFRAMEBACKPAGE" scope="REQUEST" />
+<!--Fine pagine per il trasferimento di competenza amministrativa con l'utilizzo 
+	della cooperazione applicativa -->
+
+
+<!-- Lista dello storico dei trsferimenti tra CPI di un lavoratore (Iniziata 
+	da Davide 28/10/2004) -->
+<PAGE distributed="false" name="TrasferimentiStoricoElencoPage">
+	<MODULES>
+		<MODULE keep="false" name="M_TrasferimentiStoricoElenco" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="TrasferimentiStoricoElencoPage" target="M_TrasferimentiStoricoElenco" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="TrasferimentiStoricoDettaglioPage">
+	<MODULES>
+		<MODULE keep="false" name="M_TrasferimentiStoricoDettaglio" />
+		<MODULE keep="false" name="M_TrasferimentiStoricoDettaglioProtocollo" />
+		<MODULE name="M_CHECKSTESSAPROVINCIA" />
+		<MODULE name="M_COOP_CheckProvinciaAttiva" />
+		<MODULE name="M_CheckEsistenzaDocTrasf" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="TrasferimentiStoricoDettaglioPage"
+			target="M_TrasferimentiStoricoDettaglio" />
+		<DEPENDENCE source="M_TrasferimentiStoricoDettaglio"
+			target="M_TrasferimentiStoricoDettaglioProtocollo" />
+		<DEPENDENCE source="M_TrasferimentiStoricoDettaglio"
+			target="M_CHECKSTESSAPROVINCIA">
+			<CONDITIONS>
+				<PARAMETER name="M_TRASFERIMENTISTORICODETTAGLIO.ROWS.ROW.DATFINE"
+					scope="SERVICE_RESPONSE" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_CHECKSTESSAPROVINCIA" target="M_COOP_CheckProvinciaAttiva">
+			<CONDITIONS>
+				<PARAMETER name="M_CHECKSTESSAPROVINCIA.IntraProvinciale"
+					type="RELATIVE" scope="SERVICE_RESPONSE" value="false" />
+				<PARAMETER name="M_CHECKSTESSAPROVINCIA.coopAttiva" type="RELATIVE"
+					scope="SERVICE_RESPONSE" value="true" />
+			</CONDITIONS>
+			<CONSEQUENCES>
+				<PARAMETER name="CodProvCpi" scope="SERVICE_RESPONSE"
+					type="RELATIVE" value="M_CHECKSTESSAPROVINCIA.ROWS.ROW.codProvOrig" />
+			</CONSEQUENCES>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_COOP_CheckProvinciaAttiva" target="M_CheckEsistenzaDocTrasf">
+			<CONDITIONS>
+				<PARAMETER name="M_COOP_CheckProvinciaAttiva.poloInCoop"
+					scope="SERVICE_RESPONSE" value="true" />
+			</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="AggiornaCpiPage">
+	<MODULES>
+		<MODULE keep="false" name="M_GetLavoratoreIndirizzi" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AggiornaCpiPage" target="M_GetLavoratoreIndirizzi" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="AnagDettaglioPageAccountDettaglioReinvioEmail"
+	scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetLavoratoreAnag" />
+		<MODULE name="M_GetLavoratoreIndirizzi" />
+		<MODULE name="M_ReinoltraMailAccount" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="AnagDettaglioPageAccountDettaglioReinvioEmail"
+			target="M_GetLavoratoreAnag">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="AnagDettaglioPageAccountDettaglioReinvioEmail"
+			target="M_GetLavoratoreIndirizzi">
+			<CONDITIONS>
+				<PARAMETER name="cdnLavoratore" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+		<DEPENDENCE source="AnagDettaglioPageAccountDettaglioReinvioEmail"
+			target="M_ReinoltraMailAccount">
+			<CONDITIONS>
+				<PARAMETER name="DO_REINOLTRAEMAIL" scope="SERVICE_REQUEST"
+					value="AF_DEFINED" />
+			</CONDITIONS>
+			<CONSEQUENCES />
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="RicercaBonusPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetProvince" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaBonusPage" target="M_GetProvince" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ListaBonusPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetProvince" />
+		<MODULE keep="false" name="M_DynamicRicercaBonus" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListaBonusPage" target="M_GetProvince" />
+		<DEPENDENCE source="ListaBonusPage" target="M_DynamicRicercaBonus" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DettaglioBonusPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetProvince" />
+		<MODULE keep="false" name="M_GetBonusOccupazionale" />
+		<MODULE keep="false" name="M_AggiornaBonusOccupazionale" />
+		<MODULE keep="false" name="M_VerificaEsistenzaSAP" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DettaglioBonusPage" target="M_GetProvince" />
+		<DEPENDENCE source="DettaglioBonusPage" target="M_GetBonusOccupazionale">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONEBONUS" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="DettaglioBonusPage" target="M_AggiornaBonusOccupazionale">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONEBONUS" scope="SERVICE_REQUEST" value="AGGIORNA"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="DettaglioBonusPage" target="M_VerificaEsistenzaSAP">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONEBONUS" scope="SERVICE_REQUEST" value="VERIFICASAP"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_AggiornaBonusOccupazionale" target="M_GetBonusOccupazionale" />
+		<DEPENDENCE source="M_VerificaEsistenzaSAP" target="M_GetBonusOccupazionale" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PoliticheAttiveBonusPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetPoliticheBonusOccupazionale" />
+		<MODULE keep="false" name="COMBO_ATTIVITA_POLATT" />
+		<MODULE keep="false" name="COMBO_TITOLOPROGETTO" />
+		<MODULE keep="false" name="COMBO_ENTETIT" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PoliticheAttiveBonusPage" target="COMBO_ATTIVITA_POLATT" />
+		<DEPENDENCE source="PoliticheAttiveBonusPage" target="COMBO_TITOLOPROGETTO" />
+		<DEPENDENCE source="PoliticheAttiveBonusPage" target="COMBO_ENTETIT" />
+		<DEPENDENCE source="PoliticheAttiveBonusPage" target="M_GetPoliticheBonusOccupazionale" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="NucleoFamiliarePage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetNucleoFamiliare" />
+		<MODULE keep="false" name="M_LoadNucleoFamiliare"/>
+		<MODULE keep="false" name="M_InsertNucleoFamiliare" />
+		<MODULE keep="false" name="M_UpdateNucleoFamiliare" />
+		<MODULE keep="false" name="M_DelNucleoFamiliare" />
+		<MODULE keep="false" name="M_ComboServizio" />
+		<MODULE keep="false" name="M_ComboGrado" />
+	</MODULES>
+	
+	<DEPENDENCIES>
+		<DEPENDENCE source="NucleoFamiliarePage" target="M_GetNucleoFamiliare"/>
+		<DEPENDENCE source="NucleoFamiliarePage" target="M_ComboServizio"/>
+		<DEPENDENCE source="NucleoFamiliarePage" target="M_ComboGrado" />
+		
+		<DEPENDENCE source="NucleoFamiliarePage" target="M_LoadNucleoFamiliare">
+			<CONDITIONS>
+				<PARAMETER name="PRGNUCLEOFAMILIARE" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_LoadNucleoFamiliare" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="NucleoFamiliarePage" target="M_InsertNucleoFamiliare">
+			<CONDITIONS>
+				<PARAMETER name="PRGNUCLEOFAMILIARE" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_InsertNucleoFamiliare" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_InsertNucleoFamiliare" target="M_GetNucleoFamiliare"/>
+		
+		<DEPENDENCE source="NucleoFamiliarePage" target="M_UpdateNucleoFamiliare">
+			<CONDITIONS>
+				<PARAMETER name="PRGNUCLEOFAMILIARE" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_UpdateNucleoFamiliare" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_UpdateNucleoFamiliare" target="M_GetNucleoFamiliare"/>
+		
+		<DEPENDENCE source="NucleoFamiliarePage" target="M_DelNucleoFamiliare">
+			<CONDITIONS>
+				<PARAMETER name="PRGNUCLEOFAMILIARE" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+				<PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_DelNucleoFamiliare" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_DelNucleoFamiliare" target="M_GetNucleoFamiliare"/>
+		
+	</DEPENDENCIES>	
+</PAGE>
+
+<PAGE distributed="false" name="PoliticheAttiveLavPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_AnagNotifichePNByLav" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PoliticheAttiveLavPage" target="M_AnagNotifichePNByLav" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="DidInpsLavPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_AnagDidInpsByLav" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DidInpsLavPage" target="M_AnagDidInpsByLav" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="NotificheMinSAPLavPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_AnagNotificheSapByLav" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="NotificheMinSAPLavPage" target="M_AnagNotificheSapByLav" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="RegistroInviiSapPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_AnagRegistroInviiSapByLav" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RegistroInviiSapPage" target="M_AnagRegistroInviiSapByLav" />
+	</DEPENDENCIES>
+</PAGE>

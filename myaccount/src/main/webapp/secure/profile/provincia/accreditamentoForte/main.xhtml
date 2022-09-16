@@ -1,0 +1,109 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/templates/#{godfatherBean.theme}/main.xhtml">
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{sessionLogger.grantAccessFor(sessionLogger.getProvinciaAccess())}" />
+	</f:metadata>
+	<ui:param name="pagetitle" value="#{ui['accreditamentoForte.title']}" />
+	<ui:define name="content">
+		<div class="container-fluid">
+			<h3>
+				#{ui['accreditamentoForte.title']} <br /> <small>#{ui['accreditamentoForte.desc']}</small>
+			</h3>
+			<h:form id="searchForm" styleClass="form-horizontal">
+				<!-- START row-->
+				<div class="row animated fadeIn">
+					<div class="col-sm-1" />
+					<div class="col-sm-10">
+						<!-- START panel-->
+						<div class="panel panel-warning">
+							<div class="panel-heading">#{ui['accreditamentoForte.formDesc']}</div>
+							<div class="panel-body">
+								<ui:include src="_searchInputs.xhtml" />
+							</div>
+						</div>
+						<!-- END panel-->
+					</div>
+					<div class="col-sm-1" />
+				</div>
+			</h:form>
+
+			<h:form id="searchResults">
+				<h:panelGroup rendered="#{not empty accreditamentoForteUtentiBean.lazyDataModel}">
+					<!-- START row-->
+					<div class="row animated fadeIn">
+						<div class="col-sm-1" />
+						<div class="col-sm-10">
+							<!-- START panel-->
+							<div class="well">
+								<ui:include src="_searchResults.xhtml" />
+							</div>
+							<!-- END panel-->
+						</div>
+						<div class="col-sm-1" />
+					</div>
+				</h:panelGroup>
+			</h:form>
+			<!-- END row-->
+		</div>
+		<ui:include src="_abilitaUtentePecDialog.xhtml" />
+		<script>
+			// Default: opzione "tipo di richiesta: tutti" selezionata.
+			$('.ui-selectonebutton .ui-corner-left input').click();
+		
+			function onSearchActionStart() {
+				$('.action-search-link').hide();
+				$('.action-search-loader').show();
+			}
+
+			function onSearchActionComplete() {
+				$('.action-search-link').show();
+				$('.action-search-loader').hide();
+			}
+
+			function onActionStart() {
+				$('.action-link').hide();
+				$('.action-loader').show();
+			}
+
+			function onActionComplete() {
+				$('.action-link').show();
+				$('.action-loader').hide();
+			}
+
+			function onSearchStart() {
+				onSearchActionStart();
+				if(PF('usersTableWV')){
+					PF('usersTableWV').paginator.setPage(0);
+				}
+			}
+
+			function onSearchComplete() {
+				onSearchActionComplete();
+			}
+				
+			function onAbilitaNoPecStart(rowIndex) {
+				$('.action-abilita-link-' + rowIndex).hide();
+				$('.action-abilita-loader-' + rowIndex).show();
+			}
+				
+			function onAbilitaNoPecComplete(rowIndex) {
+				$('.action-abilita-link-' + rowIndex).show();
+				$('.action-abilita-loader-' + rowIndex).hide();
+			}
+				
+			function onAbilitaPecStart() {
+				$('.action-abilita-pec-link').hide();
+				$('.action-abilita-pec-loader').show();
+			}
+				
+			function onAbilitaPecComplete() {
+				$('.action-abilita-pec-link').show();
+				$('.action-abilita-pec-loader').hide();
+				PF('abilitaPecDialogWV').hide();
+			}
+		</script>
+	</ui:define>
+</ui:composition>
+</html>

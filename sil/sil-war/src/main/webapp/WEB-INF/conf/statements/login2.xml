@@ -1,0 +1,510 @@
+<!-- File di Cristian Mudadu -->
+
+<!-- GRUPPI -->
+
+<STATEMENT name="PROF_LISTA_PROFILI"
+            query="           
+             select cdnprofilo,
+                    strdenominazione,
+                    DECODE(flgstandard, 'S', 'SI', 's', 'SI', 'N', 'NO', 'NO') flgstandard,
+                    strnota,
+                    cdnprofilopadre
+             from   ts_profilo 
+          " />
+
+<STATEMENT name="PROF_DETT_PROFILO"
+            query="           
+             select t.cdnprofilo,
+                    t.strdenominazione,
+                    t.flgstandard,
+                    t.strnota,
+                    t.cdnprofilopadre,
+                    nvl( p.strdenominazione , '(Origine)') strdenominazionepadre
+             from   ts_profilo t, ts_profilo p
+                    where t.cdnprofilo =? 
+                    and t.cdnprofilopadre = p.cdnprofilo(+)       
+                           " />          
+
+<STATEMENT name="PROF_NUOVO_PROFILO"
+          query="{call PG_PROFIL.nuovo_profilo(?,?,?,?) }"/>
+
+<STATEMENT name="PROF_DETT_NUOVO_PROF"
+            query="           
+             select t.cdnprofilo,
+                    t.strdenominazione,
+                    t.flgstandard,
+                    t.strnota,
+                    t.cdnprofilopadre,
+                    nvl( p.strdenominazione , '(Origine)') strdenominazionepadre
+             from   ts_profilo t, ts_profilo p
+                    where t.cdnprofilo =? 
+                    and t.cdnprofilopadre = p.cdnprofilo(+)         
+                           " />          
+
+<STATEMENT name="PROF_SALVA_PROFILO"
+            query="           
+             update ts_profilo set
+                    strdenominazione = ?,
+                    strnota = ?
+              where cdnprofilo = ?
+                           " />          
+
+<STATEMENT name="PROF_CLONA_PROFILO"
+          query="{call PG_PROFIL.clona_profilo(?,?,?) }"/>
+
+<STATEMENT name="COMBO_PROFILI_PADRE"
+            query="SELECT 
+                    CDNPROFILO codice, 
+                    STRDENOMINAZIONE descrizione
+                  FROM 
+                    TS_PROFILO 
+                    " />
+
+<STATEMENT name="PROFILATURA_XML"
+			query="select 
+					xmlelement(&quot;ROOT&quot;, (
+					select XMLAGG(xmlelement(&quot;TIPOFUNZIONE&quot;, xmlattributes(TF.STRTIPOfunzione &quot;CODICE&quot;,TF.stretichetta &quot;ETICHETTA&quot;, TF.strdescrizione &quot;DESCRIZIONE&quot;),
+					(select xmlagg(
+						xmlelement(&quot;FUNZIONE&quot;, xmlattributes(F.cdnfunzione &quot;CODICE&quot;, F.strdescrizione &quot;DESCRIZIONE&quot;, F.strNOTA &quot;NOTA&quot;, esiste_configurazione(F.cdnfunzione, NULL, NULL) &quot;CONF&quot;), (
+							SELECT XMLAGG(XMLELEMENT(&quot;COMPONENTE&quot;, xmlattributes(c.cdncomponente &quot;CODICE&quot;, C.strdenominazione &quot;DENOMINAZIONE&quot;,C.strDESCRIZIONE &quot;DESCRIZIONE&quot;, C.STRPAGE AS &quot;PAGE&quot;,
+							(select 'SI' from ts_abi_profilo ap where cdnprofilo=? and ap.cdncomponente=c.cdncomponente ) as &quot;ABILITATO&quot;, esiste_configurazione(null, c.cdncomponente, NULL) &quot;CONF&quot; ),
+							(
+						select xmlagg(XMLELEMENT(&quot;ATTRIBUTO&quot;, xmlattributes(a.prgattributo &quot;CODICE&quot;, a.strdenominazione &quot;DENOMINAZIONE&quot;, a.strnota &quot;NOTA&quot; ,a.strsezione &quot;SEZIONE&quot;, a.codtipoattributo as TIPO,
+							(select 'SI' from ts_abi_attributo aa where aa.cdnprofilo=? and aa.cdncomponente=c.cdncomponente and aa.prgattributo=a.prgattributo ) as &quot;ABILITATO&quot;,
+							(select 'SI' from ts_abi_attributo aa where aa.cdnprofilo=? and aa.cdncomponente=c.cdncomponente and aa.prgattributo=a.prgattributo and aa.flgmostraelencostessariga='S' ) as &quot;CARRIAGE_RET&quot;,
+							(select PRGPOSIZIONE from ts_abi_attributo aa where aa.cdnprofilo=? and aa.cdncomponente=c.cdncomponente and aa.prgattributo=a.prgattributo and aa.PRGPOSIZIONE is not null ) as &quot;POSIZIONE&quot;, esiste_configurazione(NULL, NULL,a.prgattributo) &quot;CONF&quot;
+						)))
+						from ts_attributo a
+						where a.cdncomponente=c.cdncomponente
+				)
+			))
+	FROM TS_COMPONENTE C, TS_FUNZ_COMP FC
+	WHERE FC.CDNCOMPONENTE=C.CDNCOMPONENTE
+	AND F.CDNFUNZIONE = FC.CDNFUNZIONE
+	)
+))
+from ts_funzione F
+WHERE F.STRTIPOFUNZIONE = TF.STRTIPOFUNZIONE
+)))
+from ts_TIPO_funzione TF
+)).getClobVal() as DOCXML from dual
+" />	
+	
+<!-- FINE PROFILI -->
+
+<!-- GRUPPI -->
+<STATEMENT name="COMBO_TIPO_GRUPPO"
+            query="SELECT CDNTIPOGRUPPO AS codice, STRDENOMINAZIONE as descrizione
+                  FROM TS_TIPO_GRUPPO " />
+                  
+<STATEMENT name="COMBO_TIPO_GRUPPO_FILTRATA"
+            query="SELECT CDNTIPOGRUPPO AS codice, STRDENOMINAZIONE as descrizione
+                  FROM TS_TIPO_GRUPPO
+                  WHERE STRDENOMINAZIONE = 'CENTRO PER L''IMPIEGO' 
+                  		OR CODTIPO IN ('P', 'S') " />
+<STATEMENT name="PROF_LISTA_GRUPPI"
+            query="           
+              SELECT A.CDNGRUPPO,A.STRDENOMINAZIONE,DECODE(A.FLGSTANDARD, 'S', 'SI', 's', 'SI', 'N', 'NO', 'NO') flgstandard,B.STRDENOMINAZIONE AS STRTIPOGRUPPO 
+              FROM ts_gruppo A, ts_TIPO_GRUPPO B 
+              WHERE A.CDNTIPOGRUPPO=B.CDNTIPOGRUPPO
+          " />
+
+<STATEMENT name="COMBO_CPI_PROF"
+            query="SELECT A.codcpi  AS codice, A.STRDESCRIZIONE as descrizione
+                    FROM DE_CPI A, DE_PROVINCIA B
+                    WHERE B.codregione=8
+                    AND A.CODPROVINCIA=B.CODPROVINCIA " />
+
+<STATEMENT name="PROF_DETTAGLIO_GRUPPO"
+            query="SELECT CDNGRUPPO, G.STRDENOMINAZIONE, G.FLGSTANDARD, 
+                    STRIDGRUPPO, G.STRNOTA, G.CDNTIPOGRUPPO, G.STREMAILPUBBL,
+                    STRCODRIF, CDNGRUPPOPADRE, STRLUOGORIF, 
+                    CODCOMRIF, TG.STRDENOMINAZIONE as STRTIPOGRUPPO, C.STRDENOMINAZIONE as STRCOMRIF
+                  FROM TS_GRUPPO G, TS_TIPO_GRUPPO TG, DE_COMUNE C
+                  WHERE G.CDNTIPOGRUPPO=TG.CDNTIPOGRUPPO
+                  AND G.CODCOMRIF=C.CODCOM(+)
+                  AND CDNGRUPPO=?" />
+
+<STATEMENT name="PROF_TESTATA_GRUPPO"
+            query="
+					select g.CDNGRUPPO cdngruppo, 
+						   g.STRDENOMINAZIONE strdenominazione,
+						   tg.STRDENOMINAZIONE AS STRTIPOGRUPPO
+						   from ts_gruppo g, ts_tipo_gruppo tg
+						   WHERE g.CDNTIPOGRUPPO=tg.CDNTIPOGRUPPO 
+						   AND CDNGRUPPO= ? " />
+
+
+<STATEMENT name="PROF_INSERT_GRUPPO"
+            query="INSERT INTO TS_GRUPPO (
+                     CDNGRUPPO, STRDENOMINAZIONE, FLGSTANDARD, 
+                     STRIDGRUPPO, STRNOTA, CDNTIPOGRUPPO, 
+                     STRCODRIF, CDNGRUPPOPADRE, STRLUOGORIF, 
+                     CODCOMRIF, CDNUTINS, DTMINS, 
+                     CDNUTMOD, DTMMOD, CODPROVINCIASIL, STREMAILPUBBL,STRCODRIF2) 
+                  VALUES ( ?, ?, ?,
+                      null, ?, ?,
+                      ?, null, ?,
+                      ?, ?, SYSDATE,
+                      ?, SYSDATE, (SELECT CODPROVINCIASIL FROM TS_GENERALE),?,?) " />
+                      
+<STATEMENT name="PROF_UPDATE_GRUPPO"
+            query="UPDATE TS_GRUPPO
+                    SET STRDENOMINAZIONE=?,
+                    STRNOTA=?,
+                    CDNTIPOGRUPPO=?,
+                    STRCODRIF=?,
+                    STRLUOGORIF=?,
+                    CODCOMRIF=?,
+                    CDNUTMOD=?,
+                    STREMAILPUBBL=?,
+                    CODPROVINCIASIL=(SELECT CODPROVINCIASIL FROM TS_GENERALE),
+                    DTMMOD=SYSDATE
+                    WHERE CDNGRUPPO=?" />
+                    
+<STATEMENT name="PROF_GRUPPO_NEXTVAL" query="
+    SELECT
+      S_TS_GRUPPO.nextval AS DO_NEXTVAL
+    FROM
+      DUAL
+"/>
+<!--Query per la creazione dell'XML per la scelta della visibilita dei componenti da parte dei gruppi
+Per qualsiasi chiarimento sul funzionamento chiedere a Paolo Roccetti-->
+<STATEMENT name="VISIBILITA_XML"
+			query="select (xmlelement(&quot;ROOT&quot;, 
+  						(select  XMLAGG(xmlelement(&quot;TIPOFUNZIONE&quot;, 
+  												   xmlattributes(TF.STRTIPOfunzione  &quot;CODICE&quot;,
+															     TF.stretichetta  &quot;ETICHETTA&quot;,  
+															     TF.strdescrizione  &quot;DESCRIZIONE&quot;), 
+    						(select xmlagg(xmlelement(&quot;FUNZIONE&quot;, 
+    												  xmlattributes(F.cdnfunzione  &quot;CODICE&quot;,  
+                                                        			F.strdescrizione  &quot;DESCRIZIONE&quot;, 
+                                                        			F.strNOTA  &quot;NOTA&quot;), 
+      							(SELECT XMLAGG(XMLELEMENT(&quot;COMPONENTE&quot;, 
+      													  xmlattributes(c.cdncomponente &quot;CODICE&quot;, 
+                                                            			C.strdenominazione &quot;DENOMINAZIONE&quot;,
+                                                            			C.strDESCRIZIONE &quot;DESCRIZIONE&quot;, 
+																		C.STRPAGE AS &quot;PAGE&quot;),
+        												  (XMLELEMENT(&quot;LETTURA&quot;,
+														  		(XMLELEMENT(&quot;LAVORATORE&quot;, 
+            														(select xmlagg(XMLELEMENT(&quot;FILTRO&quot;, 
+            																				  xmlattributes(FILTROVIS.prgFiltroVisibilita &quot;CODICE&quot;,
+                                                                        									FILTROVIS.strDescrizione &quot;DESCRIZIONE&quot;,
+                                                                        									FILTROVIS.Codazione &quot;AZIONE&quot;,
+                                                              								  (SELECT 'SI' 
+								                                                               FROM TS_VIS_GRUPPO_COMP VISGRUPPOCOMP 
+								                                                               WHERE VISGRUPPOCOMP.CDNGRUPPO = ?
+								                                                               AND VISGRUPPOCOMP.PRGFILTROVISIBILITA = FILTROVIS.prgFiltroVisibilita
+								                                                               AND VISGRUPPOCOMP.CDNCOMPONENTE = C.CDNCOMPONENTE
+								                                                              ) AS &quot;SELEZIONATO&quot;)))
+				    												from ts_filtro_visibilita FILTROVIS
+				    												where FILTROVIS.prgFiltroVisibilita IN (SELECT DISTINCT prgFiltroVisibilita 
+                                                    				FROM TS_VIS_COMP VC
+                                                    				WHERE VC.CDNCOMPONENTE = C.CDNCOMPONENTE)
+            														AND FILTROVIS.Codazione = 'R'
+																	AND FILTROVIS.codTipoFiltro = 'L'
+				   												   )
+															    )),
+																(XMLELEMENT(&quot;SEDE&quot;,
+            														(select xmlagg(XMLELEMENT(&quot;FILTRO&quot;, 
+            																				  xmlattributes(FILTROVIS.prgFiltroVisibilita &quot;CODICE&quot;,
+                                                                        									FILTROVIS.strDescrizione &quot;DESCRIZIONE&quot;,
+                                                                        									FILTROVIS.Codazione &quot;AZIONE&quot;,
+                                                              								  (SELECT 'SI' 
+								                                                               FROM TS_VIS_GRUPPO_COMP VISGRUPPOCOMP 
+								                                                               WHERE VISGRUPPOCOMP.CDNGRUPPO = ?
+								                                                               AND VISGRUPPOCOMP.PRGFILTROVISIBILITA = FILTROVIS.prgFiltroVisibilita
+								                                                               AND VISGRUPPOCOMP.CDNCOMPONENTE = C.CDNCOMPONENTE
+								                                                              ) AS &quot;SELEZIONATO&quot;)))
+				    												from ts_filtro_visibilita FILTROVIS
+				    												where FILTROVIS.prgFiltroVisibilita IN (SELECT DISTINCT prgFiltroVisibilita 
+                                                    				FROM TS_VIS_COMP VC
+                                                    				WHERE VC.CDNCOMPONENTE = C.CDNCOMPONENTE)
+            														AND FILTROVIS.Codazione = 'R'
+																	AND FILTROVIS.codTipoFiltro = 'U'
+				   												   )																
+																))
+        												  )),
+        												  (XMLELEMENT(&quot;SCRITTURA&quot;, 
+														  		(XMLELEMENT(&quot;LAVORATORE&quot;, 
+            														(select xmlagg(XMLELEMENT(&quot;FILTRO&quot;, 
+            																				  xmlattributes(FILTROVIS.prgFiltroVisibilita &quot;CODICE&quot;,
+                                                                        									FILTROVIS.strDescrizione &quot;DESCRIZIONE&quot;,
+                                                                        									FILTROVIS.Codazione &quot;AZIONE&quot;,
+                                                              								  (SELECT 'SI' 
+								                                                               FROM TS_VIS_GRUPPO_COMP VISGRUPPOCOMP 
+								                                                               WHERE VISGRUPPOCOMP.CDNGRUPPO = ?
+								                                                               AND VISGRUPPOCOMP.PRGFILTROVISIBILITA = FILTROVIS.prgFiltroVisibilita
+								                                                               AND VISGRUPPOCOMP.CDNCOMPONENTE = C.CDNCOMPONENTE
+								                                                              ) AS &quot;SELEZIONATO&quot;)))
+				    												from ts_filtro_visibilita FILTROVIS
+				    												where FILTROVIS.prgFiltroVisibilita IN (SELECT DISTINCT prgFiltroVisibilita 
+                                                    				FROM TS_VIS_COMP VC
+                                                    				WHERE VC.CDNCOMPONENTE = C.CDNCOMPONENTE)
+            														AND FILTROVIS.Codazione = 'W'
+																	AND FILTROVIS.codTipoFiltro = 'L'
+				   												   )
+															    )),
+																(XMLELEMENT(&quot;SEDE&quot;,
+            														(select xmlagg(XMLELEMENT(&quot;FILTRO&quot;, 
+            																				  xmlattributes(FILTROVIS.prgFiltroVisibilita &quot;CODICE&quot;,
+                                                                        									FILTROVIS.strDescrizione &quot;DESCRIZIONE&quot;,
+                                                                        									FILTROVIS.Codazione &quot;AZIONE&quot;,
+                                                              								  (SELECT 'SI' 
+								                                                               FROM TS_VIS_GRUPPO_COMP VISGRUPPOCOMP 
+								                                                               WHERE VISGRUPPOCOMP.CDNGRUPPO = ?
+								                                                               AND VISGRUPPOCOMP.PRGFILTROVISIBILITA = FILTROVIS.prgFiltroVisibilita
+								                                                               AND VISGRUPPOCOMP.CDNCOMPONENTE = C.CDNCOMPONENTE
+								                                                              ) AS &quot;SELEZIONATO&quot;)))
+				    												from ts_filtro_visibilita FILTROVIS
+				    												where FILTROVIS.prgFiltroVisibilita IN (SELECT DISTINCT prgFiltroVisibilita 
+                                                    				FROM TS_VIS_COMP VC
+                                                    				WHERE VC.CDNCOMPONENTE = C.CDNCOMPONENTE)
+            														AND FILTROVIS.Codazione = 'W'
+																	AND FILTROVIS.codTipoFiltro = 'U'
+				   												   )																
+																))
+        												  )),
+        												  (XMLELEMENT(&quot;LISTA&quot;, 
+            														(select xmlagg(XMLELEMENT(&quot;FILTRO&quot;, 
+            																				  xmlattributes(FILTROVIS.prgFiltroVisibilita &quot;CODICE&quot;,
+                                                                        									FILTROVIS.strDescrizione &quot;DESCRIZIONE&quot;,
+                                                                        									FILTROVIS.Codazione &quot;AZIONE&quot;,
+								                                                              (SELECT 'SI' 
+								                                                               FROM TS_VIS_GRUPPO_COMP VISGRUPPOCOMP 
+								                                                               WHERE VISGRUPPOCOMP.CDNGRUPPO = ?
+								                                                               AND VISGRUPPOCOMP.PRGFILTROVISIBILITA = FILTROVIS.prgFiltroVisibilita
+								                                                               AND VISGRUPPOCOMP.CDNCOMPONENTE = C.CDNCOMPONENTE
+								                                                              ) AS &quot;SELEZIONATO&quot;)))
+																    from ts_filtro_visibilita FILTROVIS
+																    where FILTROVIS.prgFiltroVisibilita IN (SELECT DISTINCT prgFiltroVisibilita 
+				                                                    FROM TS_VIS_COMP VC
+				                                                    WHERE VC.CDNCOMPONENTE = C.CDNCOMPONENTE)
+														            AND FILTROVIS.Codazione = 'L'
+				   												   )
+												          ))
+      							))
+       							FROM TS_COMPONENTE C, TS_FUNZ_COMP FC
+			 					WHERE FC.CDNCOMPONENTE=C.CDNCOMPONENTE
+			 					AND   F.CDNFUNZIONE = FC.CDNFUNZIONE
+       							AND   C.cdnComponente IN (SELECT DISTINCT cdnComponente FROM TS_VIS_COMP)
+      						 ))) 
+     						from ts_funzione F
+		 					WHERE F.STRTIPOFUNZIONE = TF.STRTIPOFUNZIONE
+						 )))
+   						from ts_TIPO_funzione TF
+  				))).getClobVal() as DOCXML from dual" />
+
+<STATEMENT name="PROFILI_ASSOCIATI_GRUPPO" 
+          query="SELECT TS_GRUPPO.CDNGRUPPO  GRUPPO,
+                        TS_PROFILO.CDNPROFILO CDNPROFILO,
+                        TS_MENU_HOME.CDNMENU  CDNMENU,
+                        TS_PROFILO.STRDENOMINAZIONE PROFILO,
+                        TS_MENU_HOME.STRDESCRIZIONE MENU
+                   FROM TS_PROFILO_GRUPPO, TS_GRUPPO, TS_PROFILO, TS_MENU_HOME
+                  WHERE TS_PROFILO_GRUPPO.CDNGRUPPO = TS_GRUPPO.CDNGRUPPO
+                    AND TS_PROFILO_GRUPPO.CDNPROFILO= TS_PROFILO.CDNPROFILO
+                    AND TS_PROFILO_GRUPPO.CDNMENU   = TS_MENU_HOME.CDNMENU
+                    AND TS_PROFILO_GRUPPO.CDNGRUPPO =? order by TS_PROFILO.STRDENOMINAZIONE, TS_MENU_HOME.STRDESCRIZIONE"/>
+
+<STATEMENT name="COMBO_PROFILI_GRUPPO" 
+          query="SELECT CDNPROFILO CODICE,
+                        STRDENOMINAZIONE DESCRIZIONE
+                   FROM TS_PROFILO order by STRDENOMINAZIONE"/>
+
+<STATEMENT name="COMBO_MENU_GRUPPO" 
+          query="SELECT CDNMENU CODICE,
+                        STRDESCRIZIONE DESCRIZIONE
+                   FROM TS_MENU_HOME order by STRDESCRIZIONE"/>
+
+<STATEMENT name="ASSOCIA_PROFILO_MENU_GRUPPO" 
+          query="INSERT INTO TS_PROFILO_GRUPPO
+                        ( CDNGRUPPO,
+                          CDNPROFILO,
+                          CDNMENU
+                        )
+                  VALUES (?,?,?)"/>
+
+<STATEMENT name="CANCELLA_PROFILO_MENU_GRUPPO" 
+          query="DELETE FROM TS_PROFILO_GRUPPO
+                  WHERE CDNGRUPPO  = ? 
+                    AND CDNPROFILO = ?
+                    AND CDNMENU    = ?"/>
+
+
+
+
+
+
+
+<!-- MENU -->
+
+<STATEMENT name="LISTA_MENU"
+            query="           
+	             select mh.cdnmenu cdnmenu,
+	                    mh.strdescrizione strdescrizione,
+	                    DECODE(mh.flgstandard, 'S', 'SI', 's', 'SI', 'N', 'NO', 'NO') flgstandard
+	             from   ts_menu_home mh 
+	          " />
+
+
+
+<STATEMENT name="CARICA_MENU" 
+          query="
+				 select   SYS_connect_By_Path(cdnvocemenu, '/') PATH,
+                              level, t.cdnvocemenu, t.strvocemenu strvocemenu, cdnfunzione, t.strdescrizionefunzione strdescrizionefunzione
+                              from 
+                                  (select 
+                                           m.cdnvocemenu,
+                                           m.prgvocemenu,
+                                           m.cdnvocemenupadre,
+                                           vm.strvocemenu,
+                                           f.cdnfunzione,
+                                           f.strdescrizione strdescrizionefunzione,
+                                           f.flgstandard,
+                                           f.strtipofunzione,
+                                           f.strnota
+                                      from ts_menu m,
+                                           ts_voce_menu vm,
+                                           ts_funzione f
+                                     where m.cdnmenu=?
+                                           and vm.cdnvocemenu = m.cdnvocemenu
+                                           and f.cdnfunzione (+) = vm.cdnfunzione 
+                                   ) t
+                      connect by prior t.cdnvocemenu = t.cdnvocemenupadre
+                      start with t.cdnvocemenupadre is null
+                      order siblings by t.prgvocemenu " />
+
+<STATEMENT name="CARICA_MENU_HOME" 
+          query="
+				select t.cdnmenu cdnmenu,
+				       t.strdescrizione strdescrizione
+				  from ts_menu_home t
+				  where t.cdnmenu=? " />
+
+<STATEMENT name="COMBO_FUNZIONI_MENU" 
+          query="
+				select cdnfunzione codice,
+				       f.strdescrizione || ' (' || tf.stretichetta || ')' descrizione
+				  from ts_funzione F, ts_tipo_funzione tf
+				  where f.strtipofunzione = tf.strtipofunzione
+				  order by tf.strtipofunzione , f.strdescrizione" />
+  
+  <STATEMENT name="FUNZIONI_MENU" 
+          query="
+				select cdnfunzione cdnfunzione,
+				       f.strdescrizione strdescrizione
+				  from ts_funzione F, ts_tipo_funzione tf
+				  where f.strtipofunzione = tf.strtipofunzione
+				  order by tf.strtipofunzione , f.strdescrizione" />
+  
+  
+<STATEMENT name="PROF_SELECT_ALL_TIPO_GRUPPO" 
+          query="select 
+		          tsTG.cdntipogruppo as CDNTIPOGRUPPO,
+		          tsTG.strdenominazione as STRDENOMINAZIONE,
+		          tsTG.flgstandard as FLGSTANDARD,
+		          tsT.Strdescrizione as AMBITO,
+		          case when tsTG.flgstandard = 'S' then 1 else 0 end AS ISSTANDARD,
+		          case when ( select count(*) from TS_GRUPPO g where g.cdntipogruppo = tsTG.Cdntipogruppo   ) > 0 then 1 else 0 end AS ISUSED
+		          from ts_tipo_gruppo tsTG
+		          inner join ts_tipo tsT on tsT.Codtipo = tsTG.Codtipo 
+		          order by STRDENOMINAZIONE" />
+
+ 
+<STATEMENT name="PROF_SELECT_SPECIFIC_TIPO_GRUPPO_STM" 
+          query="select 
+					tsTG.cdntipogruppo as CDNTIPOGRUPPO,
+					tsTG.strdenominazione as STRDENOMINAZIONE,
+					tsTG.flgstandard as FLGSTANDARD,
+					tsTG.Codtipo as CODTIPO, tsTG.strcodicefiscale as STRCODICEFISCALE,
+					tsTG.Strnota as NOTE,
+					TO_CHAR(tsTG.DTMINS, 'DD/MM/YYYY hh24:mi') DTMINS, 
+                    tsTG.CDNUTMOD, TO_CHAR(tsTG.DTMMOD, 'DD/MM/YYYY hh24:mi') DTMMOD,
+                    tsTG.CDNUTINS
+					from ts_tipo_gruppo tsTG
+					where tsTG.Cdntipogruppo = ?" />
+					
+					
+
+<STATEMENT name="PROF_GET_TS_TIPO_STM" 
+          query="select CODTIPO as CODICE, 
+						STRDESCRIZIONE as Descrizione							 
+						from TS_TIPO" />
+						
+<STATEMENT name="PROF_INSERT_TIPO_GRUPPO_STM" 
+          query="insert into TS_TIPO_GRUPPO           
+					(CDNTIPOGRUPPO, STRDENOMINAZIONE, FLGSTANDARD,            
+					CODTIPO, STRCODICEFISCALE, STRNOTA, CDNUTINS, DTMINS, CDNUTMOD, DTMMOD)             
+					values 
+					(?, ?, ?,              
+					?, UPPER(?), ?, ?, SYSDATE, ?, SYSDATE)" />						
+
+<STATEMENT name="PROF_GET_TIPO_GRUPPO_NEXTVAL_STM"
+	query="SELECT s_ts_tipo_gruppo.NEXTVAL as do_nextval FROM DUAL" />
+	
+					
+<STATEMENT name="PROF_UPDATE_TIPO_GRUPPO_STM"
+	query="UPDATE ts_tipo_gruppo  
+			SET         
+			STRDENOMINAZIONE = ?,            
+			FLGSTANDARD = ?,            
+			CODTIPO = ?,
+			STRCODICEFISCALE = UPPER(?),         
+			STRNOTA = ?,
+			CDNUTMOD = ?,            
+			DTMMOD = SYSDATE
+			WHERE 
+			CDNTIPOGRUPPO = ? AND 
+			FLGSTANDARD &lt;&gt; 'S' " />
+			
+<STATEMENT name="PROF_DELETE_TIPO_GRUPPO_STM"
+	query="DELETE ts_tipo_gruppo  
+			WHERE CDNTIPOGRUPPO = ? AND 
+			FLGSTANDARD &lt;&gt; 'S' " />
+			
+
+<STATEMENT name="S_GetTipoGruppoAmbitoPatronato"
+	query="select * from ts_tipo_gruppo where CODTIPO = 'P' " />
+
+
+<STATEMENT name="S_GetTipoGruppoAmbitoSoggAccreditati"
+	query="select STRDENOMINAZIONE, CDNTIPOGRUPPO from ts_tipo_gruppo where CODTIPO = 'S' " />
+
+
+<!--  BEGIN delega -->
+	<STATEMENT name="PROF_GET_CODTIPO_TIPOGRUPPO_PER_GRUPPO_STM"
+			query="select CODTIPO from Ts_Tipo_Gruppo tg where tg.cdntipogruppo = ?" />
+
+	<STATEMENT name="PROF_INSERT_DELEGA_STM" 
+          query="insert into TS_DELEGA           
+					( CDNDELEGA,CDNGRUPPO,CDNUTINS,DTMINS,CDNUTMOD,DTMMOD)             
+					
+					values 
+					
+					( 	?,              
+						?,              
+						?,                                        
+						SYSDATE,
+						?,                                        
+						SYSDATE)" />						
+
+	<STATEMENT name="PROF_GET_DELEGA_NEXTVAL_STM"
+			query="SELECT s_ts_delega.NEXTVAL as do_nextval FROM DUAL" />
+<!-- END delega -->						
+
+<STATEMENT  name="PROF_GET_AMBITO_TIPO_GRUPPO"
+        query="SELECT TS_TIPO.CODTIPO AS CODICE,
+        			TS_TIPO.STRDESCRIZIONE AS DESCRIZIONE
+                    FROM TS_TIPO 
+					  WHERE TS_TIPO.CODTIPO IN (
+						SELECT TC.CODICE
+						FROM TS_CONFIG_CODIFICA TC
+						WHERE TC.NOMETABELLA='TS_TIPO' AND TC.CODTIPOCONFIG = 'AMB_GRUP' AND TC.CONFIGURAZIONE = NVL(
+						(SELECT TL.NUM
+						FROM TS_CONFIG_LOC TL
+						WHERE TL.STRCODRIF = (SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE)
+						AND TL.CODTIPOCONFIG = 'AMB_GRUP'),0)
+						)
+					AND TRUNC(SYSDATE) BETWEEN TRUNC(DATINIZIOVAL) AND TRUNC(DATFINEVAL)	
+             ORDER BY DATFINEVAL DESC, DESCRIZIONE ASC "/>

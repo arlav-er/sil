@@ -1,0 +1,55 @@
+<!--
+
+	tipo 0 = docarea sare 
+	tipo 1 = docarea 161
+	tipo 2 = locale automatica
+	tipo 3 = locale manuale (non ancora testata)
+
+	caricamento=0 tipo, username e password vengono letti ad ogni chiamata (o dal db o dal configuratore)
+	caricamento=1 tipo, username e password vengono letti alla prima chiamata (o dal db o dal configuratore)
+	
+	leggi_da_db = S|N|null Se S la lettura del tipo protocollo, username e password avvengono viene fatta dalla tabella TS_CONFIG_LOC e TS_UTENTE
+	
+	attachment = null | DIME | MIME (se vale DIME viene usato DIME altrimenti MIME default)
+	
+	invio_completo = N | S se N viene sempre inviato il file vuoto, se S si generano le due stampe
+	importazione_doc_protocollati = S|N se S i movimenti importati da sare sono gia' protocollati, quindi non va chiamata la prot. docarea
+	
+	ATTENZIONE: il "codente" DEVE essere uguale allo "strcognome" nella tabella ts_utente
+	
+-->
+
+<PROTOCOLLO 
+	tipo="2" 
+	leggi_da_db="S"
+	caricamento="0"
+>
+	<DOCAREA invio_completo="N" importazione_doc_protocollati="N">
+		<!-- WSDL di Perugia -->
+		<WS 
+			TARGET_NAMESPACE="uri:Provincia.Perugia.it"
+			TARGET_NAMESPACE_RESPONSE_TYPE="http://tempuri.org/" 
+			attachment="DIME" 
+			SOAP_version="1.1"
+		/>		
+	<!-- WSDL di Bologna (SARE)
+		<WS		 
+			TARGET_NAMESPACE_RESPONSE_TYPE="http://tempuri.org/" 
+			TARGET_NAMESPACE="http://tempuri.org/"
+			attachment="MIME" 
+			SOAP_version="1.2"
+		/>
+	-->
+		
+		<FILE
+			documento_vuoto="/WEB-INF/report/Documento_vuoto.rtf" 
+			descrizione_documento_vuoto="Documento vuoto obbligatorio (necessario per avere le informazioni di protocollazione per la registrazione del documento reale nel DB provinciale)."
+			nome_documento_vuoto="Documento_vuoto.rtf"
+		/>
+		<UTENTE
+			codente="NOME_UTENTE_DOCAREA"
+			username="MODENAAVVIO"
+			password="xxxxxx"
+		/>
+	</DOCAREA>
+</PROTOCOLLO>

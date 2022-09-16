@@ -1,0 +1,241 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+
+	<h:panelGroup rendered="#{type == 'consulente'}">
+
+		<ui:repeat var="inoltroCPIvsCons"
+			value="#{pratica.inoltriDaCPIversoConsulente}">
+			<h:panelGroup layout="block" styleClass="multiMessageDiv"
+				style="margin-left:10px;">
+				<h:outputText
+					value="Inoltrato da #{inoltroCPIvsCons.mittente} - inviata il "
+					styleClass="mittente" />
+				<h:outputText value="#{inoltroCPIvsCons.dtmIns}"
+					styleClass="mittente">
+					<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+				</h:outputText>
+				<br />
+				<h:panelGroup layout="block" styleClass="corpo">
+					#{inoltroCPIvsCons.corpo}
+				</h:panelGroup>
+
+				<cc:upload rendered="#{not empty inoltroCPIvsCons.allegati}"
+					readonly="#{true}" label="Allegato"
+					idAllegato="#{inoltroCPIvsCons.allegati[0].id}"
+					value="#{inoltroCPIvsCons.allegati[0].filename}" />
+
+				<ui:repeat var="rispostaConsulente"
+					value="#{inoltroCPIvsCons.risposte}">
+					<h:panelGroup layout="block" styleClass="messageDiv"
+						style="margin-left:10px;">
+						<h:outputText
+							value="Risposta di #{rispostaConsulente.mittente} - inviata il "
+							styleClass="mittente" />
+						<h:outputText value="#{rispostaConsulente.dtmIns}"
+							styleClass="mittente">
+							<f:convertDateTime pattern="dd/MM/yyyy" type="date" />
+						</h:outputText>
+						<br />
+						<h:panelGroup layout="block" styleClass="corpo">
+						#{rispostaConsulente.corpo}
+					</h:panelGroup>
+						<h:panelGroup layout="block" styleClass="messageDiv">
+							<h:outputText value="Note per il CPI" styleClass="mittente" />
+							<br />
+							<h:panelGroup layout="block" styleClass="corpo">
+								#{rispostaConsulente.note}
+								</h:panelGroup>
+						</h:panelGroup>
+						<h:panelGroup layout="block" styleClass="messageDiv"
+							rendered="#{listaMessaggiAtipiciBean.consulenteCanView(rispostaConsulente.idFrom, rispostaConsulente.idTo)}">
+							<h:outputText value="Minuti" styleClass="mittente" />
+							<br />
+							<h:panelGroup layout="block" styleClass="corpo"
+								style="width:50px;">
+							#{rispostaConsulente.minuti}
+						</h:panelGroup>
+
+							<cc:upload rendered="#{not empty rispostaConsulente.allegati}"
+								readonly="#{true}" label="Allegato"
+								tmpValue="#{rispostaConsulente.allegati[0].filename}"
+								idAllegato="#{rispostaConsulente.allegati[0].id}"
+								value="#{rispostaConsulente.allegati[0].filename}" />
+						</h:panelGroup>
+					</h:panelGroup>
+				</ui:repeat>
+			</h:panelGroup>
+		</ui:repeat>
+	</h:panelGroup>
+
+	<h:panelGroup rendered="#{type == 'coordinatore'}">
+		<ui:repeat var="inoltroCPI"
+			value="#{pratica.inoltriDaCoordinatoreVersoCPI}">
+			<h:panelGroup layout="block" styleClass="messageDiv">
+				<h:outputText
+					value="Inoltrato da #{inoltroCPI.mittente} - inviata il "
+					styleClass="mittente" />
+				<h:outputText value="#{inoltroCPI.dtmIns}" styleClass="mittente">
+					<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+				</h:outputText>
+				<br />
+				<h:panelGroup layout="block" styleClass="corpo">
+								#{inoltroCPI.corpo}
+								</h:panelGroup>
+			</h:panelGroup>
+			<cc:upload rendered="#{not empty inoltroCPI.allegati}"
+				label="Allegato" readonly="#{true}"
+				idAllegato="#{inoltroCPI.allegati[0].id}"
+				value="#{inoltroCPI.allegati[0].filename}" />
+
+			<ui:repeat var="rispostaCPI" value="#{inoltroCPI.risposte}">
+				<h:panelGroup layout="block" styleClass="messageDiv"
+					style="margin-left:10px;">
+					<h:outputText
+						value="Risposta di #{rispostaCPI.mittente} - inviata il "
+						styleClass="mittente" />
+					<h:outputText value="#{rispostaCPI.dtmIns}" styleClass="mittente">
+						<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+					</h:outputText>
+					<br />
+					<h:panelGroup layout="block" styleClass="corpo">
+								#{rispostaCPI.corpo}
+								</h:panelGroup>
+				</h:panelGroup>
+				<cc:upload label="Allegato" readonly="#{true}"
+					rendered="#{not empty rispostaCPI.allegati}"
+					idAllegato="#{rispostaCPI.allegati[0].id}"
+					value="#{rispostaCPI.allegati[0].filename}" />
+			</ui:repeat>
+		</ui:repeat>
+
+		<ui:repeat var="inoltroCPI"
+			value="#{pratica.inoltriDaCPIversoConsulente}">
+			<h:panelGroup layout="block" styleClass="multiMessageDiv">
+				<h:outputText
+					value="Inoltrato da #{inoltroCPI.mittente} - inviata il "
+					styleClass="mittente" />
+				<h:outputText value="#{inoltroCPI.dtmIns}" styleClass="mittente">
+					<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+				</h:outputText>
+				<br />
+				<h:panelGroup layout="block" styleClass="corpo">
+				#{inoltroCPI.corpo}
+				</h:panelGroup>
+
+				<cc:upload label="Allegato" readonly="#{true}"
+					rendered="#{not empty inoltroCPI.allegati}"
+					idAllegato="#{inoltroCPI.allegati[0].id}"
+					value="#{inoltroCPI.allegati[0].filename}" />
+
+				<ui:repeat var="rispostaConsulente" value="#{inoltroCPI.risposte}">
+					<h:panelGroup layout="block" styleClass="messageDiv"
+						style="margin-left:10px;">
+						<h:outputText
+							value="Risposta di #{rispostaConsulente.mittente} - inviata il "
+							styleClass="mittente" />
+						<h:outputText value="#{rispostaConsulente.dtmIns}"
+							styleClass="mittente">
+							<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+						</h:outputText>
+						<br />
+						<h:panelGroup layout="block" styleClass="corpo">
+							#{rispostaConsulente.corpo}
+						</h:panelGroup>
+						<h:panelGroup layout="block" styleClass="messageDiv">
+							<h:outputText value="Note per il CPI" styleClass="mittente" />
+							<br />
+							<h:panelGroup layout="block" styleClass="corpo">
+									#{rispostaConsulente.note}
+									</h:panelGroup>
+						</h:panelGroup>
+						<h:panelGroup layout="block" styleClass="messageDiv">
+							<h:outputText value="Minuti" styleClass="mittente" />
+							<br />
+							<h:panelGroup layout="block" styleClass="corpo"
+								style="width:50px;">
+									#{rispostaConsulente.minuti}
+									</h:panelGroup>
+							<cc:upload readonly="#{true}" label="Allegato"
+								rendered="#{not empty rispostaConsulente.allegati}"
+								idAllegato="#{rispostaConsulente.allegati[0].id}"
+								value="#{rispostaConsulente.allegati[0].filename}" />
+						</h:panelGroup>
+					</h:panelGroup>
+				</ui:repeat>
+			</h:panelGroup>
+		</ui:repeat>
+
+	</h:panelGroup>
+
+	<h:panelGroup rendered="#{type == 'cpi'}">
+		<ui:param name="inoltroCoordinatore"
+			value="#{pratica.inoltroDaCoordinatoreVersoCPI}" />
+		<h:panelGroup layout="block" styleClass="messageDiv">
+			<h:outputText
+				value="Inoltrato da #{inoltroCoordinatore.mittente} il "
+				styleClass="mittente" />
+			<h:outputText value="#{inoltroCoordinatore.dtmIns}"
+				styleClass="mittente">
+				<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+			</h:outputText>
+			<br />
+		</h:panelGroup>
+
+		<ui:repeat var="inoltroCPI"
+			value="#{pratica.inoltriDaCPIversoConsulente}">
+			<h:panelGroup layout="block" styleClass="multiMessageDiv">
+				<h:outputText
+					value="Inoltrato da #{inoltroCPI.mittente} - inviata il "
+					styleClass="mittente" />
+				<h:outputText value="#{inoltroCPI.dtmIns}" styleClass="mittente">
+					<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+				</h:outputText>
+				<br />
+				<h:panelGroup layout="block" styleClass="corpo">
+				#{inoltroCPI.corpo}
+				</h:panelGroup>
+
+				<cc:upload label="Allegato" readonly="#{true}"
+					rendered="#{not empty inoltroCPI.allegati}"
+					idAllegato="#{inoltroCPI.allegati[0].id}"
+					value="#{inoltroCPI.allegati[0].filename}" />
+
+				<ui:repeat var="rispostaConsulente" value="#{inoltroCPI.risposte}">
+					<h:panelGroup layout="block" styleClass="messageDiv"
+						style="margin-left:10px;">
+						<h:outputText
+							value="Risposta di #{rispostaConsulente.mittente} - inviata il "
+							styleClass="mittente" />
+						<h:outputText value="#{rispostaConsulente.dtmIns}"
+							styleClass="mittente">
+							<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+						</h:outputText>
+						<br />
+						<h:panelGroup layout="block" styleClass="corpo">
+							#{rispostaConsulente.corpo}
+						</h:panelGroup>
+						<h:panelGroup layout="block" styleClass="messageDiv">
+							<h:outputText value="Note per il CPI" styleClass="mittente" />
+							<br />
+							<h:panelGroup layout="block" styleClass="corpo">
+									#{rispostaConsulente.note}
+									</h:panelGroup>
+						</h:panelGroup>
+						<h:panelGroup layout="block" styleClass="messageDiv">
+							<cc:upload readonly="#{true}" label="Allegato"
+								rendered="#{not empty rispostaConsulente.allegati}"
+								idAllegato="#{rispostaConsulente.allegati[0].id}"
+								value="#{rispostaConsulente.allegati[0].filename}" />
+						</h:panelGroup>
+					</h:panelGroup>
+				</ui:repeat>
+			</h:panelGroup>
+		</ui:repeat>
+	</h:panelGroup>
+
+</ui:composition>

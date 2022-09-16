@@ -1,0 +1,49 @@
+<!--// TEMPLATE AUTENTICATO //-->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="#{utilsBean.template}">
+
+	<ui:define name="custom_css">
+		<h:outputStylesheet
+			name="css/#{sessionBean.cssStyle}/jquery-ui-1.8.16.custom.css"></h:outputStylesheet>
+	</ui:define>
+
+	<ui:define name="upper-bar">
+	
+
+		<h:form id="logout_form" style="display:none;">
+			<h:commandLink styleClass="external-link" id="logout_link"
+				action="#{sessionBean.logout}" title="Logout" tabindex="0"
+				onclick="return confirm('Sei sicuro di voler uscire dal portale?');">
+			</h:commandLink>
+		</h:form>
+
+		<div id='modal_session' style="display: none;"> 
+			<h:form id="form_session">
+				<div>
+					<p>Sessione scaduta!</p>
+					<h:commandButton id="logout_session" styleClass="buttonStyle" value="Esegui il Login!"
+						action="#{sessionBean.logout}" />
+				</div>
+			</h:form>
+		</div>
+	</ui:define>
+
+	<ui:define name="menu">
+		<div id="menu">
+			<h:panelGroup rendered="#{const['regione.cod'] == 22}">
+				<f:loadBundle basename="messages.message_trento" var="msg" />
+			</h:panelGroup>
+			<h:panelGroup rendered="#{const['regione.cod'] == 10}">
+				<f:loadBundle basename="messages.message_umbria" var="msg" />
+			</h:panelGroup>
+			<h:panelGroup rendered="#{const['regione.cod'] != 22 and const['regione.cod'] != 10}">
+				<f:loadBundle basename="messages.message" var="msg" />
+			</h:panelGroup>
+			<ui:include src="/secure/_home_menu.xhtml" />
+		</div>
+	</ui:define>
+
+</ui:composition>

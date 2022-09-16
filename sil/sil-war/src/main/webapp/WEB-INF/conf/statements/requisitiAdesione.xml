@@ -1,0 +1,140 @@
+ <STATEMENT
+	name="CHECK_STATO_OCCUPAZIONALE_GARANZIA_OVER" 
+	query="	SELECT aso.codstatooccupaz 
+			FROM am_stato_occupaz aso 
+			WHERE aso.cdnlavoratore = ? AND 
+			trunc(aso.DATINIZIO) &lt;= trunc(SYSDATE) AND 
+			aso.DATFINE IS NULL AND 
+			(aso.codstatooccupaz = 'A21' OR aso.codstatooccupaz = 'A22' OR aso.codstatooccupaz = 'A213' OR aso.codstatooccupaz = 'A223')"/>
+			
+				
+<STATEMENT
+	name="CHECK_PATTO_SERVIZIO_GARANZIA_OVER" 
+	query="	SELECT patto.DATSTIPULA, patto.prgpattolavoratore, patto.numklopattolavoratore
+			FROM am_patto_lavoratore patto 
+			WHERE patto.cdnlavoratore = ? AND 
+			patto.FLGPATTO297 = 'S' AND
+			patto.CODSTATOATTO = 'PR' AND 
+			trunc(nvl(patto.datscadconferma,sysdate)+30) &gt;= trunc(SYSDATE) AND 
+ 			patto.DATFINE IS NULL"/>
+		
+<STATEMENT 
+	name="GET_LAVORATORE_CDN_GARANZIA_OVER" 
+	query="	SELECT al.cdnlavoratore 
+			FROM an_lavoratore al 
+			WHERE al.strcodicefiscale = ?" />
+			
+<STATEMENT 
+	name="CHECK_CPI_COMPETENZA_GARANZIA_OVER"
+	query="	SELECT cpi.STRDESCRIZIONE 
+			FROM DE_CPI cpi JOIN an_lav_storia_inf alsi ON alsi.CODCPITIT = cpi.codcpi 
+			WHERE alsi.cdnlavoratore = ? AND 
+			alsi.codmonotipocpi = 'C' AND
+			( cpi.codprovincia = '54' OR cpi.codprovincia = '55') 
+			AND alsi.DATFINE IS NULL"  />	 
+			
+<STATEMENT 
+	name="CHECK_RESIDENZA_UMBRIA_GARANZIA_OVER"
+	query="	SELECT al.cdnlavoratore 
+			FROM an_lavoratore al 
+			JOIN de_comune com ON al.CODCOMRES = com.CODCOM 
+			JOIN de_provincia prov ON prov.codprovincia = com.codprovincia 
+			WHERE al.cdnlavoratore = ? AND
+			( prov.codregione = '10' )"	/>
+			
+<STATEMENT
+	name="CHECK_DID_GARANZIA_OVER"
+	query=" SELECT did.datdichiarazione
+			FROM  am_elenco_anagrafico ea INNER JOIN  am_dich_disponibilita did ON ea.prgelencoanagrafico = did.prgelencoanagrafico
+			WHERE ea.cdnlavoratore = ? AND
+			did.codstatoatto = 'PR' AND
+			did.datfine IS NULL" />
+			
+<STATEMENT name="INSERT_BD_ADESIONE_GARANZIA_OVER"  query="
+	INSERT INTO BD_ADESIONE
+		(PRGADESIONE,
+		STRCODICEFISCALE,
+		CDNLAVORATORE,
+		TIPODICHIARAZIONE,
+		DATADESIONE,
+		CODBANDOPROGRAMMA,
+		CDNUTINS,
+		DTMINS,
+		CDNUTMOD,
+		DTMMOD)
+	VALUES (
+		s_bd_adesione.nextval,
+		?,
+		?,
+		?,
+		to_date(?,'DD/MM/YYYY'),
+		?,
+		?,
+		sysdate,
+		?,
+		sysdate)
+"/>
+
+
+<!-- STATEMENT name="UPDATE_PATTO_DATAADESIONE_GARANZIA_OVER"  query="
+	update am_patto_lavoratore set datAdesionePA = trunc(sysdate),
+	cdnutmod = ?, dtmMod = sysdate, numklopattolavoratore = ?
+	where prgpattolavoratore = ?
+"/>  -->
+
+<STATEMENT name="UPDATE_PATTO_DATAADESIONE_GARANZIA_OVER"  query="
+	update am_patto_lavoratore set datAdesionePA = TO_DATE(?,'DD/MM/YYYY'),
+	cdnutmod = ?, dtmMod = sysdate, numklopattolavoratore = ?
+	where prgpattolavoratore = ?
+"/>
+
+ <STATEMENT
+	name="CHECK_PRIVO_DI_LAVORO_WS_REIMPIEGO" 
+	query="	SELECT aso.codstatooccupaz 
+			FROM am_stato_occupaz aso 
+			WHERE aso.cdnlavoratore = ?  
+			AND to_date(?,'dd/mm/yyyy') between trunc(aso.datinizio) and nvl((trunc(aso.datfine)), sysdate)
+			AND aso.codstatooccupaz in ('A21','A213','A212')"/>
+			
+ <STATEMENT
+	name="CHECK_CESSAZIONE_PER_NASPI_WS_REIMPIEGO" 
+	query="SELECT mesi_rapporto, mesi_antecedenti_data_adesione, CODMVCESSAZIONE 
+			FROM (
+			 SELECT mesiDurataRapporto(movIniziale.DATINIZIOMOV,mov.DATINIZIOMOV) mesi_rapporto, 
+				mesiDurataRapporto(mov.DATINIZIOMOV,TO_DATE(?,'DD/MM/YYYY')) mesi_antecedenti_data_adesione,
+				mov.CODMVCESSAZIONE, row_number() over (order by trunc(mov.DATINIZIOMOV) desc) r
+			FROM am_movimento mov
+			LEFT JOIN am_movimento movIniziale on (RECUPERA_PRGMOV_INIZIALE(mov.prgMovimento) = movIniziale.prgMovimento)
+			WHERE mov.cdnlavoratore = ?
+			AND mov.CODTIPOMOV = 'CES'
+			AND mov.CODSTATOATTO = 'PR'
+			AND trunc(mov.DATINIZIOMOV) &lt; TO_DATE(?,'DD/MM/YYYY') 
+			ORDER BY trunc(mov.DATINIZIOMOV) desc) 
+		   WHERE r = 1"/>
+		   
+<STATEMENT name="CHECK_STATO_OCCUPAZ_PER_CIGS_WS_REIMPIEGO"
+	query="select count(1) as checkStatoOccupaz from am_stato_occupaz 
+			where cdnLavoratore = ? and datfine is null and codstatooccupaz = 'B'" />		   
+			
+<STATEMENT
+        name="INSERT_RICHIESTA_ADESIONE"
+        query="INSERT INTO BD_ADESIONE                                                                
+                      (PRGADESIONE,                                                                                                            
+					   STRCODICEFISCALE,                                                
+					   CDNLAVORATORE,                                                  
+					   TIPODICHIARAZIONE,
+					   DATADESIONE,
+					   CODBANDOPROGRAMMA,
+					   CDNUTINS,                                                       
+					   DTMINS,                                                         
+					   CDNUTMOD,                                                       
+					   DTMMOD)                                                  
+			   VALUES (s_bd_adesione.nextval,?,?,?,to_date(?,'DD/MM/YYYY'),'REI',?,sysdate,?,sysdate)"/>		
+
+<STATEMENT 
+	name="GET_ESISTENZA_ADESIONE_GARANZIAOVER" 
+	query="	select count(*) as num_adesione
+			from bd_adesione
+			where strcodicefiscale = ?
+			and UPPER(codbandoprogramma) = 'UMBAT'" />
+			   		

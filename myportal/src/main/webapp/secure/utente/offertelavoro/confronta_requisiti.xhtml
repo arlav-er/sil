@@ -1,0 +1,467 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/secure/template/main.xhtml"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+
+	<ui:define name="title">
+		<h:outputText value="#{msg['cittadino.offerte.confronta_requisiti.titolo']}" escape="false" />
+	</ui:define>
+	<ui:define name="content">
+		<ui:param name="bean" value="#{confrontaRequisitiBean}" />
+		<h:outputScript library="js" name="utils.js" />
+		<h:outputStylesheet type="text/css" target="head">
+			table.confrontaRequisitiInnerTable td:first-child {
+				font-weight: normal;
+				width: 30%;
+			}
+			
+			table.lingua td {
+				width: 100%;
+				min-height: 25%;
+			}
+			
+			table.confrontaRequisitiInnerTable td {
+				vertical-align: top;
+				border-width: 0px;
+				width: 70%;
+				border-width: 0px;
+			}
+			
+			table.confrontaRequisitiInnerTable {
+				border-width: 0px;
+				font-weight: bold;
+				vertical-align: top;
+			}
+			
+			.confrontaImage {
+				border-width: 0px;
+				width: 27px;
+				height: 27px;
+			}
+		</h:outputStylesheet>
+		<div class="widget_container">
+			<h:outputText value="#{txt['confrontacv.descrizione']}" escape="false" />			
+		</div>
+		<div class="widget_container">
+			<ui:fragment rendered="#{not empty bean.data.keyAnagrafica}">
+				<h3>Anagrafica</h3>
+				<h:dataTable value="#{bean.data.keyAnagrafica}" id="anagrafica"
+					styleClass="confrontaRequisitiDataTable"
+					columnClasses="confrontaRequisitiHeaderCol notSortable, confrontaRequisitiVaCol notSortable, confrontaRequisitiImgCol notSortable, confrontaRequisitiCvCol notSortable"
+					var="element">
+					<h:column>
+						<f:facet name="header">Anagrafica</f:facet>
+						<ui:param name="vaDatiAziendaVacancy"
+							value="#{bean.data.vaVisualizzaDTO.vaDatiVacancyDTO}" />
+						<ui:param name="vaDatiAziendaInfo"
+							value="#{bean.data.vaVisualizzaDTO.vaDatiVacancyDTO}" />
+						<ui:param name="vaDatiVacancy"
+							value="#{bean.data.vaVisualizzaDTO.vaDatiVacancyDTO}" />
+						<ui:param name="cvDatiPersonali"
+							value="#{bean.data.cvVisualizzaDTO.cvDatiPersonaliDTO}" />
+					</h:column>
+					<h:column>
+						<f:facet name="header">
+							<h:outputText value="#{vaDatiVacancy.attivitaPrincipale} " />
+						</f:facet>
+						<table class="confrontaRequisitiInnerTable">
+							<tbody>
+								<tr>
+									<td>Descrizione</td>
+									<td><h:outputText value="#{vaDatiVacancy.descrizione} "
+											escape="false" /></td>
+								</tr>
+								<tr>
+									<td>Sede lavorativa</td>
+									<td><h:outputText
+											value="#{(vaDatiAziendaInfo.indirizzoLavoro)} " /> <h:outputText
+											value="#{(vaDatiAziendaInfo.strComLavoro)}" /></td>
+								</tr>
+								<tr>
+									<td>Gruppo professionale</td>
+									<td><h:outputText value="#{(vaDatiVacancy.strMansione)}" /></td>
+								</tr>
+								<tr>
+									<td>Attività</td>
+									<td><h:outputText value="#{(vaDatiVacancy.strAteco)}" /></td>
+								</tr>
+								<tr>
+									<td>Profilo richiesto</td>
+									<td><h:outputText
+											value="#{(vaDatiVacancy.attivitaPrincipale)}" /></td>
+								</tr>
+							</tbody>
+						</table>
+					</h:column>
+
+					<h:column>
+						<!-- dummy x icone ok no warning -->
+					</h:column>
+					<h:column>
+						<f:facet name="header">
+							<h:outputText value="#{bean.data.cvVisualizzaDTO.nome} " />
+							<h:outputText value="#{bean.data.cvVisualizzaDTO.cognome}" />
+						</f:facet>
+						<table class="confrontaRequisitiInnerTable">
+							<tr>
+								<td>Comune o stato di nascita</td>
+								<td><h:outputText value="#{cvDatiPersonali.strComNascita}" /></td>
+							</tr>
+							<tr>
+								<td>Comune di Domicilio</td>
+								<td><h:outputText
+										value="#{cvDatiPersonali.strComDomicilio}" /></td>
+							</tr>
+							<tr>
+								<td>Telefono Cellulare</td>
+								<td><h:outputText value="#{utenteInfo.cellulare}" /></td>
+							</tr>
+							<tr>
+								<td>Telefono Fisso</td>
+								<td><h:outputText value="#{utenteInfo.telCasa}" /></td>
+							</tr>
+						</table>
+					</h:column>
+				</h:dataTable>
+			</ui:fragment>
+			<br />
+			<div style="text-align: center; vertical-align: middle;">
+				<div style="text-align: center; vertical-align: middle;">
+					<span> Confronto dei dati CV con requisiti offerta:</span>
+					<h:graphicImage value="/resources/images/no.png"
+						style="text-align: center; vertical-align: middle;"
+						alt="Non soddisfatto" />
+					<span> Non soddisfatto </span>
+					<h:graphicImage value="/resources/images/warning.png"
+						style="text-align: center; vertical-align: middle;"
+						alt="In più o differente" />
+					<span>In più o differente </span>
+					<h:graphicImage value="/resources/images/ok.png"
+						style="text-align: center; vertical-align: middle;"
+						alt="Soddisfatto" />
+					<span> Soddisfatto </span>
+				</div>
+			</div>
+			<br />
+
+			<ui:fragment rendered="#{not empty bean.data.keyIstruzione}">
+				<h3>Istruzione</h3>
+				<h:dataTable value="#{bean.data.keyIstruzione}" id="Istruzione"
+					styleClass="confrontaRequisitiDataTable"
+					columnClasses="confrontaRequisitiHeaderCol notSortable, confrontaRequisitiVaCol, confrontaRequisitiImgCol notSortable, confrontaRequisitiCvCol"
+					var="element">
+					<h:column>
+						<f:facet name="header">
+							Istruzione
+						</f:facet>
+						<ui:param name="vaIstruzione"
+							value="#{bean.data.mapIstruzione[element].vaDto}" />
+						<ui:param name="cvIstruzione"
+							value="#{bean.data.mapIstruzione[element].cvDto}" />
+							Titolo<br />
+							Votazione<br />
+					</h:column>
+					<h:column>
+						<h:outputText value="#{vaIstruzione.titolo.descrizioneParlante}"
+							rendered="#{vaIstruzione != null}" />
+						<br />
+						<h:outputText value="#{vaIstruzione.votazione}"
+							rendered="#{vaIstruzione != null}" />
+						<br />
+					</h:column>
+					<h:column>
+						<h:graphicImage
+							rendered="#{cvIstruzione == null and vaIstruzione != null}"
+							alt="Istruzione mancante nel Cv" value="/resources/images/no.png"
+							title="Istruzione mancante nel Cv" />
+						<h:graphicImage
+							rendered="#{cvIstruzione != null and vaIstruzione == null}"
+							alt="Istruzione aggiuntiva presente nel Cv"
+							title="Istruzione aggiuntiva presente nel Cv"
+							value="/resources/images/warning.png" />
+						<h:graphicImage
+							rendered="#{cvIstruzione != null and vaIstruzione != null }"
+							alt="Istruzione Presente" title="Istruzione Presente"
+							value="/resources/images/ok.png" />
+					</h:column>
+					<h:column>
+						<h:outputText value="#{cvIstruzione.titolo.descrizione}"
+							rendered="#{cvIstruzione != null}" />
+						<br />
+						<h:outputText value="#{cvIstruzione.votazione}"
+							rendered="#{cvIstruzione != null}" />
+						<br />
+					</h:column>
+				</h:dataTable>
+			</ui:fragment>
+
+			<ui:fragment rendered="#{not empty bean.data.keyLingua}">
+				<h3>Lingue</h3>
+				<h:dataTable value="#{bean.data.keyLingua}" id="Lingua"
+					styleClass="confrontaRequisitiDataTable"
+					columnClasses="confrontaRequisitiLinguaHeaderCol, confrontaRequisitiLinguaContextCol notSortable,  confrontaRequisitiLinguaVaCol, confrontaRequisitiImgCol notSortable, confrontaRequisitiCvCol"
+					var="element">
+					<h:column>
+						<f:facet name="header">
+							Lingue
+						</f:facet>
+						<ui:param name="vaLingua"
+							value="#{bean.data.mapLingua[element].vaDto}" />
+						<ui:param name="cvLingua"
+							value="#{bean.data.mapLingua[element].cvDto}" />
+						<ui:param name="mapImgLingua"
+							value="#{bean.getImmaginiConfronto(cvLingua,vaLingua)}" />
+						<ui:param name="nomeLingua"
+							value="#{bean.data.getNomeLingua(element)}" />
+						<div style="display: none;">#{nomeLingua}</div>
+						<ui:fragment
+							rendered="#{empty bean.data.getContestoLingua(element)}">
+							<div style="display: none;">0#{nomeLingua}</div>
+							<h:outputText value="#{nomeLingua}" />
+						</ui:fragment>
+						<ui:fragment
+							rendered="#{not empty bean.data.getContestoLingua(element)}">
+							<div style="display: none;">9#{nomeLingua}</div>
+						</ui:fragment>
+					</h:column>
+					<h:column>
+						<div style="display: none;">#{nomeLingua}</div>
+						<h:outputText value="#{bean.data.getContestoLingua(element)}" />
+					</h:column>
+					<h:column>
+						<div style="display: none;">#{nomeLingua}</div>
+						<h:outputText
+							value="#{bean.data.getVaLivelloLingua(element,vaLingua)}" />
+					</h:column>
+					<h:column>
+						<div style="display: none;">#{nomeLingua}</div>
+						<h:graphicImage alt="Lingua" title="Lingua"
+							value="#{bean.getImgLingua(element,cvLingua,vaLingua)}" />
+					</h:column>
+					<h:column>
+						<div style="display: none;">#{nomeLingua}</div>
+						<h:outputText
+							value="#{bean.data.getCvLivelloLingua(element,cvLingua)}" />
+					</h:column>
+				</h:dataTable>
+			</ui:fragment>
+
+			<ui:fragment rendered="#{not empty bean.data.keyPatente}">
+				<h3>Patenti</h3>
+				<h:dataTable value="#{bean.data.keyPatente}" id="Patenti"
+					styleClass="confrontaRequisitiDataTable"
+					columnClasses="confrontaRequisitiHeaderCol notSortable, confrontaRequisitiVaCol, confrontaRequisitiImgCol notSortable, confrontaRequisitiCvCol"
+					var="element">
+					<h:column>
+						<f:facet name="header">
+							Patente
+						</f:facet>
+						<ui:param name="vaPatente"
+							value="#{bean.data.mapPatenti[element].vaDto}" />
+						<ui:param name="cvPatente"
+							value="#{bean.data.mapPatenti[element].cvDto}" />
+					</h:column>
+					<h:column>
+						<h:outputText value="#{vaPatente.descrizione}"
+							rendered="#{vaPatente != null}" />
+					</h:column>
+					<h:column>
+						<h:graphicImage
+							rendered="#{cvPatente == null and vaPatente != null}"
+							alt="Patente mancante nel Cv" title="Patente mancante nel Cv"
+							value="/resources/images/no.png" />
+						<h:graphicImage
+							rendered="#{cvPatente != null and vaPatente == null}"
+							alt="Patente aggiuntivo presente nel Cv"
+							title="Patente aggiuntivo presente nel Cv"
+							value="/resources/images/warning.png" />
+						<h:graphicImage
+							rendered="#{cvPatente != null and vaPatente != null }"
+							alt="Patente Presente" title="Patente Presente"
+							value="/resources/images/ok.png" />
+					</h:column>
+					<h:column>
+						<h:outputText value="#{cvPatente.descrizione}"
+							rendered="#{cvPatente != null}" />
+					</h:column>
+				</h:dataTable>
+			</ui:fragment>
+
+			<ui:fragment rendered="#{not empty bean.data.keyPatentino}">
+				<h3>Patentini</h3>
+				<h:dataTable value="#{bean.data.keyPatentino}" id="Patentini"
+					styleClass="confrontaRequisitiDataTable"
+					columnClasses="confrontaRequisitiHeaderCol notSortable, confrontaRequisitiVaCol, confrontaRequisitiImgCol notSortable, confrontaRequisitiCvCol"
+					var="element">
+					<h:column>
+						<f:facet name="header">
+							Patentini
+						</f:facet>
+						<ui:param name="vaPatentino"
+							value="#{bean.data.mapPatentini[element].vaDto}" />
+						<ui:param name="cvPatentino"
+							value="#{bean.data.mapPatentini[element].cvDto}" />
+					</h:column>
+					<h:column>
+						<h:outputText value="#{vaPatentino.descrizione}"
+							rendered="#{vaPatentino!= null}" />
+					</h:column>
+					<h:column>
+						<h:graphicImage
+							rendered="#{cvPatentino == null and vaPatentino != null}"
+							alt="Patentino mancante nel Cv" title="Patentino mancante nel Cv"
+							value="/resources/images/no.png" />
+						<h:graphicImage
+							rendered="#{cvPatentino != null and vaPatentino == null}"
+							alt="Patentino aggiuntivo presente nel Cv"
+							title="Patentino aggiuntivo presente nel Cv"
+							value="/resources/images/warning.png" />
+						<h:graphicImage
+							rendered="#{cvPatentino != null and vaPatentino != null }"
+							alt="Patentino Presente" title="Patentino Presente"
+							value="/resources/images/ok.png" />
+					</h:column>
+					<h:column>
+						<h:outputText value="#{cvPatentino.descrizione}"
+							rendered="#{cvPatentino != null}" />
+					</h:column>
+				</h:dataTable>
+			</ui:fragment>
+
+			<ui:fragment rendered="#{not empty bean.data.keyAlbo}">
+				<h3>Iscrizione ad Albi</h3>
+				<h:dataTable value="#{bean.data.keyAlbo}" id="Albo"
+					styleClass="confrontaRequisitiDataTable"
+					columnClasses="confrontaRequisitiHeaderCol notSortable, confrontaRequisitiVaCol, confrontaRequisitiImgCol notSortable, confrontaRequisitiCvCol"
+					var="element">
+					<h:column>
+						<f:facet name="header">
+							Albo
+						</f:facet>
+						<ui:param name="vaAlbo"
+							value="#{bean.data.mapAlbo[element].vaDto}" />
+						<ui:param name="cvAlbo"
+							value="#{bean.data.mapAlbo[element].cvDto}" />
+					</h:column>
+					<h:column>
+						<h:outputText value="#{vaAlbo.descrizione}"
+							rendered="#{vaAlbo!= null}" />
+					</h:column>
+					<h:column>
+						<h:graphicImage rendered="#{cvAlbo == null and vaAlbo != null}"
+							alt="Albo mancante nel Cv" title="Albo mancante nel Cv"
+							value="/resources/images/no.png" />
+						<h:graphicImage rendered="#{cvAlbo != null and vaAlbo == null}"
+							alt="Albo aggiuntivo presente nel Cv"
+							title="Albo aggiuntivo presente nel Cv"
+							value="/resources/images/warning.png" />
+						<h:graphicImage rendered="#{cvAlbo != null and vaAlbo != null }"
+							alt="Albo Presente" title="Albo Presente"
+							value="/resources/images/ok.png" />
+					</h:column>
+					<h:column>
+						<h:outputText value="#{cvAlbo.descrizione}"
+							rendered="#{cvAlbo != null}" />
+					</h:column>
+				</h:dataTable>
+			</ui:fragment>
+
+			<ui:fragment rendered="#{not empty bean.data.keyAltreInfo}">
+				<h3>Altre informazioni</h3>
+				<h:dataTable value="#{bean.data.keyAltreInfo}" id="AltreInfo"
+					styleClass="confrontaRequisitiDataTable"
+					columnClasses="confrontaRequisitiHeaderCol notSortable, confrontaRequisitiVaCol, confrontaRequisitiImgCol notSortable, confrontaRequisitiCvCol"
+					var="element">
+					<h:column>
+						<f:facet name="header">
+							Altre Informazioni
+						</f:facet>
+						<ui:param name="vaAltreInfo" value="#{bean.data.vaAltreInfoDTO}" />
+						<ui:param name="cvAltreInfo" value="#{bean.data.cvAltreInfoDTO}" />
+						<h:outputText value="#{bean.data.getNomeAltreInfo(element)}" />
+					</h:column>
+					<h:column>
+						<h:outputText
+							value="#{bean.data.getVaAltreInfoDescrizione(element,vaAltreInfo)}" />
+					</h:column>
+					<h:column>
+						<h:graphicImage alt="ImgAltreInfo" title="Lingua"
+							value="#{bean.getImgAltreInfo(element,cvAltreInfo,vaAltreInfo)}" />
+					</h:column>
+					<h:column>
+						<h:outputText
+							value="#{bean.data.getCvAltreInfoDescrizione(element,cvAltreInfo)}" />
+					</h:column>
+				</h:dataTable>
+			</ui:fragment>
+
+			<ui:fragment rendered="#{not empty bean.data.keyAgevolazione}">
+				<h3>Agevolazioni</h3>
+				<h:dataTable value="#{bean.data.keyAgevolazione}" id="Agevolazione"
+					styleClass="confrontaRequisitiDataTable"
+					columnClasses="confrontaRequisitiHeaderCol notSortable, confrontaRequisitiVaCol, confrontaRequisitiImgCol notSortable, confrontaRequisitiCvCol"
+					var="element">
+					<h:column>
+						<f:facet name="header">
+							Agevolazione
+						</f:facet>
+						<ui:param name="vaAgevolazione"
+							value="#{bean.data.mapAgevolazioni[element].vaDto}" />
+						<ui:param name="cvAgevolazione"
+							value="#{bean.data.mapAgevolazioni[element].cvDto}" />
+					</h:column>
+					<h:column>
+						<h:outputText value="#{vaAgevolazione.descrizione}" />
+
+					</h:column>
+					<h:column>
+						<h:graphicImage
+							rendered="#{cvAgevolazione == null and vaAgevolazione != null}"
+							alt="Agevolazione mancante nel Cv"
+							title="Agevolazione mancante nel Cv"
+							value="/resources/images/no.png" />
+						<h:graphicImage
+							rendered="#{cvAgevolazione != null and vaAgevolazione == null}"
+							alt="Agevolazione aggiuntivo presente nel Cv"
+							title="Agevolazione aggiuntivo presente nel Cv"
+							value="/resources/images/warning.png" />
+						<h:graphicImage
+							rendered="#{cvAgevolazione != null and vaAgevolazione != null }"
+							alt="Agevolazione Presente" title="Agevolazione Presente"
+							value="/resources/images/ok.png" />
+					</h:column>
+					<h:column>
+						<h:outputText value="#{cvAgevolazione.descrizione}" />
+					</h:column>
+				</h:dataTable>
+			</ui:fragment>
+		</div>
+
+		<script type="text/javascript">
+				$(function() {
+					disegnaBottoni();
+					okImgs=$('img[src$="ok.png"]');
+					warningImgs=$('img[src$="warning.png"]');
+					noImgs=$('img[src$="no.png"]');
+					okDiv=$(document.createElement('div')).append('0').css('display','none');
+					okImgs.addClass( "confrontaImage" ).after(okDiv);
+					warningDiv=$(document.createElement('div')).append('100').css('display','none');
+					warningImgs.addClass( "confrontaImage" ).after(warningDiv);
+					noDiv=$(document.createElement('div')).append('200').css('display','none');
+					noImgs.addClass( "confrontaImage" ).after(noDiv);
+					generateDataTable(".confrontaRequisitiDataTable",{
+					    "aaSorting": []
+					  });
+					generateDataTable(".confrontaRequisitiDataTable_notSortable",{
+					    "aaSorting": []
+					  });
+				});
+		</script>
+		<cc:btnBack backTo="#{confrontaRequisitiBean.backTo}" />
+	</ui:define>
+
+</ui:composition>

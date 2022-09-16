@@ -1,0 +1,66 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/main_primefaces.xhtml">
+<ui:param name="pagetitle" value="Gestione checklist" />
+<ui:define name="content">
+	<div class="widget_container">
+		<h1>Checklist - Scheda fabbisogno</h1>
+		<h:form id="checklistListForm">
+			<p:dataTable value="#{fbChecklistListBean.checklists}" var="checklist" paginator="true" paginatorAlwaysVisible="false"
+				paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				emptyMessage="Non hai ancora compilato nessuna checklist" lazy="true" rows="10" rowsPerPageTemplate="5,10,15">
+				<p:column headerText="Data creazione">
+					<h:outputText value="#{checklist.dtmIns}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Stato">
+					#{checklist.deStatoFbChecklist.descrizione}
+				</p:column>
+				<p:column headerText="N.Schede Fabbisogno">
+					#{checklist.fbSchedaFabbisognoList.size()}
+				</p:column>
+				<p:column headerText="Azioni">
+					<p:button title="Modifica" rendered="#{checklist.isModificabile()}"
+						outcome="checklist_form?idFbChecklist=#{checklist.id}"  icon="ui-icon ui-icon-pencil fix_icon"/>
+					<p:button icon="ui-icon-search" title="Dettaglio ckecklist" rendered="#{not checklist.isModificabile()}"
+						outcome="checklist_form?idFbChecklist=#{checklist.id}"/>				  
+					<p:commandButton  title="Elimina checklist"  icon="ui-icon-trash"
+						rendered="#{checklist.isModificabile()}" update="@form" 
+						actionListener="#{fbChecklistListBean.setEleminaChecklist(checklist)}" onsuccess="PF('eliminaSedeDialogWV').show();"/>
+				    <!-- <p:button  title="Dettaglio"  icon="ui-icon-search" outcome="checklist_form?idFbChecklist=#{checklist.id}"
+						rendered="#{checklist.isModificabile()}" update="@form"
+						 />							 -->
+				</p:column>
+				<p:column headerText="Schede fabbisogno">
+					<p:button value="Schede fabbisogno" title="Schede fabbisogno"
+						rendered="#{checklist.canViewSchedaFabbisogno()}"
+						outcome="../scheda_fabbisogno/scheda_fb_list.xhtml">
+						<f:param name="idFbChecklist" value="#{checklist.id}" />
+					</p:button>
+				</p:column>
+			</p:dataTable>
+			<p:button outcome="checklist_form" title="Crea nuova checklist" rendered="#{fbChecklistListBean.isEnteOspitante()}"
+				value="Crea nuova checklist" styleClass="margin-1em" />
+		</h:form>
+		
+		<p:dialog id="eliminaSedeDialog" widgetVar="eliminaSedeDialogWV" modal="true" width="400"
+		header="Elimina checklist"><br/>
+		         <p>Confermi l'eliminazione della checklist?</p>		    
+		    <div class="text-center" style="padding: 10px;">
+				<p:commandButton value="Conferma" title="Conferma" update=":checklistListForm"
+					actionListener="#{fbChecklistListBean.eliminaChecklist}" styleClass="margin-1em"
+					onclick="PF('eliminaSedeDialogWV').hide();">
+				</p:commandButton>
+				<p:commandButton value="Annulla" title="Annulla" onclick="PF('eliminaSedeDialogWV').hide();" />
+			</div>
+		</p:dialog>
+	</div>
+	<p:button outcome="home" styleClass="margin-1em" title="Torna alla scrivania"
+		value="Torna alla scrivania" />
+</ui:define>
+</ui:composition>

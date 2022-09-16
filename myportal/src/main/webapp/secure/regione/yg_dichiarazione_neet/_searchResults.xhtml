@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:cc="http://java.sun.com/jsf/composite/components" xmlns:p="http://primefaces.org/ui">
+
+	<p:dataTable id="searchResultsDataTable" var="dichiarazione" styleClass="results-table"
+		paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+		value="#{ygRegioneDichiarazioneNeetBean.searchResults}" rowsPerPageTemplate="5,10,15"
+		paginator="true" rows="5" lazy="true" rowIndexVar="rowIndex" emptyMessage="Nessuna dichiarazione trovata.">
+		<p:column headerText="Dati dichiarazione" width="30%">
+			<ul>
+				<li><b>Numero di protocollo:</b> #{dichiarazione.id}</li>
+				<li><b>Cittadino:</b> #{dichiarazione.strNomeLav} #{dichiarazione.strCognomeLav}</li>
+				<li><b>Ente:</b> #{dichiarazione.strRagioneSocialeEnte}</li>
+			</ul>
+		</p:column>
+		
+		<p:column headerText="Data inserimento" styleClass="text-center">
+			<h:outputText value="#{dichiarazione.dtDichiarazione}">
+				<f:convertDateTime type="date" pattern="dd/MM/yyyy"/>
+			</h:outputText>
+		</p:column>
+		
+		<p:column headerText="Stato" styleClass="text-center">
+			<h4>#{dichiarazione.strDescrizioneStatoDichiarazione}</h4>
+		</p:column>
+		
+		<p:column headerText="Documento" styleClass="text-center white-icon">
+			<ui:fragment rendered="#{not empty dichiarazione.extDocumentoFile}">
+				<p:commandButton id="documentoButton" styleClass="commandButtonMargin"
+					value="Scarica" icon="ui-button-icon-primary ui-icon ui-icon-circle-triangle-s"
+					alt="Scarica documento" title="Scarica documento" ajax="false">
+					<p:fileDownload value="#{ygRegioneDichiarazioneNeetBean.getDocumentoIdentitaFile(dichiarazione.id)}" />
+				</p:commandButton>
+			</ui:fragment>
+			<ui:fragment rendered="#{empty dichiarazione.extDocumentoFile}">
+				<p:commandButton id="documentoNonInseritoButton" styleClass="commandButtonMargin"
+					disabled="true" value="Non inserito"
+					icon="ui-button-icon-primary ui-icon ui-icon-circle-triangle-s"
+					alt="Non inserito" title="Non inserito" ajax="false">
+				</p:commandButton>
+			</ui:fragment>
+		</p:column>
+		
+		<p:column headerText="Stampa firmata" styleClass="text-center white-icon">
+			<ui:fragment rendered="#{not empty dichiarazione.extUploadNeetFile}">
+				<p:commandButton id="stampaButton" alt="Stampa Dichiarazione NEET" title="Stampa Dichiarazione NEET" 
+					ajax="false" icon="ui-button-icon-primary ui-icon ui-icon-circle-triangle-s" value="Scarica">
+					<p:fileDownload value="#{ygRegioneDichiarazioneNeetBean.getStampaFirmata(dichiarazione.id)}">
+					</p:fileDownload>
+				</p:commandButton>
+			</ui:fragment>
+			<ui:fragment rendered="#{empty dichiarazione.extUploadNeetFile}">
+				<p:commandButton id="stampaFirmataNonInseritaButton" styleClass="commandButtonMargin"
+					disabled="true" value="Non inserita"
+					icon="ui-button-icon-primary ui-icon ui-icon-circle-triangle-s"
+					alt="Non inserita" title="Non inserita" ajax="false">
+				</p:commandButton>
+			</ui:fragment>
+		</p:column>
+		
+		<p:column headerText="Dettaglio" styleClass="text-center white-icon">
+			<p:button outcome="view" value="Apri" 
+				icon="ui-button-icon-primary ui-icon ui-icon-folder-open">
+				<f:param name="idDichiarazione" value="#{dichiarazione.id}" />
+			</p:button>
+		</p:column>
+	</p:dataTable>
+</ui:composition>

@@ -1,0 +1,46 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+
+	<h:form id="contactReceivedForm">
+		<p:remoteCommand name="initContactReceivedTable" actionListener="#{aziendaMessagingBean.initContactReceived()}" update=":content" process="@this"
+			autoRun="true" onstart="messagesLoading()" oncomplete="$('.message-date').timeago();" global="false"></p:remoteCommand>
+	</h:form>
+
+	<div class="row">
+		<div class="col-md-10">
+			<h3>
+				#{ui['messaging.contactReceviedTitle']} <br /> <small><h:outputText value="#{ui['messaging.contactReceviedSubtitle']}" escape="false" /></small>
+			</h3>
+		</div>		
+	</div>
+
+	<h:panelGroup id="content">
+		<h:panelGroup id="contactReceivedTable">
+			<h:form>
+				<ul class="messages-list">
+					<h:panelGroup styleClass="messagesRec">
+						<p:dataGrid value="#{aziendaMessagingBean.messagesList}" var="message" paginator="true" rows="10"
+							paginatorTemplate="{CurrentPageReport}  {PageLinks}" widgetVar="messagesWV" styleClass="default-data-table" columns="1" lazy="true">
+							<p:ajax event="page" oncomplete="$('.message-date').timeago();"></p:ajax>
+							<li class="unread"><a onclick="showMessageFromMessagesContactReceived(#{message.ticket})">
+									<div class="msgheader">
+										<span class="action"></span><span class="from">#{message.pfPrincipalFrom.nome} #{message.pfPrincipalFrom.cognome}</span> <span
+											class="date"> <small class="message-date"> <time class="timeago" datetime="#{message.dtmIns}"></time>
+										</small> <small class="moreSmall"><h:outputText value="#{message.dtmIns}">
+													<f:convertDateTime pattern="dd/MM/yyyy"></f:convertDateTime>
+												</h:outputText></small>
+										</span> <span class="title"> <span class="action"></span> #{message.oggetto} - <span class="description">#{aziendaMessagingBean.shortBody(message.corpo)}
+										</span>
+										</span>
+									</div>
+							</a></li>
+						</p:dataGrid>
+					</h:panelGroup>
+				</ul>
+			</h:form>
+		</h:panelGroup>
+	</h:panelGroup>
+</ui:composition>
+
+
+

@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/tab.xhtml">
+
+	<ui:define name="tabcontent">
+		<ui:param name="bean" value="#{atipiciCittadinoBean}" />	
+		
+		<style type="text/css">
+			a.page-link { text-decoration: none; }
+		</style>
+		
+		<h:outputText escape="false"
+			value="#{msg['cittadino.servizi_atipico.consulenza_lavoro.descrizione']}" />
+			
+		<cc:waiting id="lavoroInsertLoader" hidden="true" waitMessage="Inserimento in corso..." />
+		<cc:messages id="lavoroMessages" />
+		
+		<h:form id="lavoroListForm">
+			<div style="display: none">
+				<h:inputHidden id="pageValue" value="#{bean.paginationHandler.currentPage}" />
+				<h:commandButton id="pageCommand" action="#{bean.changePage}" value="DUMMY FOR PAGINATION">
+					<f:ajax execute=":lavoroListForm:pageValue" 
+						render=":lavoroListForm:tabella :lavoroDetailForm" />
+				</h:commandButton>
+			</div>
+			
+			<ui:fragment rendered="#{not (bean.status == 'insert')}">	
+				<script type="text/javascript">
+					$(function() {							
+						$(jq("lavoroPaginationBar")).pagination({							    
+							pages: #{bean.paginationHandler.pages()},						       
+						    cssStyle: 'light-theme',
+						    prevText: 'Prec.',
+						    nextText: 'Succ.',
+					    	onPageClick: function (pageNumber, event) {							        
+						        document.getElementById('lavoroListForm:pageValue').value = pageNumber;
+						        document.getElementById('lavoroListForm:pageCommand').click();
+						        $(jq("lavoroDetailForm")).hide();
+						        $(jq("lavoroListForm:tabella")).hide();				            
+						        $(jq("lavoroListForm:paginationLoader")).show();
+						        $(jq("lavoroListForm:paginationLoader")).fadeIn();
+						    }
+					    });
+					});
+				</script>
+				
+				<div id="lavoroPaginationBar" class="widget_container ui-tabs ui-widget-content ui-corner-all" />
+				<br />
+						
+				<cc:waiting id="paginationLoader" hidden="true" waitMessage="Caricamento..." />	
+				
+				<h:panelGroup layout="block" id="tabella" class="dataTables_wrapper">
+					<table class="dataTable">
+						<tr>
+							<th class="ui-state-default"></th>
+							<th class="ui-state-default">ID</th>
+							<th class="ui-state-default">Titolo</th>
+							<th class="ui-state-default">Quesito</th>
+							<th class="ui-state-default">Inoltrata il:</th>
+							<th class="ui-state-default">Risposta ricevuta il:</th>
+						</tr>
+						
+						<ui:repeat value="#{bean.pratiche}" var="pratica" varStatus="status">
+							<tr>
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<span
+											class="ui-icon #{pratica.daLeggere ? 'ui-icon-mail-closed' : 'ui-icon-mail-open'}" />
+										<f:ajax execute="@this" onevent="onShowDetail" 
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+							
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{pratica.id} &nbsp;"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:ajax execute="@this" onevent="onShowDetail" 
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+							
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{pratica.oggetto} &nbsp;"
+										styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:ajax execute="@this" onevent="onShowDetail" 
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+							
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{pratica.corpo} &nbsp;"
+										styleClass="#{pratica.daLeggere ? 'boldText' : ''}" />
+										<f:ajax execute="@this" onevent="onShowDetail" 
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+							
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{empty pratica.dtInvio ? '&nbsp;' : pratica.dtInvio}"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}">
+											<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+										</h:outputText>
+										<f:ajax execute="@this" onevent="onShowDetail" 
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+							
+								<td class="clickable-td">
+									<h:commandLink action="#{bean.view(pratica.id)}">
+										<h:outputText value="#{empty pratica.dtRisposta ? '&nbsp;' : pratica.dtInvio}"
+											styleClass="#{pratica.daLeggere ? 'boldText' : ''}">
+											<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+										</h:outputText>
+										<f:ajax execute="@this" onevent="onShowDetail" 
+											render=":lavoroListForm:tabella :lavoroDetailForm" />
+									</h:commandLink>
+								</td>
+							</tr>							
+						</ui:repeat>
+					</table>
+					
+					<script>
+		       			disegnaBottoni();
+			       		$(jq("lavoroListForm:paginationLoader")).hide();
+					</script>
+				</h:panelGroup>
+				<br />
+				
+				<h:commandLink styleClass="newAlertButton" value="Nuova richiesta"
+					action="#{bean.setStatus('insert')}">
+					<f:ajax execute="@this" render=":lavoroListForm :lavoroDetailForm :lavoroInsertForm"/>
+				</h:commandLink>
+			</ui:fragment>
+		</h:form>
+		<br />
+		
+		<cc:waiting id="lavoroDetailLoader" hidden="true" waitMessage="Caricamento..." />	
+			
+		<h:form id="lavoroDetailForm">
+			<h:panelGroup layout="block" styleClass="insertPanel" rendered="#{bean.detail and bean.status == 'list'}">
+
+				<ui:include src="/secure/atipici/corpo_pratica_atipici.xhtml">
+					<ui:param name="readonly" value="true" />
+					<ui:param name="abean" value="#{bean}" />
+					<ui:param name="pratica" value="#{bean.messaggio}" />
+				</ui:include>
+
+				<h:panelGroup id="rispostePanel" layout="block" rendered="#{not empty bean.messaggio.risposte}">
+					<ui:repeat value="#{bean.messaggio.risposte}" var="risposta">
+						<div class="messageDiv">
+						
+							<ui:fragment rendered="#{bean.messaggio.praticaRifiutata}">
+								<div class="boldText">La pratica è stata rifiutata</div>
+								<br />
+							</ui:fragment>
+							
+							<h:outputText styleClass="mittente"
+								value="Risposta di #{risposta.mittente} - inviata il " />
+							<h:outputText value="#{risposta.dtmIns}" styleClass="mittente">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date" />
+							</h:outputText>
+							<br />
+							
+							<div class="corpo">
+								<h:panelGroup layout="block" rendered="#{bean.messaggio.consulenza.corpo != null}">
+									<h:outputText value="#{bean.messaggio.consulenza.corpo}" />
+									<br />
+								</h:panelGroup>
+								<h:outputText value="#{risposta.corpo}" />
+							</div>
+							<br />
+							
+							<cc:upload readonly="#{true}" label="Allegato"
+								rendered="#{not empty risposta.allegati}"
+								idAllegato="#{risposta.allegati[0].id}"
+								value="#{risposta.allegati[0].filename}" />
+						</div>
+					</ui:repeat>
+				</h:panelGroup>
+				<br />
+				
+				<h:commandLink styleClass="marginButton closeButton" action="#{bean.closeDetail}" value="Chiudi">
+					<f:ajax execute="@this" render=":lavoroDetailForm" onevent="onHideDetail" />
+				</h:commandLink>
+				
+				<script>
+					$(jq("lavoroDetailLoader")).hide();
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+		</h:form>
+		
+		<h:form id="lavoroInsertForm">
+			<h:panelGroup layout="block" rendered="#{bean.status == 'insert'}" styleClass="insertPanel">
+
+				<div style="padding: 10px">
+					<h:outputText escape="false"
+						value="#{msg['cittadino.servizi_atipico.consulenza_lavoro.form']}" />
+				</div>
+
+				<h:panelGrid columns="2" columnClasses="width30 width30">
+					<h:outputLabel value="Tipo lavoro"
+						rendered="#{bean.richiesta.deTipoQuesito.id != 'LAVORO'}" />
+
+					<h:selectOneMenu value="#{bean.richiesta.tipoConsulenza.id}"
+						valueDescription="#{bean.richiesta.tipoConsulenza.description}"
+						disableInput="true" id="tipoConsulenza" styleClass="width50"
+						valueChangeListener="#{bean.changeTipoLavoro}"
+						rendered="#{bean.richiesta.deTipoQuesito.id != 'LAVORO'}">
+						<f:selectItems value="#{bean.tipiConsulenza}" />
+						<f:ajax event="change" execute="@this" render=":lavoroInsertForm" />
+					</h:selectOneMenu>
+				</h:panelGrid>
+				<br />
+
+				<ui:include src="/secure/atipici/corpo_pratica_atipici.xhtml">
+					<ui:param name="pratica" value="#{bean.richiesta}" />
+					<ui:param name="abean" value="#{bean}" />
+				</ui:include>
+				<br />
+					
+				<div>
+					<h:commandLink styleClass="newRequestButton" value="Invia una nuova richiesta"
+						action="#{bean.save}">
+						<f:ajax execute="@form" onevent="onInsert"
+							render=":lavoroListForm :lavoroDetailForm :lavoroInsertForm :lavoroMessages" />
+					</h:commandLink>
+
+					<h:commandLink styleClass="abortButton" style="margin-left:5px"
+						value="Annulla" action="#{bean.setStatus('list')}">
+						<f:ajax execute="@this" render=":lavoroListForm :lavoroDetailForm :lavoroInsertForm" />
+					</h:commandLink>
+				</div>
+				
+				<script type="text/javascript">
+					disegnaBottoni();
+				</script>
+			</h:panelGroup>
+		</h:form>
+		
+		<script type="text/javascript">
+			function onInsert(data) {
+				if (data.status == 'begin') {
+					$(jq("lavoroInsertForm")).hide();
+					$(jq("lavoroInsertLoader")).show();
+				}
+				else if (data.status == 'success') {
+					$(jq("lavoroInsertLoader")).hide();
+				}
+			}
+		
+			function onShowDetail(data) {
+				if (data.status == 'begin') {
+					$(jq("lavoroDetailForm")).hide();
+					$(jq("lavoroDetailLoader")).show();
+				}  else if (data.status == 'success') {
+					PrimeFaces.scrollTo("lavoroDetailForm");
+				}
+			}
+			
+			function onHideDetail(data) {
+				if (data.status == 'begin') {
+					$(jq("lavoroDetailForm")).slideUp("slow");
+				}
+			}
+		</script>
+	</ui:define>
+</ui:composition>

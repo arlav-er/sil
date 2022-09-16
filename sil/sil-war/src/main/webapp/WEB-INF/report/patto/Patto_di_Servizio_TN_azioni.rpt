@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="8" minor_version="0" major_xml_version="6" minor_xml_version="5" count="3" id="0">
+    <Datasource dll="pdsora7.dll" host="concordia:1521:ORAC10" schema="" catalog="" user="trentodev" password="" url="">
+      <Tablesource alias="OR_PERCORSO_CONCORDATO" databaseIdentifier="TRENTODEV.OR_PERCORSO_CONCORDATO">
+        <Column name="PRGCOLLOQUIO" type="6" />
+        <Column name="PRGPERCORSO" type="6" />
+        <Column name="DATSTIMATA" type="15" />
+        <Column name="DATEFFETTIVA" type="15" />
+        <Column name="PRGAZIONI" type="6" />
+        <Column name="CODESITO" type="11" />
+        <Column name="STRNOTEPROPOSTAOP" type="11" />
+        <Column name="CDNUTINS" type="6" />
+        <Column name="DTMINS" type="15" />
+        <Column name="CDNUTMOD" type="6" />
+        <Column name="DTMMOD" type="15" />
+        <Column name="STRNOTE" type="11" />
+        <Column name="CODSERVIZICIG" type="11" />
+        <Column name="FLGMEDIATORE" type="11" />
+        <Column name="FLGABILITA" type="11" />
+        <Column name="CODESITORENDICONT" type="11" />
+      </Tablesource>
+      <Tablesource alias="OR_COLLOQUIO" databaseIdentifier="TRENTODEV.OR_COLLOQUIO">
+        <Column name="PRGCOLLOQUIO" type="6" />
+        <Column name="CDNLAVORATORE" type="6" />
+        <Column name="CODCPI" type="11" />
+        <Column name="DATCOLLOQUIO" type="15" />
+        <Column name="PRGSPI" type="6" />
+        <Column name="CODSERVIZIO" type="11" />
+        <Column name="STRNOTE" type="11" />
+        <Column name="CDNUTINS" type="6" />
+        <Column name="DTMINS" type="15" />
+        <Column name="CDNUTMOD" type="6" />
+        <Column name="DTMMOD" type="15" />
+        <Column name="NUMKLOCOLLOQUIO" type="6" />
+        <Column name="CODMOTIVOCHIUSURAPER" type="11" />
+        <Column name="CODESITOCOLL" type="11" />
+        <Column name="DATCHIUSURAPER" type="15" />
+        <Column name="PRGALTRAISCR" type="6" />
+        <Column name="CODLINEAAZ" type="11" />
+      </Tablesource>
+      <Tablesource alias="DE_AZIONE" databaseIdentifier="TRENTODEV.DE_AZIONE">
+        <Column name="PRGAZIONI" type="6" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+        <Column name="PRGAZIONERAGG" type="6" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="OR_COLLOQUIO" to="OR_PERCORSO_CONCORDATO" type="inn">
+      <Link from="PRGCOLLOQUIO" to="PRGCOLLOQUIO" type="eq"/>
+    </Join>
+
+    <Join from="OR_PERCORSO_CONCORDATO" to="DE_AZIONE" type="inn">
+      <Link from="PRGAZIONI" to="PRGAZIONI" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="1">
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="dataPercorso"/>
+      <Attribute name="shortName" value="dataPercorso"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[ToText ({OR_PERCORSO_CONCORDATO.DATSTIMATA }, "dd/MM/yyyy")]]>
+    </Field>
+  </FormulaFields>
+
+  <PromptFields count="1">
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="cdnLavoratore"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="2">
+    <Field type="SortField" valueType="11">
+      <Attribute name="name" value="DE_AZIONE.STRDESCRIZIONE"/>
+      <Attribute name="shortName" value="STRDESCRIZIONE"/>
+      <Reference name="id" type="DatabaseField" refname="DE_AZIONE.STRDESCRIZIONE"/>
+      <Attribute name="operation" value="0"/>
+    </Field>
+    <Field type="SortField" valueType="15">
+      <Attribute name="name" value="OR_PERCORSO_CONCORDATO.DATSTIMATA"/>
+      <Attribute name="shortName" value="DATSTIMATA"/>
+      <Reference name="id" type="DatabaseField" refname="OR_PERCORSO_CONCORDATO.DATSTIMATA"/>
+      <Attribute name="operation" value="0"/>
+    </Field>
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{OR_COLLOQUIO.CDNLAVORATORE} =  {?cdnLavoratore}]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="12240"/>
+    <Attribute name="page height" value="15840"/>
+    <Attribute name="page orientation" value="1"/>
+    <Attribute name="page margin left" value="720"/>
+    <Attribute name="page margin right" value="720"/>
+    <Attribute name="page margin top" value="720"/>
+    <Attribute name="page margin bottom" value="720"/>
+    <Attribute name="report title" value="Report2"/>
+    <Attribute name="report last saved" value="4 Aug 2011 08:47:36 GMT"/>
+    <Attribute name="report created" value="4 Aug 2011 07:51:46 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="0"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="PageAreaPair" id="0">
+    <Area type="PageHeader" count="1">
+      <Section type="PageHeader" count="0" width="10800" height="800" id="0">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+        </SectionProperties>
+      </Section>
+    </Area>
+    <Area type="PageFooter" count="1">
+      <Section type="PageFooter" count="0" width="10800" height="800" id="1">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+        </SectionProperties>
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <Section type="ReportHeader" count="0" width="10800" height="800" id="2">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+        </SectionProperties>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <Section type="ReportFooter" count="0" width="10800" height="800" id="3">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+        </SectionProperties>
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="1">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+      </AreaProperties>
+      <Section type="Detail" count="1" width="10800" height="1350" id="4">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+        </SectionProperties>
+        <Element type="Text" count="1" x_position="150" y_position="150" width="10620" height="615">
+          <Element type="Paragraph" count="4">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[q	aderire alle seguenti misure di politica attiva: ]]>
+            </Element>
+            <Element type="FieldPart">
+              <Reference name="field" type="DatabaseField" refname="DE_AZIONE.STRDESCRIZIONE"/>
+            </Element>
+            <Element type="TextPart">
+            <![CDATA[  da svolgersi entro il ]]>
+            </Element>
+            <Element type="FieldPart">
+              <Reference name="field" type="FormulaField" refname="@dataPercorso"/>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>

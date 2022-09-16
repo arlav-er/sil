@@ -1,0 +1,90 @@
+<!-- ***************************************************************************
+                         Esporta Migrazioni
+     *************************************************************************** -->
+
+<MODULE name="M_EsportaMigrazioni"
+		class="it.eng.sil.module.amministrazione.EsportaMigrazioniModule">
+	<CONFIG pool="SIL_DATI">
+	
+		<TRANSPOSER file="WEB-INF\conf\export\esportaMigrazioniTrans.xml" />
+			<!-- file: nome del file XML (completo di path) per la configurazione del transposer (esportaMigrazioniTrans.xml) -->
+		
+		<REPORT file="migrazioni\esportaMigrazioni_CC.rpt" />
+			<!-- file: reportFile: nome del file RPT di Crystal Report (nella dir WEB-INF/conf/report) da usare come template nella generazione dei file PDF. -->
+		
+		<LOG useDefaultLog="true"
+		     statusToConsole="false" />
+		     <!-- useDefaultLog: se a TRUE esegue il LOG sul normale LOG di applicativo -->
+		     <!-- statusToConsole: se a TRUE stampa un riepilogo su console durante l'elaborazione -->
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_EsportaMigrSetInvio"
+		class="it.eng.sil.module.amministrazione.EsportaMigrSetInvioModule">
+	<CONFIG pool="SIL_DATI">
+		<UPDATE_QUERY statement="ESPORTA_MIGR_SETINVIO_UPDATE_STATO">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="FLGINVIO"/>
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGMIGRAZIONE"/>
+		</UPDATE_QUERY>
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_EsportaMigrAnnullaErrata"
+		class="it.eng.sil.module.amministrazione.EsportaMigrAnnullaErrataModule">
+	<CONFIG pool="SIL_DATI">
+		<TIMEOUT minimal="30" />
+		<!-- TIMEOUT minimal indica il tempo (in minuti) oltre il quale si puo' annullare
+		     la precedente estrazione. Se non e' trascorso almeno questo tempo dall'inizio
+		     dell'ultima esportazione, l'annullamento viene abortito (questo e' il DEFAULT!) -->
+		<DELETE_QUERY statement="ESPORTA_MIGR_ANNULLA_DELETE_STATO">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="PRGMIGRAZIONE"/>
+		</DELETE_QUERY>
+	</CONFIG>
+</MODULE>
+
+
+<MODULE name="M_EsportaMigrVisStorico"
+		class="it.eng.afExt.dispatching.module.impl.ListModule">
+	<CONFIG pool="SIL_DATI" rows="10" title="Storico dell'Esportazione Migrazioni">
+		<QUERIES>
+			<SELECT_QUERY statement="ESPORTA_MIGR_VIS_STORICO" />
+		</QUERIES>
+		<COLUMNS>
+			<COLUMN name="DATAELAB" label="Data e ora migrazione" />
+			<COLUMN name="DATALANCIO" label="Data e ora di lancio" />
+			<COLUMN name="UTENTE" label="Utente" />
+			<COLUMN name="NUMMOVIMENTIELAB" label="N&amp;deg; movimenti elaborati" />
+			<COLUMN name="NUMCPIELAB" label="N&amp;deg; CPI elaborati" />
+			<COLUMN name="TEMPOELABORAZIONE" label="Tempo impiegato (ore:min:sec)" />
+			<COLUMN name="FLGINVIO" label="Dati inviati?" />
+		</COLUMNS>
+		<CAPTIONS/>
+	</CONFIG>
+</MODULE>
+
+<!-- By FV 22-11-2004 -->
+
+<MODULE name="MailLoadDefault"	
+	class="it.eng.sil.module.amministrazione.MailLoadDefault" >
+	
+	<CONFIG pool="SIL_DATI">
+		<QUERY_SELECT statement="MailLoadDefault" />
+	</CONFIG>
+
+</MODULE>
+
+
+
+<MODULE name="MailInviaExpModule"	
+	class="it.eng.sil.module.amministrazione.MailInviaExpModule" >
+	
+	<CONFIG pool="SIL_DATI" />
+	
+</MODULE>
+
+
+
+
+

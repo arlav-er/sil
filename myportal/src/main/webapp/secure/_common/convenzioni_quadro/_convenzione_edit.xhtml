@@ -1,0 +1,494 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components">
+	<h:form id="editForm">
+		<div class="ui-widget-content ui-widget ui-corner-all">
+			<div class="margin-1em">
+				<p class="text-center">
+					<strong>Convenzione tra</strong>
+				</p>
+
+				<p class="text-center">
+					Regione Calabria, rappresentata dal Direttore Generale del Dipartimento n.7 "Sviluppo economico, Lavoro,
+					Formazione, e Politiche Sociali", Dott. Fortunato Varone, <br /> domiciliato per la carica presso la Regione
+					Calabria, Cittadella regionale, Viale Europa Località Germaneto-Catanzato 88100, <br /> di seguito singolarmente
+					denominata "Regione Calabria" o "Regione",
+				</p>
+
+				<p class="text-center">
+					<strong>e</strong>
+				</p>
+
+				<p class="text-center">
+					<br /> Società <strong>#{fbConvenzioneEditBean.connectedAzienda.ragioneSociale}</strong> con sede legale in <strong>#{fbConvenzioneEditBean.connectedAzienda.indirizzoSede},
+						#{fbConvenzioneEditBean.connectedAzienda.capSede} #{fbConvenzioneEditBean.connectedAzienda.comune.descrizione}</strong> e
+					sedi operative in:
+				</p>
+			</div>
+
+			<h:panelGroup id="sediList" layout="block">
+				<p:dataTable var="sede" value="#{fbConvenzioneEditBean.convenzioneSediDTOList}" id="sediTable"
+					emptyMessage="Non hai inserito nessuna sede" style="width: 90%; margin-left: 5%;"
+					rowStyleClass="#{fbConvenzioneEditBean.isSedeRimossa(sede) ? 'sede-rimossa-row' : ''}">
+					<p:column headerText="Comune">
+						<h:outputText value="#{sede.comune.descrizione}" />
+					</p:column>
+					<p:column headerText="Indirizzo">
+						<h:outputText value="#{sede.indirizzo}" style="tesx-align : center" />
+					</p:column>
+					<p:column headerText="Cap">
+						<h:outputText value="#{sede.cap}" />
+					</p:column>
+					<p:column headerText="Sede valida">
+						<h:outputText value="#{sede.flgAccreditata ? 'Sì' : 'No'}" />
+					</p:column>
+					<p:column headerText="#{fbConvenzioneEditBean.getRegioneMode() ? 'Disabilita' : 'Elimina'}">
+						<p:commandButton actionListener="#{fbConvenzioneEditBean.setSedeDaEliminare(sede)}" process="@this"
+							value="#{fbConvenzioneEditBean.getRegioneMode() ? 'Disabilita' : 'Elimina'}"
+							update="@this :eliminaSedeDialogForm" rendered="#{fbConvenzioneEditBean.canRemoveSede(sede)}"
+							onsuccess="PF('eliminaSedeDialogWV').show();" styleClass="margin-1em">
+						</p:commandButton>
+						<h:outputText value="-"
+							rendered="#{not fbConvenzioneEditBean.canRemoveSede(sede) and empty sede.motivoEliminazione}" />
+						<h:outputText rendered="#{not fbConvenzioneBean.canRemoveSede(sede) and not empty sede.motivoEliminazione}"
+							value="Motivazione: #{sede.motivoEliminazione}" />
+					</p:column>
+				</p:dataTable>
+				<ui:fragment
+					rendered="#{fbConvenzioneEditBean.getRegioneMode() and fbConvenzioneEditBean.fbConvenzioneDto.isProtocolla()
+					and not fbConvenzioneEditBean.hasMoreThanOneSede()}">
+					<br />
+					<p style="margin-left: 5%">Non è possibile eliminare altre sedi perchè una convenzione deve avere
+						necessariamente almeno una sede valida associata.</p>
+				</ui:fragment>
+			</h:panelGroup>
+
+			<h:panelGroup id="inserisciSedePanel">
+				<p:commandButton id="insertButton" value="Inserisci altre sedi" styleClass="margin-1em"
+					rendered="#{not fbConvenzioneEditBean.showPanel and fbConvenzioneEditBean.canInsertNewSede()}"
+					actionListener="#{fbConvenzioneEditBean.showInsertPanel}" process="@this" update="inserisciSedePanel">
+				</p:commandButton>
+
+				<ui:fragment rendered="#{fbConvenzioneEditBean.showPanel}">
+					<fieldset style="margin-left: 2em; margin-right: 2em;">
+						<legend>Inserisci nuova sede</legend>
+						<h:panelGrid columns="2" cellpadding="5">
+							<p:outputLabel value="Indirizzo" for="indirizzoInput"></p:outputLabel>
+							<h:panelGroup>
+								<p:inputText id="indirizzoInput" value="#{fbConvenzioneEditBean.newSedi.indirizzo}" required="true"
+									maxlength="255" widgetVar="usernameWV" requiredMessage="L'indirizzo è obbligatorio">
+									<p:ajax event="blur" update="indirizzoMessage"></p:ajax>
+								</p:inputText>
+								<p:message id="indirizzoMessage" for="indirizzoInput"></p:message>
+							</h:panelGroup>
+
+							<p:outputLabel value="Comune" for="comuneNascitaInput"></p:outputLabel>
+							<h:panelGroup>
+								<p:autoComplete id="comuneNascitaInput" required="true" var="comuneVar" converter="deComuneDTOConverter"
+									forceSelection="true" completeMethod="#{fbConvenzioneEditBean.completeComune}"
+									itemLabel="#{comuneVar.descrizione}" itemValue="#{comuneVar}" value="#{fbConvenzioneEditBean.newSedi.comune}"
+									requiredMessage="Il comune della sede è obbligatorio">
+									<p:ajax event="itemSelect" listener="#{fbConvenzioneEditBean.onComuneSelected}" process="@this"
+										update="@this capInput" />
+								</p:autoComplete>
+								<p:message id="comuneNascitaMessage" for="comuneNascitaInput"></p:message>
+							</h:panelGroup>
+
+							<p:outputLabel value="Cap" for="capInput"></p:outputLabel>
+							<h:panelGroup>
+								<p:inputText id="capInput" value="#{fbConvenzioneEditBean.newSedi.cap}" required="true" maxlength="5"
+									widgetVar="capWV" requiredMessage="Il cap è obbligatorio">
+									<p:ajax event="blur" update="capMessage"></p:ajax>
+								</p:inputText>
+								<p:message id="capMessage" for="capInput"></p:message>
+							</h:panelGroup>
+
+							<h:panelGroup layout="block">
+								<p:commandButton value="Inserisci" process="inserisciSedePanel"
+									update="inserisciSedePanel sediList buttonsGroup" actionListener="#{fbConvenzioneEditBean.salvaNuovaSede}"
+									oncomplete="onInserisciSedeComplete(args);">
+								</p:commandButton>
+								<p:commandButton value="Svuota" actionListener="#{fbConvenzioneEditBean.svuotaNuovaSede}" process="@this"
+									update="inserisciSedePanel" />
+								<p:commandButton value="Annulla" process="@this" actionListener="#{fbConvenzioneEditBean.setShowPanel(false)}"
+									update="inserisciSedePanel" />
+							</h:panelGroup>
+						</h:panelGrid>
+					</fieldset>
+				</ui:fragment>
+			</h:panelGroup>
+
+			<div class="margin-1em">
+				<p>
+					rappresentata dal legale rappresentante,
+					<h:outputText
+						rendered="#{fbConvenzioneEditBean.regioneMode or not fbConvenzioneEditBean.fbConvenzioneDto.isInLavorazione()}"
+						value="#{fbConvenzioneEditBean.fbConvenzioneDto.nomeLegaleRappresentante} #{fbConvenzioneEditBean.fbConvenzioneDto.cognomeLegaleRappresentante}, "
+						style="font-weight: bold;" />
+					di seguito denominato "Soggetto Promotore".
+				</p>
+				<h:panelGroup style="display: inline-block"
+					rendered="#{not fbConvenzioneEditBean.regioneMode and fbConvenzioneEditBean.fbConvenzioneDto.isInLavorazione()}">
+					<p:outputLabel for="nomeLegaleInput" value="Nome legale rappresentante" styleClass="block-label" />
+					<p:inputText id="nomeLegaleInput" required="true" maxlength="50"
+						value="#{fbConvenzioneEditBean.fbConvenzioneDto.nomeLegaleRappresentante}"
+						requiredMessage="Il nome del legale rappresentante è obbligatorio">
+					</p:inputText>
+					<p:message for="nomeLegaleInput" />
+				</h:panelGroup>
+				<h:panelGroup style="display: inline-block"
+					rendered="#{not fbConvenzioneEditBean.regioneMode and fbConvenzioneEditBean.fbConvenzioneDto.isInLavorazione()}">
+					<p:outputLabel for="cognomeLegaleInput" value="Cognome legale rappresentante" styleClass="block-label" />
+					<p:inputText id="cognomeLegaleInput" required="true" maxlength="50"
+						value="#{fbConvenzioneEditBean.fbConvenzioneDto.cognomeLegaleRappresentante}"
+						requiredMessage="Il cognome del legale rappresentante è obbligatorio">
+					</p:inputText>
+					<p:message for="cognomeLegaleInput" />
+				</h:panelGroup>
+			</div>
+
+			<fieldset>
+				<legend>Dati adesione</legend>
+				<h:panelGrid columns="4" columnClasses="width25, width25, width25, width25" style="width: 80%;">
+					<h:panelGroup rendered="#{not fbConvenzioneEditBean.fbConvenzioneDto.isInLavorazione()}">
+						<p:outputLabel value="Data Stipula" styleClass="block-label" />
+						<h:outputText value="#{fbConvenzioneEditBean.fbConvenzioneDto.dataStipula}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</h:panelGroup>
+					<h:panelGroup rendered="#{not fbConvenzioneEditBean.fbConvenzioneDto.isInLavorazione()}">
+						<p:outputLabel value="Stato" styleClass="block-label" />
+								#{fbConvenzioneEditBean.fbConvenzioneDto.codStatoConv.descrizione}
+					</h:panelGroup>
+					<h:panelGroup
+						rendered="#{not fbConvenzioneEditBean.regioneMode and fbConvenzioneEditBean.fbConvenzioneDto.isInLavorazione()}">
+						<p:outputLabel for="tipoInput" value="Tipo convenzione" />
+						<p:selectOneRadio id="tipoInput" value="#{fbConvenzioneEditBean.fbConvenzioneDto.codTipoConvenzione}"
+							layout="grid" columns="3" required="true" requiredMessage="Il tipo di convenzione è obbligatorio"
+							disabled="#{fbConvenzioneEditBean.fbConvenzioneDto.isConfirmed() or fbConvenzioneEditBean.fbConvenzioneDto.isProtocolla() or fbConvenzioneEditBean.fbConvenzioneDto.isRevoca()}"
+							converter="deTipoConvenzioneDTOConverter">
+							<f:selectItems value="#{fbConvenzioneEditBean.tipos}" var="tipo" itemLabel="#{tipo.descrizione}"
+								itemValue="#{tipo}" />
+						</p:selectOneRadio>
+						<p:message for="tipoInput" />
+					</h:panelGroup>
+					<h:panelGroup
+						rendered="#{fbConvenzioneEditBean.regioneMode or not fbConvenzioneEditBean.fbConvenzioneDto.isInLavorazione()}">
+						<p:outputLabel value="Tipo Convenzione" styleClass="block-label" />
+								#{fbConvenzioneEditBean.fbDeTipoConvenzione}
+					</h:panelGroup>
+
+					<h:panelGroup
+						rendered="#{fbConvenzioneEditBean.canOnlyViewProtocolloData() 
+						and not empty fbConvenzioneEditBean.fbConvenzioneDto.dataProtocollo}">
+						<p:outputLabel styleClass="block-label" value="Data repertorio" />
+						<h:outputText value="#{fbConvenzioneEditBean.fbConvenzioneDto.dataProtocollo}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</h:panelGroup>
+					<h:panelGroup
+						rendered="#{fbConvenzioneEditBean.canOnlyViewProtocolloData()
+						and not empty fbConvenzioneEditBean.fbConvenzioneDto.numProtocollo}">
+						<p:outputLabel styleClass="block-label" value="Numero repertorio" />
+								#{fbConvenzioneEditBean.fbConvenzioneDto.numProtocollo}
+					</h:panelGroup>
+				</h:panelGrid>
+				<h:panelGroup
+					rendered="#{fbConvenzioneEditBean.fbConvenzioneDto.isRevoca() and not empty fbConvenzioneEditBean.fbConvenzioneDto.motivoRevoca}">
+					<p:outputLabel styleClass="block-label" value="Motivo della revoca" />
+								#{fbConvenzioneEditBean.fbConvenzioneDto.motivoRevoca}
+					</h:panelGroup>
+			</fieldset>
+			<h:panelGroup id="uploadDocumentoPanel" rendered="#{not fbConvenzioneEditBean.fbConvenzioneDto.isInLavorazione()}">
+				<fieldset>
+					<legend>Allegati</legend>
+					<p:dataTable var="allegato" value="#{fbConvenzioneEditBean.fbAllegatoDTOList}" id="allegatoTable"
+						emptyMessage="Non è presente alcun allegato" style="width: 90%; margin-left: 5%;">
+
+						<p:column headerText="Nome File">
+							<h:outputText value="#{allegato.nomeFile}" style="tesx-align : center" />
+						</p:column>
+						<p:column headerText="Tipo">
+							<h:outputText value="#{allegato.tipoAllegato}" style="tesx-align : center" />
+						</p:column>
+						<p:column headerText="Data invio">
+							<h:outputText value="#{allegato.idFbConvenzione.getDtmIns()}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Elimina" rendered="#{fbConvenzioneEditBean.canUploadConvenzioneAllegato()}">
+							<p:commandButton actionListener="#{fbConvenzioneEditBean.setEliminaAllegato(allegato)}" process="@this"
+								style="width:30px;height:20px" id="elimina" icon="ui-icon-trash" update="allegatoTable"
+								onsuccess="PF('eleiminateAllegatoWV').show();">
+							</p:commandButton>
+							<p:message for="elimina" />
+							<p:tooltip for="elimina" value="Elimina" />
+						</p:column>
+						<p:column headerText="Scarica">
+							<p:commandButton ajax="false" value="Scarica" id="download">
+								<p:fileDownload value="#{fbConvenzioneEditBean.downloadStampaAllegato(allegato.id)}" />
+							</p:commandButton>
+							<p:tooltip for="download" value="Scarica il pdf precedentemente caricato" />
+						</p:column>
+
+					</p:dataTable>
+					<br />
+
+					<h:panelGroup id="uploadAllegatoPanel" rendered="#{fbConvenzioneEditBean.canUploadConvenzioneAllegato()}">
+						<ui:fragment rendered="#{empty fbConvenzioneEditBean.allegatoUpload  and not fbConvenzioneEditBean.regioneMode}">
+							<p:fileUpload fileUploadListener="#{fbConvenzioneEditBean.uploadAllegatoFile}" id="convenzioneUploadElement"
+								rendered="#{not fbConvenzioneEditBean.regioneMode}" sizeLimit="5242880" fileLimit="3" multiple="false"
+								dragDropSupport="false" fileLimitMessage="puoi caricare al massimo 3 file" mode="advanced" required="true" requiredMessage="L' allegato è obbligatorio"
+								invalidSizeMessage="La dimensione del file dev'essere inferiore a 5 MB." label="Carica documento" auto="true"
+								invalidFileMessage="Il file deve essere un PDF." update="uploadAllegatoPanel uploadDocumentoPanel allegatoTable">							
+							</p:fileUpload>
+							<p:message id="messageAllegato" for="convenzioneUploadElement"/>
+						</ui:fragment>
+						
+						<ui:fragment rendered="#{not empty fbConvenzioneEditBean.allegatoUpload}">
+						<p>#{fbConvenzioneEditBean.allegatoFileName}</p>
+						<p:messages id="messages" globalOnly="true"></p:messages>
+					</ui:fragment> 
+					<ui:fragment rendered="#{empty fbConvenzioneEditBean.allegatoUpload}">
+						<p>#{fbConvenzioneEditBean.allegatoFileName}</p>
+						<p:messages id="messagesError" globalOnly="true"></p:messages>
+					</ui:fragment>  <br/>
+
+					<p:panelGrid style="margin-left:300px">
+                   <p:row>
+                    <p:column style="text-align: center; border:#fff;background-color: #F4F4F4;">
+					<p:outputLabel for="tipo" value="Tipo Allegato" style="margin-left:20px" rendered="#{not fbConvenzioneEditBean.regioneMode}" />
+					</p:column>
+					<p:column style="text-align: center;border:#fff;background-color: #F4F4F4;">
+					<p:selectOneMenu id="tipo" value="#{fbConvenzioneEditBean.tipo}" 
+						rendered="#{not fbConvenzioneEditBean.regioneMode}">
+						<f:selectItems value="#{fbConvenzioneEditBean.tipoList}" />
+						<p:ajax event="change" update="@this" />
+					</p:selectOneMenu> 
+					<p:message for="tipo" />
+					</p:column>
+					</p:row>
+					</p:panelGrid>
+					<p:commandButton actionListener="#{fbConvenzioneEditBean.addAllegatoList}" process="@this"
+						update="allegatoTable  uploadAllegatoPanel" style="margin-top: -36px;margin-left: 600px;" value="Conferma allegati"
+						rendered="#{not fbConvenzioneEditBean.regioneMode}"></p:commandButton>
+						
+					</h:panelGroup>
+					
+
+				</fieldset>
+			</h:panelGroup>
+			<h:panelGroup id="buttonsGroup" layout="block" styleClass="text-center">
+				<ui:fragment
+					rendered="#{not empty fbConvenzioneEditBean.fbConvenzioneDto.id and empty fbConvenzioneEditBean.convenzioneSediDTOList}">
+					<div class="ui-message">Per confermare l'adesione è necessario inserire almeno una sede.</div>
+				</ui:fragment>
+
+				<p:commandButton value="Salva" styleClass="margin-1em" oncomplete="onSalvaComplete(args);" process="@form"
+					update="@form" rendered="#{fbConvenzioneEditBean.canSaveConvenzione()}"
+					actionListener="#{fbConvenzioneEditBean.saveEditConvenzione}">
+				</p:commandButton>
+
+				<p:commandButton value="Conferma" disabled="#{fbConvenzioneEditBean.convenzioneSediDTOList.isEmpty()}"
+					rendered="#{not fbConvenzioneEditBean.regioneMode and fbConvenzioneEditBean.fbConvenzioneDto.isInLavorazione()
+						and not empty fbConvenzioneEditBean.fbConvenzioneDto.id}"
+					onclick="PF('confermaSchedaDialogWV').show();" styleClass="margin-1em">
+				</p:commandButton>
+
+				<p:commandButton value="Protocolla" process="@this" update="@this" onsuccess="PF('protocollaDialogWV').show();"
+					rendered="#{fbConvenzioneEditBean.regioneMode and fbConvenzioneEditBean.fbConvenzioneDto.isConfirmed()}" />
+
+				<p:commandButton value="Revoca" process="@this" update="@this" onsuccess="PF('revocaDialogWV').show();"
+					rendered="#{fbConvenzioneEditBean.regioneMode and fbConvenzioneEditBean.fbConvenzioneDto.canRevoca()}">
+				</p:commandButton>
+
+				<p:button value="Torna alle convenzioni" outcome="convenzione_list.xhtml" styleClass="margin-1em" />
+
+				<p:commandButton value="Elimina" process="@this" onclick="PF('eliminaConvDialogWV').show();"
+					rendered="#{fbConvenzioneEditBean.fbConvenzioneDto.isInLavorazione() and not fbConvenzioneEditBean.regioneMode
+						and not empty fbConvenzioneEditBean.fbConvenzioneDto.id}" />
+
+				<p:commandButton value="Stampa" ajax="false" styleClass="margin-1em"
+					rendered="#{fbConvenzioneEditBean.canStampaConvenzione()}">
+					<p:fileDownload value="#{fbConvenzioneEditBean.downloadStampaConvenzione()}" />
+				</p:commandButton>
+			</h:panelGroup>
+		</div>
+	</h:form>
+
+
+	<p:dialog id="confermaSchedaDialog" widgetVar="confermaSchedaDialogWV" header="Conferma adesione" modal="true"
+		width="400">
+		<p>Dopo la conferma non potrai più modificare l'adesione. Sei sicuro?</p>
+		<div class="text-center">
+			<p:commandButton value="Conferma adesione" title="Conferma adesione"
+				actionListener="#{fbConvenzioneEditBean.confirmConvenzione}" styleClass="margin-1em"
+				oncomplete="PF('confermaSchedaDialogWV').hide();" />
+			<p:commandButton value="Annulla" title="Annulla" onclick="PF('confermaSchedaDialogWV').hide();" />
+		</div>
+	</p:dialog>
+
+	<p:dialog id="convenzioneSalvataDialog" widgetVar="convenzioneSalvataDialogWV" modal="true"
+		header="Adesione alla convenzione salvata" width="400">
+		<div class="text-center">
+			<p>L'adesione alla convenzione è stata salvata.</p>
+			<p:commandButton value="Chiudi" title="Chiudi" onclick="PF('convenzioneSalvataDialogWV').hide();" />
+		</div>
+	</p:dialog>
+
+	<p:dialog id="convenzioneGiaEsistenteDialog" widgetVar="convenzioneGiaEsistenteDialogWV" modal="true"
+		header="Adesione alla convenzione fallita" width="400">
+		<div class="text-center">
+			<p>Hai già aderito a una convenzione di questo tipo.</p>
+			<p:commandButton value="Chiudi" title="Chiudi" onclick="PF('convenzioneGiaEsistenteDialogWV').hide();" />
+		</div>
+	</p:dialog>
+
+	<p:dialog id="eliminaSedeDialog" widgetVar="eliminaSedeDialogWV" modal="true" width="400"
+		header="#{fbConvenzioneEditBean.getRegioneMode() ? 'Disabilita sede' : 'Elimina sede'}">
+		<h:outputText rendered="#{not fbConvenzioneEditBean.getRegioneMode()}" value="Confermi l'eliminazione di questa sede?" />
+		<h:outputText rendered="#{fbConvenzioneEditBean.getRegioneMode()}" value="Confermi la disabilitazione di questa sede?" />
+		<h:form id="eliminaSedeDialogForm">
+			<ui:fragment rendered="#{fbConvenzioneEditBean.getRegioneMode()}">
+				<p:outputLabel value="Motivo disabilitazione" styleClass="block-label" for="motivoEliminazioneInput" />
+				<p:inputTextarea id="motivoEliminazioneInput" value="#{fbConvenzioneEditBean.sedeDaEliminare.motivoEliminazione}"
+					maxlength="200" rows="3" required="true" requiredMessage="Il motivo della disabilitazione è obbligatoro">
+				</p:inputTextarea>
+			</ui:fragment>
+			<div class="text-center">
+				<p:commandButton value="Conferma" title="Conferma" update=":editForm:sediList :editForm:buttonsGroup"
+					actionListener="#{fbConvenzioneEditBean.deleteSede}" styleClass="margin-1em"
+					onclick="PF('eliminaSedeDialogWV').hide();">
+				</p:commandButton>
+				<p:commandButton value="Annulla" title="Annulla" onclick="PF('eliminaSedeDialogWV').hide();" />
+			</div>
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="protocollaDialog" widgetVar="protocollaDialogWV" header="Protocolla Adesione" modal="true" width="400">
+		<h:form id="protocollaDialogForm">
+			<p>Confermi la protocollazione di questa adesione alla convenzione?</p>
+
+			<p:outputLabel value="Data repertorio" styleClass="block-label" for="repertorioInput" />
+			<p:calendar id="repertorioInput" value="#{fbConvenzioneEditBean.fbConvenzioneDto.dataProtocollo}" showOn="button"
+				pattern="dd/MM/yyyy" required="true" requiredMessage="La data di repertorio è obbligatoria"
+				mindate="#{fbConvenzioneEditBean.minDataRepertorio}" maxdate="#{fbConvenzioneEditBean.maxDataRepertorio}">
+			</p:calendar>
+			<p:message for="repertorioInput" />
+
+			<p:outputLabel for="protocolInput" styleClass="block-label" value="Numero repertorio" />
+			<p:inputText id="protocolInput" value="#{fbConvenzioneEditBean.fbConvenzioneDto.numProtocollo}" label="Protocol"
+				widgetVar="protocolWV" required="true" requiredMessage="Il numero di protocollo è obbligatorio"
+				converterMessage="Il valore deve essere un numero">
+			</p:inputText>
+			<p:message for="protocolInput" />
+
+			<div class="text-center">
+				<p:commandButton value="Conferma protocollazione" title="Conferma protocollazione"
+					actionListener="#{fbConvenzioneEditBean.protocollaFbConvenzione}" styleClass="margin-1em"
+					oncomplete="onProtocollaComplete(args);" process="@form :editForm" update="@form :editForm">
+				</p:commandButton>
+				<p:commandButton value="Annulla" title="Annulla" onclick="PF('protocollaDialogWV').hide();" />
+			</div>
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="revocaDialog" widgetVar="revocaDialogWV" header="Revoca Adesione" modal="true" width="400">
+		<h:form id="revocaDialogForm">
+			<p>Confermi la revoca di questa adesione alla convenzione?</p>
+			<p:outputLabel value="Motivo della revoca" for="revocaInput" />
+			<p:inputTextarea id="revocaInput" required="true" requiredMessage="Il motivo della revoca è obbligatorio" rows="4"
+				value="#{fbConvenzioneEditBean.fbConvenzioneDto.motivoRevoca}" />
+			<p:message for="revocaInput" />
+
+			<div class="text-center">
+				<p:commandButton id="confermaRevocaBtn" value="Conferma revoca" title="Conferma revoca"
+					actionListener="#{fbConvenzioneEditBean.revocaFbConvenzione}" styleClass="margin-1em"
+					oncomplete="onRevocaComplete(args);" process="@form :editForm" update="@form :editForm">
+				</p:commandButton>
+				<p:commandButton value="Annulla" title="Annulla" onclick="PF('revocaDialogWV').hide();" />
+			</div>
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="protocollaCompleteDialog" widgetVar="protocollaCompleteDialogWV" header="Adesione protocollata"
+		modal="true" width="400">
+		<p>Adesione protocollata con successo.</p>
+		<div class="text-center">
+			<p:commandButton value="Chiudi" title="Chiudi" onclick="PF('protocollaCompleteDialogWV').hide();" />
+		</div>
+	</p:dialog>
+	
+	<p:dialog id="eliminaConvDialog" widgetVar="eliminaConvDialogWV" header="Elimina Adesione" modal="true" width="400">
+		<p>Confermi l'eliminazione di questa adesione alla convenzione?</p>
+		<div class="text-center">
+			<p:commandButton value="Conferma eliminazione" title="Conferma eliminazione"
+				actionListener="#{fbConvenzioneEditBean.deleteAll}" styleClass="margin-1em"
+				onclick="PF('eliminaConvDialogWV').hide();">
+			</p:commandButton>
+			<p:commandButton value="Annulla" title="Annulla" onclick="PF('eliminaConvDialogWV').hide();" />
+		</div>
+	</p:dialog>
+	
+	<p:dialog id="eleiminateAllegato" widgetVar="eleiminateAllegatoWV" header="Elimina Allegato" modal="true"
+		width="500">
+		<p>Confermi l'eliminazione dell'allegato?</p>
+		<span class="fa fa-exclamation-circle fa-5x text-danger" style="margin-left: 190px;" />
+		<div class="text-center">
+			<p:commandButton value="Conferma" title="Delete Drug"
+				actionListener="#{fbConvenzioneEditBean.deleteFromAllegatoFile}" update=":editForm" styleClass="margin-1em"
+				onclick="PF('eleiminateAllegatoWV').hide();">
+			</p:commandButton>
+			<p:commandButton value="No" title="No" onclick="PF('eleiminateAllegatoWV').hide();" style="margin-top: 5px;" />
+		</div>
+	</p:dialog>
+	
+
+	<p:dialog id="revocaCompleteDialog" widgetVar="revocaCompleteDialogWV" header="Adesione revocata" modal="true"
+		width="400">
+		<p>Adesione revocata con successo.</p>
+		<div class="text-center">
+			<p:commandButton value="Chiudi" title="Chiudi" onclick="PF('revocaCompleteDialogWV').hide();" />
+		</div>
+	</p:dialog>
+
+	<p:dialog id="sedeGiaEsistenteDialog" widgetVar="sedeGiaEsistenteDialogWV" header="Sede già esistente" modal="true"
+		width="400">
+		<p>Non è possibile inserire nella convenzione delle sedi con lo stesso indirizzo. Verificare i dati inseriti.</p>
+		<div class="text-center">
+			<p:commandButton value="Chiudi" title="Chiudi" onclick="PF('sedeGiaEsistenteDialogWV').hide();" />
+		</div>
+	</p:dialog>
+
+
+	<script>
+		function onSalvaComplete(args) {
+			if (args.success) {
+				PF('convenzioneSalvataDialogWV').show();
+			} else if (args.convenzioneGiaEsistente) {
+				PF('convenzioneGiaEsistenteDialogWV').show();
+			}
+		}
+
+		function onProtocollaComplete(args) {
+			if (args.success) {
+				PF('protocollaDialogWV').hide();
+				PF('protocollaCompleteDialogWV').show();
+			}
+		}
+
+		function onRevocaComplete(args) {
+			if (args.success) {
+				PF('revocaDialogWV').hide();
+				PF('revocaCompleteDialogWV').show();
+			}
+		}
+
+		function onInserisciSedeComplete(args) {
+			if (args.sedeGiaEsistente) {
+				PF('sedeGiaEsistenteDialogWV').show();
+			}
+		}
+	</script>
+</ui:composition>

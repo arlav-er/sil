@@ -1,0 +1,37 @@
+<STATEMENT name="GET_PRG_CONFIG_PROT_BY_TIPO_DOC"
+   query="SELECT  ST.PRGCONFIGPROT, ST.CODTIPODOCUMENTO, ST.STRNOME, ST.PRGTEMPLATESTAMPA
+		  FROM    ST_TEMPLATE_STAMPA ST
+		  WHERE   ST.CODTIPODOCUMENTO = ?
+		  AND TRUNC(SYSDATE) BETWEEN TRUNC(ST.DATINIZIOVAL) AND TRUNC(ST.DATFINEVAL)
+		  ORDER BY ST.DATINIZIOVAL DESC" />
+		  
+<STATEMENT name="GET_INFO_STATO_OCCUPAZ_DATI_LAVORATORE"
+	query="SELECT so.prgStatoOccupaz, to_char(so.datinizio, 'dd/mm/yyyy') datainizioso,
+                  desor.codStatoOccupazRagg,
+                  deso.strDescrizione as DescrizioneStato,
+                  nvl(substr(PG_MOVIMENTI.CalcolaAnzianita(so.cdnLavoratore, to_char(sysdate, 'dd/mm/yyyy')), 1,
+					   instr(PG_MOVIMENTI.CalcolaAnzianita(so.cdnLavoratore, to_char(sysdate, 'dd/mm/yyyy')), '-', 1)-1), '0') as mesiAnzianita,
+				  nvl(substr(PG_MOVIMENTI.CalcolaAnzianita(so.cdnLavoratore, to_char(sysdate, 'dd/mm/yyyy')), 
+					   instr(PG_MOVIMENTI.CalcolaAnzianita(so.cdnLavoratore, to_char(sysdate, 'dd/mm/yyyy')), '-', 1)+1), '0') as giorniAnzianita    
+            FROM AM_STATO_OCCUPAZ so
+            	 inner join DE_STATO_OCCUPAZ deso on (so.codStatoOccupaz = deso.codStatoOccupaz)
+                 inner join DE_STATO_OCCUPAZ_RAGG desor on (deso.CodStatoOccupazRagg = desor.codStatoOccupazRagg)
+            WHERE so.cdnLavoratore = ? AND so.datFine is null" />
+            
+<STATEMENT name="GET_INFO_LAV_STORIA_INFO_STAMPE_PARAM"
+	query="
+  select inf.CDNLAVORATORE, 
+    to_char(inf.DATINIZIO, 'dd/mm/yyyy') as dataInizioTrasferimentoCpi ,
+    cpi.strdescrizione as descrizioneCpiTrasferimento
+  from an_lav_storia_inf inf
+	inner join DE_CPI cpi on (inf.codcpiorig = cpi.codcpi)
+	where inf.cdnlavoratore = ? and
+		  inf.datFine is null
+" />            
+
+<STATEMENT name="GET_INFO_STATO_ISCRIZIONE_CM"
+   query="SELECT to_char(am_cm_iscr.datanzianita68, 'dd/mm/yyyy') dataanzianital68, am_cm_iscr.numiscrizione, tipoiscr.strdescrizione descrizione,
+   			to_char(am_cm_iscr.DATULTIMAISCR,'dd/mm/yyyy') DATULTIMAISCR
+          FROM am_cm_iscr
+          join de_cm_tipo_iscr tipoiscr on tipoiscr.codcmtipoiscr = am_cm_iscr.codcmtipoiscr 
+          WHERE am_cm_iscr.prgcmiscr = ? " />   

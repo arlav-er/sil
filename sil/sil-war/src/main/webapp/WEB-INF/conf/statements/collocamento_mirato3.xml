@@ -1,0 +1,123 @@
+<!-- STATEMENTS/COLLOCAMENTO_MIRATO2.XML  PROSPETTI-->	   		
+
+<STATEMENT 	name="INSERT_CM_RIEPILOGONAZIONALE" 
+		 query="insert into 
+				cm_riepilogonazionale(prgprospettoinf,numlavoratoribc,numquotarisdisabili, 
+				                      numquotariscatprot,numsospensioni, numesoneri, 
+				                      numdisabiliforza, numcatprotforza, numcatprotdisabiliforza,
+				                      numscoperturadis,numscoperturacatprot,strnote,
+				                      numbasecomputoart3, numbasecomputoart18, flgsospensione, numquotaesuberiart18)
+				VALUES(?,?,?,
+						?,?,?,
+						?,?,?,
+						?,?,?,
+						?,?,?,?)"/>
+						
+<STATEMENT 	name="INSERT_CM_RIEPILOGOPROVINCIALE" 
+		 query="insert into
+				cm_riepilogoprovinciale(prgriepilogoprov,numlavoratoribc,numsospensioni,
+				                        numdisabiliforza,numcatprotforza, numcatprotdisabiliforza,
+				                        numquotarisdisabili, numquotariscatprot, numesoneri,
+				                        numscoperturadis, numscoperturacatprot, numcompcatprot,
+				                        numcompdisabili, prgprospettoinf, codprovincia,
+				                        codmonoeccdiffdisabili, codmonoeccdiffcatprot,
+				                        numlavoratoribcart3, numlavoratoribcart18, flgsospensione)
+				VALUES(s_cm_riepilogoprovinciale.nextval,?,?,
+						?,?,?,
+						?,?,?,
+						?,?,?,
+						?,?,?,
+						?,?,
+						?,?,?)"/>        
+						
+						
+
+<STATEMENT name="CM_GET_PRGDOCUMENTO_DA_RETTIFICARE_BY_PRGPROSPETTOINF"
+query="select ad.prgdocumento
+	  	  from am_documento ad
+	      join am_documento_coll adc on ad.prgdocumento = adc.prgdocumento
+	      join cm_prospetto_inf cpi on cpi.prgprospettoinf = to_number(adc.strchiavetabella)
+	  	  where cpi.prgprospettoinf = ?
+	      and ad.codtipodocumento = 'PINF'" />
+
+<STATEMENT name="CM_RETTIFICA_PROSPETTO"
+		 query="update AM_DOCUMENTO
+				set codstatoatto = 'AN',
+			    dtmmod = sysdate,
+			    cdnutmod = ?,
+			    numklodocumento = numklodocumento+1
+				where prgdocumento = ?" />
+
+<STATEMENT name="CM_ANNULLA_PROSPETTO"
+		 query="update cm_prospetto_inf
+				set cdnutmod = ?,
+				dtmmod = sysdate,
+				codcomunicazioneann = ?,
+				numkloprospettoinf = numkloprospettoinf+1
+				where prgprospettoinf = ?" />
+			                          
+<STATEMENT name="CM_IMPOSTA_STATO_PROTOCOLLATO"		
+			query="update AM_DOCUMENTO
+					set codstatoatto = 'PR',
+					    dtmmod = sysdate,
+					    cdnutmod = ?,
+					    numklodocumento = numklodocumento+1
+					where prgdocumento = (select ad.prgdocumento
+					                      from am_documento ad
+					                           join am_documento_coll adc on ad.prgdocumento = adc.prgdocumento                           
+					                      where to_number(adc.strchiavetabella) = ?
+					                      and ad.codtipodocumento = 'PINF')" />	   
+					                      
+
+<STATEMENT name="CM_GET_PROSPETTO_BY_CODCOMUNICAZIONE"
+	query="select cpi.prgprospettoinf,
+				  cpi.prgazienda,
+				  cpi.prgunita,
+				  cpi.codprovincia,
+				  cpi.codcomunicazione,
+				  cpi.codcomunicazioneorig,
+				  to_char(cpi.datprospetto,'dd/mm/yyyy') as datprospetto
+		   from cm_prospetto_inf cpi
+		   where cpi.codcomunicazione = ?
+		   order by cpi.datprospetto desc, cpi.prgprospettoinf desc " />
+		   
+<STATEMENT name="CM_GET_PROSPETTO_BY_PRGPROSPETTOINF"
+	query="select cpi.prgprospettoinf,
+				  cpi.prgazienda,
+				  cpi.prgunita,
+				  cpi.codprovincia,
+				  cpi.codcomunicazione,
+				  cpi.codcomunicazioneorig,
+				  to_char(cpi.datprospetto,'dd/mm/yyyy') as datprospetto
+		   from cm_prospetto_inf cpi
+		   where cpi.prgprospettoinf = ?
+		   order by cpi.datprospetto desc, cpi.prgprospettoinf desc " />		   
+					                      
+					                      
+<STATEMENT name="CM_GET_PRGPROSPETTO_DA_AGGIORNARE"
+	query="select prgprospettoinf
+			from cm_prospetto_inf cpi
+			where cpi.prgazienda = ?
+			and cpi.prgunita = ?
+			and cpi.codprovincia = ?
+			and cpi.codmonostatoprospetto = 'A'
+			and cpi.numannorifprospetto = (select max(cpi2.numannorifprospetto)
+			                               from cm_prospetto_inf cpi2
+			                               where cpi.prgazienda = cpi2.prgazienda
+			                                 and cpi.prgunita = cpi2.prgunita
+			                                 and cpi.codprovincia = cpi2.codprovincia
+			                                 and cpi.codmonostatoprospetto = cpi2.codmonostatoprospetto)" />
+
+<STATEMENT name="CM_RETTIFICA_PROSPETTO_NOTE"
+		 query="update cm_prospetto_inf
+				set dtmmod = sysdate,
+			    cdnutmod = ?,
+			    strnote = strnote || ' - ' || ?,
+			    numkloprospettoinf = numkloprospettoinf+1
+				where prgprospettoinf = ?" />		
+
+<STATEMENT name="GET_RESIDENZALAV_CPI_UTENTE"
+	query="select count(*) as numCount
+		   from an_lavoratore lav, de_comune comCPI
+		   where lav.cdnlavoratore = ? and comCPI.codcpi = ?
+		   and lav.codcomres = comCPI.codcom" />

@@ -1,0 +1,187 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:cc="http://java.sun.com/jsf/composite/components" template="../../template/main.xhtml">
+
+	<ui:define name="title">
+		<h:outputText value="#{msg['cittadino.servizi.percorso_lavoratore.titolo']}" escape="false" />
+	</ui:define>
+
+	<ui:define name="content">
+		<h:panelGrid>
+			<h:form id="percorso">
+				<h:panelGrid columns="1">
+					<cc:inputText id="data_inizio" label="Data inizio" required="true" type="date"
+						value="#{percorsoLavoratoreBean.dataInizio}">
+						<f:validator validatorId="dateNotFutureValidator" for="function" />
+					</cc:inputText>
+
+					<ui:remove>
+						<!-- la data di fine non deve essere più chiesta in input, ma di default impostata alla data odierna -->
+						<cc:inputText id="data_fine" label="Data fine" required="true" type="date"
+							value="#{percorsoLavoratoreBean.dataFine}">
+							<f:attribute name="data_da_id" value="percorso:data_inizio:inputText" />
+							<f:validator validatorId="twoDatesValidator" for="function" />
+						</cc:inputText>
+					</ui:remove>
+
+					<h:commandLink id="chiamaServizioButton" onclick="$('#content .wait').fadeIn();"
+						action="#{percorsoLavoratoreBean.chiamaServizio}" value="Invia" styleClass="buttonStyle">
+						<!--
+						<f:ajax execute=":percorso" render=":percorso :result" onerror="manageError"
+							onevent="mostraWait" />
+							-->
+					</h:commandLink>
+				</h:panelGrid>
+			</h:form>
+
+			<h:panelGroup id="result" layout="block">
+				<form>
+					<ui:fragment rendered="#{percorsoLavoratoreBean.reqTried and not empty percorsoLavoratoreBean.listaElementi and (percorsoLavoratoreBean.risultatoProtocollo == null or percorsoLavoratoreBean.risultatoProtocollo =='')}">
+						<h:panelGroup class="ok" layout="block">
+							<h:graphicImage value="/resources/images/check.gif" alt="ok" />
+							<b>Dati recuperati con successo</b>
+						</h:panelGroup>
+					</ui:fragment>
+					<cc:waiting hidden="true" waitMessage="Stiamo richiedendo i dati al CPI di tua competenza..." />
+					<ui:fragment rendered="#{percorsoLavoratoreBean.reqTried and percorsoLavoratoreBean.risultato != 'OK'}">
+
+						<h:panelGroup class="error" layout="block">
+							<h:graphicImage value="/resources/images/error.png" alt="error" />
+							<br />
+							<b>Impossibile elaborare la richiesta.</b>
+							<br />
+							<h:outputText value="#{percorsoLavoratoreBean.risultato}" />
+						</h:panelGroup>
+					</ui:fragment>
+					<ui:fragment
+						rendered="#{percorsoLavoratoreBean.reqTried and percorsoLavoratoreBean.risultato == 'OK' and empty percorsoLavoratoreBean.listaElementi}">
+
+						<h:panelGroup class="warning" layout="block">
+							<h:graphicImage value="/resources/images/icons/warning.gif" alt="warning" />
+							<br />
+							<b>Non sono presenti movimenti nel periodo indicato</b>
+						</h:panelGroup>
+					</ui:fragment>
+					<ui:fragment
+						rendered="#{const['regione.cod'] != 16 and percorsoLavoratoreBean.reqTried and percorsoLavoratoreBean.risultato == 'OK'}">
+						<br />
+						<a href="#" onclick="fetchStampaPercorsoLav(#{sessionBean.connectedUtente.id});return false;" class="buttonStyle">Stampa</a>
+					</ui:fragment>
+
+					<h:form>
+						<ui:fragment
+							rendered="#{const['regione.cod'] == 16 and percorsoLavoratoreBean.reqTried and percorsoLavoratoreBean.risultato == 'OK' and not empty percorsoLavoratoreBean.listaElementi}">
+							<h:commandButton ajax="false" id="download" styleClass="buttonStyle " value="Stampa">
+								<p:fileDownload value="#{percorsoLavoratoreBean.downloadPercorsoPuglia()}" />
+							</h:commandButton>
+							<ui:fragment rendered="#{percorsoLavoratoreBean.reqProtocollo and percorsoLavoratoreBean.risultatoProtocollo != 'OK'}">
+
+								<h:panelGroup class="error" layout="block">
+									<h:graphicImage value="/resources/images/error.png" alt="error" />
+									<br />
+									<b>impossibile elaborare la richiesta di stampa</b>
+									<br />
+									<h:outputText value="#{percorsoLavoratoreBean.risultatoProtocollo}" />
+								</h:panelGroup>
+							</ui:fragment>
+
+						</ui:fragment>
+					</h:form>
+
+				</form>
+
+				<ui:fragment rendered="#{percorsoLavoratoreBean.reqTried and not empty percorsoLavoratoreBean.listaElementi}">
+					<h:dataTable id="elementi_list" summary="Percorso lavoratore" columnClasses=",,,"
+						value="#{percorsoLavoratoreBean.listaElementi}" var="element">
+
+						<h:column>
+							<f:facet name="header">Data Da</f:facet>
+							<!-- ATTENZIONE!!!
+								La vedi questa data con pattern yyyyMMdd? Bene, non la toccare, viene usata per l'ordinamento della tabella-->
+							<h:outputText value="#{element.dataDa}" style="display:none">
+								<f:convertDateTime pattern="yyyyMMdd"></f:convertDateTime>
+							</h:outputText>
+							
+							 <h:outputText value="#{element.dataDa}">
+								<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+							</h:outputText>
+						</h:column>
+
+						<h:column>
+							<f:facet name="header">Data A</f:facet>
+							<!-- ATTENZIONE!!!
+								La vedi questa data con pattern yyyyMMdd? Bene, non la toccare, viene usata per l'ordinamento della tabella -->
+							<h:outputText value="#{element.dataA}" style="display:none">
+								<f:convertDateTime pattern="yyyyMMdd"></f:convertDateTime>
+							</h:outputText>
+							<h:outputText value="#{element.dataA}">
+								<f:convertDateTime pattern="dd/MM/yyyy" type="date"></f:convertDateTime>
+							</h:outputText>
+						</h:column>
+
+						<h:column>
+							<f:facet name="header">Tipo</f:facet>
+							<h:outputText value="#{element.tipo}" />
+						</h:column>
+
+						<h:column>
+							<f:facet name="header">Descrizione</f:facet>
+							<h:outputText value="#{element.descrizione}" />
+						</h:column>
+
+					</h:dataTable>
+
+					<script type="text/javascript">
+					$(function() {
+						$('#percorso').hide();
+					});
+				</script>
+
+				</ui:fragment>
+
+
+				<script type="text/javascript">
+				
+					$("#content .wait").hide();
+					
+					disegnaBottoni();
+					
+					generateDataTable($('[id$=elementi_list]'), {
+						"bFilter" : true,
+						"bInfo" : true,
+						"aaSorting": [[ 2, "desc" ]],
+						"bLengthChange" : true,
+						"bPaginate" : true,
+						"oLanguage": { 
+							'sInfo': 'Movimenti da _START_ a _END_ di _TOTAL_'                  							
+						},
+					});
+					
+				</script>
+			</h:panelGroup>
+		</h:panelGrid>
+
+		<script type="text/javascript">
+			function mostraWait(data) {
+				if (data.status == 'begin') {
+					$("#content .wait").fadeIn();
+ 					$("#content .error").hide();
+ 					$("#content .warning").hide();
+					$('[id$=chiamaServizioButton]').hide();
+					$('[id$=data_inizio]').hide();
+					$('[id$=data_fine]').hide();
+				}
+				else if (data.status == 'complete') {
+ 					$("#content .wait").hide();
+ 					$("#content .error").hide();
+				}
+			}
+// 			$("#content .error").hide();
+// 			$("#content .warning").hide();	
+		</script>
+
+		<h:link styleClass="backButtonStyle" value="Torna indietro" title="Torna alla pagina dei servizi"
+			outcome="/secure/utente/servizi/index.xhtml" />
+
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,222 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui" xmlns:eng="http://java.sun.com/jsf/composite/components">
+	<div class="row justify-content-center">
+		<h:form id="filtersForm">
+			<legend class="col-md-12">Richiesta</legend>
+			<div class="col-md-12" style="margin-top: 30px">
+				<div class="form-group">
+					<p:outputLabel for="numRichiesta" value="Numero richiesta" styleClass="col-sm-1 control-label"
+						style="margin-left: 10px" />
+					<div class="col-md-4 col-lg-4">
+						<p:inputText id="numRichiesta" required="false" value="#{ricercaRedazioneBean.redazioneSearchParams.numRichiesta}"
+							styleClass="form-control" maxlength="4" size="4" label="Numero richiesta">
+						</p:inputText>
+					</div>
+					<p:outputLabel for="numAnno" value="Anno" styleClass="col-sm-1 control-label" style="margin-left: 10px" />
+					<div class="col-md-2 col-lg-2">
+						<p:inputText id="numAnno" value="#{ricercaRedazioneBean.redazioneSearchParams.numAnno}" styleClass="form-control"
+							label="Numero anno" maxlength="8">
+						</p:inputText>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12" style="margin-top: 30px">
+				<div class="form-group">
+					<p:outputLabel for="provenienza" value="Provenienza" style="margin-left: 10px;" styleClass="col-sm-1 control-label"></p:outputLabel>
+					<div class="col-md-4 col-lg-4">
+						<p:selectOneMenu id="provenienza" styleClass="form-control" forceSelection="true" style="width: 100%;"
+							converter="deProvenienzaConverter" value="#{ricercaRedazioneBean.redazioneSearchParams.deProvenienzas}">
+							<f:selectItem itemLabel="" itemValue="" />
+							<f:selectItems var="provenienza" value="#{ricercaRedazioneBean.findDeProvenienzaFiltered()}"
+								itemLabel="#{provenienza.descrizione}" itemValue="#{provenienza}" />
+						</p:selectOneMenu>
+					</div>
+					<p:outputLabel for="titoloAnnuncio" value="Titolo annuncio" styleClass="col-sm-1 control-label"
+						style="margin-left: 10px" />
+					<div class="col-md-4 col-lg-4">
+						<p:inputText id="titoloAnnuncio" required="false"
+							value="#{ricercaRedazioneBean.redazioneSearchParams.titoloAnnuncio}" styleClass="form-control"
+							label="Titolo annuncio">
+						</p:inputText>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12" style="margin-top: 30px">
+				<div class="form-group">
+					<p:outputLabel for="operatoreCPI" value="Operatore CPI" styleClass="col-sm-1 control-label"
+						style="margin-left: 10px" />
+					<div class="col-md-4 col-lg-4">
+						<p:inputText id="operatoreCPI" required="false" value="#{ricercaRedazioneBean.redazioneSearchParams.operatoreCPI}"
+							styleClass="form-control" label="Operatore CPI">
+						</p:inputText>
+					</div>
+					<p:outputLabel for="statoAnnuncio" value="Stato annuncio" style="margin-left: 10px;"
+						styleClass="col-sm-1 control-label">
+					</p:outputLabel>
+					<div class="col-md-2 col-lg-2">
+						<p:selectOneMenu id="statoAnnuncio" styleClass="form-control" forceSelection="true" style="width: 100%;"
+							value="#{ricercaRedazioneBean.redazioneSearchParams.statoVacancy}">
+							<f:selectItem itemLabel="" itemValue="" />
+							<f:selectItems value="#{ricercaRedazioneBean.redazioneSearchParams.selectItemList()}" var="statoVacancyVar"
+								itemLabel="#{statoVacancyVar.descrizione}" itemValue="#{statoVacancyVar}" />
+						</p:selectOneMenu>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12" style="margin-top: 30px">
+				<div class="form-group">
+					<p:outputLabel for="evasione" value="Modalità evasione" style="margin-left: 10px;"
+						styleClass="col-sm-1 control-label">
+					</p:outputLabel>
+					<div class="col-md-4 col-lg-4">
+						<p:selectOneMenu id="evasione" styleClass="form-control" forceSelection="true" style="width: 100%;"
+							converter="deEvasioneRichConverter" value="#{ricercaRedazioneBean.redazioneSearchParams.evasioneRich}">
+							<f:selectItem itemLabel="" itemValue="" />
+							<f:selectItems var="evasione" value="#{ricercaRedazioneBean.findByCodEvasione()}" itemLabel="#{evasione.descrizione}"
+								itemValue="#{evasione}" />
+						</p:selectOneMenu>
+					</div>
+					<p:outputLabel for="valideScadute" value="Valide / Scadute " style="margin-left: 10px;"
+								   styleClass="col-sm-1 control-label">
+					</p:outputLabel>
+					<div class="col-md-2 col-lg-2">
+						<p:selectOneMenu id="valideScadute" value="#{ricercaRedazioneBean.redazioneSearchParams.validaScaduta}" style="width:100%"
+										 widgetVar="valideScaduteWV">
+							<f:selectItem itemLabel="" itemValue=""/>
+							<f:selectItem itemLabel="valide" itemValue="valide"/>
+							<f:selectItem itemLabel="scadute" itemValue="scadute"/>
+						</p:selectOneMenu>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12" style="margin-top: 30px">
+				<div class="form-group">
+					<p:outputLabel for="dataPubblicazioneDa" value="Data da" styleClass="col-sm-1 control-label"
+						style="margin-left: 10px" />
+					<div class="col-md-4 col-lg-4">
+						<p:calendar id="dataPubblicazioneDa" 
+							binding="#{dataDalComponent}"
+							converterMessage="Data non valida!"
+							label="Data da"
+							navigator="true" 
+							pattern="dd/MM/yyyy"
+							value="#{ricercaRedazioneBean.redazioneSearchParams.dataPubblicazioneDa}"
+					        maxdate="#{ricercaRedazioneBean.getCurrentDate()}"
+					        styleClass="form-control" locale="it"
+					        widgetVar="dataPubblicazioneDaWV" mask="true">
+				     	</p:calendar>
+				      	<p:message id="dataPubblicazioneDaMsg" for="dataPubblicazioneDa"></p:message>
+					</div>
+					
+					<p:outputLabel for="dataPubblicazioneA" value="Data a" styleClass="col-sm-1 control-label"
+						style="margin-left: 10px" />
+					<div class="col-md-4 col-lg-4">
+						<p:calendar id="dataPubblicazioneA" label="Data a" navigator="true" 
+							pattern="dd/MM/yyyy"
+							converterMessage="Data non valida!"
+							value="#{ricercaRedazioneBean.redazioneSearchParams.dataPubblicazioneA}"
+					        maxdate="#{ricercaRedazioneBean.getCurrentDate()}"
+					        styleClass="form-control" locale="it" widgetVar="dataPubblicazioneAWV" mask="true"
+					        update="dataPubblicazioneAMsg">
+					        <f:validator validatorId="twoDatesValidatorPrimefaces" />
+							<f:attribute name="otherDate" value="#{dataDalComponent}" />
+							<f:attribute name="lessOrEqual" value="true" />
+				     	</p:calendar>
+				      	<p:message id="dataPubblicazioneAMsg" for="dataPubblicazioneA"></p:message>
+					</div>
+				</div>
+			</div>
+			<legend class="col-md-12">Azienda</legend>
+			<div class="col-md-12" style="margin-top: 30px">
+				<div class="form-group">
+					<p:outputLabel for="aziendaRichiedente" value="Azienda richiedente" styleClass="col-sm-1 control-label"
+						style="margin-left: 10px" />
+					<div class="col-md-4 col-lg-4">
+						<p:inputText id="aziendaRichiedente" required="false"
+							value="#{ricercaRedazioneBean.redazioneSearchParams.aziendaRichiedente}" styleClass="form-control"
+							label="Azienda richiedente">
+						</p:inputText>
+					</div>
+					<p:outputLabel for="comuneSedeLavoro" value="Comune luogo di lavoro" styleClass="col-sm-1 control-label"
+						style="margin-left: 10px" />
+					<div class="col-md-4 col-lg-4">
+						<p:autoComplete id="comuneSedeLavoro" converter="deComuneConverter" forceSelection="true"
+							completeMethod="#{ricercaRedazioneBean.autoCompleteBean.completeComune}"
+							itemLabel="#{comuneLavoro.denominazione}" itemValue="#{comuneLavoro}" filter="true" filterMatchMode="contains"
+							value="#{ricercaRedazioneBean.redazioneSearchParams.comuneSedeLavorativa}" var="comuneLavoro"
+							styleClass="form-control">
+						</p:autoComplete>
+						<p:message for="comuneSedeLavoro" />
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12" style="margin-top: 30px">
+				<div class="form-group">
+					<p:outputLabel for="comuneSedeAziendale" value="Comune sede azienda" styleClass="col-sm-1 control-label"
+						style="margin-left: 10px" />
+					<div class="col-md-4 col-lg-4">
+						<p:autoComplete id="comuneSedeAziendale" converter="deComuneConverter" forceSelection="true"
+							completeMethod="#{ricercaRedazioneBean.autoCompleteBean.completeComune}"
+							itemLabel="#{comuneAzienda.denominazione}" itemValue="#{comuneAzienda}" filter="true" filterMatchMode="contains"
+							value="#{ricercaRedazioneBean.redazioneSearchParams.comuneSedeAziendale}" var="comuneAzienda"
+							styleClass="form-control">
+						</p:autoComplete>
+						<p:message for="comuneSedeAziendale" />
+					</div>
+					<p:outputLabel for="provinciaLuogoLavoro" value="Provincia luogo di lavoro" styleClass="col-sm-1 control-label"
+								   style="margin-left: 10px" />
+					<div class="col-md-4 col-lg-4">
+						<p:autoComplete id="provinciaLuogoLavoro" converter="deProvinciaConverter" forceSelection="true"
+										completeMethod="#{ricercaRedazioneBean.autoCompleteBean.completeProvincia}"
+										itemLabel="#{provinciaLavoro.denominazione}" itemValue="#{provinciaLavoro}" filter="true" filterMatchMode="contains"
+										value="#{ricercaRedazioneBean.redazioneSearchParams.provinciaLuogoLavoro}" var="provinciaLavoro"
+										styleClass="form-control">
+						</p:autoComplete>
+						<p:message for="comuneSedeAziendale" />
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-md-12" style="margin-top: 30px">
+				<div class="form-group">
+					<p:outputLabel for="provinciaSedeAzienda" value="Provincia sede azienda" styleClass="col-sm-1 control-label"
+								   style="margin-left: 10px" />
+					<div class="col-md-4 col-lg-4">
+						<p:autoComplete id="provinciaSedeAzienda" converter="deProvinciaConverter" forceSelection="true"
+										completeMethod="#{ricercaRedazioneBean.autoCompleteBean.completeProvincia}"
+										itemLabel="#{provinciaSedeAzienda.denominazione}" itemValue="#{provinciaSedeAzienda}" filter="true" filterMatchMode="contains"
+										value="#{ricercaRedazioneBean.redazioneSearchParams.provinciaSedeAzienda}" var="provinciaSedeAzienda"
+										styleClass="form-control">
+						</p:autoComplete>
+						<p:message for="comuneSedeAziendale" />
+					</div>
+					<p:outputLabel for="flgVacancyNotRer" value="Fuori regione" styleClass="col-sm-1 control-label"
+								   style="margin-left: 10px" />
+					<div class="col-md-4 col-lg-4">
+						<p:selectBooleanCheckbox id="flgVacancyNotRer"
+										value="#{ricercaRedazioneBean.redazioneSearchParams.flgVacancyNotRer}"
+										styleClass="form-control">
+						</p:selectBooleanCheckbox>
+						<p:message for="flgVacancyNotRer" />
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<div class="m-t-20 search-controls-section text-center">
+						<p:commandLink id="searchBtn" styleClass="btn btn-primary btn-search m-r-5"
+							onclick="buttonToDisable = MyPortal.enableLoadingButton(this)" actionListener="#{ricercaRedazioneBean.search()}"
+							update=":vacancyResultsForm:vacancyResultsGroup @(.ui-datatable) @(.ui-message)"
+							oncomplete="MyPortal.disableLoadingButton(this);">
+							<i class="fa fa-search" aria-hidden="true"></i> Cerca
+                        </p:commandLink>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</div>
+
+</ui:composition>
+

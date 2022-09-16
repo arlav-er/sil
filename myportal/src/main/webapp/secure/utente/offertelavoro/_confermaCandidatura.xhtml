@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">	
+
+	<p:dialog id="confermaCandidatura" header="Conferma Candidatura" widgetVar="confermaCandidaturaDialog"
+			  modal="true"> 
+		<h:form id="uploadForm" enctype="multipart/form-data">			
+			<h:panelGrid id="dati_cv_panel" columns="1"	columnClasses="cv_col1">
+				<h:panelGroup rendered="#{not ricercaOfferteLavoroNewBean.fromClicLavoro}">							
+					Seleziona un Curriculum
+					<p:selectOneMenu value="#{ricercaOfferteLavoroNewBean.candidatura.idCvDatiPersonali}"
+									 filter="true" filterMatchMode="startsWith" style="width: 400px;">
+						<f:selectItems value="#{ricercaOfferteLavoroNewBean.myCurricula}"  />
+			        </p:selectOneMenu>
+			    </h:panelGroup>    
+		        <h:panelGroup rendered="#{ricercaOfferteLavoroNewBean.fromClicLavoro}">
+		        	Seleziona un Curriculum
+			        <p:selectOneMenu id="cv_cl_vacancy" value="#{ricercaOfferteLavoroNewBean.candidatura.idCvDatiPersonaliCl}"
+									 filter="true" filterMatchMode="startsWith" styleClass="width400" style="width: 400px;">
+						<f:selectItems
+							value="#{ricercaOfferteLavoroNewBean.myClicLavoroCurricula}" />
+			        </p:selectOneMenu>
+		        </h:panelGroup>
+		       	<h:panelGroup rendered="#{not ricercaOfferteLavoroNewBean.fromClicLavoro}"> 
+					Seleziona una lettera di presentazione
+					<p:selectOneMenu id="lettere_vacancy" value="#{ricercaOfferteLavoroNewBean.candidatura.idCvLetteraAcc}"
+							filter="true" filterMatchMode="startsWith" style="width: 400px;">
+						<f:selectItems value="#{ricercaOfferteLavoroNewBean.myLettere}" />
+					</p:selectOneMenu>
+				</h:panelGroup>
+	         	<br/>   		       		        								
+				<h:panelGroup>												
+					<p:fileUpload value="#{ricercaOfferteLavoroNewBean.file}" mode="advanced" auto="true"
+								  fileUploadListener="#{ricercaOfferteLavoroNewBean.handleFileUpload}" 
+								  update="uploadForm:uploadedFile" process="@this"
+								  label="Inserisci un allegato" 
+								  style="max-width: 600px;border-style:none;" />					
+				</h:panelGroup>
+				<h:panelGrid id="uploadedFile">
+					<h:panelGrid rendered="#{not empty ricercaOfferteLavoroNewBean.file }" columns="2">
+						<h:outputText value="#{ricercaOfferteLavoroNewBean.file.getFileName()}" />
+						<p:commandLink process="@this" styleClass="btn ui-button btn-primary" actionListener="#{ricercaOfferteLavoroNewBean.deleteFile()}" update="uploadForm:uploadedFile">Delete</p:commandLink>
+					</h:panelGrid>
+				</h:panelGrid>				
+				<h:panelGroup>
+					<b><h:outputText
+							value="A seguito della candidatura sarà inviato un messaggio all'azienda interessata." /><br />
+						<h:outputText
+							value="Occorre pertanto compilare la sezione sottostante. " /></b>
+				</h:panelGroup>
+				<p:outputLabel for="letter" value="Testo del messaggio"/>
+				<p:inputTextarea id="letter" value="#{ricercaOfferteLavoroNewBean.candidatura.commento}" style="background-color:#fff"
+								 rows="5" cols="60" counter="counter" maxlength="2000"       
+				    			 counterTemplate="Caratteri disponibili {0}" autoResize="false" required="true" requiredMessage="Campo obbligatorio"/>  				  
+				<h:outputText id="counter" /> 
+				<p:message for="letter"/> 
+									 					
+			    <p:commandButton rendered="#{ricercaOfferteLavoroNewBean.chekRER()}" actionListener="#{ ricercaOfferteLavoroNewBean.inviaCandidaturaNoDTO}" value="Invia" 
+								 update="@form :form_lista_offerte:riquadro_table :globalMessages"
+								 oncomplete="if (!args.validationFailed) PF('confermaCandidaturaDialog').hide()" global="true"/>
+				<p:commandButton
+					rendered="#{!ricercaOfferteLavoroNewBean.chekRER()}"
+					actionListener="#{ricercaOfferteLavoroNewBean.inviaCandidatura}"
+					value="Invia"
+					update="@form :form_lista_offerte:riquadro_table :globalMessages"
+					oncomplete="if (!args.validationFailed) PF('confermaCandidaturaDialog').hide()"
+					global="true" />
+			</h:panelGrid>
+		</h:form>
+		
+		<style>
+		.ui-fileupload-buttonbar .ui-fileupload-choose input{
+			transform: none;
+		}
+		</style>			
+	</p:dialog>	
+</ui:composition>

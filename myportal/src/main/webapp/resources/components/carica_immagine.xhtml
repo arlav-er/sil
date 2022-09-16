@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:composite="http://java.sun.com/jsf/composite">
+
+	<!--  Attributi da definire nell'interfaccia -->
+	<composite:interface>
+		<composite:attribute name="bean" required="true" />
+		<composite:attribute name="label" required="true" />
+		<composite:attribute name="alt" required="true" />
+		<composite:attribute name="type" required="true" />
+	</composite:interface>
+
+	<!--  Interfaccia implementata -->
+	<composite:implementation>
+	<f:loadBundle basename="messages.errors" var="errors" />
+		<h:form id="immagine_form">
+			<h:commandLink id="dialog_image_opener" value="#{cc.attrs.label}"
+				name="#{cc.attrs.label}" title="#{cc.attrs.label}"
+				class="buttonStyle"
+				onclick="$('#dialog_image').dialog('open'); return false;">
+			</h:commandLink>
+			<br />
+			<br />
+			<h:panelGroup>
+				<div id="foto_div">
+					<h:graphicImage id="foto"
+						value="/secure/rest/getFoto?type=#{cc.attrs.type}&amp;id=#{cc.attrs.bean.data.id}&amp;size=normal"
+						alt="#{cc.attrs.alt}" />
+				</div>
+				<span id="foto_msg" class="toggler" style=""> <span
+					id="foto_msg_msg_inner" class="globalMessages" />
+				</span>
+				<script type="text/javascript">
+				$(function() {
+					runEffectError('foto_msg');
+				});
+			</script>
+			</h:panelGroup>
+		</h:form>
+
+		<!-- Modale per la scelta dell'immagine -->
+		<div id="dialog_image" title="Inserisci un'immagine">
+			<form name="imageUpload" id="imageUpload"
+				enctype="multipart/form-data"
+				action="#{request.contextPath}/secure/rest/uploadFileService/uploadImg?idPfPrincipal=#{sessionBean.principalId}&amp;id=#{cc.attrs.bean.data.id}"
+				method="post">
+				<label for="fileupload" title="Foto"> Foto </label> <input
+					type="file" accept="image/*" name="fileupload" id="fileupload" />
+				<input type="hidden" name="id" id="id"
+					value="#{cc.attrs.bean.data.id}" /> <br /><br />
+				<button type="submit" class="buttonStyle" id="imageUploadBtn">Carica</button>
+			</form>
+		</div>
+
+		<script type="text/javascript">
+		//<![CDATA[
+		function showResponse(responseJson, statusText, xhr, $form)  {
+			if(responseJson.statusCode==200 ){
+				 //ok 
+				 //console.log("responseJson:"+responseJson);
+				paramUrl=jQuery.param({'file_name':responseJson.file_name,'timestamp':new Date().getTime()});
+		    	$('#foto_div img').attr('src','#{request.contextPath}/secure/rest/getFoto?type=#{cc.attrs.type}&id=#{cc.attrs.bean.data.id}&size=normal&refresh=' + Math.random());
+			} else {
+				mexs = $('#foto_msg');
+		       		mexs.each(
+		       		function(index,element) {
+		       			if(responseJson.error_code ){
+			       				$.jnotify(responseJson.error_code,"error",true);
+			       			} else {
+			       				$.jnotify("#{errors['img.invalid']}","error",true);
+				       			}
+			       					       			
+					}
+				);
+			}
+		    $( "#dialog_image" ).dialog('close');
+		}
+
+		$(function() {
+			$('#dialog_image').dialog({
+				autoOpen: false,
+				modal: true
+			});
+
+			disegnaBottoni();
+		});
+		
+		var options = { 
+			success:       showResponse,  // post-submit callback 
+			dataType:  'json',        // 'xml', 'script', or 'json' (expected server response type) 
+			error:	function(jqXHR, textStatus, errorThrown){
+			    mexs = $('#foto_msg_msg_inner');
+			    mexs.each(function(index,element) {       
+			    	$.jnotify("Errore durante il caricamento dell'immagine");
+	            });			        		 
+				$("#dialog_image" ).dialog('close');
+			}, 
+		};
+				 
+		// bind form using 'ajaxForm' 
+		$('#imageUpload').ajaxForm(options);
+		//]]> 
+	</script>
+	</composite:implementation>
+</ui:composition>

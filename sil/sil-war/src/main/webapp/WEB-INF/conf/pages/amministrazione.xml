@@ -1,0 +1,2043 @@
+<!-- *************************************************************************** 
+                                AmministrObbligoFormaPage
+     *************************************************************************** -->
+<PAGE name="AmministrObbligoFormaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetObbligoFormativo"/>
+    <MODULE name="M_GetModalitaAssolv"  />
+    <MODULE name="M_GetMotivoArchiviazione"  />
+    <MODULE name="M_GetDataNascitaLavoratore"/>
+    <MODULE name="M_SaveObbligoFormativo"/>
+    <MODULE name="M_InsertObbligoFormativo"/>
+  </MODULES>
+
+  <!-- PRIMO livello  -->  
+  <DEPENDENCIES>
+    
+    <DEPENDENCE source="AmministrObbligoFormaPage" target="M_SaveObbligoFormativo">
+     <CONDITIONS>
+          <PARAMETER name="salvaDatiAmministr" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+     </CONDITIONS>
+     <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="AmministrObbligoFormaPage" target="M_InsertObbligoFormativo">
+     <CONDITIONS>
+          <PARAMETER name="insertDatiAmministr" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+     </CONDITIONS>
+     <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="AmministrObbligoFormaPage" target="M_GetObbligoFormativo"/>
+    <DEPENDENCE source="AmministrObbligoFormaPage" target="M_GetMotivoArchiviazione"/>
+    
+  <!-- SECONDO livello -->
+    <DEPENDENCE source="M_GetObbligoFormativo" target="M_GetModalitaAssolv"/>
+   <!--
+    <DEPENDENCE source="M_SaveObbligoFormativo" target="M_GetObbligoFormativo"/>
+    <DEPENDENCE source="M_InsertObbligoFormativo" target="M_GetObbligoFormativo"/>
+    -->
+ 	<DEPENDENCE source="AmministrObbligoFormaPage" target="M_GetDataNascitaLavoratore"/>   
+  </DEPENDENCIES> 
+</PAGE>
+
+
+
+<!-- ***************************************************************************
+                                AmministrPermSoggPage
+     *************************************************************************** --> 
+<PAGE name="AmministrPermSoggPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetExPermSoggiorno" />
+    <MODULE name="M_GetMotivoSogg" />
+    <MODULE name="M_GetCodStatus" />
+    <MODULE name="M_GetStatoRic" />
+    <MODULE name="M_SavePermSoggiorno" />
+    <MODULE name="M_DeletePermSoggiorno" />
+    <MODULE name="M_InsertPermSoggiorno" />
+    <MODULE name="M_CittadinoCee" />
+ 	<!-- controllo presenza di dati storicizzati -->
+    <MODULE name="M_HasStorPermSogg" />
+  </MODULES>
+
+
+  <DEPENDENCIES>
+  
+  <!-- PRIMO livello  -->   
+    <DEPENDENCE source="AmministrPermSoggPage" target="M_SavePermSoggiorno">
+      <CONDITIONS>
+          <PARAMETER name="save" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="AmministrPermSoggPage" target="M_DeletePermSoggiorno">
+      <CONDITIONS>
+          <PARAMETER name="cancella" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="AmministrPermSoggPage" target="M_InsertPermSoggiorno">
+      <CONDITIONS>
+          <PARAMETER name="insert" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+       
+    <DEPENDENCE source="AmministrPermSoggPage" target="M_GetExPermSoggiorno"/>
+       
+
+  <!-- SECONDO livello  -->   
+    <DEPENDENCE source="M_GetExPermSoggiorno" target="M_GetMotivoSogg"/>   
+    <DEPENDENCE source="M_GetExPermSoggiorno" target="M_GetCodStatus"/> 
+    <DEPENDENCE source="M_GetExPermSoggiorno" target="M_GetStatoRic"/>
+    <DEPENDENCE source="M_GetExPermSoggiorno" target="M_CittadinoCee"/>
+    <DEPENDENCE source="M_GetExPermSoggiorno" target="M_HasStorPermSogg"/>
+    
+  </DEPENDENCIES>
+   
+</PAGE>
+
+<!-- *************************************************************************** 
+                                PermSoggInfStorPage-->
+<PAGE name="PermSoggInfStorPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_InfStorPermSogg"/>
+    <MODULE name="M_DelInfStorPermSogg"/>
+    <MODULE name="M_GetDatiLav"/>
+  </MODULES>
+  
+  <DEPENDENCIES>
+    <DEPENDENCE source="PermSoggInfStorPage" target="M_InfStorPermSogg"/>
+    <DEPENDENCE source="PermSoggInfStorPage" target="M_GetDatiLav"/>
+    <DEPENDENCE source="PermSoggInfStorPage" target="M_DelInfStorPermSogg">
+        <CONDITIONS>
+            <PARAMETER name="PRGPERMSOGG" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_DelInfStorPermSogg" target="M_InfStorPermSogg"/>
+
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- ***************************************************************************
+                                PermSoggInfStorDettPage -->
+<PAGE name="PermSoggInfStorDettPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_getSpecifPermSogg" />
+    <MODULE name="M_GetMotivoSogg" />
+    <MODULE name="M_GetStatoRic" />
+    <MODULE name="M_GetCodStatus" />
+    <MODULE name="M_SavePermSoggiorno" />
+  </MODULES>
+  
+  <DEPENDENCIES>
+    <DEPENDENCE source="PermSoggInfStorDettPage" target="M_SavePermSoggiorno">
+      <CONDITIONS>
+          <PARAMETER name="savePermSogg" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+       
+    <DEPENDENCE source="PermSoggInfStorDettPage" target="M_getSpecifPermSogg">
+      <CONDITIONS>
+          <PARAMETER name="prgPermSogg" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="M_getSpecifPermSogg" target="M_GetMotivoSogg"/>    
+    <DEPENDENCE source="M_getSpecifPermSogg" target="M_GetStatoRic"/>
+    <DEPENDENCE source="M_getSpecifPermSogg" target="M_GetCodStatus"/>
+    
+  </DEPENDENCIES>
+</PAGE>
+
+
+
+<!-- ***************************************************************************
+                                StatoOccupazionalePage
+     *************************************************************************** -->
+<PAGE name="StatoOccupazionalePage" scope="REQUEST">
+  <MODULES>
+  	<!-- check storico stato occupazionale per vedere il pulsante -->
+	<MODULE name="M_HasStorStatoOcc" />
+    <MODULE name="M_GetStatoOccupazionale" /> 
+    <MODULE name="M_GetLaureaPerCat181" />    
+    <MODULE name="M_InfStorStatoOcc"/>
+    <MODULE name="M_GetMovimenti"/>
+    <!-- moduli di decodifica -->
+    <MODULE name="M_GetStatoAtto" />
+    <MODULE name="M_Get181Cat" />
+    <MODULE name="M_GetDeStatoOccGestibili" />
+    <MODULE name="M_GetDeStatoOcc" />
+    <!--                         -->
+    <MODULE name="M_SaveStatoOcc" />
+    <MODULE name="M_InsStatoOcc" />
+    <MODULE name="M_InsStatoOccRicalcola" />
+  </MODULES>
+
+  <DEPENDENCIES>
+  
+  <!-- PRIMO livello  -->   
+    <DEPENDENCE source="StatoOccupazionalePage" target="M_SaveStatoOcc">
+      <CONDITIONS>
+          <PARAMETER name="saveStatoOcc" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="StatoOccupazionalePage" target="M_InsStatoOcc">
+      <CONDITIONS>
+          <PARAMETER name="insert" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="StatoOccupazionalePage" target="M_InsStatoOccRicalcola">
+      <CONDITIONS>
+          <PARAMETER name="insertRicalcola" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+  <!-- SECONDO livello  -->
+    <DEPENDENCE source="M_GetStatoOccupazionale" target="M_GetDeStatoOccGestibili"/>
+    <DEPENDENCE source="M_GetStatoOccupazionale" target="M_GetDeStatoOcc"/>
+    <DEPENDENCE source="M_GetStatoOccupazionale" target="M_Get181Cat"/>
+    <DEPENDENCE source="M_GetStatoOccupazionale" target="M_GetStatoAtto"/>
+<!--
+    <DEPENDENCE source="M_SaveStatoOcc" target="M_GetStatoOccupazionale"/>
+
+    <DEPENDENCE source="M_InsStatoOcc" target="M_GetStatoOccupazionale"/>
+    -->
+  <!-- terzo livello  -->
+    <DEPENDENCE source="M_Get181Cat" target="M_GetLaureaPerCat181"/>
+    <DEPENDENCE source="StatoOccupazionalePage" target="M_GetStatoOccupazionale"/>
+    <DEPENDENCE source="StatoOccupazionalePage" target="M_HasStorStatoOcc"/>
+	<DEPENDENCE source="StatoOccupazionalePage" target="M_GetMovimenti"/>
+
+ </DEPENDENCIES>
+</PAGE>
+
+
+
+
+<!--***************************************************************************
+                                StatoOccInfoStorPage -->
+<PAGE name="StatoOccInfoStorPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_InfStorStatoOcc"/>
+    <MODULE name="M_DelStatoOcc"/>
+    <MODULE name="M_GetDatiLav"/>    
+  </MODULES>
+  
+  <DEPENDENCIES>
+    <DEPENDENCE source="StatoOccInfoStorPage" target="M_InfStorStatoOcc"/>
+    <DEPENDENCE source="StatoOccInfoStorPage" target="M_GetDatiLav"/>
+    <DEPENDENCE source="StatoOccInfoStorPage" target="M_DelStatoOcc">
+        <CONDITIONS>
+            <PARAMETER name="prgStatoOccupaz" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_DelStatoOcc" target="M_InfStorStatoOcc"/>
+
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- ***************************************************************************
+                                StatoOccInfoStorDettPage -->
+<PAGE name="StatoOccInfoStorDettPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_getSpecifStatoOcc"/>
+    <MODULE name="M_GetDeStatoOcc" />
+    <MODULE name="M_Get181Cat" />
+    <MODULE name="M_GetLaureaPerCat181" />
+    <MODULE name="M_GetStatoAtto" />
+    <MODULE name="M_SaveStatoOcc"/>
+  </MODULES>
+  
+  <DEPENDENCIES>
+    <DEPENDENCE source="StatoOccInfoStorDettPage" target="M_SaveStatoOcc">
+        <CONDITIONS>
+            <PARAMETER name="saveStatoOcc" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+  <DEPENDENCE source="StatoOccInfoStorDettPage" target="M_getSpecifStatoOcc">
+      <CONDITIONS>
+          <PARAMETER name="prgStatoOccupaz" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+  </DEPENDENCE>
+  
+  <DEPENDENCE source="M_getSpecifStatoOcc" target="M_GetDeStatoOcc"/>
+  <DEPENDENCE source="M_getSpecifStatoOcc" target="M_Get181Cat"/>
+  <DEPENDENCE source="M_getSpecifStatoOcc" target="M_GetStatoAtto"/>
+  <DEPENDENCE source="M_Get181Cat"         target="M_GetLaureaPerCat181"/>
+ 
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- ***************************************************************************
+                                StatoOccRicercaPage -->
+<PAGE name="StatoOccRicercaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetDeStatoOcc" />
+    <MODULE name="M_Get181Cat" />
+    <MODULE name="M_GetStatoAtto" />
+    <MODULE name="M_ELENCOCPI" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="StatoOccRicercaPage" target="M_GetDeStatoOcc"/>
+    <DEPENDENCE source="StatoOccRicercaPage" target="M_Get181Cat"/>
+    <DEPENDENCE source="StatoOccRicercaPage" target="M_GetStatoAtto"/>
+    <DEPENDENCE source="StatoOccRicercaPage" target="M_ELENCOCPI"/>
+  </DEPENDENCIES>
+</PAGE>
+
+     
+<!-- ***************************************************************************
+                                StatoOccRisultRicercaPage -->
+<PAGE name="StatoOccRisultRicercaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_StatoOccRicerca"/>
+    <MODULE name="M_GetDeStatoOcc" />
+    <MODULE name="M_Get181Cat" />
+    <MODULE name="M_GetStatoAtto" />
+    <MODULE name="M_DelStatoOcc"/>
+  </MODULES>
+  
+  <DEPENDENCIES>
+    <DEPENDENCE source="StatoOccRisultRicercaPage" target="M_StatoOccRicerca"/>
+    <DEPENDENCE source="StatoOccRisultRicercaPage" target="M_GetDeStatoOcc"/>
+    <DEPENDENCE source="StatoOccRisultRicercaPage" target="M_Get181Cat"/>
+    <DEPENDENCE source="StatoOccRisultRicercaPage" target="M_GetStatoAtto"/>
+
+    <DEPENDENCE source="StatoOccRisultRicercaPage" target="M_DelStatoOcc">
+        <CONDITIONS>
+            <PARAMETER name="prgStatoOccupaz" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_DelStatoOcc" target="M_StatoOccRicerca"/>
+
+  </DEPENDENCIES>
+</PAGE>
+     
+<!-- ***************************************************************************
+                                AmministrListeSpecPage
+     *************************************************************************** -->
+<PAGE name="AmministrListeSpecPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE name="M_DeleteMobilita"/>
+    <MODULE name="M_MobilitaGetTipoFine"/>
+    <MODULE name="M_GetMobilitaIscr" />
+    <MODULE name="M_GetDeMbTipo" />
+    <MODULE name="M_GetDeMbTipoPatronato" />
+    <MODULE name="M_GetStatoMob" />
+    <MODULE name="UpdateNoteMobilita" />
+    <MODULE name="M_SaveMobilitaIscr" />
+    <MODULE name="M_InsMobilitaIscr" />    
+<!-- controllo di esistenza dello storico -->
+    <MODULE name="M_HasStorMob" />
+   	<MODULE name="M_GetDeCpi" />
+   	<MODULE name="M_MobMotivoScorrimento"/>
+   	<MODULE name="M_MobGetProvince"/>
+   	<MODULE name="M_MobGetRegioni"/>
+   	<MODULE name="ComboTipoGrado"/>
+   	<MODULE name="M_GetConfig_Mobilita"/>
+   	<MODULE name="M_MotivoRiaperturaMob"/>
+   	<MODULE name="M_InvioComunicazioneMBOInd"/>
+   	<MODULE name="M_GetConfigValue" />
+  </MODULES>
+
+  <DEPENDENCIES>
+  
+  <!-- PRIMO livello  -->  
+  	<DEPENDENCE source="AmministrListeSpecPage" target="M_DeleteMobilita">
+      <CONDITIONS>
+          <PARAMETER name="cancella" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="AmministrListeSpecPage" target="M_GetConfig_Mobilita"/>
+    
+    <DEPENDENCE source="AmministrListeSpecPage" target="M_GetConfigValue">
+    	<CONSEQUENCES>
+    		<PARAMETER name="COD_TIPO_CONFIG" type="ABSOLUTE" value="MBDUBBIO"/>
+    	</CONSEQUENCES>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="AmministrListeSpecPage" target="M_MotivoRiaperturaMob"/>
+    
+    
+    <DEPENDENCE source="AmministrListeSpecPage" target="UpdateNoteMobilita">
+      <CONDITIONS>
+          <PARAMETER name="soloNote" scope="SERVICE_REQUEST" type="ABSOLUTE" value="true"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    
+    
+    <DEPENDENCE source="AmministrListeSpecPage" target="M_GetDeCpi"/> 
+
+    <DEPENDENCE source="AmministrListeSpecPage" target="M_GetMobilitaIscr"/>
+    
+    <DEPENDENCE source="AmministrListeSpecPage" target="M_MobMotivoScorrimento"/>
+    
+    <DEPENDENCE source="AmministrListeSpecPage" target="M_MobGetProvince"/>
+    <DEPENDENCE source="AmministrListeSpecPage" target="M_MobGetRegioni"/>
+    <DEPENDENCE source="AmministrListeSpecPage" target="ComboTipoGrado"/>
+    
+    <DEPENDENCE source="AmministrListeSpecPage" target="M_HasStorMob"/>
+    
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_InvioComunicazioneMBOInd">
+    	<CONDITIONS>
+        	<PARAMETER name="inviaDomandaNCR" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+    	</CONDITIONS>
+    </DEPENDENCE>
+    
+  <!-- SECONDO livello  -->
+  	<DEPENDENCE source="M_GetConfig_Mobilita" target="M_SaveMobilitaIscr">
+      <CONDITIONS>
+          <PARAMETER name="save" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_SaveMobilitaIscr">
+      <CONDITIONS>
+          <PARAMETER name="CONTINUA_AGGIORNAMENTO_MOB" scope="SERVICE_REQUEST" type="ABSOLUTE" value="true"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_InsMobilitaIscr">
+      <CONDITIONS>
+          <PARAMETER name="insert" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_InsMobilitaIscr">
+      <CONDITIONS>
+          <PARAMETER name="CONTINUA_INSERIMENTO_MOB" scope="SERVICE_REQUEST" type="absolute" value="TRUE"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+      
+  	<DEPENDENCE source="M_GetMobilitaIscr" target="M_GetStatoMob"/>
+  	
+    <DEPENDENCE source="M_GetMobilitaIscr" target="M_GetDeMbTipo"/>
+    
+    <DEPENDENCE source="M_GetMobilitaIscr" target="M_GetDeMbTipoPatronato"/>
+
+    <DEPENDENCE source="M_GetDeMbTipo" target="M_MobilitaGetTipoFine"/>
+            
+  </DEPENDENCIES>
+ 
+</PAGE>
+
+<!--***************************************************************************
+                                MobilitaInfoStorPage -->
+<PAGE name="MobilitaInfoStorPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_InfStorMobilita"/>
+    <MODULE name="M_DeleteMobilita"/>
+    <MODULE name="M_GetDatiLav"/>
+    <MODULE name="M_GetConfig_Mobilita"/>
+    <MODULE name="M_GetConfig_Riapri_Mobilita"/>
+  </MODULES>
+  
+  <DEPENDENCIES>
+  	
+  	<DEPENDENCE source="MobilitaInfoStorPage" target="M_DeleteMobilita">
+      <CONDITIONS>
+          <PARAMETER name="cancella" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="MobilitaInfoStorPage" target="M_GetConfig_Mobilita"/>
+    <DEPENDENCE source="MobilitaInfoStorPage" target="M_GetConfig_Riapri_Mobilita"/>
+  	<DEPENDENCE source="MobilitaInfoStorPage" target="M_InfStorMobilita"/>
+	<DEPENDENCE source="MobilitaInfoStorPage" target="M_GetDatiLav"/>
+
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- ***************************************************************************
+                                MobilitaInfoStorDettPage -->
+<PAGE name="MobilitaInfoStorDettPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MobilitaGetTipoFine"/>
+    <MODULE name="M_AggiornaStatoMobilita" />
+    <MODULE name="M_GetSpecifMobilita"/>
+    <MODULE name="M_GetDeMbTipo" />
+    <MODULE name="M_GetStatoMob" />
+    <MODULE name="M_SaveMobilitaIscr"/>
+    <MODULE name="M_MobMotivoScorrimento"/>
+    <MODULE name="M_MobGetProvince"/>
+   	<MODULE name="M_MobGetRegioni"/>
+   	<MODULE name="ComboTipoGrado"/>
+   	<MODULE name="M_GetConfig_Mobilita"/>
+   	<MODULE name="M_MotivoRiaperturaMob"/>
+   	<MODULE name="M_InvioComunicazioneMBOInd"/>
+   	<MODULE name="M_GetConfigValue" />
+  </MODULES>
+  
+  <DEPENDENCIES>
+  	<DEPENDENCE source="MobilitaInfoStorDettPage" target="M_GetConfig_Mobilita"/>
+  	
+  	<DEPENDENCE source="MobilitaInfoStorDettPage" target="M_GetConfigValue">
+    	<CONSEQUENCES>
+    		<PARAMETER name="COD_TIPO_CONFIG" type="ABSOLUTE" value="MBDUBBIO"/>
+    	</CONSEQUENCES>
+    </DEPENDENCE>
+  	
+  	<DEPENDENCE source="M_GetConfig_Mobilita" target="M_InvioComunicazioneMBOInd">
+    	<CONDITIONS>
+        	<PARAMETER name="inviaDomandaNCR" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+    	</CONDITIONS>
+    </DEPENDENCE>
+    
+  <DEPENDENCE source="MobilitaInfoStorDettPage" target="M_GetSpecifMobilita">
+      <CONDITIONS>
+          <PARAMETER name="prgMobilitaIscr" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+  </DEPENDENCE>
+  
+  	<DEPENDENCE source="MobilitaInfoStorDettPage" target="M_MobMotivoScorrimento"/>
+  	
+  	<DEPENDENCE source="MobilitaInfoStorDettPage" target="M_MobGetProvince"/>
+  	<DEPENDENCE source="MobilitaInfoStorDettPage" target="M_MobGetRegioni"/>
+  	<DEPENDENCE source="MobilitaInfoStorDettPage" target="ComboTipoGrado"/>
+  	<DEPENDENCE source="MobilitaInfoStorDettPage" target="M_MotivoRiaperturaMob"/>
+  
+    <DEPENDENCE source="M_GetSpecifMobilita" target="M_GetDeMbTipo"/>
+    
+    <DEPENDENCE source="M_GetSpecifMobilita" target="M_GetStatoMob" />
+
+    <DEPENDENCE source="M_GetDeMbTipo" target="M_MobilitaGetTipoFine"/>
+    
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_AggiornaStatoMobilita">
+        <CONDITIONS>
+            <PARAMETER name="aggiorna" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_AggiornaStatoMobilita">
+        <CONDITIONS>
+            <PARAMETER name="CONTINUA_AGGIORNAMENTO_STORICO" scope="SERVICE_REQUEST" type="ABSOLUTE" value="true"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_GetConfig_Mobilita" target="M_SaveMobilitaIscr">
+        <CONDITIONS>
+        	<PARAMETER name="aggiorna" scope="SERVICE_REQUEST" value="AF_UNDEFINED"/>
+            <PARAMETER name="save" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+ 
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!-- ***************************************************************************
+                                AmstrRicAziendaPage
+     ***************************************************************************
+<PAGE name="AmstrRicAziendaPage" scope="REQUEST">
+</PAGE> -->
+
+<!-- ***************************************************************************
+                                AmstrListaAziendePage
+     *************************************************************************** -->
+<PAGE name="AmstrListaAziendePage" scope="REQUEST">
+  <MODULES>
+      <MODULE keep="false" name="M_AmstrListaAziende"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="AmstrListaAziendePage" target="M_AmstrListaAziende"/>
+  </DEPENDENCIES>
+</PAGE>  
+
+<!-- ***************************************************************************
+                                AmstrModAziendaPage
+     *************************************************************************** -->
+<PAGE name="AmstrModAziendaPage" scope="REQUEST">
+	<MODULES>
+      <MODULE keep="false" name="M_Mob_DurataMobilita"/>
+      <MODULE keep="false" name="M_Mob_MesiMobExCassaMezz"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="AmstrModAziendaPage" target="M_Mob_DurataMobilita"/>
+    <DEPENDENCE source="AmstrModAziendaPage" target="M_Mob_MesiMobExCassaMezz"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+
+
+<!-- ***************************************************************************
+                                AmstrListeSpecCMPage
+     *************************************************************************** -->
+<PAGE name="AmstrListeSpecCMPage" scope="REQUEST">
+  <MODULES>
+   <MODULE name="M_CancellaCmIscr" />
+   <MODULE name="M_GetCmIscr" />
+   <MODULE name="M_GetDettCollMirato" />
+   <MODULE name="M_GetDeCMTipoIscr" />
+   <MODULE name="M_GetDeCMTipoInvalidita" />
+   <MODULE name="UpdateNoteCM" />
+   <MODULE name="M_GetDeCMAccertSanit" />
+   <MODULE name="M_SaveCmIscr" />
+   <MODULE name="M_InsCmIscr" />
+   <!--MODULE name="M_DelCmIscr" /-->   
+   <!-- controllo esistenza dati storici -->
+   <MODULE name="M_HasStorCM" />
+  </MODULES>
+
+
+  <DEPENDENCIES>
+  
+  <!-- PRIMO livello  -->   
+  	<DEPENDENCE source="AmstrListeSpecCMPage" target="M_CancellaCmIscr">
+      <CONDITIONS>
+          <PARAMETER name="cancella" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="AmstrListeSpecCMPage" target="M_SaveCmIscr">
+      <CONDITIONS>
+          <PARAMETER name="save" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="AmstrListeSpecCMPage" target="M_InsCmIscr">
+      <CONDITIONS>
+          <PARAMETER name="insert" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="AmstrListeSpecCMPage" target="UpdateNoteCM">
+      <CONDITIONS>
+          <PARAMETER name="soloNote" scope="SERVICE_REQUEST" type="ABSOLUTE" value="true"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="AmstrListeSpecCMPage" target="M_GetDettCollMirato">
+      <CONDITIONS>
+          <PARAMETER name="prgCMIscr" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+
+    <DEPENDENCE source="AmstrListeSpecCMPage" target="M_GetCmIscr"/>
+
+  <!-- SECONDO livello  -->   
+    <DEPENDENCE source="M_GetCmIscr" target="M_GetDeCMTipoIscr"/>
+    <DEPENDENCE source="M_GetCmIscr" target="M_GetDeCMTipoInvalidita"/>
+    <DEPENDENCE source="M_GetCmIscr" target="M_GetDeCMAccertSanit"/>
+    <DEPENDENCE source="M_GetCmIscr" target="M_HasStorCM"/>
+    
+  </DEPENDENCIES>
+</PAGE>
+
+<!--***************************************************************************
+                                CollMiratoInfStorPage -->
+<PAGE name="CollMiratoInfStorPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_InfStorCollMirato"/>
+    <MODULE name="M_CancellaCmIscr"/>
+    <MODULE name="M_GetDatiLav"/>    
+  </MODULES>
+  
+  <DEPENDENCIES>
+  <DEPENDENCE source="CollMiratoInfStorPage" target="M_CancellaCmIscr">
+        <CONDITIONS>
+            <PARAMETER name="CANCELLA" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+   </DEPENDENCE>
+  <DEPENDENCE source="CollMiratoInfStorPage" target="M_GetDatiLav"/>
+    <DEPENDENCE source="CollMiratoInfStorPage" target="M_InfStorCollMirato"/>  
+    </DEPENDENCIES>
+</PAGE>
+
+<!-- ***************************************************************************
+                                CollMiratoInfStorDettPage -->
+<PAGE name="CollMiratoInfStorDettPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetSpecifCollMirato"/>
+    <MODULE name="M_GetDeCMTipoIscr" />
+    <MODULE name="M_GetDeCMTipoInvalidita" />
+    <MODULE name="M_GetDeCMAccertSanit" />
+    <MODULE name="M_SaveCmIscr" />
+  </MODULES>
+  
+  <DEPENDENCIES>
+    <DEPENDENCE source="AmstrListeSpecCMPage" target="M_SaveCmIscr">
+      <CONDITIONS>
+          <PARAMETER name="save" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+    <DEPENDENCE source="CollMiratoInfStorDettPage" target="M_SaveCmIscr">
+        <CONDITIONS>
+            <PARAMETER name="save" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+  <DEPENDENCE source="CollMiratoInfStorDettPage" target="M_GetSpecifCollMirato">
+      <CONDITIONS>
+          <PARAMETER name="prgCMIscr" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+  </DEPENDENCE>
+  <DEPENDENCE source="M_GetSpecifCollMirato" target="M_GetDeCMTipoIscr"/>
+  <DEPENDENCE source="M_GetSpecifCollMirato" target="M_GetDeCMTipoInvalidita"/>
+  <DEPENDENCE source="M_GetSpecifCollMirato" target="M_GetDeCMAccertSanit"/>
+ 
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!--***************************************************************************
+                              CollMiratoRicercaPage -->
+<PAGE name="CollMiratoRicercaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetParamCmIsc1" />
+    <MODULE name="M_GetDeCMTipoIscr" />
+    <MODULE name="M_GetDeCMTipoInvalidita" />
+    <MODULE name="M_ELENCOCPI" />
+    <MODULE name="M_GRADO_OCCUPABILITA" />
+    <MODULE name="M_GETSTATOATTOISCR"/>
+    <MODULE name="CM_GET_PROVINCIA_ISCR" />
+  </MODULES>  
+  <DEPENDENCIES>
+    <DEPENDENCE source="CollMiratoRicercaPage" target="M_GetParamCmIsc1"/>
+    <DEPENDENCE source="CollMiratoRicercaPage" target="M_GetDeCMTipoIscr"/>
+    <DEPENDENCE source="CollMiratoRicercaPage" target="M_GetDeCMTipoInvalidita"/>
+    <DEPENDENCE source="CollMiratoRicercaPage" target="M_ELENCOCPI"/>
+    <DEPENDENCE source="CollMiratoRicercaPage" target="M_GRADO_OCCUPABILITA"/>
+    <DEPENDENCE source="CollMiratoRicercaPage" target="M_GETSTATOATTOISCR"/>
+    <DEPENDENCE source="CollMiratoRicercaPage" target="CM_GET_PROVINCIA_ISCR"/>
+  </DEPENDENCIES>
+</PAGE>
+
+
+<!--***************************************************************************
+                                CollMiratoRisultRicercaPage -->
+<PAGE name="CollMiratoRisultRicercaPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_CollMiratoRicerca"/>
+    <MODULE name="M_GetDeCMTipoIscr" />
+    <MODULE name="M_GetDeCMTipoInvalidita" />
+  </MODULES>
+  
+  <DEPENDENCIES>
+    <DEPENDENCE source="CollMiratoRisultRicercaPage" target="M_CollMiratoRicerca"/>
+    <DEPENDENCE source="CollMiratoRisultRicercaPage" target="M_GetDeCMTipoIscr"/>
+    <DEPENDENCE source="CollMiratoRisultRicercaPage" target="M_GetDeCMTipoInvalidita"/>
+
+  </DEPENDENCIES>
+</PAGE>
+
+
+
+<!-- ***************************************************************************
+                                AmstrIndispTempPage
+     *************************************************************************** -->
+<PAGE name="AmstrIndispTempPage" scope="REQUEST">
+  <MODULES>
+   <MODULE name="M_GetIndispTemp" />
+   <MODULE name="M_GetIndispTempDett" />
+   <MODULE name="M_GetDeIndispTemp" />
+   <MODULE name="M_InsIndispTemp" />
+   <MODULE name="M_DelIndispTemp" />
+   <MODULE name="M_SaveIndispTemp" />
+   <!-- controllo esistenza storico -->
+   <MODULE name="M_HasStorIndisp" />
+   <MODULE name="M_Controlla_Config_Condizione"/>
+  </MODULES>
+
+  <DEPENDENCIES>
+  
+  	<!-- PRIMO livello --> 
+  	
+  	<DEPENDENCE source="AmstrIndispTempPage" target ="M_Controlla_Config_Condizione"/>
+  	
+  	<!-- SECONDO livello  -->
+    <DEPENDENCE source="M_Controlla_Config_Condizione" target="M_InsIndispTemp">
+      <CONDITIONS>
+            <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_InsIndispTemp"/> 
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+	
+    <DEPENDENCE source="M_Controlla_Config_Condizione" target="M_DelIndispTemp">
+      <CONDITIONS>
+          <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_DelIndispTemp"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="M_Controlla_Config_Condizione" target="M_SaveIndispTemp">
+      <CONDITIONS>
+            <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_SaveIndispTemp"/> 
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+
+ 	<DEPENDENCE source="M_Controlla_Config_Condizione" target="M_GetIndispTempDett">
+        <CONDITIONS>
+          <PARAMETER name="prgIndispTemp" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+          <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_GetIndispTempDett"/> 
+        </CONDITIONS>  
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+     
+    <DEPENDENCE source="M_Controlla_Config_Condizione" target="M_GetIndispTemp"/>
+    
+    <DEPENDENCE source="M_Controlla_Config_Condizione" target="M_HasStorIndisp"/>
+    
+  	<!-- TERZO livello  --> 
+    <DEPENDENCE source="M_GetIndispTemp" target="M_GetDeIndispTemp"/>
+  </DEPENDENCIES>
+</PAGE>
+  
+<!--***************************************************************************
+                                IndispTempInfStorPage -->
+<PAGE name="IndispTempInfStorPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_InfStorIndispTemp"/>
+    <MODULE name="M_DelIndispTemp"/>
+    <MODULE name="M_SaveIndispTemp" />
+    <MODULE name="M_GetDatiLav" />
+  </MODULES>
+  
+  <DEPENDENCIES>
+   	<!-- PRIMO livello -->
+	<DEPENDENCE source="IndispTempInfStorPage" target="M_GetDatiLav"/>
+    <DEPENDENCE source="IndispTempInfStorPage" target="M_DelCollMirato">
+        <CONDITIONS>
+            <PARAMETER name="prgIndispTemp" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="IndispTempInfStorPage" target="M_SaveIndispTemp">
+      <CONDITIONS>
+            <PARAMETER name="Aggiorna" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="IndispTempInfStorPage" target="M_InfStorIndispTemp">
+      <CONDITIONS>
+            <PARAMETER name="CANCELLAINDISP" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    <DEPENDENCE source="IndispTempInfStorPage" target="M_DelIndispTemp">
+      <CONDITIONS>
+            <PARAMETER name="CANCELLAINDISP" scope="SERVICE_REQUEST" value="S"/>
+      </CONDITIONS>
+      <CONSEQUENCES/>
+    </DEPENDENCE>
+    
+    <!-- SECONDO livello -->
+    <DEPENDENCE source="M_DelIndispTemp" target="M_InfStorIndispTemp"/>
+    
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- ================================================================ -->
+<PAGE name="IndispTempListPage" scope="REQUEST">
+  <MODULES>
+   <MODULE name="M_Controlla_Config_Condizione"/>
+   <MODULE name="M_GetIndispTemp" />
+   <MODULE name="M_GetDeIndispTemp" />
+  </MODULES>
+
+  <DEPENDENCIES>
+  
+  
+  <!-- PRIMO livello -->
+    <DEPENDENCE source="IndispTempListPage" target="M_Controlla_Config_Condizione"/> 
+  <!-- SECONDO livello --> 
+  	<DEPENDENCE source="M_Controlla_Config_Condizione" target="M_GetIndispTemp"/>
+  <!-- TERZO livello --> 
+    <DEPENDENCE source="M_GetIndispTemp" target="M_GetDeIndispTemp"/> 
+
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- ***************************************************************************
+                                AmstrIndTempDettPage
+     *************************************************************************** -->
+<PAGE name="AmstrIndTempDettPage" scope="REQUEST">
+  <MODULES>
+	<MODULE name="M_GetIndispTempDett" />
+	<MODULE name="M_GetDeIndispTemp" />      
+  </MODULES>
+  <DEPENDENCIES>
+  <!-- PRIMO livello -->    
+    <DEPENDENCE source="AmstrIndTempDettPage" target="M_GetIndispTempDett"/>  
+    <DEPENDENCE source="M_GetIndispTempDett" target="M_GetDeIndispTemp"/>
+  </DEPENDENCIES>
+</PAGE>
+
+  
+<!-- ***************************************************************************
+                                AmstrInfoCorrentiPage
+     *************************************************************************** -->
+<PAGE name="AmstrInfoCorrentiPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetInfoCorrPopUp"/>
+    
+    <MODULE name="M_GetObbligoFormativo"/>
+    <MODULE name="M_GetModalitaAssolv"  />
+    
+    <MODULE name="M_GetExPermSoggiorno" />
+    <MODULE name="M_GetMotivoSogg" />
+    <MODULE name="M_GetStatoRic" />
+    
+    <MODULE name="M_GetStatoOccupazionale" />
+    <MODULE name="M_GetDeStatoOcc" />
+    <MODULE name="M_Get181Cat" />
+    <MODULE name="M_GetStatoAtto" />
+
+    <MODULE name="M_GetMobilitaIscr" />
+    <MODULE name="M_GetDeMbTipo" />
+
+    <MODULE name="CM_GET_DETT_AM_CM_ISCR_ULTIMA_TIPO_D" />
+    <MODULE name="CM_GET_DETT_AM_CM_ISCR_ULTIMA_TIPO_A" />
+    
+	<MODULE name="M_Controlla_Config_Condizione"/>
+    <MODULE name="M_GetIndispTemp" />
+    <MODULE name="M_GetDeIndispTemp" />
+    
+    <MODULE name="M_GetMovimento" />
+
+    <MODULE name="M_GetLavoratoreTitoloPrinc" />
+    
+    <MODULE name="M_GetInfoCorrCorsoLav" />
+    
+    <MODULE name="M_GetInfoCorrAltreIscr" />
+    
+    <MODULE name="M_GetInfoAnnotazioni" />
+  </MODULES>
+
+  
+  <DEPENDENCIES>
+    <!-- Info Correnti CpI -->
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetInfoCorrPopUp"/>
+
+    <!-- ObbligoFormativo -->
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetObbligoFormativo"/>
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetModalitaAssolv"/>
+    
+    <!-- PermSoggiorn -->
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetExPermSoggiorno"/>
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetMotivoSogg"/>
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetStatoRic"/>
+
+    <!-- StatoOccupazionale -->
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetStatoOccupazionale"/>
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetDeStatoOcc"/>
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_Get181Cat"/>
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetStatoAtto"/>
+    
+    <!-- MobilitaIscr -->
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetMobilitaIscr"/>
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetDeMbTipo"/>
+    
+    <!-- Collocamento mirato -->
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="CM_GET_DETT_AM_CM_ISCR_ULTIMA_TIPO_A"/>
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="CM_GET_DETT_AM_CM_ISCR_ULTIMA_TIPO_D"/>
+
+    <!-- IndispTemp -->
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_Controlla_Config_Condizione"/>
+    <DEPENDENCE source="M_Controlla_Config_Condizione" target="M_GetIndispTemp"/>
+    <DEPENDENCE source="M_GetIndispTemp" target="M_GetDeIndispTemp"/>
+
+    <!-- Movimento -->
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetMovimento"/>
+
+    <!-- Titoli studio -->
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetLavoratoreTitoloPrinc"/>
+
+    <!-- Formazione professionale -->
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetInfoCorrCorsoLav"/>
+    
+    <!--  Altre iscrizioni -->
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetInfoCorrAltreIscr"/>
+    
+    <!-- annotazioni del CPI -->
+    <DEPENDENCE source="AmstrInfoCorrentiPage" target="M_GetInfoAnnotazioni"/>
+
+  </DEPENDENCIES>
+  
+</PAGE>
+
+<PAGE name="SanareSituazionePrecPage" scope="REQUEST">
+  <MODULES>
+	<MODULE name="M_GetInfoSanamentoSituazioneAmministrativa" />
+	<MODULE name="M_SanaSituazioneAmministrativa"/>
+	<MODULE name="M_StatoAttoDispo"/>
+	<MODULE name="GetDichDaProtocollare"/>
+	<MODULE name="GetDichProtocollato"/> 
+  </MODULES>
+  <DEPENDENCIES>    
+    <DEPENDENCE source="SanareSituazionePrecPage" target="M_SanaSituazioneAmministrativa">
+    	<CONDITIONS>
+            <PARAMETER name="aggiorna" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>
+    <DEPENDENCE source="SanareSituazionePrecPage" target="M_GetInfoSanamentoSituazioneAmministrativa"/> 
+    <DEPENDENCE source="SanareSituazionePrecPage" target="M_StatoAttoDispo"/> 
+    <DEPENDENCE source="SanareSituazionePrecPage" target="GetDichDaProtocollare"/>   
+    <DEPENDENCE source="M_SanaSituazioneAmministrativa" target="GetDichProtocollato">
+	    <CONSEQUENCES>
+	    	<PARAMETER name="prgdichlav" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_SanaSituazioneAmministrativa.PRGDICHLAV" />
+	    </CONSEQUENCES>
+	</DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+<!--
+D'Auria Giovanni 20/05/2005 page per la lettura e l'update dei 
+dati modificabili di un movimento  
+-->
+<PAGE name="ModificaMovimentoPage" scope="REQUEST">
+  <MODULES>
+	<MODULE name="GetMovimento" />
+	<MODULE name="UpdateMovimento" />      
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ModificaMovimentoPage" target="UpdateMovimento">
+	    <CONDITIONS>
+            <PARAMETER name="AGGIORNA_MOV" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	    </CONDITIONS>  
+    </DEPENDENCE>    
+    
+    <DEPENDENCE source="ModificaMovimentoPage" target="GetMovimento"/>    
+  </DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="MovimentiRicercaLavPage" scope="REQUEST">
+    <MODULES>
+      <MODULE name="ComboTipoAvviamento"/>
+      <MODULE name="ComboNormativaSelettiva"/>
+      <MODULE name="ComboTipoMovimento"/>
+      <!--ComboTipoCessazione-->
+      <MODULE name="ComboTipoCessazione"/>
+      <MODULE name="M_GETCCNL"/>
+      <MODULE name="ComboTipiContratto"/>
+      <MODULE name="M_GetTipiCCNL"/>
+      <MODULE name="ComboTipoAgevolazioni"/>
+      <MODULE name="M_ElencoCPI"/>
+      <MODULE name="ComboStatoAtto"/>
+      <MODULE name="ComboMotAnnullamento"/>            
+    </MODULES>
+    <DEPENDENCIES>
+      <DEPENDENCE source="MovimentiRicercaLavPage" target="ComboTipoAvviamento">
+        <CONDITIONS/>
+        <CONSEQUENCES/>
+      </DEPENDENCE>
+      <!-- Bemefici -->
+      <DEPENDENCE source="MovimentiRicercaLavPage" target="ComboTipoAgevolazioni"/>
+      <DEPENDENCE source="MovimentiRicercaLavPage" target="ComboTipoMovimento">
+        <CONDITIONS/>
+        <CONSEQUENCES/>
+      </DEPENDENCE>
+      <DEPENDENCE source="MovimentiRicercaLavPage" target="M_GETCCNL">
+        <CONDITIONS/>
+        <CONSEQUENCES/>
+      </DEPENDENCE>
+      <DEPENDENCE source="MovimentiRicercaLavPage" target="ComboTipiContratto">
+        <CONDITIONS/>
+        <CONSEQUENCES/>
+      </DEPENDENCE>
+      <DEPENDENCE source="MovimentiRicercaLavPage" target="M_GetTipiCCNL">
+        <CONDITIONS/>
+        <CONSEQUENCES/>
+      </DEPENDENCE>
+      <DEPENDENCE source="MovimentiRicercaLavPage" target="M_ElencoCPI">        
+        <CONDITIONS/>
+      </DEPENDENCE>
+      <DEPENDENCE source="MovimentiRicercaLavPage" target="ComboStatoAtto">
+        <CONDITIONS/>
+        <CONSEQUENCES/>
+      </DEPENDENCE>
+      <DEPENDENCE source="MovimentiRicercaLavPage" target="ComboMotAnnullamento">
+        <CONDITIONS/>
+        <CONSEQUENCES/>
+      </DEPENDENCE>
+      <DEPENDENCE source="MovimentiRicercaLavPage" target="ComboTipoCessazione">
+        <CONDITIONS/>
+        <CONSEQUENCES/>
+      </DEPENDENCE>      
+    </DEPENDENCIES>
+  </PAGE>
+
+
+<!--  ********************* TEST CANCELLARE ********************************************    -->
+<PAGE name="ControlliTestPage" scope="REQUEST">
+  <MODULES>
+	<MODULE name="M_ControlliTest" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ControlliTestPage" target="M_ControlliTest"/>      
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MovCercaAziendaUtilPage" scope="REQUEST">
+  <!--
+  <MODULES>
+    <MODULE name="M_MovRicercaAziendaUtilCF"/>
+    <MODULE name="M_MovRicercaUnitaAziendaUtilCF"/>
+  </MODULES>
+  
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovCercaAziendaUtilPage" target="M_MovRicercaAziendaUtilCF">
+    </DEPENDENCE>
+
+    <DEPENDENCE source="MovCercaAziendaUtilPage" target="M_MovRicercaUnitaAziendaUtilCF">
+    </DEPENDENCE>
+  </DEPENDENCIES>
+  -->
+</PAGE>
+
+<PAGE distributed="false" name="MovCercaAziendaUtilValidazionePage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovRicercaAziendaCF"/>
+    <MODULE name="M_MovRicercaUnitaAziendaCF"/>
+    <MODULE name="M_MovGetDettMovApp"/>
+  </MODULES>
+  
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovCercaAziendaUtilValidazionePage" target="M_MovGetDettMovApp">
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMovApp" target="M_MovRicercaAziendaCF">
+    <CONSEQUENCES>
+    	<PARAMETER name="strCodiceFiscale" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_MovGetDettMovApp.ROWS.ROW.strCodiceFiscaleAzUtil"/>
+    </CONSEQUENCES>
+    </DEPENDENCE>
+    <DEPENDENCE source="M_MovGetDettMovApp" target="M_MovRicercaUnitaAziendaCF">
+    <CONSEQUENCES>
+    	<PARAMETER name="strCodiceFiscale" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_MovGetDettMovApp.ROWS.ROW.strCodiceFiscaleAzUtil"/>
+    	<PARAMETER name="codcomune" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_MovGetDettMovApp.ROWS.ROW.CODUAINTCOM"/>    
+    </CONSEQUENCES>
+    </DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MovimentiSelezionaAziendaUtil" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetTipiAzienda"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovimentiSelezionaAziendaUtil" target="M_GetTipiAzienda">
+      <CONDITIONS/>
+    </DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MovimentiListaAziendaUtilPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_MovimentiGetListaAziende"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="MovimentiListaAziendaUtilPage" target="M_MovimentiGetListaAziende">
+      <CONDITIONS/>
+    </DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MovimentiRefreshAziendaUtilPage" scope="REQUEST">
+</PAGE>
+
+<!-- pop-up che gestisce il titolo di studi nei movimenti -->
+<PAGE distributed="false" name="TitoloStudioPerMovimentiPAGE" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetDescTitoloStudio"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="TitoloStudioPerMovimentiPAGE" target="M_GetDescTitoloStudio">
+      <CONDITIONS/>
+    </DEPENDENCE>
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- pop-up che gestisce la sintesi delle informazioni sul lavoratore -->
+<PAGE distributed="false" name="SintesiLavoratorePerMovimentiPAGE" scope="REQUEST">
+  <MODULES/>
+  <DEPENDENCIES/>
+</PAGE>
+
+<!-- migrazioni  -->
+<PAGE distributed="false" name="RicercaCpiMigrazioniPAGE" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetProvinceMig"/>
+    <MODULE name="M_GetRegioniMig"/>    
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="RICERCACPIMIGRAZIONIPAGE" target="M_GetProvinceMig"/>
+    <DEPENDENCE source="RICERCACPIMIGRAZIONIPAGE" target="M_GetRegioniMig"/>
+  </DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="ListaCpiMigrazioniPAGE" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_ListCpiMigrazioni"/>    
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ListaCpiMigrazioniPAGE" target="M_ListCpiMigrazioni"/>
+  </DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="CpiMigrazioniPAGE" scope="REQUEST">
+  <MODULES>    
+    <MODULE name="M_UpdateCpiMigrazioni"/>    
+    <MODULE name="M_GetCpiMigrazioni"/>
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="CpiMigrazioniPAGE" target="M_UpdateCpiMigrazioni">
+    	<CONDITIONS>
+            <PARAMETER name="Aggiorna" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+      </CONDITIONS>
+    </DEPENDENCE>        
+    <DEPENDENCE source="CpiMigrazioniPAGE" target="M_GetCpiMigrazioni"/>
+  </DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="ControlloMbCmEtaLavPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_GetMbCmEtaLav"/>    
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="ControlloMbCmEtaLavPage" target="M_GetMbCmEtaLav"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- page per la gestione della tabella di configurazione per la validazione massiva dei movimenti -->
+<PAGE name="ConfigValidazionePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ListConfigValidazione"/>
+		<MODULE name="M_ComboAziValidazione"/>		
+		<MODULE name="M_InsertConfigValidazione"/>
+		<MODULE name="M_DeleteConfigValidazione"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ConfigValidazionePage" target="M_ComboAziValidazione">
+			<CONDITIONS>
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="ConfigValidazionePage" target="M_InsertConfigValidazione">
+			<CONDITIONS>
+				 <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_InsertConfigValidazione"/>
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="ConfigValidazionePage" target="M_DeleteConfigValidazione">
+			<CONDITIONS>
+				 <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="M_DeleteConfigValidazione"/>
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>
+		<DEPENDENCE source="ConfigValidazionePage" target="M_ListConfigValidazione">
+			<CONDITIONS>
+			</CONDITIONS>
+			<CONSEQUENCES/>
+		</DEPENDENCE>		
+	</DEPENDENCIES>
+</PAGE> 
+
+<PAGE name="ListPercorsoLavoratorePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_ListPercorsoLavoratore"/>		
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="ListPercorsoLavoratorePage" target="M_ListPercorsoLavoratore"/>			
+	</DEPENDENCIES>
+</PAGE> 
+<PAGE name="CercaPercorsoLavoratorePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetConfigPercorsi"/>
+		<MODULE name="M_GetConfigFlagQualifica"/>
+		<MODULE name="M_GetConfigValue"/>
+		<MODULE name="M_GetConfigPerLavPatMan"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="CercaPercorsoLavoratorePage" target="M_GetConfigPercorsi"/>
+		<DEPENDENCE source="CercaPercorsoLavoratorePage" target="M_GetConfigFlagQualifica"/>
+		<DEPENDENCE source="CercaPercorsoLavoratorePage" target="M_GetConfigValue">
+    		<CONSEQUENCES>
+    			<PARAMETER name="COD_TIPO_CONFIG" type="ABSOLUTE" value="VSPERLAV"/>
+    		</CONSEQUENCES>
+    	</DEPENDENCE>
+    	<DEPENDENCE source="CercaPercorsoLavoratorePage" target="M_GetConfigPerLavPatMan"/>
+	</DEPENDENCIES>
+</PAGE> 
+
+<!-- pagina di visualizzazione dello stato occupazionale da percorso lavoratore
+	E' stato fatto un copia-incolla dalla pagina di dettaglio dello stato occupazionale storicizzato
+ -->
+<PAGE name="PercorsoStatoOccInfoStorDettPage" scope="REQUEST">
+  <MODULES>
+    <MODULE name="M_getSpecifStatoOcc"/>
+    <MODULE name="M_GetDeStatoOcc" />
+    <MODULE name="M_Get181Cat" />
+    <MODULE name="M_GetLaureaPerCat181" />
+    <MODULE name="M_GetStatoAtto" />    
+  </MODULES>  
+  <DEPENDENCIES>        
+	  <DEPENDENCE source="PercorsoStatoOccInfoStorDettPage" target="M_getSpecifStatoOcc"/>      
+	  <DEPENDENCE source="M_getSpecifStatoOcc" target="M_GetDeStatoOcc"/>
+	  <DEPENDENCE source="M_getSpecifStatoOcc" target="M_Get181Cat"/>
+	  <DEPENDENCE source="M_getSpecifStatoOcc" target="M_GetStatoAtto"/>
+	  <DEPENDENCE source="M_Get181Cat"         target="M_GetLaureaPerCat181"/> 
+  </DEPENDENCIES>
+</PAGE>
+
+<!-- pagina di visualizzazione del movimento da percorso lavoratore
+	E' stato fatto un copia-incolla dalla pagina di dettaglio del movimento collegato
+ -->
+<PAGE distributed="false" name="PercorsoMovimentiCollegatiPage" scope="REQUEST">
+    <MODULES>
+      <MODULE name="M_MovGetDettMovColl"/>
+      <MODULE name="M_GetDettAzienda"/>
+    </MODULES>
+    <DEPENDENCIES>
+      <DEPENDENCE source="PercorsoMovimentiCollegatiPage" target="M_MovGetDettMovColl">
+        <CONDITIONS>
+          <PARAMETER name="PRGMOVIMENTOCOLL" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+        </CONDITIONS>
+        <CONSEQUENCES/>
+      </DEPENDENCE>
+      <DEPENDENCE source="M_MovGetDettMovColl" target="M_GetDettAzienda">
+        <CONDITIONS/>        
+        <CONSEQUENCES>
+        	<PARAMETER name="PRGMOVIMENTO" scope="SERVICE_RESPONSE" type="RELATIVE" value="M_MovGetDettMovColl.ROWS.ROW.PRGMOVIMENTO"/>
+        </CONSEQUENCES>
+      </DEPENDENCE>
+    </DEPENDENCIES>  
+  </PAGE>
+  
+<PAGE name="PercorsoCollMiratoInfStorDettPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_GetSpecifCollMirato"/> 
+		<MODULE name="M_GetDeCMTipoIscr"/> 
+		<MODULE name="M_GetDeCMTipoInvalidita"/>
+		<MODULE name="M_GetDeCMAccertSanit"/> 
+		<MODULE name="CM_GET_CODCPI"/> 
+	</MODULES>  
+	<DEPENDENCIES>        
+		<DEPENDENCE source="PercorsoCollMiratoInfStorDettPage" target="M_GetSpecifCollMirato"/>        
+		<DEPENDENCE source="PercorsoCollMiratoInfStorDettPage" target="M_GetDeCMTipoIscr"/>
+		<DEPENDENCE source="PercorsoCollMiratoInfStorDettPage" target="M_GetDeCMTipoInvalidita"/>
+		<DEPENDENCE source="PercorsoCollMiratoInfStorDettPage" target="M_GetDeCMAccertSanit"/> 
+		<DEPENDENCE source="PercorsoCollMiratoInfStorDettPage" target="CM_GET_CODCPI"/> 
+	</DEPENDENCIES>
+</PAGE>
+  
+<PAGE name="PercorsoMobilitaInfoStorDettPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_MobilitaGetTipoFine"/>
+		<MODULE name="M_GetSpecifMobilita"/>
+		<MODULE name="M_GetDeMbTipo" />
+		<MODULE name="M_GetStatoMob" />
+		<MODULE name="M_MobMotivoScorrimento"/>
+		<MODULE name="M_MobGetProvince"/>
+   		<MODULE name="M_MobGetRegioni"/>
+   		<MODULE name="ComboTipoGrado"/>
+   		<MODULE name="M_GetConfig_Mobilita"/>
+   		<MODULE name="M_MotivoRiaperturaMob"/>
+   		<MODULE name="M_GetConfigValue" />
+	</MODULES>	
+	<DEPENDENCIES>    	
+		<DEPENDENCE source="PercorsoMobilitaInfoStorDettPage" target="M_GetSpecifMobilita"/>      	
+		<DEPENDENCE source="PercorsoMobilitaInfoStorDettPage" target="M_GetDeMbTipo"/>
+		<DEPENDENCE source="PercorsoMobilitaInfoStorDettPage" target="M_GetStatoMob"/>		
+		<DEPENDENCE source="PercorsoMobilitaInfoStorDettPage" target="M_MobilitaGetTipoFine"/>	
+		<DEPENDENCE source="PercorsoMobilitaInfoStorDettPage" target="M_MobMotivoScorrimento"/>	
+		<DEPENDENCE source="PercorsoMobilitaInfoStorDettPage" target="M_MobGetProvince"/>	
+		<DEPENDENCE source="PercorsoMobilitaInfoStorDettPage" target="M_MobGetRegioni"/>
+		<DEPENDENCE source="PercorsoMobilitaInfoStorDettPage" target="ComboTipoGrado"/>
+		<DEPENDENCE source="PercorsoMobilitaInfoStorDettPage" target="M_GetConfig_Mobilita"/>
+		<DEPENDENCE source="PercorsoMobilitaInfoStorDettPage" target="M_MotivoRiaperturaMob"/>
+		<DEPENDENCE source="PercorsoMobilitaInfoStorDettPage" target="M_GetConfigValue">
+	    	<CONSEQUENCES>
+	    		<PARAMETER name="COD_TIPO_CONFIG" type="ABSOLUTE" value="MBDUBBIO"/>
+	    	</CONSEQUENCES>
+    	</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PercorsoDettaglioAppuntamentoPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+    <MODULE keep="false" name="COMBO_SERVIZIO"/>
+    <MODULE keep="false" name="COMBO_SPI_SCAD"/>
+    <MODULE keep="false" name="COMBO_SPI_SCAD_EFF"/>
+    <MODULE keep="false" name="COMBO_AMBIENTE"/>
+    <MODULE keep="false" name="SELECT_DETTAGLIO_AGENDA_MOD"/>
+    <MODULE keep="false" name="LISTA_LAVORATORI_APPUNTAMENTO_SCAD_PERCORSO"/>
+    <!--MODULE keep="false" name="LISTA_AZIENDE_APPUNTAMENTO_SCAD"/-->
+   	<MODULE keep="false" name="COMBO_EFFETTO_APPUNTAMENTO"/>
+   	<MODULE keep="false" name="COMBO_ESITO_APPUNTAMENTO"/>
+    <MODULE keep="false" name="COMBO_STATO_APPUNTAMENTO"/>
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="PercorsoDettaglioAppuntamentoPage" target="M_CONFIG_UMB_NGE_AZ"/>
+    <DEPENDENCE source="PercorsoDettaglioAppuntamentoPage" target="COMBO_SERVIZIO"/>
+    <DEPENDENCE source="PercorsoDettaglioAppuntamentoPage" target="COMBO_SPI_SCAD"/>
+    <DEPENDENCE source="PercorsoDettaglioAppuntamentoPage" target="COMBO_SPI_SCAD_EFF"/>
+    <DEPENDENCE source="PercorsoDettaglioAppuntamentoPage" target="COMBO_AMBIENTE"/>
+    <DEPENDENCE source="PercorsoDettaglioAppuntamentoPage" target="SELECT_DETTAGLIO_AGENDA_MOD"/>
+    <DEPENDENCE source="PercorsoDettaglioAppuntamentoPage" target="LISTA_LAVORATORI_APPUNTAMENTO_SCAD_PERCORSO"/>
+    <!--DEPENDENCE source="PercorsoDettaglioAppuntamentoPage" target="LISTA_AZIENDE_APPUNTAMENTO_SCAD"/-->
+	<DEPENDENCE source="PercorsoDettaglioAppuntamentoPage" target="COMBO_EFFETTO_APPUNTAMENTO"/>
+	<DEPENDENCE source="PercorsoDettaglioAppuntamentoPage" target="COMBO_ESITO_APPUNTAMENTO"/>
+    <DEPENDENCE source="PercorsoDettaglioAppuntamentoPage" target="COMBO_STATO_APPUNTAMENTO"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PercorsoDettaglioContattoPage" scope="REQUEST">
+  <MODULES>
+    <MODULE keep="false" name="COMBO_SPI_SCAD"/>
+    <MODULE keep="false" name="COMBO_TIPO_CONTATTO_AG"/>
+    <MODULE keep="false" name="COMBO_MOTIVO_CONTATTO_AG"/>
+    <MODULE keep="false" name="COMBO_EFFETTO_CONTATTO_AG"/>
+    <MODULE keep="false" name="MDettContatto"/>
+  </MODULES>
+   <DEPENDENCIES>
+    <DEPENDENCE source="PercorsoDettaglioContattoPage" target="COMBO_SPI_SCAD"/>
+    <DEPENDENCE source="PercorsoDettaglioContattoPage" target="COMBO_TIPO_CONTATTO_AG"/>
+    <DEPENDENCE source="PercorsoDettaglioContattoPage" target="COMBO_MOTIVO_CONTATTO_AG"/>
+    <DEPENDENCE source="PercorsoDettaglioContattoPage" target="COMBO_EFFETTO_CONTATTO_AG"/>
+    <DEPENDENCE source="PercorsoDettaglioContattoPage" target="MDettContatto"/>
+   </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="PercorsoTrasferimentiStoricoDettaglioPage">
+    <MODULES>
+		<MODULE keep="false" name="M_TrasferimentiStoricoDettaglio"/>
+		<MODULE keep="false" name="M_TrasferimentiStoricoDettaglioProtocollo"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PercorsoTrasferimentiStoricoDettaglioPage" target="M_TrasferimentiStoricoDettaglio"/>
+		<DEPENDENCE source="M_TrasferimentiStoricoDettaglio"   target="M_TrasferimentiStoricoDettaglioProtocollo"/>
+	</DEPENDENCIES>
+</PAGE>
+<PAGE distributed="false" name="DichRedditoDettaglioSinteticoPage">
+    <MODULES>
+		<MODULE keep="false" name="M_getDichLav"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DichRedditoDettaglioSinteticoPage" target="M_getDichLav"/>
+	</DEPENDENCIES>
+</PAGE>
+<!--  lista dei lavoratori da cui accedere al percorso -->
+<PAGE distributed="false" name="ListaLavoratoriPercorsoPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_DynamicRicerca"/>	    
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="LISTALAVORATORIPERCORSOPAGE" target="M_ListaLavoratoriPercorso"/>     	
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="RicercaDichRedPage" scope="REQUEST">
+	<MODULES>
+	    <MODULE name="M_ELENCOCPI" />
+	    <MODULE name="M_ELENCOTIPODICH" />
+	    <MODULE name="M_COMBO_STATO_ATTO_PAR" />
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="RicercaDichRedPage" target="M_ELENCOCPI"/>     	
+		<DEPENDENCE source="RicercaDichRedPage" target="M_ELENCOTIPODICH"/>     	
+		<DEPENDENCE source="RicercaDichRedPage" target="M_COMBO_STATO_ATTO_PAR"/>     	
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ListaDichRedPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE name="AnnullaDichiarazione"/>
+  	<MODULE name="M_ListaDichRed"/>
+  	<MODULE name="M_GetCPIcorr"/>	  	
+  </MODULES>
+  
+  <DEPENDENCIES>  
+    <DEPENDENCE source="ListaDichRedPage" target="M_GetCPIcorr"/>
+    <DEPENDENCE source="ListaDichRedPage" target="AnnullaDichiarazione">
+   		<CONDITIONS>
+   			<!--<PARAMETER name="annullaDic" scope="SERVICE_REQUEST" type="RELATIVE" value="AF_DEFINED"/>-->
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AnnullaDichiarazione"/>
+   		</CONDITIONS>
+   	</DEPENDENCE>	
+   	<DEPENDENCE source="ListaDichRedPage" target="M_ListaDichRed"/>
+	        <PARAMETER name="MODULE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+    </DEPENDENCIES>
+    <DEPENDENCE source="AnnullaDichiarazione" target="M_ListaDichRed"/>
+</PAGE>
+
+<PAGE distributed="false" name="DichRedDettaglioPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE name="M_DettDichRed"/>  	  
+  	<MODULE name="M_DichRed"/>
+  	<MODULE name="StatoAtto"/>  	  
+  	<MODULE name="Motivazione"/>
+  	<MODULE name="GetDichProtocollato"/>
+  	<MODULE name="M_GetCPIcorr"/>
+  </MODULES>
+  <DEPENDENCIES> 
+  	<DEPENDENCE source="DichRedDettaglioPage" target="M_GetCPIcorr"/>	
+   	<DEPENDENCE source="DichRedDettaglioPage" target="M_DettDichRed"/>
+   	<DEPENDENCE source="DichRedDettaglioPage" target="M_DichRed"/>
+   	<DEPENDENCE source="DichRedDettaglioPage" target="StatoAtto"/>
+   	<DEPENDENCE source="DichRedDettaglioPage" target="Motivazione"/>
+   	<DEPENDENCE source="DichRedDettaglioPage" target="GetDichProtocollato"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MobGestioneDisponibilitaPage" scope="REQUEST">
+  <MODULES>
+  	<MODULE name="M_SaveFlagSchedaInfoMobilitaIscr"/>
+  	<MODULE name="M_SelectNumKlo"/>
+  </MODULES>
+  <DEPENDENCIES> 
+  	<DEPENDENCE source="MobGestioneDisponibilitaPage" target="M_SaveFlagSchedaInfoMobilitaIscr"/>
+  	<DEPENDENCE source="MobGestioneDisponibilitaPage" target="M_SelectNumKlo"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MobListaDisponibilitaPage" scope="REQUEST">
+  	<MODULES>
+  		<MODULE name="M_MobListaDisponibilita"/>
+  		<MODULE name="M_MobCancellaDisponibilita"/>
+  		<MODULE name="M_MobInserisciDisponibilita"/>
+  	</MODULES>
+  	<DEPENDENCIES> 
+  		<DEPENDENCE source="MobListaDisponibilitaPage" target="M_MobCancellaDisponibilita">
+	   		<CONDITIONS>
+	   			<PARAMETER name="CANCELLA" scope="SERVICE_REQUEST" value="S"/>
+	   		</CONDITIONS>
+	   	</DEPENDENCE>
+	   	
+	   	<DEPENDENCE source="MobListaDisponibilitaPage" target="M_MobInserisciDisponibilita">
+	   		<CONDITIONS>
+	   			<PARAMETER name="INSERISCI" scope="SERVICE_REQUEST" value="S"/>
+	   		</CONDITIONS>
+	   	</DEPENDENCE>
+	   	
+	   	<DEPENDENCE source="MobListaDisponibilitaPage" target="M_MobListaDisponibilita"/>
+ 	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MobRicercaDisponibilitaPage" scope="REQUEST">
+</PAGE>
+
+<PAGE distributed="false" name="MobGestioneDatePage" scope="REQUEST">
+	<MODULES>
+    	<MODULE keep="false" name="M_Mob_DurataMobilita"/>
+    	<MODULE keep="false" name="M_Mob_MesiMobExCassaMezz"/>   	
+  	</MODULES>
+  	<DEPENDENCIES>
+   		<DEPENDENCE source="MobGestioneDatePage" target="M_Mob_DurataMobilita"/>
+   		<DEPENDENCE source="MobGestioneDatePage" target="M_Mob_MesiMobExCassaMezz"/>
+  	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="MovAziDistaccatariaPage" scope="REQUEST">
+</PAGE>
+
+<PAGE distributed="false" name="ScegliAziTrasferimentoPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE keep="false" name="M_MovimentiGetListaAziendeNew"/>
+    </MODULES>
+  	<DEPENDENCIES>
+   		<DEPENDENCE source="ScegliAziTrasferimentoPage" target="M_MovimentiGetListaAziendeNew"/>
+   	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="VisualizzaDatiMissionePage" scope="REQUEST">
+  <MODULES>
+	<MODULE name="Mov_ListaMissione" />
+  </MODULES>
+  <DEPENDENCIES>
+    <DEPENDENCE source="VisualizzaDatiMissionePage" target="Mov_ListaMissione"/>
+  </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="ConsultaDatiMissionePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="Mov_DatiMissione" />
+  	</MODULES>
+  	<DEPENDENCIES>
+    	<DEPENDENCE source="ConsultaDatiMissionePage" target="Mov_DatiMissione"/>
+  	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="DeleteDatiMissionePage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="Delete_DatiMissione"/>
+		<MODULE name="Mov_ListaMissione"/>
+  	</MODULES>
+  	<DEPENDENCIES>
+    	<DEPENDENCE source="DeleteDatiMissionePage" target="Delete_DatiMissione">
+    		<CONDITIONS>
+	   				<PARAMETER name="PRGMISSIONE" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	   		</CONDITIONS>
+	   	</DEPENDENCE>
+	   	<DEPENDENCE source="DeleteDatiMissionePage" target="Mov_ListaMissione">
+    		<CONDITIONS>
+	   				<PARAMETER name="PRGMOVIMENTO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	   		</CONDITIONS>
+	   	</DEPENDENCE>
+  	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="PermessoSoggiornoPerMovimentiPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_MovAppGetLavDocEX"/>
+		<MODULE name="M_MovGetLavDocEX"/>
+  	</MODULES>
+  	<DEPENDENCIES>
+  		<DEPENDENCE source="PermessoSoggiornoPerMovimentiPage" target="M_MovAppGetLavDocEX">
+    		<CONDITIONS>
+	   			<PARAMETER name="PRGMOVIMENTOAPP" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	   		</CONDITIONS>
+	   	</DEPENDENCE>
+	   	<DEPENDENCE source="PermessoSoggiornoPerMovimentiPage" target="M_MovGetLavDocEX">
+    		<CONDITIONS>
+	   			<PARAMETER name="PRGMOVIMENTO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	   		</CONDITIONS>
+	   	</DEPENDENCE>
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="ListaStampeMobPage" scope="REQUEST">
+</PAGE>
+
+<PAGE name="RicercaComitatoSilPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_MO_TIPO_LISTA"/>
+		<MODULE name="M_GetStatoMob"/>
+    	<MODULE name="M_ElencoCPI"/>
+    </MODULES>
+    <DEPENDENCIES>
+      	<DEPENDENCE source="RicercaComitatoSilPage" target="M_MO_TIPO_LISTA">
+     	</DEPENDENCE>
+     	<DEPENDENCE source="RicercaComitatoSilPage" target="M_GetStatoMob">
+     	</DEPENDENCE>
+     	<DEPENDENCE source="RicercaComitatoSilPage" target="M_ElencoCPI">
+     	</DEPENDENCE>
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ListaComitatoSilPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_ListaComitatoSil"/>
+    	<MODULE name="M_ListaComitatoSilCnt"/>
+    	<MODULE name="CM_GET_CODCPI"/>
+    	<MODULE name="M_MO_TIPO_LISTA"/>
+    	<MODULE name="M_GetStatoMob"/>
+    </MODULES>
+    <DEPENDENCIES>
+      	<DEPENDENCE source="ListaComitatoSilPage" target="M_ListaComitatoSil">
+     	</DEPENDENCE>
+     	<DEPENDENCE source="ListaComitatoSilPage" target="M_ListaComitatoSilCnt">
+     	</DEPENDENCE>
+     	<DEPENDENCE source="ListaComitatoSilPage" target="CM_GET_CODCPI">
+     		<CONDITIONS>
+          		<PARAMETER name="CODCPI" scope="SERVICE_REQUEST" value="AF_DEFINED"/>        
+        	</CONDITIONS>
+     	</DEPENDENCE>
+     	<DEPENDENCE source="ListaComitatoSilPage" target="M_MO_TIPO_LISTA">
+     		<CONDITIONS>
+          		<PARAMETER name="CodTipoLista" scope="SERVICE_REQUEST" value="AF_DEFINED"/>        
+        	</CONDITIONS>
+     	</DEPENDENCE>
+     	<DEPENDENCE source="ListaComitatoSilPage" target="M_GetStatoMob">
+     		<CONDITIONS>
+          		<PARAMETER name="codEsito" scope="SERVICE_REQUEST" value="AF_DEFINED"/>        
+        	</CONDITIONS>
+     	</DEPENDENCE>
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="RicercaMobCancellatiPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_MO_TIPO_LISTA"/>
+    	<MODULE name="M_ElencoCPI"/>
+    </MODULES>
+    <DEPENDENCIES>
+      	<DEPENDENCE source="RicercaMobCancellatiPage" target="M_MO_TIPO_LISTA">
+     	</DEPENDENCE>
+     	<DEPENDENCE source="RicercaMobCancellatiPage" target="M_ElencoCPI">
+     	</DEPENDENCE>
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ListaMobCancellatiPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_ListaMobCancellati"/>
+    	<MODULE name="M_ListaMobCancellatiCnt"/>
+    	<MODULE name="CM_GET_CODCPI"/>
+    	<MODULE name="M_MO_TIPO_LISTA"/>
+    </MODULES>
+    <DEPENDENCIES>
+      	<DEPENDENCE source="ListaMobCancellatiPage" target="M_ListaMobCancellati">
+     	</DEPENDENCE>
+     	<DEPENDENCE source="ListaMobCancellatiPage" target="M_ListaMobCancellatiCnt">
+     	</DEPENDENCE>
+     	<DEPENDENCE source="ListaMobCancellatiPage" target="CM_GET_CODCPI">
+     		<CONDITIONS>
+          		<PARAMETER name="CODCPI" scope="SERVICE_REQUEST" value="AF_DEFINED"/>        
+        	</CONDITIONS>
+     	</DEPENDENCE>
+     	<DEPENDENCE source="ListaMobCancellatiPage" target="M_MO_TIPO_LISTA">
+     		<CONDITIONS>
+          		<PARAMETER name="CodTipoLista" scope="SERVICE_REQUEST" value="AF_DEFINED"/>        
+        	</CONDITIONS>
+     	</DEPENDENCE>
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="RicercaMobilitaUtentiEsterniPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="M_MO_TIPO_LISTA"/>
+		<MODULE name="M_GetStatoMob"/>
+    	<MODULE name="M_ElencoCPI"/>
+    </MODULES>
+    <DEPENDENCIES>
+      	<DEPENDENCE source="RicercaMobilitaUtentiEsterniPage" target="M_MO_TIPO_LISTA">
+     	</DEPENDENCE>
+     	<DEPENDENCE source="RicercaMobilitaUtentiEsterniPage" target="M_GetStatoMob">
+     	</DEPENDENCE>
+     	<DEPENDENCE source="RicercaMobilitaUtentiEsterniPage" target="M_ElencoCPI">
+     	</DEPENDENCE>
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ListaMobilitaUtentiEsterniPage" scope="REQUEST">
+	<MODULES>
+    	<MODULE name="M_ListaUtentiEsterni"/>
+    	<MODULE name="M_ListaUtentiEsterniCnt"/>
+    	<MODULE name="CM_GET_CODCPI"/>
+    	<MODULE name="M_MO_TIPO_LISTA"/>
+    	<MODULE name="M_GetStatoMob"/>
+    </MODULES>
+    <DEPENDENCIES>
+      	<DEPENDENCE source="ListaMobilitaUtentiEsterniPage" target="M_ListaUtentiEsterni">
+     	</DEPENDENCE>
+     	<DEPENDENCE source="ListaMobilitaUtentiEsterniPage" target="M_ListaUtentiEsterniCnt">
+     	</DEPENDENCE>
+     	<DEPENDENCE source="ListaMobilitaUtentiEsterniPage" target="CM_GET_CODCPI">
+     		<CONDITIONS>
+          		<PARAMETER name="CODCPI" scope="SERVICE_REQUEST" value="AF_DEFINED"/>        
+        	</CONDITIONS>
+     	</DEPENDENCE>
+     	<DEPENDENCE source="ListaMobilitaUtentiEsterniPage" target="M_MO_TIPO_LISTA">
+     		<CONDITIONS>
+          		<PARAMETER name="CodTipoLista" scope="SERVICE_REQUEST" value="AF_DEFINED"/>        
+        	</CONDITIONS>
+     	</DEPENDENCE>
+     	<DEPENDENCE source="ListaMobilitaUtentiEsterniPage" target="M_GetStatoMob">
+     		<CONDITIONS>
+          		<PARAMETER name="codEsito" scope="SERVICE_REQUEST" value="AF_DEFINED"/>        
+        	</CONDITIONS>
+     	</DEPENDENCE>
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="PermSoggReferentePerMovimentiPage" scope="REQUEST">
+	<MODULES>
+		<MODULE name="Mov_App_GetInfoPermSoggEX"/>
+		<MODULE name="Mov_GetInfoPermSoggEX"/>
+		<MODULE name="Mov_Rett_GetInfoPermSoggEX"/>
+  	</MODULES>
+  	<DEPENDENCIES>
+    	<DEPENDENCE source="PermSoggReferentePerMovimentiPage" target="Mov_App_GetInfoPermSoggEX">
+    		<CONDITIONS>
+	   			<PARAMETER name="PRGMOVIMENTOAPP" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	   		</CONDITIONS>
+	   	</DEPENDENCE>
+    	<DEPENDENCE source="PermSoggReferentePerMovimentiPage" target="Mov_GetInfoPermSoggEX">
+    		<CONDITIONS>
+	   			<PARAMETER name="PRGMOVIMENTO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	   		</CONDITIONS>
+	   	</DEPENDENCE>
+	   	<DEPENDENCE source="PermSoggReferentePerMovimentiPage" target="Mov_Rett_GetInfoPermSoggEX">
+    		<CONDITIONS>
+	   			<PARAMETER name="PRGMOVIMENTORETT" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+	   		</CONDITIONS>
+	   	</DEPENDENCE>
+    </DEPENDENCIES>
+</PAGE>
+
+
+<PAGE distributed="false" name="PercorsoCMIscrLSDettPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="COMBO_STATO_ATTO_ISCR_LISTESPEC"/>
+		<MODULE keep="false" name="M_TipoListSpec"/>
+		<MODULE keep="false" name="M_Motivo_Fine_Atto"/>
+		<MODULE name="M_GetProtocollazione"/>
+		<MODULE name="COMBO_SPI_SCAD"/>
+		<MODULE name="M_Select_PrgSPI_Da_CDNUT"/>
+		<MODULE name="M_insertIscrListe"/>
+		<MODULE name="M_Save_IscrListeSpec"/>
+		<MODULE name="SalvaIscrListeSpecDoc"/>
+		<MODULE name="M_LoadListeSpec"/>
+		<MODULE keep="false" name="CMCARICA_UT_PUNTEGGIO"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="PercorsoCMIscrLSDettPage" target="COMBO_STATO_ATTO_ISCR_LISTESPEC"/>
+		<DEPENDENCE source="PercorsoCMIscrLSDettPage" target="M_TipoListSpec"/>
+		<DEPENDENCE source="PercorsoCMIscrLSDettPage" target="M_Motivo_Fine_Atto"/>
+		<DEPENDENCE source="PercorsoCMIscrLSDettPage" target="M_GetProtocollazione"/>
+		<DEPENDENCE source="PercorsoCMIscrLSDettPage" target="COMBO_SPI_SCAD"/>
+		<DEPENDENCE source="PercorsoCMIscrLSDettPage" target="M_Select_PrgSPI_Da_CDNUT"/>
+		<DEPENDENCE source="PercorsoCMIscrLSDettPage" target="M_insertIscrListe">
+			<CONDITIONS>
+				<PARAMETER name="inserisciDoc" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_insertIscrListe" target="M_LoadListeSpec">
+			<CONDITIONS>
+				<PARAMETER name="inserisciDoc" scope="SERVICE_REQUEST" value="AF_DEFINED"/>	
+			</CONDITIONS>	
+		     <CONSEQUENCES>
+		    	<PARAMETER name="PRGISCRART1" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_insertIscrListe.PRGISCRART1"/>
+		    </CONSEQUENCES>    
+		</DEPENDENCE>
+		<DEPENDENCE source="M_insertIscrListe" target="CMCARICA_UT_PUNTEGGIO">
+			<CONDITIONS>
+				<PARAMETER name="inserisciDoc" scope="SERVICE_REQUEST" value="AF_DEFINED"/>	
+			</CONDITIONS>	
+		     <CONSEQUENCES>
+		    	<PARAMETER name="CDNUTPUNTEGGIO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_insertIscrListe.CDNUTPUNTEGGIO"/>
+		    </CONSEQUENCES>    
+		</DEPENDENCE>
+		<DEPENDENCE source="PercorsoCMIscrLSDettPage" target="M_Save_IscrListeSpec">
+			<CONDITIONS>
+				<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="M_Save_IscrListeSpec" target="M_LoadListeSpec">
+			<CONDITIONS>
+				<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST" value="AF_DEFINED"/>	
+		    </CONDITIONS>	
+		     <CONSEQUENCES>
+		    	<PARAMETER name="PRGISCRART1" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_Save_IscrListeSpec.PRGISCRART1"/>
+		    </CONSEQUENCES>    
+		</DEPENDENCE>
+		<DEPENDENCE source="M_Save_IscrListeSpec" target="CMCARICA_UT_PUNTEGGIO">
+			<CONDITIONS>
+				<PARAMETER name="aggiornamento" scope="SERVICE_REQUEST" value="AF_DEFINED"/>	
+			</CONDITIONS>	
+		     <CONSEQUENCES>
+		    	<PARAMETER name="CDNUTPUNTEGGIO" type="RELATIVE" scope="SERVICE_RESPONSE" value="M_Save_IscrListeSpec.CDNUTPUNTEGGIO"/>
+		    </CONSEQUENCES>    
+		</DEPENDENCE>
+		<DEPENDENCE source="PercorsoCMIscrLSDettPage" target="SalvaIscrListeSpecDoc">
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDoc" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="SalvaIscrListeSpecDoc" target="M_LoadListeSpec">
+			<CONDITIONS>
+				<PARAMETER name="aggiornaDoc" scope="SERVICE_REQUEST" value="AF_DEFINED"/>	
+		    </CONDITIONS>	
+		     <CONSEQUENCES>
+		    	<PARAMETER name="PRGISCRART1" type="RELATIVE" scope="SERVICE_RESPONSE" value="SalvaIscrListeSpecDoc.PRGISCRART1"/>
+		    </CONSEQUENCES>    
+		</DEPENDENCE>
+		<DEPENDENCE source="PercorsoCMIscrLSDettPage" target="M_LoadListeSpec">
+			<CONDITIONS>
+				<PARAMETER name="PRGISCRART1" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+				<PARAMETER name="inserisciDoc" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>	
+			</CONDITIONS>
+		</DEPENDENCE>
+		<DEPENDENCE source="PercorsoCMIscrLSDettPage" target="CMCARICA_UT_PUNTEGGIO">
+		<CONDITIONS>
+				<PARAMETER name="CDNUTPUNTEGGIO" scope="SERVICE_REQUEST" value="AF_DEFINED"/>
+		</CONDITIONS>
+		</DEPENDENCE>
+	</DEPENDENCIES>
+</PAGE>
+
+<!-- dettaglio mesi d'anzianita del lavoratore successivi al decreto -->
+<PAGE distributed="false" name="DettaglioMesiAnzianitaForneroPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CALCOLA_DETTAGLIO_MESI_ANZ_FORNERO" />					
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="DettaglioMesiAnzianitaForneroPage" target="M_CALCOLA_DETTAGLIO_MESI_ANZ_FORNERO" />		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE distributed="false" name="ListaProgrammazioniPage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetProgrammazioniBatch" />
+		<MODULE keep="false" name="M_InserisciProgrammazioneBatch" />
+		<MODULE keep="false" name="M_AggiornaProgrammazioneBatch" />
+		<MODULE keep="false" name="M_DeleteProgrammazioneBatch" />
+	</MODULES>
+	<DEPENDENCIES>
+		
+		<DEPENDENCE source="ListaProgrammazioniPage" target="M_GetProgrammazioniBatch">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONEPROGR" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="ListaProgrammazioniPage" target="M_GetProgrammazioniBatch">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONEPROGR" scope="SERVICE_REQUEST" value="LISTA" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="ListaProgrammazioniPage" target="M_InserisciProgrammazioneBatch">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONEPROGR" scope="SERVICE_REQUEST" value="INSERISCI" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="ListaProgrammazioniPage" target="M_AggiornaProgrammazioneBatch">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONEPROGR" scope="SERVICE_REQUEST" value="AGGIORNA" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="ListaProgrammazioniPage" target="M_DeleteProgrammazioneBatch">
+			<CONDITIONS>
+				<PARAMETER name="OPERAZIONEPROGR" scope="SERVICE_REQUEST" value="CANCELLA" />
+			</CONDITIONS>
+		</DEPENDENCE>
+		
+		<DEPENDENCE source="M_InserisciProgrammazioneBatch" target="M_GetProgrammazioniBatch" />
+		<DEPENDENCE source="M_AggiornaProgrammazioneBatch" target="M_GetProgrammazioniBatch" />
+		<DEPENDENCE source="M_DeleteProgrammazioneBatch" target="M_GetProgrammazioniBatch" />
+		
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="GestioneProgrammazionePage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_GetDettaglioProgrammazione"/>
+		<MODULE keep="false" name="M_GetTipoBatchProgrammazione"/>
+		<MODULE keep="false" name="M_GetMotivoContattoAG"/>
+		<MODULE keep="false" name="M_GetServizioAppuntamentoAG"/>
+		<MODULE keep="false" name="M_GetStatoAppuntamentoAG"/>
+		<MODULE keep="false" name="M_DEAZIONI"/>
+		<MODULE keep="false" name="M_DEESITO"/>
+		<MODULE keep="false" name="MTipiSmsProgrammazione"/>
+		<MODULE keep="false" name="MTipiEvidenzeProgrammazione"/>
+		<MODULE keep="false" name="M_MotFineAttoSms"/>
+		<MODULE keep="false" name="M_GetCpiPoloProvincialeAll"/>
+  	</MODULES>
+  	<DEPENDENCIES>
+  		<DEPENDENCE source="GestioneProgrammazionePage" target="M_GetDettaglioProgrammazione">
+			<CONDITIONS>
+				<PARAMETER name="PRGPROGRAMMABATCH" scope="SERVICE_REQUEST" value="AF_DEFINED" />
+			</CONDITIONS>
+		</DEPENDENCE>
+  		<DEPENDENCE source="GestioneProgrammazionePage" target="M_GetTipoBatchProgrammazione" />
+  		<DEPENDENCE source="GestioneProgrammazionePage" target="M_GetMotivoContattoAG" />
+  		<DEPENDENCE source="GestioneProgrammazionePage" target="M_GetServizioAppuntamentoAG" />
+  		<DEPENDENCE source="GestioneProgrammazionePage" target="M_GetStatoAppuntamentoAG" />
+  		<DEPENDENCE source="GestioneProgrammazionePage" target="M_DEAZIONI" />
+  		<DEPENDENCE source="GestioneProgrammazionePage" target="M_DEESITO" />
+  		<DEPENDENCE source="GestioneProgrammazionePage" target="MTipiSmsProgrammazione" />
+  		<DEPENDENCE source="GestioneProgrammazionePage" target="MTipiEvidenzeProgrammazione" />
+  		<DEPENDENCE source="GestioneProgrammazionePage" target="M_MotFineAttoSms" />
+  		<DEPENDENCE source="GestioneProgrammazionePage" target="M_GetCpiPoloProvincialeAll" />
+    </DEPENDENCIES>
+</PAGE>
+
+<PAGE name="SimulazioneProgrammazionePage" scope="REQUEST">
+	<MODULES>
+		<MODULE keep="false" name="M_CONFIG_UMB_NGE_AZ" />
+		<MODULE keep="false" name="M_GetTipoBatchProgrammazione"/>
+		<MODULE keep="false" name="M_DEAZIONI"/>
+		<MODULE keep="false" name="M_DEESITO"/>
+		<MODULE keep="false" name="M_GetMotivoContattoAG"/>
+		<MODULE keep="false" name="M_GetServizioAppuntamentoAG"/>
+		<MODULE keep="false" name="M_GetStatoAppuntamentoAG"/>
+		<MODULE keep="false" name="M_GetSimulazioneProgrammazione"/>
+		<MODULE keep="false" name="M_MotFineAttoSms"/>
+		<MODULE keep="false" name="M_GetCpiPoloProvincialeAll"/>
+	</MODULES>
+	<DEPENDENCIES>
+		<DEPENDENCE source="SimulazioneProgrammazionePage" target="M_CONFIG_UMB_NGE_AZ" />
+		<DEPENDENCE source="SimulazioneProgrammazionePage" target="M_GetTipoBatchProgrammazione" />
+		<DEPENDENCE source="SimulazioneProgrammazionePage" target="M_DEAZIONI" />
+		<DEPENDENCE source="SimulazioneProgrammazionePage" target="M_DEESITO" />
+		<DEPENDENCE source="SimulazioneProgrammazionePage" target="M_GetMotivoContattoAG" />
+		<DEPENDENCE source="SimulazioneProgrammazionePage" target="M_GetServizioAppuntamentoAG" />
+		<DEPENDENCE source="SimulazioneProgrammazionePage" target="M_GetStatoAppuntamentoAG" />
+		<DEPENDENCE source="SimulazioneProgrammazionePage" target="M_MotFineAttoSms" />
+		<DEPENDENCE source="SimulazioneProgrammazionePage" target="M_GetSimulazioneProgrammazione" />
+		<DEPENDENCE source="SimulazioneProgrammazionePage" target="M_GetCpiPoloProvincialeAll" />
+	</DEPENDENCIES>
+</PAGE>
+
+<PAGE name="ModificaMovimentoIntermittentePage" scope="REQUEST">
+  <MODULES>
+	<MODULE name="GetMovimento" />
+	<MODULE name="UpdateMovimentoIntermittente" />
+	<MODULE name="MovInserisciPeriodoIntermittente" />
+	<MODULE name="MovCancellaPeriodoIntermittente" />
+	<MODULE name="MovGetPeriodiIntermittente" />
+  </MODULES>
+  <DEPENDENCIES>
+  	<DEPENDENCE source="ModificaMovimentoIntermittentePage" target="MovGetPeriodiIntermittente">
+	    <CONDITIONS>
+            <PARAMETER name="OPERAZIONE" scope="SERVICE_REQUEST" value="AF_NOT_DEFINED"/>
+	    </CONDITIONS>  
+    </DEPENDENCE>
+  
+    <DEPENDENCE source="ModificaMovimentoIntermittentePage" target="UpdateMovimentoIntermittente">
+	    <CONDITIONS>
+            <PARAMETER name="OPERAZIONE" scope="SERVICE_REQUEST" value="CALCOLASTATOOCC"/>
+	    </CONDITIONS>  
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="ModificaMovimentoIntermittentePage" target="MovInserisciPeriodoIntermittente">
+	    <CONDITIONS>
+            <PARAMETER name="OPERAZIONE" scope="SERVICE_REQUEST" value="INSERISCIPERIODO"/>
+	    </CONDITIONS>  
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="ModificaMovimentoIntermittentePage" target="MovCancellaPeriodoIntermittente">
+	    <CONDITIONS>
+            <PARAMETER name="OPERAZIONE" scope="SERVICE_REQUEST" value="CANCELLA"/>
+	    </CONDITIONS>  
+    </DEPENDENCE>
+    
+    <DEPENDENCE source="MovInserisciPeriodoIntermittente" target="MovGetPeriodiIntermittente"/>
+    <DEPENDENCE source="MovCancellaPeriodoIntermittente" target="MovGetPeriodiIntermittente"/>
+    <DEPENDENCE source="UpdateMovimentoIntermittente" target="MovGetPeriodiIntermittente"/>
+    
+    <DEPENDENCE source="MovGetPeriodiIntermittente" target="GetMovimento"/>
+  </DEPENDENCIES>
+</PAGE>

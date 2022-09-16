@@ -1,0 +1,1167 @@
+<STATEMENT
+    name="SELECT_SP_LAVORATORE"
+    query=" select CDNLAVORATORE,
+                   PRGSPLAV,
+                   TO_CHAR(DATINIZIOVAL, 'DD/MM/YYYY') as DATINIZIOVAL,
+                   NUMKLOSAP
+            from SP_LAVORATORE
+            where CODMINSAP = ? and DATFINEVAL is null" />
+            
+<STATEMENT
+    name="SELECT_SP_LAVORATORE_CDNLAV"
+    query=" select PRGSPLAV,
+                   NUMKLOSAP,                   
+                   DATAINVIOMIN,
+                   CODMINSAP,
+                   CODENTETIT,
+                   to_char(DATNASC, 'dd/mm/yyyy') as DATNASC, 
+                   CDNLAVORATORE,
+                   CDNUTINS,
+                   DTMINS,
+                   CDNUTMOD,
+                   DTMMOD,
+                   STRCODICEFISCALE,
+                   CODSTATO,
+                   DATINIZIOVAL,
+                   DATFINEVAL
+            from SP_LAVORATORE
+            where CDNLAVORATORE = ? and DATFINEVAL is null" />
+
+<STATEMENT
+    name="INSERT_SP_NOTIFICA"
+    query=" insert into SP_NOTIFICA (PRGSPNOTIFICA, DATNOTIFICA, CODMINSAP, CODMOTIVO, DTMINS, DTMMOD, CDNUTINS, CDNUTMOD) values (S_SP_NOTIFICA.NEXTVAL, sysdate, ?, ?, sysdate, sysdate, ?, ?)" />
+  
+<STATEMENT
+    name="CHIUDU_SP_LAVORATORE"
+    query=" update SP_LAVORATORE set DATFINEVAL = TO_DATE(?, 'DD/MM/YYYY'), DTMMOD = sysdate, CDNUTMOD = ?, NUMKLOSAP = (? + 1) where PRGSPLAV = ?" />  
+
+<STATEMENT
+    name="UPDATE_CODMINSAP_SP_LAVORATORE"
+    query=" update SP_LAVORATORE set CODMINSAP = ?, DTMMOD = sysdate, CDNUTMOD = ?, NUMKLOSAP = (? + 1) where PRGSPLAV= ? " />
+     
+<STATEMENT
+    name="INSERT_SP_LAVORATORE"  
+    query=" insert into SP_LAVORATORE (
+                            PRGSPLAV,
+                            DATAINVIOMIN,
+                            CODMINSAP,
+                            CODENTETIT,
+                            DATNASC,
+                            CDNLAVORATORE,
+                            CDNUTINS,
+                            DTMINS,
+                            CDNUTMOD,
+                            DTMMOD,
+                            STRCODICEFISCALE,
+                            CODSTATO,
+                            DATINIZIOVAL,
+                            DATFINEVAL)
+                   select S_SP_LAVORATORE.NEXTVAL,
+                            DATAINVIOMIN,
+                            CODMINSAP,
+                            CODENTETIT,
+                            DATNASC,
+                            CDNLAVORATORE,
+                            ?,
+                            sysdate,
+                            ?,
+                            sysdate,
+                            STRCODICEFISCALE,
+                            ?,
+                            sysdate,
+                            null
+                   from SP_LAVORATORE
+                   where PRGSPLAV = ?" />
+
+<STATEMENT
+    name="SELECT_AN_LAV_STORIA_INF_SAP"
+    query="select   PRGLAVSTORIAINF,
+                    CDNLAVORATORE,
+                    TO_CHAR(DATINIZIO, 'DD/MM/YYYY') as DATINIZIO,
+                    CODCPITIT,
+                    CODMONOTIPOCPI,
+                    CODCOMDOM,
+                    STRCODICEFISCALEOLD,
+                    CDNUTMODSCHEDAANAGPROF,
+                    TO_CHAR(DTMMODSCHEDAANAGPROF, 'DD/MM/YYYY') as DTMMODSCHEDAANAGPROF,
+                    CODMONOTIPOORIG,
+                    TO_CHAR(DATTRASFERIMENTO, 'DD/MM/YYYY') as DATTRASFERIMENTO,
+                    CODCPIORIG,
+                    TO_CHAR(DATDICHIARAZIONE, 'DD/MM/YYYY') as DATDICHIARAZIONE,
+                    FLG181,
+                    TO_CHAR(DATANZIANITADISOC, 'DD/MM/YYYY') as DATANZIANITADISOC,
+                    NUMANZIANITAPREC297,
+                    NUMMESISOSP,
+                    FLGCESSATO,
+                    CODMOTIVOCESSATO,
+                    CODSTATOOCCUPAZORIG,
+                    CODLAVFLAG,
+                    CODSTATOOCCUPAZDERIVATODAPRO,
+                    STRCHIAVETABELLAPROLABOR,
+                    TO_CHAR(DATCHIAVETABELLAPROLABOR, 'DD/MM/YYYY') as DATCHIAVETABELLAPROLABOR,
+                    STRNOMETABELLAPROLABOR,
+                    TO_CHAR(DATFINE, 'DD/MM/YYYY') as DATFINE,
+                    STRNOTE,
+                    CDNUTINS,
+                    TO_CHAR(DTMINS, 'DD/MM/YYYY') as DTMINS,
+                    CDNUTMOD,
+                    TO_CHAR(DTMMOD, 'DD/MM/YYYY') as DTMMOD,
+                    NUMKLOLAVSTORIAINF,
+                    CODMONOCALCOLOANZIANITAPREC297,
+                    TO_CHAR(DATCALCOLOANZIANITA, 'DD/MM/YYYY') as DATCALCOLOANZIANITA,
+                    TO_CHAR(DATCALCOLOMESISOSP, 'DD/MM/YYYY') as DATCALCOLOMESISOSP,
+                    FLGSTAMPATRASF,
+                    FLGSTAMPADOC,
+                    CODCPIORIGPREC
+           from AN_LAV_STORIA_INF
+           where CDNLAVORATORE = ? and DATFINE is null and CODMONOTIPOCPI = 'C'" />
+           
+<STATEMENT
+        name="CHIUDI_AN_LAV_STORIA_INF_SAP"
+        query="UPDATE AN_LAV_STORIA_INF
+               SET CDNUTMOD=?, 
+                   DTMMOD=SYSDATE, 
+                   NUMKLOLAVSTORIAINF = NUMKLOLAVSTORIAINF + 1
+                WHERE PRGLAVSTORIAINF = ?"/>                    
+
+<STATEMENT
+    name="INSERT_AN_LAV_STORIA_INF_SAP"
+    query=" insert into AN_LAV_STORIA_INF (
+                    PRGLAVSTORIAINF,
+                    CDNLAVORATORE,
+                    CODCPITIT,
+                    CODMONOTIPOCPI,
+                    CODCOMDOM,
+                    STRCODICEFISCALEOLD,
+                    CDNUTMODSCHEDAANAGPROF,
+                    DTMMODSCHEDAANAGPROF,
+                    CODMONOTIPOORIG,
+                    DATTRASFERIMENTO,
+                    DATDICHIARAZIONE,
+                    FLG181,
+                    DATANZIANITADISOC,
+                    NUMANZIANITAPREC297,
+                    NUMMESISOSP,
+                    FLGCESSATO,
+                    CODMOTIVOCESSATO,
+                    CODSTATOOCCUPAZORIG,
+                    CODLAVFLAG,
+                    CODSTATOOCCUPAZDERIVATODAPRO,
+                    STRCHIAVETABELLAPROLABOR,
+                    DATCHIAVETABELLAPROLABOR,
+                    STRNOMETABELLAPROLABOR,
+                    DATFINE,
+                    STRNOTE,
+                    CODMONOCALCOLOANZIANITAPREC297,
+                    DATCALCOLOANZIANITA,
+                    DATCALCOLOMESISOSP,
+                    FLGSTAMPATRASF,
+                    FLGSTAMPADOC,
+                    CODCPIORIGPREC,
+                    DATINIZIO,
+                    CODCPIORIG,
+                    CDNUTINS,
+                    DTMINS,
+                    CDNUTMOD,
+                    DTMMOD)
+            values (S_AN_LAV_STORIA_INF.NEXTVAL,
+                    ?,
+                    ?,
+                    'T',
+                    ?,
+                    ?,
+                    ?,
+                    TO_DATE(?, 'DD/MM/YYYY'),
+                    ?,
+                    TRUNC(SYSDATE),
+                    TO_DATE(?, 'DD/MM/YYYY'),
+                    ?,
+                    TO_DATE(?, 'DD/MM/YYYY'),
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    TO_DATE(?, 'DD/MM/YYYY'),
+                    ?,
+                    null,
+                    ?,
+                    ?,
+                    TO_DATE(?, 'DD/MM/YYYY'),
+                    TO_DATE(?, 'DD/MM/YYYY'),
+                    ?,
+                    ?,
+                    ?,
+                    sysdate,
+                    'MIN',
+                    ?,
+                    sysdate,
+                    ?,
+                    sysdate)" />
+
+<STATEMENT
+    name="SELECT_MASTER_CPI_YG"
+    query=" select CODCPI from DE_CPI where STRDESCRIZIONE = 'ROMA'" />
+    
+    
+<STATEMENT
+    name="SELECT_DATI_AN_LAVORATORE_SAP"
+    query=" select STRCODICEFISCALE, STRCOGNOME, STRNOME, TO_CHAR(DATNASC, 'DD/MM/YYYY') as DATNASC, CODCOMNAS from AN_LAVORATORE where CDNLAVORATORE = ?" />
+    
+<STATEMENT
+        name="TRACCIA_AN_LAVORATORE"
+        query="UPDATE AN_LAVORATORE
+               SET CDNUTMOD = ?, 
+                   DTMMOD = SYSDATE, 
+                   NUMKLOLAVORATORE = NUMKLOLAVORATORE + 1
+                WHERE CDNLAVORATORE = ? " />    
+    
+<STATEMENT
+    name="INSERT_SP_LAVORATORE_INVIO_SAP"  
+    query=" insert into SP_LAVORATORE (
+                            PRGSPLAV,
+                            DATAINVIOMIN,
+                            CODMINSAP,
+                            CODENTETIT,
+                            DATNASC,
+                            CDNLAVORATORE,
+                            CDNUTINS,
+                            DTMINS,
+                            CDNUTMOD,
+                            DTMMOD,
+                            STRCODICEFISCALE,
+                            CODSTATO,
+                            DATINIZIOVAL,
+                            DATFINEVAL)
+                   values (S_SP_LAVORATORE.NEXTVAL,
+                            sysdate,
+                            ?,
+                            ?,
+                            to_date(?, 'dd/mm/yyyy'),
+                            ?,
+                            ?,
+                            sysdate,
+                            ?,
+                            sysdate,
+                            ?,
+                            ?,
+                            sysdate,
+                            null)" />    
+
+<STATEMENT
+    name="INSERT_SP_LAVORATORE_VERIFICA_SAP"  
+    query=" insert into SP_LAVORATORE (
+                            PRGSPLAV,
+                            DATAINVIOMIN,
+                            CODMINSAP,
+                            CODENTETIT,
+                            DATNASC,
+                            CDNLAVORATORE,
+                            CDNUTINS,  
+                            DTMINS,
+                            CDNUTMOD,
+                            DTMMOD,
+                            STRCODICEFISCALE,
+                            CODSTATO,
+                            DATINIZIOVAL,
+                            DATFINEVAL)
+                   values (S_SP_LAVORATORE.NEXTVAL,
+                            null,
+                            ?,
+                            ?,
+                            to_date(?, 'dd/mm/yyyy'),
+                            ?,
+                            ?,
+                            sysdate,
+                            ?,
+                            sysdate,
+                            ?,
+                            ?,
+                            sysdate,
+                            null)" />        
+                            
+<STATEMENT 
+	name="GET_PRG_TIPO_EVIDENZA_BY_COD_TIPO_EVIDENZA" 
+	query="select prgtipoevidenza from DE_TIPO_EVIDENZA where upper(CODTIPOEVIDENZA) = upper(?) "/>
+
+<!-- Impostazione SAP: query di verifica record duplicati -->
+<STATEMENT name="ESISTE_TIT_STU" query="select 1 from PR_STUDIO where codTitolo = ? and cdnLavoratore = ?"/>
+<STATEMENT name="ESISTE_FOR_PRO" query="select 1 from PR_CORSO where codCorso = ? and cdnLavoratore = ?"/>
+<STATEMENT name="ESISTE_LINGUE" query="select 1 from PR_LINGUA where codLingua = ? and cdnLavoratore = ?"/>
+<STATEMENT name="ESISTE_CON_INF" query="select 1 from PR_INFO where codDettInfo = ? and cdnLavoratore = ?"/>
+<STATEMENT name="ESISTE_ABILITA" query="select 1 from PR_ABILITAZIONE where codAbilitazioneGen = ? and cdnLavoratore = ?"/>
+
+<!-- Impostazione SAP: query di inserimento -->
+<STATEMENT name="INSERT_SAP_TIT_STU" query="
+insert into PR_STUDIO(
+	prgStudio,
+	cdnLavoratore,
+	codTitolo, 
+	codTipoTitolo, 
+	numAnno, 
+	strSpecifica, 
+	flgPrincipale, 
+	codMonoStato, 
+	strIstscolastico, 
+	strLocalita,
+	codCom, 
+	strVoto,
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod)
+values(S_PR_STUDIO.nextVal, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'S' , ?, sysDate, ?, sysDate)
+"/>
+
+<STATEMENT name="INSERT_SAP_FOR_PRO" query="
+insert into PR_CORSO(
+	prgCorso,
+	cdnLavoratore,
+	strDescrizione,	
+	codCorso,  
+	numAnno,	
+	strContenuto, 
+	strEnte, 
+	flgCompletato, 
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod)
+values(S_PR_CORSO.nextVal, ?, ?, ?, ?, ?, ?, ?, 'S' , ?, sysDate, ?, sysDate)
+"/>
+
+<STATEMENT name="SELECT_COMBO_LIV_LINGUA_SAP_PORTALE"
+	query="select 
+				delin.cdngrado as codice,
+    			delin.strdescrizione as descrizione
+			from de_grado_lin delin
+			inner join ma_grado_consc_lin malin on malin.cdngrado = delin.cdngrado
+			order by codice" />
+			
+			
+<STATEMENT name="SELECT_COMBO_LIV_C2_LINGUA_SAP_PORTALE"
+	query="select 
+				delin.cdngrado as codice,
+    			delin.strdescrizione as descrizione
+			from de_grado_lin delin
+			inner join ma_grado_consc_lin malin on malin.cdngrado = delin.cdngrado
+			where malin.cod_conoscenza = 'C2'
+			order by codice" />
+
+<STATEMENT name="INSERT_SAP_LINGUE" query="
+insert into PR_LINGUA(
+	prgLingua,
+	cdnLavoratore,
+	codLingua,
+	codModLingua,
+	cdnGradoLetto,
+	cdnGradoScritto,
+	cdnGradoParlato,
+	flgCertificato,
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod)
+values(S_PR_LINGUA.nextVal, ?, ?, ?, ?, ?, ?, ?, 'S' , ?, sysDate, ?, sysDate)
+"/>
+
+<STATEMENT name="SELECT_GRADOCONOSC_SIL_DA_GRADOCONOSC_SAP" query="select delin.cdngrado
+																	from de_grado_lin delin
+																	inner join ma_grado_consc_lin malin on malin.cdngrado = delin.cdngrado 
+																	where (malin.cod_conoscenza = ? or to_char(delin.cdngrado) = ?)" />
+
+<STATEMENT name="INSERT_SAP_CON_INF" query="
+insert into PR_INFO(
+	prgInfo,
+	cdnLavoratore,
+	codTipoInfo,
+	codDettInfo,
+	cdnGrado,
+	strDescInfo,
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod)
+values(S_PR_INFO.nextVal, ?, ?, ?, ?, ?, 'S', ?, sysDate, ?, sysDate)
+"/>
+
+<STATEMENT name="INSERT_SAP_ABILITA" query="
+insert into PR_ABILITAZIONE (
+	prgAbilitazione, 
+	cdnLavoratore, 
+	codAbilitazioneGen, 
+	flgImportato,
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod) 
+	values (S_PR_ABILITAZIONE.nextVal, ?, ?, 'S', ?, sysdate, ?, sysdate)
+" />
+
+<STATEMENT name="SELECT_TITOLO_PADRE" query="select codPadre from de_titolo where codTitolo = ?"/>
+<STATEMENT name="SELECT_DESC_PARLANTE" query="select strDescrizioneParlante from de_titolo where codTitolo = ?"/>
+
+<STATEMENT name="SELECT_CODPATENTE_SIL_DA_CODPATENTE_SAP" query="select DE_GEN.CODABILITAZIONEGEN, DE_GEN.STRDESCRIZIONE from de_abilitazione_gen de_gen
+																inner join ma_abilitazione ma on MA.CODABILITAZIONEGEN = DE_GEN.CODABILITAZIONEGEN 
+																where DE_GEN.CODABILITAZIONEGEN like 'PG%' 
+																and (MA.CODABILITAZIONE = ? OR MA.CODABILITAZIONEGEN = ?)"/>
+
+<STATEMENT name="SELECT_CODPATENTINO_SIL_DA_CODPATENTINO_SAP" query="select DE_GEN.CODABILITAZIONEGEN, DE_GEN.STRDESCRIZIONE  from de_abilitazione_gen de_gen
+																	inner join ma_abilitazione ma on MA.CODABILITAZIONEGEN = DE_GEN.CODABILITAZIONEGEN 
+																	where DE_GEN.CODABILITAZIONEGEN like 'PT%'
+																	and MA.CODABILITAZIONE = ?"/>
+
+<STATEMENT name="SELECT_CODALBO_SIL_DA_CODALBO_SAP" query="select DE_GEN.CODABILITAZIONEGEN, DE_GEN.STRDESCRIZIONE from de_abilitazione_gen de_gen
+															inner join ma_abilitazione ma on MA.CODABILITAZIONEGEN = DE_GEN.CODABILITAZIONEGEN 
+															where DE_GEN.CODTIPOABILITAZIONEGEN = 'AL'
+															and MA.CODABILITAZIONE = ?"/>
+
+<STATEMENT name="SELECT_COMBO_01_ABILITA_PATENTI_SAP_PORTALE" 
+			query="SELECT 
+			    		de_gen.CODABILITAZIONEGEN AS CODICE, 
+			   			de_gen.STRDESCRIZIONE AS DESCRIZIONE  
+			   		from de_abilitazione_gen de_gen
+					inner join ma_abilitazione ma on ma.CODABILITAZIONEGEN = de_gen.CODABILITAZIONEGEN 
+					where ma.CODABILITAZIONE = '01'
+					ORDER BY CODICE"/>
+					
+<STATEMENT name="SELECT_COMBO_PROP_ORARI_PER_SAP_PORTALE" 
+			query="SELECT 
+                        CODORARIO AS CODICE, 
+                        STRDESCRIZIONE AS DESCRIZIONE  
+                    from de_orario  
+                    where CODMONOORARIO = ?
+                    ORDER BY CODICE"/>
+                    
+<STATEMENT name="SELECT_COMBO_ESP_LAV_TIPI_CONTRATTO" 
+			query="SELECT codContratto as codice, 
+                        DECODE( GREATEST(LENGTH(STRDESCRIZIONE),45) , 45, 
+                               STRDESCRIZIONE, SUBSTR(STRDESCRIZIONE, 1, 45) || '...' ) 
+                      || DECODE (SYSDATE, GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)',  LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),
+                                ' (scaduto)', '') AS DESCRIZIONE, flgAutonomo
+                FROM de_contratto
+                WHERE (flgEspLav = 'S' or (flgEspLav = 'N' and flgtirocini = 'S'))
+                ORDER BY codcontratto"/> 
+                
+<STATEMENT name="SELECT_FLAGS_ESP_DA_CONTRATTO" query="select FLGESPLAV, FLGTIROCINI from DE_CONTRATTO where codcontratto = ?"/>                                   
+
+<STATEMENT name="ESISTE_MANSIONE" query="select prgMansione from PR_MANSIONE where codMansione = ? and cdnLavoratore = ?"/>
+
+<STATEMENT name="INSERT_SAP_MANSIONE" query="
+insert into PR_MANSIONE (
+	prgMansione, 
+	cdnLavoratore, 
+	codMansione,
+	flgEsperienza,
+	flgEspForm,
+	flgDisponibile,
+	strNote,
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod) 
+	values (?, ?, ?, ?, ?, ?, ?, 'S', ?, sysdate, ?, sysdate)
+" />
+
+<STATEMENT
+        name="UPDATE_FLGDISP_S_E_NOTE_MANSIONE"
+        query="UPDATE PR_MANSIONE
+               SET flgDisponibile = 'S',
+                   strNote = ?,
+                   CDNUTMOD = ?, 
+                   DTMMOD = SYSDATE 
+                WHERE prgMansione = ? " /> 
+
+<STATEMENT
+        name="UPDATE_FLGESPLAV_MANSIONE"
+        query="UPDATE PR_MANSIONE
+               SET flgEsperienza = ?,
+                   flgImportato = 'S',
+                   CDNUTMOD = ?, 
+                   DTMMOD = SYSDATE 
+                WHERE prgMansione = ? " /> 
+
+<STATEMENT
+        name="UPDATE_FLGESPFORM_MANSIONE"
+        query="UPDATE PR_MANSIONE
+               SET flgEspForm = ?,
+               	   flgImportato = 'S',
+                   CDNUTMOD = ?, 
+                   DTMMOD = SYSDATE 
+                WHERE prgMansione = ? " />                 
+
+<STATEMENT name="INSERT_SAP_ESP_LAVORO" query="
+insert into PR_ESP_LAVORO (
+	prgEspLavoro, 
+	prgMansione, 
+	strDesAttivita, 
+	codContratto, 
+	strRagSocialeAzienda, 
+	codATECO, 
+	codRapportoLav,
+	numMeseInizio, 
+	numAnnoInizio, 
+	numMeseFine, 
+	numAnnoFine, 
+	numMesi,
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod) 
+	values (s_pr_esp_lavoro.nextval, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'S', ?, sysdate, ?, sysdate)
+" />
+
+<STATEMENT name="INSERT_SAP_DIS_ORARIO" query="
+insert into PR_DIS_ORARIO (
+	prgDisOrario, 
+	prgMansione, 
+	codOrario, 
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod) 
+	values (s_pr_dis_orario.nextval, ?, ?, 'S', ?, sysdate, ?, sysdate)
+" />
+
+<STATEMENT name="ESISTE_DIS_ORARIO" query="select 1 from PR_DIS_ORARIO where codOrario = ? and prgMansione = ?"/>
+
+<STATEMENT name="INSERT_SAP_DIS_TURNO" query="
+insert into PR_DIS_TURNO (
+	prgDisTurno, 
+	prgMansione, 
+	codTurno, 
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod) 
+	values (s_pr_dis_turno.nextval, ?, ?, 'S', ?, sysdate, ?, sysdate)
+" />
+
+<STATEMENT name="ESISTE_DIS_TURNO" query="select 1 from PR_DIS_TURNO where codTurno = ? and prgMansione = ?"/>
+
+<STATEMENT name="INSERT_SAP_DIS_COMUNE" query="
+insert into PR_DIS_COMUNE (
+	prgDisComune, 
+	prgMansione, 
+	codCom, 
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod) 
+	values (s_pr_dis_comune.nextval, ?, ?, 'S', ?, sysdate, ?, sysdate)
+" />
+
+<STATEMENT name="ESISTE_DIS_COMUNE" query="select 1 from PR_DIS_COMUNE where codCom = ? and prgMansione = ?"/>
+
+<STATEMENT name="INSERT_SAP_DIS_PROVINCIA" query="
+insert into PR_DIS_PROVINCIA (
+	prgDisProvincia, 
+	prgMansione, 
+	codProvincia, 
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod) 
+	values (s_pr_dis_provincia.nextval, ?, ?, 'S', ?, sysdate, ?, sysdate)
+" />
+
+<STATEMENT name="ESISTE_DIS_PROVINCIA" query="select 1 from PR_DIS_PROVINCIA where codProvincia = ? and prgMansione = ?"/>
+
+<STATEMENT name="INSERT_SAP_DIS_REGIONE" query="
+insert into PR_DIS_REGIONE (
+	prgDisRegione, 
+	prgMansione, 
+	codRegione, 
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod) 
+	values (s_pr_dis_regione.nextval, ?, ?, 'S', ?, sysdate, ?, sysdate)
+" />
+
+<STATEMENT name="ESISTE_DIS_REGIONE" query="select 1 from PR_DIS_REGIONE where codRegione = ? and prgMansione = ?"/>
+
+<STATEMENT name="INSERT_SAP_DIS_STATO" query="
+insert into PR_DIS_STATO (
+	prgDisStato, 
+	prgMansione, 
+	codCom, 
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod) 
+	values (s_pr_dis_stato.nextval, ?, ?, 'S', ?, sysdate, ?, sysdate)
+" />
+
+<STATEMENT name="ESISTE_DIS_STATO" query="select 1 from PR_DIS_STATO where codCom = ? and prgMansione = ?"/>
+
+<STATEMENT name="INSERT_SAP_DIS_MOB_GEO" query="
+insert into PR_MOBIL_GEOGR (
+	prgMansione, 
+	flgDispAuto,
+	flgDispMoto,
+	flgMezziPub, 
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod) 
+	values (?, ?, ?, ?, 'S', ?, sysdate, ?, sysdate)
+" />
+
+<STATEMENT name="ESISTE_DIS_MOB_GEO" query="select 1 from PR_MOBIL_GEOGR where prgMansione = ?"/>
+
+<STATEMENT name="GET_DESCR_ORARIO"
+	query="SELECT strdescrizione    
+  	  				FROM de_orario 				
+  				WHERE codorario = ?" />
+
+<STATEMENT name="SELECT_SAP_ESP_LAV" query="
+SELECT 
+	dm.strDescrizione as desMansione, 
+	strDesAttivita, 
+	dc.strDescrizione as desContratto,
+	strRagsocialeAzienda,
+	da.strDescrizione as desAttivita,
+	numMeseInizio,
+	numAnnoInizio,
+	numMeseFine,
+	numAnnoFine
+FROM 
+	pr_esp_lavoro el,
+	pr_mansione m,
+	de_mansione dm,
+	de_contratto dc,
+	de_attivita da
+WHERE 
+	m.cdnlavoratore=?
+	AND m.prgMansione=el.prgMansione
+	AND m.codMansione=dm.codMansione
+	AND el.codContratto=dc.codContratto(+)
+	AND el.codATECO=da.codATECO(+)
+	AND (flgEspLav = 'S' or (flgEspLav = 'N' and flgtirocini = 'S'))
+ORDER BY el.numAnnoInizio DESC, el.numMeseInizio DESC
+"/>
+
+<STATEMENT name="SELECT_SAP_ABILITA_PER_TIPO" query="
+select 
+	prab.prgabilitazione, prab.codabilitazionegen, (da.strdescrizione || ' (Min: ' || NVL(mn.des_desabilitazione,'nessuna corrispondenza') || ')') as strdescrizione
+    from pr_abilitazione prab
+    inner join de_abilitazione_gen da on da.codabilitazionegen=prab.codabilitazionegen 
+    left join ma_abilitazione ma on ma.codabilitazionegen = da.codabilitazionegen
+    left join mn_abilitazione mn on mn.cod_abilitazione = ma.codabilitazione
+    WHERE cdnLavoratore = ?
+    AND da.codtipoabilitazionegen = ?  
+"/>
+
+<STATEMENT name="SELECT_SAP_CON_INF" query="
+select 
+	ci.codTipoInfo,
+	dt.strDescrizione as desTipoInfo,
+	ci.codDettInfo,
+	dd.strDescrizione as desDettInfo,
+	ci.cdnGrado,
+	dg.strDescrizione as desGrado,
+	ci.strDescInfo
+from 
+	pr_info ci,
+	de_tipo_info dt,
+	de_dett_info dd,
+	de_grado_info dg
+where
+	dt.codtipoinfo(+) = ci.codtipoinfo
+	and dd.coddettinfo(+) = ci.coddettinfo
+	and dg.cdngrado(+) = ci.cdngrado
+	and cdnlavoratore = ?
+"/>
+
+<STATEMENT name="SELECT_SAP_FOR_PRO" query="
+select 
+	fp.codCorso,
+	df.strDescrizione as desCorso,
+	fp.strDescrizione,
+	fp.strContenuto,
+	fp.strEnte,
+	fp.flgCompletato,
+	fp.numAnno
+from 
+	pr_corso fp, 
+	de_corso df
+where 
+	fp.codCorso = df.codCorso(+) 
+	and cdnlavoratore = ?
+order by 
+	fp.numAnno
+"/>
+
+<!--propensioni sil-->
+<!--mansioni-->
+<STATEMENT name="SELECT_SAP_PROPEN_MANSIONI" query="
+select 
+	m.codMansione,
+	m.prgMansione,
+	dm.strDescrizione,
+	m.flgDisponibile,
+	m.flgEsperienza,
+	m.strNote 
+from
+	pr_mansione m,
+	de_mansione dm
+where 
+	m.codMansione = dm.codMansione(+)
+	and m.flgDisponibile = 'S'
+	and m.cdnlavoratore = ?
+"/>
+
+<!--orario-->
+<STATEMENT name="SELECT_SAP_PROPEN_ORARIO" query="
+select 
+  pr.prgMansione,
+  de.strDescrizione
+from 
+  pr_dis_orario pr,
+  de_orario de
+where 
+  pr.codOrario = de.codOrario
+  and prgMansione = ?
+"/>
+
+<!--contratto-->
+<STATEMENT name="SELECT_SAP_PROPEN_CONTRATTO" query="
+select 
+  pr.prgMansione,
+  de.strDescrizione
+from 
+  pr_dis_contratto pr,
+  de_contratto de
+where 
+  pr.codContratto = de.codContratto
+  and prgMansione = ?
+"/>
+
+<!--turno-->
+<STATEMENT name="SELECT_SAP_PROPEN_TURNO" query="
+select 
+  pr.prgMansione,
+  de.strDescrizione
+from 
+  pr_dis_turno pr,
+  de_turno de
+where 
+  pr.codTurno = de.codTurno
+  and prgMansione = ?
+"/>
+
+<!--comune-->
+<STATEMENT name="SELECT_SAP_PROPEN_COMUNE" query="
+select 
+  pr.prgMansione,
+  de.strDenominazione
+from 
+  pr_dis_comune pr,
+  de_comune de
+where 
+  pr.codCom = de.codCom
+  and prgMansione = ?
+"/>
+
+<!--provincia-->
+<STATEMENT name="SELECT_SAP_PROPEN_PROVINCIA" query="
+select 
+  pr.prgMansione,
+  de.strDenominazione
+from 
+  pr_dis_provincia pr,
+  de_provincia de
+where 
+  pr.codProvincia = de.codProvincia
+  and prgMansione = ?
+"/>
+
+<!--regione-->
+<STATEMENT name="SELECT_SAP_PROPEN_REGIONE" query="
+select 
+  pr.prgMansione,
+  de.strDenominazione
+from 
+  pr_dis_regione pr,
+  de_regione de
+where 
+  pr.codRegione = de.codRegione
+  and prgMansione = ?
+"/>
+
+<!--stato-->
+<STATEMENT name="SELECT_SAP_PROPEN_STATO" query="
+select 
+  pr.prgMansione,
+  de.strDenominazione
+from 
+  pr_dis_stato pr,
+  de_comune de
+where 
+  pr.codCom = de.codCom
+  and prgMansione = ?
+"/>
+
+<!--mobilita-->
+<STATEMENT name="SELECT_SAP_PROPEN_MOBILITA" query="
+select 
+	flgDispAuto,
+	flgDispMoto,
+	flgMezziPub
+from pr_mobil_geogr
+where prgMansione = ?
+"/>
+
+<STATEMENT name="SELECT_SAP_CAP_CPI_COMUNE" query="select strCAP, codCPI from DE_COMUNE where codCom = ?"/>
+
+<STATEMENT name="SELECT_SAP_TIT_STU" query="
+select 
+	st.codTitolo,
+	dt.strDescrizione as desTitolo,
+	numAnno,
+	strSpecifica,
+	flgPrincipale,
+	st.codMonoStato,
+  ds.strDescrizione as desStato,
+	strIstScolastico,
+	st.codCom,
+	dc.strDenominazione as desComune,
+	strVoto
+from
+	pr_studio st,
+	de_titolo dt,
+	de_comune dc,
+	de_titolo_italiano ds
+where
+	cdnlavoratore = ?
+	and st.codTitolo = dt.codTitolo (+)
+	and st.codCom = dc.codCom (+)
+	and st.codMonoStato = ds.codMonoStato (+)
+order by numAnno
+"/>
+
+<STATEMENT name="SELECT_MOVIMENTI_RIPETUTI" 
+query="select count(*) ripetizioni from
+		am_movimento mov 
+ 		where mov.cdnlavoratore = ? and mov.codstatoatto = 'PR'
+ 		and (mov.prgmovimento = mov.prgmovimentoprec 
+    		or  mov.prgmovimento = mov.prgmovimentosucc 
+    		or mov.prgmovimentoprec = mov.prgmovimentosucc
+    	)"
+/>
+
+<STATEMENT name="SELECT_MOVIMENTI_SUCCESSIVI" 
+query="select distinct mov.cdnlavoratore
+		from am_movimento mov
+ 		where mov.cdnlavoratore = ? and mov.codstatoatto = 'PR'
+ 		and exists (
+			select mov1.prgmovimento, count(*)
+			from am_movimento mov1 
+			where mov1.prgmovimentosucc = mov.prgmovimento 
+			and mov1.codstatoatto = 'PR'
+			group by mov1.prgmovimento
+			having count(*) > 1)"
+/>
+
+<STATEMENT name="SELECT_MOVIMENTI_PRECEDENTI" 
+query="select distinct mov.cdnlavoratore
+		from am_movimento mov
+ 		where mov.cdnlavoratore = ? and mov.codstatoatto = 'PR'
+ 		and exists (
+			select mov1.prgmovimento, count(*)
+			from am_movimento mov1 
+			where mov1.prgmovimentoprec = mov.prgmovimento 
+			and mov1.codstatoatto = 'PR'
+			group by mov1.prgmovimento
+			having count(*) > 1
+			)"
+/>
+
+<STATEMENT name="SELECT_MOVIMENTI_SUCCESSIVI_APPROFONDITA" 
+query="select distinct mov.cdnlavoratore
+		from am_movimento mov
+ 		where mov.cdnlavoratore = ? and mov.codstatoatto = 'PR'
+ 		and mov.prgmovimentosucc is not null
+ 		and exists 
+		  (select mov1.prgmovimento
+    		from am_movimento mov1 
+    		where mov1.prgmovimento = mov.prgmovimentosucc 
+    		and mov1.codstatoatto = 'PR' 
+   			 AND 
+		    ( MOV1.PRGMOVIMENTOsucc = MOV.PRGMOVIMENTO OR 
+		      MOV1.PRGMOVIMENTOsucc = MOV.PRGMOVIMENTOprec OR
+		      NVL(MOV1.PRGMOVIMENTOPREC, MOV.PRGMOVIMENTO) &lt;&gt; MOV.PRGMOVIMENTO)
+		  )"
+/>
+
+<STATEMENT name="SELECT_MOVIMENTI_PRECEDENTI_APPROFONDITA" 
+query="select distinct mov.cdnlavoratore
+		from am_movimento mov
+ 		where mov.cdnlavoratore = ? and mov.codstatoatto = 'PR'
+ 		and mov.prgmovimentoprec is not null
+ 		and exists 
+		  (select mov1.prgmovimento
+    		from am_movimento mov1 
+    		where mov1.prgmovimento = mov.prgmovimentoprec   
+    		and mov1.codstatoatto = 'PR' 
+    		AND 
+		    ( MOV1.PRGMOVIMENTOPREC = MOV.PRGMOVIMENTO OR 
+		      NVL(MOV1.PRGMOVIMENTOSUCC, MOV.PRGMOVIMENTO) &lt;&gt; MOV.PRGMOVIMENTO)
+		  )"
+/>
+
+<STATEMENT name="SELECT_MOVIMENTI_NO_SUCCESSIVO_PUNTATO_DA_PREC" 
+query="select distinct mov.cdnlavoratore
+		from am_movimento mov
+ 		where mov.cdnlavoratore = ? and mov.codstatoatto = 'PR'
+ 		and mov.prgmovimentosucc is null
+ 		and exists 
+		  (select mov1.prgmovimento
+	      from am_movimento mov1
+	      where mov1.prgmovimentoprec = mov.prgmovimento
+	      and mov1.codstatoatto = 'PR'
+	       )"
+/>
+
+<STATEMENT name="SELECT_MOVIMENTI_NO_PRECEDENTE_PUNTATO_DA_SUCC" 
+query="select distinct mov.cdnlavoratore
+		from am_movimento mov
+ 		where mov.cdnlavoratore = ? and mov.codstatoatto = 'PR'
+ 		and mov.prgmovimentoprec is null
+ 		and exists 
+		  (select mov1.prgmovimento
+	      from am_movimento mov1
+	      where mov1.prgmovimentosucc = mov.prgmovimento
+	      and mov1.codstatoatto = 'PR'
+	       )"
+/>
+
+<STATEMENT name="GET_ACCORPAMENTI_SUCCESSIVI_AGGIORNAMENTO_SAP" 
+query="select count(*) numAccorpamenti from
+		an_lavoratore_accorpa
+ 		where (cdnlavoratore = ? or cdnlavoratoreaccorpato = ?) and
+    	(dtmins &gt;= to_date(?, 'dd/mm/yyyy'))"
+/>
+
+<STATEMENT name="AUTORIZZAZIONE_PRIVACY_VALIDA"
+	query="
+	select prgprivacy, to_char(datinizio, 'dd/mm/yyyy') as datinizio, to_char(datfine, 'dd/mm/yyyy') as datfine,
+	flgautoriz, numkloprivacy, cdnutins, to_char(dtmins, 'dd/mm/yyyy hh24:mi') as dtmins,
+	cdnutmod, to_char(dtmmod, 'dd/mm/yyyy hh24:mi') as dtmmod 
+	from am_privacy 
+	where (cdnlavoratore = ?) and ( (datfine is null) or (trunc(datfine) &gt;= to_date(?, 'dd/mm/yyyy')) )
+" />
+
+<STATEMENT name="LOAD_DOCUMENTO_IDENTITA_VALIDO"
+	query="SELECT doc.prgdocumento, col.prgdocumentocoll
+               FROM am_documento doc
+               INNER JOIN de_doc_tipo det ON (doc.CODTIPODOCUMENTO = det.CODTIPODOCUMENTO)
+               LEFT JOIN am_documento_coll col ON (DOC.PRGDOCUMENTO = COL.PRGDOCUMENTO)
+               WHERE doc.cdnlavoratore = ? AND det.CODAMBITODOC = 'ID'
+                     AND doc.CODSTATOATTO = 'PR' AND trunc(doc.datinizio) &lt;= to_date(?, 'dd/mm/yyyy')
+                     AND nvl(trunc(doc.datfine), to_date(?, 'dd/mm/yyyy')) &gt;= to_date(?, 'dd/mm/yyyy')
+               order by decode(doc.flgdocidentifp,'S',0,1) asc" />
+          
+<STATEMENT name="LOAD_DOCUMENTO_IDENTITA_VALIDO_NE"
+	query="SELECT doc.prgdocumento, col.prgdocumentocoll
+               FROM am_documento doc
+               INNER JOIN de_doc_tipo det ON (doc.CODTIPODOCUMENTO = det.CODTIPODOCUMENTO)
+               INNER JOIN am_documento_coll col ON (DOC.PRGDOCUMENTO = COL.PRGDOCUMENTO)
+               WHERE doc.cdnlavoratore = ? AND det.CODAMBITODOC = 'ID' AND doc.CODTIPODOCUMENTO = 'NE'
+                     AND doc.CODSTATOATTO = 'PR' AND trunc(doc.datinizio) &lt;= to_date(?, 'dd/mm/yyyy')
+                     AND nvl(trunc(doc.datfine), to_date(?, 'dd/mm/yyyy')) &gt;= to_date(?, 'dd/mm/yyyy')
+               order by decode(doc.flgdocidentifp,'S',0,1) asc" />
+
+<STATEMENT name="UPDATE_AN_LAV_STORIA_INF_INS_LAV_IMPORTA_SAP" query="
+			UPDATE AN_LAV_STORIA_INF
+               SET CODCPITIT = ?, 
+                   CDNUTMOD = ?, CDNUTMODSCHEDAANAGPROF = ?,
+                   CODMONOTIPOCPI = ?,
+                   CODCPIORIG = ?,
+                   DTMMOD=SYSDATE, DTMMODSCHEDAANAGPROF = SYSDATE,
+                   NUMKLOLAVSTORIAINF = ?,
+                   CODCOMDOM = ?,
+                   STRNOTE = ?
+                WHERE PRGLAVSTORIAINF = ?
+"/> 
+
+
+<STATEMENT name="UPDATE_AN_LAV_STORIA_INF_FROM_IMPORTA_SAP" query="
+			UPDATE AN_LAV_STORIA_INF
+               SET CODCPITIT = ?, 
+                   CDNUTMOD = ?, CDNUTMODSCHEDAANAGPROF = ?,
+                   CODMONOTIPOCPI = ?,
+                   CODCPIORIG = ?,
+                   DTMMOD=SYSDATE, DTMMODSCHEDAANAGPROF = SYSDATE,
+                   NUMKLOLAVSTORIAINF = ?,
+                   STRNOTE = ?
+                WHERE PRGLAVSTORIAINF = ?
+"/>
+
+<STATEMENT name="INSERT_SAP_MANSIONE_FROM_IMPORTA" query="
+insert into PR_MANSIONE (
+	prgMansione, 
+	cdnLavoratore, 
+	codMansione,
+	flgEsperienza,
+	flgEspForm,
+	flgDisponibile,
+	strNote,
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod) 
+	values (?, ?, ?, ?, ?, ?, ?, ?, ?, sysdate, ?, sysdate)
+" />
+
+<STATEMENT name="GET_ESP_LAVORO_FROM_IMPORTA_SAP" query="
+                      SELECT COUNT(*) NUMESPERIENZE
+                      FROM PR_ESP_LAVORO PR_ INNER JOIN PR_MANSIONE PR_M on (PR_.PRGMANSIONE = PR_M.PRGMANSIONE)
+                        AND PR_M.CDNLAVORATORE = ? AND PR_.PRGMANSIONE = ? AND PR_.NUMANNOINIZIO = TO_NUMBER(?) AND PR_.NUMMESEINIZIO = TO_NUMBER(?)" />
+
+<STATEMENT name="INSERT_SAP_ESP_LAVORO_FROM_IMPORTA" query="
+insert into PR_ESP_LAVORO (
+	prgEspLavoro, 
+	prgMansione, 
+	strDesAttivita, 
+	codContratto, 
+	strRagSocialeAzienda, strCodFiscaleAzienda, codComAzienda, strIndirizzoAzienda,
+	codATECO, 
+	numMeseInizio, 
+	numAnnoInizio, 
+	numMeseFine, 
+	numAnnoFine, 
+	numMesi,
+	flgImportato, 
+	cdnUtIns, 
+	dtmIns, 
+	cdnUtMod, 
+	dtmMod) 
+	values (s_pr_esp_lavoro.nextval, ?, ?, ?, ?, ?, ?, ?, ?, 
+	to_number(?), to_number(?), to_number(?), to_number(?), to_number(?), ?, ?, sysdate, ?, sysdate)
+" />
+
+<STATEMENT name="SELECT_CODCPI_COMPETENZA_POLO_PROVINCIALE" 
+	query="select m.codcpisil
+	from de_cpi_validita_min m
+	inner join de_cpi d on (m.codcpisil = d.codcpi)
+	where m.codcpimin = ? and m.datfineval &gt; sysdate and m.datinizioval &lt; sysdate
+	and d.codprovincia = (select codprovinciasil from ts_generale)" />
+	
+<STATEMENT name="SELECT_COLLOQUIO_IMPORTA_POLITICAATTIVA" 
+	query="select coll.prgcolloquio
+	from or_colloquio coll
+	inner join ma_servizio_tipoattivita ma_serv on (coll.codservizio = ma_serv.codservizio)
+	where coll.cdnlavoratore = ? and trunc(coll.datcolloquio) = to_date(?, 'dd/mm/yyyy')
+	and ma_serv.codtipoattivita = ? and nvl(ma_serv.flgimportadef, 'N') = 'S'
+	order by coll.dtmins desc" />
+	
+<STATEMENT name="SELECT_AZIONE_IMPORTA_POLITICAATTIVA" 
+	query="select ma_azione.prgazioni, ma_azione.codtipoprogetto
+	from ma_azione_tipoattivita ma_azione
+	where ma_azione.codtipoattivita = ? and ma_azione.codtipoprogetto = ?
+	and ma_azione.datfineval &gt; to_date(?, 'dd/mm/yyyy') and ma_azione.datinizioval &lt; to_date(?, 'dd/mm/yyyy')
+	and nvl(ma_azione.flgimportadef, 'N') = 'S'" />
+	
+<STATEMENT name="CONTROLLA_ESISTENZA_AZIONE_IMPORTA_POLITICAATTIVA"
+	query="
+        select or_percorso_concordato.prgPercorso
+        from or_percorso_concordato, or_colloquio
+        where or_percorso_concordato.PRGCOLLOQUIO = or_colloquio.PRGCOLLOQUIO
+              and or_colloquio.prgcolloquio = ?
+              and or_percorso_concordato.prgAzioni = ?
+        order by or_percorso_concordato.dtmins desc" />
+        
+<STATEMENT name="INSERISCI_AZIONE_IMPORTAZIONE"
+	query="
+	insert into or_percorso_concordato(prgPercorso, prgColloquio, datStimata, prgAzioni, codEsito, codesitorendicont,
+					cdnUtIns, dtmIns, cdnUtMod, dtmMod, dateffettiva, codtipologiadurata, strcfdatorelavoro, prgspiavvio, prgspiproposta, prgspiconclusione) 
+		values(?, ?, to_date(?,'dd/mm/yyyy'), ?, ?, ?, ?, sysdate, ?, sysdate, to_date(?,'dd/mm/yyyy'), ?, ?, ?, ?, ?)
+"/>
+
+<STATEMENT name="NEXT_S_AM_SP_IMPORTAZIONE"
+				query="SELECT S_AM_SP_IMP_MASSIVA.NEXTVAL KEY FROM DUAL"/>
+
+<STATEMENT name="INS_AM_SP_IMPORTAZIONE"
+	query="
+	INSERT INTO AM_SP_IMP_MASSIVA(PRGSPIMPMASSIVA, NUMFILE, STRNOMEFILE, DTMINS, CDNUTINS) 
+		VALUES(?, ?, ?, SYSDATE, ?)
+"/>
+
+<STATEMENT name="INS_AM_SP_IMPORTAZIONE_DETAIL"
+	query="
+	INSERT INTO AM_SP_IMP_RISULTATO(PRGSPIMPRISULTATO, PRGSPIMPMASSIVA, DTMINS, CDNUTINS, CODERRORE, FLGANAGPRESENTE, FLGDIDPRESENTE, 
+								  NUMESPERIENZESAP, NUMESPERIENZEIMP, NUMESPERIENZENONIMP, STRSQLERRMSG, STRCODICEFISCALE, STRESITO)
+		VALUES(S_AM_SP_IMP_RISULTATO.NEXTVAL, ?, SYSDATE, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+"/>
+
+<STATEMENT name="GET_RISULTATI_IMPORTAZIONE_SAP"
+	query="
+        select tbM.prgspimpmassiva, to_char(tbM.numfile) numfile, tbM.strnomefile, to_char(tbM.dtmins, 'dd/mm/yyyy hh24:mi') dtminsM,
+       		tbD.prgspimprisultato, to_char(tbD.dtmins, 'dd/mm/yyyy hh24:mi') dtminsD, tbD.coderrore, tbD.flganagpresente, 
+       		tbD.flgdidpresente, to_char(tbD.numesperienzesap) numesperienzesap, tbD.strcodicefiscale, tbD.stresito,
+       		to_char(tbD.numesperienzeimp) numesperienzeimp, to_char(tbD.numesperienzenonimp) numesperienzenonimp, tbD.strsqlerrmsg
+        from am_sp_imp_massiva tbM
+        left join am_sp_imp_risultato tbD on (tbM.prgspimpmassiva = tbD.prgspimpmassiva)
+		where tbM.prgspimpmassiva = ? order by tbD.dtmins asc" />
+		
+<STATEMENT name="GET_RISULTATI_ULTIMA_IMPORTAZIONE_SAP"
+	query="
+        select tbM.prgspimpmassiva, to_char(tbM.numfile) numfile, tbM.strnomefile, to_char(tbM.dtmins, 'dd/mm/yyyy hh24:mi') dtminsM,
+       		tbD.prgspimprisultato, to_char(tbD.dtmins, 'dd/mm/yyyy hh24:mi') dtminsD, tbD.coderrore, tbD.flganagpresente, 
+       		tbD.flgdidpresente, to_char(tbD.numesperienzesap) numesperienzesap, tbD.strcodicefiscale, tbD.stresito,
+       		to_char(tbD.numesperienzeimp) numesperienzeimp, to_char(tbD.numesperienzenonimp) numesperienzenonimp, tbD.strsqlerrmsg
+        from am_sp_imp_massiva tbM
+        left join am_sp_imp_risultato tbD on (tbM.prgspimpmassiva = tbD.prgspimpmassiva)
+		where tbM.prgspimpmassiva = (select max(imp.prgspimpmassiva) from am_sp_imp_massiva imp where imp.cdnutins = ?) order by tbD.dtmins asc" />
+		
+<STATEMENT name="SELECT_PROVINCIA_CODCPI_COMPETENZA_MINISTERIALE" 
+	query="select m.codprovincia provinciacpi, m.strdenominazione
+		   from mn_st_cpi m
+		   where m.codcpimin = ?
+" />
+
+<STATEMENT name="SELECT_REGIONE_CODCPI_COMPETENZA_MINISTERIALE" 
+	query="select m.codregione, m.strdenominazione
+		   from mn_st_cpi m
+		   where m.codcpimin = ?
+" />
+
+<STATEMENT name="SELECT_ENTETIT_BY_KEY"
+	query="select sc.codcpimin as CODICE, 
+                  sc.strdenominazione as DESCRIZIONE,
+                  sc.codcpimin || ' - ' ||  sc.strdenominazione as entePromotore
+                  from mn_st_cpi sc
+                  where sc.codcpimin = ?" />
+
+<STATEMENT name="GET_SP_LAVORATORE_VERIFICA_SAP_ZERO"
+		   query="SELECT PRGSPLAV, NUMKLOSAP
+		   			FROM SP_LAVORATORE
+				    where (CDNLAVORATORE = ?) and (DATFINEVAL is null) and (trunc(sysdate) - trunc(DATINIZIOVAL) &gt; 1)"/>
+              
+<STATEMENT name="UPDATE_SP_LAVORATORE_VERIFICA_SAP_ZERO"
+		   query="update SP_LAVORATORE 
+				    set NUMKLOSAP = ? + 1,				    
+				    CDNUTMOD = ?,
+				    DTMMOD = sysdate,
+				    DATFINEVAL = sysdate
+				    where PRGSPLAV = ?"/>

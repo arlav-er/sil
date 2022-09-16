@@ -1,0 +1,267 @@
+<!-- Cerca Budget per CPI -->
+<MODULE name="MCercaBudgetPerCpi"  class="it.eng.sil.module.budget.CercaBudgetPerCPI" >
+   <CONFIG pool="SIL_DATI">
+       
+   </CONFIG>
+</MODULE>  
+ <MODULE name="M_ELENCO_CPI_BUDGET" class="it.eng.sil.module.budget.GetElencoCpiBudget">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_CPI_CODICI_DESCRIZIONE" />
+	</CONFIG>
+</MODULE>
+<MODULE name="M_INSERT_NEW_BUDGET"  class="it.eng.sil.module.budget.InsertNewBudgetPerCpi" >
+   <CONFIG pool="SIL_DATI">
+       <QUERY statement="STORED_ATTIVA_BUDGET" />
+   </CONFIG>
+</MODULE> 
+
+
+<MODULE name="M_CampiTotaliBudget"  class="it.eng.sil.module.budget.VisualizzaPaginaTotaliBudget" >
+   <CONFIG pool="SIL_DATI">
+        <QUERIES>
+		<SELECT_QUERY statement="GET_SUB_TOTALI_BUDGET">
+        
+        </SELECT_QUERY>
+	 </QUERIES>
+   </CONFIG>
+</MODULE>  
+
+<MODULE name="M_ListaTotaliBudget" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+      <CONFIG pool="SIL_DATI" title="TOTALI VOUCHER" rows="20">
+        <QUERIES>
+            <SELECT_QUERY>   
+             <STATEMENT_PROVIDER CLASS="it.eng.sil.module.budget.DynamicListaTotaliBudget"/>
+            </SELECT_QUERY>
+        </QUERIES>
+        <COLUMNS>
+            <COLUMN name="STRDESCRIZIONE" 						label="CPI"/>            
+            <COLUMN name="NUMANNOBUDGET" 						label="Anno Bdg"/>                    
+            <COLUMN name="DECTOTBUDGET" 						label="Importo TOT" PRE="budget"/>
+            <COLUMN name="DECTOTIMPEGNATO" 						label="Impegnato" PRE="budget"/>
+            <COLUMN name="DECTOTSPESO" 							label="Speso" PRE="budget"/>
+			<COLUMN name="DECTOTRESIDUO" 						label="Residuo" PRE="budget"/>
+
+        </COLUMNS>
+        <CAPTIONS>
+           	  <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+                    <PARAMETER name="PAGE" type="ABSOLUTE" value="DettaglioTotaliBudgetPage" scope="SERVICE_REQUEST"/>
+                    <PARAMETER name="CDUT" type="RELATIVE" value="" scope="SERVICE_REQUEST"/>
+                    <PARAMETER name="CDNFUNZIONE" type="RELATIVE" value="CDNFUNZIONE" scope="SERVICE_REQUEST"/>
+              <!--       <PARAMETER name="importoTot" type="RELATIVE" value="IMPORTOTOT" scope="SERVICE_REQUEST" />
+                    <PARAMETER name="impegnato" type="RELATIVE" value="IMPEGNATO" scope="SERVICE_REQUEST" />
+                    <PARAMETER name="speso" type="RELATIVE" value="SPESO" scope="SERVICE_REQUEST "  />
+                    <PARAMETER name="residuo" type="RELATIVE" value="RESIDUO" scope="SERVICE_REQUEST" />  -->
+                    <PARAMETER name="descrizioneCPI" type="RELATIVE" value="STRDESCRIZIONE" scope="LOCAL"/>
+                    <PARAMETER name="NUMANNOBUDGET" type="RELATIVE" value="NUMANNOBUDGET" scope="LOCAL"/>
+                    <PARAMETER name="codcpi" type="RELATIVE" value="codcpi" scope="LOCAL"/>
+                    <PARAMETER name="AnnoSel" type="RELATIVE" value="AnnoSel" scope="SERVICE_REQUEST"/>
+                    <PARAMETER name="codiceCPISel" type="RELATIVE" value="codiceCPISel" scope="SERVICE_REQUEST"/>
+            </SELECT_CAPTION>
+        </CAPTIONS>
+
+    </CONFIG>
+ </MODULE>
+ <!-- Inizio Pagina di dettaglio  -->
+ <MODULE name="M_CampiDettaglioTotaliBudget" class="it.eng.sil.module.modelli.tda.GenericSelect">
+ 	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_SUB_TOTALI_BUDGET_CPI">
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="codcpi"/>
+			<PARAMETER scope="SERVICE_REQUEST" type="RELATIVE" value="NUMANNOBUDGET"/>
+      	</QUERY>
+   	</CONFIG>
+</MODULE>
+ <MODULE name="M_CampiDettaglioTotaliBudget_ORIG"  class="it.eng.sil.module.budget.CampiDettaglioTotaliBudget" >
+   <CONFIG pool="SIL_DATI">
+        <QUERIES>
+		
+	 </QUERIES>
+   </CONFIG>
+</MODULE>  
+<!-- Lista per la pagina di dettaglio -->
+<MODULE name="M_ListaDettaglioTotaliBudget" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+      <CONFIG pool="SIL_DATI" title="Lista delle operazioni che hanno costruito il Budget selezionato" rows="20">
+        <QUERIES>
+            <SELECT_QUERY>   
+             <STATEMENT_PROVIDER CLASS="it.eng.sil.module.budget.DynamicListaDettaglioTotaliBudget"/>
+            </SELECT_QUERY>
+        </QUERIES>
+        <COLUMNS>
+            <COLUMN name="numannobudget" 									label="Anno BDG"/>            
+            <COLUMN name="datoperazione" 									label="Data Operazione"/>                    
+            <COLUMN name="STRDESCRIZIONE" 									label="CPI"/>
+            <COLUMN name="decimporto" 										label="IMPORTO"/>
+            <COLUMN name="operdescr" 										label="Oper.Per il CPI"/>
+			
+        </COLUMNS>
+        <CAPTIONS>
+           	 <!-- Per adesso la delete non deve esser gestita
+           	 <DELETE_CAPTION image="../../img/del.gif" label="Cancella Budget" confirm="TRUE">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="DelBudgetPage" scope="" />
+				<PARAMETER name="numannobudget" type="RELATIVE" value="numannobudget" scope="LOCAL" />
+				<PARAMETER name="datoperazione" type="RELATIVE" value="datoperazione" scope="LOCAL" />
+				<PARAMETER name="STRDESCRIZIONE" type="RELATIVE" value="STRDESCRIZIONE" scope="LOCAL" />
+			</DELETE_CAPTION>
+			-->
+        </CAPTIONS>
+		
+
+    </CONFIG>
+ </MODULE>
+  <!-- Inizio Modulo per la pagina inserisci new budget per cpi  -->
+ <MODULE name="MCallInsertOperation"  class="it.eng.sil.module.budget.CallInsertOperation" >
+   <CONFIG pool="SIL_DATI">
+        <QUERIES>
+		
+	 </QUERIES>
+   </CONFIG>
+</MODULE>  
+ <!--Non va bene  
+ <MODULE name="M_ALTRI_CPU" class="it.eng.sil.module.budget.GetAltriCpu">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="TEST_GET_CPI_CODICI_DESCRIZIONE"></QUERY>
+	</CONFIG>
+</MODULE>
+-->
+ <MODULE name="M_ALTRI_CPU" class="it.eng.sil.module.anag.DynGenericIscrListeSpeciali">
+	<CONFIG pool="SIL_DATI" >
+		<QUERY> 
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.budget.DynComboAltriCpu"/>
+   		</QUERY> 
+	</CONFIG>
+</MODULE>
+<MODULE name="M_IMP_OPERAZ" class="it.eng.sil.module.budget.GetImportOper">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_TIPO_OPERAZIONE" />
+	</CONFIG>
+</MODULE>
+<MODULE name="M_CONFIRM_NEW_OPERATION_BUDGET"  class="it.eng.sil.module.budget.ConfirmNewOperationBudget" >
+   <CONFIG pool="SIL_DATI">
+       <QUERY statement="STORED_OPERAZIONE_BUDGET_CPI" />
+   </CONFIG>
+</MODULE> 
+<!-- Cerca Soggetti Accreditati per Voucher in Moduli-->
+<MODULE name="MCercaSoggettiAccreditatiVoucher"  class="it.eng.sil.module.budget.CercaSoggettiAccreditatiVoucher" >
+   <CONFIG pool="SIL_DATI">
+       
+   </CONFIG>
+</MODULE>  
+ <MODULE name="M_ELENCO_COMUNI_VOUCHER" class="it.eng.sil.module.budget.GetElencoSoggettiAccVoucher">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_COMUNI_CODICE_DESCRIZIONE_PER_VOUCHER" />
+	</CONFIG>
+</MODULE>
+ <!--  Lista Soggetti accreditati per Voucher  -->
+ <MODULE name="M_ListaSogAccVoucher" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+      <CONFIG pool="SIL_DATI" title="SOGGETTI ACCREDIDATI PER I VOUCHER" rows="20">
+        <QUERIES>
+            <SELECT_QUERY>   
+             <STATEMENT_PROVIDER CLASS="it.eng.sil.module.budget.DynamicListaSoggettiAccVoucher"/>
+            </SELECT_QUERY>
+        </QUERIES>
+        <COLUMNS>
+            <COLUMN name="codicefiscale" 				label="Codice Fiscale"/>            
+            <COLUMN name="codsede" 						label="Codice Sede"/>                    
+            <COLUMN name="denominazione" 				label="Denominazione"/>
+            <COLUMN name="indirizzo" 					label="Indirizzo"/>
+            <COLUMN name="comune" 						label="Comune"/>
+			        
+			
+        </COLUMNS>
+        <CAPTIONS>
+           	  <SELECT_CAPTION image="../../img/detail.gif" label="Dettaglio" confirm="false">
+                    <PARAMETER name="PAGE" type="ABSOLUTE" value="DettaglioAccreditamentiPage" scope="SERVICE_REQUEST"/>
+                    <PARAMETER name="CDUT" type="RELATIVE" value="" scope="SERVICE_REQUEST"/>
+                    <PARAMETER name="codiceFiscale" type="RELATIVE" value="codicefiscale" scope="LOCAL"/>
+					<PARAMETER name="codSede" 		type="RELATIVE" value="codsede" scope="LOCAL"/>
+					<PARAMETER name="COMUNE" 		type="RELATIVE" value="comune" scope="LOCAL"/>
+					<PARAMETER name="codcom" 		type="RELATIVE" value="codcom" scope="LOCAL"/>
+					<PARAMETER name="DENOMINAZIONE" type="RELATIVE" value="denominazione" scope="LOCAL"/>
+					<PARAMETER name="INDIRIZZO" 	type="RELATIVE" value="indirizzo" scope="LOCAL"/>
+					<PARAMETER name="noteStampa" 	type="RELATIVE" value="STRNOTESTAMPE" scope="LOCAL"/>
+					<PARAMETER name="cfSel" type="RELATIVE" value="cfSel" scope="SERVICE_REQUEST"/>
+					<PARAMETER name="denominazioneSel" type="RELATIVE" value="denominazioneSel" scope="SERVICE_REQUEST"/>
+					<PARAMETER name="descComuniSel" type="RELATIVE" value="descComuniSel" scope="SERVICE_REQUEST"/>
+					<PARAMETER name="codComuneSel" type="RELATIVE" value="codComuneSel" scope="SERVICE_REQUEST"/>
+					<PARAMETER name="tipoRicerca" type="RELATIVE" value="tipoRicerca" scope="SERVICE_REQUEST"/>
+            </SELECT_CAPTION>
+        </CAPTIONS>
+
+    </CONFIG>
+ </MODULE>
+  <!--  Lista Misure per soggetti accreditati  modificato -->
+ <MODULE name="M_ListaMisureSedeSoggetto" class="it.eng.afExt.dispatching.module.impl.DynamicStatementListModule" >
+      <CONFIG pool="SIL_DATI" title="Lista delle Misure a cui è accreditata la Sede del Soggetto" rows="20">
+        <QUERIES>
+            <SELECT_QUERY>   
+             <STATEMENT_PROVIDER CLASS="it.eng.sil.module.budget.DynamicListaDettaglioAccreditamenti"/>
+            </SELECT_QUERY>
+        </QUERIES>
+        <COLUMNS>
+            <COLUMN name="descrizione" 				label="Misura" />            
+            <COLUMN name="dataInizio" 				label="Valido dal "/>                    
+            <COLUMN name="dataFine" 				label="Valido fino al"/>	
+        </COLUMNS>
+          <CAPTIONS>
+           	
+           	 <DELETE_CAPTION image="../../img/del.gif" label="Cancella Misura" confirm="TRUE">
+				<PARAMETER name="PAGE" type="ABSOLUTE" value="DeleteAccreditamentiPage" scope="SERVICE_REQUEST" />
+				<PARAMETER name="prgMisura" 		 type="RELATIVE" value="prgEnteAcc" scope="LOCAL"/>
+				<PARAMETER name="codiceFiscale" type="RELATIVE" value="codicefiscale" scope="LOCAL"/>
+				<PARAMETER name="codSede" 		type="RELATIVE" value="codsede" scope="LOCAL"/>
+				<PARAMETER name="INDIRIZZO" type="RELATIVE" value="INDIRIZZO" scope="SERVICE_REQUEST"/>
+				<PARAMETER name="DENOMINAZIONE" 		type="RELATIVE" value="DENOMINAZIONE" scope="SERVICE_REQUEST"/>
+				<PARAMETER name="codComuneSel" 		type="RELATIVE" value="CODCOM" scope="SERVICE_REQUEST"/>
+				<PARAMETER name="descComuneSel" 		type="RELATIVE" value="COMUNE" scope="SERVICE_REQUEST"/>
+				<PARAMETER name="noteStampa" 	type="RELATIVE" value="STRNOTESTAMPE" scope="SERVICE_REQUEST"/>
+				<PARAMETER scope="SESSION"         type="RELATIVE" value="indirizzo"/>
+      			<PARAMETER scope="SESSION"         type="RELATIVE" value="denominazione"/>
+      			<PARAMETER scope="SESSION"         type="RELATIVE" value="codiceComune"/>
+      			<PARAMETER scope="SESSION"         type="RELATIVE" value="DesComune"/>
+			</DELETE_CAPTION>
+			
+        </CAPTIONS>
+
+    </CONFIG>
+ </MODULE>
+ 
+ <!--Non va bene  
+  <MODULE name="M_ELENCO_AZIONI" class="it.eng.sil.module.budget.GetElencoAzioni">
+	<CONFIG pool="SIL_DATI" title="">
+		<QUERY statement="GET_MISURE_AZIONE" />
+	</CONFIG>
+</MODULE>
+-->
+<MODULE name="M_ELENCO_AZIONI" class="it.eng.sil.module.anag.DynGenericIscrListeSpeciali">
+	<CONFIG pool="SIL_DATI" >
+		<QUERY> 
+			<STATEMENT_PROVIDER CLASS="it.eng.sil.module.budget.DynComboAzioniMisura"/>
+   		</QUERY> 
+	</CONFIG>
+</MODULE>
+
+<!--  Logica per inserimento di un nuovo accredito -->
+<MODULE name="M_CONFIRM_NEW_OPERATION_ACCREDITAMENTO"  class="it.eng.sil.module.budget.ConfirmNewOperationAccreditamento" >
+   <CONFIG pool="SIL_DATI">
+       <QUERY statement="STORED_OPERAZIONE_INSERT_ACCREDITAMENTO" />
+   </CONFIG>
+</MODULE> 
+<!--  Logica per  update ente accredito-->
+<MODULE name="M_CONFIRM_UPDATE_ACCREDITAMENTO"  class="it.eng.sil.module.budget.ConfirmUpdateAccreditamento" >
+   <CONFIG pool="SIL_DATI">
+       <QUERY statement="STORED_OPERAZIONE_UPDATE_ENTE_ACCREDITAMENTO" />
+   </CONFIG>
+</MODULE> 
+<!--  Logica per  cancella ente accredito-->
+<MODULE name="M_CONFIRM_DELETE_ACCREDITAMENTO"  class="it.eng.sil.module.budget.ConfirmDeleteAccreditamento" >
+   <CONFIG pool="SIL_DATI">
+       <QUERY statement="STORED_OPERAZIONE_DELETE_ENTE_ACCREDITAMENTO" />
+   </CONFIG>
+</MODULE> 
+<!--  Logica per  creazione soggetto accreditato-->
+<MODULE name="M_CONFIRM_MAKE_SOG_ACCREDITAMENTO"  class="it.eng.sil.module.budget.ConfirmInsertSogAccreditamento" >
+   <CONFIG pool="SIL_DATI">
+       <QUERY statement="STORED_OPERAZIONE_INSERT_ENTE_ACCREDITAMENTO" />
+   </CONFIG>
+</MODULE> 
+
+ 

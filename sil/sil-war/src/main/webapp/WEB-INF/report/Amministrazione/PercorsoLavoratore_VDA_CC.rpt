@@ -1,0 +1,2245 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="10" minor_version="0" major_xml_version="6" minor_xml_version="5" count="3" id="0">
+    <Datasource dll="pdsora7.dll" host="concordia:1521:orac10" schema="" catalog="" user="" password="" url="">
+      <Tablesource alias="VW_PERCORSO_LAV" databaseIdentifier="VW_PERCORSO_LAV">
+        <Column name="CDNLAVORATORE" type="6" />
+        <Column name="DATDATAINIZIO" type="15" />
+        <Column name="DATDATAFINE" type="15" />
+        <Column name="CODCPI" type="11" />
+        <Column name="CODCPIDEST" type="11" />
+        <Column name="CODMONOTIPOINF" type="11" />
+        <Column name="LDESCVARIE" type="11" />
+        <Column name="DESCVARIE" type="11" />
+        <Column name="LDESCVARIE2" type="11" />
+        <Column name="DESCVARIE2" type="11" />
+        <Column name="PRGRICHIESTAAZ" type="6" />
+        <Column name="NUMANNO" type="11" />
+        <Column name="PRGAZIENDA" type="6" />
+        <Column name="PRGUNITAAZ" type="6" />
+        <Column name="DESCOBIETTIVOAZIONE" type="11" />
+        <Column name="DESCESITO" type="11" />
+        <Column name="DESCSERVIZIO" type="11" />
+        <Column name="DESCTIPOPATTO" type="11" />
+        <Column name="DESCSTATOOCCUPAZ" type="11" />
+        <Column name="DESCSTATOOCCUPAZORIG" type="11" />
+        <Column name="DESCRIZIONEPERCORSO" type="11" />
+        <Column name="CHIAVEDETTAGLIO" type="6" />
+        <Column name="DESCSTATO" type="11" />
+        <Column name="STRPOSDATA" type="11" />
+        <Column name="DATASORT2" type="15" />
+        <Column name="CDNLAVORATORE_CRYPT" type="11" />
+        <Column name="DESCRIZIONEPERCORSOALTERNATIVA" type="11" />
+        <Column name="MESIANZ" type="6" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="8">
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="status"/>
+      <Attribute name="shortName" value="status"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[if ({VW_PERCORSO_LAV.STRPOSDATA}='STATUS') then
+
+    if (isNull({VW_PERCORSO_LAV.DATDATAFINE})) then 
+
+        totext({VW_PERCORSO_LAV.DATDATAINIZIO},'dd/MM/yyyy')
+
+   else 
+
+        totext({VW_PERCORSO_LAV.DATDATAINIZIO},'dd/MM/yyyy') + '->' + totext({VW_PERCORSO_LAV.DATDATAFINE},'dd/MM/yyyy')
+
+else
+
+    '']]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="servizi"/>
+      <Attribute name="shortName" value="servizi"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[if ({VW_PERCORSO_LAV.STRPOSDATA}='SERVIZI') then
+
+    if (isNull({VW_PERCORSO_LAV.DATDATAFINE})) then 
+
+       totext({VW_PERCORSO_LAV.DATDATAINIZIO},'dd/MM/yyyy')
+
+    else 
+
+        totext({VW_PERCORSO_LAV.DATDATAINIZIO},'dd/MM/yyyy') + '->' + totext({VW_PERCORSO_LAV.DATDATAFINE},'dd/MM/yyyy')
+
+else
+
+   '']]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="movimenti"/>
+      <Attribute name="shortName" value="movimenti"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[if ({VW_PERCORSO_LAV.STRPOSDATA}='MOVIMENTI' Or {VW_PERCORSO_LAV.STRPOSDATA}='MISSIONI') then
+
+    if (isNull({VW_PERCORSO_LAV.DATDATAFINE})) then 
+
+        totext({VW_PERCORSO_LAV.DATDATAINIZIO},'dd/MM/yyyy')
+
+   else 
+
+       totext({VW_PERCORSO_LAV.DATDATAINIZIO},'dd/MM/yyyy') + '->' + totext({VW_PERCORSO_LAV.DATDATAFINE},'dd/MM/yyyy')
+
+else
+
+   '']]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="domicilio"/>
+      <Attribute name="shortName" value="domicilio"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[{?indirizzoDomicilio} + '  - '+{?comuneDomicilio}]]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="totaliPagine"/>
+      <Attribute name="shortName" value="totaliPagine"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA['Pagina ' + 'di']]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="descrizionePercorso"/>
+      <Attribute name="shortName" value="descrizionePercorso"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[if ('B' = {VW_PERCORSO_LAV.CODMONOTIPOINF} ) then (
+	if ({?showQualCodB} ='S' ) then (
+ 		{VW_PERCORSO_LAV.DESCRIZIONEPERCORSO}
+	)else (
+		{VW_PERCORSO_LAV.DESCRIZIONEPERCORSOALTERNATIVA}
+	)
+)else if ('O' = {VW_PERCORSO_LAV.CODMONOTIPOINF} ) then (
+	if ({?showQualCodO} ='S') then (
+			{VW_PERCORSO_LAV.DESCRIZIONEPERCORSOALTERNATIVA}
+		)else(
+			{VW_PERCORSO_LAV.DESCRIZIONEPERCORSO}
+		)
+)else (
+		{VW_PERCORSO_LAV.DESCRIZIONEPERCORSO}
+	)]]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="dataStampa"/>
+      <Attribute name="shortName" value="dataStampa"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[Local DateVar dat := CurrentDate;
+
+Local StringVar dataEff := "";
+
+
+
+
+
+   Local StringVar str := "";
+
+   str := ToText(Day(dat),0,'','');
+
+   if (length(str)=1) then
+
+      str := "0"+str;
+
+   dataEff := str;
+
+
+
+   str := ToText(Month(dat),0,'','');
+
+   if (length(str)=1) then
+
+      str := "0"+str;
+
+   dataEff := dataEff + "/" + str;
+
+   
+
+   str := ToText(Year(dat),0,'','');
+
+   if (length(str)=1) then
+
+      str := "0"+str;
+
+   dataEff := dataEff + "/" + str; 
+
+
+
+dataEff;]]>
+    </Field>
+    <Field type="FormulaField" valueType="6">
+      <Attribute name="name" value="mesiAnz"/>
+      <Attribute name="shortName" value="mesiAnz"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[{VW_PERCORSO_LAV.MESIANZ};]]>
+    </Field>
+  </FormulaFields>
+
+  <PromptFields count="42">
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="cdnLavoratore"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="titolo"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="nomeLavoratore"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="codiceFiscale"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="dataNascita"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="indirizzoDomicilio"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="comuneDomicilio"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="statoOccupaz"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="dataInizioStOcc"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="dataInizioAnz"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="dataInizioDid"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="numAnnoProt"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="numProt"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="dataProt"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="docInOut"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="codCpi"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="Pm-?codCpi"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-?codCpi"/>
+      <Attribute name="use_range" value="false"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="dataDa"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="dataA"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoA"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoB"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoC"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoD"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoE"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoF"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoG"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoH"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoI"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoL"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoM"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoN"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoO"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="cdnLavoratoreEncrypt"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoP"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoQ"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoR"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="showQualCodB"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="showQualCodO"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="infoS"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value=""/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="InfoStatoOccupazionale"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="InfoStatoOccupazionale"/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="Intestazione"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Intestazione"/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="Protocollazione"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Protocollazione"/>
+      <Attribute name="use_range" value="false"/>
+      <DefaultPromptValues count="1">
+      <![CDATA[[null]]]>
+      </DefaultPromptValues>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="2">
+    <Field type="SortField" valueType="15">
+      <Attribute name="name" value="VW_PERCORSO_LAV.DATDATAINIZIO"/>
+      <Attribute name="shortName" value="DATDATAINIZIO"/>
+      <Reference name="id" type="DatabaseField" refname="VW_PERCORSO_LAV.DATDATAINIZIO"/>
+      <Attribute name="operation" value="1"/>
+    </Field>
+    <Field type="SortField" valueType="15">
+      <Attribute name="name" value="VW_PERCORSO_LAV.DATASORT2"/>
+      <Attribute name="shortName" value="DATASORT2"/>
+      <Reference name="id" type="DatabaseField" refname="VW_PERCORSO_LAV.DATASORT2"/>
+      <Attribute name="operation" value="1"/>
+    </Field>
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="shortName" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[if ( {?dataDa} <> '') then (
+( {VW_PERCORSO_LAV.CDNLAVORATORE} = {?cdnLavoratore} OR {VW_PERCORSO_LAV.CDNLAVORATORE_CRYPT} = {?cdnLavoratoreEncrypt} )
+and ( {VW_PERCORSO_LAV.CODMONOTIPOINF} in Array({?infoA}, {?infoB}, {?infoC}, {?infoD}, {?infoE}, {?infoF}, {?infoG}, {?infoH}, {?infoI}, {?infoL},{?infoM}, {?infoN}, {?infoO}, {?infoP}, {?infoQ}, {?infoR}, {?infoS} ) )
+and ( {VW_PERCORSO_LAV.DATDATAINIZIO}>=Date(ToNumber(Right({?dataDa},4)),ToNumber(Mid({?dataDa},4,2)),ToNumber(Left({?dataDa},2))) )
+)
+else (
+( {VW_PERCORSO_LAV.CDNLAVORATORE} = {?cdnLavoratore} OR {VW_PERCORSO_LAV.CDNLAVORATORE_CRYPT} = {?cdnLavoratoreEncrypt} )
+and ( {VW_PERCORSO_LAV.CODMONOTIPOINF} in Array({?infoA}, {?infoB}, {?infoC}, {?infoD}, {?infoE}, {?infoF}, {?infoG}, {?infoH}, {?infoI}, {?infoL},{?infoM}, {?infoN}, {?infoO}, {?infoP}, {?infoQ}, {?infoR}, {?infoS} ) ) 
+)]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="1"/>
+    <Attribute name="page margin left" value="240"/>
+    <Attribute name="page margin right" value="240"/>
+    <Attribute name="page margin top" value="283"/>
+    <Attribute name="page margin bottom" value="283"/>
+    <Attribute name="report title" value=""/>
+    <Attribute name="report author" value=""/>
+    <Attribute name="report keywords" value=""/>
+    <Attribute name="report subject" value=""/>
+    <Attribute name="report template" value=""/>
+    <Attribute name="report comments" value=""/>
+    <Attribute name="report last saved" value="24 Aug 2020 08:35:54 GMT"/>
+    <Attribute name="report created" value="26 Jan 2005 14:49:18 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="2"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="PageAreaPair" id="0">
+    <Area type="PageHeader" count="1">
+      <AreaProperties>
+        <Attribute name="hold minimal pagefooter free" value="1"/>
+      </AreaProperties>
+      <Section type="PageHeader" count="4" width="11424" height="750" id="0">
+        <SectionProperties>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+        </SectionProperties>
+        <Element type="Text" count="1" x_position="450" y_position="405" width="690" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font name" value="Arial"/>
+                <Attribute name="font size" value="195"/>
+              </FontProperties>
+            <![CDATA[Status]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="1875" y_position="405" width="690" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font name" value="Arial"/>
+                <Attribute name="font size" value="195"/>
+              </FontProperties>
+            <![CDATA[Servizi]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="3075" y_position="405" width="1080" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font name" value="Arial"/>
+                <Attribute name="font size" value="195"/>
+              </FontProperties>
+            <![CDATA[Movimenti]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="4725" y_position="405" width="1890" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font name" value="Arial"/>
+                <Attribute name="font size" value="195"/>
+              </FontProperties>
+            <![CDATA[Dettaglio]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="PageFooter" count="1">
+      <AreaProperties>
+        <Attribute name="print at bottom of page" value="true"/>
+        <Attribute name="new page after" value="true"/>
+        <Attribute name="hold minimal pagefooter free" value="1"/>
+      </AreaProperties>
+      <Section type="PageFooter" count="1" width="11424" height="570" id="1">
+        <SectionProperties>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+        </SectionProperties>
+        <Element type="Text" count="1" x_position="8775" y_position="30" width="2295" height="270">
+          <Element type="Paragraph" count="4">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Pagina  ]]>
+            </Element>
+            <Element type="FieldPart">
+              <FontProperties>
+                <Attribute name="font name" value="MS Sans Serif"/>
+                <Attribute name="font size" value="225"/>
+              </FontProperties>
+              <NumberProperties>
+                <Attribute name="negative type" value="0"/>
+                <Attribute name="use thousand seperators" value="false"/>
+                <Attribute name="use leading zero" value="false"/>
+                <Attribute name="n decimal places" value="0"/>
+                <Attribute name="rounding type" value="0"/>
+                <Attribute name="thousand seperators symbol" value="."/>
+                <Attribute name="decimal seperators symbol" value=","/>
+                <Attribute name="currency symbol" value="€"/>
+                <Attribute name="allow field clipping" value="false"/>
+              </NumberProperties>
+              <Reference name="field" type="SpecialVarField" id="17"/>
+            </Element>
+            <Element type="TextPart">
+            <![CDATA[ di ]]>
+            </Element>
+            <Element type="FieldPart">
+              <FontProperties>
+                <Attribute name="font name" value="MS Sans Serif"/>
+                <Attribute name="font size" value="225"/>
+              </FontProperties>
+              <NumberProperties>
+                <Attribute name="negative type" value="0"/>
+                <Attribute name="use thousand seperators" value="false"/>
+                <Attribute name="use leading zero" value="false"/>
+                <Attribute name="n decimal places" value="0"/>
+                <Attribute name="rounding type" value="0"/>
+                <Attribute name="thousand seperators symbol" value="."/>
+                <Attribute name="decimal seperators symbol" value=","/>
+                <Attribute name="currency symbol" value="€"/>
+                <Attribute name="allow field clipping" value="false"/>
+              </NumberProperties>
+              <Reference name="field" type="SpecialVarField" id="15"/>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="9">
+      <AreaProperties>
+        <Attribute name="new page before" value="true"/>
+        <Attribute name="hold minimal pagefooter free" value="1"/>
+      </AreaProperties>
+      <Section type="ReportHeader" count="1" width="11424" height="930" id="2">
+        <SectionProperties>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA["OFF" = {?Intestazione}]]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="Subreport" x_position="450" y_position="525" width="10605" height="345">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <BorderProperties>
+            <Attribute name="left border" value="0"/>
+            <Attribute name="right border" value="0"/>
+            <Attribute name="bottom border" value="0"/>
+            <Attribute name="top border" value="0"/>
+          </BorderProperties>
+          <SubreportProperties>
+            <Attribute name="report id" value="1"/>
+          </SubreportProperties>
+          <SubreportLinks count="1">
+            <SubreportLink>
+              <Reference name="id" type="PromptVarField" refname="?codCpi"/>
+              <Attribute name="id" value="1"/>
+            </SubreportLink>
+          </SubreportLinks>
+          <FontProperties>
+            <Attribute name="font name" value="Arial"/>
+            <Attribute name="font size" value="200"/>
+          </FontProperties>
+        </Element>
+      </Section>
+      <Section type="ReportHeader" count="1" width="11424" height="735" id="3">
+        <SectionProperties>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA["OFF" = {?Intestazione}]]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="450" y_position="225" width="10485" height="345">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="2"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font name" value="Arial"/>
+            <Attribute name="font size" value="285"/>
+          </FontProperties>
+          <StringProperties>
+            <Attribute name="line distance" value="0"/>
+            <Attribute name="line distance normal" value="1"/>
+          </StringProperties>
+          <Reference name="field" type="PromptVarField" refname="?titolo"/>
+        </Element>
+      </Section>
+      <Section type="ReportHeader" count="0" width="11424" height="179" id="4">
+        <SectionProperties>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+        </SectionProperties>
+      </Section>
+      <Section type="ReportHeader" count="6" width="11424" height="330" id="5">
+        <SectionProperties>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+        </SectionProperties>
+        <Element type="Text" count="1" x_position="4845" y_position="30" width="1455" height="285">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="3"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="210"/>
+              </FontProperties>
+            <![CDATA[codice fiscale: ]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="435" y_position="30" width="1215" height="285">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="210"/>
+              </FontProperties>
+            <![CDATA[Lavoratore: ]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="8595" y_position="30" width="1575" height="285">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="3"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="210"/>
+              </FontProperties>
+            <![CDATA[data di nascita:]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="1605" y_position="30" width="3195" height="285">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font size" value="210"/>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <StringProperties>
+            <Attribute name="line distance" value="0"/>
+            <Attribute name="line distance normal" value="1"/>
+          </StringProperties>
+          <Reference name="field" type="PromptVarField" refname="?nomeLavoratore"/>
+        </Element>
+        <Element type="FieldElement" x_position="6285" y_position="30" width="2235" height="285">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font size" value="210"/>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="PromptVarField" refname="?codiceFiscale"/>
+        </Element>
+        <Element type="FieldElement" x_position="10200" y_position="30" width="1125" height="285">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font size" value="210"/>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="PromptVarField" refname="?dataNascita"/>
+        </Element>
+      </Section>
+      <Section type="ReportHeader" count="2" width="11424" height="345" id="6">
+        <SectionProperties>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="1425" y_position="60" width="9600" height="285">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font size" value="210"/>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <StringProperties>
+            <Attribute name="line distance" value="0"/>
+            <Attribute name="line distance normal" value="1"/>
+          </StringProperties>
+          <Reference name="field" type="FormulaField" refname="@domicilio"/>
+        </Element>
+        <Element type="Text" count="1" x_position="450" y_position="60" width="915" height="285">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="210"/>
+              </FontProperties>
+            <![CDATA[Domicilio:]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+      <Section type="ReportHeader" count="6" width="11424" height="360" id="7">
+        <SectionProperties>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA["OFF" =  {?InfoStatoOccupazionale}]]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="Text" count="1" x_position="5250" y_position="60" width="1965" height="240">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{?dataInizioAnz} ='']]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="3"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="210"/>
+              </FontProperties>
+            <![CDATA[anzianità di disocc.: ]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="450" y_position="60" width="1170" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="210"/>
+              </FontProperties>
+            <![CDATA[Stato occ.:]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="1470" y_position="60" width="3645" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font size" value="210"/>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="PromptVarField" refname="?statoOccupaz"/>
+        </Element>
+        <Element type="FieldElement" x_position="7350" y_position="60" width="1275" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font size" value="210"/>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="PromptVarField" refname="?dataInizioAnz"/>
+        </Element>
+        <Element type="Text" count="1" x_position="8700" y_position="60" width="2415" height="240">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="close border on page break" value="false"/>
+            <PropertyFormula valueType="-1" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[{?dataInizioAnz} ='']]>
+            </PropertyFormula>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="210"/>
+              </FontProperties>
+            <![CDATA[mesi anzianità di disocc.:]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="10950" y_position="60" width="465" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font size" value="210"/>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <NumberProperties>
+            <Attribute name="use system default format" value="false"/>
+            <Attribute name="n decimal places" value="0"/>
+            <Attribute name="rounding type" value="11"/>
+            <Attribute name="thousand seperators symbol" value="."/>
+            <Attribute name="decimal seperators symbol" value=","/>
+            <Attribute name="currency symbol" value="€"/>
+          </NumberProperties>
+          <Reference name="field" type="FormulaField" refname="@mesiAnz"/>
+        </Element>
+      </Section>
+      <Section type="ReportHeader" count="1" width="11424" height="360" id="8">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA[{?dataInizioDid}='']]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="Subreport" x_position="450" y_position="0" width="8265" height="285">
+          <BorderProperties>
+            <Attribute name="left border" value="0"/>
+            <Attribute name="right border" value="0"/>
+            <Attribute name="bottom border" value="0"/>
+            <Attribute name="top border" value="0"/>
+          </BorderProperties>
+          <SubreportProperties>
+            <Attribute name="report id" value="4"/>
+          </SubreportProperties>
+          <SubreportLinks count="2">
+            <SubreportLink>
+              <Reference name="id" type="PromptVarField" refname="?cdnLavoratore"/>
+              <Attribute name="id" value="2"/>
+            </SubreportLink>
+            <SubreportLink>
+              <Reference name="id" type="PromptVarField" refname="?dataInizioDid"/>
+              <Attribute name="id" value="3"/>
+            </SubreportLink>
+          </SubreportLinks>
+          <FontProperties>
+            <Attribute name="font size" value="210"/>
+          </FontProperties>
+        </Element>
+      </Section>
+      <Section type="ReportHeader" count="11" width="11424" height="1085" id="9">
+        <SectionProperties>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA["OFF" =  {?Protocollazione}]]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="Box" x2_position="11205" y2_position="915" x_position="165" y_position="180" width="0" height="0">
+          <CommonProperties>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <BoxProperties>
+          </BoxProperties>
+        </Element>
+        <Element type="Text" count="1" x_position="450" y_position="225" width="570" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Anno]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="1148" y_position="228" width="1125" height="236">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <NumberProperties>
+            <Attribute name="use system default format" value="false"/>
+            <Attribute name="negative type" value="3"/>
+            <Attribute name="use thousand seperators" value="false"/>
+            <Attribute name="n decimal places" value="0"/>
+            <Attribute name="rounding type" value="11"/>
+            <Attribute name="thousand seperators symbol" value="."/>
+            <Attribute name="decimal seperators symbol" value=","/>
+            <Attribute name="currency symbol" value="€"/>
+            <Attribute name="allow field clipping" value="false"/>
+          </NumberProperties>
+          <Reference name="field" type="PromptVarField" refname="?numAnnoProt"/>
+        </Element>
+        <Element type="Text" count="1" x_position="2505" y_position="225" width="555" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Num ]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="3135" y_position="228" width="2037" height="236">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <StringProperties>
+            <Attribute name="line distance" value="0"/>
+            <Attribute name="line distance normal" value="1"/>
+          </StringProperties>
+          <Reference name="field" type="PromptVarField" refname="?numProt"/>
+        </Element>
+        <Element type="Text" count="1" x_position="5475" y_position="225" width="1080" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Data di prot.]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="6726" y_position="228" width="4449" height="236">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <StringProperties>
+            <Attribute name="line distance" value="0"/>
+            <Attribute name="line distance normal" value="1"/>
+          </StringProperties>
+          <Reference name="field" type="PromptVarField" refname="?dataProt"/>
+        </Element>
+        <Element type="Text" count="1" x_position="450" y_position="570" width="630" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Doc. di]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="1174" y_position="570" width="1072" height="236">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <StringProperties>
+            <Attribute name="line distance" value="0"/>
+            <Attribute name="line distance normal" value="1"/>
+          </StringProperties>
+          <Reference name="field" type="PromptVarField" refname="?docInOut"/>
+        </Element>
+        <Element type="Text" count="1" x_position="2730" y_position="570" width="450" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+            <![CDATA[Rif.]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Subreport" x_position="3135" y_position="570" width="7770" height="228">
+          <CommonProperties>
+            <Attribute name="suppress" value="true"/>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <PropertyFormula valueType="8" propertyType="suppress">
+              <Attribute name="name" value="suppress"/>
+              <Attribute name="basic syntax" value="false"/>
+              <![CDATA[trim({?numProt})='']]>
+            </PropertyFormula>
+          </CommonProperties>
+          <BorderProperties>
+            <Attribute name="left border" value="0"/>
+            <Attribute name="right border" value="0"/>
+            <Attribute name="bottom border" value="0"/>
+            <Attribute name="top border" value="0"/>
+          </BorderProperties>
+          <SubreportProperties>
+            <Attribute name="report id" value="2"/>
+          </SubreportProperties>
+          <SubreportLinks count="0">
+          </SubreportLinks>
+          <FontProperties>
+            <Attribute name="font name" value="Times New Roman"/>
+            <Attribute name="font size" value="200"/>
+          </FontProperties>
+        </Element>
+      </Section>
+      <Section type="ReportHeader" count="1" width="11424" height="240" id="10">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="0" y_position="0" width="1575" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <TimeProperties>
+            <Attribute name="am string" value=" AM"/>
+            <Attribute name="pm string" value=" PM"/>
+          </TimeProperties>
+          <Reference name="field" type="DatabaseField" refname="VW_PERCORSO_LAV.DATASORT2"/>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <AreaProperties>
+        <Attribute name="new page after" value="true"/>
+        <Attribute name="hold minimal pagefooter free" value="1"/>
+      </AreaProperties>
+      <Section type="ReportFooter" count="4" width="11424" height="1350" id="11">
+        <SectionProperties>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+        </SectionProperties>
+        <Element type="Text" count="1" x_position="165" y_position="600" width="11265" height="315">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font name" value="Arial"/>
+                <Attribute name="font size" value="195"/>
+              </FontProperties>
+            <![CDATA[Il presente certificato non può essere prodotto agli organi della Pubblica Amministrazione o ai privati gestori di pubblici servizi.]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="Text" count="1" x_position="150" y_position="150" width="1665" height="315">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font name" value="Arial"/>
+                <Attribute name="font size" value="195"/>
+              </FontProperties>
+            <![CDATA[Data della stampa]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="1950" y_position="150" width="1665" height="315">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font name" value="Arial"/>
+            <Attribute name="font size" value="195"/>
+          </FontProperties>
+          <Reference name="field" type="FormulaField" refname="@dataStampa"/>
+        </Element>
+        <Element type="Text" count="1" x_position="150" y_position="900" width="11265" height="315">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font name" value="Arial"/>
+                <Attribute name="font size" value="195"/>
+              </FontProperties>
+            <![CDATA[Tale documento non ha carattere di esaustività, in quanto riporta esclusivamente i movimenti agli atti dello scrivente ufficio.]]>
+            </Element>
+          </Element>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="1">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+        <Attribute name="hold minimal pagefooter free" value="1"/>
+      </AreaProperties>
+      <Section type="Detail" count="4" width="11424" height="450" id="12">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="300" y_position="150" width="1200" height="165">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font name" value="Arial"/>
+            <Attribute name="font size" value="195"/>
+          </FontProperties>
+          <StringProperties>
+            <Attribute name="line distance" value="0"/>
+            <Attribute name="line distance normal" value="1"/>
+          </StringProperties>
+          <Reference name="field" type="FormulaField" refname="@status"/>
+        </Element>
+        <Element type="FieldElement" x_position="1650" y_position="150" width="1215" height="165">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font name" value="Arial"/>
+            <Attribute name="font size" value="195"/>
+          </FontProperties>
+          <StringProperties>
+            <Attribute name="line distance" value="0"/>
+            <Attribute name="line distance normal" value="1"/>
+          </StringProperties>
+          <Reference name="field" type="FormulaField" refname="@servizi"/>
+        </Element>
+        <Element type="FieldElement" x_position="3000" y_position="150" width="1215" height="165">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font name" value="Arial"/>
+            <Attribute name="font size" value="195"/>
+          </FontProperties>
+          <StringProperties>
+            <Attribute name="line distance" value="0"/>
+            <Attribute name="line distance normal" value="1"/>
+          </StringProperties>
+          <Reference name="field" type="FormulaField" refname="@movimenti"/>
+        </Element>
+        <Element type="FieldElement" x_position="4650" y_position="150" width="6525" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <Reference name="field" type="FormulaField" refname="@descrizionePercorso"/>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="10" minor_version="0" major_xml_version="6" minor_xml_version="5" count="2" id="1">
+    <Datasource dll="pdsora7.dll" host="srvhmd:1521:orahmb" schema="" catalog="" user="" password="" url="">
+      <Tablesource alias="DE_CPI" databaseIdentifier="DE_CPI">
+        <Column name="CODCPI" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="STRINDIRIZZO" type="11" />
+        <Column name="STRLOCALITA" type="11" />
+        <Column name="STRCAP" type="11" />
+        <Column name="CODCOM" type="11" />
+        <Column name="CODPROVINCIA" type="11" />
+        <Column name="STRTEL" type="11" />
+        <Column name="STRFAX" type="11" />
+        <Column name="STREMAIL" type="11" />
+        <Column name="STRORARIO" type="11" />
+        <Column name="STRNOTE" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+        <Column name="NUMKLOCPI" type="6" />
+        <Column name="STRRESPONSABILE" type="11" />
+        <Column name="CODMONOTIPOFILE" type="11" />
+        <Column name="STREMAILMIGRAZIONE" type="11" />
+      </Tablesource>
+      <Tablesource alias="DE_PROVINCIA" databaseIdentifier="DE_PROVINCIA">
+        <Column name="CODPROVINCIA" type="11" />
+        <Column name="STRDENOMINAZIONE" type="11" />
+        <Column name="STRTARGA" type="11" />
+        <Column name="STRISTAT" type="11" />
+        <Column name="CODREGIONE" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+        <Column name="NUMKLOPROVINCIA" type="6" />
+        <Column name="STRDIRCOORDINATORE" type="11" />
+        <Column name="STRRESPONSABILEUO" type="11" />
+        <Column name="STRINDIRIZZOPOLO" type="11" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="DE_CPI" to="DE_PROVINCIA" type="inn">
+      <Link from="CODPROVINCIA" to="CODPROVINCIA" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="6">
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="cpi"/>
+      <Attribute name="shortName" value="cpi"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA['Centro per l''impiego di '+{DE_CPI.STRDESCRIZIONE}]]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="provincia"/>
+      <Attribute name="shortName" value="provincia"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA['Regione Autonoma Valle d''Aosta']]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="infoCpi"/>
+      <Attribute name="shortName" value="infoCpi"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[stringVar info :='' ;
+
+info:={DE_CPI.STRINDIRIZZO} + '  -  ' + 'tel. ';
+
+if (isNull({DE_CPI.STRTEL})) then 
+
+    info:=info+ '        '
+
+else info:=info+{DE_CPI.STRTEL}+'        ';
+
+info:=info+'fax ';
+
+if (not isnull({DE_CPI.STRFAX})) then 
+
+    info:=info+{DE_CPI.STRFAX};
+
+info]]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="faxCpi"/>
+      <Attribute name="shortName" value="faxCpi"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA['fax ' + {DE_CPI.STRFAX}]]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="telCpi"/>
+      <Attribute name="shortName" value="telCpi"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA['tel. ' + {DE_CPI.STRTEL}]]>
+    </Field>
+    <Field type="FormulaField" valueType="11">
+      <Attribute name="name" value="indCpi"/>
+      <Attribute name="shortName" value="indCpi"/>
+      <Attribute name="formula type" value="0"/>
+      <Attribute name="basic syntax" value="false"/>
+      <![CDATA[{DE_CPI.STRINDIRIZZO}]]>
+    </Field>
+  </FormulaFields>
+
+  <PromptFields count="1">
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="Pm-?codCpi"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-?codCpi"/>
+      <Attribute name="use_range" value="false"/>
+      <Attribute name="id" value="1"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="shortName" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{DE_CPI.CODCPI} = {?Pm-?codCpi}]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="0"/>
+    <Attribute name="page margin left" value="240"/>
+    <Attribute name="page margin right" value="240"/>
+    <Attribute name="page margin top" value="283"/>
+    <Attribute name="page margin bottom" value="283"/>
+    <Attribute name="report title" value="_intastazioneCpi.rpt"/>
+    <Attribute name="report author" value=""/>
+    <Attribute name="report keywords" value=""/>
+    <Attribute name="report subject" value=""/>
+    <Attribute name="report template" value=""/>
+    <Attribute name="report comments" value=""/>
+    <Attribute name="report last saved" value="24 Aug 2020 08:35:54 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="2"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <AreaProperties>
+        <Attribute name="new page before" value="true"/>
+        <Attribute name="hold minimal pagefooter free" value="1"/>
+      </AreaProperties>
+      <Section type="ReportHeader" count="0" width="10605" height="221" id="0">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+        </SectionProperties>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <AreaProperties>
+        <Attribute name="new page after" value="true"/>
+        <Attribute name="hold minimal pagefooter free" value="1"/>
+      </AreaProperties>
+      <Section type="ReportFooter" count="0" width="10605" height="0" id="1">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+        </SectionProperties>
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="1">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+        <Attribute name="hold minimal pagefooter free" value="1"/>
+      </AreaProperties>
+      <Section type="Detail" count="3" width="10605" height="1518" id="2">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="171" y_position="57" width="10374" height="399">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="2"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font name" value="Arial"/>
+            <Attribute name="font size" value="260"/>
+          </FontProperties>
+          <StringProperties>
+            <Attribute name="line distance" value="0"/>
+            <Attribute name="line distance normal" value="1"/>
+          </StringProperties>
+          <Reference name="field" type="FormulaField" refname="@provincia"/>
+        </Element>
+        <Element type="FieldElement" x_position="171" y_position="570" width="10374" height="342">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="2"/>
+            <Attribute name="close border on page break" value="false"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font name" value="Arial"/>
+            <Attribute name="font size" value="260"/>
+          </FontProperties>
+          <StringProperties>
+            <Attribute name="line distance" value="0"/>
+            <Attribute name="line distance normal" value="1"/>
+          </StringProperties>
+          <Reference name="field" type="FormulaField" refname="@cpi"/>
+        </Element>
+        <Element type="FieldElement" x_position="171" y_position="969" width="10374" height="399">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="2"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font name" value="Arial"/>
+            <Attribute name="font size" value="220"/>
+          </FontProperties>
+          <StringProperties>
+            <Attribute name="line distance" value="0"/>
+            <Attribute name="line distance normal" value="1"/>
+          </StringProperties>
+          <Reference name="field" type="FormulaField" refname="@infoCpi"/>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="10" minor_version="0" major_xml_version="6" minor_xml_version="5" count="2" id="2">
+    <Datasource dll="pdsora7.dll" host="srvhmd:1521:orahmb" schema="" catalog="" user="" password="" url="">
+      <Tablesource alias="DE_DOC_AMBITO" databaseIdentifier="DE_DOC_AMBITO">
+        <Column name="CODAMBITODOC" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+      </Tablesource>
+      <Tablesource alias="DE_DOC_TIPO" databaseIdentifier="DE_DOC_TIPO">
+        <Column name="CODTIPODOCUMENTO" type="11" />
+        <Column name="STRDESCRIZIONE" type="11" />
+        <Column name="CODAMBITODOC" type="11" />
+        <Column name="FLGDOCAMM" type="11" />
+        <Column name="STRENTEMODELLO" type="11" />
+        <Column name="STRFREQUENZAACQRIL" type="11" />
+        <Column name="DATINIZIOVAL" type="15" />
+        <Column name="DATFINEVAL" type="15" />
+        <Column name="CODMONOGESTDOC" type="11" />
+        <Column name="STRIO" type="11" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+
+    <Join from="DE_DOC_TIPO" to="DE_DOC_AMBITO" type="inn">
+      <Link from="CODAMBITODOC" to="CODAMBITODOC" type="eq"/>
+    </Join>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="0">
+  </FormulaFields>
+
+  <PromptFields count="0">
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="0">
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="shortName" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{DE_DOC_TIPO.CODTIPODOCUMENTO}='PERC_LAV']]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="0"/>
+    <Attribute name="page margin left" value="240"/>
+    <Attribute name="page margin right" value="240"/>
+    <Attribute name="page margin top" value="283"/>
+    <Attribute name="page margin bottom" value="283"/>
+    <Attribute name="report title" value="riferimento"/>
+    <Attribute name="report author" value=""/>
+    <Attribute name="report keywords" value=""/>
+    <Attribute name="report subject" value=""/>
+    <Attribute name="report template" value=""/>
+    <Attribute name="report comments" value=""/>
+    <Attribute name="report last saved" value="24 Aug 2020 08:35:54 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="2"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <AreaProperties>
+        <Attribute name="hold minimal pagefooter free" value="1"/>
+      </AreaProperties>
+      <Section type="ReportHeader" count="0" width="7770" height="0" id="0">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+        </SectionProperties>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <AreaProperties>
+        <Attribute name="hold minimal pagefooter free" value="1"/>
+      </AreaProperties>
+      <Section type="ReportFooter" count="0" width="7770" height="0" id="1">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+        </SectionProperties>
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="1">
+    <Area type="Detail" count="1">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+        <Attribute name="hold minimal pagefooter free" value="1"/>
+      </AreaProperties>
+      <Section type="Detail" count="1" width="7770" height="235" id="2">
+        <SectionProperties>
+          <Attribute name="multiple column section" value="false"/>
+          <Attribute name="hold minimal pagefooter free" value="1"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="0" y_position="0" width="7575" height="225">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <StringProperties>
+            <Attribute name="line distance" value="0"/>
+            <Attribute name="line distance normal" value="1"/>
+          </StringProperties>
+          <Reference name="field" type="DatabaseField" refname="DE_DOC_AMBITO.STRDESCRIZIONE"/>
+        </Element>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>
+<inet:Report xmlns:inet="http://www.inetsoftware.de" major_version="8" minor_version="0" major_xml_version="6" minor_xml_version="5" count="3" id="4">
+    <Datasource dll="pdsora7.dll" host="concordia:1521:ORAC10" schema="" catalog="" user="modenadev" password="" url="">
+      <Tablesource alias="AM_CONFERIMENTO_DID" databaseIdentifier="AM_CONFERIMENTO_DID">
+        <Column name="PRGCONFERIMENTODID" type="6" />
+        <Column name="CDNLAVORATORE" type="6" />
+        <Column name="DATDID" type="15" />
+        <Column name="CODPFTIPOEVENTO" type="11" />
+        <Column name="CODENTETIT" type="11" />
+        <Column name="NUMETA" type="6" />
+        <Column name="STRSESSO" type="11" />
+        <Column name="CODPFCITTADINANZA" type="11" />
+        <Column name="CODTITOLO" type="11" />
+        <Column name="CODPFCONDOCCUP" type="11" />
+        <Column name="NUMMESIDISOCC" type="6" />
+        <Column name="NUMMESIRICERCALAV" type="6" />
+        <Column name="CODPFISCRCORSO" type="11" />
+        <Column name="CODPROVINCIARES" type="11" />
+        <Column name="CODPFPRESENZAIT" type="11" />
+        <Column name="FLGESPLAVORO" type="11" />
+        <Column name="CODPFPOSIZIONEPROF" type="11" />
+        <Column name="NUMNUCLEOFAM" type="6" />
+        <Column name="FLGFIGLIACARICO" type="11" />
+        <Column name="FLGFIGLIMINORENNI" type="11" />
+        <Column name="DTMINVIO" type="15" />
+        <Column name="CODMONOSTATOINVIO" type="11" />
+        <Column name="IDSPROFILING" type="11" />
+        <Column name="CODPFCONDOCCUP_CALC" type="11" />
+        <Column name="NUMMESIDISOCC_CALC" type="6" />
+        <Column name="DECPROFILING" type="6" />
+        <Column name="DATPROFILING" type="15" />
+        <Column name="NUMKLOCONFDID" type="6" />
+      </Tablesource>
+    </Datasource>
+  <Database>
+    <QueryChanges mask="0" count="2">
+      <Attribute name="queryChange" value="null"/>
+      <Attribute name="queryChange" value="null"/>
+    </QueryChanges>
+  </Database>
+  <FormulaFields count="0">
+  </FormulaFields>
+
+  <PromptFields count="2">
+    <Field type="PromptVarField" valueType="6">
+      <Attribute name="name" value="Pm-cdnLavoratore"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-cdnLavoratore"/>
+      <Attribute name="use_range" value="false"/>
+      <Attribute name="id" value="2"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+    <Field type="PromptVarField" valueType="11">
+      <Attribute name="name" value="Pm-dataInizioDid"/>
+      <Attribute name="allow_multiple_values" value="false"/>
+      <Attribute name="discrete_or_range" value="0"/>
+      <Attribute name="allow editing" value="true"/>
+      <Attribute name="prompt_text" value="Pm-dataInizioDid"/>
+      <Attribute name="use_range" value="false"/>
+      <Attribute name="id" value="3"/>
+      <PromptValueDescr count="0">
+      </PromptValueDescr>
+      <Attribute name="sort_type" value="0"/>
+    </Field>
+  </PromptFields>
+
+  <SQLFields count="0">
+  </SQLFields>
+
+  <SummaryFields count="0">
+  </SummaryFields>
+
+  <SortFields count="0">
+  </SortFields>
+
+  <GroupNameFields count="1">
+    <Field type="GroupNameField" valueType="11">
+      <Attribute name="name" value=""/>
+      <Attribute name="group number type" value="0"/>
+      <Attribute name="group_number" value="0"/>
+    </Field>
+  </GroupNameFields>
+
+  <Field type="FormulaField" id="-1" valueType="8">
+    <Attribute name="name" value="Record_Selection"/>
+    <Attribute name="formula type" value="1"/>
+    <Attribute name="basic syntax" value="false"/>
+    <![CDATA[{AM_CONFERIMENTO_DID.CDNLAVORATORE} =  {?Pm-cdnLavoratore} and  {AM_CONFERIMENTO_DID.CODPFTIPOEVENTO} = 'C' and  {AM_CONFERIMENTO_DID.CODMONOSTATOINVIO} = 'I' and 
+{AM_CONFERIMENTO_DID.DATDID} =  DateValue (ToNumber(Right({?Pm-dataInizioDid},4)),ToNumber(Mid({?Pm-dataInizioDid},4,2)),ToNumber(Left({?Pm-dataInizioDid},2)))]]>
+  </Field>
+  <ReportProperties>
+    <Attribute name="page width" value="11907"/>
+    <Attribute name="page height" value="16839"/>
+    <Attribute name="page orientation" value="0"/>
+    <Attribute name="page margin left" value="720"/>
+    <Attribute name="page margin right" value="720"/>
+    <Attribute name="page margin top" value="720"/>
+    <Attribute name="page margin bottom" value="720"/>
+    <Attribute name="report title" value="infodidconvalida"/>
+    <Attribute name="report last saved" value="24 Aug 2020 08:35:54 GMT"/>
+    <Attribute name="mailing label type 1" value=""/>
+    <Attribute name="mailing label type 2" value=""/>
+    <Attribute name="format with multiple columns" value="false"/>
+    <Attribute name="mailing label width" value="0"/>
+    <Attribute name="mailing label height" value="0"/>
+    <Attribute name="mailing label distance vertical" value="0"/>
+    <Attribute name="mailing label distance horizontal" value="0"/>
+    <Attribute name="across then down" value="false"/>
+    <Attribute name="format groups with multiple columns" value="false"/>
+    <Attribute name="distinct" value="false"/>
+    <Attribute name="convert date time" value="0"/>
+    <Attribute name="suppress if no rows" value="false"/>
+    <Attribute name="convert null values to default" value="false"/>
+    <Attribute name="hide PageFooter inside ReportHeader" value="false"/>
+  </ReportProperties>
+  <AreaPair type="ReportAreaPair" id="0">
+    <Area type="ReportHeader" count="1">
+      <Section type="ReportHeader" count="1" width="8265" height="300" id="0">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+        </SectionProperties>
+        <Element type="FieldElement" x_position="0" y_position="0" width="2865" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+          </CommonProperties>
+          <TimeProperties>
+            <Attribute name="am string" value=" AM"/>
+            <Attribute name="pm string" value=" PM"/>
+          </TimeProperties>
+          <Reference name="field" type="DatabaseField" refname="AM_CONFERIMENTO_DID.DATDID"/>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="ReportFooter" count="1">
+      <Section type="ReportFooter" count="0" width="8265" height="0" id="1">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="GroupAreaPair" id="1">
+    <AreaPairProperties>
+      <Reference name="id" type="DatabaseField" refname="AM_CONFERIMENTO_DID.DATDID"/>
+      <Reference name="group name" type="GroupNameField" id="0"/>
+    </AreaPairProperties>
+
+    <Area type="GroupHeader" count="1">
+      <Section type="GroupHeader" count="2" width="8265" height="300" id="2">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA[isnull ({AM_CONFERIMENTO_DID.PRGCONFERIMENTODID})]]>
+          </PropertyFormula>
+        </SectionProperties>
+        <Element type="Text" count="1" x_position="0" y_position="0" width="930" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="close border on page break" value="false"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <Element type="Paragraph" count="1">
+            <CommonProperties>
+              <Attribute name="horizontal align" value="1"/>
+            </CommonProperties>
+            <Element type="TextPart">
+              <FontProperties>
+                <Attribute name="font size" value="210"/>
+              </FontProperties>
+            <![CDATA[DID del: ]]>
+            </Element>
+          </Element>
+        </Element>
+        <Element type="FieldElement" x_position="900" y_position="0" width="2565" height="240">
+          <CommonProperties>
+            <Attribute name="horizontal align" value="1"/>
+            <Attribute name="can grow" value="true"/>
+          </CommonProperties>
+          <FontProperties>
+            <Attribute name="font size" value="210"/>
+            <Attribute name="font style" value="1"/>
+          </FontProperties>
+          <Reference name="field" type="PromptVarField" refname="?Pm-dataInizioDid"/>
+        </Element>
+      </Section>
+    </Area>
+    <Area type="GroupFooter" count="1">
+      <Section type="GroupFooter" count="0" width="8265" height="0" id="3">
+      </Section>
+    </Area>
+  </AreaPair>
+
+  <AreaPair type="DetailArea" id="2">
+    <Area type="Detail" count="1">
+      <AreaProperties>
+        <Attribute name="multiple column section" value="false"/>
+      </AreaProperties>
+      <Section type="Detail" count="0" width="8265" height="0" id="4">
+        <SectionProperties>
+          <Attribute name="suppress" value="true"/>
+          <Attribute name="multiple column section" value="false"/>
+          <PropertyFormula valueType="-1" propertyType="suppress">
+            <Attribute name="name" value="suppress"/>
+            <Attribute name="basic syntax" value="false"/>
+            <![CDATA[isnull( {AM_CONFERIMENTO_DID.PRGCONFERIMENTODID} )]]>
+          </PropertyFormula>
+        </SectionProperties>
+      </Section>
+    </Area>
+  </AreaPair>
+
+</inet:Report>
+</inet:Report>

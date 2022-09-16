@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../template/template_portlet.xhtml">
+
+	<ui:define name="portlet_title">
+		<h:outputText value="#{txt['azienda.portlet.prog_formativo.titolo']}"
+			escape="false" />
+	</ui:define>
+
+	<ui:define name="portlet_content">
+		<div style="text-align: justify;">
+			<h:outputText value="#{txt['azienda.portlet.prog_formativo.descrizione']}" escape="false" rendered="#{aziendaHomeBean.promotore}" />
+			
+			<h:outputText value="#{txt['aziendaOsp.portlet.prog_formativo.descrizione']}" escape="false" rendered="#{not aziendaHomeBean.promotore}"/>
+							
+			<h:panelGroup layout="block" rendered="#{aziendaHomeBean.checkAbilitazioneVisibile('mystage')}">
+				<ui:fragment rendered="#{sessionBean.connectedAzienda.abilitatoSare and sessionBean.connectedAzienda.confermatoSare}">
+					<form id="accediMyStage" target="_blank" action="#{aziendaHomeBean.urlMyStage}" method="post">
+						<button type="submit" class="buttonStyle float-left margin-right-5" alt="Servizi per CO" tabindex="0">Gestisci Convenzione e Progetto</button>				   				
+					</form>
+				</ui:fragment>
+				<ui:fragment rendered="#{not sessionBean.connectedAzienda.abilitatoSare or not sessionBean.connectedAzienda.confermatoSare}">
+					<ui:fragment rendered="#{not utilsBean.isVDA()}">
+						<ul>
+							<li><a href="#{sessionBean.getUrlMyAccount()}/secure/account/edit">
+								Certifica ora il tuo account e richiedi accesso ai tirocini.</a></li>
+						</ul>
+					</ui:fragment>
+					<ui:fragment rendered="#{utilsBean.isVDA()}">
+						<ul>
+							<li><a href="#{sessionBean.getUrlMyAccount()}/secure/account/edit">
+								Certifica il tuo account per l'accesso ai servizi.</a></li>
+						</ul>
+					</ui:fragment>
+				</ui:fragment>
+			</h:panelGroup>							
+		</div>
+		<br />		
+				
+		<script type="text/javascript">
+			$(function() {
+				disegnaBottoni();
+			});
+		</script>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,220 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.name']}" for="nome"
+			styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:inputText id="nome"
+				value="#{provinciaEditUtenteBean.utenteInfo.pfPrincipal.nome}"
+				required="true" styleClass="form-control" maxlength="30" />
+			<p:message id="nomeMessage" for="nome"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.lastname']}" for="cognome"
+			styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:inputText id="cognome"
+				value="#{provinciaEditUtenteBean.utenteInfo.pfPrincipal.cognome}"
+				required="true" styleClass="form-control" maxlength="30" />
+			<p:message id="cognomeMessage" for="cognome"></p:message>
+		</div>
+	</div>
+
+	<h:panelGroup id="codiceFiscaleGroup" layout="block"
+		styleClass="form-group">
+		<p:outputLabel value="#{ui['shared.cf']}"
+			for="#{empty provinciaEditUtenteBean.utenteInfo.codiceFiscale?'codiceFiscale':'codiceFiscaleText'}"
+			styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<h:panelGroup
+				rendered="#{empty provinciaEditUtenteBean.utenteInfo.codiceFiscale}">
+				<p:inputText id="codiceFiscale"
+					value="#{provinciaEditUtenteBean.utenteInfo.codiceFiscale}" maxlength="16"
+					styleClass="form-control" validator="codiceFiscaleValidator">
+					<f:attribute name="type" value="persona"></f:attribute>
+				</p:inputText>
+				<p:message id="codiceFiscaleMessage" for="codiceFiscale"></p:message>
+			</h:panelGroup>
+			<h:panelGroup
+				rendered="#{not empty provinciaEditUtenteBean.utenteInfo.codiceFiscale}"
+				styleClass="form-control-static" layout="block">
+				<h:outputText id="codiceFiscaleText"
+					value="#{provinciaEditUtenteBean.utenteInfo.codiceFiscale}"></h:outputText>
+			</h:panelGroup>
+		</div>
+	</h:panelGroup>
+
+	<h:panelGroup id="dataNascitaGroup" layout="block" class="form-group">
+		<p:outputLabel value="#{ui['shared.dataNascita']}" for="dataNascita"
+			styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:calendar id="dataNascita" mindate="#{utils.minCalendarDate}"
+				maxdate="#{utils.maxCalendarDate}" pagedate="#{utils.calendarDate}"
+				label="#{ui['shared.dataNascita']}" navigator="true" required="true"
+				pattern="#{ui['shared.dateFormat']}"
+				value="#{provinciaEditUtenteBean.utenteInfo.dtNascita}"
+				converterMessage="#{ui['shared.dateNotValid']}"
+				styleClass="form-control" locale="it" validator="dateValidator">
+				<f:convertDateTime type="date" pattern="#{ui['shared.dateFormat']}" />
+			</p:calendar>
+			<p:message id="dataNascitaMessage" for="dataNascita"></p:message>
+			<span class="help-block m-b-none">#{ui['shared.example']}: <h:outputFormat
+					value="#{utils.calendarDate}">
+					<f:convertDateTime type="date" pattern="#{ui['shared.dateFormat']}" />
+				</h:outputFormat>
+			</span>
+		</div>
+	</h:panelGroup>
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['prof.indirizzoResidenza']}"
+			for="indirizzoResidenza" styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:inputText id="indirizzoResidenza" maxlength="512"
+				value="#{provinciaEditUtenteBean.utenteInfo.indirizzoResidenza}"
+				label="#{ui['prof.indirizzoResidenza']}" styleClass="form-control">
+			</p:inputText>
+			<p:message id="indirizzoResidenzaMessage" for="indirizzoResidenza"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.comuneResidenza']}"
+			for="comuneResidenza" styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:autoComplete id="comuneResidenza" required="true"
+				value="#{provinciaEditUtenteBean.utenteInfo.deComuneResidenza}"
+				converter="deComuneConverter" forceSelection="true" var="comune"
+				itemLabel="#{comune.strDescrizioneConTarga}" itemValue="#{comune}"
+				emptyMessage="#{ui['shared.emptyAutoComplete']}"
+				completeMethod="#{decodificheAutoComplete.completeComune}"
+				minQueryLength="2" styleClass="form-control" validator="comuneValidoValidator">
+			</p:autoComplete>
+			<p:message id="comuneResidenzaMessage" for="comuneResidenza"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['prof.indirizzoDomicilio']}" for="indirizzoDomicilio"
+			styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:inputText id="indirizzoDomicilio" maxlength="512"
+				value="#{provinciaEditUtenteBean.utenteInfo.indirizzoDomicilio}"
+				label="#{ui['prof.indirizzoDomicilio']}" styleClass="form-control">
+			</p:inputText>
+			<p:message id="indirizzoDomicilioMessage" for="indirizzoDomicilio"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.cellulare']}" for="cellulare"
+			styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:inputText id="cellulare" maxlength="20" converter="phoneConverter"
+				value="#{provinciaEditUtenteBean.utenteInfo.cellulare}"
+				label="#{ui['shared.cellulare']}" styleClass="form-control">
+				<o:validator validatorId="javax.faces.RegularExpression"
+					pattern="#{validation['pattern.phoneNumber']}"
+					message="#{validation['message.phoneNumber']}"></o:validator>
+			</p:inputText>
+			<p:message id="cellulareMessage" for="cellulare"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.telefono']}" for="telCasa"
+			styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:inputText id="telCasa" value="#{provinciaEditUtenteBean.utenteInfo.telCasa}"
+				label="#{ui['shared.telefono']}" styleClass="form-control"
+				maxlength="20" converter="phoneConverter">
+				<o:validator validatorId="javax.faces.RegularExpression"
+					pattern="#{validation['pattern.phoneNumber']}"
+					message="#{validation['message.phoneNumber']}"></o:validator>
+			</p:inputText>
+			<p:message id="telCasaMessage" for="telCasa"></p:message>
+		</div>
+	</div>
+	
+	<h:panelGroup id="cittadinanzaMainGroup" layout="block" styleClass="form-group">
+		<p:outputLabel value="#{ui['shared.cittadinanza']}" for="cittadinanza"
+			styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:autoComplete id="cittadinanza" required="true"
+				value="#{provinciaEditUtenteBean.utenteInfo.deCittadinanza}"
+				converter="deCittadinanzaConverter" forceSelection="true"
+				var="cittadinanza" itemLabel="#{cittadinanza.descrizione}"
+				itemValue="#{cittadinanza}" styleClass="form-control" minQueryLength="3"
+				completeMethod="#{decodificheAutoComplete.completeCittadinanza}"
+				size="55" emptyMessage="#{ui['shared.emptyAutoComplete']}">
+				<p:ajax event="itemSelect" update="cittadinanzaGroup"
+					oncomplete="pop()" />
+			</p:autoComplete>
+			<p:message id="cittadinanzaMessage" for="cittadinanza"></p:message>
+		</div>
+	</h:panelGroup>
+	
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.comuneNascita']}"
+			for="comuneNascita" styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:autoComplete id="comuneNascita" required="true"
+				value="#{provinciaEditUtenteBean.utenteInfo.deComuneNascita}"
+				converter="deComuneConverter" forceSelection="true" var="comune"
+				itemLabel="#{comune.strDescrizioneConTarga}" itemValue="#{comune}"
+				emptyMessage="#{ui['shared.emptyAutoComplete']}"
+				completeMethod="#{decodificheAutoComplete.completeComuneAll}"
+				minQueryLength="2" styleClass="form-control" />
+			<p:message id="comuneNascitaMessage" for="comuneNascita"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.comuneDomicilio']}"
+			for="comuneDomicilio" styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:autoComplete id="comuneDomicilio" required="true"
+				value="#{provinciaEditUtenteBean.utenteInfo.deComuneDomicilio}"
+				converter="deComuneConverter" forceSelection="true" var="comune"
+				itemLabel="#{comune.strDescrizioneConTarga}" itemValue="#{comune}"
+				emptyMessage="#{ui['shared.emptyAutoComplete']}"
+				completeMethod="#{decodificheAutoComplete.completeComune}"
+				minQueryLength="2" styleClass="form-control"
+				validator="comuneValidoValidator">
+				<p:ajax event="itemSelect"
+					listener="#{provinciaEditUtenteBean.comuneDomicilioChanged}"
+					update="provinciaRiferimento comuneDomicilioMessage servAminiGroup"
+					process="comuneDomicilio" oncomplete="pop()" />
+			</p:autoComplete>
+			<p:message id="comuneDomicilioMessage" for="comuneDomicilio"></p:message>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<p:outputLabel value="#{ui['prof.provinciaRiferimento']}"
+			for="provinciaRiferimento"
+			styleClass="col-md-4 control-label text-muted" />
+		<div class="col-md-8">
+			<p:selectOneMenu id="provinciaRiferimento" widgetVar="provRifWV"
+				required="true" converter="deProvinciaConverter" style="width: 100%"
+				value="#{provinciaEditUtenteBean.utenteInfo.deProvincia}"
+				styleClass="form-control">
+				<f:selectItem itemLabel="" itemValue="" />
+				<f:selectItems value="#{decodificheBean.provinceByCurrentRegione}"
+					var="provincia" itemLabel="#{provincia.descrizione}"
+					itemValue="#{provincia}" />
+				<p:ajax listener="#{provinciaEditUtenteBean.provinciaRiferimentoChanged}"
+					update="comuneDomicilioMessage"></p:ajax>
+			</p:selectOneMenu>
+			<p:message id="provinciaRiferimentoMessage"
+				for="provinciaRiferimento" />
+		</div>
+	</div>
+</ui:composition>

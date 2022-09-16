@@ -1,0 +1,87 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<div class="form-group spacer">
+		<p:outputLabel value="#{ui['shared.username']}" styleClass="col-lg-2 control-label" for="username" />
+		<div class="col-lg-10">
+			<p:inputText id="username" value="#{registerCittadino.untenteInfo.pfPrincipal.username}" required="true" label="Username"
+				styleClass="form-control" maxlength="16" widgetVar="usernameWV">
+				<o:validator validatorId="javax.faces.RegularExpression" pattern="#{validation['pattern.alphanumeric']}"
+					message="#{validation['message.alphanumeric']}"></o:validator>
+				<f:validator validatorId="uniqueUsernameValidator"></f:validator>
+				<p:ajax event="blur" update="usernameMessage"></p:ajax>
+			</p:inputText>
+			<p:message id="usernameMessage" for="username"></p:message>
+		</div>
+	</div>
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.password']}" styleClass="col-lg-2 control-label" for="password" />
+		<div class="col-lg-10">
+			<p:password id="password" match="passwordRepeat" required="true" label="Password" styleClass="form-control" maxlength="32" widgetVar="passwordWV">
+				<o:validator validatorId="javax.faces.RegularExpression" pattern="#{validation['pattern.password']}"
+					message="#{validation['message.password']}" />
+			</p:password>
+			<p:message id="passwordMessage" for="password"></p:message>
+		</div>
+	</div>
+	<div class="form-group spacer">
+		<p:outputLabel value="#{ui['shared.repeatPassword']}" styleClass="col-lg-2 control-label" for="passwordRepeat" />
+		<div class="col-lg-10">
+			<p:password id="passwordRepeat" value="#{registerCittadino.untenteInfo.pfPrincipal.passWord}" required="true" label="Ripeti Password"
+				styleClass="form-control" maxlength="32" widgetVar="passwordRepeatWV">
+				<o:validator validatorId="javax.faces.RegularExpression" pattern="#{validation['pattern.password']}"
+					message="#{validation['message.password']}" />
+			</p:password>
+			<p:message id="repeatPasswordMessage" for="passwordRepeat"></p:message>
+		</div>
+	</div>
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.secretQuestion']}" styleClass="col-lg-2 control-label" for="secretQuestion" />
+		<div class="col-lg-10">
+			<p:inputText id="secretQuestion" value="#{registerCittadino.untenteInfo.pfPrincipal.domanda}" required="true" label="Domanda segreta"
+				maxlength="255" styleClass="form-control" widgetVar="secretQuestionWV" />
+			<p:message id="secretQuestionMessage" for="secretQuestion"></p:message>
+		</div>
+	</div>
+	<div class="form-group spacer">
+		<p:outputLabel value="#{ui['shared.answer']}" styleClass="col-lg-2 control-label" for="answer" />
+		<div class="col-lg-10">
+			<p:inputText id="answer" value="#{registerCittadino.untenteInfo.pfPrincipal.risposta}" required="true" maxlength="255"
+				styleClass="form-control" widgetVar="answerWV" />
+			<p:message id="answerMessage" for="answer"></p:message>
+		</div>
+	</div>
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.email']}" styleClass="col-lg-2 control-label" for="email" />
+		<div class="col-lg-10">
+			<p:inputText id="email" value="#{registerCittadino.untenteInfo.pfPrincipal.email}" required="true" styleClass="form-control"
+				label="Email" widgetVar="emailWV">
+				<f:validator validatorId="noPECEmailValidator" />
+				<f:validator validatorId="uniqueEmailValidator"></f:validator>
+				<o:validator validatorId="javax.faces.RegularExpression" pattern="#{validation['pattern.email']}"
+					message="#{validation['message.email']}" />
+				<p:ajax event="blur" update="emailMessage equalMessage"></p:ajax>
+			</p:inputText>
+			<o:validateEqual id="equal" components="email emailConfirm" message="{0} non corrispondono" />
+			<p:message id="emailMessage" for="email"></p:message>
+			<p:message id="equalMessage" for="equal"></p:message>
+
+			<span class="help-block m-b-none">#{ui['regCit.emailDesc']}</span>
+		</div>
+		<ui:fragment rendered="#{registerCittadino.mostraEmailHelp()}">
+			<div class="col-lg-12">
+				<i>#{ui['regCit.emailHelp']}</i>
+			</div>
+		</ui:fragment>
+	</div>
+	<div class="form-group">
+		<p:outputLabel value="#{ui['shared.confirmEmail']}" styleClass="col-lg-2 control-label" for="emailConfirm" />
+		<div class="col-lg-10">
+			<p:inputText id="emailConfirm" required="true" styleClass="form-control" widgetVar="emailConfirmWV" />
+			<p:message id="emailConfirmMessage" for="emailConfirm">
+			</p:message>
+		</div>
+	</div>
+
+</ui:composition>
+

@@ -1,0 +1,145 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/templates/#{godfatherBean.theme}/infoBox.xhtml">
+	<ui:define name="boxTitle">
+		<p class="text-center mb-lg">
+			<a href="#"> </a>
+		</p>
+		<p class="text-center mb-lg">
+			<strong>#{ui['forgotP.title']}</strong>
+		</p>
+	</ui:define>
+	<ui:define name="boxBody">
+		<h:form id="forgotForm">
+			<!-- email -->
+			<span class="swMain">
+				<ul class="stepsUL anchor">
+					<li>
+						<a href="#step-1"
+							class="#{forgotPasswordBean.emailPhase or forgotPasswordBean.answerPhase or forgotPasswordBean.emailSentPhase?'selected':''}"
+							isdone="1" rel="1">
+							<div class="stepNumber">1</div>
+							<span class="stepDesc"> #{ui['forgotP.step1']} </span>
+						</a>
+					</li>
+					<li>
+						<a href="#step-2"
+							class="#{forgotPasswordBean.answerPhase or forgotPasswordBean.emailSentPhase?'selected':'disabled'}" isdone="0"
+							rel="2">
+							<div class="stepNumber">2</div>
+							<span class="stepDesc"> #{ui['forgotP.step2']} </span>
+						</a>
+					</li>
+					<li>
+						<a href="#step-3" class="#{forgotPasswordBean.emailSentPhase?'selected':'disabled'}" isdone="0" rel="3">
+							<div class="stepNumber">3</div>
+							<span class="stepDesc"> #{ui['forgotP.step3']} </span>
+						</a>
+					</li>
+				</ul>
+			</span>
+
+			<h:panelGroup id="emailPhase">
+				<h:panelGroup id="emailPhaseContent" rendered="#{forgotPasswordBean.emailPhase}">
+					<p class="text-center">#{ui['forgotP.insertEmailOrUsername']}</p>
+					<div class="form-group has-feedback">
+						<p:outputLabel value="#{ui['forgotP.usernameOrEmail']}" for="email"></p:outputLabel>
+						<p:inputText id="email" value="#{forgotPasswordBean.usernameOrPassword}" styleClass="form-control"
+							placeholder="#{ui['forgotP.usernameOrEmail']}" required="true" title="#{ui['forgotP.usernameOrEmail']}"></p:inputText>
+						<span class="fa fa-envelope form-control-feedback text-muted"></span>
+						<p:message id="emailMessage" for="email"></p:message>
+					</div>
+					<ui:fragment rendered="#{forgotPasswordBean.constantsSingleton.getCaptchaRequired()}">
+						<div class="centerCaptcha" id="captchaGroup">
+							<div class="captchaContainer">
+								<p:captcha required="true" id="captcha" secure="true" language="it"
+									validatorMessage="Testo inserito non corrispondente" requiredMessage="#{validation['message.captcha']}"
+									theme="#{forgotPasswordBean.constantsSingleton.isTrento()?'white':'red'}" />
+								<p:message for="captcha" id="captchaMessage" />
+							</div>
+						</div>
+					</ui:fragment>
+					<p class="text-center">
+						<p:commandButton ajax="false" actionListener="#{forgotPasswordBean.emailPhaseAction}"
+							value="#{ui['forgotP.recupera']}" styleClass="btn ui-button btn-primary"></p:commandButton>
+					</p>
+				</h:panelGroup>
+			</h:panelGroup>
+
+			<!-- question -->
+			<h:panelGroup id="secretQuestionPhase">
+				<h:panelGroup id="secretQuestionContent" rendered="#{forgotPasswordBean.answerPhase}">
+					<blockquote class="text-center">
+						<small>#{ui['forgotP.answerQuestion']}</small>
+						<p class="text-center">#{forgotPasswordBean.question}</p>
+					</blockquote>
+					<div class="form-group has-feedback">
+						<p:outputLabel value="#{ui['forgotP.insertAnswer']}" for="answer"></p:outputLabel>
+						<p:inputText id="answer" value="#{forgotPasswordBean.answer}" styleClass="form-control"
+							placeholder="#{ui['forgotP.answer']}" required="true"></p:inputText>
+						<span class="fa fa-question form-control-feedback text-muted"></span>
+						<p:message id="answerMessage" for="answer"></p:message>
+					</div>
+					<p class="text-center">
+						<p:commandButton update="@form" actionListener="#{forgotPasswordBean.answerPhaseAction}"
+							value="#{ui['forgotP.doAnswer']}" styleClass="btn ui-button btn-primary"></p:commandButton>
+					</p>
+				</h:panelGroup>
+			</h:panelGroup>
+
+
+			<!-- confirm -->
+			<h:panelGroup id="emailSentPhase">
+				<h:panelGroup id="emailSentContent" rendered="#{forgotPasswordBean.emailSentPhase}">
+					<p class="text-center">
+						<i class="fa fa-check-circle fa-3 fa-success "></i>
+					<blockquote class="text-center">
+						<p>#{ui['forgotP.emailSent']}</p>
+						<p>
+							<b>#{ui['forgotP.checkSpam']}</b>
+						</p>
+						<small>#{ui['confirm.loginMessage']} </small>
+					</blockquote>
+					</p>
+				</h:panelGroup>
+			</h:panelGroup>
+
+			<p class="text-center">
+				<ui:fragment rendered="#{empty param['sociale']}">
+					<a href="#{forgotPasswordBean.loginURL}" class="uk-button">
+						<i class="uk-icon-home"></i>
+						#{ui['shared.tornaHomepage']}
+					</a>
+				</ui:fragment>
+				<ui:fragment rendered="#{not empty param['sociale']}">
+					<a href="#{forgotPasswordBean.loginSocialeURL}" class="uk-button">
+						<i class="uk-icon-home"></i>
+						#{ui['shared.tornaHomepage']}
+					</a>
+				</ui:fragment>
+			</p>
+		</h:form>
+
+		<script>              
+		function scaleCaptcha(elementWidth) {
+			  var reCaptchaWidth = 300;
+			    var containerWidth = $('.captchaContainer').width();
+			  
+			  if(reCaptchaWidth > containerWidth) {
+			    var captchaScale = containerWidth / reCaptchaWidth;
+			    $('#forgotForm\\:captcha').css({
+			      'transform':'scale('+captchaScale+')'
+			    });
+			  }
+			}
+
+			$(function() { 
+			  scaleCaptcha();
+			  $(window).resize( scaleCaptcha);
+			});
+
+        </script>
+	</ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,189 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<ui:composition template="/templates/#{godfatherBean.theme}/main.xhtml">
+	<ui:param name="pagetitle" value="#{ui['regCit.registerModel']}" />
+	<ui:define name="content">
+		<h:outputScript library="commons" name="js/testUnits/registerCitt.js"
+			rendered="#{facesContext.application.projectStage == 'Development' or facesContext.application.projectStage == 'SystemTest'}" />
+		<div class="container register-module m-t-20">
+			<h3>
+				#{ui['regCit.registerModel']}
+				<br />
+				<small>#{ui['regCit.cittadino']}</small>
+			</h3>
+			<h:form id="registerForm" styleClass="form-horizontal">
+				<p:hotkey bind="ctrl+shift+f"
+					onstart="registerCittWithoutServAmini()"
+					rendered="#{facesContext.application.projectStage == 'Development' or facesContext.application.projectStage == 'SystemTest'}"></p:hotkey>
+				<!-- START row-->
+				<div class="row animated fadeIn">
+					<div class="col-sm-6">
+						<!-- START panel-->
+						<div class="panel panel-default">
+							<div class="panel-heading">#{ui['regCit.datiAccount']}</div>
+							<div class="panel-body">
+								<ui:include src="_datiAccount.xhtml" />
+							</div>
+						</div>
+						<!-- END panel-->
+					</div>
+					<div class="col-sm-6">
+						<!-- START panel-->
+						<div class="panel panel-default">
+							<div class="panel-heading">#{ui['regCit.datiPersonali']}</div>
+							<div class="panel-body">
+								<ui:include src="_datiPers.xhtml" />
+							</div>
+						</div>
+						<!-- END panel-->
+					</div>
+					<ui:remove>
+						<!-- Specific for RER-->
+					</ui:remove>
+					<ui:fragment
+						rendered="#{registerCittadino.checkSezioneServiziAmministrativiAbilitato()}">
+						<div class="col-sm-12">
+							<div class="well">
+								<ui:include src="_servAmini.xhtml" />
+							</div>
+						</div>
+					</ui:fragment>
+				</div>
+
+				<div class="row informativa-privacy">
+					<div class="col-md-12">
+						<!-- START panel-->
+						<div class="panel panel-default">
+							<div class="panel-heading">#{ui['regCit.infoDatiPer']}</div>
+							<div class="panel-body">
+								<h:panelGroup id="privacy">
+									<h:panelGroup>
+										<h:panelGrid
+											rendered="#{registerCittadino.currentRegione() == 8}">
+											<ui:include src="terms/_informativaCitt_RER.xhtml">
+												<ui:param name="chiamante" value="azienda" />
+											</ui:include>
+										</h:panelGrid>
+										<h:panelGrid
+											rendered="#{registerCittadino.currentRegione() == 18}">
+											<ui:include src="terms/_informativaCitt_CALABRIA.xhtml">
+												<ui:param name="chiamante" value="azienda" />
+											</ui:include>
+										</h:panelGrid>
+										<h:panelGrid
+											rendered="#{registerCittadino.currentRegione() == 10}">
+											<ui:include src="terms/_informativaCitt_UMBRIA.xhtml">
+												<ui:param name="chiamante" value="azienda" />
+											</ui:include>
+										</h:panelGrid>
+										<h:panelGrid class="centered widthMax"
+											rendered="#{registerCittadino.currentRegione() == 22}">
+											<ui:include src="terms/_informativaCitt_PAT.xhtml">
+												<ui:param name="chiamante" value="azienda" />
+											</ui:include>
+										</h:panelGrid>
+										<h:panelGrid
+											rendered="#{registerCittadino.currentRegione() == 2}">
+											<ui:include src="terms/_informativaCitt_VDA.xhtml">
+												<ui:param name="chiamante" value="azienda" />
+											</ui:include>
+										</h:panelGrid>
+									</h:panelGroup>
+								</h:panelGroup>
+							</div>
+							<ui:fragment 
+								rendered="#{registerCittadino.constantsSingleton.getCaptchaRequired()}">
+								<div class="row">						
+								<div id="captchaGroup" class="col-md-3 center-block col-lg-push-5">
+									<p:captcha required="true" id="captcha" secure="true"
+										language="it"
+										validatorMessage="Testo inserito non corrispondente"
+										requiredMessage="#{validation['message.captcha']}"
+										theme="#{registerCittadino.constantsSingleton.isTrento()?'white':'red'}" />
+									<div class="captchaMessage">
+										<p:message for="captcha" id="captchaMessage" />
+									</div>
+								</div>
+								</div>			
+
+                               <div class="row">
+								<div class="panel-footer text-center col-md-3 center-block col-lg-push-5">
+									<div class="clearfix">
+										<div class="pull-left">
+											<div class="checkbox c-checkbox">
+												<p:selectBooleanCheckbox
+													value="#{registerCittadino.acceptTerms}"
+													widgetVar="acceptTermsWV">
+													<p:ajax update="registerBtn" process="@this"></p:ajax>
+												</p:selectBooleanCheckbox>
+												<strong>#{ui['shared.acceptTerms']}</strong>
+											</div>
+										</div>
+									</div>
+									<p:commandButton id="registerBtn"
+										action="#{registerCittadino.save()}"
+										value="#{ui['shared.register']}" styleClass="btn btn-primary"
+										update="@(.ui-message)"
+										onclick="PF('registerBtnWV').disable()"
+										widgetVar="registerBtnWV"
+										oncomplete="PF('registerBtnWV').enable(); scrollToFirstMessage();"
+										disabled="#{not registerCittadino.acceptTerms}"></p:commandButton>
+								</div>
+								</div>
+							</ui:fragment>
+							<ui:fragment 
+								rendered="#{not registerCittadino.constantsSingleton.getCaptchaRequired()}">
+								<div class="panel-footer text-center">
+									<div class="clearfix">
+										<div class="pull-left">
+											<div class="checkbox c-checkbox">
+												<p:selectBooleanCheckbox
+													value="#{registerCittadino.acceptTerms}"
+													widgetVar="acceptTermsWV">
+													<p:ajax update="registerBtn2" process="@this"></p:ajax>
+												</p:selectBooleanCheckbox>
+												<strong>#{ui['shared.acceptTerms']}</strong>
+											</div>
+										</div>
+									</div>
+									<p:commandButton id="registerBtn2"
+										action="#{registerCittadino.save()}"
+										value="#{ui['shared.register']}" styleClass="btn btn-primary"
+										update="@(.ui-message)"
+										onclick="PF('registerBtnWV2').disable()"
+										widgetVar="registerBtnWV2"
+										oncomplete="PF('registerBtnWV2').enable(); scrollToFirstMessage()}"
+										disabled="#{not registerCittadino.acceptTerms}"></p:commandButton>
+								</div>
+							</ui:fragment>
+							<p class="text-center">
+								<a href="#{registerCittadino.loginURL}" class="uk-button">
+									<i class="uk-icon-home"></i>
+									#{ui['shared.tornaHomepage']}
+								</a>
+							</p>
+						</div>
+						<!-- END panel-->
+					</div>
+				</div>
+			</h:form>
+			<!-- END row-->
+		</div>
+		<p:dialog widgetVar="cantAbilitatoServiziWV"
+			header="#{ui['shared.attention']}" modal="true">
+			<div class="alert alert-danger" role="alert">
+				<h:outputFormat value="#{ui['regCit.cantAbilitatoServizi']}">
+					<f:param value="#{utils.nomeRegione}"></f:param>
+				</h:outputFormat>
+			</div>
+		</p:dialog>
+	</ui:define>
+</ui:composition>
+
+
+</html>

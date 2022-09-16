@@ -1,0 +1,179 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui">
+	<div class="modal fade contatta-modal" id="contatta-modal" tabindex="-1" role="dialog" aria-labelledby="contatta-modal"
+		data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&#215;</span>
+					</button>
+					<h4 class="modal-title">Invia la tua candidatura</h4>
+				</div>
+				<h:form id="contattaForm" styleClass="form-horizontal" enctype="multipart/form-data">
+					<h:panelGroup id="contattaGroup">
+						<div class="modal-body ">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="text-center m-b-20">
+										<h4>Scrivi il tuo messaggio</h4>
+										<p>Invia il tuo messaggio per contattare il datore di lavoro</p>
+									</div>
+									<div class="form-group">
+										<p:outputLabel for="nome" value="#{ui['shared.nomeCognome']}" styleClass="col-md-3 control-label"></p:outputLabel>
+										<div class="col-md-9">
+											<p:inputText id="nome" value="NOME" styleClass="form-control" required="true"></p:inputText>
+											<p:message id="nomeMessage" for="nome"></p:message>
+										</div>
+									</div>
+									<div class="form-group">
+										<p:outputLabel for="email" value="#{ui['shared.email']}" styleClass="col-md-3 control-label"></p:outputLabel>
+										<div class="col-md-9">
+											<p:inputText id="email" value="EMAIL" styleClass="form-control" maxlength="255"
+												required="true" label="#{ui['shared.email']}" validator="emailValidator">
+											</p:inputText>
+											<p:message id="emailMessage" for="email"></p:message>
+										</div>
+									</div>
+									<div class="form-group">
+										<p:outputLabel for="telefono" value="#{ui['shared.telefono']}" styleClass="col-md-3 control-label"></p:outputLabel>
+										<div class="col-md-9">
+											<p:inputText id="telefono" value="TEL" styleClass="form-control"></p:inputText>
+											<p:message id="telefonoMessage" for="telefono"></p:message>
+										</div>
+									</div>
+
+
+									<div class="form-group">
+										<p:outputLabel for="messaggio" value="#{ui['shared.messaggio']}" styleClass="col-md-3 control-label"></p:outputLabel>
+										<div class="col-md-9">
+											<p:inputTextarea id="messaggio" value="BODY" styleClass="form-control"
+												maxlength="2000" label="#{ui['shared.messaggio']}" rows="3" cols="100" style="width:100%" required="true">
+												<f:validateLength maximum="2000" />
+											</p:inputTextarea>
+											<p:message id="messaggioMessage" for="messaggio"></p:message>
+										</div>
+									</div>
+
+									<div class="row m-t-20">
+										<div class="col-md-6">
+
+											<h:panelGroup id="cvAllegatoGroup">
+												<ui:fragment rendered="#{empty vacancyViewBean.cvUploadedFile}">
+													<p:fileUpload id="cvAllegato" fileUploadListener="#{vacancyViewBean.handleCvAllegato}"
+														allowTypes="/(\.|\/)(pdf)$/" multiple="false" invalidSizeMessage="#{ui['file.invalidSizeMessage']}"
+														invalidFileMessage="#{ui['file.invalidFileMessage']}" sizeLimit="#{ui['file.size']}"
+														widgetVar="cvAllegatoWV" auto="true" styleClass="advancedHiddenFileUpload" process="@this"
+														update="cvAllegatoGroup" oncomplete="MyPortal.VacancyView.initCVAllegatiFileUpload()" label="Carica File" />
+
+													<label id="cvAllegatoBtnFile" class="btn btn-primary btn-search" for="contattaForm:cvAllegato_input"
+														data-toggle="tooltip" data-placement="right" aria-hidden="true">
+														<i class="fa fa-upload" aria-hidden="true"></i>
+														Carica CV (PDF)
+														<span class="ui-outputlabel-rfi">*</span>
+													</label>
+
+
+												</ui:fragment>
+
+												<ui:fragment rendered="#{not empty vacancyViewBean.cvUploadedFile}">
+													<div class="download-btn-container">
+														<p:commandLink ajax="false" title="#{ui['shared.scarica']} #{vacancyViewBean.cvUploadedFile.fileName}"
+															immediate="true">
+															<i class="fa fa-file" aria-hidden="true"></i>
+                                                            #{vacancyViewBean.cvUploadedFile.fileName}
+                                                            <p:fileDownload
+																value="#{vacancyViewBean.handleCvAllegatoDownload()}" />
+														</p:commandLink>
+
+														<p:commandLink actionListener="#{vacancyViewBean.removeCvAllegato()}" process="@this"
+															styleClass="pull-right" update="cvAllegatoGroup" oncomplete="MyPortal.VacancyView.initCVAllegatiFileUpload()"
+															title="#{ui['shared.cancella']} #{vacancyViewBean.cvUploadedFile.fileName}">
+															<i class="fa fa-times" aria-hidden="true"></i>
+														</p:commandLink>
+													</div>
+												</ui:fragment>
+											</h:panelGroup>
+
+										</div>
+										<div class="col-md-6">
+
+
+											<h:panelGroup id="letteraAllegatoGroup">
+												<ui:fragment rendered="#{empty vacancyViewBean.letteraUploadedFile}">
+													<p:fileUpload id="letteraAllegato" fileUploadListener="#{vacancyViewBean.handleLetteraAllegato}"
+														allowTypes="/(\.|\/)(pdf)$/" multiple="false" invalidSizeMessage="#{ui['file.invalidSizeMessage']}"
+														invalidFileMessage="#{ui['file.invalidFileMessage']}" sizeLimit="#{ui['file.size']}"
+														widgetVar="letteraAllegatoWV" auto="true" styleClass="advancedHiddenFileUpload" process="@this"
+														update="letteraAllegatoGroup" oncomplete="MyPortal.VacancyView.initLetteraAllegatiFileUpload()"
+														label="Carica File" />
+
+													<label id="letteraAllegatoBtnFile" class="btn btn-primary btn-search"
+														for="contattaForm:letteraAllegato_input" data-toggle="tooltip" data-placement="right" aria-hidden="true">
+														<i class="fa fa-upload" aria-hidden="true"></i>
+														Carica Lettera (PDF)
+													</label>
+
+													<div id="letteraAllegatoMessages" aria-live="polite" role="alert"></div>
+													<p:message id="letteraAllegatoMessage" for="letteraAllegato"></p:message>
+												</ui:fragment>
+
+												<ui:fragment rendered="#{not empty vacancyViewBean.letteraUploadedFile}">
+													<div class="download-btn-container">
+														<p:commandLink ajax="false"
+															title="#{ui['shared.scarica']} #{vacancyViewBean.letteraUploadedFile.fileName}" immediate="true">
+															<i class="fa fa-file" aria-hidden="true"></i>
+                                                            #{vacancyViewBean.letteraUploadedFile.fileName}
+                                                            <p:fileDownload
+																value="#{vacancyViewBean.handleLetteraAllegatoDownload()}" />
+														</p:commandLink>
+
+														<p:commandLink actionListener="#{vacancyViewBean.removeLetteraAllegato()}" process="@this"
+															styleClass="pull-right" update="letteraAllegatoGroup"
+															oncomplete="MyPortal.VacancyView.initLetteraAllegatiFileUpload()"
+															title="#{ui['shared.cancella']} #{vacancyViewBean.letteraUploadedFile.fileName}">
+															<i class="fa fa-times" aria-hidden="true"></i>
+														</p:commandLink>
+													</div>
+												</ui:fragment>
+											</h:panelGroup>
+										</div>
+										<div class="col-md-12 m-t-20">
+											<div id="cvAllegatoMessages" aria-live="polite" role="alert"></div>
+											<p:message id="cvAllegatoMessage" for="cvAllegato"></p:message>
+										</div>
+
+									</div>
+									<div class="form-group text-center m-t-20"></div>
+
+									<div class="contatta-error alert alert-danger hidden">
+										<strong>Errore invio mail candidatura!</strong>
+										Impossibile inviare la mail.
+									</div>
+
+								</div>
+							</div>
+
+						</div>
+						<div class="modal-footer">
+							<p:commandLink id="invia" actionListener="#{vacancyViewBean.sendMail}" update="@(.ui-message)"
+								styleClass="btn btn-primary btn-search contatt-dattore-lavoro"
+								onclick="buttonToDisable = MyPortal.enableLoadingButton(this)"
+								oncomplete="MyPortal.disableLoadingButton(this); MyPortal.VacancyView.inviaCompleted(args);"
+								title="#{ui['shared.inviaMessaggio']} ">
+								<i class="fa fa-paper-plane" aria-hidden="true"></i>
+                                #{ui['shared.inviaMessaggio']} 
+                            </p:commandLink>
+
+							<button type="button" class="btn btn-search btn-grey pull-left" data-dismiss="modal">#{ui['shared.annulla']}</button>
+						</div>
+
+					</h:panelGroup>
+				</h:form>
+
+
+			</div>
+		</div>
+	</div>
+</ui:composition>

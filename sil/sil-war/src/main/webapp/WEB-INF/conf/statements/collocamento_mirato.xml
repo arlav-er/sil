@@ -1,0 +1,877 @@
+<!-- STATEMENTS/COLLOCAMENTO_MIRATO.XML -->
+				 
+<STATEMENT name="CM_INFO_UNITA_AZIENDA"
+           query="SELECT az.strCodiceFiscale, az.strPartitaIva, az.strRagioneSociale, 
+           		auz.strIndirizzo || ' (' || com.strDenominazione || ')' as strIndirizzo, auz.strEmail
+			   		FROM AN_AZIENDA az  
+			   		INNER JOIN AN_UNITA_AZIENDA auz on az.prgAzienda=auz.prgAzienda  
+			   		INNER JOIN DE_COMUNE com on auz.codCom = com.CodCom 
+			   		WHERE az.prgAzienda= ?
+			   		AND auz.prgUnita= ? "/>
+
+<STATEMENT
+        name="SELECT_PRGCONV_SEQUENCE"
+        query="SELECT
+               S_CM_CONVENZIONE.nextval AS do_nextval
+               FROM DUAL"/>
+
+<STATEMENT 	name="INS_CONVENZIONE" 
+			query="INSERT  INTO CM_CONVENZIONE (
+						   PRGCONV, 
+						   NUMANNOCONV, 
+						   NUMCONVENZIONE, 
+						   PRGAZIENDA, 
+						   PRGUNITA, 
+						   CODMONOINTERA, 
+						   NUMCOINVOLTI, 
+						   DATCONVENZIONE, 
+						   CODSTATORICHIESTA, 
+						   DATSCADENZA, 
+						   NUMDURATA, 
+						   FLGPROROGA, 
+						   FLGMODIFICA,
+						   NUMRINUNCIADIS, 
+						   NUMRINUNCIAART18,
+						   STRNOTE,
+						   CODPROVINCIA,
+						   CDNUTINS, 
+						   DTMINS, 
+						   CDNUTMOD, 
+						   DTMMOD) 
+				   VALUES  ( ?,
+						   	 ?, 
+							 ?,
+					    	 ?, 
+							 ?, 
+							 ?,
+					    	 ?, 
+							 to_date(?,'dd/mm/yyyy'), 
+							 ?,
+					    	 to_date(?,'dd/mm/yyyy'), 
+							 ?, 
+							 ?,
+					    	 ?, 
+							 ?, 
+							 ?,
+					    	 ?,
+					    	 ?,
+					    	 ?,
+							 sysdate, 
+							 ?, 
+							 sysdate)" />
+			 
+<STATEMENT 	name="GET_NUMERO_CONVENZIONE" 
+			query="SELECT NVL (MAX (NUMCONVENZIONE), 0) + 1 AS NUMCONVENZIONE
+  					 FROM CM_CONVENZIONE
+ 					WHERE NUMANNOCONV = (SELECT  (to_char(sysdate,'yyyy')) AS ANNO from dual)" />
+				 				 				 
+<STATEMENT 	name="GET_DATI_GENERALI_CONV" 
+			query="SELECT CM_CONVENZIONE.PRGCONV,  	 
+   					  CM_CONVENZIONE.NUMANNOCONV AS anno,  
+   					  CM_CONVENZIONE.NUMCONVENZIONE AS numero, 
+					  CM_CONVENZIONE.PRGAZIENDA,
+					  CM_CONVENZIONE.PRGUNITA, 
+					  AN_AZIENDA.STRRAGIONESOCIALE AS ragionesociale,
+					  AN_AZIENDA.STRCODICEFISCALE AS cf,
+					  AN_AZIENDA.STRPARTITAIVA AS piva,
+					  AN_UNITA_AZIENDA.STRINDIRIZZO || ' (' || DE_COMUNE.STRDENOMINAZIONE || ')' AS strIndirizzo, 
+					  CM_CONVENZIONE.CODMONOINTERA, 
+					  CM_CONVENZIONE.NUMCOINVOLTI,  
+					  to_char(DATCONVENZIONE,'dd/mm/yyyy') AS DATCONVENZIONE,  
+					  CODSTATORICHIESTA, 
+					  to_char(CM_CONVENZIONE.DATSCADENZA,'dd/mm/yyyy')AS DATSCADENZA, 
+					  CM_CONVENZIONE.NUMDURATA, 
+					  CM_CONVENZIONE.FLGPROROGA, 
+					  CM_CONVENZIONE.FLGMODIFICA, 
+					  CM_CONVENZIONE.NUMRINUNCIADIS, 
+					  CM_CONVENZIONE.NUMRINUNCIAART18, 
+					  CM_CONVENZIONE.STRNOTE, 
+					  CM_CONVENZIONE.CDNUTINS, 
+					  CM_CONVENZIONE.CODPROVINCIA,
+					  to_char(CM_CONVENZIONE.DTMINS,'dd/mm/yyyy hh24:mi') AS DTMINS, 
+					  CM_CONVENZIONE.CDNUTMOD,
+					  to_char(CM_CONVENZIONE.DTMMOD,'dd/mm/yyyy hh24:mi') AS DTMMOD,
+					  NUMKLOCONV   
+					FROM CM_CONVENZIONE
+					  INNER JOIN AN_AZIENDA ON (CM_CONVENZIONE.PRGAZIENDA = AN_AZIENDA.PRGAZIENDA)
+					  INNER JOIN AN_UNITA_AZIENDA ON (CM_CONVENZIONE.PRGAZIENDA = AN_UNITA_AZIENDA.PRGAZIENDA
+					  and CM_CONVENZIONE.PRGUNITA = AN_UNITA_AZIENDA.PRGUNITA)
+					  INNER JOIN DE_COMUNE on (AN_UNITA_AZIENDA.CODCOM = DE_COMUNE.CODCOM)
+				 	WHERE CM_CONVENZIONE.PRGCONV = ?"/>
+				 	
+<STATEMENT 	name="GET_DATI_PROSPETTO_INF" 
+			query="SELECT * FROM (SELECT P.PRGPROSPETTOINF, 
+						P.CODMONOCATEGORIA,
+						P.NUMANNORIFPROSPETTO,
+						P.CODMONOSTATOPROSPETTO,
+						P.NUMBASECOMPUTO,
+						P.NUMQUOTADISABILI,
+						P.NUMDISFORZA,
+						P.NUMQUOTAART18,
+						P.NUMART18FORZA
+				   FROM CM_PROSPETTO_INF P
+				   WHERE P.PRGAZIENDA = ? 
+				   AND P.CODPROVINCIA = (SELECT CODPROVINCIASIL FROM TS_GENERALE) 
+				   AND P.CODMONOSTATOPROSPETTO IN ('A','S','U') 
+				   ORDER BY P.NUMANNORIFPROSPETTO DESC, P.CODMONOSTATOPROSPETTO ASC) WHERE ROWNUM = 1 "/>
+				 	  
+<STATEMENT 	name="UPD_DATIGEN_CONVENZIONI" 
+			query="UPDATE CM_CONVENZIONE
+					  SET NUMANNOCONV = ?,  
+   					  	  NUMCONVENZIONE = ?, 
+					  	  PRGAZIENDA = ?,
+					  	  PRGUNITA = ?, 
+					  	  CODMONOINTERA     = ?,
+					      NUMCOINVOLTI      = ?,
+					      DATCONVENZIONE    = to_date(?,'dd/mm/yyyy'),
+					      CODSTATORICHIESTA = ?,
+					      DATSCADENZA       = to_date(?,'dd/mm/yyyy'),
+					      NUMDURATA         = ?, 
+					  	  FLGPROROGA        = ?,
+					      FLGMODIFICA       = ?, 
+					  	  NUMRINUNCIADIS    = ?, 
+					  	  NUMRINUNCIAART18  = ?,
+					  	  STRNOTE           = ?,
+					      CDNUTMOD          = ?,
+					      DTMMOD            = sysdate,
+					      NUMKLOCONV        = TO_NUMBER(?) + 1
+					WHERE PRGCONV           = ?"/>
+					
+<STATEMENT name="SELECT_DOC_FROM_CONV"
+            query="SELECT am_documento.NUMPROTOCOLLO, 
+            		to_char(am_documento.DATPROTOCOLLO, 'DD/MM/YYYY hh24:mi') as DATPROTOCOLLO, 
+            		am_documento.NUMANNOPROT, 
+            		am_documento.CODSTATOATTO
+					from am_documento, am_documento_coll	  
+					where am_documento.PRGDOCUMENTO = am_documento_coll.PRGDOCUMENTO
+					and am_documento.CODTIPODOCUMENTO = 'CMDCONV'
+					and am_documento_coll.STRCHIAVETABELLA = ?" />
+										
+<STATEMENT name="SELECT_PRGDOC_FROM_CONV"
+            query="SELECT am_documento.PRGDOCUMENTO, 
+            			  am_documento.CODSTATOATTO,
+            			  to_char(am_documento.DATINIZIO, 'DD/MM/YYYY') AS DATINIZIO, 
+            			  to_char(am_documento.DATACQRIL, 'DD/MM/YYYY') AS DATACQRIL, 
+            			  am_documento.NUMKLODOCUMENTO
+					from am_documento, am_documento_coll	  
+					where am_documento.PRGDOCUMENTO = am_documento_coll.PRGDOCUMENTO
+					and am_documento.CODTIPODOCUMENTO = 'CMDCONV'
+					and am_documento_coll.STRCHIAVETABELLA = ?" />
+		
+<STATEMENT
+        name="UPDATE_DOC_ASS_CONV"
+        query="UPDATE am_documento SET 
+                  	  CODSTATOATTO=?,
+                  	  CDNUTMOD=?, 
+                      DTMMOD=SYSDATE, 
+                      NUMKLODOCUMENTO=?
+                where am_documento.PRGDOCUMENTO=?"/>
+                
+<STATEMENT name="UPDATE_ANNULLAMENTO_CONV" query="
+	update CM_CONVENZIONE SET    
+		   CODSTATORICHIESTA = ?,
+		   CDNUTMOD = ?,		   
+		   DTMMOD = sysdate,
+		   NUMKLOCONV = TO_NUMBER(?) + 1
+	WHERE  PRGCONV = ?"/>
+                
+<STATEMENT 	name="GET_INFO_AZ_DA_CONV" 
+			query="SELECT CM_CONVENZIONE.PRGCONV,  	 
+					  CM_CONVENZIONE.PRGAZIENDA,
+					  CM_CONVENZIONE.PRGUNITA,
+					  CM_CONVENZIONE.CODSTATORICHIESTA, 
+					  AN_AZIENDA.STRRAGIONESOCIALE AS ragionesociale,
+					  AN_AZIENDA.STRCODICEFISCALE AS cf,
+					  AN_AZIENDA.STRPARTITAIVA AS piva,
+					  AN_UNITA_AZIENDA.STRINDIRIZZO || ' (' || DE_COMUNE.STRDENOMINAZIONE || ')' AS strIndirizzo 
+					FROM CM_CONVENZIONE
+					  INNER JOIN AN_AZIENDA ON (CM_CONVENZIONE.PRGAZIENDA = AN_AZIENDA.PRGAZIENDA)
+					  INNER JOIN AN_UNITA_AZIENDA ON (CM_CONVENZIONE.PRGAZIENDA = AN_UNITA_AZIENDA.PRGAZIENDA
+					  and CM_CONVENZIONE.PRGUNITA = AN_UNITA_AZIENDA.PRGUNITA)
+					  INNER JOIN DE_COMUNE on (AN_UNITA_AZIENDA.CODCOM = DE_COMUNE.CODCOM)
+				 	WHERE CM_CONVENZIONE.PRGCONV = ?"/>  
+				 	
+<STATEMENT 	name="GET_PROSPETTO_COLLEGATO" 
+			query="SELECT PRGPROSPETTOINF FROM (
+						SELECT P.PRGPROSPETTOINF 
+						FROM CM_PROSPETTO_INF P
+				   		WHERE P.PRGAZIENDA = ? 
+				   		AND P.NUMANNORIFPROSPETTO &gt;= to_char(to_date(?, 'dd/mm/yyyy'), 'yyyy')
+       					AND ((? is null) OR (P.NUMANNORIFPROSPETTO &lt;= to_char(to_date(?, 'dd/mm/yyyy'), 'yyyy'))) 				   		
+				   		AND P.CODPROVINCIA = (SELECT CODPROVINCIA FROM CM_CONVENZIONE WHERE PRGCONV = ?) 
+				   		AND P.CODMONOSTATOPROSPETTO = 'A'  
+				   		ORDER BY P.NUMANNORIFPROSPETTO DESC) 
+				   WHERE ROWNUM = 1 "/>				 	              
+                					
+<STATEMENT 	name="GET_DETTAGLIO_ASSUNZIONE" 
+			query= "SELECT  cm_conv_dettaglio.prgconvdettaglio, 
+							cm_conv_dettaglio.prgconv,
+							cm_conv_dettaglio.codstato,			         		
+			         		cm_conv_dettaglio.numlavoratori,
+			         		cm_conv_dettaglio.codmonotipo,
+					        cm_conv_dettaglio.codmonocategoria,        
+					        cm_conv_dettaglio.cdnlavoratore,
+					        cm_conv_dettaglio.strNote,
+					        an_lavoratore.strcodicefiscale,
+					        an_lavoratore.strcognome,
+					        an_lavoratore.strnome,
+			         		TO_CHAR (cm_conv_dettaglio.datscadenza, 'DD/MM/YYYY') datscadenza,
+			         		de_mansione.codmansione AS codmansione,
+			         		de_mansione.strdescrizione AS strmansione,			         		
+			         		cm_conv_dettaglio.codcontratto,			         		
+			         		cm_conv_dettaglio.numggprolungprova,
+			         		cm_conv_dettaglio.flginnalzamentolimiti, 
+			         		cm_conv_dettaglio.codmonolavprogram
+			    	 FROM 	cm_conv_dettaglio INNER JOIN cm_convenzione ON (cm_conv_dettaglio.prgconv =
+			                                                            cm_convenzione.prgconv
+			                                                        )
+			         LEFT OUTER JOIN an_lavoratore ON (cm_conv_dettaglio.cdnlavoratore =
+			                                                   an_lavoratore.cdnlavoratore
+			                                          )
+			         LEFT OUTER JOIN de_mansione ON (cm_conv_dettaglio.codmansione =
+			                                                       de_mansione.codmansione
+			                                        )
+			  		 WHERE cm_conv_dettaglio.prgconvdettaglio = ?" />		
+					
+<STATEMENT 	name="DEL_ASSUNZIONE" 
+			query="DELETE 
+					 FROM CM_CONV_DETTAGLIO
+					WHERE PRGCONVDETTAGLIO  = ?	"/>	
+					
+<STATEMENT 	name="REITERA_ASSUNZIONE" 
+			query="INSERT INTO CM_CONV_DETTAGLIO
+					(prgconvdettaglio, 
+					prgconv, 
+					codstato, 
+					numlavoratori, 
+					codmonocategoria, 
+					codmonotipo, 
+					cdnlavoratore, 
+					datscadenza, 
+					codmansione, 
+					codcontratto, 
+					numggprolungprova, 
+					flginnalzamentolimiti, 
+					strnote, 
+					codmonolavprogram)
+					SELECT 
+					s_cm_conv_dettaglio.nextval, 
+					cd.prgconv, 
+					cd.codstato, 
+					cd.numlavoratori, 
+					cd.codmonocategoria, 
+					cd.codmonotipo, 
+					null, 
+					cd.datscadenza, 
+					cd.codmansione, 
+					cd.codcontratto, 
+					cd.numggprolungprova, 
+					cd.flginnalzamentolimiti, 
+					cd.strnote, 
+					cd.codmonolavprogram
+					FROM CM_CONV_DETTAGLIO cd
+					WHERE cd.PRGCONVDETTAGLIO = ? "/>						
+					
+<STATEMENT 	name="GET_COMBO_STATO_ASS" 
+			query="SELECT 
+						DE_CONV_STATO_ASS.CODSTATO AS CODICE,
+	   					DE_CONV_STATO_ASS.STRDESCRIZIONE || DECODE(SYSDATE,    
+			   				GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto) &apos;,
+			   				LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto) &apos;, 
+			   				&apos;&apos;) AS DESCRIZIONE									  
+				   FROM DE_CONV_STATO_ASS " />		
+				   
+<STATEMENT 	name="GET_COMBO_CONTRATTO_ASS" 
+			query="SELECT 
+						DE_CONTRATTO.CODCONTRATTO AS CODICE,
+	   					DE_CONTRATTO.STRDESCRIZIONE || DECODE(SYSDATE,    
+			   				GREATEST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto) &apos;,
+			   				LEAST(SYSDATE, DATINIZIOVAL, DATFINEVAL),&apos; (scaduto) &apos;, 
+			   				&apos;&apos;) AS DESCRIZIONE									  
+				   FROM DE_CONTRATTO
+				   WHERE DE_CONTRATTO.FLGCONV = 'S'" />	
+
+<STATEMENT 	name="COMBO_AGEVOLAZIONI" 
+			query="SELECT 
+        			  DE_AGEVOLAZIONE.CODAGEVOLAZIONE AS CODICE,
+        			  DE_AGEVOLAZIONE.STRDESCRIZIONE AS DESCRIZIONE
+				 FROM DE_AGEVOLAZIONE
+				WHERE DE_AGEVOLAZIONE.FLGCONV = 'S'" />
+				 
+<STATEMENT
+        name="SELECT_PRGCONVDETTAGLIO_SEQUENCE"
+        query="SELECT
+               S_CM_CONV_DETTAGLIO.nextval AS do_nextval
+               FROM DUAL"/>
+
+<STATEMENT 	name="INS_ASSUNZIONE" 
+			query="INSERT INTO CM_CONV_DETTAGLIO (
+  						  PRGCONVDETTAGLIO, 
+  						  PRGCONV,  
+   						  NUMLAVORATORI,
+   						  CDNLAVORATORE,  
+   						  CODMONOCATEGORIA, 
+   						  CODMONOTIPO, 
+   						  DATSCADENZA, 
+   						  CODSTATO,
+   						  CODMANSIONE, 
+   						  CODCONTRATTO, 
+   						  NUMGGPROLUNGPROVA, 
+   						  FLGINNALZAMENTOLIMITI,
+   						  STRNOTE,
+   						  CODMONOLAVPROGRAM    						  
+   						  ) 
+				  VALUES (? ,
+				  		  ? ,
+				  		  ? ,
+				  		  ? , 
+				  		  ? ,
+				  		  ? ,
+    					  to_date(?,'dd/mm/yyyy'), 
+    					  ? ,
+    					  ? ,
+    					  ? , 
+    					  ? , 
+    					  ? ,
+    					  ? ,
+    					  ? )" />
+    					  
+<STATEMENT 	name="UPD_ASSUNZIONE" 
+			query="UPDATE CM_CONV_DETTAGLIO
+					  SET PRGCONV               = ?,  
+   					  	  NUMLAVORATORI         = ?, 
+					  	  CDNLAVORATORE 		= ?,
+					  	  CODMONOCATEGORIA 		= ?, 
+					  	  CODMONOTIPO     		= ?,
+					      DATSCADENZA    		= to_date(?,'dd/mm/yyyy'),
+					      CODSTATO 				= ?,
+					      CODMANSIONE         	= ?, 
+					  	  CODCONTRATTO        	= ?,
+					      NUMGGPROLUNGPROVA     = ?, 
+					  	  FLGINNALZAMENTOLIMITI = ?,
+					  	  CODMONOLAVPROGRAM     = ?,
+					  	  STRNOTE               = ?
+					WHERE PRGCONVDETTAGLIO  	= ?"/>
+
+<STATEMENT 	name="CERCA_AVV_ASS" 
+			query="SELECT TO_CHAR(MOV.DATINIZIOMOV, 'DD/MM/YYYY') DATINIZIOMOV,
+                 TO_CHAR(MOV.DATFINEMOVEFFETTIVA, 'DD/MM/YYYY') DATFINEMOVEFFETTIVA,
+                 MOV.CODTIPOCONTRATTO,
+                 TCON.CODCONTRATTO,
+                 TCON.STRDESCRIZIONE AS STRTIPOCONTRATTO,
+                 CON.STRDESCRIZIONE AS STRCONTRATTO,
+                 MOV.CODMANSIONE,
+                 MAN.STRDESCRIZIONE AS STRMANSIONE
+           FROM AM_MOVIMENTO MOV 
+           LEFT JOIN DE_MANSIONE MAN ON (MOV.CODMANSIONE = MAN.CODMANSIONE) 
+           LEFT JOIN DE_TIPO_CONTRATTO TCON ON (MOV.CODTIPOCONTRATTO = TCON.CODTIPOCONTRATTO)
+           LEFT JOIN DE_CONTRATTO CON ON (TCON.CODCONTRATTO = CON.CODCONTRATTO)
+           WHERE MOV.CODTIPOMOV = 'AVV' AND MOV.CODSTATOATTO = 'PR' 
+           AND MOV.CDNLAVORATORE = ? AND MOV.PRGAZIENDA = ?  
+           AND MOV.DATINIZIOMOV &lt;= to_date(?, 'DD/MM/YYYY') 
+           AND (MOV.DATFINEMOV IS NULL OR MOV.DATFINEMOV &gt;= to_date(?, 'DD/MM/YYYY'))"/>			
+
+<STATEMENT 	name="COMBO_AGEVOLAZIONI_PRESENTI" 
+			query="select age.codAgevolazione, de_age.strDescrizione
+				   from cm_dett_agevolazioni age, de_agevolazione de_age
+				   where age.codAgevolazione = de_age.codAgevolazione and age.prgConvDettaglio = ?"/>
+								   		   						 	  
+<STATEMENT name="INSERT_AGEVOLAZIONE" 
+			query="insert into CM_DETT_AGEVOLAZIONI (prgConvDettaglio, codAgevolazione) values (?,?) "/>
+			
+<STATEMENT 	name="DEL_AGEVOLAZIONE" 
+			query="DELETE 
+					 FROM CM_DETT_AGEVOLAZIONI
+					WHERE PRGCONVDETTAGLIO  = ?	
+					AND CODAGEVOLAZIONE = ?"/>	
+					
+<STATEMENT 	name="SELECT_AGEVOLAZIONE" 
+			query="SELECT 
+        			  PRGCONVDETTAGLIO,
+        			  CODAGEVOLAZIONE
+				FROM CM_DETT_AGEVOLAZIONI
+				WHERE PRGCONVDETTAGLIO  = ?	
+					AND CODAGEVOLAZIONE = ?" />
+					
+<!-- **********************************************************************************
+                  STATEMENTS  ISCRIZIONI COLLOCAMENTO MIRATO
+     ********************************************************************************** -->	
+               
+<STATEMENT  name="GET_DE_CM_TIPO_ISCR_D"
+        query="SELECT T.CODCMTIPOISCR CODICE,                     
+               case   	   
+				when ma.cod_categoria is not null
+				     then (T.STRDESCRIZIONE || ' (Min: ' || mn.des_categoria || ')' ||
+                        DECODE(SYSDATE, GREATEST(SYSDATE, T.DATFINEVAL),  ' (scaduto)',
+                                                           LEAST   (SYSDATE, T.DATINIZIOVAL),' (scaduto)', 
+                                                           ''
+                                                 ))	     
+				     else T.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)' ||
+                        DECODE(SYSDATE, GREATEST(SYSDATE, T.DATFINEVAL),  ' (scaduto)',
+                                                           LEAST   (SYSDATE, T.DATINIZIOVAL),' (scaduto)', 
+                                                           ''
+                                                 )
+				end as DESCRIZIONE                               
+               FROM DE_CM_TIPO_ISCR T 
+               inner join ma_cat_protette ma on ma.codcmtipoiscr= t.codcmtipoiscr
+			   left join mn_cat_protette mn on mn.cod_categoria= ma.cod_categoria
+               WHERE CODMONOTIPORAGG = 'D'
+               ORDER BY DESCRIZIONE "/>
+
+<STATEMENT  name="GET_DE_CM_TIPO_ISCR_A"
+        query="SELECT T.CODCMTIPOISCR CODICE,                     
+               case   	   
+				when ma.cod_categoria != '0'
+				     then (T.STRDESCRIZIONE || ' (Min: ' || mn.des_categoria || ')' ||
+                        DECODE(SYSDATE, GREATEST(SYSDATE, T.DATFINEVAL),  ' (scaduto)',
+                                                           LEAST   (SYSDATE, T.DATINIZIOVAL),' (scaduto)', 
+                                                           ''
+                                                 ))	     
+				     else T.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)' ||
+                        DECODE(SYSDATE, GREATEST(SYSDATE, T.DATFINEVAL),  ' (scaduto)',
+                                                           LEAST   (SYSDATE, T.DATINIZIOVAL),' (scaduto)', 
+                                                           ''
+                                                 )
+				end as DESCRIZIONE                               
+               FROM DE_CM_TIPO_ISCR T 
+               inner join ma_cat_protette ma on ma.codcmtipoiscr= t.codcmtipoiscr
+			   left join mn_cat_protette mn on mn.cod_categoria= ma.cod_categoria
+               WHERE CODMONOTIPORAGG = 'A'
+               ORDER BY DESCRIZIONE "/>
+
+<STATEMENT  name="GET_DE_CM_TIPO_INVALIDITA"
+        query="SELECT T.CODTIPOINVALIDITA CODICE,
+                      T.STRDESCRIZIONE ||
+                        DECODE(SYSDATE, GREATEST(SYSDATE, T.DATFINEVAL),  ' (scaduto)',
+                                                           LEAST   (SYSDATE, T.DATINIZIOVAL),' (scaduto)', 
+                                                           ''
+                                                 ) AS DESCRIZIONE 
+               FROM DE_CM_TIPO_INVALIDITA T
+               WHERE T.CODTIPOINVALIDITA IN
+               (
+                SELECT TC.CODICE
+                FROM TS_CONFIG_CODIFICA TC
+                WHERE TC.NOMETABELLA='DE_CM_TIPO_INVALIDITA' AND TC.CODTIPOCONFIG = 'CM_ISCR' AND TC.CONFIGURAZIONE = NVL(
+                (SELECT TL.NUM
+                FROM TS_CONFIG_LOC TL
+                WHERE TL.STRCODRIF = (SELECT TS_GENERALE.CODPROVINCIASIL FROM TS_GENERALE)
+                AND TL.CODTIPOCONFIG = 'CM_ISCR'),0)
+                )"/>
+
+<STATEMENT  name="GET_DE_CM_ACCSANIT"
+        query="SELECT T.CODACCERTSANITARIO CODICE,
+                      T.STRDESCRIZIONE ||
+                        DECODE(SYSDATE, GREATEST(SYSDATE, T.DATFINEVAL),  ' (scaduto)',
+                                                           LEAST   (SYSDATE, T.DATINIZIOVAL),' (scaduto)', 
+                                                           ''
+                                                 ) AS DESCRIZIONE
+	   
+               FROM DE_CM_ACCERT_SANITARIO T"/>
+               
+<STATEMENT  name="GET_DETT_AM_CM_ISCR"
+        query="SELECT I.PRGCMISCR, I.CDNLAVORATORE, I.NUMISCRIZIONE, I.CODCMTIPOISCR, 
+        			to_char(I.DATDATAINIZIO,'DD/MM/YYYY') DATINIZIO, to_char(I.DATDATAFINE,'DD/MM/YYYY') DATFINE, 
+        			I.CODTIPOINVALIDITA, I.NUMPERCINVALIDITA, I.CODACCERTSANITARIO, 
+        			to_char(I.DATACCERTSANITARIO,'DD/MM/YYYY') DATACCERTSANITARIO, I.STRNOTE, 
+        			I.PRGSPIMOD, I.CDNUTINS, I.CDNUTMOD, to_char(I.DTMINS,'DD/MM/YYYY HH24:MI') DTMINS, 
+		 			to_char(I.DTMMOD,'DD/MM/YYYY HH24:MI') DTMMOD, I.NUMKLOCMISCR, 
+		 			to_char(I.DATANZIANITA68, 'DD/MM/YYYY') DATANZIANITA68, to_char(I.DATANZORDPREGRESSA,'DD/MM/YYYY') DATANZIANITAORDINARIO,
+		 			to_char(I.DATULTIMAISCR, 'DD/MM/YYYY') DATULTIMAISCR, I.CODMOTIVOFINEATTO, 
+		 			I.PRGVERBALEACC, I.FLGAUTOMATICO, TIS.codMonoTipoRagg, 
+		 			DOC.NUMPROTOCOLLO, TO_CHAR (DOC.DATPROTOCOLLO, 'dd/mm/yyyy hh24:mi') AS DATPROTOCOLLO, 
+		 			DOC.NUMANNOPROT, DOC.CODSTATOATTO, de_doc_tipo.strio striodoc, PR.STRDENOMINAZIONE as PROVINCIA_ISCR, 
+		 			de_doc_tipo.codtipodocumento codtipodoc, de_doc_tipo.strdescrizione strtipodoc, 
+		 			de_doc_tipo.codambitodoc codambitodoc, de_doc_ambito.strdescrizione strambitodoc,
+		 			I.CODCMANNOTA, nvl(TIS.FLGESCLUDIDAAUTCM, 'N') FLGESCLUDIDAAUTCM, I.CODPROVINCIA
+		 	   	FROM AM_CM_ISCR I 
+		 		INNER JOIN DE_CM_TIPO_ISCR TIS ON (I.CODCMTIPOISCR = TIS.CODCMTIPOISCR) 
+		 		INNER JOIN AM_DOCUMENTO_COLL COLL ON (I.PRGCMISCR = COLL.STRCHIAVETABELLA)
+				INNER JOIN AM_DOCUMENTO DOC ON (COLL.PRGDOCUMENTO = DOC.PRGDOCUMENTO AND DOC.CODTIPODOCUMENTO = 'L68')
+				INNER JOIN DE_PROVINCIA PR ON (I.CODPROVINCIA = PR.CODPROVINCIA)
+				inner join de_doc_tipo on (de_doc_tipo.codtipodocumento = DOC.CODTIPODOCUMENTO) 
+				inner join de_doc_ambito on (de_doc_ambito.codambitodoc = de_doc_tipo.codambitodoc)
+				WHERE I.PRGCMISCR = ? and DOC.cdnlavoratore = DECRYPT(?,?)"/>
+				
+<STATEMENT  name="GET_DETT_AM_CM_ISCR_ULTIMA"
+        query="SELECT to_char(I.DATDATAINIZIO,'DD/MM/YYYY') DATINIZIO, 
+                    case   	   
+           			    when ma.cod_categoria != '0'
+           			         then (TIS.STRDESCRIZIONE || ' (Min: ' || mn.des_categoria || ')')	     
+           			    else TIS.STRDESCRIZIONE || ' (Min: nessuna corrispondenza)'
+           			end as CATEGORIAISCR, 
+        			INV.STRDESCRIZIONE AS TIPOINV, 
+        			I.NUMPERCINVALIDITA,  
+		 			DECODE(TIS.CODMONOTIPORAGG,'D','Disabile','A','Altra categoria protetta') AS TIPOISCR,
+		 			nvl(TIS.FLGESCLUDIDAAUTCM, 'N') FLGESCLUDIDAAUTCM 		 	   	
+		 	   	FROM AM_CM_ISCR I, DE_CM_TIPO_ISCR TIS, DE_CM_TIPO_INVALIDITA INV, AM_DOCUMENTO_COLL COLL, AM_DOCUMENTO DOC,
+		 	   	ma_cat_protette ma, mn_cat_protette mn  
+               	WHERE I.CDNLAVORATORE = ENCRYPT(?,?)  
+                AND I.CODCMTIPOISCR = TIS.CODCMTIPOISCR 
+                AND TIS.CODMONOTIPORAGG = ?
+                AND I.CODTIPOINVALIDITA = INV.CODTIPOINVALIDITA(+)
+                AND I.DATDATAFINE IS NULL
+                and ma.codcmtipoiscr = TIS.Codcmtipoiscr
+                and ma.cod_categoria = mn.cod_categoria (+)
+		 		AND I.PRGCMISCR = COLL.STRCHIAVETABELLA 
+		 		AND COLL.PRGDOCUMENTO = DOC.PRGDOCUMENTO
+		 		AND DOC.CDNLAVORATORE = ?
+				AND DOC.CODTIPODOCUMENTO = 'L68' 
+				AND DOC.CODSTATOATTO = 'PR' "/>
+
+<STATEMENT  name="GET_DATANZIANITA68_ISCR_PREC_CM"
+        query="SELECT DATANZIANITA68 FROM (
+		    		SELECT to_char(I.DATANZIANITA68,'DD/MM/YYYY') DATANZIANITA68 		 	   	
+			 	   	FROM AM_CM_ISCR I, DE_CM_TIPO_ISCR TIS, AM_DOCUMENTO_COLL COLL, AM_DOCUMENTO DOC 
+		           	WHERE I.CDNLAVORATORE = ?
+		            AND I.CODCMTIPOISCR = TIS.CODCMTIPOISCR 
+		            AND TIS.CODMONOTIPORAGG = ? 
+			 		AND I.PRGCMISCR = COLL.STRCHIAVETABELLA 
+			 		AND COLL.PRGDOCUMENTO = DOC.PRGDOCUMENTO 
+					AND DOC.CODTIPODOCUMENTO = 'L68'
+					AND DOC.CDNLAVORATORE = DECRYPT(?,?)
+					AND DOC.CODSTATOATTO = 'PR' 
+					AND I.DATDATAINIZIO = ( SELECT MAX(ISC.DATDATAINIZIO) 
+										   	FROM AM_CM_ISCR ISC, DE_CM_TIPO_ISCR TISC, AM_DOCUMENTO_COLL COL, AM_DOCUMENTO DO 
+		           						   	WHERE ISC.CDNLAVORATORE = I.CDNLAVORATORE    
+		            						AND ISC.CODCMTIPOISCR = TISC.CODCMTIPOISCR 
+		            						AND TISC.CODMONOTIPORAGG = TIS.CODMONOTIPORAGG    
+			 								AND ISC.PRGCMISCR = COL.STRCHIAVETABELLA 
+			 								AND COL.PRGDOCUMENTO = DO.PRGDOCUMENTO 
+											AND DO.CODTIPODOCUMENTO = 'L68' 
+											AND DO.CODSTATOATTO = 'PR' )
+					ORDER BY I.DTMINS DESC) 
+				WHERE ROWNUM = 1"/>
+
+<STATEMENT  name="GET_VERB_ACC"
+        query="SELECT V.prgVerbaleAcc AS CODICE, TO_CHAR(V.datverbaleprimaist,'dd/mm/yyyy') || ' - ' || SUBSTR(V.strverbaleprimaist, 0, 50) AS DESCRIZIONE
+				FROM CM_VERBALE_ACCERT V
+				WHERE V.cdnLavoratore = DECRYPT(?,?)"/>
+					
+<STATEMENT  name="GET_AMB_TERR"
+        query="SELECT pr.CODPROVINCIA as codice, pr.STRDENOMINAZIONE AS DESCRIZIONE from DE_PROVINCIA pr 
+        	where pr.codregione = (select codregionesil from ts_generale where prggenerale=1) order by 2"/>
+
+<STATEMENT  name="SELECT_DAT_VERB_ACC"
+        query="SELECT TO_CHAR(V.DATVERBALEDAREVISIONARE,'dd/mm/yyyy') AS DATVERBALEDAREVISIONARE
+				FROM CM_VERBALE_ACCERT V
+				WHERE V.PRGVERBALEACC = ?"/>			
+				
+
+<STATEMENT  name="GET_CPI_COMP"
+        query="SELECT de_cpi.strdescrizione || ' - ' || inf.codcpitit AS DESCRIZIONE 
+				FROM an_lav_storia_inf inf
+				LEFT JOIN de_cpi ON (de_cpi.codcpi = inf.codcpitit)
+				WHERE inf.cdnlavoratore = DECRYPT(?,?)
+				AND inf.datfine IS NULL"/>
+				
+<STATEMENT name="GET_Motivo_Fine_Atto" 
+		   query=" SELECT mot.codmotivofineatto as codice,
+		   			mot.STRDESCRIZIONE || DECODE(SYSDATE,GREATEST(SYSDATE, mot.DATINIZIOVAL, mot.DATFINEVAL), '(scaduto)',
+               			  LEAST(SYSDATE, mot.DATINIZIOVAL, mot.DATFINEVAL),'(scaduto)', '') as descrizione
+				   FROM de_motivo_fine_atto mot, de_mot_fine_atto_lst_tab lst
+				   WHERE mot.codmotivofineatto = lst.codmotivofineatto 
+				   AND trunc(sysdate) between trunc(lst.DATINIZIOVAL) and trunc(lst.DATFINEVAL)
+				   AND lst.codlsttab = 'AM_CM_IS'"/>
+				   
+<STATEMENT name="GET_NEW_PRG_CM_ISCR"
+           query="SELECT s_am_cm_iscr.nextval as prgCmIscr from dual"/>
+
+<STATEMENT  name="QUERY_INSERT_ISCR"
+        query="INSERT INTO AM_CM_ISCR 
+                    (PRGCMISCR, CDNLAVORATORE, NUMISCRIZIONE, CODCMTIPOISCR,
+                     DATDATAINIZIO, DATDATAFINE, 
+                     CODTIPOINVALIDITA, NUMPERCINVALIDITA, CODACCERTSANITARIO,
+                     DATACCERTSANITARIO, STRNOTE, PRGSPIMOD,
+                     DTMINS, DTMMOD, CDNUTINS, CDNUTMOD, DATANZIANITA68, 
+                     DATULTIMAISCR, CODMOTIVOFINEATTO, PRGVERBALEACC, CODSTATOATTO,
+                     CODCMANNOTA, DATANZORDPREGRESSA,CODPROVINCIA
+                    )
+             VALUES (?, ?, ?, ?, 
+                     TO_DATE(?,'DD/MM/YYYY'), TO_DATE(?,'DD/MM/YYYY'),
+                     ?, ?, ?,  
+                     TO_DATE(?,'DD/MM/YYYY'), ?, ?, 
+                     SYSDATE, SYSDATE, ?, ?, TO_DATE(?,'DD/MM/YYYY'), 
+                     TO_DATE(?,'DD/MM/YYYY'), ?, ?, ?,?, TO_DATE(?,'DD/MM/YYYY'),?
+                    )"/>     
+
+<STATEMENT name="GET_NUM_CM_ISCR" query="{ call ? := PG_COLL_MIRATO.GetNumIscrCM(?, ?, ?) }" />
+      
+<STATEMENT  name="UPD_CM_ISCR"
+        query="UPDATE AM_CM_ISCR SET
+                      CODCMTIPOISCR = ?,
+                      DATDATAINIZIO = TO_DATE(?,'DD/MM/YYYY'),
+                      DATDATAFINE   = TO_DATE(?,'DD/MM/YYYY'),  
+                      CODTIPOINVALIDITA = ?,
+                      NUMPERCINVALIDITA = ?,
+                      CODACCERTSANITARIO = ?, 
+                      DATACCERTSANITARIO = TO_DATE(?,'DD/MM/YYYY'), 
+                      STRNOTE  = ?,
+                      PRGSPIMOD  = ?, 
+                      CDNUTMOD = ?,
+                      DTMMOD = SYSDATE, 
+                      NUMKLOCMISCR = TO_NUMBER(?) + 1, 
+                      DATANZIANITA68=TO_DATE(?, 'DD/MM/YYYY'),
+                      DATULTIMAISCR=TO_DATE(?, 'DD/MM/YYYY'),                      
+                      CODMOTIVOFINEATTO = ?,  
+                      PRGVERBALEACC = ?, 
+                      CODSTATOATTO = ?,
+                      CODCMANNOTA = ?,
+                      DATANZORDPREGRESSA = TO_DATE(?,'DD/MM/YYYY')
+                WHERE PRGCMISCR = ?"/>
+                
+<STATEMENT  name="UPD_CM_ISCR_DIAGNOSI"
+        query="UPDATE AM_CM_ISCR SET                        
+               CODTIPOINVALIDITA = ?,
+               NUMPERCINVALIDITA = ?,
+               CODACCERTSANITARIO = ?,                        
+               CDNUTMOD = ?,
+               DTMMOD = SYSDATE, 
+               NUMKLOCMISCR = TO_NUMBER(?) + 1                        
+               WHERE PRGCMISCR = ?"/>                 
+                 
+                
+<STATEMENT name="SELECT_PRGDOC_FROM_CM_ISCR"
+            query="SELECT am_documento.PRGDOCUMENTO, 
+            			  am_documento.CODSTATOATTO, 
+            			  to_char(am_documento.DATINIZIO, 'DD/MM/YYYY') AS DATINIZIO, 
+            			  to_char(am_documento.DATACQRIL, 'DD/MM/YYYY') AS DATACQRIL, 
+            			  am_documento.NUMKLODOCUMENTO
+					from am_documento, am_documento_coll	  
+					where am_documento.PRGDOCUMENTO = am_documento_coll.PRGDOCUMENTO
+					and am_documento.CODTIPODOCUMENTO = 'L68'
+					and am_documento.CDNLAVORATORE = ?
+					and am_documento_coll.STRCHIAVETABELLA = ?" /> 
+							
+<STATEMENT  name="UPD_STATO_ATTO_CM_ISCR"
+        query="UPDATE AM_CM_ISCR SET  
+                      CODSTATOATTO = ?, 
+                      NUMKLOCMISCR = TO_NUMBER(?) + 1, 
+                      CDNUTMOD = ?,
+                      DTMMOD = SYSDATE                        
+                WHERE PRGCMISCR = ?"/> 			
+
+<STATEMENT name="CHECK_CAN_ISCR"
+            query="SELECT de_stato_occupaz.strdescrizione AS descrizionestato,
+         				de_stato_occupaz_ragg.codstatooccupazragg, 
+         				inf.codcpitit, 
+         				de_cpi.strdescrizione 
+    				FROM am_stato_occupaz
+         			INNER JOIN de_stato_occupaz ON (am_stato_occupaz.codstatooccupaz = de_stato_occupaz.codstatooccupaz)
+         			INNER JOIN de_stato_occupaz_ragg ON (de_stato_occupaz.codstatooccupazragg = de_stato_occupaz_ragg.codstatooccupazragg)
+         			INNER JOIN an_lav_storia_inf inf ON (am_stato_occupaz.cdnlavoratore = inf.cdnlavoratore)
+    		 		left JOIN de_cpi ON (de_cpi.codcpi = inf.codcpitit)		
+   					WHERE am_stato_occupaz.datfine IS NULL
+         			AND am_stato_occupaz.cdnlavoratore = ?
+         			AND inf.datfine IS NULL
+   					ORDER BY am_stato_occupaz.datinizio DESC" />	
+   					
+<STATEMENT name="CHECK_CAN_ISCR_DECRYPT"
+            query="SELECT de_stato_occupaz.strdescrizione AS descrizionestato,
+         				de_stato_occupaz_ragg.codstatooccupazragg, 
+         				inf.codcpitit, 
+         				de_cpi.strdescrizione 
+    				FROM am_stato_occupaz
+         			INNER JOIN de_stato_occupaz ON (am_stato_occupaz.codstatooccupaz = de_stato_occupaz.codstatooccupaz)
+         			INNER JOIN de_stato_occupaz_ragg ON (de_stato_occupaz.codstatooccupazragg = de_stato_occupaz_ragg.codstatooccupazragg)
+         			INNER JOIN an_lav_storia_inf inf ON (am_stato_occupaz.cdnlavoratore = inf.cdnlavoratore)
+    		 		left JOIN de_cpi ON (de_cpi.codcpi = inf.codcpitit)		
+   					WHERE am_stato_occupaz.datfine IS NULL
+         			AND am_stato_occupaz.cdnlavoratore = DECRYPT(?,?)
+         			AND inf.datfine IS NULL
+   					ORDER BY am_stato_occupaz.datinizio DESC" />   		
+   											
+<STATEMENT name="SET_FLAG_LAV_CM_ISCR" query="{ call PG_COLL_MIRATO.setCondIscrLavCM(?, ?, ?) }" />  
+
+<STATEMENT name="AGGIORNA_SCHEDA_LAV_CM_ISCR" query="{ call PG_GESTAMM.pdModSchedaAnagProf(?, ?, sysdate) }" /> 
+ 	
+<STATEMENT
+        name="GetInfoDeDoc_IscrL68"
+        query="SELECT 
+	        		de_doc_tipo.strio striodoc,
+	        		de_doc_tipo.codtipodocumento codtipodoc, 
+	        		de_doc_tipo.strdescrizione strtipodoc,
+	        		de_doc_tipo.codambitodoc codambitodoc,
+	        		de_doc_ambito.strdescrizione strambitodoc 	
+				from de_doc_tipo, de_doc_ambito	  
+				where de_doc_tipo.codambitodoc = de_doc_ambito.codambitodoc
+				and de_doc_tipo.CODTIPODOCUMENTO = 'L68'"/>		
+						   					
+<STATEMENT 	name="STORICO_MODIFICHE_ISCRL68" 
+			query="SELECT UT1.STRCOGNOME || ' ' || UT1.STRNOME AS UTINS,
+						  TO_CHAR(STO.DTMINS,'DD/MM/YYYY HH24:MI') AS DTMINS, 
+						  UT2.STRCOGNOME || ' ' || UT2.STRNOME AS UTMOD,
+						  TIN.STRDESCRIZIONE AS DESCRTIPOINV, 
+						  STO.NUMPERCINVALIDITA AS NUMPERCINV, 
+						  TO_CHAR(STO.DATACCERTSANITARIO,'DD/MM/YYYY') AS DATACCSAN,
+						  DCA.STRDESCRIZIONE AS DESC_ANNOTA,
+						  ACS.STRDESCRIZIONE ||
+                        	DECODE(SYSDATE, GREATEST(SYSDATE, ACS.DATFINEVAL),  ' (scaduto)', 
+                        					LEAST(SYSDATE, ACS.DATINIZIOVAL),' (scaduto)', '') AS DESCRACCSAN,
+                          TO_CHAR(STO.DATANZIANITA68, 'DD/MM/YYYY') DATANZIANITA68, 
+                          DECODE(STO.PRGVERBALEACC,NULL,'',TO_CHAR(VER.DATVERBALEPRIMAIST,'DD/MM/YYYY') || ' - ' || 
+                          	SUBSTR(VER.STRVERBALEPRIMAIST, 0, 50)) AS DESCRVERBACC, 
+                          DECODE(STO.PRGSPIMOD,NULL,'',SPI.STRCOGNOME || ' ' || SPI.STRNOME) AS DESCRSPIMOD, 
+                          STO.STRNOTE, 
+                          DECODE(CODMONOMOTIVOMODIFICA, 'M', 'Modifica situazione', 
+                          		'A', 'Aggiornamento dati', 'E', 'Errore di digitazione', '') AS DESCRMOTMODIFICA                       
+				   FROM AM_CM_ISCR_STORICO STO 
+				   INNER JOIN TS_UTENTE UT1 ON (UT1.CDNUT = STO.CDNUTINS) 
+				   INNER JOIN TS_UTENTE UT2 ON (UT2.CDNUT = STO.CDNUTMOD)
+				   LEFT JOIN DE_CM_TIPO_INVALIDITA TIN ON (STO.CODTIPOINVALIDITA = TIN.CODTIPOINVALIDITA) 
+				   LEFT JOIN DE_CM_ACCERT_SANITARIO ACS ON (STO.CODACCERTSANITARIO = ACS.CODACCERTSANITARIO)
+				   LEFT JOIN CM_VERBALE_ACCERT VER ON (VER.PRGVERBALEACC = STO.PRGVERBALEACC)
+				   LEFT JOIN AN_SPI SPI ON (SPI.PRGSPI = STO.PRGSPIMOD) 
+				   LEFT JOIN DE_CM_ANNOTA DCA ON DCA.CODCMANNOTA = STO.CODCMANNOTA
+				   WHERE STO.PRGCMISCR = ? 
+				   ORDER BY STO.DTMINS DESC"/>
+
+<STATEMENT name="GET_NEW_PRG_CM_ISCR_STORICO"
+           query="SELECT S_AM_CM_ISCR_STORICO.NEXTVAL as PRGCMISCRSTORICO FROM DUAL"/>
+           
+<STATEMENT  name="QUERY_INSERT_ISCR_STORICO"
+        query="INSERT INTO AM_CM_ISCR_STORICO 
+                    (PRGCMISCRSTORICO, PRGCMISCR, NUMPERCINVALIDITA, 
+                     CODACCERTSANITARIO, DATACCERTSANITARIO, STRNOTE, 
+                     CODTIPOINVALIDITA, CODMONOMOTIVOMODIFICA, PRGSPIMOD,
+                     CDNUTINS, CDNUTMOD, DTMINS, DTMMOD,
+                     DATANZIANITA68, PRGVERBALEACC, CODCMANNOTA
+                    )
+             VALUES (?, ?, ?, 
+             		 ?, TO_DATE(?,'DD/MM/YYYY'), ?,  
+                     ?, ?, ?, 
+                     ?, ?, SYSDATE, TO_DATE(?,'DD/MM/YYYY HH24:MI'), 
+                     TO_DATE(?,'DD/MM/YYYY'), ?, ?  
+                    )"/>
+                               
+<STATEMENT  name="GET_DE_CM_ANNOTA"
+        query="SELECT T.CODCMANNOTA CODICE,
+                      T.STRDESCRIZIONE ||
+                        DECODE(SYSDATE, GREATEST(SYSDATE, T.DATFINEVAL),  ' (scaduto)',
+                                                           LEAST   (SYSDATE, T.DATINIZIOVAL),' (scaduto)', 
+                                                           ''
+                                                 ) AS DESCRIZIONE 
+               FROM DE_CM_ANNOTA T
+               "/>           
+ 
+ <STATEMENT  name="GET_PARAM_CONFIG_CM_ISC_1"
+        query="select nvl( (select to_char(ts_config_loc.num) num from ts_config_loc 
+			   			    where strcodrif=(select ts_generale.codprovinciasil from ts_generale) and codtipoconfig='CM_ISC_1') , 0) as PARAM_CM_ISC_1, 
+			   		 (select TS_GENERALE.CODPROVINCIASIL from TS_GENERALE) as CODPROVINCIASIL
+ 			   from DUAL"/>    
+                
+<STATEMENT name="Get_Data_Anz_Disocc"
+            query="select 
+			  to_char(tab.datInizio, 'dd/mm/yyyy') as datinizio, 
+			  to_char(tab.DATANZIANITADISOC,'dd/mm/yyyy') as DATANZIANITADISOC
+			  from
+			  am_stato_occupaz tab,
+			  DE_STATO_OCCUPAZ deso, 
+			  DE_STATO_OCCUPAZ_RAGG desorag
+			  WHERE tab.CDNLAVORATORE = DECRYPT(?,?) 
+			  AND tab.datFine is null
+			  AND tab.codStatoOccupaz = deso.CODSTATOOCCUPAZ
+			  AND deso.CODSTATOOCCUPAZRAGG = desorag.CODSTATOOCCUPAZRAGG        
+			  and deso.CODSTATOOCCUPAZRAGG in ('I', 'D')" />	           
+		
+<!-- Calcolo Punt Presunto ISC -->	  
+			  
+<STATEMENT name="S_Get_Stato_Occup"
+            query=" select count(o.prgstatooccupaz)  AS RESULT_STATO_OCCUP
+           from am_stato_occupaz  o
+           inner join de_stato_occupaz s on s.codstatooccupaz = o.codstatooccupaz
+           where cdnLavoratore = decrypt( ? , ?)
+           and o.datfine is null
+           and s.codstatooccupazragg in ('D', 'I')
+           " />				  
+		
+<STATEMENT name="S_CM_CALCOLO_PUNTEGGIO_PRESUNTO_CM_ISCR"
+           query="{ call ? := PG_COLL_MIRATO.CalcoloPuntPresLavIsc(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) }"
+/>
+
+<STATEMENT name="CM_GET_DATI_ISCRIZIONE_C_P"
+          query="select to_char(ci.datdatainizio, 'dd/mm/yyyy') as datdatainizio,
+					ci.cdnlavoratore, 
+					decode(ci.datanzianita68, null, to_char(ci.datdatainizio, 'dd/mm/yyyy'), to_char(ci.datanzianita68, 'dd/mm/yyyy')) as datanzianita68, 
+					to_char(ci.datanzordpregressa, 'dd/mm/yyyy') as datanzordpregressa,
+					to_char(ci.datsospensione, 'dd/mm/yyyy') as datsospensione, 
+          			ci.nummesisospesterni, 
+          			deisc.codmonotiporagg, nvl(deisc.FLGESCLUDIDAAUTCM, 'N') FLGESCLUDIDAAUTCM
+					from am_cm_iscr ci
+					inner join de_cm_tipo_iscr deisc on deisc.codcmtipoiscr = ci.codcmtipoiscr					
+    				WHERE ci.CODSTATOATTO = 'PR'
+    				and deisc.codmonotiporagg = ?  
+					and ci.cdnlavoratore = encrypt(?,?)
+					and ci.datdatafine is null"
+/>
+
+<STATEMENT name="GET_PRG_ULTIMA_ISCR_LAV_TIPO"
+			query="SELECT iscr.prgcmiscr prgUltimaIscrLavTipo 
+			from am_cm_iscr iscr 
+			join de_cm_tipo_iscr tipoiscr on tipoiscr.codcmtipoiscr = iscr.codcmtipoiscr 
+			inner JOIN AM_DOCUMENTO_COLL COLL ON (Iscr.PRGCMISCR = COLL.STRCHIAVETABELLA)
+			inner JOIN AM_DOCUMENTO DOC ON (COLL.PRGDOCUMENTO = DOC.PRGDOCUMENTO AND DOC.CODTIPODOCUMENTO = 'L68') 
+			where tipoiscr.codmonotiporagg = ? and iscr.cdnlavoratore = ? 
+				  and DOC.cdnlavoratore = DECRYPT(?,?)
+				  and DOC.CODSTATOATTO = 'PR' and iscr.datdatainizio = 
+					(SELECT max(iscr1.datdatainizio) 
+					from am_cm_iscr iscr1 
+					join de_cm_tipo_iscr tipoiscr1 on tipoiscr1.codcmtipoiscr = iscr1.codcmtipoiscr 
+					inner JOIN AM_DOCUMENTO_COLL COLL1 ON (Iscr1.PRGCMISCR = COLL1.STRCHIAVETABELLA)
+					inner JOIN AM_DOCUMENTO DOC1 ON (COLL1.PRGDOCUMENTO = DOC1.PRGDOCUMENTO AND DOC1.CODTIPODOCUMENTO = 'L68') 
+					where tipoiscr1.codmonotiporagg = ? and iscr1.cdnlavoratore = iscr.cdnlavoratore)"
+/>			       
+
+<STATEMENT 	name="GET_LAST_DIAGNOSI_FUNZ_LAV" 
+			query="select prgdiagnosifunzionale,TO_CHAR(datdiagnosi,'dd/mm/yyyy') data_inizio,
+					TO_CHAR(DATFINE,'dd/mm/yyyy') data_fine,
+					TO_CHAR(datrevisioneaccert,'dd/mm/yyyy') data_revisione, FLGINVALIDFISICA, FLGINVALIDPSICHICA,
+FLGINVALIDSENSORIALE, FLGINVALIDINTELLETTIVA, cdnlavoratore from cm_diagnosi_funzionale where cdnlavoratore =  ? and datdiagnosi = (select max(datdiagnosi) from cm_diagnosi_funzionale where cdnlavoratore=?)"
+/>				      					
+
+
+
+<STATEMENT name="CM_GET_LISTA_ISCRIZIONI_DISABILI_L68"
+query="Select 	aci.prgcmiscr,
+				aci.cdnlavoratore, 
+				aci.codcmtipoiscr,
+				dcti.codmonotiporagg, 
+				aci.codmotivofineatto,
+        		aci.codstatoAtto,
+        		aci.strnote,
+        		aci.prgspimod,
+        		to_char(aci.dataccertsanitario, 'DD/MM/YYYY') dataccertsanitario, 		
+				to_char(aci.datdatainizio, 'DD/MM/YYYY') datdatainizio, 
+				to_char(aci.datdatafine, 'DD/MM/YYYY') datdatafine, 
+				to_char(aci.datultimaiscr, 'DD/MM/YYYY') datultimaiscr,
+				To_Char(Aci.Datanzianita68, 'DD/MM/YYYY') Datanzianita68, 		
+				Dctinv.Strdescrizione As tipoinvalidita,
+				aci.numpercinvalidita as percinvalidita,
+        		dcas.strdescrizione as accertSanitario,
+        		dmfa.strdescrizione as motivoFineAtto,
+        		aci.codtipoinvalidita as codtipoInvalidita,
+        		aci.PRGVERBALEACC,
+        		aci.CODACCERTSANITARIO,        		              
+                aci.numklocmiscr,
+                aci.cdnutmod,
+                to_char(aci.dtmmod, 'DD/MM/YYYY') dtmmod,
+                aci.codcmannota,
+                nvl(dcti.FLGESCLUDIDAAUTCM, 'N') FLGESCLUDIDAAUTCM
+                From Am_Cm_Iscr Aci
+				Left Join De_Cm_Tipo_Invalidita Dctinv On (Aci.Codtipoinvalidita = Dctinv.Codtipoinvalidita)
+        		left join de_cm_accert_sanitario dcas on (aci.codaccertsanitario = dcas.codaccertsanitario)
+        		left join de_motivo_fine_atto dmfa on (aci.codmotivofineatto = dmfa.codmotivofineatto)
+				Join De_Cm_Tipo_Iscr Dcti On (Aci.Codcmtipoiscr = Dcti.Codcmtipoiscr)
+				Join Am_Documento_Coll adc On (aci.Prgcmiscr = adc.Strchiavetabella) 
+				Join Am_Documento ad On (adc.Prgdocumento = ad.Prgdocumento) 
+				Where Dcti.Codmonotiporagg = 'D'
+				 And Ad.Codtipodocumento = 'L68'
+				 And Ad.Codstatoatto != 'AN'
+				 and aci.cdnlavoratore = ?
+				 and Ad.cdnlavoratore = DECRYPT(?,?)
+				Order By aci.Datdatainizio Desc"/>
+				
+<STATEMENT 	name="CM_GET_LAV_IS_ISCRITTO" 
+			query="select count(*) as ISCRIZIONE
+				from AM_CM_ISCR isc
+				where isc.DATDATAFINE is null and DECRYPT(isc.CDNLAVORATORE,?) = ?"
+/>	

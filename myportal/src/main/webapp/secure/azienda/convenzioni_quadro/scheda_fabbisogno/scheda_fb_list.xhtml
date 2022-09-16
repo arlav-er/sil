@@ -1,0 +1,74 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite/components"
+	template="../../../template/main_primefaces.xhtml">
+<ui:param name="pagetitle" value="Schede Fabbisogno" />
+<ui:define name="content">
+	<div class="widget_container">
+		<h1>
+			Schede fabbisogno per la checklist 
+			<h:outputText rendered="not empty #{fbSchedaListBean.checklist.dtPubblicazione}" value="#{fbSchedaListBean.checklist.dtPubblicazione}">
+				del <f:convertDateTime pattern="dd/MM/yyyy" />
+			</h:outputText>
+		</h1>
+		<h:form id="schedaFabbisognoForm">
+		<p:dataTable id="schedeFbTable" value="#{fbSchedaListBean.checklist.fbSchedaFabbisognoList}" 
+			paginator="true" rows="10" rowsPerPageTemplate="5, 10, 15" var="schedaFb"
+			paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+			emptyMessage="Nessuna scheda fabbisogno trovata" paginatorAlwaysVisible="false">
+			<p:column headerText="Data Creazione">
+				<h:outputText value="#{schedaFb.dtmIns}">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Stato">
+				#{schedaFb.deStatoScheda.descrizione}
+			</p:column>
+			<p:column headerText="Azioni">
+				<p:button outcome="scheda_fb_form"  title="Modifica scheda fabbisogno" icon="ui-icon ui-icon-pencil fix_icon" rendered="#{fbSchedaListBean.checklist.isModificabileSchedaFabbisogno(schedaFb)}">
+				<f:param name="idFbSchedaFabbisogno" value="#{schedaFb.id}" />
+				</p:button>
+				<p:button  title="Dettaglio scheda fabbisogno"  icon="ui-icon-search" outcome="scheda_fb_form"
+						rendered="#{fbSchedaListBean.checklist.canDettaglioSchedaFabbisogno(schedaFb)}">
+				<f:param name="idFbSchedaFabbisogno" value="#{schedaFb.id}"/>		
+					</p:button>	
+				<p:commandButton  title="Elimina Scheda fabbisogno"  icon="ui-icon-trash" actionListener="#{fbSchedaListBean.setEliminateFbSchedaFabbisognoDTO(schedaFb)}"
+						rendered="#{fbSchedaListBean.checklist.isModificabileSchedaFabbisogno(schedaFb)}" process="@form" update="@form" 
+						onclick="PF('confermaEliminazioneDialogWV').show();"/>		
+			</p:column>
+		</p:dataTable>
+		  <ui:fragment rendered="#{fbSchedaListBean.showEliminaSchedaError}">
+						<p></p>
+						<p:messages id="messages" globalOnly="true"></p:messages>
+					</ui:fragment> 
+		<div>
+			<ui:fragment rendered="#{fbSchedaListBean.checklist.isChiusa()}">
+				<h3 class="margin-1em">La checklist è chiusa: non è possibile creare nuove Schede Fabbisogno.</h3>
+			</ui:fragment>
+			
+			<p:button value="Crea nuova scheda" outcome="scheda_fb_form" styleClass="margin-1em"
+				rendered="#{fbSchedaListBean.checklist.canCreaSchedaFabbisogno()}">
+				<f:param name="idFbChecklist" value="#{fbSchedaListBean.checklist.id}" />
+			</p:button>
+			<p:button value="Torna alle checklist" outcome="../checklist/checklist_list.xhtml"
+				styleClass="margin-1em">
+			</p:button>
+		</div>
+		</h:form>
+	</div>
+	
+	 
+	<p:dialog id="confermaEliminazioneDialog" widgetVar="confermaEliminazioneDialogWV" modal="true" width="400" header="Elimina Scheda Fabbisogno" >
+	  <p>Confermi l’eliminazione della Scheda Fabbisogno?</p> 
+	  <div class="text-center">
+			<p:commandButton value="Conferma eliminazione" title="Conferma eliminazione"
+				actionListener="#{fbSchedaListBean.eliminaSchedaFabbisogno}" styleClass="margin-1em" 
+				update=":schedaFabbisognoForm" onclick="PF('confermaEliminazioneDialogWV').hide();"/>
+			<p:commandButton value="Annulla" title="Annulla" onclick="PF('confermaEliminazioneDialogWV').hide();" />
+		</div> 
+	</p:dialog>
+</ui:define>
+</ui:composition>
