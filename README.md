@@ -21,6 +21,7 @@ Ogni modulo eroga dei servizi specifici, comunicano tra di loro tramite lo scamb
 
 ### Architettura applicativa
 Il SIL è costituito da una serie di applicazioni web che girano su **JBoss 7.1.3 su Java 7** con database **Postgres 9+** oppure **EAP 7.2.7 su Java 11** con database **Oracle 12+**.
+Ogni applicazione web è un modulo a sè stante ed è autoconsistente nel senso che per la compilazione e l'esecuzione non necessita degli altri moduli alcuni dei quali sono diventano necessari in senso funzionale (MyCas e MyAuthService, che gestiscono l'autenticazione e le autorizzazioni degli utenti sono obbligatori per il corretto funzionamento del sistema).
 
 Nel dettaglio le applicazioni:
   - myaccount
@@ -36,7 +37,9 @@ mentre le applicazioni
  girano su EAP 7.2.7 su Java 11 ed usano un DB Oracle i cui script di creazione sono reperibili in **database/oracle**
  
 ### Compilazione dei moduli del sistema e creazione dei relativi pacchetti
-Si faccia riferimento al **README** pressente in ogni modulo per le istrzioni di compilazione dei sorgenti e creazione dei relativi pacchetti
+Si faccia riferimento al **README** pressente in ogni modulo per le istruzioni di compilazione dei sorgenti e per la creazione dei relativi pacchetti.
+Relativamente alla compilazione i vari moduli sono indipendenti fra di loro.
+
 
  
 

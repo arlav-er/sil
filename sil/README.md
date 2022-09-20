@@ -19,3 +19,5 @@ Dopo di che per la compilazione è necessario eseguire il comando maven:
 **mvn clean package**
 
 L'artefatto prodotto va pubblicato nella folder di deployments di EAP 7.2.7.
+
+Si noti che per la presenza di libreria usate per la generazione di ducumenti **pdf** (librerie "InetSoftware") non open source la compilazione non va a buon fine se non risultano essere disponibili ed accessibili a Maven tali artefatti.
